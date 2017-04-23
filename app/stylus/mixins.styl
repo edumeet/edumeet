@@ -1,0 +1,33 @@
+placeholder()
+	&::-webkit-input-placeholder
+		{block}
+	&:-moz-placeholder
+		{block}
+	&::-moz-placeholder
+		{block}
+	&:-ms-input-placeholder
+		{block}
+
+text-fill-color()
+	-webkit-text-fill-color: arguments;
+	-moz-text-fill-color: arguments;
+	text-fill-color: arguments;
+
+mobile()
+	@media (max-device-width: 720px)
+		{block}
+
+desktop()
+	@media (min-device-width: 721px)
+		{block}
+
+TransitionAppear($duration = 1s, $appearOpacity = 0, $activeOpacity = 1)
+	will-change: opacity;
+
+	&.transition-appear
+		opacity: $appearOpacity;
+
+	&.transition-appear.transition-appear-active
+		transition-property: opacity;
+		transition-duration: $duration;
+		opacity: $activeOpacity;

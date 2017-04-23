@@ -1,0 +1,114 @@
+[data-component='Room'] {
+	position: relative;
+	overflow: auto;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	+desktop() {
+		min-height: 100vh;
+		width: 100%;
+	}
+
+	> .room-link-wrapper {
+		pointer-events: none;
+		position: absolute;
+		z-index: 1;
+		top: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+
+		> .room-link {
+			width: auto;
+			background-color: rgba(#fff, 0.8);
+			border-bottom-right-radius: 4px;
+			border-bottom-left-radius: 4px;
+			box-shadow: 0px 3px 12px 2px rgba(#111, 0.4);
+
+			> a.link {
+				display: block;;
+				user-select: none;
+				pointer-events: auto;
+				padding: 10px 20px;
+				color: #104758;
+				font-size: 16px;
+				cursor: pointer;
+				text-decoration: none;
+				transition-property: opacity;
+				transition-duration: 0.25s;
+				opacity: 0.8;
+
+				&:hover {
+					opacity: 1;
+					text-decoration: underline;
+				}
+			}
+		}
+	}
+
+	> .remote-videos {
+		+desktop() {
+			min-height: 100vh;
+			width: 100%;
+			padding-bottom: 150px;
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			align-content: center;
+		}
+
+		+mobile() {
+			min-height: 100vh;
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+	}
+
+	> .local-video {
+		position: fixed;
+		display: flex;
+		flex-direction: row;
+		z-index: 100;
+		box-shadow: 0px 5px 12px 2px rgba(#111, 0.5);
+
+		+desktop() {
+			bottom: 20px;
+			left: 20px;
+		}
+
+		+mobile() {
+			bottom: 10px;
+			left: 10px;
+		}
+
+		> .show-stats {
+			position: absolute;
+			bottom: 5px;
+			right: -40px;
+			width: 30px;
+			height: 30px;
+			background-image: url('/resources/images/stats.svg');
+			background-position: center;
+			background-size: cover;
+			background-repeat: no-repeat;
+			background-color: rgba(#000, 0.25);
+			border-radius: 4px;
+			cursor: pointer;
+			opacity: 0.85;
+			transition-duration: 0.25s;
+
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
+}

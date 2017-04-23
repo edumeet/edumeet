@@ -1,0 +1,67 @@
+@import 'nib';
+
+global-reset();
+
+@import './mixins';
+@import './fonts';
+
+html {
+	font-family: 'Roboto';
+	background-image: url('/resources/images/body-bg-2.jpg');
+	background-attachment: fixed;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	min-height: 100vh;
+	width: 100%;
+	font-weight: 400;
+
+	+desktop() {
+		font-size: 16px;
+	}
+
+	+mobile() {
+		font-size: 12px;
+	}
+}
+
+body {
+	background: none;
+}
+
+* {
+	box-sizing: border-box;
+	outline: none;
+}
+
+#mediasoup-demo-app-container {
+	min-height: 100vh;
+	width: 100%;
+
+	// Components
+	@import './components/App';
+	@import './components/Room';
+	@import './components/LocalVideo';
+	@import './components/RemoteVideo';
+	@import './components/Video';
+	@import './components/Stats';
+}
+
+// Hack to detect in JS the current media query
+#mediasoup-demo-app-media-query-detector {
+	position: relative;
+	z-index: -1000;
+	bottom: 0;
+	left: 0;
+	height: 1px;
+	width: 1px;
+
+	// In desktop let it "visible" so elem.offsetParent returns the parent element
+	+desktop() {}
+
+	// In mobile ensure it's not displayed so elem.offsetParent returns null
+	+mobile() {
+		display: none;
+		position: fixed; // Required for old IE
+	}
+}
