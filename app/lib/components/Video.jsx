@@ -90,12 +90,12 @@ export default class Video extends React.Component
 
 			this._hark.on('speaking', () =>
 			{
-				logger.debug('hark "speaking" event');
+				// logger.debug('hark "speaking" event');
 			});
 
 			this._hark.on('stopped_speaking', () =>
 			{
-				logger.debug('hark "stopped_speaking" event');
+				// logger.debug('hark "stopped_speaking" event');
 
 				this.setState({ volume: 0 });
 			});

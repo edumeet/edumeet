@@ -33,7 +33,10 @@ export default class RemoteVideo extends React.Component
 		return (
 			<div
 				data-component='RemoteVideo'
-				className={classnames({ fullsize: !!props.fullsize })}
+				className={classnames({
+					fullsize         : !!props.fullsize,
+					'active-speaker' : props.isActiveSpeaker
+				})}
 			>
 				<Video
 					stream={props.stream}
@@ -93,9 +96,10 @@ export default class RemoteVideo extends React.Component
 
 RemoteVideo.propTypes =
 {
-	peer           : React.PropTypes.object.isRequired,
-	stream         : React.PropTypes.object.isRequired,
-	fullsize       : React.PropTypes.bool,
-	onDisableVideo : React.PropTypes.func.isRequired,
-	onEnableVideo  : React.PropTypes.func.isRequired
+	peer            : React.PropTypes.object.isRequired,
+	stream          : React.PropTypes.object.isRequired,
+	fullsize        : React.PropTypes.bool,
+	isActiveSpeaker : React.PropTypes.bool.isRequired,
+	onDisableVideo  : React.PropTypes.func.isRequired,
+	onEnableVideo   : React.PropTypes.func.isRequired
 };

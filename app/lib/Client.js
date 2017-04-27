@@ -28,6 +28,9 @@ export default class Client extends events.EventEmitter
 		super();
 		this.setMaxListeners(Infinity);
 
+		// TODO: TMP
+		global.CLIENT = this;
+
 		let url = urlFactory.getProtooUrl(peerId, roomId);
 		let transport = new protooClient.WebSocketTransport(url);
 
@@ -708,6 +711,16 @@ export default class Client extends events.EventEmitter
 				break;
 			}
 
+			case 'activespeaker':
+			{
+				let data = request.data;
+
+				this.emit('activespeaker', data.peer, data.level);
+				accept();
+
+				break;
+			}
+
 			default:
 			{
 				logger.error('unknown method');
@@ -776,7 +789,6 @@ export default class Client extends events.EventEmitter
 		this._peerconnection = new RTCPeerConnection({ iceServers: [] });
 
 		// TODO: TMP
-		global.CLIENT = this;
 		global.PC = this._peerconnection;
 
 		if (this._localStream)

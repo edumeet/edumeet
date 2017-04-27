@@ -9,6 +9,7 @@ const config = require('../config');
 const MAX_BITRATE = config.mediasoup.maxBitrate || 3000000;
 const MIN_BITRATE = Math.min(50000 || MAX_BITRATE);
 const BITRATE_FACTOR = 0.75;
+const MIN_AUDIO_LEVEL = -50;
 
 class Room extends EventEmitter
 {
@@ -30,6 +31,8 @@ class Room extends EventEmitter
 		this._pendingProtooPeers = [];
 		// Current max bitrate for all the participants.
 		this._maxBitrate = MAX_BITRATE;
+		// Current active speaker mediasoup Peer.
+		this._activeSpeaker = null;
 
 		// Create a mediasoup room.
 		mediaServer.createRoom(
@@ -52,6 +55,60 @@ class Room extends EventEmitter
 						{
 							this._updateMaxBitrate();
 						});
+					});
+
+					this._mediaRoom.on('audiolevels', (entries) =>
+					{
+						logger.debug('room "audiolevels" event');
+
+						for (let entry of entries)
+						{
+							logger.debug('- [peer name:%s, rtpReceiver.id:%s, audio level:%s]',
+								entry.peer.name, entry.rtpReceiver.id, entry.audioLevel);
+						}
+
+						let activeSpeaker;
+						let activeLevel;
+
+						if (entries.length > 0)
+						{
+							activeSpeaker = entries[0].peer;
+							activeLevel = entries[0].audioLevel;
+
+							if (activeLevel < MIN_AUDIO_LEVEL)
+							{
+								activeSpeaker = null;
+								activeLevel = undefined;
+							}
+						}
+						else
+						{
+							activeSpeaker = null;
+						}
+
+						if (this._activeSpeaker !== activeSpeaker)
+						{
+							let data = {};
+
+							if (activeSpeaker)
+							{
+								logger.debug('active speaker [peer:"%s", volume:%s]',
+									activeSpeaker.name, activeLevel);
+
+								data.peer = { id: activeSpeaker.name };
+								data.level = activeLevel;
+							}
+							else
+							{
+								logger.debug('no current speaker');
+
+								data.peer = null;
+							}
+
+							this._protooRoom.spread('activespeaker', data);
+						}
+
+						this._activeSpeaker = activeSpeaker;
 					});
 				});
 

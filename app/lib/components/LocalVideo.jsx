@@ -5,6 +5,7 @@ import IconButton from 'material-ui/IconButton/IconButton';
 import MicOffIcon from 'material-ui/svg-icons/av/mic-off';
 import VideoCamOffIcon from 'material-ui/svg-icons/av/videocam-off';
 import ChangeVideoCamIcon from 'material-ui/svg-icons/av/repeat';
+import classnames from 'classnames';
 import Video from './Video';
 import Logger from '../Logger';
 
@@ -30,7 +31,12 @@ export default class LocalVideo extends React.Component
 		let state = this.state;
 
 		return (
-			<div data-component='LocalVideo' className={`state-${props.connectionState}`}>
+			<div
+				data-component='LocalVideo'
+				className={classnames(`state-${props.connectionState}`, {
+					'active-speaker' : props.isActiveSpeaker
+				})}
+			>
 				{props.stream ?
 					<Video
 						stream={props.stream}
@@ -141,6 +147,7 @@ LocalVideo.propTypes =
 	multipleWebcams    : React.PropTypes.bool.isRequired,
 	webcamType         : React.PropTypes.string,
 	connectionState    : React.PropTypes.string,
+	isActiveSpeaker    : React.PropTypes.bool.isRequired,
 	onMicMute          : React.PropTypes.func.isRequired,
 	onWebcamToggle     : React.PropTypes.func.isRequired,
 	onWebcamChange     : React.PropTypes.func.isRequired,

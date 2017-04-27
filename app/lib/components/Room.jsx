@@ -29,7 +29,8 @@ export default class Room extends React.Component
 			connectionState      : null,
 			remoteStreams        : {},
 			showStats            : false,
-			stats                : null
+			stats                : null,
+			activeSpeakerId      : null
 		};
 
 		// Mounted flag
@@ -89,6 +90,7 @@ export default class Room extends React.Component
 											peer={peer}
 											stream={stream}
 											fullsize={numPeers === 1}
+											isActiveSpeaker={peer.id === state.activeSpeakerId}
 											onDisableVideo={this.handleDisableRemoteVideo.bind(this)}
 											onEnableVideo={this.handleEnableRemoteVideo.bind(this)}
 										/>
@@ -107,6 +109,7 @@ export default class Room extends React.Component
 								multipleWebcams={state.multipleWebcams}
 								webcamType={state.webcamType}
 								connectionState={state.connectionState}
+								isActiveSpeaker={props.peerId === state.activeSpeakerId}
 								onMicMute={this.handleLocalMute.bind(this)}
 								onWebcamToggle={this.handleLocalWebcamToggle.bind(this)}
 								onWebcamChange={this.handleLocalWebcamChange.bind(this)}
@@ -296,8 +299,12 @@ export default class Room extends React.Component
 
 		this._client.on('close', (error) =>
 		{
-			// Clear remote streams (for reconnections).
-			this.setState({ remoteStreams: {} });
+			// Clear remote streams (for reconnections) and more stuff.
+			this.setState(
+				{
+					remoteStreams   : {},
+					activeSpeakerId : null
+				});
 
 			if (error)
 			{
@@ -430,6 +437,14 @@ export default class Room extends React.Component
 			// Just firef for Firefox due to bug:
 			// https://bugzilla.mozilla.org/show_bug.cgi?id=1347578
 			this.forceUpdate();
+		});
+
+		this._client.on('activespeaker', (peer) =>
+		{
+			this.setState(
+				{
+					activeSpeakerId : (peer ? peer.id : null)
+				});
 		});
 	}
 

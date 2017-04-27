@@ -21,7 +21,7 @@
 	}
 
 	&.state-checking {
-		animation: LocalVideo-state-checking .75s infinite linear;
+		animation: LocalVideo-state-checking .5s infinite linear;
 	}
 
 	&.state-connected,
@@ -33,6 +33,10 @@
 	&.state-disconnected,
 	&.state-closed {
 		border-color: rgba(#ff2000, 0.75);
+	}
+
+	&.active-speaker {
+		border-color: rgba(#fff, 0.9);
 	}
 
 	> .controls {
