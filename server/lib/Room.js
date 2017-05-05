@@ -380,12 +380,15 @@ class Room extends EventEmitter
 									.then(() =>
 									{
 										if (disable)
-											return videoRtpSender.disable();
+											return videoRtpSender.disable({ emit: false });
 										else
-											return videoRtpSender.enable();
+											return videoRtpSender.enable({ emit: false });
 									})
 									.then(() =>
 									{
+										logger.log('"disableremotevideo" request succeed [disable:%s]',
+											!!disable);
+
 										accept();
 									})
 									.catch((error) =>

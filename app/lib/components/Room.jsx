@@ -242,14 +242,14 @@ export default class Room extends React.Component
 	{
 		logger.debug('handleDisableRemoteVideo() [msid:"%s"]', msid);
 
-		this._client.disableRemoteVideo(msid);
+		return this._client.disableRemoteVideo(msid);
 	}
 
 	handleEnableRemoteVideo(msid)
 	{
 		logger.debug('handleEnableRemoteVideo() [msid:"%s"]', msid);
 
-		this._client.enableRemoteVideo(msid);
+		return this._client.enableRemoteVideo(msid);
 	}
 
 	_runClient()

@@ -369,7 +369,7 @@ export default class Client extends events.EventEmitter
 
 	disableRemoteVideo(msid)
 	{
-		this._protooPeer.send('disableremotevideo', { msid, disable: true })
+		return this._protooPeer.send('disableremotevideo', { msid, disable: true })
 			.catch((error) =>
 			{
 				logger.warn('disableRemoteVideo() failed: %o', error);
@@ -378,7 +378,7 @@ export default class Client extends events.EventEmitter
 
 	enableRemoteVideo(msid)
 	{
-		this._protooPeer.send('disableremotevideo', { msid, disable: false })
+		return this._protooPeer.send('disableremotevideo', { msid, disable: false })
 			.catch((error) =>
 			{
 				logger.warn('enableRemoteVideo() failed: %o', error);

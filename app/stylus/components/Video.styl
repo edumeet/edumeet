@@ -2,6 +2,12 @@
 	position: relative;
 	height: 100%;
 	width: 100%;
+	object-fit: cover;
+	background-color: rgba(#041918, 0.65);
+	background-image: url('/resources/images/buddy.svg');
+	background-position: bottom;
+	background-size: auto 85%;
+	background-repeat: no-repeat;
 	overflow: hidden;
 
 	> .resolution {
@@ -66,14 +72,13 @@
 		height: 100%;
 		width: 100%;
 		object-fit: cover;
-		background-color: rgba(#041918, 0.65);
-		background-image: url('/resources/images/buddy.svg');
-		background-position: bottom;
-		background-size: auto 85%;
-		background-repeat: no-repeat;
 
 		&.mirror {
 			transform: scaleX(-1);
+		}
+
+		&.hidden {
+			display: none;
 		}
 	}
 }

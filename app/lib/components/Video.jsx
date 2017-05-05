@@ -63,7 +63,11 @@ export default class Video extends React.Component
 
 				<video
 					ref='video'
-					className={classnames({ mirror: props.mirror })}
+					className={classnames(
+						{
+							mirror : props.mirror,
+							hidden : props.videoDisabled
+						})}
 					autoPlay
 					muted={props.muted}
 				/>
@@ -74,6 +78,7 @@ export default class Video extends React.Component
 	componentDidMount()
 	{
 		let stream = this.props.stream;
+		let videoDisabled = !!this.props.videoDisabled;
 		let video = this.refs.video;
 
 		video.srcObject = stream;
@@ -81,6 +86,9 @@ export default class Video extends React.Component
 		this._showVideoResolution();
 		this._videoResolutionTimer = setInterval(() =>
 		{
+			if (!videoDisabled)
+				return;
+
 			this._showVideoResolution();
 		}, 500);
 
@@ -228,6 +236,7 @@ Video.propTypes =
 	stream             : React.PropTypes.object.isRequired,
 	resolution         : React.PropTypes.string,
 	muted              : React.PropTypes.bool,
+	videoDisabled      : React.PropTypes.bool,
 	mirror             : React.PropTypes.bool,
 	onResolutionChange : React.PropTypes.func
 };

@@ -20,15 +20,29 @@ export default class RemoteVideo extends React.Component
 		{
 			audioMuted : false
 		};
+
+		let videoTrack = props.stream.getVideoTracks()[0];
+
+		if (videoTrack)
+		{
+			videoTrack.addEventListener('mute', () =>
+			{
+				logger.debug('video track "mute" event');
+			});
+
+			videoTrack.addEventListener('unmute', () =>
+			{
+				logger.debug('video track "unmute" event');
+			});
+		}
 	}
 
 	render()
 	{
 		let props = this.props;
 		let state = this.state;
-		let hasVideo = !!props.stream.getVideoTracks()[0];
-
-		global.SS = props.stream;
+		let videoTrack = props.stream.getVideoTracks()[0];
+		let videoEnabled = videoTrack && videoTrack.enabled;
 
 		return (
 			<div
@@ -41,6 +55,7 @@ export default class RemoteVideo extends React.Component
 				<Video
 					stream={props.stream}
 					muted={state.audioMuted}
+					videoDisabled={!videoEnabled}
 				/>
 
 				<div className='controls'>
@@ -53,14 +68,16 @@ export default class RemoteVideo extends React.Component
 						/>
 					</IconButton>
 
-					<IconButton
-						className='control'
-						onClick={this.handleClickDisableVideo.bind(this)}
-					>
-						<VideoOffIcon
-							color={hasVideo ? '#fff' : '#ff8a00'}
-						/>
-					</IconButton>
+					{videoTrack ?
+						<IconButton
+							className='control'
+							onClick={this.handleClickDisableVideo.bind(this)}
+						>
+							<VideoOffIcon
+								color={videoEnabled ? '#fff' : '#ff8a00'}
+							/>
+						</IconButton>
+					:null}
 				</div>
 
 				<div className='info'>
@@ -83,14 +100,29 @@ export default class RemoteVideo extends React.Component
 	{
 		logger.debug('handleClickDisableVideo()');
 
+		let videoTrack = this.props.stream.getVideoTracks()[0];
+		let videoEnabled = videoTrack && videoTrack.enabled;
 		let stream = this.props.stream;
 		let msid = stream.id;
-		let hasVideo = !!stream.getVideoTracks()[0];
 
-		if (hasVideo)
-			this.props.onDisableVideo(msid);
+		if (videoEnabled)
+		{
+			this.props.onDisableVideo(msid)
+				.then(() =>
+				{
+					videoTrack.enabled = false;
+					this.forceUpdate();
+				});
+		}
 		else
-			this.props.onEnableVideo(msid);
+		{
+			this.props.onEnableVideo(msid)
+				.then(() =>
+				{
+					videoTrack.enabled = true;
+					this.forceUpdate();
+				});
+		}
 	}
 }
 
