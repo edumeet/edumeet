@@ -78,7 +78,6 @@ export default class Video extends React.Component
 	componentDidMount()
 	{
 		let stream = this.props.stream;
-		let videoDisabled = !!this.props.videoDisabled;
 		let video = this.refs.video;
 
 		video.srcObject = stream;
@@ -86,9 +85,6 @@ export default class Video extends React.Component
 		this._showVideoResolution();
 		this._videoResolutionTimer = setInterval(() =>
 		{
-			if (!videoDisabled)
-				return;
-
 			this._showVideoResolution();
 		}, 500);
 

@@ -12,7 +12,7 @@ import Logger from './Logger';
 import utils from './utils';
 import App from './components/App';
 
-const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#room-id=([0-9a-zA-Z]+)$');
+const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#room-id=([0-9a-zA-Z_\-]+)$');
 const logger = new Logger();
 
 logger.debug('detected browser [name:"%s", version:%s]', browser.name, browser.version);

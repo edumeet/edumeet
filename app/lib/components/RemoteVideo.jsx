@@ -8,7 +8,7 @@ import classnames from 'classnames';
 import Video from './Video';
 import Logger from '../Logger';
 
-const logger = new Logger('RemoteVideo'); // eslint-disable-line no-unused-vars
+const logger = new Logger('RemoteVideo');
 
 export default class RemoteVideo extends React.Component
 {
