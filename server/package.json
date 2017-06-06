@@ -10,7 +10,7 @@
     "colors": "^1.1.2",
     "debug": "^2.6.4",
     "express": "^4.15.2",
-    "mediasoup": "^1.0.1",
+    "mediasoup": "^1.2.3",
     "protoo-server": "^1.1.4"
   },
   "devDependencies": {

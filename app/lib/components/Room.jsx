@@ -2,12 +2,13 @@
 
 import React from 'react';
 import ClipboardButton from 'react-clipboard.js';
+import browser from 'bowser';
 import TransitionAppear from './TransitionAppear';
 import LocalVideo from './LocalVideo';
 import RemoteVideo from './RemoteVideo';
 import Stats from './Stats';
 import Logger from '../Logger';
-import utils from '../utils';
+import * as utils from '../utils';
 import Client from '../Client';
 
 const logger = new Logger('Room');
@@ -285,8 +286,8 @@ export default class Room extends React.Component
 					imageHeight : 80
 				});
 
-			// Start retrieving WebRTC stats (unless mobile)
-			if (utils.isDesktop())
+			// Start retrieving WebRTC stats (unless mobile or Edge).
+			if (utils.isDesktop() && !browser.msedge)
 			{
 				this.setState({ showStats: true });
 
@@ -475,10 +476,10 @@ export default class Room extends React.Component
 
 					this.setState({ stats: null });
 
-					this._statsTimer = setTimeout(() =>
-					{
-						getStats.call(this);
-					}, STATS_INTERVAL);
+					// this._statsTimer = setTimeout(() =>
+					// {
+					// 	getStats.call(this);
+					// }, STATS_INTERVAL);
 				});
 		}
 	}

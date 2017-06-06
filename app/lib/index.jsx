@@ -9,13 +9,26 @@ import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import randomString from 'random-string';
 import Logger from './Logger';
-import utils from './utils';
+import * as utils from './utils';
+import edgeRTCPeerConnection from './edge/RTCPeerConnection';
+import edgeRTCSessionDescription from './edge/RTCSessionDescription';
 import App from './components/App';
+
+// TODO: TMP
+global.BROWSER = browser;
 
 const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#room-id=([0-9a-zA-Z_\-]+)$');
 const logger = new Logger();
 
-logger.debug('detected browser [name:"%s", version:%s]', browser.name, browser.version);
+logger.warn('detected browser [name:"%s", version:%s]', browser.name, browser.version);
+
+if (browser.msedge)
+{
+	logger.warn('EDGE detected, overriding WebRTC global classes');
+
+	window.RTCPeerConnection = edgeRTCPeerConnection;
+	window.RTCSessionDescription = edgeRTCSessionDescription;
+}
 
 injectTapEventPlugin();
 

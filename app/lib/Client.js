@@ -5,8 +5,8 @@ import browser from 'bowser';
 import sdpTransform from 'sdp-transform';
 import Logger from './Logger';
 import protooClient from 'protoo-client';
-import urlFactory from './urlFactory';
-import utils from './utils';
+import * as urlFactory from './urlFactory';
+import * as utils from './utils';
 
 const logger = new Logger('Client');
 
