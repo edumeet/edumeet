@@ -36,7 +36,7 @@ export function isMobile()
 
 export function isPlanB()
 {
-	if (browser.chrome || browser.chromium || browser.opera || browser.msedge)
+	if (browser.chrome || browser.chromium || browser.opera || browser.safari || browser.msedge)
 		return true;
 	else
 		return false;
