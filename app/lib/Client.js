@@ -132,10 +132,8 @@ export default class Client extends events.EventEmitter
 			return Promise.reject(new Error('no video track'));
 		}
 
-		stream.removeTrack(videoTrack);
 		videoTrack.stop();
 
-		// NOTE: For Firefox (modern WenRTC API).
 		if (this._peerconnection.removeTrack)
 		{
 			let sender;
@@ -147,6 +145,10 @@ export default class Client extends events.EventEmitter
 			}
 
 			this._peerconnection.removeTrack(sender);
+		}
+		else
+		{
+			stream.removeTrack(videoTrack);
 		}
 
 		if (!dontNegotiate)
@@ -185,11 +187,14 @@ export default class Client extends events.EventEmitter
 
 				if (stream)
 				{
+					// Fucking hack for adapter.js in Chrome.
+					if (this._peerconnection.removeStream)
+						this._peerconnection.removeStream(stream);
+
 					stream.addTrack(newVideoTrack);
 
-					// NOTE: For Firefox (modern WenRTC API).
 					if (this._peerconnection.addTrack)
-						this._peerconnection.addTrack(newVideoTrack, this._localStream);
+						this._peerconnection.addTrack(newVideoTrack, stream);
 				}
 				else
 				{

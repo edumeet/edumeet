@@ -14,23 +14,20 @@ import edgeRTCPeerConnection from './edge/RTCPeerConnection';
 import edgeRTCSessionDescription from './edge/RTCSessionDescription';
 import App from './components/App';
 
-// TODO: TMP
-global.BROWSER = browser;
-
 const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#room-id=([0-9a-zA-Z_\-]+)$');
 const logger = new Logger();
 
-logger.warn('detected browser [name:"%s", version:%s]', browser.name, browser.version);
+injectTapEventPlugin();
+
+logger.debug('detected browser [name:"%s", version:%s]', browser.name, browser.version);
 
 if (browser.msedge)
 {
-	logger.warn('EDGE detected, overriding WebRTC global classes');
+	logger.debug('EDGE detected, overriding WebRTC global classes');
 
 	window.RTCPeerConnection = edgeRTCPeerConnection;
 	window.RTCSessionDescription = edgeRTCSessionDescription;
 }
-
-injectTapEventPlugin();
 
 domready(() =>
 {
