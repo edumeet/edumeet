@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import IconButton from 'material-ui/IconButton/IconButton';
 import VolumeOffIcon from 'material-ui/svg-icons/av/volume-off';
 import VideoOffIcon from 'material-ui/svg-icons/av/videocam-off';
@@ -128,10 +129,10 @@ export default class RemoteVideo extends React.Component
 
 RemoteVideo.propTypes =
 {
-	peer            : React.PropTypes.object.isRequired,
-	stream          : React.PropTypes.object.isRequired,
-	fullsize        : React.PropTypes.bool,
-	isActiveSpeaker : React.PropTypes.bool.isRequired,
-	onDisableVideo  : React.PropTypes.func.isRequired,
-	onEnableVideo   : React.PropTypes.func.isRequired
+	peer            : PropTypes.object.isRequired,
+	stream          : PropTypes.object.isRequired,
+	fullsize        : PropTypes.bool,
+	isActiveSpeaker : PropTypes.bool.isRequired,
+	onDisableVideo  : PropTypes.func.isRequired,
+	onEnableVideo   : PropTypes.func.isRequired
 };

@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import ClipboardButton from 'react-clipboard.js';
 import browser from 'bowser';
 import TransitionAppear from './TransitionAppear';
@@ -496,8 +497,8 @@ export default class Room extends React.Component
 
 Room.propTypes =
 {
-	peerId             : React.PropTypes.string.isRequired,
-	roomId             : React.PropTypes.string.isRequired,
-	onNotify           : React.PropTypes.func.isRequired,
-	onHideNotification : React.PropTypes.func.isRequired
+	peerId             : PropTypes.string.isRequired,
+	roomId             : PropTypes.string.isRequired,
+	onNotify           : PropTypes.func.isRequired,
+	onHideNotification : PropTypes.func.isRequired
 };

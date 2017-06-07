@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import browser from 'bowser';
 import Logger from '../Logger';
 
@@ -492,6 +493,6 @@ export default class Stats extends React.Component
 
 Stats.propTypes =
 {
-	stats   : React.PropTypes.object.isRequired,
-	onClose : React.PropTypes.func.isRequired
+	stats   : PropTypes.object.isRequired,
+	onClose : PropTypes.func.isRequired
 };

@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import Logger from '../Logger';
 import classnames from 'classnames';
 import hark from 'hark';
@@ -229,10 +230,10 @@ export default class Video extends React.Component
 
 Video.propTypes =
 {
-	stream             : React.PropTypes.object.isRequired,
-	resolution         : React.PropTypes.string,
-	muted              : React.PropTypes.bool,
-	videoDisabled      : React.PropTypes.bool,
-	mirror             : React.PropTypes.bool,
-	onResolutionChange : React.PropTypes.func
+	stream             : PropTypes.object.isRequired,
+	resolution         : PropTypes.string,
+	muted              : PropTypes.bool,
+	videoDisabled      : PropTypes.bool,
+	mirror             : PropTypes.bool,
+	onResolutionChange : PropTypes.func
 };

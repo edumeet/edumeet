@@ -1,7 +1,8 @@
 'use strict';
 
 import React from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import PropTypes from 'prop-types';
+import TransitionGroup from 'react-transition-group/TransitionGroup';
 
 const DEFAULT_DURATION = 1000;
 
@@ -18,7 +19,7 @@ export default class TransitionAppear extends React.Component
 		let duration = props.hasOwnProperty('duration') ? props.duration : DEFAULT_DURATION;
 
 		return (
-			<ReactCSSTransitionGroup
+			<TransitionGroup
 				component={FakeTransitionWrapper}
 				transitionName='transition'
 				transitionAppear={!!duration}
@@ -27,15 +28,15 @@ export default class TransitionAppear extends React.Component
 				transitionLeave={false}
 			>
 				{this.props.children}
-			</ReactCSSTransitionGroup>
+			</TransitionGroup>
 		);
 	}
 }
 
 TransitionAppear.propTypes =
 {
-	children : React.PropTypes.any,
-	duration : React.PropTypes.number
+	children : PropTypes.any,
+	duration : PropTypes.number
 };
 
 class FakeTransitionWrapper extends React.Component
@@ -55,5 +56,5 @@ class FakeTransitionWrapper extends React.Component
 
 FakeTransitionWrapper.propTypes =
 {
-	children : React.PropTypes.any
+	children : PropTypes.any
 };

@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Logger from '../Logger';
 import muiTheme from './muiTheme';
@@ -51,6 +52,6 @@ export default class App extends React.Component
 
 App.propTypes =
 {
-	peerId : React.PropTypes.string.isRequired,
-	roomId : React.PropTypes.string.isRequired
+	peerId : PropTypes.string.isRequired,
+	roomId : PropTypes.string.isRequired
 };

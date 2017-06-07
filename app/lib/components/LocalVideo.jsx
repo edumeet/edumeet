@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import IconButton from 'material-ui/IconButton/IconButton';
 import MicOffIcon from 'material-ui/svg-icons/av/mic-off';
 import VideoCamOffIcon from 'material-ui/svg-icons/av/videocam-off';
@@ -141,15 +142,15 @@ export default class LocalVideo extends React.Component
 
 LocalVideo.propTypes =
 {
-	peerId             : React.PropTypes.string.isRequired,
-	stream             : React.PropTypes.object,
-	resolution         : React.PropTypes.string,
-	multipleWebcams    : React.PropTypes.bool.isRequired,
-	webcamType         : React.PropTypes.string,
-	connectionState    : React.PropTypes.string,
-	isActiveSpeaker    : React.PropTypes.bool.isRequired,
-	onMicMute          : React.PropTypes.func.isRequired,
-	onWebcamToggle     : React.PropTypes.func.isRequired,
-	onWebcamChange     : React.PropTypes.func.isRequired,
-	onResolutionChange : React.PropTypes.func.isRequired
+	peerId             : PropTypes.string.isRequired,
+	stream             : PropTypes.object,
+	resolution         : PropTypes.string,
+	multipleWebcams    : PropTypes.bool.isRequired,
+	webcamType         : PropTypes.string,
+	connectionState    : PropTypes.string,
+	isActiveSpeaker    : PropTypes.bool.isRequired,
+	onMicMute          : PropTypes.func.isRequired,
+	onWebcamToggle     : PropTypes.func.isRequired,
+	onWebcamChange     : PropTypes.func.isRequired,
+	onResolutionChange : PropTypes.func.isRequired
 };
