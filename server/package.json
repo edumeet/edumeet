@@ -8,9 +8,9 @@
   "main": "lib/index.js",
   "dependencies": {
     "colors": "^1.1.2",
-    "debug": "^2.6.4",
-    "express": "^4.15.2",
-    "mediasoup": "^1.2.3",
+    "debug": "^2.6.8",
+    "express": "^4.15.3",
+    "mediasoup": "^1.2.5",
     "protoo-server": "^1.1.4"
   },
   "devDependencies": {
@@ -19,7 +19,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
-    "gulp-eslint": "^3.0.1",
+    "gulp-eslint": "^4.0.0",
     "gulp-plumber": "^1.1.0"
   }
 }

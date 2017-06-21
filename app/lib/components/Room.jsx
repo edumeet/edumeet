@@ -41,6 +41,9 @@ export default class Room extends React.Component
 		this._client = null;
 		// Timer to retrieve RTC stats.
 		this._statsTimer = null;
+
+		// TODO: TMP
+		global.ROOM = this;
 	}
 
 	render()
@@ -221,6 +224,13 @@ export default class Room extends React.Component
 	{
 		logger.debug('handleLocalResolutionChange()');
 
+		if (!utils.canChangeResolution())
+		{
+			logger.warn('changing local resolution not implemented for this browser');
+
+			return;
+		}
+
 		this._client.changeVideoResolution();
 	}
 
@@ -395,8 +405,23 @@ export default class Room extends React.Component
 
 			let peers = this.state.peers;
 
+			peer = peers[peer.id];
+			if (!peer)
+				return;
+
 			delete peers[peer.id];
-			this.setState({ peers });
+
+			// NOTE: This shouldn't be needed but Safari 11 does not fire pc "removestream"
+			// nor stream "removetrack" nor track "ended", so we need to cleanup remote
+			// streams when a peer leaves.
+			let remoteStreams = this.state.remoteStreams;
+
+			for (let msid of peer.msids)
+			{
+				delete remoteStreams[msid];
+			}
+
+			this.setState({ peers, remoteStreams });
 		});
 
 		this._client.on('connectionstate', (state) =>
@@ -407,16 +432,18 @@ export default class Room extends React.Component
 		this._client.on('addstream', (stream) =>
 		{
 			let remoteStreams = this.state.remoteStreams;
+			let streamId = stream.jitsiRemoteId || stream.id;
 
-			remoteStreams[stream.id] = stream;
+			remoteStreams[streamId] = stream;
 			this.setState({ remoteStreams });
 		});
 
 		this._client.on('removestream', (stream) =>
 		{
 			let remoteStreams = this.state.remoteStreams;
+			let streamId = stream.jitsiRemoteId || stream.id;
 
-			delete remoteStreams[stream.id];
+			delete remoteStreams[streamId];
 			this.setState({ remoteStreams });
 		});
 

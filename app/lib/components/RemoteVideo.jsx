@@ -104,7 +104,7 @@ export default class RemoteVideo extends React.Component
 		let videoTrack = this.props.stream.getVideoTracks()[0];
 		let videoEnabled = videoTrack && videoTrack.enabled;
 		let stream = this.props.stream;
-		let msid = stream.id;
+		let msid = stream.jitsiRemoteId || stream.id;
 
 		if (videoEnabled)
 		{

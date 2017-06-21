@@ -1,7 +1,6 @@
 'use strict';
 
 import browser from 'bowser';
-import webrtc from 'webrtc-adapter'; // eslint-disable-line no-unused-vars
 import domready from 'domready';
 import UrlParse from 'url-parse';
 import React from 'react';
@@ -14,19 +13,28 @@ import edgeRTCPeerConnection from './edge/RTCPeerConnection';
 import edgeRTCSessionDescription from './edge/RTCSessionDescription';
 import App from './components/App';
 
-const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#room-id=([0-9a-zA-Z_\-]+)$');
+const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#room-id=([0-9a-zA-Z_-]+)$');
 const logger = new Logger();
 
 injectTapEventPlugin();
 
 logger.debug('detected browser [name:"%s", version:%s]', browser.name, browser.version);
 
+// If Edge, use the Jitsi RTCPeerConnection shim.
 if (browser.msedge)
 {
-	logger.debug('EDGE detected, overriding WebRTC global classes');
+	logger.debug('Edge detected, overriding RTCPeerConnection and RTCSessionDescription');
 
 	window.RTCPeerConnection = edgeRTCPeerConnection;
 	window.RTCSessionDescription = edgeRTCSessionDescription;
+}
+// Otherwise, do almost anything.
+else
+{
+	window.RTCPeerConnection =
+		window.webkitRTCPeerConnection ||
+		window.mozRTCPeerConnection ||
+		window.RTCPeerConnection;
 }
 
 domready(() =>

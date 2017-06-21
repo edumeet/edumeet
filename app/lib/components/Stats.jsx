@@ -96,6 +96,8 @@ export default class Stats extends React.Component
 
 	_processStats(stats)
 	{
+		// global.STATS = stats; // TODO: REMOVE
+
 		if (browser.check({ chrome: '58' }, true))
 		{
 			this._processStatsChrome58(stats);
@@ -107,6 +109,10 @@ export default class Stats extends React.Component
 		else if (browser.check({ firefox: '40' }, true))
 		{
 			this._processStatsFirefox(stats);
+		}
+		else if (browser.check({ safari: '11' }, true))
+		{
+			this._processStatsSafari11(stats);
 		}
 		else
 		{
@@ -388,9 +394,6 @@ export default class Stats extends React.Component
 
 		for (let group of stats.values())
 		{
-			// TODO: REMOVE
-			global.STATS = stats;
-
 			switch (group.type)
 			{
 				case 'candidate-pair':
@@ -477,6 +480,87 @@ export default class Stats extends React.Component
 			transport['remote IP'] = remoteCandidate.ipAddress;
 			transport['remote port'] = remoteCandidate.portNumber;
 		}
+
+		// Set state.
+		this.setState(
+		{
+			stats :
+			{
+				transport,
+				audio,
+				video
+			}
+		});
+	}
+
+	_processStatsSafari11(stats)
+	{
+		let transport = {};
+		let audio = {};
+		let video = {};
+
+		for (let group of stats.values())
+		{
+			switch (group.type)
+			{
+				case 'candidate-pair':
+				{
+					if (!group.writable)
+						break;
+
+					transport['bytes sent'] = group.bytesSent;
+					transport['bytes received'] = group.bytesReceived;
+					transport['available bitrate'] =
+						Math.round(group.availableOutgoingBitrate / 1000) + ' kbps';
+					transport['current RTT'] =
+						Math.round(group.currentRoundTripTime * 1000) + ' ms';
+
+					break;
+				}
+
+				case 'outbound-rtp':
+				{
+					if (group.isRemote)
+						break;
+
+					let block;
+
+					switch (group.mediaType)
+					{
+						case 'audio':
+							block = audio;
+							break;
+						case 'video':
+							block = video;
+							break;
+					}
+
+					if (!block)
+						break;
+
+					block['ssrc'] = group.ssrc;
+					block['bytes sent'] = group.bytesSent;
+					block['packets sent'] = group.packetsSent;
+
+					if (block === video)
+						block['frames encoded'] = group.framesEncoded;
+
+					block['NACK count'] = group.nackCount;
+					block['PLI count'] = group.pliCount;
+					block['FIR count'] = group.firCount;
+
+					break;
+				}
+			}
+		}
+
+		// Post checks.
+
+		if (!video.ssrc)
+			video = {};
+
+		if (!audio.ssrc)
+			audio = {};
 
 		// Set state.
 		this.setState(

@@ -4,6 +4,8 @@ import browser from 'bowser';
 import randomNumberLib from 'random-number';
 import Logger from './Logger';
 
+global.BROWSER = browser;
+
 const logger = new Logger('utils');
 const randomNumberGenerator = randomNumberLib.generator(
 	{
@@ -40,6 +42,18 @@ export function isPlanB()
 		return true;
 	else
 		return false;
+}
+
+/**
+ * Unfortunately Edge produces rtpSender.send() to fail when receiving media
+ * from others and removing/adding a local track.
+ */
+export function canChangeResolution()
+{
+	if (browser.msedge)
+		return false;
+
+	return true;
 }
 
 export function randomNumber()

@@ -161,7 +161,9 @@ export default class Video extends React.Component
 		return stream.getTracks()
 			.map((track) =>
 			{
-				return track.id;
+				let trackId = track.jitsiRemoteId || track.id;
+
+				return trackId;
 			})
 			.join('|');
 	}

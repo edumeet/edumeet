@@ -133,7 +133,9 @@ export default class Client extends events.EventEmitter
 		}
 
 		videoTrack.stop();
+		stream.removeTrack(videoTrack);
 
+		// New API.
 		if (this._peerconnection.removeTrack)
 		{
 			let sender;
@@ -146,9 +148,11 @@ export default class Client extends events.EventEmitter
 
 			this._peerconnection.removeTrack(sender);
 		}
+		// Old API.
 		else
 		{
-			stream.removeTrack(videoTrack);
+			this._peerconnection.removeStream(stream);
+			this._peerconnection.addStream(stream);
 		}
 
 		if (!dontNegotiate)
@@ -187,19 +191,33 @@ export default class Client extends events.EventEmitter
 
 				if (stream)
 				{
-					// Fucking hack for adapter.js in Chrome.
-					if (this._peerconnection.removeStream)
-						this._peerconnection.removeStream(stream);
-
 					stream.addTrack(newVideoTrack);
 
+					// New API.
 					if (this._peerconnection.addTrack)
+					{
 						this._peerconnection.addTrack(newVideoTrack, stream);
+					}
+					// Old API.
+					else
+					{
+						this._peerconnection.addStream(stream);
+					}
 				}
 				else
 				{
 					this._localStream = newStream;
-					this._peerconnection.addStream(newStream);
+
+					// New API.
+					if (this._peerconnection.addTrack)
+					{
+						this._peerconnection.addTrack(newVideoTrack, stream);
+					}
+					// Old API.
+					else
+					{
+						this._peerconnection.addStream(stream);
+					}
 				}
 
 				this.emit('localstream', this._localStream, videoResolution);
@@ -803,7 +821,10 @@ export default class Client extends events.EventEmitter
 		{
 			let state = this._peerconnection.iceConnectionState;
 
-			logger.debug('peerconnection "iceconnectionstatechange" event [state:%s]', state);
+			if (state === 'failed')
+				logger.warn('peerconnection "iceconnectionstatechange" event [state:failed]');
+			else
+				logger.debug('peerconnection "iceconnectionstatechange" event [state:%s]', state);
 
 			this.emit('connectionstate', state);
 		});
