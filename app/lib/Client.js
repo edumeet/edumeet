@@ -151,7 +151,6 @@ export default class Client extends events.EventEmitter
 		// Old API.
 		else
 		{
-			this._peerconnection.removeStream(stream);
 			this._peerconnection.addStream(stream);
 		}
 

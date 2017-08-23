@@ -57,8 +57,8 @@ class Room extends EventEmitter
 						});
 					});
 
-					// TODO: FIX
-					this._mediaRoom.on('____audiolevels', (entries) =>
+					// TODO: FIX?
+					this._mediaRoom.on('audiolevels', (entries) =>
 					{
 						logger.debug('room "audiolevels" event');
 

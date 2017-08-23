@@ -243,7 +243,8 @@ function openTerminal()
 	closeCommandConsole();
 	closeTerminal();
 
-	terminal = repl.start({
+	terminal = repl.start(
+		{
 			prompt          : 'terminal> ',
 			useColors       : true,
 			useGlobal       : true,

@@ -624,14 +624,14 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 			if (track.readyState === 'ended') {
 				logger.warn('ignoring ended MediaStreamTrack');
 
-				continue; // eslint-disable-line no-continue
+				continue;
 			}
 
 			// Ignore if track is already present.
 			if (this._localTrackInfos.has(track.id)) {
 				logger.warn('ignoring already handled MediaStreamTrack');
 
-				continue; // eslint-disable-line no-continue
+				continue;
 			}
 
 			const rtpSender = new RTCRtpSender(track, this._dtlsTransport);
@@ -641,6 +641,42 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 				rtpSender,
 				stream
 			});
+		}
+
+		// Check for local tracks removal.
+		for (const [ trackId, info ] of this._localTrackInfos) {
+			const track = info.rtpSender.track;
+
+			// Check if any of the local tracks has been stopped.
+			if (track.readyState === 'ended') {
+				logger.debug(
+					`_addStream() an already handled track was stopped, track.id:${track.id}`);
+
+				try {
+					info.rtpSender.stop();
+				} catch (error) {
+					logger.warn(`rtpSender.stop() failed:${error}`);
+				}
+
+				// Remove from the map.
+				this._localTrackInfos.delete(track.id);
+
+			// Also, if the stream was already handled, check whether tracks
+			// have been removed via stream.removeTrack() and, if so, stop
+			// their RtpSenders.
+			} else if (info.stream === stream && !stream.getTrackById(trackId)) {
+				logger.debug(
+					`_addStream() a track in this stream was removed, track.id:${trackId}`);
+
+				try {
+					info.rtpSender.stop();
+				} catch (error) {
+					logger.warn(`rtpSender.stop() failed:${error}`);
+				}
+
+				// Remove from the map.
+				this._localTrackInfos.delete(track.id);
+			}
 		}
 
 		// It may need to renegotiate.
@@ -825,9 +861,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 
 				// Add codecs.
 				for (const codec of localCapabilities.codecs) {
-					if (codec.kind && codec.kind !== kind) {
-						continue; // eslint-disable-line no-continue
-					}
+					if (codec.kind && codec.kind !== kind)
+						continue;
 
 					payloads.push(codec.preferredPayloadType);
 
@@ -896,13 +931,11 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 					const track = rtpSender.track;
 
 					// Ignore if ended.
-					if (track.readyState === 'ended') {
-						continue; // eslint-disable-line no-continue
-					}
+					if (track.readyState === 'ended')
+						continue;
 
-					if (track.kind !== kind) {
-						continue; // eslint-disable-line no-continue
-					}
+					if (track.kind !== kind)
+						continue;
 
 					// Set a random provisional SSRC if not set.
 					if (!info.ssrc) {
@@ -977,9 +1010,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 				mediaObject.ext = [];
 
 				for (const extension of localCapabilities.headerExtensions) {
-					if (extension.kind && extension.kind !== kind) {
-						continue; // eslint-disable-line no-continue
-					}
+					if (extension.kind && extension.kind !== kind)
+						continue;
 
 					mediaObject.ext.push({
 						value: extension.preferredId,
@@ -1163,9 +1195,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 
 				// Add codecs.
 				for (const codec of localCapabilities.codecs) {
-					if (codec.kind && codec.kind !== kind) {
-						continue; // eslint-disable-line no-continue
-					}
+					if (codec.kind && codec.kind !== kind)
+						continue;
 
 					payloads.push(codec.preferredPayloadType);
 
@@ -1234,13 +1265,11 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 					const track = rtpSender.track;
 
 					// Ignore if ended.
-					if (track.readyState === 'ended') {
-						continue; // eslint-disable-line no-continue
-					}
+					if (track.readyState === 'ended')
+						continue;
 
-					if (track.kind !== kind) {
-						continue; // eslint-disable-line no-continue
-					}
+					if (track.kind !== kind)
+						continue;
 
 					// Set a random provisional SSRC if not set.
 					if (!info.ssrc) {
@@ -1315,9 +1344,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 				mediaObject.ext = [];
 
 				for (const extension of localCapabilities.headerExtensions) {
-					if (extension.kind && extension.kind !== kind) {
-						continue; // eslint-disable-line no-continue
-					}
+					if (extension.kind && extension.kind !== kind)
+						continue;
 
 					mediaObject.ext.push({
 						value: extension.preferredId,
@@ -1364,9 +1392,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 		}
 
 		for (const sdpCandidate of this._bufferedIceCandidates) {
-			if (!sdpCandidate) {
-				continue; // eslint-disable-line no-continue
-			}
+			if (!sdpCandidate)
+				continue;
 
 			// Now we have set the MID values of the SDP O/A, so let's fill the
 			// sdpMIndex of the candidate.
@@ -1553,10 +1580,12 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 		const codecs = [];
 		let codecPayloadType;
 
-		for (const codecCapability of localCapabilities.codecs) {
+		for (const codecCapability of localCapabilities.codecs)
+		{
 			if (codecCapability.kind !== kind
-				|| codecCapability.name === 'rtx') {
-				continue; // eslint-disable-line no-continue
+				|| codecCapability.name === 'rtx')
+			{
+				continue;
 			}
 
 			codecPayloadType = codecCapability.preferredPayloadType;
@@ -1576,10 +1605,12 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 		}
 
 		if (rtxSsrc) {
-			for (const codecCapability of localCapabilities.codecs) {
+			for (const codecCapability of localCapabilities.codecs)
+			{
 				if (codecCapability.kind !== kind
-					|| codecCapability.name !== 'rtx') {
-					continue; // eslint-disable-line no-continue
+					|| codecCapability.name !== 'rtx')
+				{
+					continue;
 				}
 
 				codecs.push({
@@ -1611,10 +1642,10 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 
 		parameters.encodings.push(encoding);
 
-		for (const extension of localCapabilities.headerExtensions) {
-			if (extension.kind !== kind) {
-				continue; // eslint-disable-line no-continue
-			}
+		for (const extension of localCapabilities.headerExtensions)
+		{
+			if (extension.kind !== kind)
+				continue;
 
 			parameters.headerExtensions.push({
 				encrypt: extension.preferredEncrypt,
@@ -1655,8 +1686,9 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 
 		for (const codecCapability of localCapabilities.codecs) {
 			if (codecCapability.kind !== kind
-				|| codecCapability.name === 'rtx') {
-				continue; // eslint-disable-line no-continue
+				|| codecCapability.name === 'rtx')
+			{
+				continue;
 			}
 
 			codecPayloadType = codecCapability.preferredPayloadType;
@@ -1678,8 +1710,9 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 		if (rtxSsrc) {
 			for (const codecCapability of localCapabilities.codecs) {
 				if (codecCapability.kind !== kind
-					|| codecCapability.name !== 'rtx') {
-					continue; // eslint-disable-line no-continue
+					|| codecCapability.name !== 'rtx')
+				{
+					continue;
 				}
 
 				codecs.push({
@@ -1712,9 +1745,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 		parameters.encodings.push(encoding);
 
 		for (const extension of localCapabilities.headerExtensions) {
-			if (extension.kind !== kind) {
-				continue; // eslint-disable-line no-continue
-			}
+			if (extension.kind !== kind)
+				continue;
 
 			parameters.headerExtensions.push({
 				encrypt: extension.preferredEncrypt,
@@ -1856,9 +1888,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 		// Check new tracks.
 		for (const [ ssrc, info ] of newRemoteTrackInfos) {
 			// If already handled, ignore it.
-			if (currentRemoteSsrcs.has(ssrc)) {
-				continue; // eslint-disable-line no-continue
-			}
+			if (currentRemoteSsrcs.has(ssrc))
+				continue;
 
 			logger.debug(`_receiveMedia() new remote track, ssrc:${ssrc}`);
 
@@ -1924,9 +1955,6 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 				// Set custom property with the remote id.
 				track.jitsiRemoteId = trackRemoteId;
 
-				// TODO: TMP
-				logger.warn(`new remote track [stream.jitsiRemoteId:${stream.jitsiRemoteId}, track.jitsiRemoteId:${track.jitsiRemoteId}, track.id:${track.id}]`);
-
 				// Add the track to the stream.
 				stream.addTrack(track);
 
@@ -1941,19 +1969,15 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 
 		// Check track removal.
 		for (const ssrc of currentRemoteSsrcs) {
-			if (newRemoteTrackInfos.has(ssrc)) {
-				continue; // eslint-disable-line no-continue
-			}
+			if (newRemoteTrackInfos.has(ssrc))
+				continue;
 
 			logger.debug(`_receiveMedia() remote track removed, ssrc:${ssrc}`);
 
 			const info = this._remoteTrackInfos.get(ssrc);
 			const stream = info.stream;
 			const track = info.track;
-						const rtpReceiver = info.rtpReceiver;
-
-			// TODO: TMP
-			logger.warn(`remote track removed [track.jitsiRemoteId:${track.jitsiRemoteId}, track.id:${track.id}]`);
+			const rtpReceiver = info.rtpReceiver;
 
 			try {
 				rtpReceiver.stop();
@@ -1977,9 +2001,6 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 
 		// Emit MediaStream 'removetrack' for removed tracks.
 		for (const [ track, stream ] of removedRemoteTracks) {
-			// TODO: TMP
-			logger.warn(`emit "removetrack" [stream.jitsiRemoteId:${stream.jitsiRemoteId}, track.jitsiRemoteId:${track.jitsiRemoteId}, track.id:${track.id}]`);
-
 			const event = new Event('removetrack');
 
 			event.track = track;
@@ -2002,12 +2023,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 
 		// Emit RTCPeerConnection 'removestream' for removed remote streams.
 		for (const [ streamRemoteId, stream ] of this._remoteStreams) {
-			// TODO: TMP
-			logger.warn(`remote stream [streamRemoteId:${streamRemoteId}, jitsiRemoteId:${stream.jitsiRemoteId}, tracks:${stream.getTracks().length}]`);
-
-			if (stream.getTracks().length > 0) {
-				continue; // eslint-disable-line no-continue
-			}
+			if (stream.getTracks().length > 0)
+				continue;
 
 			this._remoteStreams.delete(streamRemoteId);
 			this._emitRemoveStream(stream);
@@ -2026,9 +2043,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 		// Stop and remove the RTCRtpSender associated to each track.
 		for (const track of stream.getTracks()) {
 			// Ignore if track not present.
-			if (!this._localTrackInfos.has(track.id)) {
-				continue; // eslint-disable-line no-continue
-			}
+			if (!this._localTrackInfos.has(track.id))
+				continue;
 
 			const rtpSender = this._localTrackInfos.get(track.id).rtpSender;
 
@@ -2054,12 +2070,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 
 		for (const info of this._localTrackInfos.values()) {
 			// Ignore if already sending.
-			if (info.sending) {
-				continue; // eslint-disable-line no-continue
-			}
-
-			// Update sending field.
-			info.sending = true;
+			if (info.sending)
+				continue;
 
 			const rtpSender = info.rtpSender;
 			const ssrc = info.ssrc;
@@ -2075,9 +2087,12 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 			logger.debug(
 				'calling rtpSender.send(), parameters:', parameters);
 
-			// Start rsending media.
+			// Start sending media.
 			try {
 				rtpSender.send(parameters);
+
+				// Update sending field.
+				info.sending = true;
 			} catch (error) {
 				logger.error(`rtpSender.send() failed:${error.message}`);
 				logger.error(error);
@@ -2418,9 +2433,8 @@ export default class ortcRTCPeerConnection extends yaeti.EventTarget {
 		// Add remote ICE candidates.
 		// NOTE: Remove candidates that Edge doesn't like.
 		for (const candidate of remoteIceCandidates) {
-			if (candidate.port === 0 || candidate.port === 9) {
-				continue; // eslint-disable-line no-continue
-			}
+			if (candidate.port === 0 || candidate.port === 9)
+				continue;
 
 			this._iceTransport.addRemoteCandidate(candidate);
 		}
