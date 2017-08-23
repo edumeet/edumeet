@@ -184,6 +184,9 @@ export default class Stats extends React.Component
 							block = audio;
 							break;
 						case 'video':
+							if (codec === 'rtx')
+								break;
+
 							block = video;
 							break;
 					}
