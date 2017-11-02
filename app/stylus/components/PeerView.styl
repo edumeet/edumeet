@@ -1,0 +1,262 @@
+[data-component='PeerView'] {
+	position: relative;
+	flex: 100 100 auto;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background-color: rgba(#2a4b58, 0.9);
+	background-image: url('/resources/images/buddy.svg');
+	background-position: bottom;
+	background-size: auto 85%;
+	background-repeat: no-repeat;
+
+	> .info {
+		$backgroundTint = #000;
+
+		position: absolute;
+		z-index: 5
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		background: linear-gradient(to bottom,
+			rgba($backgroundTint, 0) 0%,
+			rgba($backgroundTint, 0) 60%,
+			rgba($backgroundTint, 0.1) 70%,
+			rgba($backgroundTint, 0.8) 100%);
+
+		> .media {
+			flex: 0 0 auto;
+			display: flex;
+			flex-direction: row;
+
+			> .box {
+				margin: 4px;
+				padding: 2px 4px;
+				border-radius: 2px;
+				background-color: rgba(#000, 0.25);
+
+				> p {
+					user-select: none;
+					pointer-events: none;
+					margin-bottom: 2px;
+					color: rgba(#fff, 0.7);
+					font-size: 10px;
+
+					&:last-child {
+						margin-bottom: 0;
+					}
+				}
+			}
+		}
+
+		> .peer {
+			flex: 0 0 auto;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+
+			+desktop() {
+				&.is-me {
+					padding: 10px;
+					align-items: flex-start;
+				}
+
+				&:not(.is-me) {
+					padding: 20px;
+					align-items: flex-start;
+				}
+			}
+
+			+mobile() {
+				&.is-me {
+					padding: 10px;
+					align-items: flex-start;
+				}
+
+				&:not(.is-me) {
+					padding: 10px;
+					align-items: flex-end;
+				}
+			}
+
+			> .display-name {
+				font-size: 14px;
+				font-weight: 400;
+				color: rgba(#fff, 0.85);
+			}
+
+			> span.display-name {
+				user-select: none;
+				cursor: text;
+
+				&:not(.editable) {
+					cursor: default;
+				}
+
+				&.editable {
+					+desktop() {
+						&:hover {
+							background-color: rgba(#aeff00, 0.25);
+						}
+					}
+				}
+
+				&.loading {
+					opacity: 0.5;
+				}
+			}
+
+			> input.display-name {
+				border: none;
+				border-bottom: 1px solid #aeff00;
+				background-color: transparent;
+			}
+
+			> .row {
+				margin-top: 4px;
+				display: flex;
+				flex-direction: row;
+				justify-content: flex-start;
+				align-items: flex-end;
+
+				> .device-icon {
+					height: 18px;
+					width: 18px;
+					margin-right: 3px;
+					user-select: none;
+					pointer-events: none;
+					background-position: center;
+					background-size: 100%;
+					background-repeat: no-repeat;
+					background-image: url('/resources/images/devices/unknown.svg');
+
+					&.chrome {
+						background-image: url('/resources/images/devices/chrome_16x16.png');
+					}
+
+					&.firefox {
+						background-image: url('/resources/images/devices/firefox_16x16.png');
+					}
+
+					&.safari {
+						background-image: url('/resources/images/devices/safari_16x16.png');
+					}
+
+					&.msedge {
+						background-image: url('/resources/images/devices/edge_16x16.png');
+					}
+
+					&.opera {
+						background-image: url('/resources/images/devices/opera_16x16.png');
+					}
+
+					&.sipendpoint {
+						background-image: url('/resources/images/devices/sip_endpoint.svg');
+					}
+				}
+
+				> .device-version {
+					user-select: none;
+					pointer-events: none;
+					font-size: 11px;
+					color: rgba(#fff, 0.55);
+				}
+			}
+		}
+	}
+
+	> video {
+		flex: 100 100 auto;
+		height: 100%;
+		width: 100%;
+		object-fit: cover;
+		user-select: none;
+		transition-property: opacity;
+		transition-duration: .15s;
+		background-color: rgba(#000, 0.75);
+
+		&.is-me {
+			transform: scaleX(-1);
+		}
+
+		&.hidden {
+			opacity: 0;
+			transition-duration: 0s;
+		}
+
+		&.loading {
+			filter: blur(5px);
+		}
+	}
+
+	> .volume-container {
+		position: absolute;
+		top: 0
+		bottom: 0;
+		right: 2px;
+		width: 10px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		> .bar {
+			width: 6px;
+			border-radius: 6px;
+			background: rgba(yellow, 0.65);
+			transition-property: height background-color;
+			transition-duration: 0.25s;
+
+			&.level0  { height: 0;    background-color: rgba(yellow, 0.65); }
+			&.level1  { height: 10%;  background-color: rgba(yellow, 0.65); }
+			&.level2  { height: 20%;  background-color: rgba(yellow, 0.65); }
+			&.level3  { height: 30%;  background-color: rgba(yellow, 0.65); }
+			&.level4  { height: 40%;  background-color: rgba(orange, 0.65); }
+			&.level5  { height: 50%;  background-color: rgba(orange, 0.65); }
+			&.level6  { height: 60%;  background-color: rgba(red,    0.65); }
+			&.level7  { height: 70%;  background-color: rgba(red,    0.65); }
+			&.level8  { height: 80%;  background-color: rgba(#000,   0.65); }
+			&.level9  { height: 90%;  background-color: rgba(#000,   0.65); }
+			&.level10 { height: 100%; background-color: rgba(#000,   0.65); }
+		}
+	}
+
+	> .spinner-container {
+		position: absolute;
+		top: 0
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: rgba(#000, 0.75);
+
+		.react-spinner {
+			position: relative;
+			width: 48px;
+			height: 48px;
+			top: 50%;
+			left: 50%;
+
+			.react-spinner_bar {
+				position: absolute;
+				width: 20%;
+				height: 7.8%;
+				top: -3.9%;
+				left: -10%;
+				animation: PeerView-spinner 1.2s linear infinite;
+				border-radius: 5px;
+				background-color: rgba(#fff, 0.5);
+			}
+		}
+	}
+}
+
+@keyframes PeerView-spinner {
+	0% { opacity: 1; }
+	100% { opacity: 0.15; }
+}

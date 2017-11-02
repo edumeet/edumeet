@@ -1,11 +1,7 @@
 node_modules/
 
-/app/config.*
-!/app/config.example.js
-
 /server/config.*
 !/server/config.example.js
 /server/public/
-/server/certs/*
-!/server/certs/mediasoup-demo.localhost.cert.pem
-!/server/certs/mediasoup-demo.localhost.key.pem
+/server/certs/
+!/server/certs/mediasoup-demo.localhost.*

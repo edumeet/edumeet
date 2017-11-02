@@ -1,12 +1,7 @@
-'use strict';
-
-const config = require('../config');
-
-export function getProtooUrl(peerId, roomId)
+export function getProtooUrl(peerName, roomId)
 {
-	let hostname = window.location.hostname;
-	let port = config.protoo.listenPort;
-	let url = `wss://${hostname}:${port}/?peer-id=${peerId}&room-id=${roomId}`;
+	const hostname = window.location.hostname;
+	const url = `wss://${hostname}:3443/?peerName=${peerName}&roomId=${roomId}`;
 
 	return url;
 }

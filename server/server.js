@@ -6,11 +6,13 @@ process.title = 'mediasoup-demo-server';
 
 const config = require('./config');
 
-process.env.DEBUG = config.debug || '*LOG* *WARN* *ERROR*';
+process.env.DEBUG = config.debug || '*INFO* *WARN* *ERROR*';
 
+/* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
 console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
 console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
+/* eslint-enable no-console */
 
 const fs = require('fs');
 const https = require('https');
@@ -20,14 +22,16 @@ const mediasoup = require('mediasoup');
 const readline = require('readline');
 const colors = require('colors/safe');
 const repl = require('repl');
-const logger = require('./lib/logger')();
+const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 
+const logger = new Logger();
+
 // Map of Room instances indexed by roomId.
-let rooms = new Map();
+const rooms = new Map();
 
 // mediasoup server.
-let mediaServer = mediasoup.Server(
+const mediaServer = mediasoup.Server(
 	{
 		numWorkers       : 1,
 		logLevel         : config.mediasoup.logLevel,
@@ -41,30 +45,55 @@ let mediaServer = mediasoup.Server(
 	});
 
 global.SERVER = mediaServer;
+
 mediaServer.on('newroom', (room) =>
 {
 	global.ROOM = room;
+
+	room.on('newpeer', (peer) =>
+	{
+		global.PEER = peer;
+
+		if (peer.consumers.length > 0)
+			global.CONSUMER = peer.consumers[peer.consumers.length - 1];
+
+		peer.on('newtransport', (transport) =>
+		{
+			global.TRANSPORT = transport;
+		});
+
+		peer.on('newproducer', (producer) =>
+		{
+			global.PRODUCER = producer;
+		});
+
+		peer.on('newconsumer', (consumer) =>
+		{
+			global.CONSUMER = consumer;
+		});
+	});
 });
 
 // HTTPS server for the protoo WebSocjet server.
-let tls =
+const tls =
 {
 	cert : fs.readFileSync(config.tls.cert),
 	key  : fs.readFileSync(config.tls.key)
 };
-let httpsServer = https.createServer(tls, (req, res) =>
-	{
-		res.writeHead(404, 'Not Here');
-		res.end();
-	});
 
-httpsServer.listen(config.protoo.listenPort, config.protoo.listenIp, () =>
+const httpsServer = https.createServer(tls, (req, res) =>
 {
-	logger.log('protoo WebSocket server running');
+	res.writeHead(404, 'Not Here');
+	res.end();
+});
+
+httpsServer.listen(3443, '0.0.0.0', () =>
+{
+	logger.info('protoo WebSocket server running');
 });
 
 // Protoo WebSocket server.
-let webSocketServer = new protooServer.WebSocketServer(httpsServer,
+const webSocketServer = new protooServer.WebSocketServer(httpsServer,
 	{
 		maxReceivedFrameSize     : 960000, // 960 KBytes.
 		maxReceivedMessageSize   : 960000,
@@ -76,30 +105,48 @@ let webSocketServer = new protooServer.WebSocketServer(httpsServer,
 webSocketServer.on('connectionrequest', (info, accept, reject) =>
 {
 	// The client indicates the roomId and peerId in the URL query.
-	let u = url.parse(info.request.url, true);
-	let roomId = u.query['room-id'];
-	let peerId = u.query['peer-id'];
+	const u = url.parse(info.request.url, true);
+	const roomId = u.query['roomId'];
+	const peerName = u.query['peerName'];
 
-	if (!roomId || !peerId)
+	if (!roomId || !peerName)
 	{
-		logger.warn('connection request without roomId and/or peerId');
+		logger.warn('connection request without roomId and/or peerName');
 
-		reject(400, 'Connection request without roomId and/or peerId');
+		reject(400, 'Connection request without roomId and/or peerName');
+
 		return;
 	}
 
-	logger.log('connection request [roomId:"%s", peerId:"%s"]', roomId, peerId);
+	logger.info(
+		'connection request [roomId:"%s", peerName:"%s"]', roomId, peerName);
+
+	let room;
 
 	// If an unknown roomId, create a new Room.
 	if (!rooms.has(roomId))
 	{
-		logger.debug('creating a new Room [roomId:"%s"]', roomId);
+		logger.info('creating a new Room [roomId:"%s"]', roomId);
 
-		let room = new Room(roomId, mediaServer);
-		let logStatusTimer = setInterval(() =>
+		try
+		{
+			room = new Room(roomId, mediaServer);
+
+			global.APP_ROOM = room;
+		}
+		catch (error)
+		{
+			logger.error('error creating a new Room: %s', error);
+
+			reject(error);
+
+			return;
+		}
+
+		const logStatusTimer = setInterval(() =>
 		{
 			room.logStatus();
-		}, 10000);
+		}, 30000);
 
 		rooms.set(roomId, room);
 
@@ -109,21 +156,22 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 			clearInterval(logStatusTimer);
 		});
 	}
+	else
+	{
+		room = rooms.get(roomId);
+	}
 
-	let room = rooms.get(roomId);
-	let transport = accept();
+	const transport = accept();
 
-	room.createProtooPeer(peerId, transport)
-		.catch((error) =>
-		{
-			logger.error('error creating a protoo peer: %s', error);
-		});
+	room.handleConnection(peerName, transport);
 });
 
 // Listen for keyboard input.
 
 let cmd;
 let terminal;
+
+openCommandConsole();
 
 function openCommandConsole()
 {
@@ -133,10 +181,10 @@ function openCommandConsole()
 	closeTerminal();
 
 	cmd = readline.createInterface(
-	{
-		input  : process.stdin,
-		output : process.stdout
-	});
+		{
+			input  : process.stdin,
+			output : process.stdout
+		});
 
 	cmd.on('SIGINT', () =>
 	{
@@ -162,10 +210,14 @@ function openCommandConsole()
 				{
 					stdinLog('');
 					stdinLog('available commands:');
-					stdinLog('- h,  help       : show this message');
-					stdinLog('- sd, serverdump : execute server.dump()');
-					stdinLog('- rd, roomdump   : execute room.dump() for the latest created mediasoup Room');
-					stdinLog('- t,  terminal   : open REPL Terminal');
+					stdinLog('- h,  help          : show this message');
+					stdinLog('- sd, serverdump    : execute server.dump()');
+					stdinLog('- rd, roomdump      : execute room.dump() for the latest created mediasoup Room');
+					stdinLog('- pd, peerdump      : execute peer.dump() for the latest created mediasoup Peer');
+					stdinLog('- td, transportdump : execute transport.dump() for the latest created mediasoup Transport');
+					stdinLog('- prd, producerdump : execute producer.dump() for the latest created mediasoup Producer');
+					stdinLog('- cd, consumerdump : execute consumer.dump() for the latest created mediasoup Consumer');
+					stdinLog('- t,  terminal      : open REPL Terminal');
 					stdinLog('');
 					readStdin();
 
@@ -178,7 +230,7 @@ function openCommandConsole()
 					mediaServer.dump()
 						.then((data) =>
 						{
-							stdinLog(`mediaServer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							stdinLog(`server.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
 							readStdin();
 						})
 						.catch((error) =>
@@ -202,14 +254,108 @@ function openCommandConsole()
 					global.ROOM.dump()
 						.then((data) =>
 						{
-							stdinLog('global.ROOM.dump() succeeded');
-							stdinLog(`- peers:\n${JSON.stringify(data.peers, null, '  ')}`);
-							stdinLog(`- num peers: ${data.peers.length}`);
+							stdinLog(`room.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
 							readStdin();
 						})
 						.catch((error) =>
 						{
-							stdinError(`global.ROOM.dump() failed: ${error}`);
+							stdinError(`room.dump() failed: ${error}`);
+							readStdin();
+						});
+
+					break;
+				}
+
+				case 'pd':
+				case 'peerdump':
+				{
+					if (!global.PEER)
+					{
+						readStdin();
+						break;
+					}
+
+					global.PEER.dump()
+						.then((data) =>
+						{
+							stdinLog(`peer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							readStdin();
+						})
+						.catch((error) =>
+						{
+							stdinError(`peer.dump() failed: ${error}`);
+							readStdin();
+						});
+
+					break;
+				}
+
+				case 'td':
+				case 'transportdump':
+				{
+					if (!global.TRANSPORT)
+					{
+						readStdin();
+						break;
+					}
+
+					global.TRANSPORT.dump()
+						.then((data) =>
+						{
+							stdinLog(`transport.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							readStdin();
+						})
+						.catch((error) =>
+						{
+							stdinError(`transport.dump() failed: ${error}`);
+							readStdin();
+						});
+
+					break;
+				}
+
+				case 'prd':
+				case 'producerdump':
+				{
+					if (!global.PRODUCER)
+					{
+						readStdin();
+						break;
+					}
+
+					global.PRODUCER.dump()
+						.then((data) =>
+						{
+							stdinLog(`producer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							readStdin();
+						})
+						.catch((error) =>
+						{
+							stdinError(`producer.dump() failed: ${error}`);
+							readStdin();
+						});
+
+					break;
+				}
+
+				case 'cd':
+				case 'consumerdump':
+				{
+					if (!global.CONSUMER)
+					{
+						readStdin();
+						break;
+					}
+
+					global.CONSUMER.dump()
+						.then((data) =>
+						{
+							stdinLog(`consumer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							readStdin();
+						})
+						.catch((error) =>
+						{
+							stdinError(`consumer.dump() failed: ${error}`);
 							readStdin();
 						});
 
@@ -248,13 +394,10 @@ function openTerminal()
 			prompt          : 'terminal> ',
 			useColors       : true,
 			useGlobal       : true,
-			ignoreUndefined : true
+			ignoreUndefined : false
 		});
 
-	terminal.on('exit', () =>
-	{
-		process.exit();
-	});
+	terminal.on('exit', () => openCommandConsole());
 }
 
 function closeCommandConsole()
@@ -276,23 +419,14 @@ function closeTerminal()
 	}
 }
 
-openCommandConsole();
-
-// Export openCommandConsole function by typing 'c'.
-Object.defineProperty(global, 'c',
-	{
-		get : function()
-		{
-			openCommandConsole();
-		}
-	});
-
 function stdinLog(msg)
 {
+	// eslint-disable-next-line no-console
 	console.log(colors.green(msg));
 }
 
 function stdinError(msg)
 {
+	// eslint-disable-next-line no-console
 	console.error(colors.red.bold('ERROR: ') + colors.red(msg));
 }

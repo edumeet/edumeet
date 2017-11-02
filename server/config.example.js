@@ -1,7 +1,7 @@
 module.exports =
 {
 	// DEBUG env variable For the NPM debug module.
-	debug  : '*LOG* *WARN* *ERROR* *mediasoup-worker*',
+	debug  : '*INFO* *WARN* *ERROR* *mediasoup-worker*',
 	// Listening hostname for `gulp live|open`.
 	domain : 'localhost',
 	tls    :
@@ -9,24 +9,19 @@ module.exports =
 		cert : `${__dirname}/certs/mediasoup-demo.localhost.cert.pem`,
 		key  : `${__dirname}/certs/mediasoup-demo.localhost.key.pem`
 	},
-	protoo :
-	{
-		listenIp   : '0.0.0.0',
-		listenPort : 3443
-	},
 	mediasoup :
 	{
 		// mediasoup Server settings.
-		logLevel : 'debug',
-		logTags :
+		logLevel : 'warn',
+		logTags  :
 		[
 			'info',
-			// 'ice',
-			// 'dlts',
+			'ice',
+			'dlts'
 			'rtp',
-			// 'srtp',
+			'srtp',
 			'rtcp',
-			// 'rbe',
+			'rbe',
 			'rtx'
 		],
 		rtcIPv4          : true,
@@ -35,32 +30,35 @@ module.exports =
 		rtcAnnouncedIPv6 : null,
 		rtcMinPort       : 40000,
 		rtcMaxPort       : 49999,
-		// mediasoup Room settings.
-		roomCodecs :
+		// mediasoup Room codecs.
+		mediaCodecs      :
 		[
 			{
 				kind       : 'audio',
-				name       : 'audio/opus',
+				name       : 'opus',
 				clockRate  : 48000,
+				channels   : 2,
 				parameters :
 				{
-					useInbandFec : 1,
-					minptime     : 10
+					useinbandfec : 1
 				}
 			},
 			{
-				kind       : 'video',
-				name       : 'video/vp8',
-				clockRate  : 90000
+				kind      : 'video',
+				name      : 'VP8',
+				clockRate : 90000
 			}
+			// {
+			// 	kind       : 'video',
+			// 	name       : 'H264',
+			// 	clockRate  : 90000,
+			// 	parameters :
+			// 	{
+			// 		'packetization-mode' : 1
+			// 	}
+			// }
 		],
-		// mediasoup per Peer Transport settings.
-		peerTransport :
-		{
-			udp : true,
-			tcp : true
-		},
-		// mediasoup per Peer max sending bitrate (in kpbs).
+		// mediasoup per Peer max sending bitrate (in bps).
 		maxBitrate : 500000
 	}
 };

@@ -1,0 +1,98 @@
+[data-component='Me'] {
+	position: relative;
+	height: 100%;
+	width: 100%;
+
+	> .controls {
+		position: absolute;
+		z-index: 10
+		top: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		flex-direction:; row;
+		justify-content: flex-end;
+		align-items: center;
+
+		> .button {
+			flex: 0 0 auto;
+			margin: 4px;
+			margin-left: 0;
+			border-radius: 2px;
+			background-position: center;
+			background-size: 75%;
+			background-repeat: no-repeat;
+			background-color: rgba(#000, 0.5);
+			cursor: pointer;
+			transition-property: opacity, background-color;
+			transition-duration: 0.15s;
+
+			+desktop() {
+				width: 28px;
+				height: 28px;
+				opacity: 0.85;
+
+				&:hover {
+					opacity: 1;
+				}
+			}
+
+			+mobile() {
+				width: 26px;
+				height: 26px;
+			}
+
+			&.unsupported {
+				pointer-events: none;
+			}
+
+			&.disabled {
+				pointer-events: none;
+				opacity: 0.5;
+			}
+
+			&.on {
+				background-color: rgba(#fff, 0.7);
+			}
+
+			&.mic {
+				&.on {
+					background-image: url('/resources/images/icon_mic_black_on.svg');
+				}
+
+				&.off {
+					background-image: url('/resources/images/icon_mic_white_off.svg');
+					background-color: rgba(#d42241, 0.7);
+				}
+
+				&.unsupported {
+					background-image: url('/resources/images/icon_mic_white_unsupported.svg');
+				}
+			}
+
+			&.webcam {
+				&.on {
+					background-image: url('/resources/images/icon_webcam_black_on.svg');
+				}
+
+				&.off {
+					background-image: url('/resources/images/icon_webcam_white_on.svg');
+				}
+
+				&.unsupported {
+					background-image: url('/resources/images/icon_webcam_white_unsupported.svg');
+				}
+			}
+
+			&.change-webcam {
+				&.on {
+					background-image: url('/resources/images/icon_change_webcam_black.svg');
+				}
+
+				&.unsupported {
+					background-image: url('/resources/images/icon_change_webcam_white_unsupported.svg');
+				}
+			}
+		}
+	}
+}

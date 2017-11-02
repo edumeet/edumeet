@@ -1,17 +1,13 @@
-'use strict';
-
 /**
  * Tasks:
  *
- * gulp prod
- *   Generates the browser app in production mode.
- *
- * gulp dev
- *   Generates the browser app in development mode.
+ * gulp dist
+ *   Generates the browser app in development mode (unless NODE_ENV is set
+ *   to 'production').
  *
  * gulp live
- *   Generates the browser app in development mode, opens it and watches
- *   for changes in the source code.
+ *   Generates the browser app in development mode (unless NODE_ENV is set
+ *   to 'production'), opens it and watches for changes in the source code.
  *
  * gulp
  *   Alias for `gulp live`.
@@ -23,9 +19,9 @@ const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const plumber = require('gulp-plumber');
-const touch = require('gulp-touch');
 const rename = require('gulp-rename');
 const header = require('gulp-header');
+const touch = require('gulp-touch-cmd');
 const browserify = require('browserify');
 const watchify = require('watchify');
 const envify = require('envify/custom');
@@ -50,24 +46,25 @@ const BANNER_OPTIONS =
 };
 const OUTPUT_DIR = '../server/public';
 
-// Default environment.
-process.env.NODE_ENV = 'development';
+// Set Node 'development' environment (unless externally set).
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
+gutil.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
 function logError(error)
 {
-	gutil.log(gutil.colors.red(String(error)));
-
-	throw error;
+	gutil.log(gutil.colors.red(error.stack));
 }
 
 function bundle(options)
 {
 	options = options || {};
 
-	let watch = !!options.watch;
+	const watch = Boolean(options.watch);
+
 	let bundler = browserify(
 		{
-			entries      : path.join(__dirname, PKG.main),
+			entries      : PKG.main,
 			extensions   : [ '.js', '.jsx' ],
 			// required for sourcemaps (must be false otherwise).
 			debug        : process.env.NODE_ENV === 'development',
@@ -81,7 +78,12 @@ function bundle(options)
 		.transform('babelify',
 			{
 				presets : [ 'es2015', 'react' ],
-				plugins : [ 'transform-runtime', 'transform-object-assign' ]
+				plugins :
+				[
+					'transform-runtime',
+					'transform-object-assign',
+					'transform-object-rest-spread'
+				]
 			})
 		.transform(envify(
 			{
@@ -95,7 +97,7 @@ function bundle(options)
 
 		bundler.on('update', () =>
 		{
-			let start = Date.now();
+			const start = Date.now();
 
 			gutil.log('bundling...');
 			rebundle();
@@ -107,6 +109,7 @@ function bundle(options)
 	{
 		return bundler.bundle()
 			.on('error', logError)
+			.pipe(plumber())
 			.pipe(source(`${PKG.name}.js`))
 			.pipe(buffer())
 			.pipe(rename(`${PKG.name}.js`))
@@ -122,25 +125,14 @@ function bundle(options)
 
 gulp.task('clean', () => del(OUTPUT_DIR, { force: true }));
 
-gulp.task('env:dev', (done) =>
-{
-	gutil.log('setting "dev" environment');
-
-	process.env.NODE_ENV = 'development';
-	done();
-});
-
-gulp.task('env:prod', (done) =>
-{
-	gutil.log('setting "prod" environment');
-
-	process.env.NODE_ENV = 'production';
-	done();
-});
-
 gulp.task('lint', () =>
 {
-	let src = [ 'gulpfile.js', 'lib/**/*.js', 'lib/**/*.jsx' ];
+	const src =
+	[
+		'gulpfile.js',
+		'lib/**/*.js',
+		'lib/**/*.jsx'
+	];
 
 	return gulp.src(src)
 		.pipe(plumber())
@@ -176,7 +168,7 @@ gulp.task('html', () =>
 
 gulp.task('resources', (done) =>
 {
-	let dst = path.join(OUTPUT_DIR, 'resources');
+	const dst = path.join(OUTPUT_DIR, 'resources');
 
 	mkdirp.sync(dst);
 	ncp('resources', dst, { stopOnErr: true }, (error) =>
@@ -204,9 +196,9 @@ gulp.task('livebrowser', (done) =>
 
 	browserSync(
 		{
-			open      : 'external',
-			host      : config.domain,
-			server    :
+			open   : 'external',
+			host   : config.domain,
+			server :
 			{
 				baseDir : OUTPUT_DIR
 			},
@@ -224,9 +216,9 @@ gulp.task('browser', (done) =>
 
 	browserSync(
 		{
-			open      : 'external',
-			host      : config.domain,
-			server    :
+			open   : 'external',
+			host   : config.domain,
+			server :
 			{
 				baseDir : OUTPUT_DIR
 			},
@@ -262,18 +254,7 @@ gulp.task('watch', (done) =>
 	done();
 });
 
-gulp.task('prod', gulp.series(
-	'env:prod',
-	'clean',
-	'lint',
-	'bundle',
-	'html',
-	'css',
-	'resources'
-));
-
-gulp.task('dev', gulp.series(
-	'env:dev',
+gulp.task('dist', gulp.series(
 	'clean',
 	'lint',
 	'bundle',
@@ -283,7 +264,6 @@ gulp.task('dev', gulp.series(
 ));
 
 gulp.task('live', gulp.series(
-	'env:dev',
 	'clean',
 	'lint',
 	'bundle:watch',

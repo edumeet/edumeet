@@ -2,21 +2,21 @@
 
 <html>
 	<head>
-		<title>mediasoup demo</title>
+		<title>mediasoup v2 demo</title>
 		<meta charset='UTF-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'>
-		<meta name='description' content='mediasoup demo - Cutting Edge WebRTC Video Conferencing'>
+		<meta name='description' content='mediasoup v2 demo - Cutting Edge WebRTC Video Conferencing'>
 
 		<link rel='stylesheet' href='/mediasoup-demo-app.css'>
 
 		<script src='/resources/js/antiglobal.js'></script>
 		<script>
-			window.localStorage.setItem('debug', '* -engine* -socket* *WARN* *ERROR*');
+			window.localStorage.setItem('debug', '* -engine* -socket* -RIE* *WARN* *ERROR*');
 
 			if (window.antiglobal)
 			{
-				window.antiglobal('___browserSync___oldSocketIo', 'io', '___browserSync___', '__core-js_shared__', 'RTCPeerConnection');
-				setInterval(window.antiglobal, 5000);
+				window.antiglobal('___browserSync___oldSocketIo', 'io', '___browserSync___', '__core-js_shared__');
+				setInterval(window.antiglobal, 180000);
 			}
 		</script>
 		<script async src='/mediasoup-demo-app.js'></script>

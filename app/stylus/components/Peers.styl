@@ -1,0 +1,60 @@
+[data-component='Peers'] {
+	min-height: 100%;
+	width: 100%;
+
+	+desktop() {
+		width: 100%;
+		padding: 40px 0 140px 0;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+		align-content: center;
+	}
+
+	+mobile() {
+		min-height: 100vh;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	> .peer-container {
+		overflow: hidden;
+
+		AppearFadeIn(1000ms);
+
+		+desktop() {
+			flex: 0 0 auto;
+			height: 382px;
+			width: 450px;
+			margin: 6px;
+			border: 1px solid rgba(#fff, 0.15);
+			box-shadow: 0px 5px 12px 2px rgba(#111, 0.5);
+			transition-property: border-color;
+			transition-duration: 0.15s;
+
+			&.active-speaker {
+				border-color: #fff;
+			}
+		}
+
+		+mobile() {
+			flex: 100 100 auto;
+			order: 2;
+			min-height: 25vh;
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+
+			&.active-speaker {
+				order: 1;
+			}
+		}
+	}
+}

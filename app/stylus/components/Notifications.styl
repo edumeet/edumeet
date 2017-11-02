@@ -1,0 +1,101 @@
+[data-component='Notifications'] {
+	position: fixed;
+	z-index: 9999;
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: flex-end;
+
+	+desktop() {
+		padding: 10px;
+		width: 300px;
+	}
+
+	+mobile() {
+		padding: 4px;
+		width: 65%;
+		max-width: 220px;
+	}
+
+	> .notification {
+		pointer-events: auto;
+		margin-top: 4px;
+		border-radius: 4px;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+
+		&.Appear-appear {
+			visibility: hidden;
+			opacity: 0;
+			transition: all 0.15s ease-in-out 0s, visibility 0s linear 0.25s;
+			transform: translateX(200px);
+		}
+
+		&.Appear-appear.Appear-appear-active {
+			visibility: visible;
+			pointer-events: auto;
+			opacity: 1;
+			transform: translateY(0%);
+			transition-delay: 0s, 0s;
+		}
+
+		+desktop() {
+			padding: 16px 24px 16px 12px;
+		}
+
+		+mobile() {
+			padding: 6px 16px 6px 12px;
+		}
+
+		> .icon {
+			flex: 0 0 auto;
+			height: 24px;
+			width: 24px;
+			margin-right: 12px;
+			background-position: center;
+			background-size: 100%;
+			background-repeat: no-repeat;
+		}
+
+		> .text {
+			font-size: 13px;
+			user-select: none;
+			cursor: default;
+
+			+desktop() {
+				font-size: 13px;
+			}
+
+			+mobile() {
+				font-size: 11px;
+			}
+		}
+
+		&.info {
+			background-color: rgba(#0a1d26, 0.75);
+			color: rgba(#fff, 0.65);
+
+			>.icon {
+				opacity: 0.65;
+				background-image: url('/resources/images/icon_notification_info_white.svg');
+			}
+		}
+
+		&.error {
+			background-color: rgba(#ff1914, 0.65);
+			color: rgba(#fff, 0.85);
+
+			>.icon {
+				opacity: 0.85;
+				background-image: url('/resources/images/icon_notification_error_white.svg');
+			}
+		}
+	}
+}

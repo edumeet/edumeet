@@ -2,7 +2,7 @@
 
 const debug = require('debug');
 
-const NAMESPACE = 'mediasoup-demo-server';
+const APP_NAME = 'mediasoup-demo-server';
 
 class Logger
 {
@@ -10,23 +10,25 @@ class Logger
 	{
 		if (prefix)
 		{
-			this._debug = debug(NAMESPACE + ':' + prefix);
-			this._log = debug(NAMESPACE + ':LOG:' + prefix);
-			this._warn = debug(NAMESPACE + ':WARN:' + prefix);
-			this._error = debug(NAMESPACE + ':ERROR:' + prefix);
+			this._debug = debug(`${APP_NAME}:${prefix}`);
+			this._info = debug(`${APP_NAME}:INFO:${prefix}`);
+			this._warn = debug(`${APP_NAME}:WARN:${prefix}`);
+			this._error = debug(`${APP_NAME}:ERROR:${prefix}`);
 		}
 		else
 		{
-			this._debug = debug(NAMESPACE);
-			this._log = debug(NAMESPACE + ':LOG');
-			this._warn = debug(NAMESPACE + ':WARN');
-			this._error = debug(NAMESPACE + ':ERROR');
+			this._debug = debug(APP_NAME);
+			this._info = debug(`${APP_NAME}:INFO`);
+			this._warn = debug(`${APP_NAME}:WARN`);
+			this._error = debug(`${APP_NAME}:ERROR`);
 		}
 
+		/* eslint-disable no-console */
 		this._debug.log = console.info.bind(console);
-		this._log.log = console.info.bind(console);
+		this._info.log = console.info.bind(console);
 		this._warn.log = console.warn.bind(console);
 		this._error.log = console.error.bind(console);
+		/* eslint-enable no-console */
 	}
 
 	get debug()
@@ -34,9 +36,9 @@ class Logger
 		return this._debug;
 	}
 
-	get log()
+	get info()
 	{
-		return this._log;
+		return this._info;
 	}
 
 	get warn()
@@ -50,7 +52,4 @@ class Logger
 	}
 }
 
-module.exports = function(prefix)
-{
-	return new Logger(prefix);
-};
+module.exports = Logger;

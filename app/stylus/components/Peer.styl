@@ -1,0 +1,72 @@
+[data-component='Peer'] {
+	flex: 100 100 auto;
+	position: relative;
+	height: 100%;
+	width: 100%;
+
+	+mobile() {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	> .indicators {
+		position: absolute;
+		z-index: 10
+		top: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		flex-direction:; row;
+		justify-content: flex-end;
+		align-items: center;
+
+		> .icon {
+			flex: 0 0 auto;
+			margin: 4px;
+			margin-left: 0;
+			width: 32px;
+			height: 32px;
+			background-position: center;
+			background-size: 75%;
+			background-repeat: no-repeat;
+			transition-property: opacity;
+			transition-duration: 0.15s;
+
+			+desktop() {
+				opacity: 0.85;
+			}
+
+			&.mic-off {
+				background-image: url('/resources/images/icon_remote_mic_white_off.svg');
+			}
+
+			&.webcam-off {
+				background-image: url('/resources/images/icon_remote_webcam_white_off.svg');
+			}
+		}
+	}
+
+	.incompatible-video {
+		position: absolute;
+		z-index: 2
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		> p {
+			padding: 6px 12px;
+			border-radius: 6px;
+			user-select: none;
+			pointer-events: none;
+			font-size: 15px;
+			color: rgba(#fff, 0.55);
+		}
+	}
+}

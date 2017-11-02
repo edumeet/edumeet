@@ -1,41 +1,51 @@
-'use strict';
-
-import browser from 'bowser';
 import domready from 'domready';
 import UrlParse from 'url-parse';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import injectTapEventPlugin from 'react-tap-event-plugin';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import {
+	applyMiddleware as applyReduxMiddleware,
+	createStore as createReduxStore
+} from 'redux';
+import thunk from 'redux-thunk';
+import { createLogger as createReduxLogger } from 'redux-logger';
+import { getDeviceInfo } from 'mediasoup-client';
 import randomString from 'random-string';
+import randomName from 'node-random-name';
 import Logger from './Logger';
 import * as utils from './utils';
-import edgeRTCPeerConnection from './edge/RTCPeerConnection';
-import edgeRTCSessionDescription from './edge/RTCSessionDescription';
-import App from './components/App';
+import * as cookiesManager from './cookiesManager';
+import * as requestActions from './redux/requestActions';
+import * as stateActions from './redux/stateActions';
+import reducers from './redux/reducers';
+import roomClientMiddleware from './redux/roomClientMiddleware';
+import Room from './components/Room';
 
-const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#room-id=([0-9a-zA-Z_-]+)$');
 const logger = new Logger();
+const reduxMiddlewares =
+[
+	thunk,
+	roomClientMiddleware
+];
 
-injectTapEventPlugin();
-
-logger.debug('detected browser [name:"%s", version:%s]', browser.name, browser.version);
-
-// If Edge, use the Jitsi RTCPeerConnection shim.
-if (browser.msedge)
+if (process.env.NODE_ENV === 'development')
 {
-	logger.debug('Edge detected, overriding RTCPeerConnection and RTCSessionDescription');
+	const reduxLogger = createReduxLogger(
+		{
+			duration  : true,
+			timestamp : false,
+			level     : 'log',
+			logErrors : true
+		});
 
-	window.RTCPeerConnection = edgeRTCPeerConnection;
-	window.RTCSessionDescription = edgeRTCSessionDescription;
+	reduxMiddlewares.push(reduxLogger);
 }
-// Otherwise, do almost anything.
-else
-{
-	window.RTCPeerConnection =
-		window.webkitRTCPeerConnection ||
-		window.mozRTCPeerConnection ||
-		window.RTCPeerConnection;
-}
+
+const store = createReduxStore(
+	reducers,
+	undefined,
+	applyReduxMiddleware(...reduxMiddlewares)
+);
 
 domready(() =>
 {
@@ -43,32 +53,131 @@ domready(() =>
 
 	// Load stuff and run
 	utils.initialize()
-		.then(run)
-		.catch((error) =>
-		{
-			console.error(error);
-		});
+		.then(run);
 });
 
 function run()
 {
 	logger.debug('run() [environment:%s]', process.env.NODE_ENV);
 
-	let container = document.getElementById('mediasoup-demo-app-container');
-	let urlParser = new UrlParse(window.location.href, true);
-	let match = urlParser.hash.match(REGEXP_FRAGMENT_ROOM_ID);
-	let peerId = randomString({ length: 8 }).toLowerCase();
-	let roomId;
+	const peerName = randomString({ length: 8 }).toLowerCase();
+	const urlParser = new UrlParse(window.location.href, true);
+	let roomId = urlParser.query.roomId;
+	const produce = urlParser.query.produce !== 'false';
+	let displayName = urlParser.query.displayName;
+	const isSipEndpoint = urlParser.query.sipEndpoint === 'true';
+	const useSimulcast = urlParser.query.simulcast !== 'false';
 
-	if (match)
+	if (!roomId)
 	{
-		roomId = match[1];
+		roomId = randomString({ length: 8 }).toLowerCase();
+
+		urlParser.query.roomId = roomId;
+		window.history.pushState('', '', urlParser.toString());
+	}
+
+	// Get the effective/shareable Room URL.
+	const roomUrlParser = new UrlParse(window.location.href, true);
+
+	for (const key of Object.keys(roomUrlParser.query))
+	{
+		// Don't keep some custom params.
+		switch (key)
+		{
+			case 'roomId':
+			case 'simulcast':
+				break;
+			default:
+				delete roomUrlParser.query[key];
+		}
+	}
+	delete roomUrlParser.hash;
+
+	const roomUrl = roomUrlParser.toString();
+
+	// Get displayName from cookie (if not already given as param).
+	const userCookie = cookiesManager.getUser() || {};
+	let displayNameSet;
+
+	if (!displayName)
+		displayName = userCookie.displayName;
+
+	if (displayName)
+	{
+		displayNameSet = true;
 	}
 	else
 	{
-		roomId = randomString({ length: 8 }).toLowerCase();
-		window.location = `#room-id=${roomId}`;
+		displayName = randomName();
+		displayNameSet = false;
 	}
 
-	ReactDOM.render(<App peerId={peerId} roomId={roomId}/>, container);
+	// Get current device.
+	const device = getDeviceInfo();
+
+	// If a SIP endpoint mangle device info.
+	if (isSipEndpoint)
+	{
+		device.flag = 'sipendpoint';
+		device.name = 'SIP Endpoint';
+		device.version = undefined;
+	}
+
+	// NOTE: I don't like this.
+	store.dispatch(
+		stateActions.setRoomUrl(roomUrl));
+
+	// NOTE: I don't like this.
+	store.dispatch(
+		stateActions.setMe({ peerName, displayName, displayNameSet, device }));
+
+	// NOTE: I don't like this.
+	store.dispatch(
+		requestActions.joinRoom(
+			{ roomId, peerName, displayName, device, useSimulcast, produce }));
+
+	render(
+		<Provider store={store}>
+			<Room />
+		</Provider>,
+		document.getElementById('mediasoup-demo-app-container')
+	);
 }
+
+// TODO: Debugging stuff.
+
+setInterval(() =>
+{
+	if (!global.CLIENT._room.peers[0])
+	{
+		delete global.CONSUMER;
+
+		return;
+	}
+
+	const peer = global.CLIENT._room.peers[0];
+
+	global.CONSUMER = peer.consumers[peer.consumers.length - 1];
+}, 2000);
+
+global.sendSdp = function()
+{
+	logger.debug('---------- SEND_TRANSPORT LOCAL SDP OFFER:');
+	logger.debug(
+		global.CLIENT._sendTransport._handler._pc.localDescription.sdp);
+
+	logger.debug('---------- SEND_TRANSPORT REMOTE SDP ANSWER:');
+	logger.debug(
+		global.CLIENT._sendTransport._handler._pc.remoteDescription.sdp);
+};
+
+global.recvSdp = function()
+{
+	logger.debug('---------- RECV_TRANSPORT REMOTE SDP OFFER:');
+	logger.debug(
+		global.CLIENT._recvTransport._handler._pc.remoteDescription.sdp);
+
+	logger.debug('---------- RECV_TRANSPORT LOCAL SDP ANSWER:');
+	logger.debug(
+		global.CLIENT._recvTransport._handler._pc.localDescription.sdp);
+};

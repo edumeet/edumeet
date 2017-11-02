@@ -21,13 +21,13 @@ desktop()
 	@media (min-device-width: 721px)
 		{block}
 
-TransitionAppear($duration = 1s, $appearOpacity = 0, $activeOpacity = 1)
+AppearFadeIn($duration = 1s, $enterOpacity = 0, $activeOpacity = 1)
 	will-change: opacity;
 
-	&.transition-appear
-		opacity: $appearOpacity;
+	&.Appear-appear
+		opacity: $enterOpacity;
 
-	&.transition-appear.transition-appear-active
+	&.Appear-appear.Appear-appear-active
 		transition-property: opacity;
 		transition-duration: $duration;
 		opacity: $activeOpacity;
