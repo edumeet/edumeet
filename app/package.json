@@ -13,7 +13,7 @@
     "domready": "^1.0.8",
     "hark": "^1.1.6",
     "js-cookie": "^2.2.0",
-    "mediasoup-client": "^2.0.1",
+    "mediasoup-client": "^2.0.2",
     "node-random-name": "^1.0.1",
     "prop-types": "^15.6.0",
     "protoo-client": "^2.0.5",
