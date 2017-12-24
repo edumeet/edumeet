@@ -66,7 +66,7 @@ $ gulp live
 
 ```bash
 $ cd app
-$ gulp prod
+$ gulp dist
 ```
 
 * Upload the entire `server` folder to your server and make your web server (Apache, Nginx...) expose the `server/public` folder.
