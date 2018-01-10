@@ -17,7 +17,7 @@ module.exports =
 		[
 			'info',
 			'ice',
-			'dlts',
+			'dtls',
 			'rtp',
 			'srtp',
 			'rtcp',

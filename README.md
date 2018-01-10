@@ -83,5 +83,5 @@ $ gulp dist
 
 ## License
 
-All Rights Reserved.
+MIT
 
