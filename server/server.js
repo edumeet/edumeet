@@ -74,7 +74,7 @@ mediaServer.on('newroom', (room) =>
 	});
 });
 
-// HTTPS server for the protoo WebSocjet server.
+// HTTPS server for the protoo WebSocket server.
 const tls =
 {
 	cert : fs.readFileSync(config.tls.cert),
