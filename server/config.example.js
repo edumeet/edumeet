@@ -1,7 +1,5 @@
 module.exports =
 {
-	// DEBUG env variable For the NPM debug module.
-	debug  : '*INFO* *WARN* *ERROR* *mediasoup-worker*',
 	// Listening hostname for `gulp live|open`.
 	domain : 'localhost',
 	tls    :

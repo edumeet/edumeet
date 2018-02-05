@@ -58,7 +58,7 @@ export const Consumer = PropTypes.shape(
 		supported      : PropTypes.bool.isRequired,
 		locallyPaused  : PropTypes.bool.isRequired,
 		remotelyPaused : PropTypes.bool.isRequired,
-		profile        : PropTypes.oneOf([ 'none', 'low', 'medium', 'high' ]),
+		profile        : PropTypes.oneOf([ 'none', 'default', 'low', 'medium', 'high' ]),
 		track          : PropTypes.any,
 		codec          : PropTypes.string
 	});
