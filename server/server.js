@@ -6,8 +6,6 @@ process.title = 'mediasoup-demo-server';
 
 const config = require('./config');
 
-process.env.DEBUG = process.env.DEBUG || '*INFO* *WARN* *ERROR* *mediasoup-worker*';
-
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
 console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
