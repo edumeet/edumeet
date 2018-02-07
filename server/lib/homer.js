@@ -350,8 +350,6 @@ function emit(event, stream)
 
 	const line = JSON.stringify(event);
 
-	console.warn(line);
-
 	stream.write(line);
 	stream.write('\n');
 }
