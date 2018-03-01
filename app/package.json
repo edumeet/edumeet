@@ -1,8 +1,8 @@
 {
-  "name": "mediasoup-demo-app",
-  "version": "2.0.0",
+  "name": "multiparty-meeting",
+  "version": "1.0.0",
   "private": true,
-  "description": "mediasoup demo app",
+  "description": "multiparty meeting service",
   "author": "Iñaki Baz Castillo <ibc@aliax.net>",
   "license": "All Rights Reserved",
   "main": "lib/index.jsx",

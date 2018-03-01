@@ -140,7 +140,7 @@ function run()
 		<Provider store={store}>
 			<Room />
 		</Provider>,
-		document.getElementById('mediasoup-demo-app-container')
+		document.getElementById('multiparty-meeting')
 	);
 }
 
