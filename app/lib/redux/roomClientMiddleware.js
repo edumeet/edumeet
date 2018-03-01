@@ -108,6 +108,15 @@ export default ({ dispatch, getState }) => (next) =>
 
 				break;
 			}
+
+			case 'SEND_CHAT_MESSAGE':
+			{
+				const { message } = action.payload;
+
+				client.sendChatMessage(message);
+
+				break;
+			}
 		}
 
 		return next(action);

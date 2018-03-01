@@ -1,5 +1,9 @@
 import randomString from 'random-string';
 import * as stateActions from './stateActions';
+import
+{
+	createNewMessage
+} from './reducers/helper';
 
 export const joinRoom = (
 	{ roomId, peerName, displayName, device, useSimulcast, produce }) =>
@@ -78,6 +82,16 @@ export const restartIce = () =>
 {
 	return {
 		type : 'RESTART_ICE'
+	};
+};
+
+export const sendChatMessage = (text, name) =>
+{
+	const message = createNewMessage(text, 'response', name);
+
+	return {
+		type    : 'SEND_CHAT_MESSAGE',
+		payload : { message }
 	};
 };
 

@@ -220,3 +220,48 @@ export const removeAllNotifications = () =>
 		type : 'REMOVE_ALL_NOTIFICATIONS'
 	};
 };
+
+export const toggleChat = () =>
+{
+	return {
+		type : 'TOGGLE_CHAT'
+	};
+};
+
+export const toggleInputDisabled = () =>
+{
+	return {
+		type : 'TOGGLE_INPUT_DISABLED'
+	};
+};
+
+export const addUserMessage = (text) =>
+{
+	return {
+		type    : 'ADD_NEW_USER_MESSAGE',
+		payload : { text }
+	};
+};
+
+export const addResponseMessage = (message) =>
+{
+	return {
+		type    : 'ADD_NEW_RESPONSE_MESSAGE',
+		payload : { message }
+	};
+};
+
+export const addChatHistory = (chatHistory) =>
+{
+	return {
+		type    : 'ADD_CHAT_HISTORY',
+		payload : { chatHistory }
+	};
+};
+
+export const dropMessages = () =>
+{
+	return {
+		type : 'DROP_MESSAGES'
+	};
+};

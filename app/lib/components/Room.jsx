@@ -10,6 +10,7 @@ import { Appear } from './transitions';
 import Me from './Me';
 import Peers from './Peers';
 import Notifications from './Notifications';
+import ChatWidget from './ChatWidget';
 
 class Room extends React.Component
 {
@@ -29,6 +30,7 @@ class Room extends React.Component
 			<Appear duration={300}>
 				<div data-component='Room'>
 					<Notifications />
+					<ChatWidget />
 
 					<div className='state' data-tip='Server status'>
 						<div className={classnames('icon', room.state)} />

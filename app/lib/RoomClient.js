@@ -13,7 +13,7 @@ const ROOM_OPTIONS =
 	requestTimeout   : 10000,
 	transportOptions :
 	{
-		tcp : false
+		tcp : true
 	}
 };
 
@@ -138,6 +138,40 @@ export default class RoomClient
 				// We need to refresh the component for it to render the previous
 				// displayName again.
 				this._dispatch(stateActions.setDisplayName());
+			});
+	}
+
+	sendChatMessage(chatMessage)
+	{
+		logger.debug('sendChatMessage() [chatMessage:"%s"]', chatMessage);
+
+		return this._protoo.send('chat-message', { chatMessage })
+			.catch((error) =>
+			{
+				logger.error('sendChatMessage() | failed: %o', error);
+
+				this._dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : `Could not send chat: ${error}`
+					}));
+			});
+	}
+
+	getChatHistory()
+	{
+		logger.debug('getChatHistory()');
+
+		return this._protoo.send('chat-history', {})
+			.catch((error) =>
+			{
+				logger.error('getChatHistory() | failed: %o', error);
+
+				this._dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : `Could not get chat history: ${error}`
+					}));
 			});
 	}
 
@@ -579,6 +613,36 @@ export default class RoomClient
 					break;
 				}
 
+				case 'chat-message-receive':
+				{
+					accept();
+
+					const { peerName, chatMessage } = request.data;
+
+					logger.debug('Got chat from "%s"', peerName);
+
+					this._dispatch(
+						stateActions.addResponseMessage(chatMessage));
+
+					break;
+				}
+
+				case 'chat-history-receive':
+				{
+					accept();
+
+					const { chatHistory } = request.data;
+
+					if (chatHistory.length > 0)
+					{
+						logger.debug('Got chat history');
+						this._dispatch(
+							stateActions.addChatHistory(chatHistory));
+					}
+
+					break;
+				}
+
 				default:
 				{
 					logger.error('unknown protoo method "%s"', request.method);
@@ -708,6 +772,8 @@ export default class RoomClient
 
 				// Clean all the existing notifcations.
 				this._dispatch(stateActions.removeAllNotifications());
+
+				this.getChatHistory();
 
 				this._dispatch(requestActions.notify(
 					{

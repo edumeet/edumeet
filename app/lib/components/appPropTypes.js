@@ -69,3 +69,11 @@ export const Notification = PropTypes.shape(
 		type    : PropTypes.oneOf([ 'info', 'error' ]).isRequired,
 		timeout : PropTypes.number
 	});
+
+export const Message = PropTypes.shape(
+	{
+		type      : PropTypes.string,
+		component : PropTypes.string,
+		text      : PropTypes.string,
+		sender    : PropTypes.string
+	});

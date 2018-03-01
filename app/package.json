@@ -13,6 +13,7 @@
     "domready": "^1.0.8",
     "hark": "^1.1.6",
     "js-cookie": "^2.2.0",
+    "marked": "^0.3.17",
     "mediasoup-client": "^2.0.14",
     "node-random-name": "^1.0.1",
     "prop-types": "^15.6.0",

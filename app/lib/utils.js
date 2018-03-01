@@ -4,7 +4,7 @@ export function initialize()
 {
 	// Media query detector stuff.
 	mediaQueryDetectorElem =
-		document.getElementById('mediasoup-demo-app-media-query-detector');
+		document.getElementById('multiparty-meeting-media-query-detector');
 
 	return Promise.resolve();
 }

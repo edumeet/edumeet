@@ -26,6 +26,8 @@ class Room extends EventEmitter
 		// Closed flag.
 		this._closed = false;
 
+		this._chatHistory = [];
+
 		try
 		{
 			// Protoo Room instance.
@@ -222,6 +224,38 @@ class Room extends EventEmitter
 							oldDisplayName : oldDisplayName
 						},
 						[ protooPeer ]);
+
+					break;
+				}
+
+				case 'chat-message':
+				{
+					accept();
+
+					const { chatMessage } = request.data;
+
+					this._chatHistory.push(chatMessage);
+
+					// Spread to others via protoo.
+					this._protooRoom.spread(
+						'chat-message-receive',
+						{
+							peerName    : protooPeer.id,
+							chatMessage : chatMessage
+						},
+						[ protooPeer ]);
+
+					break;
+				}
+
+				case 'chat-history':
+				{
+					accept();
+
+					protooPeer.send(
+						'chat-history-receive',
+						{ chatHistory : this._chatHistory }
+					);
 
 					break;
 				}
