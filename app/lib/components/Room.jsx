@@ -11,96 +11,109 @@ import Me from './Me';
 import Peers from './Peers';
 import Notifications from './Notifications';
 
-const Room = (
-	{
-		room,
-		me,
-		amActiveSpeaker,
-		onRoomLinkCopy,
-		onSetAudioMode,
-		onRestartIce
-	}) =>
+class Room extends React.Component
 {
-	return (
-		<Appear duration={300}>
-			<div data-component='Room'>
-				<Notifications />
+	render()
+	{
+		const {
+			room,
+			me,
+			amActiveSpeaker,
+			onRoomLinkCopy,
+			onSetAudioMode,
+			onRestartIce,
+			onLeaveMeeting
+		} = this.props;
 
-				<div className='state'>
-					<div className={classnames('icon', room.state)} />
-					<p className={classnames('text', room.state)}>{room.state}</p>
-				</div>
+		return (
+			<Appear duration={300}>
+				<div data-component='Room'>
+					<Notifications />
 
-				<div className='room-link-wrapper'>
-					<div className='room-link'>
-						<ClipboardButton
-							component='a'
-							className='link'
-							button-href={room.url}
-							button-target='_blank'
-							data-clipboard-text={room.url}
-							onSuccess={onRoomLinkCopy}
-							onClick={(event) =>
-							{
-								// If this is a 'Open in new window/tab' don't prevent
-								// click default action.
-								if (
-									event.ctrlKey || event.shiftKey || event.metaKey ||
-									// Middle click (IE > 9 and everyone else).
-									(event.button && event.button === 1)
-								)
-								{
-									return;
-								}
-
-								event.preventDefault();
-							}}
-						>
-							invitation link
-						</ClipboardButton>
+					<div className='state' data-tip='Server status'>
+						<div className={classnames('icon', room.state)} />
+						<p className={classnames('text', room.state)}>{room.state}</p>
 					</div>
-				</div>
 
-				<Peers />
+					<div className='room-link-wrapper'>
+						<div className='room-link'>
+							<ClipboardButton
+								component='a'
+								className='link'
+								button-href={room.url}
+								button-target='_blank'
+								data-tip='Click to copy room link'
+								data-clipboard-text={room.url}
+								onSuccess={onRoomLinkCopy}
+								onClick={(event) =>
+								{
+									// If this is a 'Open in new window/tab' don't prevent
+									// click default action.
+									if (
+										event.ctrlKey || event.shiftKey || event.metaKey ||
+										// Middle click (IE > 9 and everyone else).
+										(event.button && event.button === 1)
+									)
+									{
+										return;
+									}
 
-				<div
-					className={classnames('me-container', {
-						'active-speaker' : amActiveSpeaker
-					})}
-				>
-					<Me />
-				</div>
+									event.preventDefault();
+								}}
+							>
+								invitation link
+							</ClipboardButton>
+						</div>
+					</div>
 
-				<div className='sidebar'>
+					<Peers />
+
 					<div
-						className={classnames('button', 'audio-only', {
-							on       : me.audioOnly,
-							disabled : me.audioOnlyInProgress
+						className={classnames('me-container', {
+							'active-speaker' : amActiveSpeaker
 						})}
-						data-tip='Toggle audio only mode'
-						data-type='dark'
-						onClick={() => onSetAudioMode(!me.audioOnly)}
-					/>
+					>
+						<Me />
+					</div>
 
-					<div
-						className={classnames('button', 'restart-ice', {
-							disabled : me.restartIceInProgress
-						})}
-						data-tip='Restart ICE'
-						data-type='dark'
-						onClick={() => onRestartIce()}
+					<div className='sidebar'>
+						<div
+							className={classnames('button', 'audio-only', {
+								on       : me.audioOnly,
+								disabled : me.audioOnlyInProgress
+							})}
+							data-tip='Toggle audio only mode'
+							data-type='dark'
+							onClick={() => onSetAudioMode(!me.audioOnly)}
+						/>
+
+						<div
+							className={classnames('button', 'restart-ice', {
+								disabled : me.restartIceInProgress
+							})}
+							data-tip='Restart ICE'
+							data-type='dark'
+							onClick={() => onRestartIce()}
+						/>
+
+						<div
+							className={classnames('button', 'leave-meeting')}
+							data-tip='Leave meeting'
+							data-type='dark'
+							onClick={() => onLeaveMeeting()}
+						/>
+					</div>
+
+					<ReactTooltip
+						effect='solid'
+						delayShow={100}
+						delayHide={100}
 					/>
 				</div>
-
-				<ReactTooltip
-					effect='solid'
-					delayShow={100}
-					delayHide={100}
-				/>
-			</div>
-		</Appear>
-	);
-};
+			</Appear>
+		);
+	}
+}
 
 Room.propTypes =
 {
@@ -109,7 +122,8 @@ Room.propTypes =
 	amActiveSpeaker : PropTypes.bool.isRequired,
 	onRoomLinkCopy  : PropTypes.func.isRequired,
 	onSetAudioMode  : PropTypes.func.isRequired,
-	onRestartIce    : PropTypes.func.isRequired
+	onRestartIce    : PropTypes.func.isRequired,
+	onLeaveMeeting  : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -141,6 +155,10 @@ const mapDispatchToProps = (dispatch) =>
 		onRestartIce : () =>
 		{
 			dispatch(requestActions.restartIce());
+		},
+		onLeaveMeeting : () =>
+		{
+			dispatch(requestActions.leaveRoom());
 		}
 	};
 };
