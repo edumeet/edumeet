@@ -1,6 +1,6 @@
 import debug from 'debug';
 
-const APP_NAME = 'mediasoup-demo';
+const APP_NAME = 'multiparty-meeting';
 
 export default class Logger
 {

@@ -2,7 +2,7 @@
 
 const debug = require('debug');
 
-const APP_NAME = 'mediasoup-demo-server';
+const APP_NAME = 'multiparty-meeting-server';
 
 class Logger
 {

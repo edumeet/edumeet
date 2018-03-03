@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "description": "multiparty meeting service",
-  "author": "Iñaki Baz Castillo <ibc@aliax.net>",
-  "license": "All Rights Reserved",
+  "author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
+  "license": "MIT",
   "main": "lib/index.jsx",
   "dependencies": {
     "babel-runtime": "^6.26.0",
@@ -15,7 +15,6 @@
     "js-cookie": "^2.2.0",
     "marked": "^0.3.17",
     "mediasoup-client": "^2.0.14",
-    "node-random-name": "^1.0.1",
     "prop-types": "^15.6.0",
     "protoo-client": "^2.0.7",
     "random-string": "^0.2.0",

@@ -1,8 +1,8 @@
-# mediasoup-demo
+# multiparty-meeting
 
-A demo of [mediasoup](https://mediasoup.org).
+A WebRTC meeting service using [mediasoup](https://mediasoup.org) as its backend.
 
-Try it online at https://demo.mediasoup.org.
+Try it online at https://mediasoup.akademia.no.
 
 
 ## Installation
@@ -10,8 +10,8 @@ Try it online at https://demo.mediasoup.org.
 * Clone the project:
 
 ```bash
-$ git clone https://github.com/versatica/mediasoup-demo.git
-$ cd mediasoup-demo
+$ git clone https://github.com/havfo/multiparty-meeting.git
+$ cd multiparty-meeting
 ```
 
 * Set up the server:
@@ -78,6 +78,10 @@ $ gulp dist
 
 ## Author
 
+* Håvar Aambø Fosstveit
+
+
+This is heavily based on the [work](https://github.com/versatica/mediasoup-demo) done by:
 * Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
 
 

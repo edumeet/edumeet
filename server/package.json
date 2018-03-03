@@ -1,16 +1,16 @@
 {
-  "name": "mediasoup-demo-server",
+  "name": "multiparty-meeting-server",
   "version": "2.0.0",
   "private": true,
-  "description": "mediasoup demo server",
-  "author": "Iñaki Baz Castillo <ibc@aliax.net>",
-  "license": "All Rights Reserved",
+  "description": "multiparty meeting server",
+  "author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
+  "license": "MIT",
   "main": "lib/index.js",
   "dependencies": {
     "colors": "^1.1.2",
     "debug": "^3.1.0",
     "express": "^4.16.2",
-    "mediasoup": "^2.0.9",
+    "mediasoup": "^2.0.14",
     "protoo-server": "^2.0.7"
   },
   "devDependencies": {

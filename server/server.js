@@ -2,7 +2,7 @@
 
 'use strict';
 
-process.title = 'mediasoup-demo-server';
+process.title = 'multiparty-meeting-server';
 
 const config = require('./config');
 

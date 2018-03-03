@@ -11,7 +11,6 @@ import thunk from 'redux-thunk';
 import { createLogger as createReduxLogger } from 'redux-logger';
 import { getDeviceInfo } from 'mediasoup-client';
 import randomString from 'random-string';
-import randomName from 'node-random-name';
 import Logger from './Logger';
 import * as utils from './utils';
 import * as cookiesManager from './cookiesManager';
@@ -108,7 +107,7 @@ function run()
 	}
 	else
 	{
-		displayName = randomName();
+		displayName = 'Guest';
 		displayNameSet = false;
 	}
 
