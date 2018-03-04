@@ -31,15 +31,28 @@ class Room extends React.Component
 		} = this.props;
 
 		let screenState;
+		let screenTip;
 
 		if (me.needExtension)
+		{
 			screenState = 'need-extension';
+			screenTip = 'Install screen sharing extension';
+		}
 		else if (!me.canShareScreen)
+		{
 			screenState = 'unsupported';
+			screenTip = 'Screen sharing not supported';
+		}
 		else if (screenProducer)
+		{
 			screenState = 'on';
+			screenTip = 'Stop screen sharing';
+		}
 		else
+		{
 			screenState = 'off';
+			screenTip = 'Start screen sharing';
+		}
 
 		return (
 			<Appear duration={300}>
@@ -96,7 +109,7 @@ class Room extends React.Component
 					<div className='sidebar'>
 						<div
 							className={classnames('button', 'screen', screenState)}
-							data-tip='Toggle screen sharing'
+							data-tip={screenTip}
 							data-type='dark'
 							onClick={() =>
 							{
