@@ -85,6 +85,20 @@ export const restartIce = () =>
 	};
 };
 
+export const enableScreenSharing = () =>
+{
+	return {
+		type : 'ENABLE_SCREEN_SHARING'
+	};
+};
+
+export const disableScreenSharing = () =>
+{
+	return {
+		type : 'DISABLE_SCREEN_SHARING'
+	};
+};
+
 export const sendChatMessage = (text, name) =>
 {
 	const message = createNewMessage(text, 'response', name);
