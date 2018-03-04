@@ -63,6 +63,16 @@ class ChromeScreenShare
 
 		return false;
 	}
+	
+	needExtension()
+	{
+		if ('__multipartyMeetingScreenShareExtensionAvailable__' in window)
+		{
+			return false;
+		}
+
+		return true;
+	}
 
 	_toConstraints(options, streamId)
 	{
@@ -133,6 +143,11 @@ class FirefoxScreenShare
 	isScreenShareAvailable()
 	{
 		return true;
+	}
+
+	needExtension()
+	{
+		return false;
 	}
 
 	_toConstraints(options)

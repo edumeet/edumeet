@@ -30,11 +30,19 @@ export const setMe = ({ peerName, displayName, displayNameSet, device }) =>
 	};
 };
 
-export const setMediaCapabilities = ({ canSendMic, canSendWebcam, canShareScreen }) =>
+export const setMediaCapabilities = ({ canSendMic, canSendWebcam }) =>
 {
 	return {
 		type    : 'SET_MEDIA_CAPABILITIES',
-		payload : { canSendMic, canSendWebcam, canShareScreen }
+		payload : { canSendMic, canSendWebcam }
+	};
+};
+
+export const setScreenCapabilities = ({	canShareScreen, needExtension }) =>
+{
+	return {
+		type    : 'SET_SCREEN_CAPABILITIES',
+		payload : { canShareScreen, needExtension }
 	};
 };
 

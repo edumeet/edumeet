@@ -123,6 +123,13 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
+			case 'INSTALL_EXTENSION':
+			{
+				client.installExtension();
+
+				break;
+			}
+
 			case 'SEND_CHAT_MESSAGE':
 			{
 				const { message } = action.payload;

@@ -6,7 +6,6 @@ import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
 import * as stateActions from './redux/stateActions';
-import { getBrowserType } from './utils';
 
 const logger = new Logger('RoomClient');
 
@@ -81,8 +80,7 @@ export default class RoomClient
 		// Local Webcam. Object with:
 		// - {MediaDeviceInfo} [device]
 		// - {String} [resolution] - 'qvga' / 'vga' / 'hd'.
-		this._webcam =
-		{
+		this._webcam = {
 			device     : null,
 			resolution : 'hd'
 		};
@@ -195,6 +193,57 @@ export default class RoomClient
 		this._micProducer.resume();
 	}
 
+	installExtension()
+	{
+		logger.debug('installExtension()');
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				window.addEventListener('message', _onExtensionMessage, false);
+				function _onExtensionMessage({ data })
+				{
+					if (data.type === 'ScreenShareInjected')
+					{
+						logger.debug('installExtension() | installation succeeded');
+
+						return;
+					}
+				}
+
+				function _failedInstall(reason)
+				{
+					window.removeEventListener('message', _onExtensionMessage);
+
+					return Promise.reject(
+						new Error('Failed to install extension: %s', reason));
+				}
+
+				function _successfulInstall()
+				{
+					logger.debug('installExtension() | installation accepted');
+				}
+
+				// eslint-disable-next-line no-undef
+				chrome.webstore.install(null, _successfulInstall, _failedInstall);
+			})
+			.then(() =>
+			{
+				this._dispatch(stateActions.setScreenCapabilities(
+					{
+						canShareScreen : true,
+						needExtension  : false
+					}));
+			})
+			.catch((error) =>
+			{
+				logger.error('enableScreenSharing() | failed: %o', error);
+
+				this._dispatch(
+					stateActions.setScreenShareInProgress(false));
+			});
+	}
+
 	enableScreenSharing()
 	{
 		logger.debug('enableScreenSharing()');
@@ -203,37 +252,6 @@ export default class RoomClient
 			stateActions.setScreenShareInProgress(true));
 
 		return Promise.resolve()
-			.then(() =>
-			{
-				const browser = getBrowserType();
-
-				switch (browser)
-				{
-					case 'chrome':
-					{
-						// Check if we have extension, if not, try to install
-						// if (!('__multipartyMeetingScreenShareExtensionAvailable__' in window))
-						// {
-						// window.addEventListener('message', function(ev)
-						// {
-						// if (ev.data.type === 'ScreenShareInjected')
-						// {
-						// }
-						// }, false);
-						// }
-						break;
-					}
-					case 'firefox':
-					{
-						break;
-					}
-					default:
-					{
-						return Promise.reject(
-							new Error('Unsupported browser for screen sharing'));
-					}
-				}
-			})
 			.then(() =>
 			{
 				return this._setScreenShareProducer();
@@ -820,9 +838,14 @@ export default class RoomClient
 				// Set our media capabilities.
 				this._dispatch(stateActions.setMediaCapabilities(
 					{
-						canSendMic     : this._room.canSend('audio'),
-						canSendWebcam  : this._room.canSend('video'),
-						canShareScreen : this._room.canSend('video')
+						canSendMic    : this._room.canSend('audio'),
+						canSendWebcam : this._room.canSend('video')
+					}));
+				this._dispatch(stateActions.setScreenCapabilities(
+					{
+						canShareScreen : this._room.canSend('video') &&
+							this._screenSharing.isScreenShareAvailable(),
+						needExtension : this._screenSharing.needExtension()
 					}));
 			})
 			.then(() =>
@@ -1007,7 +1030,8 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				const available = this._screenSharing.isScreenShareAvailable();
+				const available = this._screenSharing.isScreenShareAvailable() &&
+					!this._screenSharing.needExtension();
 
 				if (!available)
 					throw new Error('screen sharing not available');

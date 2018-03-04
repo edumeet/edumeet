@@ -99,6 +99,13 @@ export const disableScreenSharing = () =>
 	};
 };
 
+export const installExtension = () =>
+{
+	return {
+		type : 'INSTALL_EXTENSION'
+	};
+};
+
 export const sendChatMessage = (text, name) =>
 {
 	const message = createNewMessage(text, 'response', name);

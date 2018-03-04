@@ -6,7 +6,8 @@ const initialState =
 	device                : null,
 	canSendMic            : false,
 	canSendWebcam         : false,
-	canShareScreen        : true,
+	canShareScreen        : false,
+	needExtension         : false,
 	canChangeWebcam       : false,
 	webcamInProgress      : false,
 	screenShareInProgress : false,
@@ -28,9 +29,16 @@ const me = (state = initialState, action) =>
 
 		case 'SET_MEDIA_CAPABILITIES':
 		{
-			const { canSendMic, canSendWebcam, canShareScreen } = action.payload;
+			const {	canSendMic, canSendWebcam } = action.payload;
 
-			return { ...state, canSendMic, canSendWebcam, canShareScreen };
+			return { ...state, canSendMic, canSendWebcam };
+		}
+		
+		case 'SET_SCREEN_CAPABILITIES':
+		{
+			const { canShareScreen, needExtension } = action.payload;
+			
+			return { ...state, canShareScreen, needExtension };
 		}
 
 		case 'SET_CAN_CHANGE_WEBCAM':
