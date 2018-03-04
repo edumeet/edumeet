@@ -20,6 +20,7 @@ const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const plumber = require('gulp-plumber');
 const rename = require('gulp-rename');
+const change = require('gulp-change');
 const header = require('gulp-header');
 const touch = require('gulp-touch-cmd');
 const browserify = require('browserify');
@@ -45,6 +46,7 @@ const BANNER_OPTIONS =
 	currentYear : (new Date()).getFullYear()
 };
 const OUTPUT_DIR = '../server/public';
+const appOptions = require('./config');
 
 // Set Node 'development' environment (unless externally set).
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
@@ -123,6 +125,11 @@ function bundle(options)
 	return rebundle();
 }
 
+function changeHTML(content)
+{
+	return content.replace(/chromeExtension/g, appOptions.chromeExtension);
+}
+
 gulp.task('clean', () => del(OUTPUT_DIR, { force: true }));
 
 gulp.task('lint', () =>
@@ -163,6 +170,7 @@ gulp.task('css', () =>
 gulp.task('html', () =>
 {
 	return gulp.src('index.html')
+		.pipe(change(changeHTML))
 		.pipe(gulp.dest(OUTPUT_DIR));
 });
 
