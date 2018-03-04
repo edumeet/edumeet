@@ -197,50 +197,46 @@ export default class RoomClient
 	{
 		logger.debug('installExtension()');
 
-		return Promise.resolve()
+		return new Promise((resolve, reject) =>
+		{
+			window.addEventListener('message', _onExtensionMessage, false);
+			// eslint-disable-next-line no-undef
+			chrome.webstore.install(null, _successfulInstall, _failedInstall);
+			function _onExtensionMessage({ data })
+			{
+				if (data.type === 'ScreenShareInjected')
+				{
+					logger.debug('installExtension() | installation succeeded');
+
+					return resolve();
+				}
+			}
+
+			function _failedInstall(reason)
+			{
+				window.removeEventListener('message', _onExtensionMessage);
+
+				return reject(
+					new Error('Failed to install extension: %s', reason));
+			}
+
+			function _successfulInstall()
+			{
+				logger.debug('installExtension() | installation accepted');
+			}
+		})
 			.then(() =>
 			{
-				window.addEventListener('message', _onExtensionMessage, false);
-				function _onExtensionMessage({ data })
-				{
-					if (data.type === 'ScreenShareInjected')
-					{
-						logger.debug('installExtension() | installation succeeded');
-
-						return;
-					}
-				}
-
-				function _failedInstall(reason)
-				{
-					window.removeEventListener('message', _onExtensionMessage);
-
-					return Promise.reject(
-						new Error('Failed to install extension: %s', reason));
-				}
-
-				function _successfulInstall()
-				{
-					logger.debug('installExtension() | installation accepted');
-				}
-
-				// eslint-disable-next-line no-undef
-				chrome.webstore.install(null, _successfulInstall, _failedInstall);
-			})
-			.then(() =>
-			{
+				// This should be handled better
 				this._dispatch(stateActions.setScreenCapabilities(
 					{
-						canShareScreen : true,
+						canShareScreen : this._room.canSend('video'),
 						needExtension  : false
 					}));
 			})
 			.catch((error) =>
 			{
-				logger.error('enableScreenSharing() | failed: %o', error);
-
-				this._dispatch(
-					stateActions.setScreenShareInProgress(false));
+				logger.error('installExtension() | failed: %o', error);
 			});
 	}
 
