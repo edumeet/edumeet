@@ -70,6 +70,22 @@ export const setAudioOnlyInProgress = (flag) =>
 	};
 };
 
+export const setRaiseHandState = (enabled) =>
+{
+	return {
+		type    : 'SET_RAISE_HAND_STATE',
+		payload : { enabled }
+	};
+};
+
+export const setRaiseHandInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_RAISE_HAND_STATE_IN_PROGRESS',
+		payload : { flag }
+	};
+};
+
 export const setRestartIceInProgress = (flag) =>
 {
 	return {

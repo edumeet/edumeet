@@ -23,6 +23,7 @@ class Room extends React.Component
 			onRoomLinkCopy,
 			onSetAudioMode,
 			onRestartIce,
+			onToggleHand,
 			onLeaveMeeting
 		} = this.props;
 
@@ -99,6 +100,16 @@ class Room extends React.Component
 						/>
 
 						<div
+							className={classnames('button', 'raise-hand', {
+								on       : me.raiseHand,
+								disabled : me.raiseHandInProgress
+							})}
+							data-tip='Raise hand'
+							data-type='dark'
+							onClick={() => onToggleHand(!me.raiseHand)}
+						/>
+
+						<div
 							className={classnames('button', 'leave-meeting')}
 							data-tip='Leave meeting'
 							data-type='dark'
@@ -125,6 +136,7 @@ Room.propTypes =
 	onRoomLinkCopy  : PropTypes.func.isRequired,
 	onSetAudioMode  : PropTypes.func.isRequired,
 	onRestartIce    : PropTypes.func.isRequired,
+	onToggleHand 	  : PropTypes.func.isRequired,
 	onLeaveMeeting  : PropTypes.func.isRequired
 };
 
@@ -157,6 +169,13 @@ const mapDispatchToProps = (dispatch) =>
 		onRestartIce : () =>
 		{
 			dispatch(requestActions.restartIce());
+		},
+		onToggleHand : (enable) =>
+		{
+			if (enable)
+				dispatch(requestActions.raiseHand());
+			else
+				dispatch(requestActions.lowerHand());
 		},
 		onLeaveMeeting : () =>
 		{

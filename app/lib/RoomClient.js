@@ -486,6 +486,35 @@ export default class RoomClient
 			});
 	}
 
+	raiseHand()
+	{
+		logger.debug('raiseHand()');
+
+		this._dispatch(
+			stateActions.setRaiseHandInProgress(true));
+
+		this._dispatch(
+			stateActions.setRaiseHandState(true));
+
+		this._dispatch(
+			stateActions.setRaiseHandInProgress(false));
+
+	}
+
+	lowerHand()
+	{
+		logger.debug('lowerHand()');
+
+		this._dispatch(
+			stateActions.setRaiseHandInProgress(true));
+
+		this._dispatch(
+			stateActions.setRaiseHandState(false));
+
+		this._dispatch(
+			stateActions.setRaiseHandInProgress(false));
+	}
+
 	restartIce()
 	{
 		logger.debug('restartIce()');

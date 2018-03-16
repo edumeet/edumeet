@@ -102,6 +102,20 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
+			case 'RAISE_HAND':
+			{
+				client.raiseHand();
+
+				break;
+			}
+
+			case 'LOWER_HAND':
+			{
+				client.lowerHand();
+
+				break;
+			}
+
 			case 'RESTART_ICE':
 			{
 				client.restartIce();

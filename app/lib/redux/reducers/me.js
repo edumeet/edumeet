@@ -10,6 +10,8 @@ const initialState =
 	webcamInProgress     : false,
 	audioOnly            : false,
 	audioOnlyInProgress  : false,
+	raiseHand            : false,
+	raiseHandInProgress  : false,
 	restartIceInProgress : false
 };
 
@@ -68,6 +70,20 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, audioOnlyInProgress: flag };
+		}
+
+		case 'SET_RAISE_HAND_STATE':
+		{
+			const { enabled } = action.payload;
+
+			return { ...state, raiseHand: enabled };
+		}
+
+		case 'SET_RAISE_HAND_STATE_IN_PROGRESS':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, raiseHandInProgress: flag };
 		}
 
 		case 'SET_RESTART_ICE_IN_PROGRESS':
