@@ -2,7 +2,9 @@ const initialState =
 {
 	url               : null,
 	state             : 'new', // new/connecting/connected/disconnected/closed,
-	activeSpeakerName : null
+	activeSpeakerName : null,
+	peerHeight        : 300,
+	peerWidth         : 400
 };
 
 const room = (state = initialState, action) =>
@@ -31,6 +33,13 @@ const room = (state = initialState, action) =>
 			const { peerName } = action.payload;
 
 			return { ...state, activeSpeakerName: peerName };
+		}
+
+		case 'SET_COMPONENT_SIZE':
+		{
+			const { peerWidth, peerHeight } = action.payload;
+
+			return { ...state, peerWidth: peerWidth, peerHeight: peerHeight };
 		}
 
 		default:
