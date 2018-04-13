@@ -2,6 +2,8 @@
 
 ```js
 {
+	peerWidth : 200,
+	peerHeight : 150,
   room :
   {
     url               : 'https://example.io/?&roomId=d0el8y34',

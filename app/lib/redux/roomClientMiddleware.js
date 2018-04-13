@@ -109,6 +109,27 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
+			case 'ENABLE_SCREEN_SHARING':
+			{
+				client.enableScreenSharing();
+
+				break;
+			}
+
+			case 'DISABLE_SCREEN_SHARING':
+			{
+				client.disableScreenSharing();
+
+				break;
+			}
+
+			case 'INSTALL_EXTENSION':
+			{
+				client.installExtension();
+
+				break;
+			}
+
 			case 'SEND_CHAT_MESSAGE':
 			{
 				const { message } = action.payload;

@@ -8,7 +8,8 @@ const Peer = (props) =>
 	const {
 		peer,
 		micConsumer,
-		webcamConsumer
+		webcamConsumer,
+		screenConsumer
 	} = props;
 
 	const micEnabled = (
@@ -23,10 +24,21 @@ const Peer = (props) =>
 		!webcamConsumer.remotelyPaused
 	);
 
+	const screenVisible = (
+		Boolean(screenConsumer) &&
+		!screenConsumer.locallyPaused &&
+		!screenConsumer.remotelyPaused
+	);
+
 	let videoProfile;
 
 	if (webcamConsumer)
 		videoProfile = webcamConsumer.profile;
+
+	let screenProfile;
+
+	if (screenConsumer)
+		screenProfile = screenConsumer.profile;
 
 	return (
 		<div data-component='Peer'>
@@ -52,10 +64,14 @@ const Peer = (props) =>
 				peer={peer}
 				audioTrack={micConsumer ? micConsumer.track : null}
 				videoTrack={webcamConsumer ? webcamConsumer.track : null}
+				screenTrack={screenConsumer ? screenConsumer.track : null}
 				videoVisible={videoVisible}
 				videoProfile={videoProfile}
+				screenVisible={screenVisible}
+				screenProfile={screenProfile}
 				audioCodec={micConsumer ? micConsumer.codec : null}
 				videoCodec={webcamConsumer ? webcamConsumer.codec : null}
+				screenCodec={screenConsumer ? screenConsumer.codec : null}
 			/>
 		</div>
 	);
@@ -65,7 +81,8 @@ Peer.propTypes =
 {
 	peer           : appPropTypes.Peer.isRequired,
 	micConsumer    : appPropTypes.Consumer,
-	webcamConsumer : appPropTypes.Consumer
+	webcamConsumer : appPropTypes.Consumer,
+	screenConsumer : appPropTypes.Consumer
 };
 
 const mapStateToProps = (state, { name }) =>
@@ -77,11 +94,14 @@ const mapStateToProps = (state, { name }) =>
 		consumersArray.find((consumer) => consumer.source === 'mic');
 	const webcamConsumer =
 		consumersArray.find((consumer) => consumer.source === 'webcam');
+	const screenConsumer =
+		consumersArray.find((consumer) => consumer.source === 'screen');
 
 	return {
 		peer,
 		micConsumer,
-		webcamConsumer
+		webcamConsumer,
+		screenConsumer
 	};
 };
 

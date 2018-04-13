@@ -1,6 +1,7 @@
 import protooClient from 'protoo-client';
 import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
+import ScreenShare from './ScreenShare';
 import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
@@ -79,11 +80,14 @@ export default class RoomClient
 		// Local Webcam. Object with:
 		// - {MediaDeviceInfo} [device]
 		// - {String} [resolution] - 'qvga' / 'vga' / 'hd'.
-		this._webcam =
-		{
+		this._webcam = {
 			device     : null,
 			resolution : 'hd'
 		};
+
+		this._screenSharing = ScreenShare.create();
+
+		this._screenSharingProducer = null;
 
 		this._join({ displayName, device });
 	}
@@ -189,6 +193,79 @@ export default class RoomClient
 		this._micProducer.resume();
 	}
 
+	installExtension()
+	{
+		logger.debug('installExtension()');
+
+		return new Promise((resolve, reject) =>
+		{
+			window.addEventListener('message', _onExtensionMessage, false);
+			// eslint-disable-next-line no-undef
+			chrome.webstore.install(null, _successfulInstall, _failedInstall);
+			function _onExtensionMessage({ data })
+			{
+				if (data.type === 'ScreenShareInjected')
+				{
+					logger.debug('installExtension() | installation succeeded');
+
+					return resolve();
+				}
+			}
+
+			function _failedInstall(reason)
+			{
+				window.removeEventListener('message', _onExtensionMessage);
+
+				return reject(
+					new Error('Failed to install extension: %s', reason));
+			}
+
+			function _successfulInstall()
+			{
+				logger.debug('installExtension() | installation accepted');
+			}
+		})
+			.then(() =>
+			{
+				// This should be handled better
+				this._dispatch(stateActions.setScreenCapabilities(
+					{
+						canShareScreen : this._room.canSend('video'),
+						needExtension  : false
+					}));
+			})
+			.catch((error) =>
+			{
+				logger.error('installExtension() | failed: %o', error);
+			});
+	}
+
+	enableScreenSharing()
+	{
+		logger.debug('enableScreenSharing()');
+
+		this._dispatch(
+			stateActions.setScreenShareInProgress(true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				return this._setScreenShareProducer();
+			})
+			.then(() =>
+			{
+				this._dispatch(
+					stateActions.setScreenShareInProgress(false));
+			})
+			.catch((error) =>
+			{
+				logger.error('enableScreenSharing() | failed: %o', error);
+
+				this._dispatch(
+					stateActions.setScreenShareInProgress(false));
+			});
+	}
+
 	enableWebcam()
 	{
 		logger.debug('enableWebcam()');
@@ -219,6 +296,30 @@ export default class RoomClient
 
 				this._dispatch(
 					stateActions.setWebcamInProgress(false));
+			});
+	}
+
+	disableScreenSharing()
+	{
+		logger.debug('disableScreenSharing()');
+
+		this._dispatch(
+			stateActions.setScreenShareInProgress(true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				this._screenSharingProducer.close();
+
+				this._dispatch(
+					stateActions.setScreenShareInProgress(false));
+			})
+			.catch((error) =>
+			{
+				logger.error('disableScreenSharing() | failed: %o', error);
+
+				this._dispatch(
+					stateActions.setScreenShareInProgress(false));
 			});
 	}
 
@@ -736,6 +837,12 @@ export default class RoomClient
 						canSendMic    : this._room.canSend('audio'),
 						canSendWebcam : this._room.canSend('video')
 					}));
+				this._dispatch(stateActions.setScreenCapabilities(
+					{
+						canShareScreen : this._room.canSend('video') &&
+							this._screenSharing.isScreenShareAvailable(),
+						needExtension : this._screenSharing.needExtension()
+					}));
 			})
 			.then(() =>
 			{
@@ -897,6 +1004,117 @@ export default class RoomClient
 				this._dispatch(requestActions.notify(
 					{
 						text : `Mic producer failed: ${error.name}:${error.message}`
+					}));
+
+				if (producer)
+					producer.close();
+
+				throw error;
+			});
+	}
+
+	_setScreenShareProducer()
+	{
+		if (!this._room.canSend('video'))
+		{
+			return Promise.reject(
+				new Error('cannot send screen'));
+		}
+
+		let producer;
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				const available = this._screenSharing.isScreenShareAvailable() &&
+					!this._screenSharing.needExtension();
+
+				if (!available)
+					throw new Error('screen sharing not available');
+
+				logger.debug('_setScreenShareProducer() | calling getUserMedia()');
+
+				return this._screenSharing.start({
+					width     : 1280,
+					height    : 720,
+					frameRate : 3
+				});
+			})
+			.then((stream) =>
+			{
+				const track = stream.getVideoTracks()[0];
+
+				producer = this._room.createProducer(
+					track, { simulcast: false }, { source: 'screen' });
+
+				// No need to keep original track.
+				track.stop();
+
+				// Send it.
+				return producer.send(this._sendTransport);
+			})
+			.then(() =>
+			{
+				this._screenSharingProducer = producer;
+
+				this._dispatch(stateActions.addProducer(
+					{
+						id             : producer.id,
+						source         : 'screen',
+						deviceLabel    : 'screen',
+						type           : 'screen',
+						locallyPaused  : producer.locallyPaused,
+						remotelyPaused : producer.remotelyPaused,
+						track          : producer.track,
+						codec          : producer.rtpParameters.codecs[0].name
+					}));
+
+				producer.on('close', (originator) =>
+				{
+					logger.debug(
+						'webcam Producer "close" event [originator:%s]', originator);
+
+					this._screenSharingProducer = null;
+					this._dispatch(stateActions.removeProducer(producer.id));
+				});
+
+				producer.on('pause', (originator) =>
+				{
+					logger.debug(
+						'webcam Producer "pause" event [originator:%s]', originator);
+
+					this._dispatch(stateActions.setProducerPaused(producer.id, originator));
+				});
+
+				producer.on('resume', (originator) =>
+				{
+					logger.debug(
+						'webcam Producer "resume" event [originator:%s]', originator);
+
+					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
+				});
+
+				producer.on('handled', () =>
+				{
+					logger.debug('webcam Producer "handled" event');
+				});
+
+				producer.on('unhandled', () =>
+				{
+					logger.debug('webcam Producer "unhandled" event');
+				});
+			})
+			.then(() =>
+			{
+				logger.debug('_setScreenShareProducer() succeeded');
+			})
+			.catch((error) =>
+			{
+				logger.error('_setScreenShareProducer() failed:%o', error);
+
+				this._dispatch(requestActions.notify(
+					{
+						text : `Screen share producer failed: ${error.name}:${error.message}`
 					}));
 
 				if (producer)

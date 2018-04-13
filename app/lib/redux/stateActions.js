@@ -22,6 +22,14 @@ export const setRoomActiveSpeaker = (peerName) =>
 	};
 };
 
+export const onComponentResize = (peerWidth, peerHeight) =>
+{
+	return {
+		type    : 'SET_COMPONENT_SIZE',
+		payload : { peerWidth, peerHeight }
+	};
+};
+
 export const setMe = ({ peerName, displayName, displayNameSet, device }) =>
 {
 	return {
@@ -35,6 +43,14 @@ export const setMediaCapabilities = ({ canSendMic, canSendWebcam }) =>
 	return {
 		type    : 'SET_MEDIA_CAPABILITIES',
 		payload : { canSendMic, canSendWebcam }
+	};
+};
+
+export const setScreenCapabilities = ({	canShareScreen, needExtension }) =>
+{
+	return {
+		type    : 'SET_SCREEN_CAPABILITIES',
+		payload : { canShareScreen, needExtension }
 	};
 };
 
@@ -122,6 +138,14 @@ export const setWebcamInProgress = (flag) =>
 {
 	return {
 		type    : 'SET_WEBCAM_IN_PROGRESS',
+		payload : { flag }
+	};
+};
+
+export const setScreenShareInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_SCREEN_SHARE_IN_PROGRESS',
 		payload : { flag }
 	};
 };

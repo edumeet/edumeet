@@ -20,11 +20,39 @@ class Room extends React.Component
 			room,
 			me,
 			amActiveSpeaker,
+			screenProducer,
 			onRoomLinkCopy,
 			onSetAudioMode,
 			onRestartIce,
-			onLeaveMeeting
+			onLeaveMeeting,
+			onShareScreen,
+			onUnShareScreen,
+			onNeedExtension
 		} = this.props;
+
+		let screenState;
+		let screenTip;
+
+		if (me.needExtension)
+		{
+			screenState = 'need-extension';
+			screenTip = 'Install screen sharing extension';
+		}
+		else if (!me.canShareScreen)
+		{
+			screenState = 'unsupported';
+			screenTip = 'Screen sharing not supported';
+		}
+		else if (screenProducer)
+		{
+			screenState = 'on';
+			screenTip = 'Stop screen sharing';
+		}
+		else
+		{
+			screenState = 'off';
+			screenTip = 'Start screen sharing';
+		}
 
 		return (
 			<Appear duration={300}>
@@ -80,6 +108,37 @@ class Room extends React.Component
 
 					<div className='sidebar'>
 						<div
+							className={classnames('button', 'screen', screenState)}
+							data-tip={screenTip}
+							data-type='dark'
+							onClick={() =>
+							{
+								switch (screenState)
+								{
+									case 'on':
+									{
+										onUnShareScreen();
+										break;
+									}
+									case 'off':
+									{
+										onShareScreen();
+										break;
+									}
+									case 'need-extension':
+									{
+										onNeedExtension();
+										break;
+									}
+									default:
+									{
+										break;
+									}
+								}
+							}}
+						/>
+
+						<div
 							className={classnames('button', 'audio-only', {
 								on       : me.audioOnly,
 								disabled : me.audioOnlyInProgress
@@ -122,18 +181,27 @@ Room.propTypes =
 	room            : appPropTypes.Room.isRequired,
 	me              : appPropTypes.Me.isRequired,
 	amActiveSpeaker : PropTypes.bool.isRequired,
+	screenProducer  : appPropTypes.Producer,
 	onRoomLinkCopy  : PropTypes.func.isRequired,
 	onSetAudioMode  : PropTypes.func.isRequired,
 	onRestartIce    : PropTypes.func.isRequired,
-	onLeaveMeeting  : PropTypes.func.isRequired
+	onLeaveMeeting  : PropTypes.func.isRequired,
+	onShareScreen   : PropTypes.func.isRequired,
+	onUnShareScreen : PropTypes.func.isRequired,
+	onNeedExtension : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
+	const producersArray = Object.values(state.producers);
+	const screenProducer =
+		producersArray.find((producer) => producer.source === 'screen');
+
 	return {
 		room            : state.room,
 		me              : state.me,
-		amActiveSpeaker : state.me.name === state.room.activeSpeakerName
+		amActiveSpeaker : state.me.name === state.room.activeSpeakerName,
+		screenProducer  : screenProducer
 	};
 };
 
@@ -161,6 +229,18 @@ const mapDispatchToProps = (dispatch) =>
 		onLeaveMeeting : () =>
 		{
 			dispatch(requestActions.leaveRoom());
+		},
+		onShareScreen : () =>
+		{
+			dispatch(requestActions.enableScreenSharing());
+		},
+		onUnShareScreen : () =>
+		{
+			dispatch(requestActions.disableScreenSharing());
+		},
+		onNeedExtension : () =>
+		{
+			dispatch(requestActions.installExtension());
 		}
 	};
 };

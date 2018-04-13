@@ -1,16 +1,19 @@
 const initialState =
 {
-	name                 : null,
-	displayName          : null,
-	displayNameSet       : false,
-	device               : null,
-	canSendMic           : false,
-	canSendWebcam        : false,
-	canChangeWebcam      : false,
-	webcamInProgress     : false,
-	audioOnly            : false,
-	audioOnlyInProgress  : false,
-	restartIceInProgress : false
+	name                  : null,
+	displayName           : null,
+	displayNameSet        : false,
+	device                : null,
+	canSendMic            : false,
+	canSendWebcam         : false,
+	canShareScreen        : false,
+	needExtension         : false,
+	canChangeWebcam       : false,
+	webcamInProgress      : false,
+	screenShareInProgress : false,
+	audioOnly             : false,
+	audioOnlyInProgress   : false,
+	restartIceInProgress  : false
 };
 
 const me = (state = initialState, action) =>
@@ -26,9 +29,16 @@ const me = (state = initialState, action) =>
 
 		case 'SET_MEDIA_CAPABILITIES':
 		{
-			const { canSendMic, canSendWebcam } = action.payload;
+			const {	canSendMic, canSendWebcam } = action.payload;
 
 			return { ...state, canSendMic, canSendWebcam };
+		}
+		
+		case 'SET_SCREEN_CAPABILITIES':
+		{
+			const { canShareScreen, needExtension } = action.payload;
+			
+			return { ...state, canShareScreen, needExtension };
 		}
 
 		case 'SET_CAN_CHANGE_WEBCAM':
@@ -43,6 +53,13 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, webcamInProgress: flag };
+		}
+
+		case 'SET_SCREEN_SHARE_IN_PROGRESS':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, screenShareInProgress: flag };
 		}
 
 		case 'SET_DISPLAY_NAME':
