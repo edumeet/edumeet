@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as appPropTypes from './appPropTypes';
 import PeerView from './PeerView';
-import PeerScreenView from './PeerScreenView';
 
 const Peer = (props) =>
 {
@@ -41,53 +40,41 @@ const Peer = (props) =>
 	if (screenConsumer)
 		screenProfile = screenConsumer.profile;
 
-	if (screenVisible && screenConsumer.supported)
-	{
-		return (
-			<div data-component='Peer'>
-				<PeerScreenView
-					videoTrack={screenConsumer ? screenConsumer.track : null}
-					videoVisible={screenVisible}
-					videoProfile={screenProfile}
-					videoCodec={screenConsumer ? screenConsumer.codec : null}
-				/>
-			</div>
-		);
-	}
-	else
-	{
-		return (
-			<div data-component='Peer'>
-				<div className='indicators'>
-					{!micEnabled ?
-						<div className='icon mic-off' />
-						:null
-					}
-					{!videoVisible ?
-						<div className='icon webcam-off' />
-						:null
-					}
-				</div>
-
-				{videoVisible && !webcamConsumer.supported ?
-					<div className='incompatible-video'>
-						<p>incompatible video</p>
-					</div>
+	return (
+		<div data-component='Peer'>
+			<div className='indicators'>
+				{!micEnabled ?
+					<div className='icon mic-off' />
 					:null
 				}
-
-				<PeerView
-					peer={peer}
-					audioTrack={micConsumer ? micConsumer.track : null}
-					videoTrack={webcamConsumer ? webcamConsumer.track : null}
-					videoVisible={videoVisible}
-					videoProfile={videoProfile}
-					audioCodec={micConsumer ? micConsumer.codec : null}
-					videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-				/>
+				{!videoVisible ?
+					<div className='icon webcam-off' />
+					:null
+				}
 			</div>
-		);
-	}
+
+			{videoVisible && !webcamConsumer.supported ?
+				<div className='incompatible-video'>
+					<p>incompatible video</p>
+				</div>
+				:null
+			}
+
+			<PeerView
+				peer={peer}
+				audioTrack={micConsumer ? micConsumer.track : null}
+				videoTrack={webcamConsumer ? webcamConsumer.track : null}
+				screenTrack={screenConsumer ? screenConsumer.track : null}
+				videoVisible={videoVisible}
+				videoProfile={videoProfile}
+				screenVisible={screenVisible}
+				screenProfile={screenProfile}
+				audioCodec={micConsumer ? micConsumer.codec : null}
+				videoCodec={webcamConsumer ? webcamConsumer.codec : null}
+				screenCodec={screenConsumer ? screenConsumer.codec : null}
+			/>
+		</div>
+	);
 };
 
 Peer.propTypes =
