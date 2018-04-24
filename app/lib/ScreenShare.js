@@ -189,6 +189,19 @@ class FirefoxScreenShare
 	}
 }
 
+class DefaultScreenShare
+{
+	isScreenShareAvailable()
+	{
+		return false;
+	}
+
+	needExtension()
+	{
+		return false;
+	}
+}
+
 export default class ScreenShare
 {
 	static create()
@@ -205,7 +218,7 @@ export default class ScreenShare
 			}
 			default:
 			{
-				return null;
+				return new DefaultScreenShare();
 			}
 		}
 	}

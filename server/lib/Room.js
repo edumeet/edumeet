@@ -254,7 +254,7 @@ class Room extends EventEmitter
 
 					protooPeer.send(
 						'chat-history-receive',
-						{ chatHistory : this._chatHistory }
+						{ chatHistory: this._chatHistory }
 					);
 
 					break;

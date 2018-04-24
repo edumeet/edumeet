@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as appPropTypes from './appPropTypes';
 import PeerView from './PeerView';
-import PeerScreenView from './PeerScreenView';
 
 const Peer = (props) =>
 {
@@ -79,19 +78,30 @@ const Peer = (props) =>
 					</div>
 					:null
 				}
-
-				<PeerView
-					peer={peer}
-					audioTrack={micConsumer ? micConsumer.track : null}
-					videoTrack={webcamConsumer ? webcamConsumer.track : null}
-					videoVisible={videoVisible}
-					videoProfile={videoProfile}
-					audioCodec={micConsumer ? micConsumer.codec : null}
-					videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-				/>
 			</div>
-		);
-	}
+
+			{videoVisible && !webcamConsumer.supported ?
+				<div className='incompatible-video'>
+					<p>incompatible video</p>
+				</div>
+				:null
+			}
+
+			<PeerView
+				peer={peer}
+				audioTrack={micConsumer ? micConsumer.track : null}
+				videoTrack={webcamConsumer ? webcamConsumer.track : null}
+				screenTrack={screenConsumer ? screenConsumer.track : null}
+				videoVisible={videoVisible}
+				videoProfile={videoProfile}
+				screenVisible={screenVisible}
+				screenProfile={screenProfile}
+				audioCodec={micConsumer ? micConsumer.codec : null}
+				videoCodec={webcamConsumer ? webcamConsumer.codec : null}
+				screenCodec={screenConsumer ? screenConsumer.codec : null}
+			/>
+		</div>
+	);
 };
 
 Peer.propTypes =
