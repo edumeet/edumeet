@@ -31,6 +31,10 @@ const Peer = (props) =>
 	return (
 		<div data-component='Peer'>
 			<div className='indicators'>
+				{peer.raiseHandState ?
+					<div className='icon raise-hand' />
+					:null
+				}
 				{!micEnabled ?
 					<div className='icon mic-off' />
 					:null

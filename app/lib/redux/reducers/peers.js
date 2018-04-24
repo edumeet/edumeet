@@ -34,6 +34,19 @@ const peers = (state = initialState, action) =>
 			return { ...state, [newPeer.name]: newPeer };
 		}
 
+		case 'SET_PEER_RAISE_HAND_STATE':
+		{
+			const { peerName, raiseHandState } = action.payload;
+			const peer = state[peerName];
+
+			if (!peer)
+				throw new Error('no Peer found');
+
+			const newPeer = { ...peer, raiseHandState };
+
+			return { ...state, [newPeer.name]: newPeer };
+		}
+
 		case 'ADD_CONSUMER':
 		{
 			const { consumer, peerName } = action.payload;

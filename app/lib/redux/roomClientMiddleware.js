@@ -104,14 +104,14 @@ export default ({ dispatch, getState }) => (next) =>
 
 			case 'RAISE_HAND':
 			{
-				client.raiseHand();
+				client.sendRaiseHandState(true);
 
 				break;
 			}
 
 			case 'LOWER_HAND':
 			{
-				client.lowerHand();
+				client.sendRaiseHandState(false);
 
 				break;
 			}

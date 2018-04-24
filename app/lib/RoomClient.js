@@ -486,33 +486,41 @@ export default class RoomClient
 			});
 	}
 
-	raiseHand()
+	sendRaiseHandState(state)
 	{
-		logger.debug('raiseHand()');
+		logger.debug('sendRaiseHandState: ', state);
 
 		this._dispatch(
-			stateActions.setRaiseHandInProgress(true));
+			stateActions.setMyRaiseHandStateInProgress(true));
 
-		this._dispatch(
-			stateActions.setRaiseHandState(true));
+		return this._protoo.send('raisehand-message', { raiseHandState: state })
+			.then(() =>
+			{
+				this._dispatch(
+					stateActions.setMyRaiseHandState(state));
 
-		this._dispatch(
-			stateActions.setRaiseHandInProgress(false));
+				this._dispatch(requestActions.notify(
+					{
+						text : 'raiseHand state changed'
+					}));
+				this._dispatch(
+					stateActions.setMyRaiseHandStateInProgress(false));
+			})
+			.catch((error) =>
+			{
+				logger.error('sendRaiseHandState() | failed: %o', error);
 
-	}
+				this._dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : `Could not change raise hand state: ${error}`
+					}));
 
-	lowerHand()
-	{
-		logger.debug('lowerHand()');
-
-		this._dispatch(
-			stateActions.setRaiseHandInProgress(true));
-
-		this._dispatch(
-			stateActions.setRaiseHandState(false));
-
-		this._dispatch(
-			stateActions.setRaiseHandInProgress(false));
+				// We need to refresh the component for it to render changed state
+				this._dispatch(stateActions.setMyRaiseHandState(!state));
+				this._dispatch(
+					stateActions.setMyRaiseHandStateInProgress(false));
+			});
 	}
 
 	restartIce()
@@ -639,6 +647,17 @@ export default class RoomClient
 							text : `${oldDisplayName} is now ${displayName}`
 						}));
 
+					break;
+				}
+				case 'raisehand-message':
+				{
+					accept();
+					const { peerName, raiseHandState } = request.data;
+
+					logger.debug('Got raiseHandState from "%s"', peerName);
+
+					this._dispatch(
+						stateActions.setPeerRaiseHandState(peerName, raiseHandState));
 					break;
 				}
 

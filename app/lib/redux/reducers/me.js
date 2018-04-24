@@ -72,14 +72,14 @@ const me = (state = initialState, action) =>
 			return { ...state, audioOnlyInProgress: flag };
 		}
 
-		case 'SET_RAISE_HAND_STATE':
+		case 'SET_MY_RAISE_HAND_STATE':
 		{
-			const { enabled } = action.payload;
+			const { flag } = action.payload;
 
-			return { ...state, raiseHand: enabled };
+			return { ...state, raiseHand: flag };
 		}
 
-		case 'SET_RAISE_HAND_STATE_IN_PROGRESS':
+		case 'SET_MY_RAISE_HAND_STATE_IN_PROGRESS':
 		{
 			const { flag } = action.payload;
 
