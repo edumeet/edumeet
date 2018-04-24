@@ -86,6 +86,30 @@ export const setAudioOnlyInProgress = (flag) =>
 	};
 };
 
+export const setMyRaiseHandState = (flag) =>
+{
+	return {
+		type    : 'SET_MY_RAISE_HAND_STATE',
+		payload : { flag }
+	};
+};
+
+export const setMyRaiseHandStateInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_MY_RAISE_HAND_STATE_IN_PROGRESS',
+		payload : { flag }
+	};
+};
+
+export const setPeerRaiseHandState = (peerName, raiseHandState) =>
+{
+	return {
+		type    : 'SET_PEER_RAISE_HAND_STATE',
+		payload : { peerName, raiseHandState }
+	};
+};
+
 export const setRestartIceInProgress = (flag) =>
 {
 	return {

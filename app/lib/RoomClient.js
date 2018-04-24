@@ -587,6 +587,43 @@ export default class RoomClient
 			});
 	}
 
+	sendRaiseHandState(state)
+	{
+		logger.debug('sendRaiseHandState: ', state);
+
+		this._dispatch(
+			stateActions.setMyRaiseHandStateInProgress(true));
+
+		return this._protoo.send('raisehand-message', { raiseHandState: state })
+			.then(() =>
+			{
+				this._dispatch(
+					stateActions.setMyRaiseHandState(state));
+
+				this._dispatch(requestActions.notify(
+					{
+						text : 'raiseHand state changed'
+					}));
+				this._dispatch(
+					stateActions.setMyRaiseHandStateInProgress(false));
+			})
+			.catch((error) =>
+			{
+				logger.error('sendRaiseHandState() | failed: %o', error);
+
+				this._dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : `Could not change raise hand state: ${error}`
+					}));
+
+				// We need to refresh the component for it to render changed state
+				this._dispatch(stateActions.setMyRaiseHandState(!state));
+				this._dispatch(
+					stateActions.setMyRaiseHandStateInProgress(false));
+			});
+	}
+
 	restartIce()
 	{
 		logger.debug('restartIce()');
@@ -711,6 +748,17 @@ export default class RoomClient
 							text : `${oldDisplayName} is now ${displayName}`
 						}));
 
+					break;
+				}
+				case 'raisehand-message':
+				{
+					accept();
+					const { peerName, raiseHandState } = request.data;
+
+					logger.debug('Got raiseHandState from "%s"', peerName);
+
+					this._dispatch(
+						stateActions.setPeerRaiseHandState(peerName, raiseHandState));
 					break;
 				}
 

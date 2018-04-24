@@ -24,10 +24,11 @@ class Room extends React.Component
 			onRoomLinkCopy,
 			onSetAudioMode,
 			onRestartIce,
-			onLeaveMeeting,
 			onShareScreen,
 			onUnShareScreen,
-			onNeedExtension
+			onNeedExtension,
+			onToggleHand,
+			onLeaveMeeting
 		} = this.props;
 
 		let screenState;
@@ -158,6 +159,16 @@ class Room extends React.Component
 						/>
 
 						<div
+							className={classnames('button', 'raise-hand', {
+								on       : me.raiseHand,
+								disabled : me.raiseHandInProgress
+							})}
+							data-tip='Raise hand'
+							data-type='dark'
+							onClick={() => onToggleHand(!me.raiseHand)}
+						/>
+
+						<div
 							className={classnames('button', 'leave-meeting')}
 							data-tip='Leave meeting'
 							data-type='dark'
@@ -185,10 +196,11 @@ Room.propTypes =
 	onRoomLinkCopy  : PropTypes.func.isRequired,
 	onSetAudioMode  : PropTypes.func.isRequired,
 	onRestartIce    : PropTypes.func.isRequired,
-	onLeaveMeeting  : PropTypes.func.isRequired,
 	onShareScreen   : PropTypes.func.isRequired,
 	onUnShareScreen : PropTypes.func.isRequired,
-	onNeedExtension : PropTypes.func.isRequired
+	onNeedExtension : PropTypes.func.isRequired,
+	onToggleHand 	  : PropTypes.func.isRequired,
+	onLeaveMeeting  : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -225,6 +237,13 @@ const mapDispatchToProps = (dispatch) =>
 		onRestartIce : () =>
 		{
 			dispatch(requestActions.restartIce());
+		},
+		onToggleHand : (enable) =>
+		{
+			if (enable)
+				dispatch(requestActions.raiseHand());
+			else
+				dispatch(requestActions.lowerHand());
 		},
 		onLeaveMeeting : () =>
 		{

@@ -13,6 +13,8 @@ const initialState =
 	screenShareInProgress : false,
 	audioOnly             : false,
 	audioOnlyInProgress   : false,
+	raiseHand             : false,
+	raiseHandInProgress   : false,
 	restartIceInProgress  : false
 };
 
@@ -33,11 +35,11 @@ const me = (state = initialState, action) =>
 
 			return { ...state, canSendMic, canSendWebcam };
 		}
-		
+
 		case 'SET_SCREEN_CAPABILITIES':
 		{
 			const { canShareScreen, needExtension } = action.payload;
-			
+
 			return { ...state, canShareScreen, needExtension };
 		}
 
@@ -85,6 +87,20 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, audioOnlyInProgress: flag };
+		}
+
+		case 'SET_MY_RAISE_HAND_STATE':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, raiseHand: flag };
+		}
+
+		case 'SET_MY_RAISE_HAND_STATE_IN_PROGRESS':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, raiseHandInProgress: flag };
 		}
 
 		case 'SET_RESTART_ICE_IN_PROGRESS':

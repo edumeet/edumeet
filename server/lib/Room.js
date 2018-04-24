@@ -260,6 +260,27 @@ class Room extends EventEmitter
 					break;
 				}
 
+				case 'raisehand-message':
+				{
+					accept();
+
+					const { raiseHandState } = request.data;
+					const { mediaPeer } = protooPeer.data;
+
+					mediaPeer.appData.raiseHand = request.data.raiseHandState;
+
+					// Spread to others via protoo.
+					this._protooRoom.spread(
+						'raisehand-message',
+						{
+							peerName    : protooPeer.id,
+							raiseHandState : raiseHandState
+						},
+						[ protooPeer ]);
+
+					break;
+				}
+
 				default:
 				{
 					logger.error('unknown request.method "%s"', request.method);

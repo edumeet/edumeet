@@ -78,6 +78,20 @@ export const disableAudioOnly = () =>
 	};
 };
 
+export const raiseHand = () =>
+{
+	return {
+		type : 'RAISE_HAND'
+	};
+};
+
+export const lowerHand = () =>
+{
+	return {
+		type : 'LOWER_HAND'
+	};
+};
+
 export const restartIce = () =>
 {
 	return {
