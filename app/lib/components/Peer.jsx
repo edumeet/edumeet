@@ -40,42 +40,19 @@ const Peer = (props) =>
 	if (screenConsumer)
 		screenProfile = screenConsumer.profile;
 
-	if (screenVisible && screenConsumer.supported)
-	{
-		return (
-			<div data-component='Peer'>
-				<PeerScreenView
-					videoTrack={screenConsumer ? screenConsumer.track : null}
-					videoVisible={screenVisible}
-					videoProfile={screenProfile}
-					videoCodec={screenConsumer ? screenConsumer.codec : null}
-				/>
-			</div>
-		);
-	}
-	else
-	{
-		return (
-			<div data-component='Peer'>
-				<div className='indicators'>
-					{peer.raiseHandState ?
-						<div className='icon raise-hand' />
-						:null
-					}
-					{!micEnabled ?
-						<div className='icon mic-off' />
-						:null
-					}
-					{!videoVisible ?
-						<div className='icon webcam-off' />
-						:null
-					}
-				</div>
-
-				{videoVisible && !webcamConsumer.supported ?
-					<div className='incompatible-video'>
-						<p>incompatible video</p>
-					</div>
+	return (
+		<div data-component='Peer'>
+			<div className='indicators'>
+				{peer.raiseHandState ?
+					<div className='icon raise-hand' />
+					:null
+				}
+				{!micEnabled ?
+					<div className='icon mic-off' />
+					:null
+				}
+				{!videoVisible ?
+					<div className='icon webcam-off' />
 					:null
 				}
 			</div>
