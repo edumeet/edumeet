@@ -78,7 +78,7 @@ function run()
 	const produce = urlParser.query.produce !== 'false';
 	let displayName = urlParser.query.displayName;
 	const isSipEndpoint = urlParser.query.sipEndpoint === 'true';
-	const useSimulcast = urlParser.query.simulcast !== 'false';
+	const useSimulcast = urlParser.query.simulcast === 'true';
 
 	if (!roomId)
 	{
