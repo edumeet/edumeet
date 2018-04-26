@@ -74,7 +74,8 @@ function run()
 
 	const peerName = randomString({ length: 8 }).toLowerCase();
 	const urlParser = new UrlParse(window.location.href, true);
-	let roomId = urlParser.query.roomId;
+	let roomId = (urlParser.pathname).substr(1)
+		? (urlParser.pathname).substr(1) : urlParser.query.roomId;
 	const produce = urlParser.query.produce !== 'false';
 	let displayName = urlParser.query.displayName;
 	const isSipEndpoint = urlParser.query.sipEndpoint === 'true';
