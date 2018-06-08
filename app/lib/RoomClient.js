@@ -20,9 +20,9 @@ const ROOM_OPTIONS =
 
 const VIDEO_CONSTRAINS =
 {
-	qvga : { width: { ideal: 320 }, height: { ideal: 240 } },
-	vga  : { width: { ideal: 640 }, height: { ideal: 480 } },
-	hd   : { width: { ideal: 1280 }, height: { ideal: 720 } }
+	qvga : { width: { ideal: 320 }, height: { ideal: 240 }, aspectRatio: 1.334 },
+	vga  : { width: { ideal: 640 }, height: { ideal: 480 }, aspectRatio: 1.334 },
+	hd   : { width: { ideal: 800 }, height: { ideal: 600 }, aspectRatio: 1.334 }
 };
 
 export default class RoomClient
@@ -36,6 +36,9 @@ export default class RoomClient
 
 		const protooUrl = getProtooUrl(peerName, roomId);
 		const protooTransport = new protooClient.WebSocketTransport(protooUrl);
+
+		// window element to external login site
+		this._loginWindow;
 
 		// Closed flag.
 		this._closed = false;
@@ -60,6 +63,7 @@ export default class RoomClient
 
 		// mediasoup-client Room instance.
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
+		this._room.roomId = roomId;
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -109,6 +113,18 @@ export default class RoomClient
 		setTimeout(() => this._protoo.close(), 250);
 
 		this._dispatch(stateActions.setRoomState('closed'));
+	}
+
+	login()
+	{
+		const url = `/login?roomId=${this._room.roomId}&peerName=${this._peerName}`;
+
+		this._loginWindow = window.open(url, 'loginWindow');
+	}
+
+	closeLoginWindow()
+	{
+		this._loginWindow.close();
 	}
 
 	changeDisplayName(displayName)
@@ -750,6 +766,35 @@ export default class RoomClient
 
 					break;
 				}
+
+				// This means: server wants to change MY displayName
+				case 'auth':
+				{
+					logger.debug('got auth event from server', request.data);
+					accept();
+
+					if (request.data.verified == true)
+					{
+						this.changeDisplayName(request.data.name);
+						this._dispatch(requestActions.notify(
+							{
+								text : `Authenticated successfully: ${request.data}`
+							}
+						));
+					}
+					else
+					{
+						this._dispatch(requestActions.notify(
+							{
+								text : `Authentication failed: ${request.data}`
+							}
+						));
+					}
+					this.closeLoginWindow();
+					break;
+
+				}
+
 				case 'raisehand-message':
 				{
 					accept();

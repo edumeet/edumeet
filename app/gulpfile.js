@@ -206,6 +206,7 @@ gulp.task('livebrowser', (done) =>
 		{
 			open   : 'external',
 			host   : config.domain,
+			port   : 3000,
 			server :
 			{
 				baseDir : OUTPUT_DIR
@@ -226,6 +227,7 @@ gulp.task('browser', (done) =>
 		{
 			open   : 'external',
 			host   : config.domain,
+			port   : 3000,
 			server :
 			{
 				baseDir : OUTPUT_DIR
