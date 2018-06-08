@@ -13,24 +13,23 @@ class Peers extends React.Component
 	{
 		super();
 		this.state = {
-			ratio : 4 / 3
+			ratio : 1.334
 		};
-		
 	}
 	updateDimensions()
 	{
 		const n = this.props.peers.length;
 
-		if (n == 0) 
+		if (n == 0)
 		{
 			return;
 		}
 
 		const width = this.refs.peers.clientWidth;
 		const height = this.refs.peers.clientHeight;
-		
+
 		let x, y, space;
-		
+
 		for (let rows = 1; rows < 100; rows = rows + 1)
 		{
 			x = width / Math.ceil(n / rows);
@@ -43,8 +42,8 @@ class Peers extends React.Component
 			}
 			space = height - (y * (rows));
 			if (space < y)
-			{ 
-				break; 
+			{
+				break;
 			}
 		}
 		if (Math.ceil(this.props.peerWidth) !== Math.ceil(0.9 * x))
@@ -52,17 +51,17 @@ class Peers extends React.Component
 			this.props.onComponentResize(0.9 * x, 0.9 * y);
 		}
 	}
-	
+
 	componentDidMount()
 	{
 		window.addEventListener('resize', this.updateDimensions.bind(this));
 	}
-	
-	componentWillUnmount() 
+
+	componentWillUnmount()
 	{
 		window.removeEventListener('resize', this.updateDimensions.bind(this));
 	}
-	
+
 	render()
 	{
 		const {
@@ -71,15 +70,15 @@ class Peers extends React.Component
 			peerWidth,
 			peerHeight
 		} = this.props;
-		
-		const style = 
+
+		const style =
 			{
 				'width'  : peerWidth,
 				'height' : peerHeight
 			};
 
 		this.updateDimensions();
-		
+
 		return (
 			<div data-component='Peers' ref='peers'>
 				{
@@ -127,7 +126,7 @@ const mapStateToProps = (state) =>
 	// TODO: This is not OK since it's creating a new array every time, so triggering a
 	// component rendering.
 	const peersArray = Object.values(state.peers);
-	
+
 	return {
 		peers             : peersArray,
 		activeSpeakerName : state.room.activeSpeakerName,
