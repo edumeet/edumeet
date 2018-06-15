@@ -315,7 +315,7 @@ PeerView.propTypes =
 	screenTrack         : PropTypes.any,
 	videoVisible        : PropTypes.bool.isRequired,
 	videoProfile        : PropTypes.string,
-	screenVisible       : PropTypes.bool.isRequired,
+	screenVisible       : PropTypes.bool,
 	screenProfile       : PropTypes.string,
 	audioCodec          : PropTypes.string,
 	videoCodec          : PropTypes.string,

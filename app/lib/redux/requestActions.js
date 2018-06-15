@@ -78,6 +78,38 @@ export const disableAudioOnly = () =>
 	};
 };
 
+export const mutePeerAudio = (peerName) =>
+{
+	return {
+		type    : 'MUTE_PEER_AUDIO',
+		payload : { peerName }
+	};
+};
+
+export const unmutePeerAudio = (peerName) =>
+{
+	return {
+		type    : 'UNMUTE_PEER_AUDIO',
+		payload : { peerName }
+	};
+};
+
+export const pausePeerVideo = (peerName) =>
+{
+	return {
+		type    : 'PAUSE_PEER_VIDEO',
+		payload : { peerName }
+	};
+};
+
+export const resumePeerVideo = (peerName) =>
+{
+	return {
+		type    : 'RESUME_PEER_VIDEO',
+		payload : { peerName }
+	};
+};
+
 export const raiseHand = () =>
 {
 	return {

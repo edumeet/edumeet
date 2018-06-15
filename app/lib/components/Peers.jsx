@@ -16,9 +16,10 @@ class Peers extends React.Component
 			ratio : 1.334
 		};
 	}
-	updateDimensions()
+
+	updateDimensions(nextProps = null)
 	{
-		const n = this.props.peers.length;
+		const n = nextProps ? nextProps.peers.length : this.props.peers.length;
 
 		if (n == 0)
 		{
@@ -62,6 +63,11 @@ class Peers extends React.Component
 		window.removeEventListener('resize', this.updateDimensions.bind(this));
 	}
 
+	componentWillReceiveProps(nextProps)
+	{
+		this.updateDimensions(nextProps);
+	}
+
 	render()
 	{
 		const {
@@ -76,8 +82,6 @@ class Peers extends React.Component
 				'width'  : peerWidth,
 				'height' : peerHeight
 			};
-
-		this.updateDimensions();
 
 		return (
 			<div data-component='Peers' ref='peers'>

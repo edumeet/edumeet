@@ -86,6 +86,22 @@ export const setAudioOnlyInProgress = (flag) =>
 	};
 };
 
+export const setPeerVideoInProgress = (peerName, flag) =>
+{
+	return {
+		type    : 'SET_PEER_VIDEO_IN_PROGRESS',
+		payload : { peerName, flag }
+	};
+};
+
+export const setPeerAudioInProgress = (peerName, flag) =>
+{
+	return {
+		type    : 'SET_PEER_AUDIO_IN_PROGRESS',
+		payload : { peerName, flag }
+	};
+};
+
 export const setMyRaiseHandState = (flag) =>
 {
 	return {

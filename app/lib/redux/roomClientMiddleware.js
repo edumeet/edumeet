@@ -102,6 +102,42 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
+			case 'MUTE_PEER_AUDIO':
+			{
+				const { peerName } = action.payload;
+
+				client.mutePeerAudio(peerName);
+
+				break;
+			}
+
+			case 'UNMUTE_PEER_AUDIO':
+			{
+				const { peerName } = action.payload;
+
+				client.unmutePeerAudio(peerName);
+
+				break;
+			}
+
+			case 'PAUSE_PEER_VIDEO':
+			{
+				const { peerName } = action.payload;
+
+				client.pausePeerVideo(peerName);
+
+				break;
+			}
+
+			case 'RESUME_PEER_VIDEO':
+			{
+				const { peerName } = action.payload;
+
+				client.resumePeerVideo(peerName);
+
+				break;
+			}
+
 			case 'RAISE_HAND':
 			{
 				client.sendRaiseHandState(true);
