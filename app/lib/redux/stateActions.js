@@ -62,6 +62,14 @@ export const setCanChangeWebcam = (flag) =>
 	};
 };
 
+export const setWebcamDevices = (devices) =>
+{
+	return {
+		type    : 'SET_WEBCAM_DEVICES',
+		payload : devices
+	};
+};
+
 export const setDisplayName = (displayName) =>
 {
 	return {
@@ -107,6 +115,13 @@ export const setMyRaiseHandState = (flag) =>
 	return {
 		type    : 'SET_MY_RAISE_HAND_STATE',
 		payload : { flag }
+	};
+};
+
+export const toggleSettings = () =>
+{
+	return {
+		type : 'TOGGLE_SETTINGS'
 	};
 };
 

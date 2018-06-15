@@ -35,8 +35,7 @@ class Me extends React.Component
 			onMuteMic,
 			onUnmuteMic,
 			onEnableWebcam,
-			onDisableWebcam,
-			onChangeWebcam
+			onDisableWebcam
 		} = this.props;
 
 		let micState;
@@ -58,13 +57,6 @@ class Me extends React.Component
 			webcamState = 'on';
 		else
 			webcamState = 'off';
-
-		let changeWebcamState;
-
-		if (Boolean(webcamProducer) && me.canChangeWebcam)
-			changeWebcamState = 'on';
-		else
-			changeWebcamState = 'unsupported';
 
 		const videoVisible = (
 			Boolean(webcamProducer) &&
@@ -103,13 +95,6 @@ class Me extends React.Component
 							{
 								webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
 							}}
-						/>
-
-						<div
-							className={classnames('button', 'change-webcam', changeWebcamState, {
-								disabled : me.webcamInProgress
-							})}
-							onClick={() => onChangeWebcam()}
 						/>
 					</div>
 					:null
@@ -179,8 +164,7 @@ Me.propTypes =
 	onMuteMic           : PropTypes.func.isRequired,
 	onUnmuteMic         : PropTypes.func.isRequired,
 	onEnableWebcam      : PropTypes.func.isRequired,
-	onDisableWebcam     : PropTypes.func.isRequired,
-	onChangeWebcam      : PropTypes.func.isRequired
+	onDisableWebcam     : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -209,8 +193,7 @@ const mapDispatchToProps = (dispatch) =>
 		onMuteMic       : () => dispatch(requestActions.muteMic()),
 		onUnmuteMic     : () => dispatch(requestActions.unmuteMic()),
 		onEnableWebcam  : () => dispatch(requestActions.enableWebcam()),
-		onDisableWebcam : () => dispatch(requestActions.disableWebcam()),
-		onChangeWebcam  : () => dispatch(requestActions.changeWebcam())
+		onDisableWebcam : () => dispatch(requestActions.disableWebcam())
 	};
 };
 

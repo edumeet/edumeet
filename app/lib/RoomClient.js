@@ -366,9 +366,9 @@ export default class RoomClient
 			});
 	}
 
-	changeWebcam()
+	changeWebcam(deviceId)
 	{
-		logger.debug('changeWebcam()');
+		logger.debug('changeWebcam() [deviceId: %s]', deviceId);
 
 		this._dispatch(
 			stateActions.setWebcamInProgress(true));
@@ -376,22 +376,20 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				return this._updateWebcams();
+				logger.debug('changeWebcam() | calling enumerateDevices()');
+
+				return navigator.mediaDevices.enumerateDevices();
 			})
-			.then(() =>
+			.then((devices) =>
 			{
-				const array = Array.from(this._webcams.keys());
-				const len = array.length;
-				const deviceId =
-					this._webcam.device ? this._webcam.device.deviceId : undefined;
-				let idx = array.indexOf(deviceId);
+				for (const device of devices)
+				{
+					if (device.kind !== 'videoinput')
+						continue;
 
-				if (idx < len - 1)
-					idx++;
-				else
-					idx = 0;
-
-				this._webcam.device = this._webcams.get(array[idx]);
+					if (device.deviceId == deviceId)
+						this._webcam.device = device;
+				}
 
 				logger.debug(
 					'changeWebcam() | new selected webcam [device:%o]',
@@ -1487,7 +1485,7 @@ export default class RoomClient
 		logger.debug('_updateWebcams()');
 
 		// Reset the list.
-		this._webcams = new Map();
+		this._webcams = {};
 
 		return Promise.resolve()
 			.then(() =>
@@ -1503,25 +1501,33 @@ export default class RoomClient
 					if (device.kind !== 'videoinput')
 						continue;
 
-					this._webcams.set(device.deviceId, device);
+					this._webcams[device.deviceId] = {
+						value : device.deviceId,
+						label : device.label
+					};
 				}
 			})
 			.then(() =>
 			{
-				const array = Array.from(this._webcams.values());
-				const len = array.length;
 				const currentWebcamId =
 					this._webcam.device ? this._webcam.device.deviceId : undefined;
 
-				logger.debug('_updateWebcams() [webcams:%o]', array);
+				logger.debug('_updateWebcams() [webcams:%o]', this._webcams);
+
+				const len = Object.keys(this._webcams).length;
 
 				if (len === 0)
 					this._webcam.device = null;
-				else if (!this._webcams.has(currentWebcamId))
-					this._webcam.device = array[0];
+				else if (!this._webcams[currentWebcamId])
+					for (this._webcam.device in this._webcams)
+						if (this._webcams.hasOwnProperty(this._webcam.device))
+							break;
 
 				this._dispatch(
-					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
+					stateActions.setCanChangeWebcam(len >= 2));
+				if (len >= 1)
+					this._dispatch(
+						stateActions.setWebcamDevices(this._webcams));
 			});
 	}
 

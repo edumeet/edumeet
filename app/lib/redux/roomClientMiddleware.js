@@ -83,7 +83,9 @@ export default ({ dispatch, getState }) => (next) =>
 
 			case 'CHANGE_WEBCAM':
 			{
-				client.changeWebcam();
+				const { deviceId } = action.payload;
+
+				client.changeWebcam(deviceId);
 
 				break;
 			}

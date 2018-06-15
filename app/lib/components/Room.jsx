@@ -5,12 +5,14 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import ClipboardButton from 'react-clipboard.js';
 import * as appPropTypes from './appPropTypes';
+import * as stateActions from '../redux/stateActions';
 import * as requestActions from '../redux/requestActions';
 import { Appear } from './transitions';
 import Me from './Me';
 import Peers from './Peers';
 import Notifications from './Notifications';
 import ChatWidget from './ChatWidget';
+import Settings from './Settings';
 
 class Room extends React.Component
 {
@@ -24,6 +26,7 @@ class Room extends React.Component
 			onRoomLinkCopy,
 			onSetAudioMode,
 			onRestartIce,
+			onToggleSettings,
 			onShareScreen,
 			onUnShareScreen,
 			onNeedExtension,
@@ -159,6 +162,16 @@ class Room extends React.Component
 						/>
 
 						<div
+							className={classnames('button', 'settings', {
+								on  : room.showSettings,
+								off : !room.showSettings
+							})}
+							data-tip='Open settings'
+							data-type='dark'
+							onClick={() => onToggleSettings()}
+						/>
+
+						<div
 							className={classnames('button', 'raise-hand', {
 								on       : me.raiseHand,
 								disabled : me.raiseHandInProgress
@@ -176,6 +189,10 @@ class Room extends React.Component
 						/>
 					</div>
 
+					<Settings
+						onToggleSettings={onToggleSettings}
+					/>
+
 					<ReactTooltip
 						effect='solid'
 						delayShow={100}
@@ -189,18 +206,19 @@ class Room extends React.Component
 
 Room.propTypes =
 {
-	room            : appPropTypes.Room.isRequired,
-	me              : appPropTypes.Me.isRequired,
-	amActiveSpeaker : PropTypes.bool.isRequired,
-	screenProducer  : appPropTypes.Producer,
-	onRoomLinkCopy  : PropTypes.func.isRequired,
-	onSetAudioMode  : PropTypes.func.isRequired,
-	onRestartIce    : PropTypes.func.isRequired,
-	onShareScreen   : PropTypes.func.isRequired,
-	onUnShareScreen : PropTypes.func.isRequired,
-	onNeedExtension : PropTypes.func.isRequired,
-	onToggleHand 	  : PropTypes.func.isRequired,
-	onLeaveMeeting  : PropTypes.func.isRequired
+	room             : appPropTypes.Room.isRequired,
+	me               : appPropTypes.Me.isRequired,
+	amActiveSpeaker  : PropTypes.bool.isRequired,
+	screenProducer   : appPropTypes.Producer,
+	onRoomLinkCopy   : PropTypes.func.isRequired,
+	onSetAudioMode   : PropTypes.func.isRequired,
+	onRestartIce     : PropTypes.func.isRequired,
+	onShareScreen    : PropTypes.func.isRequired,
+	onUnShareScreen  : PropTypes.func.isRequired,
+	onNeedExtension  : PropTypes.func.isRequired,
+	onToggleSettings : PropTypes.func.isRequired,
+	onToggleHand     : PropTypes.func.isRequired,
+	onLeaveMeeting   : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -237,6 +255,10 @@ const mapDispatchToProps = (dispatch) =>
 		onRestartIce : () =>
 		{
 			dispatch(requestActions.restartIce());
+		},
+		onToggleSettings : () =>
+		{
+			dispatch(stateActions.toggleSettings());
 		},
 		onToggleHand : (enable) =>
 		{

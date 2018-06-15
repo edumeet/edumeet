@@ -57,10 +57,11 @@ export const disableWebcam = () =>
 	};
 };
 
-export const changeWebcam = () =>
+export const changeWebcam = (deviceId) =>
 {
 	return {
-		type : 'CHANGE_WEBCAM'
+		type    : 'CHANGE_WEBCAM',
+		payload : { deviceId }
 	};
 };
 

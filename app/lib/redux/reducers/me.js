@@ -9,6 +9,7 @@ const initialState =
 	canShareScreen        : false,
 	needExtension         : false,
 	canChangeWebcam       : false,
+	webcamDevices         : null,
 	webcamInProgress      : false,
 	screenShareInProgress : false,
 	audioOnly             : false,
@@ -48,6 +49,13 @@ const me = (state = initialState, action) =>
 			const canChangeWebcam = action.payload;
 
 			return { ...state, canChangeWebcam };
+		}
+
+		case 'SET_WEBCAM_DEVICES':
+		{
+			const devices = action.payload;
+
+			return { ...state, webcamDevices: devices };
 		}
 
 		case 'SET_WEBCAM_IN_PROGRESS':
