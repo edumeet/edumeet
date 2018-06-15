@@ -80,7 +80,9 @@ class Me extends React.Component
 				{connected ?
 					<div className='controls'>
 						<div
-							className={classnames('button', 'mic', micState)}
+							className={classnames('button', 'mic', micState, {
+								disabled : me.audioInProgress
+							})}
 							onClick={() =>
 							{
 								micState === 'on' ? onMuteMic() : onUnmuteMic();

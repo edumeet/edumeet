@@ -79,7 +79,9 @@ export default class RoomClient
 
 		// Map of webcam MediaDeviceInfos indexed by deviceId.
 		// @type {Map<String, MediaDeviceInfos>}
-		this._webcams = new Map();
+		this._webcams = {};
+
+		this._audioDevices = {};
 
 		// Local Webcam. Object with:
 		// - {MediaDeviceInfo} [device]
@@ -87,6 +89,10 @@ export default class RoomClient
 		this._webcam = {
 			device     : null,
 			resolution : 'hd'
+		};
+
+		this._audioDevice = {
+			device : null
 		};
 
 		this._screenSharing = ScreenShare.create();
@@ -366,6 +372,72 @@ export default class RoomClient
 			});
 	}
 
+	changeAudioDevice(deviceId)
+	{
+		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
+
+		this._dispatch(
+			stateActions.setAudioInProgress(true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				this._audioDevice.device = this._audioDevices[deviceId];
+
+				logger.debug(
+					'changeAudioDevice() | new selected webcam [device:%o]',
+					this._audioDevice.device);
+			})
+			.then(() =>
+			{
+				const { device } = this._audioDevice;
+
+				if (!device)
+					throw new Error('no audio devices');
+
+				logger.debug('changeAudioDevice() | calling getUserMedia()');
+
+				return navigator.mediaDevices.getUserMedia(
+					{
+						audio :
+						{
+							deviceId : { exact: device.deviceId }
+						}
+					});
+			})
+			.then((stream) =>
+			{
+				const track = stream.getAudioTracks()[0];
+
+				return this._micProducer.replaceTrack(track)
+					.then((newTrack) =>
+					{
+						track.stop();
+
+						return newTrack;
+					});
+			})
+			.then((newTrack) =>
+			{
+				this._dispatch(
+					stateActions.setProducerTrack(this._micProducer.id, newTrack));
+
+				return this._updateAudioDevices();
+			})
+			.then(() =>
+			{
+				this._dispatch(
+					stateActions.setAudioInProgress(false));
+			})
+			.catch((error) =>
+			{
+				logger.error('changeAudioDevice() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setAudioInProgress(false));
+			});
+	}
+
 	changeWebcam(deviceId)
 	{
 		logger.debug('changeWebcam() [deviceId: %s]', deviceId);
@@ -376,20 +448,7 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				logger.debug('changeWebcam() | calling enumerateDevices()');
-
-				return navigator.mediaDevices.enumerateDevices();
-			})
-			.then((devices) =>
-			{
-				for (const device of devices)
-				{
-					if (device.kind !== 'videoinput')
-						continue;
-
-					if (device.deviceId == deviceId)
-						this._webcam.device = device;
-				}
+				this._webcam.device = this._webcams[deviceId];
 
 				logger.debug(
 					'changeWebcam() | new selected webcam [device:%o]',
@@ -433,6 +492,10 @@ export default class RoomClient
 				this._dispatch(
 					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
 
+				return this._updateWebcams();
+			})
+			.then(() =>
+			{
 				this._dispatch(
 					stateActions.setWebcamInProgress(false));
 			})
@@ -1163,6 +1226,12 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
+				logger.debug('_setMicProducer() | calling _updateAudioDevices()');
+
+				return this._updateAudioDevices();
+			})
+			.then(() =>
+			{
 				logger.debug('_setMicProducer() | calling getUserMedia()');
 
 				return navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1480,6 +1549,58 @@ export default class RoomClient
 			});
 	}
 
+	_updateAudioDevices()
+	{
+		logger.debug('_updateAudioDevices()');
+
+		// Reset the list.
+		this._audioDevices = {};
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				logger.debug('_updateAudioDevices() | calling enumerateDevices()');
+
+				return navigator.mediaDevices.enumerateDevices();
+			})
+			.then((devices) =>
+			{
+				for (const device of devices)
+				{
+					if (device.kind !== 'audioinput')
+						continue;
+
+					this._audioDevices[device.deviceId] = {
+						value    : device.deviceId,
+						label    : device.label,
+						deviceId : device.deviceId
+					};
+				}
+			})
+			.then(() =>
+			{
+				const currentAudioDeviceId =
+					this._audioDevice.device ? this._audioDevice.device.deviceId : undefined;
+
+				logger.debug('_updateAudioDevices() [audiodevices:%o]', this._audioDevices);
+
+				const len = Object.keys(this._audioDevices).length;
+
+				if (len === 0)
+					this._audioDevice.device = null;
+				else if (!this._audioDevices[currentAudioDeviceId])
+					for (this._audioDevice.device in this._audioDevices)
+						if (this._audioDevices.hasOwnProperty(this._audioDevice.device))
+							break;
+
+				this._dispatch(
+					stateActions.setCanChangeAudioDevice(len >= 2));
+				if (len >= 1)
+					this._dispatch(
+						stateActions.setAudioDevices(this._audioDevices));
+			});
+	}
+
 	_updateWebcams()
 	{
 		logger.debug('_updateWebcams()');
@@ -1502,8 +1623,9 @@ export default class RoomClient
 						continue;
 
 					this._webcams[device.deviceId] = {
-						value : device.deviceId,
-						label : device.label
+						value    : device.deviceId,
+						label    : device.label,
+						deviceId : device.deviceId
 					};
 				}
 			})

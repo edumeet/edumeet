@@ -8,9 +8,12 @@ const initialState =
 	canSendWebcam         : false,
 	canShareScreen        : false,
 	needExtension         : false,
+	canChangeAudioDevice  : false,
+	audioDevices          : null,
 	canChangeWebcam       : false,
 	webcamDevices         : null,
 	webcamInProgress      : false,
+	audioInProgress       : false,
 	screenShareInProgress : false,
 	audioOnly             : false,
 	audioOnlyInProgress   : false,
@@ -44,6 +47,20 @@ const me = (state = initialState, action) =>
 			return { ...state, canShareScreen, needExtension };
 		}
 
+		case 'SET_CAN_CHANGE_AUDIO_DEVICE':
+		{
+			const canChangeAudioDevice = action.payload;
+
+			return { ...state, canChangeAudioDevice };
+		}
+
+		case 'SET_AUDIO_DEVICES':
+		{
+			const { devices } = action.payload;
+
+			return { ...state, audioDevices: devices };
+		}
+
 		case 'SET_CAN_CHANGE_WEBCAM':
 		{
 			const canChangeWebcam = action.payload;
@@ -53,9 +70,16 @@ const me = (state = initialState, action) =>
 
 		case 'SET_WEBCAM_DEVICES':
 		{
-			const devices = action.payload;
+			const { devices } = action.payload;
 
 			return { ...state, webcamDevices: devices };
+		}
+
+		case 'SET_AUDIO_IN_PROGRESS':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, audioInProgress: flag };
 		}
 
 		case 'SET_WEBCAM_IN_PROGRESS':

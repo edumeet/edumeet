@@ -90,6 +90,15 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
+			case 'CHANGE_AUDIO_DEVICE':
+			{
+				const { deviceId } = action.payload;
+
+				client.changeAudioDevice(deviceId);
+
+				break;
+			}
+
 			case 'ENABLE_AUDIO_ONLY':
 			{
 				client.enableAudioOnly();

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import PropTypes from 'prop-types';
+import { Appear } from './transitions';
 import Dropdown from 'react-dropdown';
 
 class Settings extends React.Component
@@ -18,49 +19,82 @@ class Settings extends React.Component
 			room,
 			me,
 			handleChangeWebcam,
+			handleChangeAudioDevice,
 			onToggleSettings
 		} = this.props;
 
 		if (!room.showSettings)
 			return null;
 
-		const webcams = Object.values(me.webcamDevices);
+		let webcams;
+		let webcamText;
+
+		if (me.canChangeWebcam)
+			webcamText = 'Select camera';
+		else
+			webcamText = 'Unable to select camera';
+
+		if (me.webcamDevices)
+			webcams = Object.values(me.webcamDevices);
+		else
+			webcams = [];
+
+		let audioDevices;
+		let audioDevicesText;
+
+		if (me.canChangeAudioDevice)
+			audioDevicesText = 'Select audio input device';
+		else
+			audioDevicesText = 'Unable to select audio input device';
+
+		if (me.audioDevices)
+			audioDevices = Object.values(me.audioDevices);
+		else
+			audioDevices = [];
 
 		return (
-			<div data-component='Settings'>
-				<div className='dialog'>
-					<div className='header'>
-						<span>Settings</span>
-					</div>
-					<div className='settings'>
-						<Dropdown
-							disabled={!me.canChangeWebcam}
-							options={webcams}
-							onChange={handleChangeWebcam}
-							value={webcams[0]}
-							placeholder='No other cameras detected'
-						/>
-					</div>
-					<div className='footer'>
-						<span
-							className='button'
-							onClick={() => onToggleSettings()}
-						>
-							Close
-						</span>
+			<Appear duration={500}>
+				<div data-component='Settings'>
+					<div className='dialog'>
+						<div className='header'>
+							<span>Settings</span>
+						</div>
+						<div className='settings'>
+							<Dropdown
+								disabled={!me.canChangeWebcam}
+								options={webcams}
+								onChange={handleChangeWebcam}
+								placeholder={webcamText}
+							/>
+							<Dropdown
+								disabled={!me.canChangeAudioDevice}
+								options={audioDevices}
+								onChange={handleChangeAudioDevice}
+								placeholder={audioDevicesText}
+							/>
+						</div>
+						<div className='footer'>
+							<span
+								className='button'
+								onClick={() => onToggleSettings()}
+							>
+								Close
+							</span>
+						</div>
 					</div>
 				</div>
-			</div>
+			</Appear>
 		);
 	}
 }
 
 Settings.propTypes =
 {
-	me                 : appPropTypes.Me.isRequired,
-	room               : appPropTypes.Room.isRequired,
-	onToggleSettings   : PropTypes.func.isRequired,
-	handleChangeWebcam : PropTypes.func.isRequired
+	me                      : appPropTypes.Me.isRequired,
+	room                    : appPropTypes.Room.isRequired,
+	onToggleSettings        : PropTypes.func.isRequired,
+	handleChangeWebcam      : PropTypes.func.isRequired,
+	handleChangeAudioDevice : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -77,6 +111,10 @@ const mapDispatchToProps = (dispatch) =>
 		handleChangeWebcam : (device) =>
 		{
 			dispatch(requestActions.changeWebcam(device.value));
+		},
+		handleChangeAudioDevice : (device) =>
+		{
+			dispatch(requestActions.changeAudioDevice(device.value));
 		}
 	};
 };

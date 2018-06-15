@@ -65,6 +65,14 @@ export const changeWebcam = (deviceId) =>
 	};
 };
 
+export const changeAudioDevice = (deviceId) =>
+{
+	return {
+		type    : 'CHANGE_AUDIO_DEVICE',
+		payload : { deviceId }
+	};
+};
+
 export const enableAudioOnly = () =>
 {
 	return {
