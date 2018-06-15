@@ -523,6 +523,150 @@ export default class RoomClient
 			});
 	}
 
+	mutePeerAudio(peerName)
+	{
+		logger.debug('mutePeerAudio() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerAudioInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.kind !== 'audio')
+								continue;
+
+							consumer.pause('mute-audio');
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerAudioInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('mutePeerAudio() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerAudioInProgress(peerName, false));
+			});
+	}
+
+	unmutePeerAudio(peerName)
+	{
+		logger.debug('unmutePeerAudio() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerAudioInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.kind !== 'audio' || !consumer.supported)
+								continue;
+
+							consumer.resume();
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerAudioInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('unmutePeerAudio() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerAudioInProgress(peerName, false));
+			});
+	}
+
+	pausePeerVideo(peerName)
+	{
+		logger.debug('pausePeerVideo() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerVideoInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.kind !== 'video')
+								continue;
+
+							consumer.pause('pause-video');
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerVideoInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('pausePeerVideo() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerVideoInProgress(peerName, false));
+			});
+	}
+
+	resumePeerVideo(peerName)
+	{
+		logger.debug('resumePeerVideo() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerVideoInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.kind !== 'video' || !consumer.supported)
+								continue;
+
+							consumer.resume();
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerVideoInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('resumePeerVideo() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerVideoInProgress(peerName, false));
+			});
+	}
+
 	enableAudioOnly()
 	{
 		logger.debug('enableAudioOnly()');

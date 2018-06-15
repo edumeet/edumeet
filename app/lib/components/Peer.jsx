@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
+import * as requestActions from '../redux/requestActions';
 import PeerView from './PeerView';
 
 const Peer = (props) =>
@@ -9,7 +12,11 @@ const Peer = (props) =>
 		peer,
 		micConsumer,
 		webcamConsumer,
-		screenConsumer
+		screenConsumer,
+		onMuteMic,
+		onUnmuteMic,
+		onDisableWebcam,
+		onEnableWebcam
 	} = props;
 
 	const micEnabled = (
@@ -42,19 +49,33 @@ const Peer = (props) =>
 
 	return (
 		<div data-component='Peer'>
-			<div className='indicators'>
-				{peer.raiseHandState ?
-					<div className='icon raise-hand' />
-					:null
-				}
-				{!micEnabled ?
-					<div className='icon mic-off' />
-					:null
-				}
-				{!videoVisible ?
-					<div className='icon webcam-off' />
-					:null
-				}
+			<div className='controls'>
+				<div
+					className={classnames('button', 'mic', {
+						on       : micEnabled,
+						off      : !micEnabled,
+						disabled : peer.peerAudioInProgress
+					})}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+						micEnabled ? onMuteMic(peer.name) : onUnmuteMic(peer.name);
+					}}
+				/>
+
+				<div
+					className={classnames('button', 'webcam', {
+						on       : videoVisible,
+						off      : !videoVisible,
+						disabled : peer.peerVideoInProgress
+					})}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+						videoVisible ?
+							onDisableWebcam(peer.name) : onEnableWebcam(peer.name);
+					}}
+				/>
 			</div>
 
 			{videoVisible && !webcamConsumer.supported ?
@@ -83,10 +104,14 @@ const Peer = (props) =>
 
 Peer.propTypes =
 {
-	peer           : appPropTypes.Peer.isRequired,
-	micConsumer    : appPropTypes.Consumer,
-	webcamConsumer : appPropTypes.Consumer,
-	screenConsumer : appPropTypes.Consumer
+	peer            : appPropTypes.Peer.isRequired,
+	micConsumer     : appPropTypes.Consumer,
+	webcamConsumer  : appPropTypes.Consumer,
+	screenConsumer  : appPropTypes.Consumer,
+	onMuteMic       : PropTypes.func.isRequired,
+	onUnmuteMic     : PropTypes.func.isRequired,
+	onEnableWebcam  : PropTypes.func.isRequired,
+	onDisableWebcam : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state, { name }) =>
@@ -109,6 +134,32 @@ const mapStateToProps = (state, { name }) =>
 	};
 };
 
-const PeerContainer = connect(mapStateToProps)(Peer);
+const mapDispatchToProps = (dispatch) =>
+{
+	return {
+		onMuteMic : (peerName) =>
+		{
+			dispatch(requestActions.mutePeerAudio(peerName));
+		},
+		onUnmuteMic : (peerName) =>
+		{
+			dispatch(requestActions.unmutePeerAudio(peerName));
+		},
+		onEnableWebcam : (peerName) =>
+		{
+			
+			dispatch(requestActions.resumePeerVideo(peerName));
+		},
+		onDisableWebcam : (peerName) =>
+		{
+			dispatch(requestActions.pausePeerVideo(peerName));
+		}
+	};
+};
+
+const PeerContainer = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(Peer);
 
 export default PeerContainer;
