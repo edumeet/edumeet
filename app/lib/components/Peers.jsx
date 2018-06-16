@@ -86,16 +86,16 @@ class Peers extends React.Component
 		return (
 			<div data-component='Peers' ref='peers'>
 				{
-					peers.map((peer) =>
+					Object.keys(peers).map(function(key)
 					{
 						return (
-							<Appear key={peer.name} duration={1000}>
+							<Appear key={peers[key].name} duration={1000}>
 								<div
 									className={classnames('peer-container', {
-										'active-speaker' : peer.name === activeSpeakerName
+										'active-speaker' : peers[key].name === activeSpeakerName
 									})} style={style}
 								>
-									<Peer name={peer.name} />
+									<Peer name={peers[key].name} />
 								</div>
 							</Appear>
 						);
@@ -108,7 +108,7 @@ class Peers extends React.Component
 
 Peers.propTypes =
 {
-	peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
+	peers             : PropTypes.object.isRequired,
 	activeSpeakerName : PropTypes.string,
 	peerHeight        : PropTypes.number,
 	peerWidth         : PropTypes.number,
@@ -127,12 +127,8 @@ const mapDispatchToProps = (dispatch) =>
 
 const mapStateToProps = (state) =>
 {
-	// TODO: This is not OK since it's creating a new array every time, so triggering a
-	// component rendering.
-	const peersArray = Object.values(state.peers);
-
 	return {
-		peers             : peersArray,
+		peers             : state.peers,
 		activeSpeakerName : state.room.activeSpeakerName,
 		peerHeight        : state.room.peerHeight,
 		peerWidth         : state.room.peerWidth
