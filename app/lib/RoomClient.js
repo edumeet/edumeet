@@ -18,13 +18,6 @@ const ROOM_OPTIONS =
 	}
 };
 
-const VIDEO_CONSTRAINS =
-{
-	qvga : { width: { ideal: 320 }, height: { ideal: 240 }, aspectRatio: 1.334 },
-	vga  : { width: { ideal: 640 }, height: { ideal: 480 }, aspectRatio: 1.334 },
-	hd   : { width: { ideal: 800 }, height: { ideal: 600 }, aspectRatio: 1.334 }
-};
-
 export default class RoomClient
 {
 	constructor(
@@ -459,7 +452,7 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				const { device, resolution } = this._webcam;
+				const { device } = this._webcam;
 
 				if (!device)
 					throw new Error('no webcam devices');
@@ -471,7 +464,20 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS[resolution]
+							optional : [
+								{ minWidth: 160 },
+								{ minWidth: 176 },
+								{ minWidth: 320 },
+								{ minWidth: 352 },
+								{ minWidth: 640 },
+								{ minWidth: 800 },
+								{ minWidth: 1024 },
+								{ minWidth: 1280 },
+								{ minWidth: 1600 },
+								{ minWidth: 1920 },
+								{ minWidth: 2560 },
+								{ minWidth: 3840 }
+							]
 						}
 					});
 			})
@@ -540,7 +546,7 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				const { device, resolution } = this._webcam;
+				const { device } = this._webcam;
 
 				logger.debug('changeWebcamResolution() | calling getUserMedia()');
 
@@ -549,7 +555,20 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS[resolution]
+							optional : [
+								{ minWidth: 160 },
+								{ minWidth: 176 },
+								{ minWidth: 320 },
+								{ minWidth: 352 },
+								{ minWidth: 640 },
+								{ minWidth: 800 },
+								{ minWidth: 1024 },
+								{ minWidth: 1280 },
+								{ minWidth: 1600 },
+								{ minWidth: 1920 },
+								{ minWidth: 2560 },
+								{ minWidth: 3840 }
+							]
 						}
 					});
 			})
@@ -1447,7 +1466,7 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				const { device, resolution } = this._webcam;
+				const { device } = this._webcam;
 
 				if (!device)
 					throw new Error('no webcam devices');
@@ -1459,7 +1478,20 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS[resolution]
+							optional : [
+								{ minWidth: 160 },
+								{ minWidth: 176 },
+								{ minWidth: 320 },
+								{ minWidth: 352 },
+								{ minWidth: 640 },
+								{ minWidth: 800 },
+								{ minWidth: 1024 },
+								{ minWidth: 1280 },
+								{ minWidth: 1600 },
+								{ minWidth: 1920 },
+								{ minWidth: 2560 },
+								{ minWidth: 3840 }
+							]
 						}
 					});
 			})
