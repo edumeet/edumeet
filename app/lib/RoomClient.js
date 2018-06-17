@@ -48,6 +48,9 @@ export default class RoomClient
 		// Redux store getState function.
 		this._getState = getState;
 
+		// This device
+		this._device = device;
+
 		// My peer name.
 		this._peerName = peerName;
 
@@ -459,27 +462,37 @@ export default class RoomClient
 
 				logger.debug('changeWebcam() | calling getUserMedia()');
 
-				return navigator.mediaDevices.getUserMedia(
-					{
-						video :
+				if (this._device.flag !== 'chrome')
+					return navigator.mediaDevices.getUserMedia(
 						{
-							deviceId : { exact: device.deviceId },
-							optional : [
-								{ minWidth: 160 },
-								{ minWidth: 176 },
-								{ minWidth: 320 },
-								{ minWidth: 352 },
-								{ minWidth: 640 },
-								{ minWidth: 800 },
-								{ minWidth: 1024 },
-								{ minWidth: 1280 },
-								{ minWidth: 1600 },
-								{ minWidth: 1920 },
-								{ minWidth: 2560 },
-								{ minWidth: 3840 }
-							]
-						}
-					});
+							video :
+							{
+								deviceId : { exact: device.deviceId },
+								width    : { ideal: 3840 }
+							}
+						});
+				else
+					return navigator.mediaDevices.getUserMedia(
+						{
+							video :
+							{
+								deviceId : { exact: device.deviceId },
+								optional : [
+									{ minWidth: 160 },
+									{ minWidth: 176 },
+									{ minWidth: 320 },
+									{ minWidth: 352 },
+									{ minWidth: 640 },
+									{ minWidth: 800 },
+									{ minWidth: 1024 },
+									{ minWidth: 1280 },
+									{ minWidth: 1600 },
+									{ minWidth: 1920 },
+									{ minWidth: 2560 },
+									{ minWidth: 3840 }
+								]
+							}
+						});
 			})
 			.then((stream) =>
 			{
@@ -550,27 +563,37 @@ export default class RoomClient
 
 				logger.debug('changeWebcamResolution() | calling getUserMedia()');
 
-				return navigator.mediaDevices.getUserMedia(
-					{
-						video :
+				if (this._device.flag !== 'chrome')
+					return navigator.mediaDevices.getUserMedia(
 						{
-							deviceId : { exact: device.deviceId },
-							optional : [
-								{ minWidth: 160 },
-								{ minWidth: 176 },
-								{ minWidth: 320 },
-								{ minWidth: 352 },
-								{ minWidth: 640 },
-								{ minWidth: 800 },
-								{ minWidth: 1024 },
-								{ minWidth: 1280 },
-								{ minWidth: 1600 },
-								{ minWidth: 1920 },
-								{ minWidth: 2560 },
-								{ minWidth: 3840 }
-							]
-						}
-					});
+							video :
+							{
+								deviceId : { exact: device.deviceId },
+								width    : { ideal: 3840 }
+							}
+						});
+				else
+					return navigator.mediaDevices.getUserMedia(
+						{
+							video :
+							{
+								deviceId : { exact: device.deviceId },
+								optional : [
+									{ minWidth: 160 },
+									{ minWidth: 176 },
+									{ minWidth: 320 },
+									{ minWidth: 352 },
+									{ minWidth: 640 },
+									{ minWidth: 800 },
+									{ minWidth: 1024 },
+									{ minWidth: 1280 },
+									{ minWidth: 1600 },
+									{ minWidth: 1920 },
+									{ minWidth: 2560 },
+									{ minWidth: 3840 }
+								]
+							}
+						});
 			})
 			.then((stream) =>
 			{
@@ -1473,27 +1496,37 @@ export default class RoomClient
 
 				logger.debug('_setWebcamProducer() | calling getUserMedia()');
 
-				return navigator.mediaDevices.getUserMedia(
-					{
-						video :
+				if (this._device.flag !== 'chrome')
+					return navigator.mediaDevices.getUserMedia(
 						{
-							deviceId : { exact: device.deviceId },
-							optional : [
-								{ minWidth: 160 },
-								{ minWidth: 176 },
-								{ minWidth: 320 },
-								{ minWidth: 352 },
-								{ minWidth: 640 },
-								{ minWidth: 800 },
-								{ minWidth: 1024 },
-								{ minWidth: 1280 },
-								{ minWidth: 1600 },
-								{ minWidth: 1920 },
-								{ minWidth: 2560 },
-								{ minWidth: 3840 }
-							]
-						}
-					});
+							video :
+							{
+								deviceId : { exact: device.deviceId },
+								width    : { ideal: 3840 }
+							}
+						});
+				else
+					return navigator.mediaDevices.getUserMedia(
+						{
+							video :
+							{
+								deviceId : { exact: device.deviceId },
+								optional : [
+									{ minWidth: 160 },
+									{ minWidth: 176 },
+									{ minWidth: 320 },
+									{ minWidth: 352 },
+									{ minWidth: 640 },
+									{ minWidth: 800 },
+									{ minWidth: 1024 },
+									{ minWidth: 1280 },
+									{ minWidth: 1600 },
+									{ minWidth: 1920 },
+									{ minWidth: 2560 },
+									{ minWidth: 3840 }
+								]
+							}
+						});
 			})
 			.then((stream) =>
 			{
