@@ -20,7 +20,8 @@ const ROOM_OPTIONS =
 
 const VIDEO_CONSTRAINS =
 {
-	width : { ideal: 3840 }
+	width       : { ideal: 1280 },
+	aspectRatio : 1.334
 };
 
 export default class RoomClient

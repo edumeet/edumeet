@@ -18,12 +18,14 @@ class Peers extends React.Component
 		};
 	}
 
-	updateDimensions(nextProps = null)
+	resizeUpdate()
 	{
-		if (!nextProps.peers && !this.props.peers)
-			return;
+		this.updateDimensions();
+	}
 
-		const n = nextProps ? nextProps.peers.length : this.props.peers.length;
+	updateDimensions(props = this.props)
+	{
+		const n = props.peers ? props.peers.length : 0;
 
 		if (n == 0)
 		{
@@ -62,17 +64,18 @@ class Peers extends React.Component
 
 	componentDidMount()
 	{
-		window.addEventListener('resize', this.updateDimensions.bind(this));
+		window.addEventListener('resize', this.resizeUpdate.bind(this));
 	}
 
 	componentWillUnmount()
 	{
-		window.removeEventListener('resize', this.updateDimensions.bind(this));
+		window.removeEventListener('resize', this.resizeUpdate.bind(this));
 	}
 
 	componentWillReceiveProps(nextProps)
 	{
-		this.updateDimensions(nextProps);
+		if (nextProps.peers)
+			this.updateDimensions(nextProps);
 	}
 
 	render()
