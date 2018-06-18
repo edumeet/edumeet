@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
-import * as stateActions from '../redux/stateActions';
 import { Appear } from './transitions';
 import Peer from './Peer';
 
@@ -13,13 +12,20 @@ class Peers extends React.Component
 	{
 		super();
 		this.state = {
-			ratio : 1.334
+			peerWidth  : 400,
+			peerHeight : 300,
+			ratio      : 1.334
 		};
 	}
 
-	updateDimensions(nextProps = null)
+	resizeUpdate()
 	{
-		const n = nextProps ? nextProps.peers.length : this.props.peers.length;
+		this.updateDimensions();
+	}
+
+	updateDimensions(props = this.props)
+	{
+		const n = props.peers ? props.peers.length : 0;
 
 		if (n == 0)
 		{
@@ -47,40 +53,42 @@ class Peers extends React.Component
 				break;
 			}
 		}
-		if (Math.ceil(this.props.peerWidth) !== Math.ceil(0.9 * x))
+		if (Math.ceil(this.state.peerWidth) !== Math.ceil(0.9 * x))
 		{
-			this.props.onComponentResize(0.9 * x, 0.9 * y);
+			this.setState({
+				peerWidth  : 0.9 * x,
+				peerHeight : 0.9 * y
+			});
 		}
 	}
 
 	componentDidMount()
 	{
-		window.addEventListener('resize', this.updateDimensions.bind(this));
+		window.addEventListener('resize', this.resizeUpdate.bind(this));
 	}
 
 	componentWillUnmount()
 	{
-		window.removeEventListener('resize', this.updateDimensions.bind(this));
+		window.removeEventListener('resize', this.resizeUpdate.bind(this));
 	}
 
 	componentWillReceiveProps(nextProps)
 	{
-		this.updateDimensions(nextProps);
+		if (nextProps.peers)
+			this.updateDimensions(nextProps);
 	}
 
 	render()
 	{
 		const {
 			activeSpeakerName,
-			peers,
-			peerWidth,
-			peerHeight
+			peers
 		} = this.props;
 
 		const style =
 			{
-				'width'  : peerWidth,
-				'height' : peerHeight
+				'width'  : this.state.peerWidth,
+				'height' : this.state.peerHeight
 			};
 
 		return (
@@ -109,39 +117,21 @@ class Peers extends React.Component
 Peers.propTypes =
 {
 	peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
-	activeSpeakerName : PropTypes.string,
-	peerHeight        : PropTypes.number,
-	peerWidth         : PropTypes.number,
-	onComponentResize : PropTypes.func.isRequired
-};
-
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		onComponentResize : (peerWidth, peerHeight) =>
-		{
-			dispatch(stateActions.onComponentResize(peerWidth, peerHeight));
-		}
-	};
+	activeSpeakerName : PropTypes.string
 };
 
 const mapStateToProps = (state) =>
 {
-	// TODO: This is not OK since it's creating a new array every time, so triggering a
-	// component rendering.
 	const peersArray = Object.values(state.peers);
 
 	return {
 		peers             : peersArray,
-		activeSpeakerName : state.room.activeSpeakerName,
-		peerHeight        : state.room.peerHeight,
-		peerWidth         : state.room.peerWidth
+		activeSpeakerName : state.room.activeSpeakerName
 	};
 };
 
 const PeersContainer = connect(
-	mapStateToProps,
-	mapDispatchToProps
+	mapStateToProps
 )(Peers);
 
 export default PeersContainer;

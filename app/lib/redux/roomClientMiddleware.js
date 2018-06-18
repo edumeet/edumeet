@@ -83,7 +83,18 @@ export default ({ dispatch, getState }) => (next) =>
 
 			case 'CHANGE_WEBCAM':
 			{
-				client.changeWebcam();
+				const { deviceId } = action.payload;
+
+				client.changeWebcam(deviceId);
+
+				break;
+			}
+
+			case 'CHANGE_AUDIO_DEVICE':
+			{
+				const { deviceId } = action.payload;
+
+				client.changeAudioDevice(deviceId);
 
 				break;
 			}
@@ -141,6 +152,13 @@ export default ({ dispatch, getState }) => (next) =>
 			case 'RAISE_HAND':
 			{
 				client.sendRaiseHandState(true);
+
+				break;
+			}
+
+			case 'USER_LOGIN':
+			{
+				client.login();
 
 				break;
 			}
