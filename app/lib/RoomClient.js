@@ -18,6 +18,11 @@ const ROOM_OPTIONS =
 	}
 };
 
+const VIDEO_CONSTRAINS =
+{
+	width : { ideal: 3840 }
+};
+
 export default class RoomClient
 {
 	constructor(
@@ -462,37 +467,14 @@ export default class RoomClient
 
 				logger.debug('changeWebcam() | calling getUserMedia()');
 
-				if (this._device.flag !== 'chrome')
-					return navigator.mediaDevices.getUserMedia(
+				return navigator.mediaDevices.getUserMedia(
+					{
+						video :
 						{
-							video :
-							{
-								deviceId : { exact: device.deviceId },
-								width    : { ideal: 3840 }
-							}
-						});
-				else
-					return navigator.mediaDevices.getUserMedia(
-						{
-							video :
-							{
-								deviceId : { exact: device.deviceId },
-								optional : [
-									{ minWidth: 160 },
-									{ minWidth: 176 },
-									{ minWidth: 320 },
-									{ minWidth: 352 },
-									{ minWidth: 640 },
-									{ minWidth: 800 },
-									{ minWidth: 1024 },
-									{ minWidth: 1280 },
-									{ minWidth: 1600 },
-									{ minWidth: 1920 },
-									{ minWidth: 2560 },
-									{ minWidth: 3840 }
-								]
-							}
-						});
+							deviceId : { exact: device.deviceId },
+							...VIDEO_CONSTRAINS
+						}
+					});
 			})
 			.then((stream) =>
 			{
@@ -563,37 +545,14 @@ export default class RoomClient
 
 				logger.debug('changeWebcamResolution() | calling getUserMedia()');
 
-				if (this._device.flag !== 'chrome')
-					return navigator.mediaDevices.getUserMedia(
+				return navigator.mediaDevices.getUserMedia(
+					{
+						video :
 						{
-							video :
-							{
-								deviceId : { exact: device.deviceId },
-								width    : { ideal: 3840 }
-							}
-						});
-				else
-					return navigator.mediaDevices.getUserMedia(
-						{
-							video :
-							{
-								deviceId : { exact: device.deviceId },
-								optional : [
-									{ minWidth: 160 },
-									{ minWidth: 176 },
-									{ minWidth: 320 },
-									{ minWidth: 352 },
-									{ minWidth: 640 },
-									{ minWidth: 800 },
-									{ minWidth: 1024 },
-									{ minWidth: 1280 },
-									{ minWidth: 1600 },
-									{ minWidth: 1920 },
-									{ minWidth: 2560 },
-									{ minWidth: 3840 }
-								]
-							}
-						});
+							deviceId : { exact: device.deviceId },
+							...VIDEO_CONSTRAINS
+						}
+					});
 			})
 			.then((stream) =>
 			{
@@ -1496,37 +1455,14 @@ export default class RoomClient
 
 				logger.debug('_setWebcamProducer() | calling getUserMedia()');
 
-				if (this._device.flag !== 'chrome')
-					return navigator.mediaDevices.getUserMedia(
+				return navigator.mediaDevices.getUserMedia(
+					{
+						video :
 						{
-							video :
-							{
-								deviceId : { exact: device.deviceId },
-								width    : { ideal: 3840 }
-							}
-						});
-				else
-					return navigator.mediaDevices.getUserMedia(
-						{
-							video :
-							{
-								deviceId : { exact: device.deviceId },
-								optional : [
-									{ minWidth: 160 },
-									{ minWidth: 176 },
-									{ minWidth: 320 },
-									{ minWidth: 352 },
-									{ minWidth: 640 },
-									{ minWidth: 800 },
-									{ minWidth: 1024 },
-									{ minWidth: 1280 },
-									{ minWidth: 1600 },
-									{ minWidth: 1920 },
-									{ minWidth: 2560 },
-									{ minWidth: 3840 }
-								]
-							}
-						});
+							deviceId : { exact: device.deviceId },
+							...VIDEO_CONSTRAINS
+						}
+					});
 			})
 			.then((stream) =>
 			{
