@@ -134,6 +134,14 @@ export const setMyRaiseHandState = (flag) =>
 	};
 };
 
+export const setLoginInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_LOGIN_IN_PROGRESS',
+		payload : { flag }
+	};
+};
+
 export const toggleSettings = () =>
 {
 	return {

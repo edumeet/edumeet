@@ -156,6 +156,13 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
+			case 'USER_LOGIN':
+			{
+				client.login();
+
+				break;
+			}
+
 			case 'LOWER_HAND':
 			{
 				client.sendRaiseHandState(false);

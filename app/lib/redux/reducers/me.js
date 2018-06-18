@@ -15,6 +15,7 @@ const initialState =
 	webcamInProgress      : false,
 	audioInProgress       : false,
 	screenShareInProgress : false,
+	loginInProgress       : false,
 	audioOnly             : false,
 	audioOnlyInProgress   : false,
 	raiseHand             : false,
@@ -94,6 +95,13 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, screenShareInProgress: flag };
+		}
+
+		case 'SET_LOGIN_IN_PROGRESS':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, loginInProgress: flag };
 		}
 
 		case 'SET_DISPLAY_NAME':

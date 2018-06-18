@@ -24,9 +24,8 @@ class Room extends React.Component
 			amActiveSpeaker,
 			screenProducer,
 			onRoomLinkCopy,
-			onSetAudioMode,
-			onRestartIce,
 			onToggleSettings,
+			onLogin,
 			onShareScreen,
 			onUnShareScreen,
 			onNeedExtension,
@@ -143,25 +142,6 @@ class Room extends React.Component
 						/>
 
 						<div
-							className={classnames('button', 'audio-only', {
-								on       : me.audioOnly,
-								disabled : me.audioOnlyInProgress
-							})}
-							data-tip='Toggle audio only mode'
-							data-type='dark'
-							onClick={() => onSetAudioMode(!me.audioOnly)}
-						/>
-
-						<div
-							className={classnames('button', 'restart-ice', {
-								disabled : me.restartIceInProgress
-							})}
-							data-tip='Restart ICE'
-							data-type='dark'
-							onClick={() => onRestartIce()}
-						/>
-
-						<div
 							className={classnames('button', 'settings', {
 								on  : room.showSettings,
 								off : !room.showSettings
@@ -169,6 +149,15 @@ class Room extends React.Component
 							data-tip='Open settings'
 							data-type='dark'
 							onClick={() => onToggleSettings()}
+						/>
+
+						<div
+							className={classnames('button', 'login', 'off', {
+								disabled : me.loginInProgress
+							})}
+							data-tip='Login'
+							data-type='dark'
+							onClick={() => onLogin()}
 						/>
 
 						<div
@@ -211,14 +200,13 @@ Room.propTypes =
 	amActiveSpeaker  : PropTypes.bool.isRequired,
 	screenProducer   : appPropTypes.Producer,
 	onRoomLinkCopy   : PropTypes.func.isRequired,
-	onSetAudioMode   : PropTypes.func.isRequired,
-	onRestartIce     : PropTypes.func.isRequired,
 	onShareScreen    : PropTypes.func.isRequired,
 	onUnShareScreen  : PropTypes.func.isRequired,
 	onNeedExtension  : PropTypes.func.isRequired,
 	onToggleSettings : PropTypes.func.isRequired,
 	onToggleHand     : PropTypes.func.isRequired,
-	onLeaveMeeting   : PropTypes.func.isRequired
+	onLeaveMeeting   : PropTypes.func.isRequired,
+	onLogin          : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -244,17 +232,6 @@ const mapDispatchToProps = (dispatch) =>
 				{
 					text : 'Room link copied to the clipboard'
 				}));
-		},
-		onSetAudioMode : (enable) =>
-		{
-			if (enable)
-				dispatch(requestActions.enableAudioOnly());
-			else
-				dispatch(requestActions.disableAudioOnly());
-		},
-		onRestartIce : () =>
-		{
-			dispatch(requestActions.restartIce());
 		},
 		onToggleSettings : () =>
 		{
@@ -282,6 +259,10 @@ const mapDispatchToProps = (dispatch) =>
 		onNeedExtension : () =>
 		{
 			dispatch(requestActions.installExtension());
+		},
+		onLogin : () =>
+		{
+			dispatch(requestActions.userLogin());
 		}
 	};
 };
