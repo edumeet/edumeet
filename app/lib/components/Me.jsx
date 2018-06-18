@@ -29,6 +29,7 @@ class Me extends React.Component
 		const {
 			connected,
 			me,
+			advancedMode,
 			micProducer,
 			webcamProducer,
 			onChangeDisplayName,
@@ -104,6 +105,7 @@ class Me extends React.Component
 
 				<PeerView
 					isMe
+					advancedMode={advancedMode}
 					peer={me}
 					audioTrack={micProducer ? micProducer.track : null}
 					videoTrack={webcamProducer ? webcamProducer.track : null}
@@ -159,6 +161,7 @@ class Me extends React.Component
 Me.propTypes =
 {
 	connected           : PropTypes.bool.isRequired,
+	advancedMode        : PropTypes.bool,
 	me                  : appPropTypes.Me.isRequired,
 	micProducer         : appPropTypes.Producer,
 	webcamProducer      : appPropTypes.Producer,

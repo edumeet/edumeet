@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
+import * as stateActions from '../redux/stateActions';
 import PropTypes from 'prop-types';
 import { Appear } from './transitions';
 import Dropdown from 'react-dropdown';
@@ -20,7 +21,8 @@ class Settings extends React.Component
 			me,
 			handleChangeWebcam,
 			handleChangeAudioDevice,
-			onToggleSettings
+			onToggleSettings,
+			onToggleAdvancedMode
 		} = this.props;
 
 		if (!room.showSettings)
@@ -72,6 +74,12 @@ class Settings extends React.Component
 								onChange={handleChangeAudioDevice}
 								placeholder={audioDevicesText}
 							/>
+							<input
+								type='checkbox'
+								defaultChecked={room.advancedMode}
+								onChange={onToggleAdvancedMode}
+							/>
+							<span>Advanced mode</span>
 						</div>
 						<div className='footer'>
 							<span
@@ -94,7 +102,8 @@ Settings.propTypes =
 	room                    : appPropTypes.Room.isRequired,
 	onToggleSettings        : PropTypes.func.isRequired,
 	handleChangeWebcam      : PropTypes.func.isRequired,
-	handleChangeAudioDevice : PropTypes.func.isRequired
+	handleChangeAudioDevice : PropTypes.func.isRequired,
+	onToggleAdvancedMode    : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -115,6 +124,10 @@ const mapDispatchToProps = (dispatch) =>
 		handleChangeAudioDevice : (device) =>
 		{
 			dispatch(requestActions.changeAudioDevice(device.value));
+		},
+		onToggleAdvancedMode : () =>
+		{
+			dispatch(stateActions.toggleAdvancedMode());
 		}
 	};
 };

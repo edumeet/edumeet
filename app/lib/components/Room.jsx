@@ -99,14 +99,18 @@ class Room extends React.Component
 						</div>
 					</div>
 
-					<Peers />
+					<Peers
+						advancedMode={room.advancedMode}
+					/>
 
 					<div
 						className={classnames('me-container', {
 							'active-speaker' : amActiveSpeaker
 						})}
 					>
-						<Me />
+						<Me
+							advancedMode={room.advancedMode}
+						/>
 					</div>
 
 					<div className='sidebar'>

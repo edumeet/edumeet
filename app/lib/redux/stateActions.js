@@ -22,14 +22,6 @@ export const setRoomActiveSpeaker = (peerName) =>
 	};
 };
 
-export const onComponentResize = (peerWidth, peerHeight) =>
-{
-	return {
-		type    : 'SET_COMPONENT_SIZE',
-		payload : { peerWidth, peerHeight }
-	};
-};
-
 export const setMe = ({ peerName, displayName, displayNameSet, device }) =>
 {
 	return {
@@ -91,6 +83,13 @@ export const setDisplayName = (displayName) =>
 	return {
 		type    : 'SET_DISPLAY_NAME',
 		payload : { displayName }
+	};
+};
+
+export const toggleAdvancedMode = () =>
+{
+	return {
+		type : 'TOGGLE_ADVANCED_MODE'
 	};
 };
 
