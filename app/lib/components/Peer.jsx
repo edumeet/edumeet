@@ -9,6 +9,7 @@ import PeerView from './PeerView';
 const Peer = (props) =>
 {
 	const {
+		advancedMode,
 		peer,
 		micConsumer,
 		webcamConsumer,
@@ -86,6 +87,7 @@ const Peer = (props) =>
 			}
 
 			<PeerView
+				advancedMode={advancedMode}
 				peer={peer}
 				audioTrack={micConsumer ? micConsumer.track : null}
 				videoTrack={webcamConsumer ? webcamConsumer.track : null}
@@ -104,6 +106,7 @@ const Peer = (props) =>
 
 Peer.propTypes =
 {
+	advancedMode    : PropTypes.bool,
 	peer            : appPropTypes.Peer.isRequired,
 	micConsumer     : appPropTypes.Consumer,
 	webcamConsumer  : appPropTypes.Consumer,

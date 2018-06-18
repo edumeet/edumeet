@@ -8,9 +8,9 @@ import Peer from './Peer';
 
 class Peers extends React.Component
 {
-	constructor()
+	constructor(props)
 	{
-		super();
+		super(props);
 		this.state = {
 			peerWidth  : 400,
 			peerHeight : 300,
@@ -81,6 +81,7 @@ class Peers extends React.Component
 	render()
 	{
 		const {
+			advancedMode,
 			activeSpeakerName,
 			peers
 		} = this.props;
@@ -103,7 +104,10 @@ class Peers extends React.Component
 										'active-speaker' : peer.name === activeSpeakerName
 									})} style={style}
 								>
-									<Peer name={peer.name} />
+									<Peer
+										advancedMode={advancedMode}
+										name={peer.name}
+									/>
 								</div>
 							</Appear>
 						);
@@ -116,6 +120,7 @@ class Peers extends React.Component
 
 Peers.propTypes =
 {
+	advancedMode      : PropTypes.bool,
 	peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 	activeSpeakerName : PropTypes.string
 };

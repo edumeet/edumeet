@@ -3,9 +3,8 @@ const initialState =
 	url               : null,
 	state             : 'new', // new/connecting/connected/disconnected/closed,
 	activeSpeakerName : null,
-	peerHeight        : 300,
-	peerWidth         : 400,
-	showSettings      : false
+	showSettings      : false,
+	advancedMode      : false
 };
 
 const room = (state = initialState, action) =>
@@ -36,18 +35,18 @@ const room = (state = initialState, action) =>
 			return { ...state, activeSpeakerName: peerName };
 		}
 
-		case 'SET_COMPONENT_SIZE':
-		{
-			const { peerWidth, peerHeight } = action.payload;
-
-			return { ...state, peerWidth: peerWidth, peerHeight: peerHeight };
-		}
-
 		case 'TOGGLE_SETTINGS':
 		{
 			const showSettings = !state.showSettings;
 
 			return { ...state, showSettings };
+		}
+
+		case 'TOGGLE_ADVANCED_MODE':
+		{
+			const advancedMode = !state.advancedMode;
+
+			return { ...state, advancedMode };
 		}
 
 		default:
