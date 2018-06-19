@@ -2,7 +2,7 @@
 
 A WebRTC meeting service using [mediasoup](https://mediasoup.org) as its backend.
 
-Try it online at https://mediasoup.akademia.no.
+Try it online at https://akademia.no. You can add /roomname to the URL for specifying a room.
 
 
 ## Installation
