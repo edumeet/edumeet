@@ -7,6 +7,13 @@ import MessageList from './Chat/MessageList';
 
 class ChatWidget extends Component
 {
+	componentWillReceiveProps(nextProps)
+	{
+		if (nextProps.chatmessages.length !== this.props.chatmessages.length)
+			if (!this.props.showChat)
+				this.props.increaseBadge();
+	}
+
 	render()
 	{
 		const {
@@ -68,15 +75,15 @@ ChatWidget.propTypes =
 	disabledInput     : PropTypes.bool,
 	badge             : PropTypes.number,
 	autofocus         : PropTypes.bool,
-	displayName       : PropTypes.string
+	displayName       : PropTypes.string,
+	chatmessages      : PropTypes.arrayOf(PropTypes.object),
+	increaseBadge     : PropTypes.func
 };
 
 ChatWidget.defaultProps =
 {
 	senderPlaceHolder : 'Type a message...',
-	badge             : 0,
-	autofocus         : true,
-	displayName       : null
+	autofocus         : true
 };
 
 const mapStateToProps = (state) =>
@@ -84,7 +91,9 @@ const mapStateToProps = (state) =>
 	return {
 		showChat      : state.chatbehavior.showChat,
 		disabledInput : state.chatbehavior.disabledInput,
-		displayName   : state.me.displayName
+		displayName   : state.me.displayName,
+		badge         : state.chatbehavior.badge,
+		chatmessages  : state.chatmessages
 	};
 };
 
@@ -106,6 +115,10 @@ const mapDispatchToProps = (dispatch) =>
 				dispatch(requestActions.sendChatMessage(userInput, displayName));
 			}
 			event.target.message.value = '';
+		},
+		increaseBadge : () =>
+		{
+			dispatch(stateActions.increaseBadge());
 		}
 	};
 };

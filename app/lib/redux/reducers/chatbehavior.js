@@ -12,8 +12,9 @@ const chatbehavior = (state = initialState, action) =>
 		case 'TOGGLE_CHAT':
 		{
 			const showChat = !state.showChat;
+			const badge = 0;
 
-			return { ...state, showChat };
+			return { ...state, showChat, badge };
 		}
 
 		case 'TOGGLE_INPUT_DISABLED':
@@ -23,6 +24,10 @@ const chatbehavior = (state = initialState, action) =>
 			return { ...state, disabledInput };
 		}
 
+		case 'INCREASE_BADGE':
+		{
+			return { ...state, badge: state.badge + (state.showChat ? 0 : 1) };
+		}
 		default:
 			return state;
 	}
