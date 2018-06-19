@@ -13,11 +13,11 @@
 		flex-direction:; row;
 		justify-content: flex-end;
 		align-items: center;
+		padding: 0.4vmin;
 
 		> .button {
 			flex: 0 0 auto;
-			margin: 4px;
-			margin-left: 0;
+			margin: 0.2vmin;
 			border-radius: 2px;
 			background-position: center;
 			background-size: 75%;
@@ -28,8 +28,8 @@
 			transition-duration: 0.15s;
 
 			+desktop() {
-				width: 28px;
-				height: 28px;
+				width: 24px;
+				height: 24px;
 				opacity: 0.85;
 
 				&:hover {
@@ -38,8 +38,8 @@
 			}
 
 			+mobile() {
-				width: 26px;
-				height: 26px;
+				width: 22px;
+				height: 22px;
 			}
 
 			&.unsupported {
@@ -76,21 +76,12 @@
 				}
 
 				&.off {
-					background-image: url('/resources/images/icon_webcam_white_on.svg');
+					background-image: url('/resources/images/icon_remote_webcam_white_off.svg');
+					background-color: rgba(#d42241, 0.7);
 				}
 
 				&.unsupported {
 					background-image: url('/resources/images/icon_webcam_white_unsupported.svg');
-				}
-			}
-
-			&.change-webcam {
-				&.on {
-					background-image: url('/resources/images/icon_change_webcam_black.svg');
-				}
-
-				&.unsupported {
-					background-image: url('/resources/images/icon_change_webcam_white_unsupported.svg');
 				}
 			}
 		}
