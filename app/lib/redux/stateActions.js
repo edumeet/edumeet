@@ -338,6 +338,13 @@ export const toggleChat = () =>
 	};
 };
 
+export const increaseBadge = () =>
+{
+	return {
+		type : 'INCREASE_BADGE'
+	};
+};
+
 export const toggleInputDisabled = () =>
 {
 	return {
