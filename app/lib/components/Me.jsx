@@ -7,6 +7,7 @@ import { getDeviceInfo } from 'mediasoup-client';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import PeerView from './PeerView';
+import ScreenView from './ScreenView';
 
 class Me extends React.Component
 {
@@ -32,6 +33,7 @@ class Me extends React.Component
 			advancedMode,
 			micProducer,
 			webcamProducer,
+			screenProducer,
 			onChangeDisplayName,
 			onMuteMic,
 			onUnmuteMic,
@@ -63,6 +65,12 @@ class Me extends React.Component
 			Boolean(webcamProducer) &&
 			!webcamProducer.locallyPaused &&
 			!webcamProducer.remotelyPaused
+		);
+
+		const screenVisible = (
+			Boolean(screenProducer) &&
+			!screenProducer.locallyPaused &&
+			!screenProducer.remotelyPaused
 		);
 
 		let tip;
@@ -115,6 +123,17 @@ class Me extends React.Component
 					onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
 				/>
 
+				{screenProducer ?
+					<ScreenView
+						isMe
+						advancedMode={advancedMode}
+						screenTrack={screenProducer ? screenProducer.track : null}
+						screenVisible={screenVisible}
+						screenCodec={screenProducer ? screenProducer.codec : null}
+					/>
+					:null
+				}
+
 				{this._tooltip ?
 					<ReactTooltip
 						effect='solid'
@@ -165,6 +184,7 @@ Me.propTypes =
 	me                  : appPropTypes.Me.isRequired,
 	micProducer         : appPropTypes.Producer,
 	webcamProducer      : appPropTypes.Producer,
+	screenProducer      : appPropTypes.Producer,
 	onChangeDisplayName : PropTypes.func.isRequired,
 	onMuteMic           : PropTypes.func.isRequired,
 	onUnmuteMic         : PropTypes.func.isRequired,
@@ -179,12 +199,15 @@ const mapStateToProps = (state) =>
 		producersArray.find((producer) => producer.source === 'mic');
 	const webcamProducer =
 		producersArray.find((producer) => producer.source === 'webcam');
+	const screenProducer =
+		producersArray.find((producer) => producer.source === 'screen');
 
 	return {
 		connected      : state.room.state === 'connected',
 		me             : state.me,
 		micProducer    : micProducer,
-		webcamProducer : webcamProducer
+		webcamProducer : webcamProducer,
+		screenProducer : screenProducer
 	};
 };
 

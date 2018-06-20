@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import PeerView from './PeerView';
+import ScreenView from './ScreenView';
 
 const Peer = (props) =>
 {
@@ -91,15 +92,22 @@ const Peer = (props) =>
 				peer={peer}
 				audioTrack={micConsumer ? micConsumer.track : null}
 				videoTrack={webcamConsumer ? webcamConsumer.track : null}
-				screenTrack={screenConsumer ? screenConsumer.track : null}
 				videoVisible={videoVisible}
 				videoProfile={videoProfile}
-				screenVisible={screenVisible}
-				screenProfile={screenProfile}
 				audioCodec={micConsumer ? micConsumer.codec : null}
 				videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-				screenCodec={screenConsumer ? screenConsumer.codec : null}
 			/>
+
+			{screenConsumer ?
+				<ScreenView
+					advancedMode={advancedMode}
+					screenTrack={screenConsumer ? screenConsumer.track : null}
+					screenVisible={screenVisible}
+					screenProfile={screenProfile}
+					screenCodec={screenConsumer ? screenConsumer.codec : null}
+				/>
+				:null
+			}
 		</div>
 	);
 };
