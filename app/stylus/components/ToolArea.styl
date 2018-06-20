@@ -1,0 +1,99 @@
+[data-component='ToolAreaButton'] {
+	position: absolute;
+	z-index: 101;
+	top: 20px;
+	right: 20px;
+	height: 36px;
+	width: 36px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	> .button {
+		flex: 0 0 auto;
+		margin: 4px 0;
+		background-position: center;
+		background-size: 75%;
+		background-repeat: no-repeat;
+		background-color: rgba(#fff, 0.3);
+		cursor: pointer;
+		transition-property: opacity, background-color;
+		transition-duration: 0.15s;
+		border-radius: 100%;
+
+		+desktop() {
+			height: 36px;
+			width: 36px;
+		}
+
+		+mobile() {
+			height: 32px;
+			width: 32px;
+		}
+
+		&.on {
+			background-color: rgba(#fff, 0.7);
+		}
+
+		&.disabled {
+			pointer-events: none;
+			opacity: 0.5;
+		}
+
+		&.toolarea-button {
+			background-image: url('/resources/images/icon_tool_area_white.svg');
+
+			&.on {
+				background-image: url('/resources/images/icon_tool_area_black.svg');
+			}
+		}
+	}
+}
+
+[data-component='ToolArea'] {
+	width: 100%;
+	height: 100%;
+
+	> .tabs {
+		display: flex;
+		flex-wrap: wrap;
+		height: 100%;
+
+		> label {
+			order: 1;
+			display: block;
+			padding: 1vmin 0 1vmin 0;
+			cursor: pointer;
+			background: rgba(#000, 0.3);
+			font-weight: bold;
+			transition: background ease 0.2s;
+			text-align: center;
+			width: 25%;
+			font-size: 1.3vmin;
+			height: 3vmin;
+		}
+
+		> .tab {
+			order: 99;
+			flex-grow: 1;
+			width: 100%;
+			height: 100%;
+			display: none;
+			padding: 1vmin;
+			background: #fff;
+		}
+
+		> input[type="radio"] {
+			display: none;
+		}
+
+		> input[type="radio"]:checked + label {
+			background: #fff;
+		}
+
+		> input[type="radio"]:checked + label + .tab {
+			display: block;
+		}
+	}
+}

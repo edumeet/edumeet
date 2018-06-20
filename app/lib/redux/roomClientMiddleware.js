@@ -149,6 +149,24 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
+			case 'PAUSE_PEER_SCREEN':
+			{
+				const { peerName } = action.payload;
+
+				client.pausePeerScreen(peerName);
+
+				break;
+			}
+
+			case 'RESUME_PEER_SCREEN':
+			{
+				const { peerName } = action.payload;
+
+				client.resumePeerScreen(peerName);
+
+				break;
+			}
+
 			case 'RAISE_HAND':
 			{
 				client.sendRaiseHandState(true);

@@ -1,267 +1,282 @@
 [data-component='Room'] {
-	position: relative;
-	height: 100%;
-	width: 100%;
-
 	AppearFadeIn(300ms);
 
-	> .state {
-		position: fixed;
-		z-index: 100;
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-		border-radius: 25px;
-		background-color: rgba(#fff, 0.2);
-
-		+desktop() {
-			top: 20px;
-			left: 20px;
-			width: 124px;
-		}
-
-		+mobile() {
-			top: 10px;
-			left: 10px;
-			width: 110px;
-		}
-
-		> .icon {
-			flex: 0 0 auto;
-			border-radius: 100%;
-
-			+desktop() {
-				margin: 5px;
-				margin-right: 0;
-				height: 20px;
-				width: 20px;
-			}
-
-			+mobile() {
-				margin: 4px;
-				margin-right: 0;
-				height: 16px;
-				width: 16px;
-			}
-
-			&.new, &.closed {
-				background-color: rgba(#aaa, 0.5);
-			}
-
-			&.connecting {
-				animation: Room-info-state-connecting .75s infinite linear;
-			}
-
-			&.connected {
-				background-color: rgba(#30bd18, 0.75);
-
-				+mobile() {
-					display: none;
-				}
-			}
-		}
-
-		> .text {
-			flex: 100 0 auto;
-			user-select: none;
-			pointer-events: none;
-			text-align: center;
-			text-transform: uppercase;
-			font-family: 'Roboto';
-			font-weight: 400;
-			color: rgba(#fff, 0.75);
-
-			+desktop() {
-				font-size: 12px;
-			}
-
-			+mobile() {
-				font-size: 10px;
-			}
-
-			&.connected {
-				+mobile() {
-					display: none;
-				}
-			}
-		}
-	}
-
-	> .room-link-wrapper {
-		pointer-events: none;
+	> .room-wrapper {
 		position: absolute;
-		z-index: 1;
 		top: 0;
 		left: 0;
-		right: 0;
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
+		height: 100%;
+		width: 100%;
+		transition: width 0.3s;
 
-		> .room-link {
-			width: auto;
-			background-color: rgba(#fff, 0.75);
-			border-bottom-right-radius: 4px;
-			border-bottom-left-radius: 4px;
-			box-shadow: 0px 3px 12px 2px rgba(#111, 0.4);
+		> .state {
+			position: fixed;
+			z-index: 100;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			border-radius: 25px;
+			background-color: rgba(#fff, 0.2);
 
-			> a.link {
-				display: block;;
-				user-select: none;
-				pointer-events: auto;
-				color: #104758;
-				font-weight: 400;
-				cursor: pointer;
-				text-decoration: none;
-				transition-property: opacity;
-				transition-duration: 0.25s;
-				opacity: 0.8;
+			+desktop() {
+				top: 20px;
+				left: 20px;
+				width: 124px;
+			}
+
+			+mobile() {
+				top: 10px;
+				left: 10px;
+				width: 110px;
+			}
+
+			> .icon {
+				flex: 0 0 auto;
+				border-radius: 100%;
 
 				+desktop() {
-					padding: 10px 20px;
-					font-size: 16px;
+					margin: 5px;
+					margin-right: 0;
+					height: 20px;
+					width: 20px;
 				}
 
 				+mobile() {
-					padding: 6px 10px;
-					font-size: 14px;
+					margin: 4px;
+					margin-right: 0;
+					height: 16px;
+					width: 16px;
 				}
 
-				&:hover {
-					opacity: 1;
-					text-decoration: underline;
+				&.new, &.closed {
+					background-color: rgba(#aaa, 0.5);
+				}
+
+				&.connecting {
+					animation: Room-info-state-connecting .75s infinite linear;
+				}
+
+				&.connected {
+					background-color: rgba(#30bd18, 0.75);
+
+					+mobile() {
+						display: none;
+					}
+				}
+			}
+
+			> .text {
+				flex: 100 0 auto;
+				user-select: none;
+				pointer-events: none;
+				text-align: center;
+				text-transform: uppercase;
+				font-family: 'Roboto';
+				font-weight: 400;
+				color: rgba(#fff, 0.75);
+
+				+desktop() {
+					font-size: 12px;
+				}
+
+				+mobile() {
+					font-size: 10px;
+				}
+
+				&.connected {
+					+mobile() {
+						display: none;
+					}
 				}
 			}
 		}
-	}
 
-	> .me-container {
-		position: fixed;
-		z-index: 100;
-		overflow: hidden;
-		box-shadow: 0px 5px 12px 2px rgba(#111, 0.5);
-		transition-property: border-color;
-		transition-duration: 0.15s;
+		> .room-link-wrapper {
+			pointer-events: none;
+			position: absolute;
+			z-index: 1;
+			top: 0;
+			left: 0;
+			right: 0;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
 
-		&.active-speaker {
-			border-color: #fff;
+			> .room-link {
+				width: auto;
+				background-color: rgba(#fff, 0.75);
+				border-bottom-right-radius: 4px;
+				border-bottom-left-radius: 4px;
+				box-shadow: 0px 3px 12px 2px rgba(#111, 0.4);
+
+				> a.link {
+					display: block;;
+					user-select: none;
+					pointer-events: auto;
+					color: #104758;
+					font-weight: 400;
+					cursor: pointer;
+					text-decoration: none;
+					transition-property: opacity;
+					transition-duration: 0.25s;
+					opacity: 0.8;
+
+					+desktop() {
+						padding: 10px 20px;
+						font-size: 16px;
+					}
+
+					+mobile() {
+						padding: 6px 10px;
+						font-size: 14px;
+					}
+
+					&:hover {
+						opacity: 1;
+						text-decoration: underline;
+					}
+				}
+			}
 		}
 
-		+desktop() {
-			height: 200px;
-			width: 235px;
-			bottom: 20px;
-			left: 20px;
-			border: 1px solid rgba(#fff, 0.15);
-		}
-
-		+mobile() {
-			height: 175px;
-			width: 150px;
-			bottom: 10px;
-			left: 10px;
-			border: 1px solid rgba(#fff, 0.25);
-		}
-	}
-
-	> .sidebar {
-		position: fixed;
-		z-index: 101;
-		top: calc(50% - 60px);
-		height: 120px;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-
-		+desktop() {
-			left: 20px;
-			width: 36px;
-		}
-
-		+mobile() {
-			left: 10px;
-			width: 32px;
-		}
-
-		> .button {
-			flex: 0 0 auto;
-			margin: 4px 0;
-			background-position: center;
-			background-size: 75%;
-			background-repeat: no-repeat;
-			background-color: rgba(#fff, 0.3);
-			cursor: pointer;
-			transition-property: opacity, background-color;
+		> .me-container {
+			position: fixed;
+			z-index: 100;
+			overflow: hidden;
+			box-shadow: 0px 5px 12px 2px rgba(#111, 0.5);
+			transition-property: border-color;
 			transition-duration: 0.15s;
-			border-radius: 100%;
+
+			&.active-speaker {
+				border-color: #fff;
+			}
 
 			+desktop() {
-				height: 36px;
+				height: 200px;
+				width: 235px;
+				bottom: 20px;
+				left: 20px;
+				border: 1px solid rgba(#fff, 0.15);
+			}
+
+			+mobile() {
+				height: 175px;
+				width: 150px;
+				bottom: 10px;
+				left: 10px;
+				border: 1px solid rgba(#fff, 0.25);
+			}
+		}
+
+		> .sidebar {
+			position: fixed;
+			z-index: 101;
+			top: calc(50% - 60px);
+			height: 120px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+
+			+desktop() {
+				left: 20px;
 				width: 36px;
 			}
 
 			+mobile() {
-				height: 32px;
+				left: 10px;
 				width: 32px;
 			}
 
-			&.on {
-				background-color: rgba(#fff, 0.7);
-			}
+			> .button {
+				flex: 0 0 auto;
+				margin: 4px 0;
+				background-position: center;
+				background-size: 75%;
+				background-repeat: no-repeat;
+				background-color: rgba(#fff, 0.3);
+				cursor: pointer;
+				transition-property: opacity, background-color;
+				transition-duration: 0.15s;
+				border-radius: 100%;
 
-			&.disabled {
-				pointer-events: none;
-				opacity: 0.5;
-			}
-
-			&.login {
-				&.off {
-					background-image: url('/resources/images/icon_login_white.svg');
+				+desktop() {
+					height: 36px;
+					width: 36px;
 				}
-			}
 
-			&.settings {
-				&.off {
-					background-image: url('/resources/images/icon_settings_white.svg');
+				+mobile() {
+					height: 32px;
+					width: 32px;
 				}
 
 				&.on {
-					background-image: url('/resources/images/icon_settings_black.svg');
-				}
-			}
-
-			&.screen {
-				&.on {
-					background-image: url('/resources/images/no-share-screen-black.svg');
+					background-color: rgba(#fff, 0.7);
 				}
 
-				&.off {
-					background-image: url('/resources/images/share-screen-white.svg');
+				&.disabled {
+					pointer-events: none;
+					opacity: 0.5;
 				}
 
-				&.unsupported {
-					background-image: url('/resources/images/no-share-screen-white.svg');
-					background-color: rgba(#d42241, 0.7);
+				&.login {
+					&.off {
+						background-image: url('/resources/images/icon_login_white.svg');
+					}
 				}
 
-				&.need-extension {
-					background-image: url('/resources/images/share-screen-extension.svg');
-				}
-			}
-			&.raise-hand {
-				background-image: url('/resources/images/icon-hand-white.svg');
+				&.settings {
+					&.off {
+						background-image: url('/resources/images/icon_settings_white.svg');
+					}
 
-				&.on {
-					background-image: url('/resources/images/icon-hand-black.svg');
+					&.on {
+						background-image: url('/resources/images/icon_settings_black.svg');
+					}
 				}
-			}
 
-			&.leave-meeting {
-				background-image: url('/resources/images/leave-meeting.svg');
+				&.screen {
+					&.on {
+						background-image: url('/resources/images/no-share-screen-black.svg');
+					}
+
+					&.off {
+						background-image: url('/resources/images/share-screen-white.svg');
+					}
+
+					&.unsupported {
+						background-image: url('/resources/images/no-share-screen-white.svg');
+						background-color: rgba(#d42241, 0.7);
+					}
+
+					&.need-extension {
+						background-image: url('/resources/images/share-screen-extension.svg');
+					}
+				}
+				&.raise-hand {
+					background-image: url('/resources/images/icon-hand-white.svg');
+
+					&.on {
+						background-image: url('/resources/images/icon-hand-black.svg');
+					}
+				}
+
+				&.leave-meeting {
+					background-image: url('/resources/images/leave-meeting.svg');
+				}
 			}
 		}
+	}
+
+	> .toolarea-wrapper {
+		position: fixed;
+		top: 0;
+		right: 0;
+		width: 20%;
+		height: 100%;
+		background-color: #FFF;
+		transition: width 0.3s;
 	}
 }
 
@@ -358,6 +373,60 @@
 	cursor: default;
 	display: block;
 	padding: 8px 10px;
+}
+
+.react-tabs__tab-list {
+	border-bottom: 1px solid #aaa;
+	margin: 0 0 10px;
+	padding: 0;
+}
+
+.react-tabs__tab {
+	display: inline-block;
+	border: 1px solid transparent;
+	border-bottom: none;
+	bottom: -1px;
+	position: relative;
+	list-style: none;
+	padding: 6px 12px;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.react-tabs__tab--selected {
+	background: #fff;
+	border-color: #aaa;
+	color: black;
+	border-radius: 5px 5px 0 0;
+}
+
+.react-tabs__tab--disabled {
+	color: GrayText;
+	cursor: default;
+}
+
+.react-tabs__tab:focus {
+	box-shadow: 0 0 5px hsl(208, 99%, 50%);
+	border-color: hsl(208, 99%, 50%);
+	outline: none;
+}
+
+.react-tabs__tab:focus:after {
+	content: "";
+	position: absolute;
+	height: 5px;
+	left: -4px;
+	right: -4px;
+	bottom: -5px;
+	background: #fff;
+}
+
+.react-tabs__tab-panel {
+	display: none;
+}
+
+.react-tabs__tab-panel--selected {
+	display: block;
 }
 
 @keyframes Room-info-state-connecting {

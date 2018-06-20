@@ -4,7 +4,6 @@ import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import * as stateActions from '../redux/stateActions';
 import PropTypes from 'prop-types';
-import { Appear } from './transitions';
 import Dropdown from 'react-dropdown';
 
 class Settings extends React.Component
@@ -21,12 +20,8 @@ class Settings extends React.Component
 			me,
 			handleChangeWebcam,
 			handleChangeAudioDevice,
-			onToggleSettings,
 			onToggleAdvancedMode
 		} = this.props;
-
-		if (!room.showSettings)
-			return null;
 
 		let webcams;
 		let webcamText;
@@ -55,43 +50,28 @@ class Settings extends React.Component
 			audioDevices = [];
 
 		return (
-			<Appear duration={500}>
-				<div data-component='Settings'>
-					<div className='dialog'>
-						<div className='header'>
-							<span>Settings</span>
-						</div>
-						<div className='settings'>
-							<Dropdown
-								disabled={!me.canChangeWebcam}
-								options={webcams}
-								onChange={handleChangeWebcam}
-								placeholder={webcamText}
-							/>
-							<Dropdown
-								disabled={!me.canChangeAudioDevice}
-								options={audioDevices}
-								onChange={handleChangeAudioDevice}
-								placeholder={audioDevicesText}
-							/>
-							<input
-								type='checkbox'
-								defaultChecked={room.advancedMode}
-								onChange={onToggleAdvancedMode}
-							/>
-							<span>Advanced mode</span>
-						</div>
-						<div className='footer'>
-							<span
-								className='button'
-								onClick={() => onToggleSettings()}
-							>
-								Close
-							</span>
-						</div>
-					</div>
+			<div data-component='Settings'>
+				<div className='settings'>
+					<Dropdown
+						disabled={!me.canChangeWebcam}
+						options={webcams}
+						onChange={handleChangeWebcam}
+						placeholder={webcamText}
+					/>
+					<Dropdown
+						disabled={!me.canChangeAudioDevice}
+						options={audioDevices}
+						onChange={handleChangeAudioDevice}
+						placeholder={audioDevicesText}
+					/>
+					<input
+						type='checkbox'
+						defaultChecked={room.advancedMode}
+						onChange={onToggleAdvancedMode}
+					/>
+					<span>Advanced mode</span>
 				</div>
-			</Appear>
+			</div>
 		);
 	}
 }
@@ -100,7 +80,6 @@ Settings.propTypes =
 {
 	me                      : appPropTypes.Me.isRequired,
 	room                    : appPropTypes.Room.isRequired,
-	onToggleSettings        : PropTypes.func.isRequired,
 	handleChangeWebcam      : PropTypes.func.isRequired,
 	handleChangeAudioDevice : PropTypes.func.isRequired,
 	onToggleAdvancedMode    : PropTypes.func.isRequired
