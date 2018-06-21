@@ -14,11 +14,9 @@ export default class PeerView extends React.Component
 
 		this.state =
 		{
-			volume       : 0, // Integer from 0 to 10.,
-			videoWidth   : null,
-			videoHeight  : null,
-			screenWidth  : null,
-			screenHeight : null
+			volume      : 0, // Integer from 0 to 10.,
+			videoWidth  : null,
+			videoHeight : null
 		};
 
 		// Latest received video track.
@@ -28,10 +26,6 @@ export default class PeerView extends React.Component
 		// Latest received video track.
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
-
-		// Latest received screen track.
-		// @type {MediaStreamTrack}
-		this._screenTrack = null;
 
 		// Hark instance.
 		// @type {Object}
@@ -45,24 +39,19 @@ export default class PeerView extends React.Component
 	{
 		const {
 			isMe,
-			advancedMode,
 			peer,
+			advancedMode,
 			videoVisible,
 			videoProfile,
-			screenVisible,
-			screenProfile,
 			audioCodec,
 			videoCodec,
-			screenCodec,
 			onChangeDisplayName
 		} = this.props;
 
 		const {
 			volume,
 			videoWidth,
-			videoHeight,
-			screenWidth,
-			screenHeight
+			videoHeight
 		} = this.state;
 
 		return (
@@ -70,40 +59,22 @@ export default class PeerView extends React.Component
 				<div className='info'>
 					{advancedMode ?
 						<div className={classnames('media', { 'is-me': isMe })}>
-							{screenVisible ?
-								<div className='box'>
-									{audioCodec ?
-										<p className='codec'>{audioCodec}</p>
-										:null
-									}
+							<div className='box'>
+								{audioCodec ?
+									<p className='codec'>{audioCodec}</p>
+									:null
+								}
 
-									{screenCodec ?
-										<p className='codec'>{screenCodec} {screenProfile}</p>
-										:null
-									}
+								{videoCodec ?
+									<p className='codec'>{videoCodec} {videoProfile}</p>
+									:null
+								}
 
-									{(screenVisible && screenWidth !== null) ?
-										<p className='resolution'>{screenWidth}x{screenHeight}</p>
-										:null
-									}
-								</div>
-								:<div className='box'>
-									{audioCodec ?
-										<p className='codec'>{audioCodec}</p>
-										:null
-									}
-
-									{videoCodec ?
-										<p className='codec'>{videoCodec} {videoProfile}</p>
-										:null
-									}
-
-									{(videoVisible && videoWidth !== null) ?
-										<p className='resolution'>{videoWidth}x{videoHeight}</p>
-										:null
-									}
-								</div>
-							}
+								{(videoVisible && videoWidth !== null) ?
+									<p className='resolution'>{videoWidth}x{videoHeight}</p>
+									:null
+								}
+							</div>
 						</div>
 						:null
 					}
@@ -147,35 +118,19 @@ export default class PeerView extends React.Component
 				<video
 					ref='video'
 					className={classnames({
-						hidden  : !videoVisible && !screenVisible,
+						hidden  : !videoVisible,
 						'is-me' : isMe,
-						loading : videoProfile === 'none' && screenProfile === 'none'
+						loading : videoProfile === 'none'
 					})}
 					autoPlay
 					muted={isMe}
 				/>
 
-				{screenVisible ?
-					<div className='minivideo'>
-						<video
-							ref='minivideo'
-							className={classnames({
-								hidden  : !videoVisible,
-								'is-me' : isMe,
-								loading : videoProfile === 'none'
-							})}
-							autoPlay
-							muted={isMe}
-						/>
-					</div>
-					:null
-				}
-
 				<div className='volume-container'>
 					<div className={classnames('bar', `level${volume}`)} />
 				</div>
 
-				{videoProfile === 'none' && screenProfile === 'none' ?
+				{videoProfile === 'none' ?
 					<div className='spinner-container'>
 						<Spinner />
 					</div>
@@ -187,9 +142,9 @@ export default class PeerView extends React.Component
 
 	componentDidMount()
 	{
-		const { audioTrack, videoTrack, screenTrack } = this.props;
+		const { audioTrack, videoTrack } = this.props;
 
-		this._setTracks(audioTrack, videoTrack, screenTrack);
+		this._setTracks(audioTrack, videoTrack);
 	}
 
 	componentWillUnmount()
@@ -202,21 +157,18 @@ export default class PeerView extends React.Component
 
 	componentWillReceiveProps(nextProps)
 	{
-		const { audioTrack, videoTrack, screenTrack } = nextProps;
+		const { audioTrack, videoTrack } = nextProps;
 
-		this._setTracks(audioTrack, videoTrack, screenTrack);
+		this._setTracks(audioTrack, videoTrack);
 	}
 
-	_setTracks(audioTrack, videoTrack, screenTrack)
+	_setTracks(audioTrack, videoTrack)
 	{
-		if (this._audioTrack === audioTrack &&
-			this._videoTrack === videoTrack &&
-			this._screenTrack === screenTrack)
+		if (this._audioTrack === audioTrack && this._videoTrack === videoTrack)
 			return;
 
 		this._audioTrack = audioTrack;
 		this._videoTrack = videoTrack;
-		this._screenTrack = screenTrack;
 
 		if (this._hark)
 			this._hark.stop();
@@ -224,9 +176,9 @@ export default class PeerView extends React.Component
 		clearInterval(this._videoResolutionTimer);
 		this._hideVideoResolution();
 
-		const { video, minivideo } = this.refs;
+		const { video } = this.refs;
 
-		if (audioTrack || videoTrack || screenTrack)
+		if (audioTrack || videoTrack)
 		{
 			const stream = new MediaStream;
 
@@ -236,19 +188,7 @@ export default class PeerView extends React.Component
 			if (videoTrack)
 				stream.addTrack(videoTrack);
 
-			if (screenTrack)
-			{
-				const screenStream = new MediaStream;
-
-				screenStream.addTrack(screenTrack);
-
-				video.srcObject = screenStream;
-				minivideo.srcObject = stream;
-			}
-			else
-			{
-				video.srcObject = stream;
-			}
+			video.srcObject = stream;
 
 			if (audioTrack)
 				this._runHark(stream);
@@ -314,19 +254,15 @@ export default class PeerView extends React.Component
 
 PeerView.propTypes =
 {
-	isMe         : PropTypes.bool,
-	advancedMode : PropTypes.bool,
-	peer         : PropTypes.oneOfType(
+	isMe : PropTypes.bool,
+	peer : PropTypes.oneOfType(
 		[ appPropTypes.Me, appPropTypes.Peer ]).isRequired,
+	advancedMode        : PropTypes.bool,
 	audioTrack          : PropTypes.any,
 	videoTrack          : PropTypes.any,
-	screenTrack         : PropTypes.any,
 	videoVisible        : PropTypes.bool.isRequired,
 	videoProfile        : PropTypes.string,
-	screenVisible       : PropTypes.bool,
-	screenProfile       : PropTypes.string,
 	audioCodec          : PropTypes.string,
 	videoCodec          : PropTypes.string,
-	screenCodec         : PropTypes.string,
 	onChangeDisplayName : PropTypes.func
 };

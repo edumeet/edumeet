@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import PeerView from './PeerView';
+import ScreenView from './ScreenView';
 
 const Peer = (props) =>
 {
@@ -17,7 +18,8 @@ const Peer = (props) =>
 		onMuteMic,
 		onUnmuteMic,
 		onDisableWebcam,
-		onEnableWebcam
+		onEnableWebcam,
+		style
 	} = props;
 
 	const micEnabled = (
@@ -49,7 +51,12 @@ const Peer = (props) =>
 		screenProfile = screenConsumer.profile;
 
 	return (
-		<div data-component='Peer'>
+		<div
+			data-component='Peer'
+			className={classnames({
+				screen : screenConsumer
+			})}
+		>
 			<div className='controls'>
 				<div
 					className={classnames('button', 'mic', {
@@ -86,35 +93,48 @@ const Peer = (props) =>
 				:null
 			}
 
-			<PeerView
-				advancedMode={advancedMode}
-				peer={peer}
-				audioTrack={micConsumer ? micConsumer.track : null}
-				videoTrack={webcamConsumer ? webcamConsumer.track : null}
-				screenTrack={screenConsumer ? screenConsumer.track : null}
-				videoVisible={videoVisible}
-				videoProfile={videoProfile}
-				screenVisible={screenVisible}
-				screenProfile={screenProfile}
-				audioCodec={micConsumer ? micConsumer.codec : null}
-				videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-				screenCodec={screenConsumer ? screenConsumer.codec : null}
-			/>
+			<div className={classnames('view-container', 'webcam')} style={style}>
+				<PeerView
+					advancedMode={advancedMode}
+					peer={peer}
+					audioTrack={micConsumer ? micConsumer.track : null}
+					videoTrack={webcamConsumer ? webcamConsumer.track : null}
+					videoVisible={videoVisible}
+					videoProfile={videoProfile}
+					audioCodec={micConsumer ? micConsumer.codec : null}
+					videoCodec={webcamConsumer ? webcamConsumer.codec : null}
+				/>
+			</div>
+
+			{screenConsumer ?
+				<div className={classnames('view-container', 'screen')} style={style}>
+					<ScreenView
+						advancedMode={advancedMode}
+						screenTrack={screenConsumer ? screenConsumer.track : null}
+						screenVisible={screenVisible}
+						screenProfile={screenProfile}
+						screenCodec={screenConsumer ? screenConsumer.codec : null}
+					/>
+				</div>
+				:null
+			}
 		</div>
 	);
 };
 
 Peer.propTypes =
 {
-	advancedMode    : PropTypes.bool,
-	peer            : appPropTypes.Peer.isRequired,
-	micConsumer     : appPropTypes.Consumer,
-	webcamConsumer  : appPropTypes.Consumer,
-	screenConsumer  : appPropTypes.Consumer,
-	onMuteMic       : PropTypes.func.isRequired,
-	onUnmuteMic     : PropTypes.func.isRequired,
-	onEnableWebcam  : PropTypes.func.isRequired,
-	onDisableWebcam : PropTypes.func.isRequired
+	advancedMode     : PropTypes.bool,
+	peer             : appPropTypes.Peer.isRequired,
+	micConsumer      : appPropTypes.Consumer,
+	webcamConsumer   : appPropTypes.Consumer,
+	screenConsumer   : appPropTypes.Consumer,
+	onMuteMic        : PropTypes.func.isRequired,
+	onUnmuteMic      : PropTypes.func.isRequired,
+	onEnableWebcam   : PropTypes.func.isRequired,
+	onDisableWebcam  : PropTypes.func.isRequired,
+	streamDimensions : PropTypes.object,
+	style            : PropTypes.object
 };
 
 const mapStateToProps = (state, { name }) =>

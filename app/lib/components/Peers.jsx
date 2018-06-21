@@ -13,7 +13,7 @@ class Peers extends React.Component
 		super(props);
 		this.state = {
 			peerWidth  : 400,
-			peerHeight : 300,
+			peerHeight : 300, 
 			ratio      : 1.334
 		};
 	}
@@ -25,7 +25,7 @@ class Peers extends React.Component
 
 	updateDimensions(props = this.props)
 	{
-		const n = props.peers ? props.peers.length : 0;
+		const n = props.videoStreams ? props.videoStreams : 0;
 
 		if (n == 0)
 		{
@@ -74,7 +74,7 @@ class Peers extends React.Component
 
 	componentWillReceiveProps(nextProps)
 	{
-		if (nextProps.peers)
+		if (nextProps.videoStreams)
 			this.updateDimensions(nextProps);
 	}
 
@@ -86,11 +86,11 @@ class Peers extends React.Component
 			peers
 		} = this.props;
 
-		const style =
-			{
-				'width'  : this.state.peerWidth,
-				'height' : this.state.peerHeight
-			};
+		const style = 
+		{
+			'width'  : this.state.peerWidth,
+			'height' : this.state.peerHeight
+		};
 
 		return (
 			<div data-component='Peers' ref='peers'>
@@ -102,11 +102,12 @@ class Peers extends React.Component
 								<div
 									className={classnames('peer-container', {
 										'active-speaker' : peer.name === activeSpeakerName
-									})} style={style}
+									})}
 								>
 									<Peer
 										advancedMode={advancedMode}
 										name={peer.name}
+										style={style}
 									/>
 								</div>
 							</Appear>
@@ -122,15 +123,23 @@ Peers.propTypes =
 {
 	advancedMode      : PropTypes.bool,
 	peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
+	videoStreams      : PropTypes.any,
 	activeSpeakerName : PropTypes.string
 };
 
 const mapStateToProps = (state) =>
 {
 	const peersArray = Object.values(state.peers);
+	const videoStreamsArray = Object.values(state.consumers);
+	const videoStreams =
+		videoStreamsArray.filter((consumer) =>
+		{
+			return (consumer.source === 'webcam' || consumer.source === 'screen');
+		}).length;
 
 	return {
 		peers             : peersArray,
+		videoStreams      : videoStreams,
 		activeSpeakerName : state.room.activeSpeakerName
 	};
 };
