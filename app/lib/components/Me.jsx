@@ -78,6 +78,11 @@ class Me extends React.Component
 		if (!me.displayNameSet)
 			tip = 'Click on your name to change it';
 
+		const style =
+			{
+				'width' : screenProducer ? '40vmin' : ''
+			};
+
 		return (
 			<div
 				data-component='Me'
@@ -85,52 +90,57 @@ class Me extends React.Component
 				data-tip={tip}
 				data-tip-disable={!tip}
 				data-type='dark'
+				style={style}
 			>
-				{connected ?
-					<div className='controls'>
-						<div
-							className={classnames('button', 'mic', micState, {
-								disabled : me.audioInProgress
-							})}
-							onClick={() =>
-							{
-								micState === 'on' ? onMuteMic() : onUnmuteMic();
-							}}
-						/>
+				<div className={classnames('view-container', 'webcam')}>
+					{connected ?
+						<div className='controls'>
+							<div
+								className={classnames('button', 'mic', micState, {
+									disabled : me.audioInProgress
+								})}
+								onClick={() =>
+								{
+									micState === 'on' ? onMuteMic() : onUnmuteMic();
+								}}
+							/>
 
-						<div
-							className={classnames('button', 'webcam', webcamState, {
-								disabled : me.webcamInProgress
-							})}
-							onClick={() =>
-							{
-								webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
-							}}
-						/>
-					</div>
-					:null
-				}
+							<div
+								className={classnames('button', 'webcam', webcamState, {
+									disabled : me.webcamInProgress
+								})}
+								onClick={() =>
+								{
+									webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
+								}}
+							/>
+						</div>
+						:null
+					}
 
-				<PeerView
-					isMe
-					advancedMode={advancedMode}
-					peer={me}
-					audioTrack={micProducer ? micProducer.track : null}
-					videoTrack={webcamProducer ? webcamProducer.track : null}
-					videoVisible={videoVisible}
-					audioCodec={micProducer ? micProducer.codec : null}
-					videoCodec={webcamProducer ? webcamProducer.codec : null}
-					onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
-				/>
-
-				{screenProducer ?
-					<ScreenView
+					<PeerView
 						isMe
 						advancedMode={advancedMode}
-						screenTrack={screenProducer ? screenProducer.track : null}
-						screenVisible={screenVisible}
-						screenCodec={screenProducer ? screenProducer.codec : null}
+						peer={me}
+						audioTrack={micProducer ? micProducer.track : null}
+						videoTrack={webcamProducer ? webcamProducer.track : null}
+						videoVisible={videoVisible}
+						audioCodec={micProducer ? micProducer.codec : null}
+						videoCodec={webcamProducer ? webcamProducer.codec : null}
+						onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
 					/>
+				</div>
+
+				{screenProducer ?
+					<div className={classnames('view-container', 'screen')}>
+						<ScreenView
+							isMe
+							advancedMode={advancedMode}
+							screenTrack={screenProducer ? screenProducer.track : null}
+							screenVisible={screenVisible}
+							screenCodec={screenProducer ? screenProducer.codec : null}
+						/>
+					</div>
 					:null
 				}
 
