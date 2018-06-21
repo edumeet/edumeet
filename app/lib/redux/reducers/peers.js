@@ -60,6 +60,19 @@ const peers = (state = initialState, action) =>
 			return { ...state, [newPeer.name]: newPeer };
 		}
 
+		case 'SET_PEER_SCREEN_IN_PROGRESS':
+		{
+			const { peerName, flag } = action.payload;
+			const peer = state[peerName];
+
+			if (!peer)
+				throw new Error('no Peer found');
+
+			const newPeer = { ...peer, peerScreenInProgress: flag };
+
+			return { ...state, [newPeer.name]: newPeer };
+		}
+
 		case 'SET_PEER_RAISE_HAND_STATE':
 		{
 			const { peerName, raiseHandState } = action.payload;

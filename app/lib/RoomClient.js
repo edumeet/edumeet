@@ -732,6 +732,78 @@ export default class RoomClient
 			});
 	}
 
+	pausePeerScreen(peerName)
+	{
+		logger.debug('pausePeerScreen() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerScreenInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.appData.source !== 'screen')
+								continue;
+
+							consumer.pause('pause-screen');
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerScreenInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('pausePeerScreen() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerScreenInProgress(peerName, false));
+			});
+	}
+
+	resumePeerScreen(peerName)
+	{
+		logger.debug('resumePeerScreen() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerScreenInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.appData.source !== 'screen' || !consumer.supported)
+								continue;
+
+							consumer.resume();
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerScreenInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('resumePeerScreen() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerScreenInProgress(peerName, false));
+			});
+	}
+
 	enableAudioOnly()
 	{
 		logger.debug('enableAudioOnly()');

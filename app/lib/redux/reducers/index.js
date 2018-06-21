@@ -7,6 +7,7 @@ import consumers from './consumers';
 import notifications from './notifications';
 import chatmessages from './chatmessages';
 import chatbehavior from './chatbehavior';
+import toolarea from './toolarea';
 
 const reducers = combineReducers(
 	{
@@ -17,7 +18,8 @@ const reducers = combineReducers(
 		consumers,
 		notifications,
 		chatmessages,
-		chatbehavior
+		chatbehavior,
+		toolarea
 	});
 
 export default reducers;

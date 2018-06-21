@@ -119,6 +119,22 @@ export const resumePeerVideo = (peerName) =>
 	};
 };
 
+export const pausePeerScreen = (peerName) =>
+{
+	return {
+		type    : 'PAUSE_PEER_SCREEN',
+		payload : { peerName }
+	};
+};
+
+export const resumePeerScreen = (peerName) =>
+{
+	return {
+		type    : 'RESUME_PEER_SCREEN',
+		payload : { peerName }
+	};
+};
+
 export const userLogin = () =>
 {
 	return {

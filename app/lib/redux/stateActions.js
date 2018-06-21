@@ -125,6 +125,14 @@ export const setPeerAudioInProgress = (peerName, flag) =>
 	};
 };
 
+export const setPeerScreenInProgress = (peerName, flag) =>
+{
+	return {
+		type    : 'SET_PEER_SCREEN_IN_PROGRESS',
+		payload : { peerName, flag }
+	};
+};
+
 export const setMyRaiseHandState = (flag) =>
 {
 	return {
@@ -145,6 +153,21 @@ export const toggleSettings = () =>
 {
 	return {
 		type : 'TOGGLE_SETTINGS'
+	};
+};
+
+export const toggleToolArea = () =>
+{
+	return {
+		type : 'TOGGLE_TOOL_AREA'
+	};
+};
+
+export const setToolTab = (toolTab) =>
+{
+	return {
+		type    : 'SET_TOOL_TAB',
+		payload : { toolTab }
 	};
 };
 
