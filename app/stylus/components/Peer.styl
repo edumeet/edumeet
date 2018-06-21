@@ -3,6 +3,15 @@
 	position: relative;
 	height: 100%;
 	width: 100%;
+	flex-direction: row;
+	display: flex;
+
+	&.screen {
+		border: 5px solid rgba(#fff, 0.4);
+	}
+
+	&:not(.screen) {
+	}
 
 	> .controls {
 		position: absolute;
@@ -92,6 +101,16 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+	}
+
+	> .view-container {
+		&.webcam {
+			order: 2;
+		}
+
+		&.screen {
+			order: 1;
+		}
 	}
 
 	.incompatible-video {

@@ -1,0 +1,109 @@
+[data-component='ScreenView'] {
+	position: relative;
+	flex: 100 100 auto;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background-color: rgba(#2a4b58, 0.9);
+	background-image: url('/resources/images/buddy.svg');
+	background-position: bottom;
+	background-size: auto 85%;
+	background-repeat: no-repeat;
+
+	> .info {
+		$backgroundTint = #000;
+
+		position: absolute;
+		z-index: 5
+		top: 0.6vmin;
+		left: 0.6vmin;
+		bottom: 0;
+		right: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+
+		> .media {
+			flex: 0 0 auto;
+			display: flex;
+			flex-direction: row;
+
+			> .box {
+				padding: 0.4vmin;
+				border-radius: 2px;
+				background-color: rgba(#000, 0.25);
+
+				> p {
+					user-select: none;
+					pointer-events: none;
+					margin-bottom: 2px;
+					color: rgba(#fff, 0.7);
+					font-size: 10px;
+
+					&:last-child {
+						margin-bottom: 0;
+					}
+				}
+			}
+		}
+	}
+
+	> video {
+		flex: 100 100 auto;
+		height: 100%;
+		width: 100%;
+		object-fit: contain;
+		user-select: none;
+		transition-property: opacity;
+		transition-duration: .15s;
+		background-color: rgba(#000, 0.75);
+
+		&.is-me {
+			transform: scaleX(-1);
+		}
+
+		&.hidden {
+			opacity: 0;
+			transition-duration: 0s;
+		}
+
+		&.loading {
+			filter: blur(5px);
+		}
+	}
+
+	> .spinner-container {
+		position: absolute;
+		top: 0
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: rgba(#000, 0.75);
+
+		.react-spinner {
+			position: relative;
+			width: 48px;
+			height: 48px;
+			top: 50%;
+			left: 50%;
+
+			.react-spinner_bar {
+				position: absolute;
+				width: 20%;
+				height: 7.8%;
+				top: -3.9%;
+				left: -10%;
+				animation: PeerView-spinner 1.2s linear infinite;
+				border-radius: 5px;
+				background-color: rgba(#fff, 0.5);
+			}
+		}
+	}
+}
+
+@keyframes ScreenView-spinner {
+	0% { opacity: 1; }
+	100% { opacity: 0.15; }
+}

@@ -40,6 +40,7 @@ export default class PeerView extends React.Component
 		const {
 			isMe,
 			peer,
+			advancedMode,
 			videoVisible,
 			videoProfile,
 			audioCodec,
@@ -56,24 +57,27 @@ export default class PeerView extends React.Component
 		return (
 			<div data-component='PeerView'>
 				<div className='info'>
-					<div className={classnames('media', { 'is-me': isMe })}>
-						<div className='box'>
-							{audioCodec ?
-								<p className='codec'>{audioCodec}</p>
-								:null
-							}
+					{advancedMode ?
+						<div className={classnames('media', { 'is-me': isMe })}>
+							<div className='box'>
+								{audioCodec ?
+									<p className='codec'>{audioCodec}</p>
+									:null
+								}
 
-							{videoCodec ?
-								<p className='codec'>{videoCodec} {videoProfile}</p>
-								:null
-							}
+								{videoCodec ?
+									<p className='codec'>{videoCodec} {videoProfile}</p>
+									:null
+								}
 
-							{(videoVisible && videoWidth !== null) ?
-								<p className='resolution'>{videoWidth}x{videoHeight}</p>
-								:null
-							}
+								{(videoVisible && videoWidth !== null) ?
+									<p className='resolution'>{videoWidth}x{videoHeight}</p>
+									:null
+								}
+							</div>
 						</div>
-					</div>
+						:null
+					}
 
 					<div className={classnames('peer', { 'is-me': isMe })}>
 						{isMe ?
@@ -97,14 +101,17 @@ export default class PeerView extends React.Component
 							</span>
 						}
 
-						<div className='row'>
-							<span
-								className={classnames('device-icon', peer.device.flag)}
-							/>
-							<span className='device-version'>
-								{peer.device.name} {Math.floor(peer.device.version) || null}
-							</span>
-						</div>
+						{advancedMode ?
+							<div className='row'>
+								<span
+									className={classnames('device-icon', peer.device.flag)}
+								/>
+								<span className='device-version'>
+									{peer.device.name} {Math.floor(peer.device.version) || null}
+								</span>
+							</div>
+							:null
+						}
 					</div>
 				</div>
 
@@ -250,6 +257,7 @@ PeerView.propTypes =
 	isMe : PropTypes.bool,
 	peer : PropTypes.oneOfType(
 		[ appPropTypes.Me, appPropTypes.Peer ]).isRequired,
+	advancedMode        : PropTypes.bool,
 	audioTrack          : PropTypes.any,
 	videoTrack          : PropTypes.any,
 	videoVisible        : PropTypes.bool.isRequired,
