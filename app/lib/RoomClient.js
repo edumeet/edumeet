@@ -1460,6 +1460,14 @@ export default class RoomClient
 					this._dispatch(stateActions.removeProducer(producer.id));
 				});
 
+				producer.on('trackended', (originator) =>
+				{
+					logger.debug(
+						'webcam Producer "trackended" event [originator:%s]', originator);
+
+					this.disableScreenSharing();
+				});
+
 				producer.on('pause', (originator) =>
 				{
 					logger.debug(
