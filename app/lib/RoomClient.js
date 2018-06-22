@@ -604,7 +604,7 @@ export default class RoomClient
 					{
 						for (const consumer of peer.consumers)
 						{
-							if (consumer.kind !== 'audio')
+							if (consumer.appData.source !== 'mic')
 								continue;
 
 							consumer.pause('mute-audio');
@@ -640,7 +640,7 @@ export default class RoomClient
 					{
 						for (const consumer of peer.consumers)
 						{
-							if (consumer.kind !== 'audio' || !consumer.supported)
+							if (consumer.appData.source !== 'mic' || !consumer.supported)
 								continue;
 
 							consumer.resume();
@@ -676,7 +676,7 @@ export default class RoomClient
 					{
 						for (const consumer of peer.consumers)
 						{
-							if (consumer.kind !== 'video')
+							if (consumer.appData.source !== 'webcam')
 								continue;
 
 							consumer.pause('pause-video');
@@ -712,7 +712,7 @@ export default class RoomClient
 					{
 						for (const consumer of peer.consumers)
 						{
-							if (consumer.kind !== 'video' || !consumer.supported)
+							if (consumer.appData.source !== 'webcam' || !consumer.supported)
 								continue;
 
 							consumer.resume();

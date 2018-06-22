@@ -74,8 +74,7 @@ class Peers extends React.Component
 
 	componentWillReceiveProps(nextProps)
 	{
-		if (nextProps.videoStreams)
-			this.updateDimensions(nextProps);
+		this.updateDimensions(nextProps);
 	}
 
 	render()
@@ -83,7 +82,8 @@ class Peers extends React.Component
 		const {
 			advancedMode,
 			activeSpeakerName,
-			peers
+			peers,
+			toolAreaOpen
 		} = this.props;
 
 		const style = 
@@ -108,6 +108,7 @@ class Peers extends React.Component
 										advancedMode={advancedMode}
 										name={peer.name}
 										style={style}
+										toolAreaOpen={toolAreaOpen}
 									/>
 								</div>
 							</Appear>
@@ -124,7 +125,8 @@ Peers.propTypes =
 	advancedMode      : PropTypes.bool,
 	peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 	videoStreams      : PropTypes.any,
-	activeSpeakerName : PropTypes.string
+	activeSpeakerName : PropTypes.string,
+	toolAreaOpen      : PropTypes.bool
 };
 
 const mapStateToProps = (state) =>
@@ -140,7 +142,8 @@ const mapStateToProps = (state) =>
 	return {
 		peers             : peersArray,
 		videoStreams      : videoStreams,
-		activeSpeakerName : state.room.activeSpeakerName
+		activeSpeakerName : state.room.activeSpeakerName,
+		toolAreaOpen      : state.toolarea.toolAreaOpen
 	};
 };
 

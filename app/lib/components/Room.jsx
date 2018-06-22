@@ -12,6 +12,7 @@ import Peers from './Peers';
 import Notifications from './Notifications';
 import ToolAreaButton from './ToolArea/ToolAreaButton';
 import ToolArea from './ToolArea/ToolArea';
+import FullScreenView from './FullScreenView';
 
 class Room extends React.Component
 {
@@ -59,6 +60,7 @@ class Room extends React.Component
 		return (
 			<Appear duration={300}>
 				<div data-component='Room'>
+					<FullScreenView advancedMode={room.advancedMode} />
 					<div
 						className='room-wrapper'
 						style={{
