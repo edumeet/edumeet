@@ -361,6 +361,14 @@ export const toggleChat = () =>
 	};
 };
 
+export const toggleConsumerFullscreen = (consumerId) =>
+{
+	return {
+		type    : 'TOGGLE_FULLSCREEN_CONSUMER',
+		payload : { consumerId }
+	};
+};
+
 export const increaseBadge = () =>
 {
 	return {

@@ -22,7 +22,7 @@ export default class FullView extends React.Component
 		} = this.props;
 
 		return (
-			<div data-component='ScreenView'>
+			<div data-component='FullView'>
 				<video
 					ref='video'
 					className={classnames({

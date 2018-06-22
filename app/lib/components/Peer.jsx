@@ -226,7 +226,8 @@ const mapDispatchToProps = (dispatch) =>
 		},
 		toggleConsumerFullscreen : (consumer) =>
 		{
-			dispatch(stateActions.toggleConsumerFullscreen(consumer));
+			if (consumer)
+				dispatch(stateActions.toggleConsumerFullscreen(consumer.id));
 		}
 	};
 };

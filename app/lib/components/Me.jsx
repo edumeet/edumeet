@@ -78,11 +78,6 @@ class Me extends React.Component
 		if (!me.displayNameSet)
 			tip = 'Click on your name to change it';
 
-		const style =
-			{
-				'width' : screenProducer ? '40vmin' : ''
-			};
-
 		return (
 			<div
 				data-component='Me'
@@ -90,7 +85,6 @@ class Me extends React.Component
 				data-tip={tip}
 				data-tip-disable={!tip}
 				data-type='dark'
-				style={style}
 			>
 				<div className={classnames('view-container', 'webcam')}>
 					{connected ?
