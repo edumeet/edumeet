@@ -35,5 +35,11 @@ export function getBrowserType()
 		return 'chrome';
 	}
 
+	// MSEdge
+	if (ua.indexOf('edge') !== -1)
+	{
+		return 'edge';
+	}
+
 	return 'N/A';
 }
