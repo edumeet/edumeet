@@ -81,9 +81,9 @@ export default class RoomClient
 
 		// Map of webcam MediaDeviceInfos indexed by deviceId.
 		// @type {Map<String, MediaDeviceInfos>}
-		this._webcams = {};
+		this._webcams = new Map();
 
-		this._audioDevices = {};
+		this._audioDevices = new Map();
 
 		// Local Webcam. Object with:
 		// - {MediaDeviceInfo} [device]
@@ -386,7 +386,7 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				this._audioDevice.device = this._audioDevices[deviceId];
+				this._audioDevice.device = this._audioDevices.get(deviceId);
 
 				logger.debug(
 					'changeAudioDevice() | new selected webcam [device:%o]',
@@ -452,7 +452,7 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				this._webcam.device = this._webcams[deviceId];
+				this._webcam.device = this._webcams.get(deviceId);
 
 				logger.debug(
 					'changeWebcam() | new selected webcam [device:%o]',
@@ -1640,7 +1640,7 @@ export default class RoomClient
 		logger.debug('_updateAudioDevices()');
 
 		// Reset the list.
-		this._audioDevices = {};
+		this._audioDevices = new Map();
 
 		return Promise.resolve()
 			.then(() =>
@@ -1656,28 +1656,27 @@ export default class RoomClient
 					if (device.kind !== 'audioinput')
 						continue;
 
-					this._audioDevices[device.deviceId] = {
-						value    : device.deviceId,
-						label    : device.label,
-						deviceId : device.deviceId
-					};
+					device.value = device.deviceId;
+
+					this._audioDevices.set(device.deviceId, device);
 				}
 			})
 			.then(() =>
 			{
+				const array = Array.from(this._audioDevices.values());
+				const len = array.length;
 				const currentAudioDeviceId =
 					this._audioDevice.device ? this._audioDevice.device.deviceId : undefined;
 
-				logger.debug('_updateAudioDevices() [audiodevices:%o]', this._audioDevices);
-
-				const len = Object.keys(this._audioDevices).length;
+				logger.debug('_updateAudioDevices() [audiodevices:%o]', array);
 
 				if (len === 0)
 					this._audioDevice.device = null;
-				else if (!this._audioDevices[currentAudioDeviceId])
-					for (this._audioDevice.device in this._audioDevices)
-						if (this._audioDevices.hasOwnProperty(this._audioDevice.device))
-							break;
+				else if (!this._audioDevices.has(currentAudioDeviceId))
+					this._audioDevice.device = array[0];
+
+				this._dispatch(
+					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
 
 				this._dispatch(
 					stateActions.setCanChangeAudioDevice(len >= 2));
@@ -1692,7 +1691,7 @@ export default class RoomClient
 		logger.debug('_updateWebcams()');
 
 		// Reset the list.
-		this._webcams = {};
+		this._webcams = new Map();
 
 		return Promise.resolve()
 			.then(() =>
@@ -1708,28 +1707,27 @@ export default class RoomClient
 					if (device.kind !== 'videoinput')
 						continue;
 
-					this._webcams[device.deviceId] = {
-						value    : device.deviceId,
-						label    : device.label,
-						deviceId : device.deviceId
-					};
+					device.value = device.deviceId;
+
+					this._webcams.set(device.deviceId, device);
 				}
 			})
 			.then(() =>
 			{
+				const array = Array.from(this._webcams.values());
+				const len = array.length;
 				const currentWebcamId =
 					this._webcam.device ? this._webcam.device.deviceId : undefined;
 
-				logger.debug('_updateWebcams() [webcams:%o]', this._webcams);
-
-				const len = Object.keys(this._webcams).length;
+				logger.debug('_updateWebcams() [webcams:%o]', array);
 
 				if (len === 0)
 					this._webcam.device = null;
-				else if (!this._webcams[currentWebcamId])
-					for (this._webcam.device in this._webcams)
-						if (this._webcams.hasOwnProperty(this._webcam.device))
-							break;
+				else if (!this._webcams.has(currentWebcamId))
+					this._webcam.device = array[0];
+
+				this._dispatch(
+					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
 
 				this._dispatch(
 					stateActions.setCanChangeWebcam(len >= 2));

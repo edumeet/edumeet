@@ -32,7 +32,7 @@ class Settings extends React.Component
 			webcamText = 'Unable to select camera';
 
 		if (me.webcamDevices)
-			webcams = Object.values(me.webcamDevices);
+			webcams = Array.from(me.webcamDevices.values());
 		else
 			webcams = [];
 
@@ -45,7 +45,7 @@ class Settings extends React.Component
 			audioDevicesText = 'Unable to select audio input device';
 
 		if (me.audioDevices)
-			audioDevices = Object.values(me.audioDevices);
+			audioDevices = Array.from(me.audioDevices.values());
 		else
 			audioDevices = [];
 
