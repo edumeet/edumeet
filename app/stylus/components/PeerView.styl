@@ -17,9 +17,9 @@
 
 		position: absolute;
 		z-index: 5
-		top: 0;
+		top: 0.6vmin;
+		left: 0.6vmin;
 		bottom: 0;
-		left: 0;
 		right: 0;
 		display: flex;
 		flex-direction: column;
@@ -31,8 +31,7 @@
 			flex-direction: row;
 
 			> .box {
-				margin: 4px;
-				padding: 2px 4px;
+				padding: 0.4vmin;
 				border-radius: 2px;
 				background-color: rgba(#000, 0.25);
 
@@ -55,27 +54,32 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: flex-end;
+			position: absolute;
+			bottom: 0.6vmin;
+			left: 0;
+			border-radius: 2px;
+			background-color: rgba(#000, 0.25);
 
 			+desktop() {
 				&.is-me {
-					padding: 10px;
+					padding: 1vmin;
 					align-items: flex-start;
 				}
 
 				&:not(.is-me) {
-					padding: 20px;
+					padding: 1vmin;
 					align-items: flex-start;
 				}
 			}
 
 			+mobile() {
 				&.is-me {
-					padding: 10px;
+					padding: 1vmin;
 					align-items: flex-start;
 				}
 
 				&:not(.is-me) {
-					padding: 10px;
+					padding: 1vmin;
 					align-items: flex-end;
 				}
 			}
@@ -114,15 +118,15 @@
 			}
 
 			> .row {
-				margin-top: 4px;
+				margin-top: 0.4vmin;
 				display: flex;
 				flex-direction: row;
 				justify-content: flex-start;
 				align-items: flex-end;
 
 				> .device-icon {
-					height: 18px;
-					width: 18px;
+					height: 12px;
+					width: 12px;
 					margin-right: 3px;
 					user-select: none;
 					pointer-events: none;
@@ -187,39 +191,6 @@
 
 		&.loading {
 			filter: blur(5px);
-		}
-	}
-
-	> .minivideo {
-		height: 15%;
-		width: 15%;
-		bottom: 1%;
-		right: 1%;
-		position: absolute;
-		overflow: hidden;
-
-		> video {
-			flex: 100 100 auto;
-			height: 100%;
-			width: 100%;
-			object-fit: cover;
-			user-select: none;
-			transition-property: opacity;
-			transition-duration: .15s;
-			background-color: rgba(#000, 0.75);
-
-			&.is-me {
-				transform: scaleX(-1);
-			}
-
-			&.hidden {
-				opacity: 0;
-				transition-duration: 0s;
-			}
-
-			&.loading {
-				filter: blur(5px);
-			}
 		}
 	}
 

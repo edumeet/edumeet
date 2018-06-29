@@ -22,19 +22,11 @@ export const setRoomActiveSpeaker = (peerName) =>
 	};
 };
 
-export const onComponentResize = (peerWidth, peerHeight) =>
-{
-	return {
-		type    : 'SET_COMPONENT_SIZE',
-		payload : { peerWidth, peerHeight }
-	};
-};
-
-export const setMe = ({ peerName, displayName, displayNameSet, device }) =>
+export const setMe = ({ peerName, displayName, displayNameSet, device, loginEnabled }) =>
 {
 	return {
 		type    : 'SET_ME',
-		payload : { peerName, displayName, displayNameSet, device }
+		payload : { peerName, displayName, displayNameSet, device, loginEnabled }
 	};
 };
 
@@ -54,6 +46,22 @@ export const setScreenCapabilities = ({	canShareScreen, needExtension }) =>
 	};
 };
 
+export const setCanChangeAudioDevice = (flag) =>
+{
+	return {
+		type    : 'SET_CAN_CHANGE_AUDIO_DEVICE',
+		payload : flag
+	};
+};
+
+export const setAudioDevices = (devices) =>
+{
+	return {
+		type    : 'SET_AUDIO_DEVICES',
+		payload : { devices }
+	};
+};
+
 export const setCanChangeWebcam = (flag) =>
 {
 	return {
@@ -62,11 +70,26 @@ export const setCanChangeWebcam = (flag) =>
 	};
 };
 
+export const setWebcamDevices = (devices) =>
+{
+	return {
+		type    : 'SET_WEBCAM_DEVICES',
+		payload : { devices }
+	};
+};
+
 export const setDisplayName = (displayName) =>
 {
 	return {
 		type    : 'SET_DISPLAY_NAME',
 		payload : { displayName }
+	};
+};
+
+export const toggleAdvancedMode = () =>
+{
+	return {
+		type : 'TOGGLE_ADVANCED_MODE'
 	};
 };
 
@@ -83,6 +106,84 @@ export const setAudioOnlyInProgress = (flag) =>
 	return {
 		type    : 'SET_AUDIO_ONLY_IN_PROGRESS',
 		payload : { flag }
+	};
+};
+
+export const setPeerVideoInProgress = (peerName, flag) =>
+{
+	return {
+		type    : 'SET_PEER_VIDEO_IN_PROGRESS',
+		payload : { peerName, flag }
+	};
+};
+
+export const setPeerAudioInProgress = (peerName, flag) =>
+{
+	return {
+		type    : 'SET_PEER_AUDIO_IN_PROGRESS',
+		payload : { peerName, flag }
+	};
+};
+
+export const setPeerScreenInProgress = (peerName, flag) =>
+{
+	return {
+		type    : 'SET_PEER_SCREEN_IN_PROGRESS',
+		payload : { peerName, flag }
+	};
+};
+
+export const setMyRaiseHandState = (flag) =>
+{
+	return {
+		type    : 'SET_MY_RAISE_HAND_STATE',
+		payload : { flag }
+	};
+};
+
+export const setLoginInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_LOGIN_IN_PROGRESS',
+		payload : { flag }
+	};
+};
+
+export const toggleSettings = () =>
+{
+	return {
+		type : 'TOGGLE_SETTINGS'
+	};
+};
+
+export const toggleToolArea = () =>
+{
+	return {
+		type : 'TOGGLE_TOOL_AREA'
+	};
+};
+
+export const setToolTab = (toolTab) =>
+{
+	return {
+		type    : 'SET_TOOL_TAB',
+		payload : { toolTab }
+	};
+};
+
+export const setMyRaiseHandStateInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_MY_RAISE_HAND_STATE_IN_PROGRESS',
+		payload : { flag }
+	};
+};
+
+export const setPeerRaiseHandState = (peerName, raiseHandState) =>
+{
+	return {
+		type    : 'SET_PEER_RAISE_HAND_STATE',
+		payload : { peerName, raiseHandState }
 	};
 };
 
@@ -131,6 +232,14 @@ export const setProducerTrack = (producerId, track) =>
 	return {
 		type    : 'SET_PRODUCER_TRACK',
 		payload : { producerId, track }
+	};
+};
+
+export const setAudioInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_AUDIO_IN_PROGRESS',
+		payload : { flag }
 	};
 };
 
@@ -249,6 +358,21 @@ export const toggleChat = () =>
 {
 	return {
 		type : 'TOGGLE_CHAT'
+	};
+};
+
+export const toggleConsumerFullscreen = (consumerId) =>
+{
+	return {
+		type    : 'TOGGLE_FULLSCREEN_CONSUMER',
+		payload : { consumerId }
+	};
+};
+
+export const increaseBadge = () =>
+{
+	return {
+		type : 'INCREASE_BADGE'
 	};
 };
 

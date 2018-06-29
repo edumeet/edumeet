@@ -5,7 +5,8 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import {
 	applyMiddleware as applyReduxMiddleware,
-	createStore as createReduxStore
+	createStore as createReduxStore,
+	compose as composeRedux
 } from 'redux';
 import thunk from 'redux-thunk';
 import { createLogger as createReduxLogger } from 'redux-logger';
@@ -19,6 +20,7 @@ import * as stateActions from './redux/stateActions';
 import reducers from './redux/reducers';
 import roomClientMiddleware from './redux/roomClientMiddleware';
 import Room from './components/Room';
+import { loginEnabled } from '../config';
 
 const logger = new Logger();
 const reduxMiddlewares =
@@ -40,10 +42,22 @@ if (process.env.NODE_ENV === 'development')
 	reduxMiddlewares.push(reduxLogger);
 }
 
+const composeEnhancers =
+typeof window === 'object' &&
+window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+	window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+		// Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
+	}) : composeRedux;
+
+const enhancer = composeEnhancers(
+	applyReduxMiddleware(...reduxMiddlewares)
+	// other store enhancers if any
+);
+
 const store = createReduxStore(
 	reducers,
 	undefined,
-	applyReduxMiddleware(...reduxMiddlewares)
+	enhancer
 );
 
 domready(() =>
@@ -61,11 +75,12 @@ function run()
 
 	const peerName = randomString({ length: 8 }).toLowerCase();
 	const urlParser = new UrlParse(window.location.href, true);
-	let roomId = urlParser.query.roomId;
+	let roomId = (urlParser.pathname).substr(1)
+		? (urlParser.pathname).substr(1) : urlParser.query.roomId;
 	const produce = urlParser.query.produce !== 'false';
 	let displayName = urlParser.query.displayName;
 	const isSipEndpoint = urlParser.query.sipEndpoint === 'true';
-	const useSimulcast = urlParser.query.simulcast !== 'false';
+	const useSimulcast = urlParser.query.simulcast === 'true';
 
 	if (!roomId)
 	{
@@ -128,7 +143,7 @@ function run()
 
 	// NOTE: I don't like this.
 	store.dispatch(
-		stateActions.setMe({ peerName, displayName, displayNameSet, device }));
+		stateActions.setMe({ peerName, displayName, displayNameSet, device, loginEnabled }));
 
 	// NOTE: I don't like this.
 	store.dispatch(

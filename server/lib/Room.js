@@ -254,8 +254,28 @@ class Room extends EventEmitter
 
 					protooPeer.send(
 						'chat-history-receive',
-						{ chatHistory : this._chatHistory }
+						{ chatHistory: this._chatHistory }
 					);
+
+					break;
+				}
+
+				case 'raisehand-message':
+				{
+					accept();
+
+					const { raiseHandState } = request.data;
+					const { mediaPeer } = protooPeer.data;
+
+					mediaPeer.appData.raiseHand = request.data.raiseHandState;
+					// Spread to others via protoo.
+					this._protooRoom.spread(
+						'raisehand-message',
+						{
+							peerName    : protooPeer.id,
+							raiseHandState : raiseHandState
+						},
+						[ protooPeer ]);
 
 					break;
 				}

@@ -51,10 +51,11 @@
   {
     'alice' :
     {
-      name        : 'alice',
-      displayName : 'Alice Thomsom',
-      device      : { flag: 'chrome', name: 'Chrome', version: '58' },
-      consumers   : [ 5551, 5552 ]
+      name           : 'alice',
+      displayName    : 'Alice Thomsom',
+      raiseHandState : false,
+      device         : { flag: 'chrome', name: 'Chrome', version: '58' },
+      consumers      : [ 5551, 5552 ]
     }
   },
   consumers :

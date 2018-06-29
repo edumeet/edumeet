@@ -3,34 +3,40 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
-import * as stateActions from '../redux/stateActions';
 import { Appear } from './transitions';
 import Peer from './Peer';
 
 class Peers extends React.Component
 {
-	constructor()
+	constructor(props)
 	{
-		super();
+		super(props);
 		this.state = {
-			ratio : 4 / 3
+			peerWidth  : 400,
+			peerHeight : 300, 
+			ratio      : 1.334
 		};
-		
 	}
-	updateDimensions()
-	{
-		const n = this.props.peers.length;
 
-		if (n == 0) 
+	resizeUpdate()
+	{
+		this.updateDimensions();
+	}
+
+	updateDimensions(props = this.props)
+	{
+		const n = props.videoStreams ? props.videoStreams : 0;
+
+		if (n == 0)
 		{
 			return;
 		}
 
 		const width = this.refs.peers.clientWidth;
 		const height = this.refs.peers.clientHeight;
-		
+
 		let x, y, space;
-		
+
 		for (let rows = 1; rows < 100; rows = rows + 1)
 		{
 			x = width / Math.ceil(n / rows);
@@ -43,43 +49,49 @@ class Peers extends React.Component
 			}
 			space = height - (y * (rows));
 			if (space < y)
-			{ 
-				break; 
+			{
+				break;
 			}
 		}
-		if (Math.ceil(this.props.peerWidth) !== Math.ceil(0.9 * x))
+		if (Math.ceil(this.state.peerWidth) !== Math.ceil(0.9 * x))
 		{
-			this.props.onComponentResize(0.9 * x, 0.9 * y);
+			this.setState({
+				peerWidth  : 0.9 * x,
+				peerHeight : 0.9 * y
+			});
 		}
 	}
-	
+
 	componentDidMount()
 	{
-		window.addEventListener('resize', this.updateDimensions.bind(this));
+		window.addEventListener('resize', this.resizeUpdate.bind(this));
 	}
-	
-	componentWillUnmount() 
+
+	componentWillUnmount()
 	{
-		window.removeEventListener('resize', this.updateDimensions.bind(this));
+		window.removeEventListener('resize', this.resizeUpdate.bind(this));
 	}
-	
+
+	componentWillReceiveProps(nextProps)
+	{
+		this.updateDimensions(nextProps);
+	}
+
 	render()
 	{
 		const {
+			advancedMode,
 			activeSpeakerName,
 			peers,
-			peerWidth,
-			peerHeight
+			toolAreaOpen
 		} = this.props;
-		
-		const style = 
-			{
-				'width'  : peerWidth,
-				'height' : peerHeight
-			};
 
-		this.updateDimensions();
-		
+		const style = 
+		{
+			'width'  : this.state.peerWidth,
+			'height' : this.state.peerHeight
+		};
+
 		return (
 			<div data-component='Peers' ref='peers'>
 				{
@@ -90,9 +102,14 @@ class Peers extends React.Component
 								<div
 									className={classnames('peer-container', {
 										'active-speaker' : peer.name === activeSpeakerName
-									})} style={style}
+									})}
 								>
-									<Peer name={peer.name} />
+									<Peer
+										advancedMode={advancedMode}
+										name={peer.name}
+										style={style}
+										toolAreaOpen={toolAreaOpen}
+									/>
 								</div>
 							</Appear>
 						);
@@ -105,40 +122,33 @@ class Peers extends React.Component
 
 Peers.propTypes =
 {
+	advancedMode      : PropTypes.bool,
 	peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
+	videoStreams      : PropTypes.any,
 	activeSpeakerName : PropTypes.string,
-	peerHeight        : PropTypes.number,
-	peerWidth         : PropTypes.number,
-	onComponentResize : PropTypes.func.isRequired
-};
-
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		onComponentResize : (peerWidth, peerHeight) =>
-		{
-			dispatch(stateActions.onComponentResize(peerWidth, peerHeight));
-		}
-	};
+	toolAreaOpen      : PropTypes.bool
 };
 
 const mapStateToProps = (state) =>
 {
-	// TODO: This is not OK since it's creating a new array every time, so triggering a
-	// component rendering.
 	const peersArray = Object.values(state.peers);
-	
+	const videoStreamsArray = Object.values(state.consumers);
+	const videoStreams =
+		videoStreamsArray.filter((consumer) =>
+		{
+			return (consumer.source === 'webcam' || consumer.source === 'screen');
+		}).length;
+
 	return {
 		peers             : peersArray,
+		videoStreams      : videoStreams,
 		activeSpeakerName : state.room.activeSpeakerName,
-		peerHeight        : state.room.peerHeight,
-		peerWidth         : state.room.peerWidth
+		toolAreaOpen      : state.toolarea.toolAreaOpen
 	};
 };
 
 const PeersContainer = connect(
-	mapStateToProps,
-	mapDispatchToProps
+	mapStateToProps
 )(Peers);
 
 export default PeersContainer;

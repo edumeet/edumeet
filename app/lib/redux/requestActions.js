@@ -57,10 +57,19 @@ export const disableWebcam = () =>
 	};
 };
 
-export const changeWebcam = () =>
+export const changeWebcam = (deviceId) =>
 {
 	return {
-		type : 'CHANGE_WEBCAM'
+		type    : 'CHANGE_WEBCAM',
+		payload : { deviceId }
+	};
+};
+
+export const changeAudioDevice = (deviceId) =>
+{
+	return {
+		type    : 'CHANGE_AUDIO_DEVICE',
+		payload : { deviceId }
 	};
 };
 
@@ -75,6 +84,75 @@ export const disableAudioOnly = () =>
 {
 	return {
 		type : 'DISABLE_AUDIO_ONLY'
+	};
+};
+
+export const mutePeerAudio = (peerName) =>
+{
+	return {
+		type    : 'MUTE_PEER_AUDIO',
+		payload : { peerName }
+	};
+};
+
+export const unmutePeerAudio = (peerName) =>
+{
+	return {
+		type    : 'UNMUTE_PEER_AUDIO',
+		payload : { peerName }
+	};
+};
+
+export const pausePeerVideo = (peerName) =>
+{
+	return {
+		type    : 'PAUSE_PEER_VIDEO',
+		payload : { peerName }
+	};
+};
+
+export const resumePeerVideo = (peerName) =>
+{
+	return {
+		type    : 'RESUME_PEER_VIDEO',
+		payload : { peerName }
+	};
+};
+
+export const pausePeerScreen = (peerName) =>
+{
+	return {
+		type    : 'PAUSE_PEER_SCREEN',
+		payload : { peerName }
+	};
+};
+
+export const resumePeerScreen = (peerName) =>
+{
+	return {
+		type    : 'RESUME_PEER_SCREEN',
+		payload : { peerName }
+	};
+};
+
+export const userLogin = () =>
+{
+	return {
+		type : 'USER_LOGIN'
+	};
+};
+
+export const raiseHand = () =>
+{
+	return {
+		type : 'RAISE_HAND'
+	};
+};
+
+export const lowerHand = () =>
+{
+	return {
+		type : 'LOWER_HAND'
 	};
 };
 

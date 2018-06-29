@@ -6,23 +6,25 @@ import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
 import * as stateActions from './redux/stateActions';
+import {
+	turnServers,
+	requestTimeout,
+	transportOptions
+} from '../config';
 
 const logger = new Logger('RoomClient');
 
 const ROOM_OPTIONS =
 {
-	requestTimeout   : 10000,
-	transportOptions :
-	{
-		tcp : true
-	}
+	requestTimeout   : requestTimeout,
+	transportOptions : transportOptions,
+	turnServers      : turnServers
 };
 
 const VIDEO_CONSTRAINS =
 {
-	qvga : { width: { ideal: 320 }, height: { ideal: 240 } },
-	vga  : { width: { ideal: 640 }, height: { ideal: 480 } },
-	hd   : { width: { ideal: 1280 }, height: { ideal: 720 } }
+	width       : { ideal: 1280 },
+	aspectRatio : 1.334
 };
 
 export default class RoomClient
@@ -36,6 +38,9 @@ export default class RoomClient
 
 		const protooUrl = getProtooUrl(peerName, roomId);
 		const protooTransport = new protooClient.WebSocketTransport(protooUrl);
+
+		// window element to external login site
+		this._loginWindow;
 
 		// Closed flag.
 		this._closed = false;
@@ -52,6 +57,9 @@ export default class RoomClient
 		// Redux store getState function.
 		this._getState = getState;
 
+		// This device
+		this._device = device;
+
 		// My peer name.
 		this._peerName = peerName;
 
@@ -60,6 +68,7 @@ export default class RoomClient
 
 		// mediasoup-client Room instance.
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
+		this._room.roomId = roomId;
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -77,12 +86,18 @@ export default class RoomClient
 		// @type {Map<String, MediaDeviceInfos>}
 		this._webcams = new Map();
 
+		this._audioDevices = new Map();
+
 		// Local Webcam. Object with:
 		// - {MediaDeviceInfo} [device]
 		// - {String} [resolution] - 'qvga' / 'vga' / 'hd'.
 		this._webcam = {
 			device     : null,
 			resolution : 'hd'
+		};
+
+		this._audioDevice = {
+			device : null
 		};
 
 		this._screenSharing = ScreenShare.create();
@@ -109,6 +124,20 @@ export default class RoomClient
 		setTimeout(() => this._protoo.close(), 250);
 
 		this._dispatch(stateActions.setRoomState('closed'));
+	}
+
+	login()
+	{
+		this._dispatch(stateActions.setLoginInProgress(true));
+
+		const url = `/login?roomId=${this._room.roomId}&peerName=${this._peerName}`;
+
+		this._loginWindow = window.open(url, 'loginWindow');
+	}
+
+	closeLoginWindow()
+	{
+		this._loginWindow.close();
 	}
 
 	changeDisplayName(displayName)
@@ -350,9 +379,75 @@ export default class RoomClient
 			});
 	}
 
-	changeWebcam()
+	changeAudioDevice(deviceId)
 	{
-		logger.debug('changeWebcam()');
+		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
+
+		this._dispatch(
+			stateActions.setAudioInProgress(true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				this._audioDevice.device = this._audioDevices.get(deviceId);
+
+				logger.debug(
+					'changeAudioDevice() | new selected webcam [device:%o]',
+					this._audioDevice.device);
+			})
+			.then(() =>
+			{
+				const { device } = this._audioDevice;
+
+				if (!device)
+					throw new Error('no audio devices');
+
+				logger.debug('changeAudioDevice() | calling getUserMedia()');
+
+				return navigator.mediaDevices.getUserMedia(
+					{
+						audio :
+						{
+							deviceId : { exact: device.deviceId }
+						}
+					});
+			})
+			.then((stream) =>
+			{
+				const track = stream.getAudioTracks()[0];
+
+				return this._micProducer.replaceTrack(track)
+					.then((newTrack) =>
+					{
+						track.stop();
+
+						return newTrack;
+					});
+			})
+			.then((newTrack) =>
+			{
+				this._dispatch(
+					stateActions.setProducerTrack(this._micProducer.id, newTrack));
+
+				return this._updateAudioDevices();
+			})
+			.then(() =>
+			{
+				this._dispatch(
+					stateActions.setAudioInProgress(false));
+			})
+			.catch((error) =>
+			{
+				logger.error('changeAudioDevice() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setAudioInProgress(false));
+			});
+	}
+
+	changeWebcam(deviceId)
+	{
+		logger.debug('changeWebcam() [deviceId: %s]', deviceId);
 
 		this._dispatch(
 			stateActions.setWebcamInProgress(true));
@@ -360,22 +455,7 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				return this._updateWebcams();
-			})
-			.then(() =>
-			{
-				const array = Array.from(this._webcams.keys());
-				const len = array.length;
-				const deviceId =
-					this._webcam.device ? this._webcam.device.deviceId : undefined;
-				let idx = array.indexOf(deviceId);
-
-				if (idx < len - 1)
-					idx++;
-				else
-					idx = 0;
-
-				this._webcam.device = this._webcams.get(array[idx]);
+				this._webcam.device = this._webcams.get(deviceId);
 
 				logger.debug(
 					'changeWebcam() | new selected webcam [device:%o]',
@@ -386,7 +466,7 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				const { device, resolution } = this._webcam;
+				const { device } = this._webcam;
 
 				if (!device)
 					throw new Error('no webcam devices');
@@ -398,7 +478,7 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS[resolution]
+							...VIDEO_CONSTRAINS
 						}
 					});
 			})
@@ -419,6 +499,10 @@ export default class RoomClient
 				this._dispatch(
 					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
 
+				return this._updateWebcams();
+			})
+			.then(() =>
+			{
 				this._dispatch(
 					stateActions.setWebcamInProgress(false));
 			})
@@ -463,7 +547,7 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				const { device, resolution } = this._webcam;
+				const { device } = this._webcam;
 
 				logger.debug('changeWebcamResolution() | calling getUserMedia()');
 
@@ -472,7 +556,7 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS[resolution]
+							...VIDEO_CONSTRAINS
 						}
 					});
 			})
@@ -504,6 +588,222 @@ export default class RoomClient
 					stateActions.setWebcamInProgress(false));
 
 				this._webcam.resolution = oldResolution;
+			});
+	}
+
+	mutePeerAudio(peerName)
+	{
+		logger.debug('mutePeerAudio() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerAudioInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.appData.source !== 'mic')
+								continue;
+
+							consumer.pause('mute-audio');
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerAudioInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('mutePeerAudio() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerAudioInProgress(peerName, false));
+			});
+	}
+
+	unmutePeerAudio(peerName)
+	{
+		logger.debug('unmutePeerAudio() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerAudioInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.appData.source !== 'mic' || !consumer.supported)
+								continue;
+
+							consumer.resume();
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerAudioInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('unmutePeerAudio() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerAudioInProgress(peerName, false));
+			});
+	}
+
+	pausePeerVideo(peerName)
+	{
+		logger.debug('pausePeerVideo() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerVideoInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.appData.source !== 'webcam')
+								continue;
+
+							consumer.pause('pause-video');
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerVideoInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('pausePeerVideo() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerVideoInProgress(peerName, false));
+			});
+	}
+
+	resumePeerVideo(peerName)
+	{
+		logger.debug('resumePeerVideo() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerVideoInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.appData.source !== 'webcam' || !consumer.supported)
+								continue;
+
+							consumer.resume();
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerVideoInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('resumePeerVideo() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerVideoInProgress(peerName, false));
+			});
+	}
+
+	pausePeerScreen(peerName)
+	{
+		logger.debug('pausePeerScreen() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerScreenInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.appData.source !== 'screen')
+								continue;
+
+							consumer.pause('pause-screen');
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerScreenInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('pausePeerScreen() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerScreenInProgress(peerName, false));
+			});
+	}
+
+	resumePeerScreen(peerName)
+	{
+		logger.debug('resumePeerScreen() [peerName:"%s"]', peerName);
+
+		this._dispatch(
+			stateActions.setPeerScreenInProgress(peerName, true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				for (const peer of this._room.peers)
+				{
+					if (peer.name === peerName)
+					{
+						for (const consumer of peer.consumers)
+						{
+							if (consumer.appData.source !== 'screen' || !consumer.supported)
+								continue;
+
+							consumer.resume();
+						}
+					}
+				}
+
+				this._dispatch(
+					stateActions.setPeerScreenInProgress(peerName, false));
+			})
+			.catch((error) =>
+			{
+				logger.error('resumePeerScreen() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setPeerScreenInProgress(peerName, false));
 			});
 	}
 
@@ -584,6 +884,43 @@ export default class RoomClient
 
 				this._dispatch(
 					stateActions.setAudioOnlyInProgress(false));
+			});
+	}
+
+	sendRaiseHandState(state)
+	{
+		logger.debug('sendRaiseHandState: ', state);
+
+		this._dispatch(
+			stateActions.setMyRaiseHandStateInProgress(true));
+
+		return this._protoo.send('raisehand-message', { raiseHandState: state })
+			.then(() =>
+			{
+				this._dispatch(
+					stateActions.setMyRaiseHandState(state));
+
+				this._dispatch(requestActions.notify(
+					{
+						text : 'raiseHand state changed'
+					}));
+				this._dispatch(
+					stateActions.setMyRaiseHandStateInProgress(false));
+			})
+			.catch((error) =>
+			{
+				logger.error('sendRaiseHandState() | failed: %o', error);
+
+				this._dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : `Could not change raise hand state: ${error}`
+					}));
+
+				// We need to refresh the component for it to render changed state
+				this._dispatch(stateActions.setMyRaiseHandState(!state));
+				this._dispatch(
+					stateActions.setMyRaiseHandStateInProgress(false));
 			});
 	}
 
@@ -711,6 +1048,48 @@ export default class RoomClient
 							text : `${oldDisplayName} is now ${displayName}`
 						}));
 
+					break;
+				}
+
+				// This means: server wants to change MY displayName
+				case 'auth':
+				{
+					logger.debug('got auth event from server', request.data);
+					accept();
+
+					if (request.data.verified == true)
+					{
+						this.changeDisplayName(request.data.name);
+						this._dispatch(requestActions.notify(
+							{
+								text : `Authenticated successfully: ${request.data}`
+							}
+						));
+					}
+					else
+					{
+						this._dispatch(requestActions.notify(
+							{
+								text : `Authentication failed: ${request.data}`
+							}
+						));
+					}
+					this.closeLoginWindow();
+
+					this._dispatch(stateActions.setLoginInProgress(false));
+					break;
+
+				}
+
+				case 'raisehand-message':
+				{
+					accept();
+					const { peerName, raiseHandState } = request.data;
+
+					logger.debug('Got raiseHandState from "%s"', peerName);
+
+					this._dispatch(
+						stateActions.setPeerRaiseHandState(peerName, raiseHandState));
 					break;
 				}
 
@@ -928,6 +1307,12 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
+				logger.debug('_setMicProducer() | calling _updateAudioDevices()');
+
+				return this._updateAudioDevices();
+			})
+			.then(() =>
+			{
 				logger.debug('_setMicProducer() | calling getUserMedia()');
 
 				return navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1078,6 +1463,14 @@ export default class RoomClient
 					this._dispatch(stateActions.removeProducer(producer.id));
 				});
 
+				producer.on('trackended', (originator) =>
+				{
+					logger.debug(
+						'webcam Producer "trackended" event [originator:%s]', originator);
+
+					this.disableScreenSharing();
+				});
+
 				producer.on('pause', (originator) =>
 				{
 					logger.debug(
@@ -1143,7 +1536,7 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				const { device, resolution } = this._webcam;
+				const { device } = this._webcam;
 
 				if (!device)
 					throw new Error('no webcam devices');
@@ -1155,7 +1548,7 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS[resolution]
+							...VIDEO_CONSTRAINS
 						}
 					});
 			})
@@ -1245,6 +1638,57 @@ export default class RoomClient
 			});
 	}
 
+	_updateAudioDevices()
+	{
+		logger.debug('_updateAudioDevices()');
+
+		// Reset the list.
+		this._audioDevices = new Map();
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				logger.debug('_updateAudioDevices() | calling enumerateDevices()');
+
+				return navigator.mediaDevices.enumerateDevices();
+			})
+			.then((devices) =>
+			{
+				for (const device of devices)
+				{
+					if (device.kind !== 'audioinput')
+						continue;
+
+					device.value = device.deviceId;
+
+					this._audioDevices.set(device.deviceId, device);
+				}
+			})
+			.then(() =>
+			{
+				const array = Array.from(this._audioDevices.values());
+				const len = array.length;
+				const currentAudioDeviceId =
+					this._audioDevice.device ? this._audioDevice.device.deviceId : undefined;
+
+				logger.debug('_updateAudioDevices() [audiodevices:%o]', array);
+
+				if (len === 0)
+					this._audioDevice.device = null;
+				else if (!this._audioDevices.has(currentAudioDeviceId))
+					this._audioDevice.device = array[0];
+
+				this._dispatch(
+					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
+
+				this._dispatch(
+					stateActions.setCanChangeAudioDevice(len >= 2));
+				if (len >= 1)
+					this._dispatch(
+						stateActions.setAudioDevices(this._audioDevices));
+			});
+	}
+
 	_updateWebcams()
 	{
 		logger.debug('_updateWebcams()');
@@ -1266,6 +1710,8 @@ export default class RoomClient
 					if (device.kind !== 'videoinput')
 						continue;
 
+					device.value = device.deviceId;
+
 					this._webcams.set(device.deviceId, device);
 				}
 			})
@@ -1285,6 +1731,12 @@ export default class RoomClient
 
 				this._dispatch(
 					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
+
+				this._dispatch(
+					stateActions.setCanChangeWebcam(len >= 2));
+				if (len >= 1)
+					this._dispatch(
+						stateActions.setWebcamDevices(this._webcams));
 			});
 	}
 

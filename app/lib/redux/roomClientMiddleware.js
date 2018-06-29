@@ -83,7 +83,18 @@ export default ({ dispatch, getState }) => (next) =>
 
 			case 'CHANGE_WEBCAM':
 			{
-				client.changeWebcam();
+				const { deviceId } = action.payload;
+
+				client.changeWebcam(deviceId);
+
+				break;
+			}
+
+			case 'CHANGE_AUDIO_DEVICE':
+			{
+				const { deviceId } = action.payload;
+
+				client.changeAudioDevice(deviceId);
 
 				break;
 			}
@@ -98,6 +109,81 @@ export default ({ dispatch, getState }) => (next) =>
 			case 'DISABLE_AUDIO_ONLY':
 			{
 				client.disableAudioOnly();
+
+				break;
+			}
+
+			case 'MUTE_PEER_AUDIO':
+			{
+				const { peerName } = action.payload;
+
+				client.mutePeerAudio(peerName);
+
+				break;
+			}
+
+			case 'UNMUTE_PEER_AUDIO':
+			{
+				const { peerName } = action.payload;
+
+				client.unmutePeerAudio(peerName);
+
+				break;
+			}
+
+			case 'PAUSE_PEER_VIDEO':
+			{
+				const { peerName } = action.payload;
+
+				client.pausePeerVideo(peerName);
+
+				break;
+			}
+
+			case 'RESUME_PEER_VIDEO':
+			{
+				const { peerName } = action.payload;
+
+				client.resumePeerVideo(peerName);
+
+				break;
+			}
+
+			case 'PAUSE_PEER_SCREEN':
+			{
+				const { peerName } = action.payload;
+
+				client.pausePeerScreen(peerName);
+
+				break;
+			}
+
+			case 'RESUME_PEER_SCREEN':
+			{
+				const { peerName } = action.payload;
+
+				client.resumePeerScreen(peerName);
+
+				break;
+			}
+
+			case 'RAISE_HAND':
+			{
+				client.sendRaiseHandState(true);
+
+				break;
+			}
+
+			case 'USER_LOGIN':
+			{
+				client.login();
+
+				break;
+			}
+
+			case 'LOWER_HAND':
+			{
+				client.sendRaiseHandState(false);
 
 				break;
 			}

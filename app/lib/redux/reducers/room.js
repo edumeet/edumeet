@@ -1,10 +1,11 @@
 const initialState =
 {
-	url               : null,
-	state             : 'new', // new/connecting/connected/disconnected/closed,
-	activeSpeakerName : null,
-	peerHeight        : 300,
-	peerWidth         : 400
+	url                : null,
+	state              : 'new', // new/connecting/connected/disconnected/closed,
+	activeSpeakerName  : null,
+	showSettings       : false,
+	advancedMode       : false,
+	fullScreenConsumer : null // ConsumerID
 };
 
 const room = (state = initialState, action) =>
@@ -35,11 +36,26 @@ const room = (state = initialState, action) =>
 			return { ...state, activeSpeakerName: peerName };
 		}
 
-		case 'SET_COMPONENT_SIZE':
+		case 'TOGGLE_SETTINGS':
 		{
-			const { peerWidth, peerHeight } = action.payload;
+			const showSettings = !state.showSettings;
 
-			return { ...state, peerWidth: peerWidth, peerHeight: peerHeight };
+			return { ...state, showSettings };
+		}
+
+		case 'TOGGLE_ADVANCED_MODE':
+		{
+			const advancedMode = !state.advancedMode;
+
+			return { ...state, advancedMode };
+		}
+
+		case 'TOGGLE_FULLSCREEN_CONSUMER':
+		{
+			const { consumerId } = action.payload;
+			const currentConsumer = state.fullScreenConsumer;
+
+			return { ...state, fullScreenConsumer: currentConsumer ? null : consumerId };
 		}
 
 		default:

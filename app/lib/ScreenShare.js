@@ -189,6 +189,70 @@ class FirefoxScreenShare
 	}
 }
 
+class EdgeScreenShare
+{
+	constructor()
+	{
+		this._stream = null;
+	}
+
+	start(options = {})
+	{
+		const constraints = this._toConstraints(options);
+
+		return navigator.getDisplayMedia(constraints)
+			.then((stream) =>
+			{
+				this._stream = stream;
+
+				return Promise.resolve(stream);
+			});
+	}
+
+	stop()
+	{
+		if (this._stream instanceof MediaStream === false)
+		{
+			return;
+		}
+
+		this._stream.getTracks().forEach((track) => track.stop());
+		this._stream = null;
+	}
+
+	isScreenShareAvailable()
+	{
+		return true;
+	}
+
+	needExtension()
+	{
+		return false;
+	}
+
+	_toConstraints()
+	{
+		const constraints = {
+			video : true
+		};
+
+		return constraints;
+	}
+}
+
+class DefaultScreenShare
+{
+	isScreenShareAvailable()
+	{
+		return false;
+	}
+
+	needExtension()
+	{
+		return false;
+	}
+}
+
 export default class ScreenShare
 {
 	static create()
@@ -203,9 +267,13 @@ export default class ScreenShare
 			{
 				return new ChromeScreenShare();
 			}
+			case 'edge':
+			{
+				return new EdgeScreenShare();
+			}
 			default:
 			{
-				return null;
+				return new DefaultScreenShare();
 			}
 		}
 	}

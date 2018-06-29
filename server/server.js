@@ -14,7 +14,9 @@ console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
 
 const fs = require('fs');
 const https = require('https');
+const router = require('./router');
 const url = require('url');
+const path = require('path');
 const protooServer = require('protoo-server');
 const mediasoup = require('mediasoup');
 const readline = require('readline');
@@ -77,25 +79,34 @@ mediaServer.on('newroom', (room) =>
 	});
 });
 
-// HTTPS server for the protoo WebSocket server.
+// HTTPS server
 const tls =
 {
 	cert : fs.readFileSync(config.tls.cert),
 	key  : fs.readFileSync(config.tls.key)
 };
 
-const httpsServer = https.createServer(tls, (req, res) =>
+const httpsServer = https.createServer(tls, router.handleRequest);
+httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 {
-	res.writeHead(404, 'Not Here');
-	res.end();
+	logger.info('Server running, port: ',config.listeningPort);
 });
 
-httpsServer.listen(3443, '0.0.0.0', () =>
-{
-	logger.info('protoo WebSocket server running');
-});
+router.on('auth',function(event){
+	console.log('router: Got an event: ',event)
+	if ( rooms.has(event.roomId) )
+	{
+		const room = rooms.get(event.roomId)._protooRoom;
+		if ( room.hasPeer(event.peerName) )
+		{
+			const peer = room.getPeer(event.peerName);
+			peer.send('auth', event)
+		}
+	}
+})
 
-// Protoo WebSocket server.
+// Protoo WebSocket server listens to same webserver so everythink is available
+// via same port
 const webSocketServer = new protooServer.WebSocketServer(httpsServer,
 	{
 		maxReceivedFrameSize     : 960000, // 960 KBytes.

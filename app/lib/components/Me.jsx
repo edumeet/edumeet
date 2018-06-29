@@ -7,6 +7,7 @@ import { getDeviceInfo } from 'mediasoup-client';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import PeerView from './PeerView';
+import ScreenView from './ScreenView';
 
 class Me extends React.Component
 {
@@ -29,14 +30,15 @@ class Me extends React.Component
 		const {
 			connected,
 			me,
+			advancedMode,
 			micProducer,
 			webcamProducer,
+			screenProducer,
 			onChangeDisplayName,
 			onMuteMic,
 			onUnmuteMic,
 			onEnableWebcam,
-			onDisableWebcam,
-			onChangeWebcam
+			onDisableWebcam
 		} = this.props;
 
 		let micState;
@@ -59,17 +61,16 @@ class Me extends React.Component
 		else
 			webcamState = 'off';
 
-		let changeWebcamState;
-
-		if (Boolean(webcamProducer) && me.canChangeWebcam)
-			changeWebcamState = 'on';
-		else
-			changeWebcamState = 'unsupported';
-
 		const videoVisible = (
 			Boolean(webcamProducer) &&
 			!webcamProducer.locallyPaused &&
 			!webcamProducer.remotelyPaused
+		);
+
+		const screenVisible = (
+			Boolean(screenProducer) &&
+			!screenProducer.locallyPaused &&
+			!screenProducer.remotelyPaused
 		);
 
 		let tip;
@@ -85,46 +86,57 @@ class Me extends React.Component
 				data-tip-disable={!tip}
 				data-type='dark'
 			>
-				{connected ?
-					<div className='controls'>
-						<div
-							className={classnames('button', 'mic', micState)}
-							onClick={() =>
-							{
-								micState === 'on' ? onMuteMic() : onUnmuteMic();
-							}}
-						/>
+				<div className={classnames('view-container', 'webcam')}>
+					{connected ?
+						<div className='controls'>
+							<div
+								className={classnames('button', 'mic', micState, {
+									disabled : me.audioInProgress
+								})}
+								onClick={() =>
+								{
+									micState === 'on' ? onMuteMic() : onUnmuteMic();
+								}}
+							/>
 
-						<div
-							className={classnames('button', 'webcam', webcamState, {
-								disabled : me.webcamInProgress
-							})}
-							onClick={() =>
-							{
-								webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
-							}}
-						/>
+							<div
+								className={classnames('button', 'webcam', webcamState, {
+									disabled : me.webcamInProgress
+								})}
+								onClick={() =>
+								{
+									webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
+								}}
+							/>
+						</div>
+						:null
+					}
 
-						<div
-							className={classnames('button', 'change-webcam', changeWebcamState, {
-								disabled : me.webcamInProgress
-							})}
-							onClick={() => onChangeWebcam()}
+					<PeerView
+						isMe
+						advancedMode={advancedMode}
+						peer={me}
+						audioTrack={micProducer ? micProducer.track : null}
+						videoTrack={webcamProducer ? webcamProducer.track : null}
+						videoVisible={videoVisible}
+						audioCodec={micProducer ? micProducer.codec : null}
+						videoCodec={webcamProducer ? webcamProducer.codec : null}
+						onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
+					/>
+				</div>
+
+				{screenProducer ?
+					<div className={classnames('view-container', 'screen')}>
+						<ScreenView
+							isMe
+							advancedMode={advancedMode}
+							screenTrack={screenProducer ? screenProducer.track : null}
+							screenVisible={screenVisible}
+							screenCodec={screenProducer ? screenProducer.codec : null}
 						/>
 					</div>
 					:null
 				}
-
-				<PeerView
-					isMe
-					peer={me}
-					audioTrack={micProducer ? micProducer.track : null}
-					videoTrack={webcamProducer ? webcamProducer.track : null}
-					videoVisible={videoVisible}
-					audioCodec={micProducer ? micProducer.codec : null}
-					videoCodec={webcamProducer ? webcamProducer.codec : null}
-					onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
-				/>
 
 				{this._tooltip ?
 					<ReactTooltip
@@ -172,15 +184,16 @@ class Me extends React.Component
 Me.propTypes =
 {
 	connected           : PropTypes.bool.isRequired,
+	advancedMode        : PropTypes.bool,
 	me                  : appPropTypes.Me.isRequired,
 	micProducer         : appPropTypes.Producer,
 	webcamProducer      : appPropTypes.Producer,
+	screenProducer      : appPropTypes.Producer,
 	onChangeDisplayName : PropTypes.func.isRequired,
 	onMuteMic           : PropTypes.func.isRequired,
 	onUnmuteMic         : PropTypes.func.isRequired,
 	onEnableWebcam      : PropTypes.func.isRequired,
-	onDisableWebcam     : PropTypes.func.isRequired,
-	onChangeWebcam      : PropTypes.func.isRequired
+	onDisableWebcam     : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -190,12 +203,15 @@ const mapStateToProps = (state) =>
 		producersArray.find((producer) => producer.source === 'mic');
 	const webcamProducer =
 		producersArray.find((producer) => producer.source === 'webcam');
+	const screenProducer =
+		producersArray.find((producer) => producer.source === 'screen');
 
 	return {
 		connected      : state.room.state === 'connected',
 		me             : state.me,
 		micProducer    : micProducer,
-		webcamProducer : webcamProducer
+		webcamProducer : webcamProducer,
+		screenProducer : screenProducer
 	};
 };
 
@@ -209,8 +225,7 @@ const mapDispatchToProps = (dispatch) =>
 		onMuteMic       : () => dispatch(requestActions.muteMic()),
 		onUnmuteMic     : () => dispatch(requestActions.unmuteMic()),
 		onEnableWebcam  : () => dispatch(requestActions.enableWebcam()),
-		onDisableWebcam : () => dispatch(requestActions.disableWebcam()),
-		onChangeWebcam  : () => dispatch(requestActions.changeWebcam())
+		onDisableWebcam : () => dispatch(requestActions.disableWebcam())
 	};
 };
 
