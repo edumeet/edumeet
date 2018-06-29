@@ -170,7 +170,7 @@ const actions = {
       });
 
       // File exists, stream it to user
-			if (parsedUrl.pathname.indexOf('svg') > -1) {headers = {'Content-Type': 'image/svg+xml'}};
+			if (parsedUrl.pathname.indexOf('svg') === parsedUrl.pathname.length -3) {headers = {'Content-Type': 'image/svg+xml'}};
 			res.writeHead(200, headers);
       stream.pipe(res);
     }

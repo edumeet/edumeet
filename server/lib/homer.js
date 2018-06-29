@@ -13,9 +13,7 @@ function homer(server)
 	server.on('newroom', (room) =>
 	{
 		const fileName =
-			path.join(
-				process.env.MEDIASOUP_HOMER_OUTPUT,
-				`${(new Date()).toISOString()}_${room.id}`);
+			path.join(process.env.MEDIASOUP_HOMER_OUTPUT);
 
 		const stream = fs.createWriteStream(fileName, { flags: 'a' });
 
