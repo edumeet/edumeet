@@ -70,23 +70,6 @@ class ToolArea extends React.Component
 					<div className='tab'>
 						<Settings />
 					</div>
-
-					<input
-						type='radio'
-						name='tabs'
-						id='tab-layout'
-						onChange={() =>
-						{
-							setToolTab('layout');
-						}}
-						checked={toolarea.currentToolTab === 'layout'}
-					/>
-					<label htmlFor='tab-layout'>Layout</label>
-
-					<div className='tab'>
-						<h1>Tab Three Content</h1>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-					</div>
 				</div>
 			</div>
 		);

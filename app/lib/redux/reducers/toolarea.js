@@ -1,7 +1,7 @@
 const initialState =
 {
 	toolAreaOpen   : false,
-	currentToolTab : 'chat' // chat, settings, layout, users
+	currentToolTab : 'chat' // chat, settings, users
 };
 
 const toolarea = (state = initialState, action) =>
