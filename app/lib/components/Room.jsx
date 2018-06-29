@@ -29,7 +29,6 @@ class Room extends React.Component
 			onShareScreen,
 			onUnShareScreen,
 			onNeedExtension,
-			onToggleHand,
 			onLeaveMeeting
 		} = this.props;
 
@@ -165,16 +164,6 @@ class Room extends React.Component
 							}
 
 							<div
-								className={classnames('button', 'raise-hand', {
-									on       : me.raiseHand,
-									disabled : me.raiseHandInProgress
-								})}
-								data-tip='Raise hand'
-								data-type='dark'
-								onClick={() => onToggleHand(!me.raiseHand)}
-							/>
-
-							<div
 								className={classnames('button', 'leave-meeting')}
 								data-tip='Leave meeting'
 								data-type='dark'
@@ -218,7 +207,6 @@ Room.propTypes =
 	onShareScreen   : PropTypes.func.isRequired,
 	onUnShareScreen : PropTypes.func.isRequired,
 	onNeedExtension : PropTypes.func.isRequired,
-	onToggleHand    : PropTypes.func.isRequired,
 	onLeaveMeeting  : PropTypes.func.isRequired,
 	onLogin         : PropTypes.func.isRequired
 };
@@ -247,13 +235,6 @@ const mapDispatchToProps = (dispatch) =>
 				{
 					text : 'Room link copied to the clipboard'
 				}));
-		},
-		onToggleHand : (enable) =>
-		{
-			if (enable)
-				dispatch(requestActions.raiseHand());
-			else
-				dispatch(requestActions.lowerHand());
 		},
 		onLeaveMeeting : () =>
 		{
