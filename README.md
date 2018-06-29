@@ -73,7 +73,7 @@ $ edit /etc/systemd/system/multiparty-meeting.service
 
 ```bash
 $ systemctl daemon-reload
-$ systemctl start cdrReceiver
+$ systemctl start multiparty-meeting
 ```
 
 * if you want to start multiparty-meeting at boot time:
@@ -99,6 +99,8 @@ $ systemctl enable multiparty-meeting
 ## Author
 
 * Håvar Aambø Fosstveit
+* Stefan Otto
+* Mészáros Mihály
 
 
 This is heavily based on the [work](https://github.com/versatica/mediasoup-demo) done by:
