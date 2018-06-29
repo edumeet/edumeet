@@ -13,6 +13,7 @@ import Notifications from './Notifications';
 import ToolAreaButton from './ToolArea/ToolAreaButton';
 import ToolArea from './ToolArea/ToolArea';
 import FullScreenView from './FullScreenView';
+import Draggable from 'react-draggable';
 
 class Room extends React.Component
 {
@@ -69,10 +70,13 @@ class Room extends React.Component
 						<Notifications />
 						<ToolAreaButton />
 
-						<div className='state' data-tip='Server status'>
-							<div className={classnames('icon', room.state)} />
-							<p className={classnames('text', room.state)}>{room.state}</p>
-						</div>
+						{room.advancedMode ?
+							<div className='state' data-tip='Server status'>
+								<div className={classnames('icon', room.state)} />
+								<p className={classnames('text', room.state)}>{room.state}</p>
+							</div>
+							:null
+						}
 
 						<div className='room-link-wrapper'>
 							<div className='room-link'>
@@ -109,15 +113,17 @@ class Room extends React.Component
 							advancedMode={room.advancedMode}
 						/>
 
-						<div
-							className={classnames('me-container', {
-								'active-speaker' : amActiveSpeaker
-							})}
-						>
-							<Me
-								advancedMode={room.advancedMode}
-							/>
-						</div>
+						<Draggable handle='.me-container' bounds='body' cancel='.display-name'>
+							<div
+								className={classnames('me-container', {
+									'active-speaker' : amActiveSpeaker
+								})}
+							>
+								<Me
+									advancedMode={room.advancedMode}
+								/>
+							</div>
+						</Draggable>
 
 						<div className='sidebar'>
 							<div
