@@ -152,14 +152,17 @@ class Room extends React.Component
 								}}
 							/>
 
-							<div
-								className={classnames('button', 'login', 'off', {
-									disabled : me.loginInProgress
-								})}
-								data-tip='Login'
-								data-type='dark'
-								onClick={() => onLogin()}
-							/>
+							{me.loginEnabled ?
+								<div
+									className={classnames('button', 'login', 'off', {
+										disabled : me.loginInProgress
+									})}
+									data-tip='Login'
+									data-type='dark'
+									onClick={() => onLogin()}
+								/>
+								:null
+							}
 
 							<div
 								className={classnames('button', 'raise-hand', {

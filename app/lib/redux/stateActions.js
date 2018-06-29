@@ -22,11 +22,11 @@ export const setRoomActiveSpeaker = (peerName) =>
 	};
 };
 
-export const setMe = ({ peerName, displayName, displayNameSet, device }) =>
+export const setMe = ({ peerName, displayName, displayNameSet, device, loginEnabled }) =>
 {
 	return {
 		type    : 'SET_ME',
-		payload : { peerName, displayName, displayNameSet, device }
+		payload : { peerName, displayName, displayNameSet, device, loginEnabled }
 	};
 };
 

@@ -20,6 +20,7 @@ import * as stateActions from './redux/stateActions';
 import reducers from './redux/reducers';
 import roomClientMiddleware from './redux/roomClientMiddleware';
 import Room from './components/Room';
+import { loginEnabled } from '../config';
 
 const logger = new Logger();
 const reduxMiddlewares =
@@ -142,7 +143,7 @@ function run()
 
 	// NOTE: I don't like this.
 	store.dispatch(
-		stateActions.setMe({ peerName, displayName, displayNameSet, device }));
+		stateActions.setMe({ peerName, displayName, displayNameSet, device, loginEnabled }));
 
 	// NOTE: I don't like this.
 	store.dispatch(

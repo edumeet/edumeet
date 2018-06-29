@@ -6,16 +6,19 @@ import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
 import * as stateActions from './redux/stateActions';
+import {
+	turnServers,
+	requestTimeout,
+	transportOptions
+} from '../config';
 
 const logger = new Logger('RoomClient');
 
 const ROOM_OPTIONS =
 {
-	requestTimeout   : 10000,
-	transportOptions :
-	{
-		tcp : true
-	}
+	requestTimeout   : requestTimeout,
+	transportOptions : transportOptions,
+	turnServers      : turnServers
 };
 
 const VIDEO_CONSTRAINS =

@@ -16,6 +16,7 @@ const initialState =
 	audioInProgress       : false,
 	screenShareInProgress : false,
 	loginInProgress       : false,
+	loginEnabled          : false,
 	audioOnly             : false,
 	audioOnlyInProgress   : false,
 	raiseHand             : false,
@@ -29,9 +30,22 @@ const me = (state = initialState, action) =>
 	{
 		case 'SET_ME':
 		{
-			const { peerName, displayName, displayNameSet, device } = action.payload;
+			const {
+				peerName,
+				displayName,
+				displayNameSet,
+				device,
+				loginEnabled
+			} = action.payload;
 
-			return { ...state, name: peerName, displayName, displayNameSet, device };
+			return {
+				...state,
+				name : peerName,
+				displayName,
+				displayNameSet,
+				device,
+				loginEnabled
+			};
 		}
 
 		case 'SET_MEDIA_CAPABILITIES':
