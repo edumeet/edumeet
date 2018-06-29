@@ -158,19 +158,21 @@ const actions = {
       var resolvedBase = path.resolve('./public');
       var safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
       var fileLoc = path.join(resolvedBase, safeSuffix);
+			var headers = {};
 
-          var stream = fs.createReadStream(fileLoc);
+      var stream = fs.createReadStream(fileLoc);
 
-          // Handle non-existent file -> delivering index.html
-          stream.on('error', function(error) {
-  						stream = fs.createReadStream(path.resolve('./public/index.html'));
-              res.statusCode = 200;
-  		        stream.pipe(res);
-          });
-
-          // File exists, stream it to user
+      // Handle non-existent file -> delivering index.html
+      stream.on('error', function(error) {
+					stream = fs.createReadStream(path.resolve('./public/index.html'));
           res.statusCode = 200;
-          stream.pipe(res);
+	        stream.pipe(res);
+      });
+
+      // File exists, stream it to user
+			if (parsedUrl.pathname.indexOf('svg') > -1) {headers = {'Content-Type': 'image/svg+xml'}};
+			res.writeHead(200, headers);
+      stream.pipe(res);
     }
   },
 
