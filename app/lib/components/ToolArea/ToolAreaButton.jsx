@@ -10,14 +10,16 @@ class ToolAreaButton extends React.Component
 	{
 		const {
 			toolAreaOpen,
-			toggleToolArea
+			toggleToolArea,
+			unread
 		} = this.props;
 
 		return (
 			<div data-component='ToolAreaButton'>
 				<div
 					className={classnames('button', 'toolarea-button', {
-						on : toolAreaOpen
+						on : toolAreaOpen,
+						unread
 					})}
 					data-tip='Toggle tool area'
 					data-type='dark'
@@ -32,13 +34,15 @@ class ToolAreaButton extends React.Component
 ToolAreaButton.propTypes =
 {
 	toolAreaOpen   : PropTypes.bool.isRequired,
-	toggleToolArea : PropTypes.func.isRequired
+	toggleToolArea : PropTypes.func.isRequired,
+	unread         : PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		toolAreaOpen : state.toolarea.toolAreaOpen
+		toolAreaOpen : state.toolarea.toolAreaOpen,
+		unread       : state.toolarea.unread > 0
 	};
 };
 
