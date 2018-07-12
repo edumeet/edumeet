@@ -35,7 +35,11 @@ class ToolArea extends React.Component
 						checked={currentToolTab === 'chat'}
 					/>
 					<label htmlFor='tab-chat'>
-						Chat ({unread} new)
+						Chat
+						
+						{unread > 0 && (
+							<span className='badge'>{unread}</span>
+						)}
 					</label>
 
 					<div className='tab'>
