@@ -18,14 +18,19 @@ class ToolAreaButton extends React.Component
 			<div data-component='ToolAreaButton'>
 				<div
 					className={classnames('button', 'toolarea-button', {
-						on : toolAreaOpen,
-						unread
+						on : toolAreaOpen
 					})}
 					data-tip='Toggle tool area'
 					data-type='dark'
 					data-for='globaltip'
 					onClick={() => toggleToolArea()}
 				/>
+
+				{unread > 0 && (
+					<span className='badge'>
+						{unread}
+					</span>
+				)}
 			</div>
 		);
 	}
@@ -42,7 +47,7 @@ const mapStateToProps = (state) =>
 {
 	return {
 		toolAreaOpen : state.toolarea.toolAreaOpen,
-		unread       : state.toolarea.unread > 0
+		unread       : state.toolarea.unread
 	};
 };
 
