@@ -49,6 +49,25 @@
 			}
 		}
 	}
+
+	> .badge {
+		border-radius: 50%;
+    font-size: 1rem;
+    background: #b12525;
+    color: #fff;
+    text-align: center;
+    margin-top: -8px;
+    line-height: 1rem;
+    margin-right: -8px;
+    position: absolute;
+    padding: 0.2rem 0.4rem;
+    top: 0;
+    right: 0;
+
+		&.long {
+			border-radius: 25% / 50%;
+		}
+	}
 }
 
 [data-component='ToolArea'] {
@@ -63,7 +82,7 @@
 		> label {
 			order: 1;
 			display: block;
-			padding: 1vmin 0 1vmin 0;
+			padding: 1vmin 0 0.8vmin 0;
 			cursor: pointer;
 			background: rgba(#000, 0.3);
 			font-weight: bold;
@@ -72,6 +91,17 @@
 			width: 33.33%;
 			font-size: 1.3vmin;
 			height: 3vmin;
+
+			> .badge {
+				padding: 0.1vmin 1vmin;
+				text-align: center;
+				font-weight: 300;
+				font-size: 1.2vmin;
+				color: #fff;
+				background-color: #b12525;
+				border-radius: 2px;
+				margin-left: 1vmin;
+			}
 		}
 
 		> .tab {

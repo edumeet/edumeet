@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import * as stateActions from '../../redux/stateActions';
+import * as toolTabActions from '../../redux/stateActions';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import Chat from '../Chat/Chat';
 import Settings from '../Settings';
@@ -16,7 +16,8 @@ class ToolArea extends React.Component
 	render()
 	{
 		const {
-			toolarea,
+			currentToolTab,
+			unread,
 			setToolTab
 		} = this.props;
 
@@ -31,9 +32,15 @@ class ToolArea extends React.Component
 						{
 							setToolTab('chat');
 						}}
-						checked={toolarea.currentToolTab === 'chat'}
+						checked={currentToolTab === 'chat'}
 					/>
-					<label htmlFor='tab-chat'>Chat</label>
+					<label htmlFor='tab-chat'>
+						Chat
+						
+						{unread > 0 && (
+							<span className='badge'>{unread}</span>
+						)}
+					</label>
 
 					<div className='tab'>
 						<Chat />
@@ -47,7 +54,7 @@ class ToolArea extends React.Component
 						{
 							setToolTab('users');
 						}}
-						checked={toolarea.currentToolTab === 'users'}
+						checked={currentToolTab === 'users'}
 					/>
 					<label htmlFor='tab-users'>Users</label>
 
@@ -63,7 +70,7 @@ class ToolArea extends React.Component
 						{
 							setToolTab('settings');
 						}}
-						checked={toolarea.currentToolTab === 'settings'}
+						checked={currentToolTab === 'settings'}
 					/>
 					<label htmlFor='tab-settings'>Settings</label>
 
@@ -78,26 +85,19 @@ class ToolArea extends React.Component
 
 ToolArea.propTypes =
 {
-	advancedMode : PropTypes.bool,
-	toolarea     : PropTypes.object.isRequired,
-	setToolTab   : PropTypes.func.isRequired
+	advancedMode   : PropTypes.bool,
+	currentToolTab : PropTypes.string.isRequired,
+	setToolTab     : PropTypes.func.isRequired,
+	unread         : PropTypes.number.isRequired
 };
 
-const mapStateToProps = (state) =>
-{
-	return {
-		toolarea : state.toolarea
-	};
-};
+const mapStateToProps = (state) => ({
+	currentToolTab : state.toolarea.currentToolTab,
+	unread         : state.toolarea.unread
+});
 
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		setToolTab : (toolTab) =>
-		{
-			dispatch(stateActions.setToolTab(toolTab));
-		}
-	};
+const mapDispatchToProps = {
+	setToolTab : toolTabActions.setToolTab
 };
 
 const ToolAreaContainer = connect(
