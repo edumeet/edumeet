@@ -27,7 +27,7 @@ class ToolAreaButton extends React.Component
 				/>
 
 				{unread > 0 && (
-					<span className='badge'>
+					<span className={classnames('badge', { long: unread >= 10 })}>
 						{unread}
 					</span>
 				)}
