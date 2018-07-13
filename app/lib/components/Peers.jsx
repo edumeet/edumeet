@@ -23,9 +23,9 @@ class Peers extends React.Component
 		this.updateDimensions();
 	}
 
-	updateDimensions(props = this.props)
+	updateDimensions()
 	{
-		const n = props.videoStreams ? props.videoStreams : 0;
+		const n = this.props.videoStreams ? this.props.videoStreams : 0;
 
 		if (n == 0)
 		{
@@ -72,9 +72,9 @@ class Peers extends React.Component
 		window.removeEventListener('resize', this.resizeUpdate.bind(this));
 	}
 
-	componentWillReceiveProps(nextProps)
+	componentDidUpdate()
 	{
-		this.updateDimensions(nextProps);
+		this.updateDimensions();
 	}
 
 	render()
