@@ -79,13 +79,7 @@ function bundle(options)
 		})
 		.transform('babelify',
 			{
-				presets : [ 'es2015', 'react' ],
-				plugins :
-				[
-					'transform-runtime',
-					'transform-object-assign',
-					'transform-object-rest-spread'
-				]
+				presets : [ 'es2015', 'react-app' ]
 			})
 		.transform(envify(
 			{

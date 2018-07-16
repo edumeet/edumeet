@@ -17,6 +17,20 @@ import Draggable from 'react-draggable';
 
 class Room extends React.Component
 {
+	handleMouseMove = () => {
+		
+	}
+
+	componentDidMount()
+	{
+
+	}
+
+	componentWillUnmount()
+	{
+
+	}
+
 	render()
 	{
 		const {
