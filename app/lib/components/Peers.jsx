@@ -25,12 +25,7 @@ class Peers extends React.Component
 
 	updateDimensions()
 	{
-		const n = this.props.videoStreams ? this.props.videoStreams : 0;
-
-		if (n == 0)
-		{
-			return;
-		}
+		const n = this.props.peers.length;
 
 		const width = this.refs.peers.clientWidth;
 		const height = this.refs.peers.clientHeight;
