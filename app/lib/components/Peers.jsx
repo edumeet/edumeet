@@ -67,9 +67,11 @@ class Peers extends React.Component
 		window.removeEventListener('resize', this.resizeUpdate.bind(this));
 	}
 
-	componentDidUpdate()
+	componentDidUpdate(prevProps)
 	{
-		this.updateDimensions();
+		if (prevProps.toolAreaOpen !== this.props.toolAreaOpen) {
+			this.updateDimensions();
+		}
 	}
 
 	render()
