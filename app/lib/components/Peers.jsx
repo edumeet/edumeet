@@ -69,7 +69,8 @@ class Peers extends React.Component
 
 	componentDidUpdate(prevProps)
 	{
-		if (prevProps.toolAreaOpen !== this.props.toolAreaOpen) {
+		if (prevProps.toolAreaOpen !== this.props.toolAreaOpen) 
+		{
 			this.updateDimensions();
 		}
 	}
