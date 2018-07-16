@@ -79,7 +79,7 @@ function bundle(options)
 		})
 		.transform('babelify',
 			{
-				presets : [ 'es2015', 'react-app' ]
+				presets : [ 'env', 'react-app' ]
 			})
 		.transform(envify(
 			{
