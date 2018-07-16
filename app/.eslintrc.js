@@ -24,14 +24,14 @@ module.exports =
 			version: '15'
 		}
 	},
+	parser: 'babel-eslint',
 	parserOptions:
 	{
-		ecmaVersion: 6,
+		ecmaVersion: 9,
 		sourceType: 'module',
 		ecmaFeatures:
 		{
 			impliedStrict: true,
-			experimentalObjectRestSpread: true,
 			jsx: true
 		}
 	},
@@ -121,7 +121,6 @@ module.exports =
 		'no-implicit-globals': 2,
 		'no-inner-declarations': 2,
 		'no-invalid-regexp': 2,
-		'no-invalid-this': 2,
 		'no-irregular-whitespace': 2,
 		'no-lonely-if': 2,
 		'no-mixed-operators': 2,

@@ -369,6 +369,11 @@ export const toggleConsumerFullscreen = (consumerId) =>
 	};
 };
 
+export const setToolbarsVisible = (toolbarsVisible) => ({
+	type    : 'SET_TOOLBARS_VISIBLE',
+	payload : { toolbarsVisible }
+});
+
 export const increaseBadge = () =>
 {
 	return {

@@ -276,6 +276,18 @@
 	}
 }
 
+.room-controls {
+	visibility: hidden;
+	animation: fade-out 0.5s;
+	opacity: 0;
+
+	&.visible {
+		visibility: visible;
+		opacity: 1;
+		animation: fade-in 0.5s;
+	}
+}
+
 .Dropdown-root {
 	position: relative;
 	padding: 0.3vmin;
@@ -427,4 +439,28 @@
 
 @keyframes Room-info-state-connecting {
 	50% { background-color: rgba(orange, 0.75); }
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+		visibility: hidden;
+	}
+
+	to {
+		opacity: 1;
+		visibility: visible;
+	}
+}
+
+@keyframes fade-out {
+	from {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	to {
+		opacity: 0;
+		visibility: hidden;
+	}
 }

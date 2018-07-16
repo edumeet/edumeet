@@ -5,7 +5,8 @@ const initialState =
 	activeSpeakerName  : null,
 	showSettings       : false,
 	advancedMode       : false,
-	fullScreenConsumer : null // ConsumerID
+	fullScreenConsumer : null, // ConsumerID
+	toolbarsVisible    : true
 };
 
 const room = (state = initialState, action) =>
@@ -58,6 +59,12 @@ const room = (state = initialState, action) =>
 			return { ...state, fullScreenConsumer: currentConsumer ? null : consumerId };
 		}
 
+		case 'SET_TOOLBARS_VISIBLE':
+		{
+			const { toolbarsVisible } = action.payload;
+
+			return { ...state, toolbarsVisible };
+		}
 		default:
 			return state;
 	}
