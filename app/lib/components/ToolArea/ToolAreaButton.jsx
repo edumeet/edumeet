@@ -17,8 +17,9 @@ class ToolAreaButton extends React.Component
 		return (
 			<div data-component='ToolAreaButton'>
 				<div
-					className={classnames('button', 'toolarea-button', {
-						on : toolAreaOpen
+					className={classnames('button toolarea-button room-controls', {
+						on      : toolAreaOpen,
+						visible : this.props.visible
 					})}
 					data-tip='Toggle tool area'
 					data-type='dark'
@@ -40,13 +41,15 @@ ToolAreaButton.propTypes =
 {
 	toolAreaOpen   : PropTypes.bool.isRequired,
 	toggleToolArea : PropTypes.func.isRequired,
-	unread         : PropTypes.bool.isRequired
+	unread         : PropTypes.bool.isRequired,
+	visible        : PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
 		toolAreaOpen : state.toolarea.toolAreaOpen,
+		visible      : state.room.toolbarsVisible,
 		unread       : state.toolarea.unread
 	};
 };

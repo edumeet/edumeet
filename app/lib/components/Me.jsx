@@ -11,6 +11,24 @@ import ScreenView from './ScreenView';
 
 class Me extends React.Component
 {
+	state = {
+		controlsVisible : false
+	};
+
+	handleMouseOver = () => 
+	{
+		this.setState({
+			controlsVisible : true
+		});
+	};
+
+	handleMouseOut = () => 
+	{
+		this.setState({
+			controlsVisible : false
+		});
+	};
+
 	constructor(props)
 	{
 		super(props);
@@ -85,10 +103,15 @@ class Me extends React.Component
 				data-tip={tip}
 				data-tip-disable={!tip}
 				data-type='dark'
+				onMouseOver={this.handleMouseOver}
+				onMouseOut={this.handleMouseOut}
 			>
 				<div className={classnames('view-container', 'webcam')}>
 					{connected ?
-						<div className='controls'>
+						<div className={classnames('controls', {
+							visible : this.state.controlsVisible
+						})}
+						>
 							<div
 								className={classnames('button', 'mic', micState, {
 									disabled : me.audioInProgress
