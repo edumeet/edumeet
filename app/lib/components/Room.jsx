@@ -15,29 +15,10 @@ import ToolAreaButton from './ToolArea/ToolAreaButton';
 import ToolArea from './ToolArea/ToolArea';
 import FullScreenView from './FullScreenView';
 import Draggable from 'react-draggable';
+import { idle } from '../utils';
 
 // Hide toolbars after 10 seconds of inactivity.
 const TIMEOUT = 10 * 1000;
-
-/**
- * Create a function which will call the callback function
- * after the given amount of milliseconds has passed since
- * the last time the callback function was called.
- */
-const idle = (callback, delay) => 
-{
-	let handle;
-
-	return () => 
-	{
-		if (handle) 
-		{
-			clearTimeout(handle);
-		}
-
-		handle = setTimeout(callback, delay);
-	};
-};
 
 class Room extends React.Component
 {
