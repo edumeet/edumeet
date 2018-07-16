@@ -126,19 +126,27 @@ function changeHTML(content)
 
 gulp.task('clean', () => del(OUTPUT_DIR, { force: true }));
 
+const LINTING_FILES = [
+	'gulpfile.js',
+	'lib/**/*.js',
+	'lib/**/*.jsx'
+];
+
 gulp.task('lint', () =>
 {
-	const src =
-	[
-		'gulpfile.js',
-		'lib/**/*.js',
-		'lib/**/*.jsx'
-	];
-
-	return gulp.src(src)
+	return gulp.src(LINTING_FILES)
 		.pipe(plumber())
 		.pipe(eslint())
 		.pipe(eslint.format());
+});
+
+gulp.task('lint-fix', function() 
+{
+	return gulp.src(LINTING_FILES)
+		.pipe(plumber())
+		.pipe(eslint({ fix: true }))
+		.pipe(eslint.format())
+		.pipe(gulp.dest((file) => file.base));
 });
 
 gulp.task('css', () =>
