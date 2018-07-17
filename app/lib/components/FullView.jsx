@@ -92,7 +92,7 @@ export default class FullView extends React.Component
 		{
 			const stream = new MediaStream;
 
-			stream.addTrack(videoTrack);
+      stream.addTrack(videoTrack);
 			video.srcObject = stream;
 		}
 		else
