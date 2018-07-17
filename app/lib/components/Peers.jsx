@@ -56,9 +56,15 @@ class Peers extends React.Component
 
 	componentDidMount()
 	{
+		window.addEventListener('resize', this.updateDimensions);
 		const observer = new ResizeObserver(this.updateDimensions);
 
 		observer.observe(this.refs.peers);
+	}
+
+	componentWillUnmount() 
+	{
+		window.removeEventListener('resize', this.updateDimensions);
 	}
 
 	componentDidUpdate() 
