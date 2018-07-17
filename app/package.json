@@ -11,6 +11,7 @@
     "classnames": "^2.2.6",
     "debug": "^3.1.0",
     "domready": "^1.0.8",
+    "fscreen": "^1.0.2",
     "hark": "^1.2.0",
     "js-cookie": "^2.2.0",
     "marked": "^0.4.0",
