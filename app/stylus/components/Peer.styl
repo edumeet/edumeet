@@ -41,14 +41,11 @@
 			justify-content: flex-start;
 			align-items: center;
 			padding: 0.4vmin;
-			visibility: hidden;
 			opacity: 0;
-			animation: fade-out 0.3s;
-
+			transition: opacity 0.3s;
+			
 			&.visible {
-				visibility: visible;
 				opacity: 1;
-				animation: fade-in 0.3s;
 			}
 			
 			> .button {
