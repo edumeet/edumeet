@@ -7,6 +7,8 @@ import { Appear } from './transitions';
 import Peer from './Peer';
 import ResizeObserver from 'resize-observer-polyfill';
 
+const RATIO = 1.334;
+
 class Peers extends React.Component
 {
 	constructor(props)
@@ -14,8 +16,7 @@ class Peers extends React.Component
 		super(props);
 		this.state = {
 			peerWidth  : 400,
-			peerHeight : 300, 
-			ratio      : 1.334
+			peerHeight : 300
 		};
 	}
 
@@ -31,11 +32,11 @@ class Peers extends React.Component
 		for (let rows = 1; rows < 100; rows = rows + 1)
 		{
 			x = width / Math.ceil(n / rows);
-			y = x / this.state.ratio;
+			y = x / RATIO;
 			if (height < (y * rows))
 			{
 				y = height / rows;
-				x = this.state.ratio * y;
+				x = RATIO * y;
 				break;
 			}
 			space = height - (y * (rows));
@@ -56,7 +57,13 @@ class Peers extends React.Component
 	componentDidMount()
 	{
 		const observer = new ResizeObserver(this.updateDimensions);
+
 		observer.observe(this.refs.peers);
+	}
+
+	componentDidUpdate() 
+	{
+		this.updateDimensions();
 	}
 
 	render()
