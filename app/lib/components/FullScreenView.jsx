@@ -53,6 +53,7 @@ const FullScreenView = (props) =>
 				videoTrack={consumer ? consumer.track : null}
 				videoVisible={consumerVisible}
 				videoProfile={consumerProfile}
+				toggleFullscreen={() => toggleConsumerFullscreen(consumer)}
 			/>
 		</div>
 	);

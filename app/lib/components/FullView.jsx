@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import Spinner from 'react-spinner';
+import fscreen from 'fscreen';
 
 export default class FullView extends React.Component
 {
@@ -12,6 +13,8 @@ export default class FullView extends React.Component
 		// Latest received video track.
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
+
+		this.video = React.createRef();
 	}
 
 	render()
@@ -24,7 +27,7 @@ export default class FullView extends React.Component
 		return (
 			<div data-component='FullView'>
 				<video
-					ref='video'
+					ref={this.video}
 					className={classnames({
 						hidden  : !videoVisible,
 						loading : videoProfile === 'none'
@@ -48,11 +51,26 @@ export default class FullView extends React.Component
 		const { videoTrack } = this.props;
 
 		this._setTracks(videoTrack);
+
+		if (fscreen.fullscreenEnabled) {
+			fscreen.addEventListener('fullscreenchange', this.handleExitFullscreen, false);
+			fscreen.requestFullscreen(this.video.current);
+		}
 	}
 
-	componentWillReceiveProps(nextProps)
+	componentWillUnmount() {
+		fscreen.removeEventListener('fullscreenchange', this.handleExitFullscreen);
+	}
+
+	handleExitFullscreen = () => {
+		if (!fscreen.fullscreenElement) {
+			this.props.toggleFullscreen();
+		}
+	};
+
+	componentDidUpdate()
 	{
-		const { videoTrack } = nextProps;
+		const { videoTrack } = this.props;
 
 		this._setTracks(videoTrack);
 	}
@@ -64,15 +82,12 @@ export default class FullView extends React.Component
 
 		this._videoTrack = videoTrack;
 
-		const { video } = this.refs;
+		const video = this.video.current;
 
 		if (videoTrack)
 		{
 			const stream = new MediaStream;
-
-			if (videoTrack)
-				stream.addTrack(videoTrack);
-
+			stream.addTrack(videoTrack);
 			video.srcObject = stream;
 		}
 		else
