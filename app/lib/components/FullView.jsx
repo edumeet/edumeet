@@ -52,18 +52,22 @@ export default class FullView extends React.Component
 
 		this._setTracks(videoTrack);
 
-		if (fscreen.fullscreenEnabled) {
+		if (fscreen.fullscreenEnabled) 
+		{
 			fscreen.addEventListener('fullscreenchange', this.handleExitFullscreen, false);
 			fscreen.requestFullscreen(this.video.current);
 		}
 	}
 
-	componentWillUnmount() {
+	componentWillUnmount() 
+	{
 		fscreen.removeEventListener('fullscreenchange', this.handleExitFullscreen);
 	}
 
-	handleExitFullscreen = () => {
-		if (!fscreen.fullscreenElement) {
+	handleExitFullscreen = () => 
+	{
+		if (!fscreen.fullscreenElement) 
+		{
 			this.props.toggleFullscreen();
 		}
 	};
@@ -87,7 +91,8 @@ export default class FullView extends React.Component
 		if (videoTrack)
 		{
 			const stream = new MediaStream;
-			stream.addTrack(videoTrack);
+
+      stream.addTrack(videoTrack);
 			video.srcObject = stream;
 		}
 		else
@@ -99,7 +104,8 @@ export default class FullView extends React.Component
 
 FullView.propTypes =
 {
-	videoTrack   : PropTypes.any,
-	videoVisible : PropTypes.bool,
-	videoProfile : PropTypes.string
+	videoTrack       : PropTypes.any,
+	videoVisible     : PropTypes.bool,
+	videoProfile     : PropTypes.string,
+	toggleFullscreen : PropTypes.func.isRequired
 };
