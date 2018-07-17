@@ -140,6 +140,7 @@ class Me extends React.Component
 						advancedMode={advancedMode}
 						peer={me}
 						audioTrack={micProducer ? micProducer.track : null}
+						volume={micProducer ? micProducer.volume : null}
 						videoTrack={webcamProducer ? webcamProducer.track : null}
 						videoVisible={videoVisible}
 						audioCodec={micProducer ? micProducer.codec : null}

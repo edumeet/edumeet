@@ -1,6 +1,7 @@
 import protooClient from 'protoo-client';
 import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
+import hark from 'hark';
 import ScreenShare from './ScreenShare';
 import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
@@ -1380,7 +1381,33 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
+				const stream = new MediaStream;
+
 				logger.debug('_setMicProducer() succeeded');
+				stream.addTrack(producer.track);
+				if (!stream.getAudioTracks()[0])
+					throw new Error('_setMicProducer(): given stream has no audio track');
+				producer.hark = hark(stream, { play: false });
+
+				// eslint-disable-next-line no-unused-vars
+				producer.hark.on('volume_change', (dBs, threshold) =>
+				{
+					// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+					//   Math.pow(10, dBs / 20)
+					// However it does not produce a visually useful output, so let exagerate
+					// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+					// minimize component renderings.
+					let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+					if (volume === 1)
+						volume = 0;
+
+					if (volume !== producer.volume)
+					{
+						producer.volume = volume;
+						this._dispatch(stateActions.setProducerVolume(producer.id, volume));
+					}
+				});
 			})
 			.catch((error) =>
 			{
@@ -1823,7 +1850,8 @@ export default class RoomClient
 				track          : null,
 				codec          : codec ? codec.name : null
 			},
-			consumer.peer.name));
+			consumer.peer.name)
+		);
 
 		consumer.on('close', (originator) =>
 		{
@@ -1833,6 +1861,43 @@ export default class RoomClient
 
 			this._dispatch(stateActions.removeConsumer(
 				consumer.id, consumer.peer.name));
+		});
+
+		consumer.on('handled', (originator) =>
+		{
+			logger.debug(
+				'consumer "handled" event [id:%s, originator:%s, consumer:%o]',
+				consumer.id, originator, consumer);
+			if (consumer.kind === 'audio')
+			{
+				const stream = new MediaStream;
+
+				stream.addTrack(consumer.track);
+				if (!stream.getAudioTracks()[0])
+					throw new Error('consumer.on("handled" | given stream has no audio track');
+
+				consumer.hark = hark(stream, { play: false });
+
+				// eslint-disable-next-line no-unused-vars
+				consumer.hark.on('volume_change', (dBs, threshold) =>
+				{
+					// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+					//   Math.pow(10, dBs / 20)
+					// However it does not produce a visually useful output, so let exagerate
+					// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+					// minimize component renderings.
+					let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+					if (volume === 1)
+						volume = 0;
+
+					if (volume !== consumer.volume)
+					{
+						consumer.volume = volume;
+						this._dispatch(stateActions.setConsumerVolume(consumer.id, volume));
+					}
+				});
+			}
 		});
 
 		consumer.on('pause', (originator) =>
