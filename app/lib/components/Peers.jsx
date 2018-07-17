@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import { Appear } from './transitions';
 import Peer from './Peer';
+import ResizeObserver from 'resize-observer-polyfill';
 
 class Peers extends React.Component
 {
@@ -18,12 +19,7 @@ class Peers extends React.Component
 		};
 	}
 
-	resizeUpdate()
-	{
-		this.updateDimensions();
-	}
-
-	updateDimensions()
+	updateDimensions = () =>
 	{
 		const n = this.props.videoStreams ? this.props.videoStreams : 0;
 
@@ -60,21 +56,13 @@ class Peers extends React.Component
 				peerHeight : 0.9 * y
 			});
 		}
-	}
+	};
 
 	componentDidMount()
 	{
-		window.addEventListener('resize', this.resizeUpdate.bind(this));
-	}
+		const observer = new ResizeObserver(this.updateDimensions);
 
-	componentWillUnmount()
-	{
-		window.removeEventListener('resize', this.resizeUpdate.bind(this));
-	}
-
-	componentDidUpdate()
-	{
-		this.updateDimensions();
+		observer.observe(this.refs.peers);
 	}
 
 	render()
