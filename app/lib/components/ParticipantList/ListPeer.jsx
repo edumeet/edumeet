@@ -67,6 +67,8 @@ const ListPeer = (props) =>
 						off      : !micEnabled,
 						disabled : peer.peerAudioInProgress
 					})}
+					style={{ opacity : micEnabled && micConsumer ? (micConsumer.volume/10)
+						+ 0.2 :1 }}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
@@ -140,7 +142,7 @@ const mapDispatchToProps = (dispatch) =>
 		},
 		onEnableWebcam : (peerName) =>
 		{
-			
+
 			dispatch(requestActions.resumePeerVideo(peerName));
 		},
 		onDisableWebcam : (peerName) =>
