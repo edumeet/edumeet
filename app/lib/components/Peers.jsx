@@ -5,6 +5,9 @@ import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import { Appear } from './transitions';
 import Peer from './Peer';
+import ResizeObserver from 'resize-observer-polyfill';
+
+const RATIO = 1.334;
 
 class Peers extends React.Component
 {
@@ -13,17 +16,11 @@ class Peers extends React.Component
 		super(props);
 		this.state = {
 			peerWidth  : 400,
-			peerHeight : 300, 
-			ratio      : 1.334
+			peerHeight : 300
 		};
 	}
 
-	resizeUpdate()
-	{
-		this.updateDimensions();
-	}
-
-	updateDimensions()
+	updateDimensions = () =>
 	{
 		const n = this.props.peers.length;
 
@@ -35,11 +32,11 @@ class Peers extends React.Component
 		for (let rows = 1; rows < 100; rows = rows + 1)
 		{
 			x = width / Math.ceil(n / rows);
-			y = x / this.state.ratio;
+			y = x / RATIO;
 			if (height < (y * rows))
 			{
 				y = height / rows;
-				x = this.state.ratio * y;
+				x = RATIO * y;
 				break;
 			}
 			space = height - (y * (rows));
@@ -55,24 +52,24 @@ class Peers extends React.Component
 				peerHeight : 0.9 * y
 			});
 		}
-	}
+	};
 
 	componentDidMount()
 	{
-		window.addEventListener('resize', this.resizeUpdate.bind(this));
+		window.addEventListener('resize', this.updateDimensions);
+		const observer = new ResizeObserver(this.updateDimensions);
+
+		observer.observe(this.refs.peers);
 	}
 
-	componentWillUnmount()
+	componentWillUnmount() 
 	{
-		window.removeEventListener('resize', this.resizeUpdate.bind(this));
+		window.removeEventListener('resize', this.updateDimensions);
 	}
 
-	componentDidUpdate(prevProps)
+	componentDidUpdate() 
 	{
-		if (prevProps.toolAreaOpen !== this.props.toolAreaOpen) 
-		{
-			this.updateDimensions();
-		}
+		this.updateDimensions();
 	}
 
 	render()
