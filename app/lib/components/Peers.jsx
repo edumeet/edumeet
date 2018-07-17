@@ -62,12 +62,12 @@ class Peers extends React.Component
 		observer.observe(this.refs.peers);
 	}
 
-	componentWillUnmount() 
+	componentWillUnmount()
 	{
 		window.removeEventListener('resize', this.updateDimensions);
 	}
 
-	componentDidUpdate() 
+	componentDidUpdate()
 	{
 		this.updateDimensions();
 	}
@@ -81,7 +81,7 @@ class Peers extends React.Component
 			toolAreaOpen
 		} = this.props;
 
-		const style = 
+		const style =
 		{
 			'width'  : this.state.peerWidth,
 			'height' : this.state.peerHeight

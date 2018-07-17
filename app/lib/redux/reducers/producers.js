@@ -35,6 +35,15 @@ const producers = (state = initialState, action) =>
 			return { ...state, [producerId]: newProducer };
 		}
 
+		case 'SET_PRODUCER_VOLUME':
+		{
+			const { producerId, volume } = action.payload;
+			const producer = state[producerId];
+			const newProducer = { ...producer, volume };
+
+			return { ...state, [producerId]: newProducer };
+		}
+
 		case 'SET_PRODUCER_RESUMED':
 		{
 			const { producerId, originator } = action.payload;

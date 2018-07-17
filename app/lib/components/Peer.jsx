@@ -8,27 +8,27 @@ import * as stateActions from '../redux/stateActions';
 import PeerView from './PeerView';
 import ScreenView from './ScreenView';
 
-class Peer extends Component 
+class Peer extends Component
 {
 	state = {
 		controlsVisible : false
 	};
 
-	handleMouseOver = () => 
+	handleMouseOver = () =>
 	{
 		this.setState({
 			controlsVisible : true
 		});
 	};
 
-	handleMouseOut = () => 
+	handleMouseOut = () =>
 	{
 		this.setState({
 			controlsVisible : false
 		});
 	};
 
-	render() 
+	render()
 	{
 		const {
 			advancedMode,
@@ -45,35 +45,35 @@ class Peer extends Component
 			toggleConsumerFullscreen,
 			style
 		} = this.props;
-	
+
 		const micEnabled = (
 			Boolean(micConsumer) &&
 			!micConsumer.locallyPaused &&
 			!micConsumer.remotelyPaused
 		);
-	
+
 		const videoVisible = (
 			Boolean(webcamConsumer) &&
 			!webcamConsumer.locallyPaused &&
 			!webcamConsumer.remotelyPaused
 		);
-	
+
 		const screenVisible = (
 			Boolean(screenConsumer) &&
 			!screenConsumer.locallyPaused &&
 			!screenConsumer.remotelyPaused
 		);
-	
+
 		let videoProfile;
-	
+
 		if (webcamConsumer)
 			videoProfile = webcamConsumer.profile;
-	
+
 		let screenProfile;
-	
+
 		if (screenConsumer)
 			screenProfile = screenConsumer.profile;
-	
+
 		return (
 			<div
 				data-component='Peer'
@@ -89,7 +89,7 @@ class Peer extends Component
 					</div>
 					:null
 				}
-	
+
 				<div className={classnames('view-container', 'webcam')} style={style}>
 					<div
 						className={classnames('controls', {
@@ -108,7 +108,7 @@ class Peer extends Component
 								micEnabled ? onMuteMic(peer.name) : onUnmuteMic(peer.name);
 							}}
 						/>
-	
+
 						<div
 							className={classnames('button', 'webcam', {
 								on       : videoVisible,
@@ -122,7 +122,7 @@ class Peer extends Component
 									onDisableWebcam(peer.name) : onEnableWebcam(peer.name);
 							}}
 						/>
-	
+
 						<div
 							className={classnames('button', 'fullscreen')}
 							onClick={(e) =>
@@ -136,6 +136,7 @@ class Peer extends Component
 						advancedMode={advancedMode}
 						peer={peer}
 						audioTrack={micConsumer ? micConsumer.track : null}
+						volume={micConsumer ? micConsumer.volume : null}
 						videoTrack={webcamConsumer ? webcamConsumer.track : null}
 						videoVisible={videoVisible}
 						videoProfile={videoProfile}
@@ -143,7 +144,7 @@ class Peer extends Component
 						videoCodec={webcamConsumer ? webcamConsumer.codec : null}
 					/>
 				</div>
-	
+
 				{screenConsumer ?
 					<div className={classnames('view-container', 'screen')} style={style}>
 						<div className='controls'>
@@ -160,7 +161,7 @@ class Peer extends Component
 										onDisableScreen(peer.name) : onEnableScreen(peer.name);
 								}}
 							/>
-	
+
 							<div
 								className={classnames('button', 'fullscreen')}
 								onClick={(e) =>
@@ -236,7 +237,7 @@ const mapDispatchToProps = (dispatch) =>
 		},
 		onEnableWebcam : (peerName) =>
 		{
-			
+
 			dispatch(requestActions.resumePeerVideo(peerName));
 		},
 		onDisableWebcam : (peerName) =>
