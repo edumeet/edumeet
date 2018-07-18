@@ -74,40 +74,32 @@
 		color: rgba(#000, 1.0)
 
 		> .client {
-			background-color: rgba(#fff, 0.9);
-			border-radius: 5px;
-			padding: 6px;
-			max-width: 215px;
-			text-align: left;
 			margin-left: auto;
-
-			> .message-text {
-				font-size: 1.3vmin;
-				color: rgba(#000, 1.0);
-			}
-
-			> .message-time {
-				font-size: 1vmin;
-				color: rgba(#777, 1.0)
-			}
 		}
 
-		> .response {
+		> .client, > .response {
 			background-color: rgba(#fff, 0.9);
 			border-radius: 5px;
-			padding: 6px;
 			max-width: 215px;
-			text-align: left;
-			font-size: 1.3vmin;
+			display: flex;
+			align-items: center;
 
-			> .message-text {
-				font-size: 1.3vmin;
-				color: rgba(#000, 1.0);
+			> .message-avatar {
+				height: 2rem;
 			}
 
-			> .message-time {
-				font-size: 1vmin;
-				color: rgba(#777, 1.0);
+			> .message-content {
+				padding: 6px;
+
+				> .message-text {
+					font-size: 1.3vmin;
+					color: rgba(#000, 1.0);
+				}
+
+				> .message-time {
+					font-size: 1vmin;
+					color: rgba(#777, 1.0);
+				}
 			}
 		}
 	}

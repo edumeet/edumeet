@@ -46,7 +46,8 @@ Chat.propTypes =
 	onSendMessage     : PropTypes.func,
 	disabledInput     : PropTypes.bool,
 	autofocus         : PropTypes.bool,
-	displayName       : PropTypes.string
+	displayName       : PropTypes.string,
+	picture           : PropTypes.string
 };
 
 Chat.defaultProps =

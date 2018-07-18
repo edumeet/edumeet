@@ -31,7 +31,8 @@ const peer = (state = {}, action) =>
 
 		case 'REMOVE_CONSUMER':
 		{
-			const consumers = state.consumers.filter((consumer) => consumer !== action.payload.consumerId);
+			const consumers = state.consumers.filter((consumer) =>
+				consumer !== action.payload.consumerId);
 
 			return { ...state, consumers };
 		}
