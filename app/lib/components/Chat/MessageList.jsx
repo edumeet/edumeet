@@ -50,8 +50,8 @@ class MessageList extends Component
 					{
 						const messageTime = new Date(message.time);
 
-						const picture = message.sender === 'response' ?
-							message.picture : this.props.myPicture;
+						const picture = (message.sender === 'response' ?
+							message.picture : this.props.myPicture) || 'resources/images/avatar-empty.jpeg';
 
 						return (
 							<div className='message' key={i}>

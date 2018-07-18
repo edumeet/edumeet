@@ -174,6 +174,16 @@ export default class RoomClient
 			});
 	}
 
+	changeProfilePicture(picture) 
+	{
+		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
+
+		this._protoo.send('change-profile-picture', { picture }).catch((error) => 
+		{
+			logger.error('shareProfilePicure() | failed: %o', error);
+		});
+	}
+
 	sendChatMessage(chatMessage)
 	{
 		logger.debug('sendChatMessage() [chatMessage:"%s"]', chatMessage);
@@ -1051,6 +1061,17 @@ export default class RoomClient
 					break;
 				}
 
+				case 'profile-picture-changed':
+				{
+					accept();
+
+					const { peerName, picture } = request.data;
+
+					this._dispatch(stateActions.setPeerPicture(peerName, picture));
+
+					break;
+				}
+
 				// This means: server wants to change MY user information
 				case 'auth':
 				{
@@ -1061,6 +1082,7 @@ export default class RoomClient
 					{
 						this.changeDisplayName(request.data.name);
 
+						this.changeProfilePicture(request.data.picture);
 						this._dispatch(stateActions.setPicture(request.data.picture));
 
 						this._dispatch(requestActions.notify(

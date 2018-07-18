@@ -38,9 +38,12 @@ const ListPeer = (props) =>
 		!screenConsumer.remotelyPaused
 	);
 
+	const picture = peer.picture || 'resources/images/avatar-empty.jpeg';
+
 	return (
 		<div data-component='ListPeer'>
-			<img className='avatar' />
+			<img className='avatar' src={picture} />
+
 			<div className='peer-info'>
 				{peer.displayName}
 			</div>

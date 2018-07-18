@@ -1,6 +1,6 @@
 import omit from 'lodash/omit';
 
-const peer = (state, action) =>
+const peer = (state = {}, action) =>
 {
 	switch (action.type) 
 	{
@@ -36,6 +36,11 @@ const peer = (state, action) =>
 			return { ...state, consumers };
 		}
 
+		case 'SET_PEER_PICTURE':
+		{
+			return { ...state, picture: action.payload.picture };
+		}
+
 		default:
 			return state;
 	}
@@ -60,6 +65,7 @@ const peers = (state = {}, action) =>
 		case 'SET_PEER_AUDIO_IN_PROGRESS':
 		case 'SET_PEER_SCREEN_IN_PROGRESS':
 		case 'SET_PEER_RAISE_HAND_STATE':
+		case 'SET_PEER_PICTURE':
 		case 'ADD_CONSUMER':
 		{
 			const oldPeer = state[action.payload.peerName];
