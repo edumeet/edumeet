@@ -73,6 +73,7 @@
 [data-component='ToolArea'] {
 	width: 100%;
 	height: 100%;
+	color: #fff;
 
 	> .tabs {
 		display: flex;
@@ -84,7 +85,7 @@
 			display: block;
 			padding: 1vmin 0 0.8vmin 0;
 			cursor: pointer;
-			background: rgba(#000, 0.3);
+			background: rgba(0,0,0,0.3);
 			font-weight: bold;
 			transition: background ease 0.2s;
 			text-align: center;
@@ -111,7 +112,7 @@
 			height: 100%;
 			display: none;
 			padding: 1vmin;
-			background: #fff;
+			background: rgba(0,0,0,0.1);
 		}
 
 		> input[type="radio"] {
@@ -119,11 +120,12 @@
 		}
 
 		> input[type="radio"]:checked + label {
-			background: #fff;
+			background: rgba(0,0,0,0.1);
 		}
 
 		> input[type="radio"]:checked + label + .tab {
 			display: block;
+			background: rgba(0,0,0,0.1);
 		}
 	}
 }

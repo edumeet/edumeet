@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import Spinner from 'react-spinner';
-import hark from 'hark';
 import * as appPropTypes from './appPropTypes';
 import EditableInput from './EditableInput';
 
@@ -27,10 +26,6 @@ export default class PeerView extends React.Component
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
 
-		// Hark instance.
-		// @type {Object}
-		this._hark = null;
-
 		// Periodic timer for showing video resolution.
 		this._videoResolutionTimer = null;
 	}
@@ -40,6 +35,7 @@ export default class PeerView extends React.Component
 		const {
 			isMe,
 			peer,
+			volume,
 			advancedMode,
 			videoVisible,
 			videoProfile,
@@ -49,7 +45,6 @@ export default class PeerView extends React.Component
 		} = this.props;
 
 		const {
-			volume,
 			videoWidth,
 			videoHeight
 		} = this.state;
@@ -149,9 +144,6 @@ export default class PeerView extends React.Component
 
 	componentWillUnmount()
 	{
-		if (this._hark)
-			this._hark.stop();
-
 		clearInterval(this._videoResolutionTimer);
 	}
 
@@ -160,6 +152,7 @@ export default class PeerView extends React.Component
 		const { audioTrack, videoTrack } = nextProps;
 
 		this._setTracks(audioTrack, videoTrack);
+
 	}
 
 	_setTracks(audioTrack, videoTrack)
@@ -169,9 +162,6 @@ export default class PeerView extends React.Component
 
 		this._audioTrack = audioTrack;
 		this._videoTrack = videoTrack;
-
-		if (this._hark)
-			this._hark.stop();
 
 		clearInterval(this._videoResolutionTimer);
 		this._hideVideoResolution();
@@ -190,9 +180,6 @@ export default class PeerView extends React.Component
 
 			video.srcObject = stream;
 
-			if (audioTrack)
-				this._runHark(stream);
-
 			if (videoTrack)
 				this._showVideoResolution();
 		}
@@ -200,31 +187,6 @@ export default class PeerView extends React.Component
 		{
 			video.srcObject = null;
 		}
-	}
-
-	_runHark(stream)
-	{
-		if (!stream.getAudioTracks()[0])
-			throw new Error('_runHark() | given stream has no audio track');
-
-		this._hark = hark(stream, { play: false });
-
-		// eslint-disable-next-line no-unused-vars
-		this._hark.on('volume_change', (dBs, threshold) =>
-		{
-			// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-			//   Math.pow(10, dBs / 20)
-			// However it does not produce a visually useful output, so let exagerate
-			// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-			// minimize component renderings.
-			let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-			if (volume === 1)
-				volume = 0;
-
-			if (volume !== this.state.volume)
-				this.setState({ volume: volume });
-		});
 	}
 
 	_showVideoResolution()
@@ -259,6 +221,7 @@ PeerView.propTypes =
 		[ appPropTypes.Me, appPropTypes.Peer ]).isRequired,
 	advancedMode        : PropTypes.bool,
 	audioTrack          : PropTypes.any,
+	volume              : PropTypes.number,
 	videoTrack          : PropTypes.any,
 	videoVisible        : PropTypes.bool.isRequired,
 	videoProfile        : PropTypes.string,

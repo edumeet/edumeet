@@ -331,6 +331,22 @@ export const setConsumerTrack = (consumerId, track) =>
 	};
 };
 
+export const setConsumerVolume = (consumerId, volume) =>
+{
+	return {
+		type    : 'SET_CONSUMER_VOLUME',
+		payload : { consumerId, volume }
+	};
+};
+
+export const setProducerVolume = (producerId, volume) =>
+{
+	return {
+		type    : 'SET_PRODUCER_VOLUME',
+		payload : { producerId, volume }
+	};
+};
+
 export const addNotification = (notification) =>
 {
 	return {

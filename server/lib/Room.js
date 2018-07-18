@@ -232,7 +232,6 @@ class Room extends EventEmitter
 				{
 					accept();
 
-					console.log('YES LAWD les cghange tat prifule pic!!')
 					this._protooRoom.spread('profile-picture-changed', {
 						peerName: protooPeer.id,
 						picture: request.data.picture
