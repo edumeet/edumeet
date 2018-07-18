@@ -235,7 +235,7 @@ class Room extends EventEmitter
 					this._protooRoom.spread('profile-picture-changed', {
 						peerName: protooPeer.id,
 						picture: request.data.picture
-					});
+					}, [ protooPeer ]);
 
 					break;
 				}
