@@ -41,7 +41,7 @@ ToolAreaButton.propTypes =
 {
 	toolAreaOpen   : PropTypes.bool.isRequired,
 	toggleToolArea : PropTypes.func.isRequired,
-	unread         : PropTypes.bool.isRequired,
+	unread         : PropTypes.number.isRequired,
 	visible        : PropTypes.bool.isRequired
 };
 
