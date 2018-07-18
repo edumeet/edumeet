@@ -184,9 +184,9 @@ export const installExtension = () =>
 	};
 };
 
-export const sendChatMessage = (text, name) =>
+export const sendChatMessage = (text, name, picture) =>
 {
-	const message = createNewMessage(text, 'response', name);
+	const message = createNewMessage(text, 'response', name, picture);
 
 	return {
 		type    : 'SEND_CHAT_MESSAGE',

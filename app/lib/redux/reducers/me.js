@@ -21,7 +21,8 @@ const initialState =
 	audioOnlyInProgress   : false,
 	raiseHand             : false,
 	raiseHandInProgress   : false,
-	restartIceInProgress  : false
+	restartIceInProgress  : false,
+	picture               : null
 };
 
 const me = (state = initialState, action) =>
@@ -162,6 +163,11 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, restartIceInProgress: flag };
+		}
+
+		case 'SET_PICTURE':
+		{
+			return { ...state, picture: action.payload.picture };
 		}
 
 		default:

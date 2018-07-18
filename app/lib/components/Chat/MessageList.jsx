@@ -50,9 +50,14 @@ class MessageList extends Component
 					{
 						const messageTime = new Date(message.time);
 
+						const picture = message.sender === 'response' ?
+							message.picture : this.props.myPicture;
+
 						return (
 							<div className='message' key={i}>
 								<div className={message.sender}>
+									{picture && <img src={picture} />}
+
 									<div
 										className='message-text'
 										// eslint-disable-next-line react/no-danger
@@ -82,7 +87,8 @@ MessageList.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		chatmessages : state.chatmessages
+		chatmessages : state.chatmessages,
+		myPicture    : state.me.picture
 	};
 };
 

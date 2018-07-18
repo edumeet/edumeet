@@ -418,3 +418,9 @@ export const dropMessages = () =>
 		type : 'DROP_MESSAGES'
 	};
 };
+
+export const setPicture = (picture) =>
+	({
+		type    : 'SET_PICTURE',
+		payload : { picture }
+	});
