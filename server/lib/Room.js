@@ -228,6 +228,18 @@ class Room extends EventEmitter
 					break;
 				}
 
+				case 'change-profile-picture':
+				{
+					accept();
+
+					this._protooRoom.spread('profile-picture-changed', {
+						peerName: protooPeer.id,
+						picture: request.data.picture
+					}, [ protooPeer ]);
+
+					break;
+				}
+
 				case 'chat-message':
 				{
 					accept();

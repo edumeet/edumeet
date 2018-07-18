@@ -3,9 +3,7 @@ import
 	createNewMessage
 } from './helper';
 
-const initialState = [];
-
-const chatmessages = (state = initialState, action) =>
+const chatmessages = (state = [], action) =>
 {
 	switch (action.type)
 	{

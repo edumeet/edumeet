@@ -434,3 +434,15 @@ export const dropMessages = () =>
 		type : 'DROP_MESSAGES'
 	};
 };
+
+export const setPicture = (picture) =>
+	({
+		type    : 'SET_PICTURE',
+		payload : { picture }
+	});
+
+export const setPeerPicture = (peerName, picture) =>
+	({
+		type    : 'SET_PEER_PICTURE',
+		payload : { peerName, picture }
+	});

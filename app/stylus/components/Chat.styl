@@ -73,38 +73,33 @@
 		word-wrap: break-word;
 
 		> .client {
-			background-color: rgba(#000, 0.1);
-			border-radius: 5px;
-			padding: 6px;
-			max-width: 215px;
-			text-align: left;
 			margin-left: auto;
-
-			> .message-text {
-				font-size: 1.3vmin;
-			}
-
-			> .message-time {
-				font-size: 1vmin;
-				opacity:0.8;
-			}
 		}
 
-		> .response {
+		> .client, > .response {
 			background-color: rgba(#000, 0.1);
 			border-radius: 5px;
-			padding: 6px;
 			max-width: 215px;
-			text-align: left;
-			font-size: 1.3vmin;
+			display: flex;
+			align-items: center;
+			padding: 6px;
 
-			> .message-text {
-				font-size: 1.3vmin;
+			> .message-avatar {
+				height: 2rem;
+				border-radius: 50%;
 			}
 
-			> .message-time {
-				font-size: 1vmin;
-				opacity: 0.8;
+			> .message-content {
+				padding-left: 6px;
+
+				> .message-text {
+					font-size: 1.3vmin;
+				}
+
+				> .message-time {
+					font-size: 1vmin;
+					opacity: 0.8;
+				}
 			}
 		}
 	}

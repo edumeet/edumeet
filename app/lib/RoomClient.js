@@ -175,6 +175,16 @@ export default class RoomClient
 			});
 	}
 
+	changeProfilePicture(picture) 
+	{
+		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
+
+		this._protoo.send('change-profile-picture', { picture }).catch((error) => 
+		{
+			logger.error('shareProfilePicure() | failed: %o', error);
+		});
+	}
+
 	sendChatMessage(chatMessage)
 	{
 		logger.debug('sendChatMessage() [chatMessage:"%s"]', chatMessage);
@@ -1052,7 +1062,18 @@ export default class RoomClient
 					break;
 				}
 
-				// This means: server wants to change MY displayName
+				case 'profile-picture-changed':
+				{
+					accept();
+
+					const { peerName, picture } = request.data;
+
+					this._dispatch(stateActions.setPeerPicture(peerName, picture));
+
+					break;
+				}
+
+				// This means: server wants to change MY user information
 				case 'auth':
 				{
 					logger.debug('got auth event from server', request.data);
@@ -1061,6 +1082,10 @@ export default class RoomClient
 					if (request.data.verified == true)
 					{
 						this.changeDisplayName(request.data.name);
+
+						this.changeProfilePicture(request.data.picture);
+						this._dispatch(stateActions.setPicture(request.data.picture));
+
 						this._dispatch(requestActions.notify(
 							{
 								text : `Authenticated successfully: ${request.data}`
@@ -1103,7 +1128,7 @@ export default class RoomClient
 					logger.debug('Got chat from "%s"', peerName);
 
 					this._dispatch(
-						stateActions.addResponseMessage(chatMessage));
+						stateActions.addResponseMessage({ ...chatMessage, peerName }));
 
 					break;
 				}

@@ -14,7 +14,8 @@ class Chat extends Component
 			onSendMessage,
 			disabledInput,
 			autofocus,
-			displayName
+			displayName,
+			picture
 		} = this.props;
 
 		return (
@@ -22,7 +23,7 @@ class Chat extends Component
 				<MessageList />
 				<form
 					data-component='Sender'
-					onSubmit={(e) => { onSendMessage(e, displayName); }}
+					onSubmit={(e) => { onSendMessage(e, displayName, picture); }}
 				>
 					<input
 						type='text'
@@ -45,7 +46,8 @@ Chat.propTypes =
 	onSendMessage     : PropTypes.func,
 	disabledInput     : PropTypes.bool,
 	autofocus         : PropTypes.bool,
-	displayName       : PropTypes.string
+	displayName       : PropTypes.string,
+	picture           : PropTypes.string
 };
 
 Chat.defaultProps =
@@ -59,14 +61,15 @@ const mapStateToProps = (state) =>
 {
 	return {
 		disabledInput : state.chatbehavior.disabledInput,
-		displayName   : state.me.displayName
+		displayName   : state.me.displayName,
+		picture       : state.me.picture
 	};
 };
 
 const mapDispatchToProps = (dispatch) =>
 {
 	return {
-		onSendMessage : (event, displayName) =>
+		onSendMessage : (event, displayName, picture) =>
 		{
 			event.preventDefault();
 			const userInput = event.target.message.value;
@@ -74,7 +77,7 @@ const mapDispatchToProps = (dispatch) =>
 			if (userInput)
 			{
 				dispatch(stateActions.addUserMessage(userInput));
-				dispatch(requestActions.sendChatMessage(userInput, displayName));
+				dispatch(requestActions.sendChatMessage(userInput, displayName, picture));
 			}
 			event.target.message.value = '';
 		}
