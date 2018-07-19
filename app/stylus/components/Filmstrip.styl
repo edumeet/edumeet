@@ -8,6 +8,11 @@
   > .active-peer {
     width: 95vmin;
     padding: 10vmin 1vmin 1vmin 1vmin;
+
+    > [data-component='Peer'] {
+      border: 5px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0px 5px 12px 2px rgba(17, 17, 17, 0.5);
+    }
   }
 
   > .filmstrip {
@@ -17,15 +22,25 @@
 
     > .film {
       height: 15vmin;
-      max-width: 15vmin * (2 * 4 / 3);
       margin: 1vmin;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0px 5px 12px 2px rgba(17, 17, 17, 0.5);
+
+      > [data-component='Peer'] {
+        max-width: 15vmin * (4 / 3);
+
+        &.screen {
+          max-width: 15vmin * (2 * 4 / 3);
+          border: 0;
+        }
+      }
 
       &.active {
-        border: 5px solid white;
+        border-color: #FFF;
       }
 
       &.selected {
-        border: 5px solid pink;
+        border-color: #377EFF;
       }
     }
   }
