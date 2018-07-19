@@ -16,6 +16,7 @@ import ToolArea from './ToolArea/ToolArea';
 import FullScreenView from './FullScreenView';
 import Draggable from 'react-draggable';
 import { idle } from '../utils';
+import Sidebar from './Sidebar';
 
 // Hide toolbars after 10 seconds of inactivity.
 const TIMEOUT = 10 * 1000;
@@ -58,41 +59,10 @@ class Room extends React.Component
 	{
 		const {
 			room,
-			me,
 			toolAreaOpen,
 			amActiveSpeaker,
-			screenProducer,
-			onRoomLinkCopy,
-			onLogin,
-			onShareScreen,
-			onUnShareScreen,
-			onNeedExtension,
-			onLeaveMeeting
+			onRoomLinkCopy
 		} = this.props;
-
-		let screenState;
-		let screenTip;
-
-		if (me.needExtension)
-		{
-			screenState = 'need-extension';
-			screenTip = 'Install screen sharing extension';
-		}
-		else if (!me.canShareScreen)
-		{
-			screenState = 'unsupported';
-			screenTip = 'Screen sharing not supported';
-		}
-		else if (screenProducer)
-		{
-			screenState = 'on';
-			screenTip = 'Stop screen sharing';
-		}
-		else
-		{
-			screenState = 'off';
-			screenTip = 'Start screen sharing';
-		}
 
 		return (
 			<Appear duration={300}>
@@ -105,6 +75,7 @@ class Room extends React.Component
 						}}
 					>
 						<Notifications />
+
 						<ToolAreaButton />
 
 						{room.advancedMode ?
@@ -166,60 +137,7 @@ class Room extends React.Component
 							</div>
 						</Draggable>
 
-						<div className={classnames('sidebar room-controls', {
-							'visible' : this.props.room.toolbarsVisible
-						})}
-						>
-							<div
-								className={classnames('button', 'screen', screenState)}
-								data-tip={screenTip}
-								data-type='dark'
-								onClick={() =>
-								{
-									switch (screenState)
-									{
-										case 'on':
-										{
-											onUnShareScreen();
-											break;
-										}
-										case 'off':
-										{
-											onShareScreen();
-											break;
-										}
-										case 'need-extension':
-										{
-											onNeedExtension();
-											break;
-										}
-										default:
-										{
-											break;
-										}
-									}
-								}}
-							/>
-
-							{me.loginEnabled ?
-								<div
-									className={classnames('button', 'login', 'off', {
-										disabled : me.loginInProgress
-									})}
-									data-tip='Login'
-									data-type='dark'
-									onClick={() => onLogin()}
-								/>
-								:null
-							}
-
-							<div
-								className={classnames('button', 'leave-meeting')}
-								data-tip='Leave meeting'
-								data-type='dark'
-								onClick={() => onLeaveMeeting()}
-							/>
-						</div>
+						<Sidebar />
 
 						<ReactTooltip
 							effect='solid'
@@ -254,11 +172,6 @@ Room.propTypes =
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	screenProducer     : appPropTypes.Producer,
 	onRoomLinkCopy     : PropTypes.func.isRequired,
-	onShareScreen      : PropTypes.func.isRequired,
-	onUnShareScreen    : PropTypes.func.isRequired,
-	onNeedExtension    : PropTypes.func.isRequired,
-	onLeaveMeeting     : PropTypes.func.isRequired,
-	onLogin            : PropTypes.func.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired
 };
 
@@ -287,26 +200,7 @@ const mapDispatchToProps = (dispatch) =>
 					text : 'Room link copied to the clipboard'
 				}));
 		},
-		onLeaveMeeting : () =>
-		{
-			dispatch(requestActions.leaveRoom());
-		},
-		onShareScreen : () =>
-		{
-			dispatch(requestActions.enableScreenSharing());
-		},
-		onUnShareScreen : () =>
-		{
-			dispatch(requestActions.disableScreenSharing());
-		},
-		onNeedExtension : () =>
-		{
-			dispatch(requestActions.installExtension());
-		},
-		onLogin : () =>
-		{
-			dispatch(requestActions.userLogin());
-		},
+
 		setToolbarsVisible : (visible) =>
 		{
 			dispatch(stateActions.setToolbarsVisible(visible));

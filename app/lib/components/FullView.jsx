@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import Spinner from 'react-spinner';
-import fscreen from 'fscreen';
 
 export default class FullView extends React.Component
 {
@@ -51,26 +50,7 @@ export default class FullView extends React.Component
 		const { videoTrack } = this.props;
 
 		this._setTracks(videoTrack);
-
-		if (fscreen.fullscreenEnabled)
-		{
-			fscreen.addEventListener('fullscreenchange', this.handleExitFullscreen, false);
-			fscreen.requestFullscreen(this.video.current);
-		}
 	}
-
-	componentWillUnmount()
-	{
-		fscreen.removeEventListener('fullscreenchange', this.handleExitFullscreen);
-	}
-
-	handleExitFullscreen = () =>
-	{
-		if (!fscreen.fullscreenElement)
-		{
-			this.props.toggleFullscreen();
-		}
-	};
 
 	componentDidUpdate()
 	{
