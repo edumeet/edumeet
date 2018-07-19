@@ -9,22 +9,26 @@ import fscreen from 'fscreen';
 class Sidebar extends Component
 {
 	state = {
-		fullscreen: false
+		fullscreen : false
 	};
 
 	handleToggleFullscreen = () =>
 	{
-		if (fscreen.fullscreenElement) {
+		if (fscreen.fullscreenElement) 
+		{
 			fscreen.exitFullscreen();
-		} else {
+		}
+		else 
+		{
 			fscreen.requestFullscreen(document.documentElement);
 		}
 	};
 
-	handleFullscreenChange = () => {
+	handleFullscreenChange = () => 
+	{
 		this.setState({
-			fullscreen: fscreen.fullscreenElement !== null
-		})
+			fullscreen : fscreen.fullscreenElement !== null
+		});
 	};
 
 	componentDidMount()
@@ -43,7 +47,8 @@ class Sidebar extends Component
 		}
 	}
 
-	render() {
+	render() 
+	{
 		const {
 			toolbarsVisible, me, screenProducer, onLogin, onShareScreen,
 			onUnShareScreen, onNeedExtension, onLeaveMeeting
@@ -83,7 +88,7 @@ class Sidebar extends Component
 				{fscreen.fullscreenEnabled && (
 					<div
 						className={classnames('button', 'fullscreen', {
-							on: this.state.fullscreen
+							on : this.state.fullscreen
 						})}
 						onClick={this.handleToggleFullscreen}
 						data-tip='Fullscreen'
