@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import * as appPropTypes from '../appPropTypes';
-import Peer from '../Peer';
+import * as appPropTypes from './appPropTypes';
+import Peer from './Peer';
 
 class Filmstrip extends Component
 {
