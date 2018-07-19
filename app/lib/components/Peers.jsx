@@ -82,8 +82,7 @@ class Peers extends React.Component
 		const {
 			advancedMode,
 			activeSpeakerName,
-			peers,
-			toolAreaOpen
+			peers
 		} = this.props;
 
 		const style =
@@ -108,7 +107,6 @@ class Peers extends React.Component
 										advancedMode={advancedMode}
 										name={peer.name}
 										style={style}
-										toolAreaOpen={toolAreaOpen}
 									/>
 								</div>
 							</Appear>
@@ -125,8 +123,7 @@ Peers.propTypes =
 		advancedMode      : PropTypes.bool,
 		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 		boxes             : PropTypes.number,
-		activeSpeakerName : PropTypes.string,
-		toolAreaOpen      : PropTypes.bool
+		activeSpeakerName : PropTypes.string
 	};
 
 const mapStateToProps = (state) =>
@@ -139,8 +136,7 @@ const mapStateToProps = (state) =>
 	return {
 		peers,
 		boxes,
-		activeSpeakerName : state.room.activeSpeakerName,
-		toolAreaOpen      : state.toolarea.toolAreaOpen
+		activeSpeakerName : state.room.activeSpeakerName
 	};
 };
 

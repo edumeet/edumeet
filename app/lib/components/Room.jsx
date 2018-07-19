@@ -17,6 +17,7 @@ import FullScreenView from './FullScreenView';
 import Draggable from 'react-draggable';
 import { idle } from '../utils';
 import Sidebar from './Sidebar';
+import Filmstrip from './Filmstrip';
 
 // Hide toolbars after 10 seconds of inactivity.
 const TIMEOUT = 10 * 1000;
@@ -121,9 +122,12 @@ class Room extends React.Component
 							</div>
 						</div>
 
-						<Peers
-							advancedMode={room.advancedMode}
-						/>
+						<Filmstrip advancedMode={room.advancedMode} />
+						{false && (
+							<Peers
+								advancedMode={room.advancedMode}
+							/>
+						)}
 
 						<Draggable handle='.me-container' bounds='body' cancel='.display-name'>
 							<div
