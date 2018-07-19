@@ -1,96 +1,147 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
+import fscreen from 'fscreen';
 
-const Sidebar = ({
-	toolbarsVisible, me, screenProducer, onLogin, onShareScreen,
-	onUnShareScreen, onNeedExtension, onLeaveMeeting
-}) =>
+class Sidebar extends Component
 {
-	let screenState;
-	let screenTip;
+	state = {
+		fullscreen: false
+	};
 
-	if (me.needExtension)
+	handleToggleFullscreen = () =>
 	{
-		screenState = 'need-extension';
-		screenTip = 'Install screen sharing extension';
-	}
-	else if (!me.canShareScreen)
+		if (fscreen.fullscreenElement) {
+			fscreen.exitFullscreen();
+		} else {
+			fscreen.requestFullscreen(document.documentElement);
+		}
+	};
+
+	handleFullscreenChange = () => {
+		this.setState({
+			fullscreen: fscreen.fullscreenElement !== null
+		})
+	};
+
+	componentDidMount()
 	{
-		screenState = 'unsupported';
-		screenTip = 'Screen sharing not supported';
-	}
-	else if (screenProducer)
-	{
-		screenState = 'on';
-		screenTip = 'Stop screen sharing';
-	}
-	else
-	{
-		screenState = 'off';
-		screenTip = 'Start screen sharing';
+		if (fscreen.fullscreenEnabled)
+		{
+			fscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
+		}
 	}
 
-	return (
-		<div className={classnames('sidebar room-controls', {
-			'visible' : toolbarsVisible
-		})}
-		>
-			<div
-				className={classnames('button', 'screen', screenState)}
-				data-tip={screenTip}
-				data-type='dark'
-				onClick={() =>
-				{
-					switch (screenState)
-					{
-						case 'on':
-						{
-							onUnShareScreen();
-							break;
-						}
-						case 'off':
-						{
-							onShareScreen();
-							break;
-						}
-						case 'need-extension':
-						{
-							onNeedExtension();
-							break;
-						}
-						default:
-						{
-							break;
-						}
-					}
-				}}
-			/>
+	componentWillUnmount()
+	{
+		if (fscreen.fullscreenEnabled)
+		{
+			fscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
+		}
+	}
 
-			{me.loginEnabled ?
+	render() {
+		const {
+			toolbarsVisible, me, screenProducer, onLogin, onShareScreen,
+			onUnShareScreen, onNeedExtension, onLeaveMeeting
+		} = this.props;
+
+		let screenState;
+		let screenTip;
+	
+		if (me.needExtension)
+		{
+			screenState = 'need-extension';
+			screenTip = 'Install screen sharing extension';
+		}
+		else if (!me.canShareScreen)
+		{
+			screenState = 'unsupported';
+			screenTip = 'Screen sharing not supported';
+		}
+		else if (screenProducer)
+		{
+			screenState = 'on';
+			screenTip = 'Stop screen sharing';
+		}
+		else
+		{
+			screenState = 'off';
+			screenTip = 'Start screen sharing';
+		}
+	
+		return (
+			<div className={classnames('sidebar room-controls', {
+				'visible' : toolbarsVisible
+			})}
+			>
+				{fscreen.fullscreenEnabled && (
+					<div
+						className={classnames('button', 'fullscreen', {
+							on: this.state.fullscreen
+						})}
+						onClick={this.handleToggleFullscreen}
+						data-tip='Fullscreen'
+						data-type='dark'
+					/>
+				)}
+
 				<div
-					className={classnames('button', 'login', 'off', {
-						disabled : me.loginInProgress
-					})}
-					data-tip='Login'
+					className={classnames('button', 'screen', screenState)}
+					data-tip={screenTip}
 					data-type='dark'
-					onClick={() => onLogin()}
+					onClick={() =>
+					{
+						switch (screenState)
+						{
+							case 'on':
+							{
+								onUnShareScreen();
+								break;
+							}
+							case 'off':
+							{
+								onShareScreen();
+								break;
+							}
+							case 'need-extension':
+							{
+								onNeedExtension();
+								break;
+							}
+							default:
+							{
+								break;
+							}
+						}
+					}}
 				/>
-				:null
-			}
-
-			<div
-				className={classnames('button', 'leave-meeting')}
-				data-tip='Leave meeting'
-				data-type='dark'
-				onClick={() => onLeaveMeeting()}
-			/>
-		</div>
-	);
-};
+	
+				{me.loginEnabled ?
+					<div
+						className={classnames('button', 'login', 'off', {
+							disabled : me.loginInProgress
+						})}
+						data-tip='Login'
+						data-type='dark'
+						onClick={() => onLogin()}
+					/>
+					:null
+				}
+	
+				<div
+					className={classnames('button', 'leave-meeting')}
+					data-tip='Leave meeting'
+					data-type='dark'
+					onClick={() => onLeaveMeeting()}
+				/>
+			</div>
+		);
+	}
+}
 
 Sidebar.propTypes = {
 	toolbarsVisible : PropTypes.bool.isRequired,
