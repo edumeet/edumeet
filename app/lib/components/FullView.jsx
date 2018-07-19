@@ -52,21 +52,21 @@ export default class FullView extends React.Component
 
 		this._setTracks(videoTrack);
 
-		if (fscreen.fullscreenEnabled) 
+		if (fscreen.fullscreenEnabled)
 		{
 			fscreen.addEventListener('fullscreenchange', this.handleExitFullscreen, false);
 			fscreen.requestFullscreen(this.video.current);
 		}
 	}
 
-	componentWillUnmount() 
+	componentWillUnmount()
 	{
 		fscreen.removeEventListener('fullscreenchange', this.handleExitFullscreen);
 	}
 
-	handleExitFullscreen = () => 
+	handleExitFullscreen = () =>
 	{
-		if (!fscreen.fullscreenElement) 
+		if (!fscreen.fullscreenElement)
 		{
 			this.props.toggleFullscreen();
 		}

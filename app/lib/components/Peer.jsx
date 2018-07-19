@@ -147,7 +147,11 @@ class Peer extends Component
 
 				{screenConsumer ?
 					<div className={classnames('view-container', 'screen')} style={style}>
-						<div className='controls'>
+						<div
+							className={classnames('controls', {
+								visible : this.state.controlsVisible
+							})}
+						>
 							<div
 								className={classnames('button', 'screen', {
 									on       : screenVisible,
