@@ -74,9 +74,11 @@ class Sidebar extends Component
 		}
 	
 		return (
-			<div className={classnames('sidebar room-controls', {
-				'visible' : toolbarsVisible
-			})}
+			<div
+				className={classnames('sidebar room-controls', {
+					'visible' : toolbarsVisible
+				})}
+				data-component='Sidebar'
 			>
 				{fscreen.fullscreenEnabled && (
 					<div
