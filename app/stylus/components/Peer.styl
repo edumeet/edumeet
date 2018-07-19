@@ -22,13 +22,15 @@
 
 	> .view-container {
 		position: relative;
-
+		flex-grow: 1;
+		
 		&.webcam {
 			order: 2;
 		}
 
 		&.screen {
 			order: 1;
+			max-width: 50%;
 		}
 
 		> .controls {

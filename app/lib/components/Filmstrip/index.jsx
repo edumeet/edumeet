@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import Peer from '../Peer';
 
@@ -12,9 +13,10 @@ class Filmstrip extends Component
 
 	handleSelectPeer = (selectedPeerName) =>
 	{
-		this.setState({
-			selectedPeerName
-		});
+		this.setState((oldState) => ({
+			selectedPeerName : oldState.selectedPeerName === selectedPeerName ?
+				null : selectedPeerName
+		}));
 	};
 
 	render()
@@ -25,14 +27,10 @@ class Filmstrip extends Component
 		// the latest active speaker, or the manually selected peer.
 		const activePeerName = this.state.selectedPeerName || activeSpeakerName;
 
-		// Find the remainding peer names, which will be shown in the filmstrip.
-		const remaindingPeerNames = Object.keys(peers).filter((peerName) =>
-			peerName !== activePeerName);
-
 		return (
-			<div>
+			<div data-component='Filmstrip'>
 				{peers[activePeerName] && (
-					<div>
+					<div className='active-peer'>
 						<Peer
 							advancedMode={advancedMode}
 							name={activePeerName}
@@ -40,11 +38,15 @@ class Filmstrip extends Component
 					</div>
 				)}
 
-				<div>
-					{remaindingPeerNames.map((peerName) => (
+				<div className='filmstrip'>
+					{Object.keys(peers).map((peerName) => (
 						<div
 							key={peerName}
 							onClick={() => this.handleSelectPeer(peerName)}
+							className={classnames('film', {
+								selected : this.state.selectedPeerName === peerName,
+								active   : activeSpeakerName === peerName
+							})}
 						>
 							<Peer
 								advancedMode={advancedMode}

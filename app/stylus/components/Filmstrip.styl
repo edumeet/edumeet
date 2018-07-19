@@ -1,0 +1,32 @@
+[data-component='Filmstrip'] {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+
+  > .active-peer {
+    width: 95vmin;
+    padding: 10vmin 1vmin 1vmin 1vmin;
+  }
+
+  > .filmstrip {
+    display: flex;
+    padding: 0.5vmin;
+    cursor: pointer;
+
+    > .film {
+      height: 15vmin;
+      max-width: 15vmin * (2 * 4 / 3);
+      margin: 1vmin;
+
+      &.active {
+        border: 5px solid white;
+      }
+
+      &.selected {
+        border: 5px solid pink;
+      }
+    }
+  }
+}
