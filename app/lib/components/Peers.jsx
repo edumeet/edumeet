@@ -22,7 +22,12 @@ class Peers extends React.Component
 
 	updateDimensions = () =>
 	{
-		const n = this.props.peers.length;
+		const n = this.props.boxes;
+
+		if (n === 0)
+		{
+			return;
+		}
 
 		const width = this.refs.peers.clientWidth;
 		const height = this.refs.peers.clientHeight;
@@ -116,27 +121,24 @@ class Peers extends React.Component
 }
 
 Peers.propTypes =
-{
-	advancedMode      : PropTypes.bool,
-	peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
-	videoStreams      : PropTypes.any,
-	activeSpeakerName : PropTypes.string,
-	toolAreaOpen      : PropTypes.bool
-};
+	{
+		advancedMode      : PropTypes.bool,
+		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
+		boxes             : PropTypes.number,
+		activeSpeakerName : PropTypes.string,
+		toolAreaOpen      : PropTypes.bool
+	};
 
 const mapStateToProps = (state) =>
 {
-	const peersArray = Object.values(state.peers);
-	const videoStreamsArray = Object.values(state.consumers);
-	const videoStreams =
-		videoStreamsArray.filter((consumer) =>
-		{
-			return (consumer.source === 'webcam' || consumer.source === 'screen');
-		}).length;
+	const peers = Object.values(state.peers);
+
+	const boxes = peers.length + Object.values(state.consumers)
+		.filter((consumer) => consumer.source === 'screen').length;
 
 	return {
-		peers             : peersArray,
-		videoStreams      : videoStreams,
+		peers,
+		boxes,
 		activeSpeakerName : state.room.activeSpeakerName,
 		toolAreaOpen      : state.toolarea.toolAreaOpen
 	};
