@@ -65,6 +65,11 @@ class Room extends React.Component
 			onRoomLinkCopy
 		} = this.props;
 
+		const View = {
+			filmstrip  : Filmstrip,
+			democratic : Peers
+		}[room.mode];
+
 		return (
 			<Appear duration={300}>
 				<div data-component='Room'>
@@ -122,12 +127,7 @@ class Room extends React.Component
 							</div>
 						</div>
 
-						<Filmstrip advancedMode={room.advancedMode} />
-						{false && (
-							<Peers
-								advancedMode={room.advancedMode}
-							/>
-						)}
+						<View advancedMode={room.advancedMode} />
 
 						<Draggable handle='.me-container' bounds='body' cancel='.display-name'>
 							<div

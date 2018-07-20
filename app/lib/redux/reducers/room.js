@@ -6,7 +6,8 @@ const initialState =
 	showSettings       : false,
 	advancedMode       : false,
 	fullScreenConsumer : null, // ConsumerID
-	toolbarsVisible    : true
+	toolbarsVisible    : true,
+	mode               : 'democratic'
 };
 
 const room = (state = initialState, action) =>
@@ -65,6 +66,10 @@ const room = (state = initialState, action) =>
 
 			return { ...state, toolbarsVisible };
 		}
+
+		case 'SET_DISPLAY_MODE':
+			return { ...state, mode: action.payload.mode };
+
 		default:
 			return state;
 	}

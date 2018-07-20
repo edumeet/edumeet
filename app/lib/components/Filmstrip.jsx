@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import * as appPropTypes from './appPropTypes';
 import Peer from './Peer';
 
 class Filmstrip extends Component
@@ -65,7 +64,7 @@ class Filmstrip extends Component
 Filmstrip.propTypes = {
 	activeSpeakerName : PropTypes.string,
 	advancedMode      : PropTypes.bool,
-	peers             : appPropTypes.peers
+	peers             : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
