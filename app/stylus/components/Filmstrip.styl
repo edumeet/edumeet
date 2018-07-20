@@ -29,40 +29,47 @@
     height: 20vh;
     align-items: center;
 
-    > .film {
-      height: 18vh;
-      flex-shrink: 0;     
-      padding-left: 1vh;  
+    > .filmstrip-content {
+      margin: 0 auto;
+      display: flex;
+      height: 100%;
+      align-items: center;
 
-      &:last-child {
-        padding-right: 1vh;
-      }
+      > .film {
+        height: 18vh;
+        flex-shrink: 0;     
+        padding-left: 1vh;  
 
-      > .film-content {
-        height: 100%;
-        width: 100%;
-        border: 1px solid rgba(255,255,255,0.15);
+        &:last-child {
+          padding-right: 1vh;
+        }
 
-        > [data-component='Peer'] {
-          max-width: 17vh * (4 / 3);
-          cursor: pointer;
+        > .film-content {
+          height: 100%;
+          width: 100%;
+          border: 1px solid rgba(255,255,255,0.15);
 
-          &.screen {
-            max-width: 17vh * (2 * 4 / 3);
-            border: 0;
+          > [data-component='Peer'] {
+            max-width: 18vh * (4 / 3);
+            cursor: pointer;
+
+            &.screen {
+              max-width: 18vh * (2 * 4 / 3);
+              border: 0;
+            }
           }
         }
-      }
 
-      &.active {
-        > .film-content {
-          border-color: #FFF;
+        &.active {
+          > .film-content {
+            border-color: #FFF;
+          }
         }
-      }
 
-      &.selected {
-        > .film-content {
-          border-color: #377EFF;
+        &.selected {
+          > .film-content {
+            border-color: #377EFF;
+          }
         }
       }
     }
