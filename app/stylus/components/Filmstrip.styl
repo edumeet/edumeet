@@ -4,13 +4,20 @@
   align-items: center;
   height: 100%;
 
-  > .active-peer {
-    width: 95vmin;
-    padding: 10vmin 1vmin 1vmin 1vmin;
+  > .active-peer-container {
+    width: 100%;
+    height: 80vh;
+    display: flex;
+    justify-content: center;
 
-    > [data-component='Peer'] {
-      border: 5px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0px 5px 12px 2px rgba(17, 17, 17, 0.5);
+    > .active-peer {
+      width: 100%;
+      padding: 5vmin 1vmin 1vmin 1vmin;
+
+      > [data-component='Peer'] {
+        border: 5px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0px 5px 12px 2px rgba(17, 17, 17, 0.5);
+      }
     }
   }
 
@@ -19,16 +26,16 @@
     background: rgba(0, 0, 0 , 0.5);
     width: 100%;
     overflow-x: auto;
-    padding: 1vmin 0;
-    margin-top: auto;
+    height: 20vh;
+    align-items: center;
 
     > .film {
-      height: 15vmin;
-      flex-shrink: 0;        
-      padding-left: 1vmin;
+      height: 18vh;
+      flex-shrink: 0;     
+      padding-left: 1vh;  
 
       &:last-child {
-        padding-right: 1vmin;
+        padding-right: 1vh;
       }
 
       > .film-content {
@@ -37,11 +44,11 @@
         border: 1px solid rgba(255,255,255,0.15);
 
         > [data-component='Peer'] {
-          max-width: 15vmin * (4 / 3);
+          max-width: 17vh * (4 / 3);
           cursor: pointer;
 
           &.screen {
-            max-width: 15vmin * (2 * 4 / 3);
+            max-width: 17vh * (2 * 4 / 3);
             border: 0;
           }
         }
