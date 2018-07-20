@@ -8,18 +8,34 @@ import Dropdown from 'react-dropdown';
 
 class Settings extends React.Component
 {
-	constructor(props)
+	state = {
+		selectedCamera: null,
+		selectedAudioDevice: null
+	};
+
+	handleChangeWebcam = (webcam) =>
 	{
-		super(props);
+		this.props.handleChangeWebcam(webcam);
+
+		this.setState({
+			selectedCamera: webcam
+		});
 	}
 
-	render()
+	handleChangeAudioDevice = (device) =>
 	{
+		this.props.handleChangeAudioDevice(device);
+
+		this.setState({
+			selectedAudioDevice: device
+		});
+	}
+	
+	render()
+	{	
 		const {
 			room,
 			me,
-			handleChangeWebcam,
-			handleChangeAudioDevice,
 			onToggleAdvancedMode
 		} = this.props;
 
@@ -55,21 +71,24 @@ class Settings extends React.Component
 					<Dropdown
 						disabled={!me.canChangeWebcam}
 						options={webcams}
-						onChange={handleChangeWebcam}
+						value={this.state.selectedCamera}
+						onChange={this.handleChangeWebcam}
 						placeholder={webcamText}
 					/>
 					<Dropdown
 						disabled={!me.canChangeAudioDevice}
 						options={audioDevices}
-						onChange={handleChangeAudioDevice}
+						value={this.state.selectedAudioDevice}
+						onChange={this.handleChangeAudioDevice}
 						placeholder={audioDevicesText}
 					/>
 					<input
+						id='room-mode'
 						type='checkbox'
-						defaultChecked={room.advancedMode}
+						checked={room.advancedMode}
 						onChange={onToggleAdvancedMode}
 					/>
-					<span>Advanced mode</span>
+					<label htmlFor='room-mode'>Advanced mode</label>
 				</div>
 			</div>
 		);
