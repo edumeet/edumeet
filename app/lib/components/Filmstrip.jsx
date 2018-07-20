@@ -48,10 +48,12 @@ class Filmstrip extends Component
 								active   : activeSpeakerName === peerName
 							})}
 						>
-							<Peer
-								advancedMode={advancedMode}
-								name={peerName}
-							/>
+							<div className='film-content'>
+								<Peer
+									advancedMode={advancedMode}
+									name={peerName}
+								/>
+							</div>
 						</div>
 					))}
 				</div>
