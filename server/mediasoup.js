@@ -318,4 +318,4 @@ function stdinError(msg)
 	console.error(colors.red.bold('ERROR: ') + colors.red(msg));
 }
 
-export default mediaServer;
+module.exports = mediaServer;
