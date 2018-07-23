@@ -5,6 +5,14 @@
 process.title = 'multiparty-meeting-server';
 
 const config = require('./config');
+const fs = require('fs');
+const https = require('https');
+const express = require('express');
+const url = require('url');
+const protooServer = require('protoo-server');
+const Logger = require('./lib/Logger');
+const Room = require('./lib/Room');
+const Dataporten = require('passport-dataporten');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -12,100 +20,66 @@ console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
 console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
 /* eslint-enable no-console */
 
-const fs = require('fs');
-const https = require('https');
-const router = require('./router');
-const url = require('url');
-const path = require('path');
-const protooServer = require('protoo-server');
-const mediasoup = require('mediasoup');
-const readline = require('readline');
-const colors = require('colors/safe');
-const repl = require('repl');
-const Logger = require('./lib/Logger');
-const Room = require('./lib/Room');
-const homer = require('./lib/homer');
+// Start the mediasoup server.
+require('./mediasoup');
 
 const logger = new Logger();
 
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
 
-// mediasoup server.
-const mediaServer = mediasoup.Server(
-	{
-		numWorkers       : 1,
-		logLevel         : config.mediasoup.logLevel,
-		logTags          : config.mediasoup.logTags,
-		rtcIPv4          : config.mediasoup.rtcIPv4,
-		rtcIPv6          : config.mediasoup.rtcIPv6,
-		rtcAnnouncedIPv4 : config.mediasoup.rtcAnnouncedIPv4,
-		rtcAnnouncedIPv6 : config.mediasoup.rtcAnnouncedIPv6,
-		rtcMinPort       : config.mediasoup.rtcMinPort,
-		rtcMaxPort       : config.mediasoup.rtcMaxPort
-	});
-
-// Do Homer stuff.
-if (process.env.MEDIASOUP_HOMER_OUTPUT)
-	homer(mediaServer);
-
-global.SERVER = mediaServer;
-
-mediaServer.on('newroom', (room) =>
-{
-	global.ROOM = room;
-
-	room.on('newpeer', (peer) =>
-	{
-		global.PEER = peer;
-
-		if (peer.consumers.length > 0)
-			global.CONSUMER = peer.consumers[peer.consumers.length - 1];
-
-		peer.on('newtransport', (transport) =>
-		{
-			global.TRANSPORT = transport;
-		});
-
-		peer.on('newproducer', (producer) =>
-		{
-			global.PRODUCER = producer;
-		});
-
-		peer.on('newconsumer', (consumer) =>
-		{
-			global.CONSUMER = consumer;
-		});
-	});
-});
-
-// HTTPS server
+// TLS server configuration.
 const tls =
 {
 	cert : fs.readFileSync(config.tls.cert),
 	key  : fs.readFileSync(config.tls.key)
 };
 
-const httpsServer = https.createServer(tls, router.handleRequest);
-httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
-{
-	logger.info('Server running, port: ',config.listeningPort);
-});
+const app = express();
 
-router.on('auth',function(event){
-	console.log('router: Got an event: ',event)
-	if ( rooms.has(event.roomId) )
+const dataporten = new Dataporten.Setup(config.oauth2);
+
+app.use(dataporten.passport.initialize());
+app.use(dataporten.passport.session());
+
+dataporten.setupAuthenticate(app, '/login');
+dataporten.setupLogout(app, '/logout');
+dataporten.setupCallback(app);
+
+app.get(
+	'/auth-callback',
+
+	dataporten.passport.authenticate('dataporten', { failureRedirect: '/login' }),
+	
+	(req, res) =>
 	{
-		const room = rooms.get(event.roomId)._protooRoom;
-		if ( room.hasPeer(event.peerName) )
+		res.redirect(req.session.redirectToAfterLogin || '/');
+
+		if (rooms.has(req.query.roomId))
 		{
-			const peer = room.getPeer(event.peerName);
-			peer.send('auth', event)
+			const room = rooms.get(req.query.roomId)._protooRoom;
+			if ( room.hasPeer(req.query.peerName) )
+			{
+				const peer = room.getPeer(req.query.peerName);
+				peer.send('auth', {
+					name: req.user.displayName,
+					picture: req.user.photos[0]
+				});
+			}
 		}
 	}
-})
+)
 
-// Protoo WebSocket server listens to same webserver so everythink is available
+// Serve all files in the public folder as static files.
+app.use(express.static('public'));
+
+const httpsServer = https.createServer(tls, app);
+httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
+{
+	logger.info('Server running on port: ', config.listeningPort);
+});
+
+// Protoo WebSocket server listens to same webserver so everything is available
 // via same port
 const webSocketServer = new protooServer.WebSocketServer(httpsServer,
 	{
@@ -179,268 +153,3 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 
 	room.handleConnection(peerName, transport);
 });
-
-// Listen for keyboard input.
-
-let cmd;
-let terminal;
-
-openCommandConsole();
-
-function openCommandConsole()
-{
-	stdinLog('[opening Readline Command Console...]');
-
-	closeCommandConsole();
-	closeTerminal();
-
-	cmd = readline.createInterface(
-		{
-			input  : process.stdin,
-			output : process.stdout
-		});
-
-	cmd.on('SIGINT', () =>
-	{
-		process.exit();
-	});
-
-	readStdin();
-
-	function readStdin()
-	{
-		cmd.question('cmd> ', (answer) =>
-		{
-			switch (answer)
-			{
-				case '':
-				{
-					readStdin();
-					break;
-				}
-
-				case 'h':
-				case 'help':
-				{
-					stdinLog('');
-					stdinLog('available commands:');
-					stdinLog('- h,  help          : show this message');
-					stdinLog('- sd, serverdump    : execute server.dump()');
-					stdinLog('- rd, roomdump      : execute room.dump() for the latest created mediasoup Room');
-					stdinLog('- pd, peerdump      : execute peer.dump() for the latest created mediasoup Peer');
-					stdinLog('- td, transportdump : execute transport.dump() for the latest created mediasoup Transport');
-					stdinLog('- prd, producerdump : execute producer.dump() for the latest created mediasoup Producer');
-					stdinLog('- cd, consumerdump : execute consumer.dump() for the latest created mediasoup Consumer');
-					stdinLog('- t,  terminal      : open REPL Terminal');
-					stdinLog('');
-					readStdin();
-
-					break;
-				}
-
-				case 'sd':
-				case 'serverdump':
-				{
-					mediaServer.dump()
-						.then((data) =>
-						{
-							stdinLog(`server.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
-							readStdin();
-						})
-						.catch((error) =>
-						{
-							stdinError(`mediaServer.dump() failed: ${error}`);
-							readStdin();
-						});
-
-					break;
-				}
-
-				case 'rd':
-				case 'roomdump':
-				{
-					if (!global.ROOM)
-					{
-						readStdin();
-						break;
-					}
-
-					global.ROOM.dump()
-						.then((data) =>
-						{
-							stdinLog(`room.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
-							readStdin();
-						})
-						.catch((error) =>
-						{
-							stdinError(`room.dump() failed: ${error}`);
-							readStdin();
-						});
-
-					break;
-				}
-
-				case 'pd':
-				case 'peerdump':
-				{
-					if (!global.PEER)
-					{
-						readStdin();
-						break;
-					}
-
-					global.PEER.dump()
-						.then((data) =>
-						{
-							stdinLog(`peer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
-							readStdin();
-						})
-						.catch((error) =>
-						{
-							stdinError(`peer.dump() failed: ${error}`);
-							readStdin();
-						});
-
-					break;
-				}
-
-				case 'td':
-				case 'transportdump':
-				{
-					if (!global.TRANSPORT)
-					{
-						readStdin();
-						break;
-					}
-
-					global.TRANSPORT.dump()
-						.then((data) =>
-						{
-							stdinLog(`transport.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
-							readStdin();
-						})
-						.catch((error) =>
-						{
-							stdinError(`transport.dump() failed: ${error}`);
-							readStdin();
-						});
-
-					break;
-				}
-
-				case 'prd':
-				case 'producerdump':
-				{
-					if (!global.PRODUCER)
-					{
-						readStdin();
-						break;
-					}
-
-					global.PRODUCER.dump()
-						.then((data) =>
-						{
-							stdinLog(`producer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
-							readStdin();
-						})
-						.catch((error) =>
-						{
-							stdinError(`producer.dump() failed: ${error}`);
-							readStdin();
-						});
-
-					break;
-				}
-
-				case 'cd':
-				case 'consumerdump':
-				{
-					if (!global.CONSUMER)
-					{
-						readStdin();
-						break;
-					}
-
-					global.CONSUMER.dump()
-						.then((data) =>
-						{
-							stdinLog(`consumer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
-							readStdin();
-						})
-						.catch((error) =>
-						{
-							stdinError(`consumer.dump() failed: ${error}`);
-							readStdin();
-						});
-
-					break;
-				}
-
-				case 't':
-				case 'terminal':
-				{
-					openTerminal();
-
-					break;
-				}
-
-				default:
-				{
-					stdinError(`unknown command: ${answer}`);
-					stdinLog('press \'h\' or \'help\' to get the list of available commands');
-
-					readStdin();
-				}
-			}
-		});
-	}
-}
-
-function openTerminal()
-{
-	stdinLog('[opening REPL Terminal...]');
-
-	closeCommandConsole();
-	closeTerminal();
-
-	terminal = repl.start(
-		{
-			prompt          : 'terminal> ',
-			useColors       : true,
-			useGlobal       : true,
-			ignoreUndefined : false
-		});
-
-	terminal.on('exit', () => openCommandConsole());
-}
-
-function closeCommandConsole()
-{
-	if (cmd)
-	{
-		cmd.close();
-		cmd = undefined;
-	}
-}
-
-function closeTerminal()
-{
-	if (terminal)
-	{
-		terminal.removeAllListeners('exit');
-		terminal.close();
-		terminal = undefined;
-	}
-}
-
-function stdinLog(msg)
-{
-	// eslint-disable-next-line no-console
-	console.log(colors.green(msg));
-}
-
-function stdinError(msg)
-{
-	// eslint-disable-next-line no-console
-	console.error(colors.red.bold('ERROR: ') + colors.red(msg));
-}

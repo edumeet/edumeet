@@ -1079,32 +1079,16 @@ export default class RoomClient
 					logger.debug('got auth event from server', request.data);
 					accept();
 
-					if (request.data.verified == true)
-					{
-						this.changeDisplayName(request.data.name);
+					this.changeDisplayName(request.data.name);
 
-						this.changeProfilePicture(request.data.picture);
-						this._dispatch(stateActions.setPicture(request.data.picture));
+					this.changeProfilePicture(request.data.picture);
+					this._dispatch(stateActions.setPicture(request.data.picture));
 
-						this._dispatch(requestActions.notify(
-							{
-								text : `Authenticated successfully: ${request.data}`
-							}
-						));
-					}
-					else
-					{
-						this._dispatch(requestActions.notify(
-							{
-								text : `Authentication failed: ${request.data}`
-							}
-						));
-					}
-					this.closeLoginWindow();
-
-					this._dispatch(stateActions.setLoginInProgress(false));
-					break;
-
+					this._dispatch(requestActions.notify(
+						{
+							text : `Authenticated successfully: ${request.data}`
+						}
+					));
 				}
 
 				case 'raisehand-message':
