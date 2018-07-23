@@ -233,8 +233,8 @@ class Room extends EventEmitter
 					accept();
 
 					this._protooRoom.spread('profile-picture-changed', {
-						peerName: protooPeer.id,
-						picture: request.data.picture
+						peerName : protooPeer.id,
+						picture  : request.data.picture
 					}, [ protooPeer ]);
 
 					break;
@@ -284,7 +284,7 @@ class Room extends EventEmitter
 					this._protooRoom.spread(
 						'raisehand-message',
 						{
-							peerName    : protooPeer.id,
+							peerName       : protooPeer.id,
 							raiseHandState : raiseHandState
 						},
 						[ protooPeer ]);

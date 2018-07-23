@@ -21,7 +21,7 @@ console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
 /* eslint-enable no-console */
 
 // Start the mediasoup server.
-require('./mediasoup');
+const mediaServer = require('./mediasoup');
 
 const logger = new Logger();
 
@@ -58,22 +58,25 @@ app.get(
 		if (rooms.has(req.query.roomId))
 		{
 			const room = rooms.get(req.query.roomId)._protooRoom;
-			if ( room.hasPeer(req.query.peerName) )
+
+			if (room.hasPeer(req.query.peerName))
 			{
 				const peer = room.getPeer(req.query.peerName);
+
 				peer.send('auth', {
-					name: req.user.displayName,
-					picture: req.user.photos[0]
+					name    : req.user.displayName,
+					picture : req.user.photos[0]
 				});
 			}
 		}
 	}
-)
+);
 
 // Serve all files in the public folder as static files.
 app.use(express.static('public'));
 
 const httpsServer = https.createServer(tls, app);
+
 httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 {
 	logger.info('Server running on port: ', config.listeningPort);

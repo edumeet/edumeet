@@ -3,15 +3,15 @@ module.exports =
 	// oAuth2 conf
 	oauth2 :
 	{
-		client_id			: '',
-		client_secret		: '',
-		providerID		: '',
-		redirect_uri	: 'https://mYDomainName:port/auth-callback',
+		client_id           			: '',
+		client_secret        		: '',
+		providerID           		: '',
+		redirect_uri          	: 'https://mYDomainName:port/auth-callback',
 		authorization_endpoint	: '',
-		userinfo_endpoint : '',
-		token_endpoint : '',
-		scopes				: { request : [ 'openid', 'userid','profile'] },
-		response_type : 'code'
+		userinfo_endpoint      : '',
+		token_endpoint         : '',
+		scopes             				: { request: [ 'openid', 'userid', 'profile' ] },
+		response_type          : 'code'
 	},
 	// Listening hostname for `gulp live|open`.
 	domain : 'localhost',
@@ -22,7 +22,7 @@ module.exports =
 	},
 	// Listening port for https server.
 	listeningPort : 3443,
-	mediasoup :
+	mediasoup     :
 	{
 		// mediasoup Server settings.
 		logLevel : 'warn',

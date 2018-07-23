@@ -317,3 +317,5 @@ function stdinError(msg)
 	// eslint-disable-next-line no-console
 	console.error(colors.red.bold('ERROR: ') + colors.red(msg));
 }
+
+export default mediaServer;
