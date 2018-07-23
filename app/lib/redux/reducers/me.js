@@ -22,7 +22,9 @@ const initialState =
 	raiseHand             : false,
 	raiseHandInProgress   : false,
 	restartIceInProgress  : false,
-	picture               : null
+	picture               : null,
+	selectedWebcam        : null,
+	selectedAudioDevice   : null
 };
 
 const me = (state = initialState, action) =>
@@ -47,6 +49,16 @@ const me = (state = initialState, action) =>
 				device,
 				loginEnabled
 			};
+		}
+
+		case 'CHANGE_WEBCAM':
+		{
+			return { ...state, selectedWebcam: action.payload.deviceId };
+		}
+
+		case 'CHANGE_AUDIO_DEVICE':
+		{
+			return { ...state, selectedAudioDevice: action.payload.deviceId };
 		}
 
 		case 'SET_MEDIA_CAPABILITIES':
