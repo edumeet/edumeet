@@ -44,7 +44,6 @@ app.use(dataporten.passport.session());
 
 dataporten.setupAuthenticate(app, '/login');
 dataporten.setupLogout(app, '/logout');
-dataporten.setupCallback(app);
 
 app.get(
 	'/auth-callback',
