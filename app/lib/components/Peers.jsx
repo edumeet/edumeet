@@ -14,14 +14,22 @@ class Peers extends React.Component
 	constructor(props)
 	{
 		super(props);
+
 		this.state = {
 			peerWidth  : 400,
 			peerHeight : 300
 		};
+
+		this.peersRef = React.createRef();
 	}
 
 	updateDimensions = () =>
 	{
+		if (!this.peersRef.current) 
+		{
+			return;
+		}
+
 		const n = this.props.boxes;
 
 		if (n === 0)
@@ -29,8 +37,8 @@ class Peers extends React.Component
 			return;
 		}
 
-		const width = this.refs.peers.clientWidth;
-		const height = this.refs.peers.clientHeight;
+		const width = this.peersRef.current.clientWidth;
+		const height = this.peersRef.current.clientHeight;
 
 		let x, y, space;
 
@@ -64,7 +72,7 @@ class Peers extends React.Component
 		window.addEventListener('resize', this.updateDimensions);
 		const observer = new ResizeObserver(this.updateDimensions);
 
-		observer.observe(this.refs.peers);
+		observer.observe(this.peersRef.current);
 	}
 
 	componentWillUnmount()
@@ -82,8 +90,7 @@ class Peers extends React.Component
 		const {
 			advancedMode,
 			activeSpeakerName,
-			peers,
-			toolAreaOpen
+			peers
 		} = this.props;
 
 		const style =
@@ -93,7 +100,7 @@ class Peers extends React.Component
 		};
 
 		return (
-			<div data-component='Peers' ref='peers'>
+			<div data-component='Peers' ref={this.peersRef}>
 				{
 					peers.map((peer) =>
 					{
@@ -108,7 +115,6 @@ class Peers extends React.Component
 										advancedMode={advancedMode}
 										name={peer.name}
 										style={style}
-										toolAreaOpen={toolAreaOpen}
 									/>
 								</div>
 							</Appear>
@@ -125,8 +131,7 @@ Peers.propTypes =
 		advancedMode      : PropTypes.bool,
 		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 		boxes             : PropTypes.number,
-		activeSpeakerName : PropTypes.string,
-		toolAreaOpen      : PropTypes.bool
+		activeSpeakerName : PropTypes.string
 	};
 
 const mapStateToProps = (state) =>
@@ -139,8 +144,7 @@ const mapStateToProps = (state) =>
 	return {
 		peers,
 		boxes,
-		activeSpeakerName : state.room.activeSpeakerName,
-		toolAreaOpen      : state.toolarea.toolAreaOpen
+		activeSpeakerName : state.room.activeSpeakerName
 	};
 };
 

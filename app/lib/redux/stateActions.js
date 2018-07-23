@@ -93,6 +93,12 @@ export const toggleAdvancedMode = () =>
 	};
 };
 
+export const setDisplayMode = (mode) =>
+	({
+		type    : 'SET_DISPLAY_MODE',
+		payload : { mode }
+	});
+
 export const setAudioOnlyState = (enabled) =>
 {
 	return {
