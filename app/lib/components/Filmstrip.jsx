@@ -16,13 +16,14 @@ class Filmstrip extends Component
 
 	state = {
 		selectedPeerName : null,
+		lastSpeaker      : null,
 		width            : 400
 	};
 
 	// Find the name of the peer which is currently speaking. This is either
 	// the latest active speaker, or the manually selected peer.
 	getActivePeerName = () =>
-		this.state.selectedPeerName || this.props.activeSpeakerName;
+		this.state.selectedPeerName || this.state.lastSpeaker;
 
 	isSharingCamera = (peerName) => this.props.peers[peerName] &&
 		this.props.peers[peerName].consumers.some((consumer) =>
@@ -63,15 +64,11 @@ class Filmstrip extends Component
 
 	componentDidMount()
 	{
-		this.updateDimensions();
-	}
-
-	componentDidMount()
-	{
 		window.addEventListener('resize', this.updateDimensions);
 		const observer = new ResizeObserver(this.updateDimensions);
 
 		observer.observe(this.activePeerContainer.current);
+		this.updateDimensions();
 	}
 
 	componentWillUnmount()
@@ -84,6 +81,14 @@ class Filmstrip extends Component
 		if (prevProps !== this.props)
 		{
 			this.updateDimensions();
+
+			if (this.props.activeSpeakerName !== this.props.myName)
+			{
+				// eslint-disable-next-line react/no-did-update-set-state
+				this.setState({
+					lastSpeaker : this.props.activeSpeakerName
+				});
+			}
 		}
 	}
 
@@ -97,7 +102,7 @@ class Filmstrip extends Component
 
 	render()
 	{
-		const { activeSpeakerName, peers, advancedMode } = this.props;
+		const { peers, advancedMode } = this.props;
 
 		const activePeerName = this.getActivePeerName();
 
@@ -107,7 +112,10 @@ class Filmstrip extends Component
 					{peers[activePeerName] && (
 						<div
 							className='active-peer'
-							style={{ width: this.state.width, height: this.state.width / this.getRatio() }}
+							style={{
+								width  : this.state.width,
+								height : this.state.width / this.getRatio()
+							}}
 						>
 							<Peer
 								advancedMode={advancedMode}
@@ -125,7 +133,7 @@ class Filmstrip extends Component
 								onClick={() => this.handleSelectPeer(peerName)}
 								className={classnames('film', {
 									selected : this.state.selectedPeerName === peerName,
-									active   : activeSpeakerName === peerName
+									active   : this.state.lastSpeaker === peerName
 								})}
 							>
 								<div className='film-content'>
@@ -147,14 +155,16 @@ Filmstrip.propTypes = {
 	activeSpeakerName : PropTypes.string,
 	advancedMode      : PropTypes.bool,
 	peers             : PropTypes.object.isRequired,
-	consumers         : PropTypes.object.isRequired
+	consumers         : PropTypes.object.isRequired,
+	myName            : PropTypes.string.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
 		activeSpeakerName : state.room.activeSpeakerName,
 		peers             : state.peers,
-		consumers         : state.consumers
+		consumers         : state.consumers,
+		myName            : state.me.name
 	});
 
 export default connect(
