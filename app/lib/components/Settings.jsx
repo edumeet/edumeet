@@ -14,112 +14,75 @@ const modes = [ {
 	label : 'Filmstrip view'
 } ];
 
-class Settings extends React.Component
+const findOption = (options, value) => options.find((option) => option.value === value);
+
+const Settings = ({
+	room, me, onToggleAdvancedMode, handleChangeWebcam,
+	handleChangeAudioDevice, handleChangeMode
+}) =>
 {
-	state = {
-		selectedCamera      : null,
-		selectedAudioDevice : null,
-		selectedMode        : modes[0]
-	};
+	let webcams;
+	let webcamText;
 
-	handleChangeWebcam = (webcam) =>
-	{
-		this.props.handleChangeWebcam(webcam.value);
+	if (me.canChangeWebcam)
+		webcamText = 'Select camera';
+	else
+		webcamText = 'Unable to select camera';
 
-		this.setState({
-			selectedCamera : webcam
-		});
-	}
+	if (me.webcamDevices)
+		webcams = Array.from(me.webcamDevices.values());
+	else
+		webcams = [];
 
-	handleChangeAudioDevice = (device) =>
-	{
-		this.props.handleChangeAudioDevice(device.value);
+	let audioDevices;
+	let audioDevicesText;
 
-		this.setState({
-			selectedAudioDevice : device
-		});
-	}
-	
-	handleChangeMode = (mode) =>
-	{
-		this.setState({
-			selectedMode : mode
-		});
+	if (me.canChangeAudioDevice)
+		audioDevicesText = 'Select audio input device';
+	else
+		audioDevicesText = 'Unable to select audio input device';
 
-		this.props.handleChangeMode(mode.value);
-	};
+	if (me.audioDevices)
+		audioDevices = Array.from(me.audioDevices.values());
+	else
+		audioDevices = [];
 
-	render()
-	{	
-		const {
-			room,
-			me,
-			onToggleAdvancedMode
-		} = this.props;
+	return (
+		<div data-component='Settings'>
+			<div className='settings'>
+				<Dropdown
+					disabled={!me.canChangeWebcam}
+					options={webcams}
+					value={findOption(webcams, me.selectedWebcam)}
+					onChange={(webcam) => handleChangeWebcam(webcam.value)}
+					placeholder={webcamText}
+				/>
+			
+				<Dropdown
+					disabled={!me.canChangeAudioDevice}
+					options={audioDevices}
+					value={findOption(audioDevices, me.selectedAudioDevice)}
+					onChange={(device) => handleChangeAudioDevice(device.value)}
+					placeholder={audioDevicesText}
+				/>
 
-		let webcams;
-		let webcamText;
+				<input
+					id='room-mode'
+					type='checkbox'
+					checked={room.advancedMode}
+					onChange={onToggleAdvancedMode}
+				/>
+				<label htmlFor='room-mode'>Advanced mode</label>
 
-		if (me.canChangeWebcam)
-			webcamText = 'Select camera';
-		else
-			webcamText = 'Unable to select camera';
-
-		if (me.webcamDevices)
-			webcams = Array.from(me.webcamDevices.values());
-		else
-			webcams = [];
-
-		let audioDevices;
-		let audioDevicesText;
-
-		if (me.canChangeAudioDevice)
-			audioDevicesText = 'Select audio input device';
-		else
-			audioDevicesText = 'Unable to select audio input device';
-
-		if (me.audioDevices)
-			audioDevices = Array.from(me.audioDevices.values());
-		else
-			audioDevices = [];
-
-		return (
-			<div data-component='Settings'>
-				<div className='settings'>
-					<Dropdown
-						disabled={!me.canChangeWebcam}
-						options={webcams}
-						value={this.state.selectedCamera}
-						onChange={this.handleChangeWebcam}
-						placeholder={webcamText}
-					/>
-				
-					<Dropdown
-						disabled={!me.canChangeAudioDevice}
-						options={audioDevices}
-						value={this.state.selectedAudioDevice}
-						onChange={this.handleChangeAudioDevice}
-						placeholder={audioDevicesText}
-					/>
-
-					<input
-						id='room-mode'
-						type='checkbox'
-						checked={room.advancedMode}
-						onChange={onToggleAdvancedMode}
-					/>
-					<label htmlFor='room-mode'>Advanced mode</label>
-
-					<Dropdown
-						options={modes}
-						value={this.state.selectedMode}
-						onChange={this.handleChangeMode}
-					/>
-				</div>
+				<Dropdown
+					options={modes}
+					value={findOption(modes, room.mode)}
+					onChange={(mode) => handleChangeMode(mode.value)}
+				/>
 			</div>
-		);
-	}
-}
+		</div>
+	);
+};
 
 Settings.propTypes =
 {
