@@ -13,6 +13,8 @@ const protooServer = require('protoo-server');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const Dataporten = require('passport-dataporten');
+const utils = require('./util');
+const base64 = require('base-64');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -42,7 +44,18 @@ const dataporten = new Dataporten.Setup(config.oauth2);
 app.use(dataporten.passport.initialize());
 app.use(dataporten.passport.session());
 
-dataporten.setupAuthenticate(app, '/login');
+app.get('/login', (req, res, next) => 
+{
+	dataporten.passport.authenticate('dataporten', {
+		state : base64.encode(JSON.stringify({
+			roomId   : req.query.roomId,
+			peerName : req.query.peerName,
+			code     : utils.random(10)
+		}))
+		
+	})(req, res, next);
+});
+
 dataporten.setupLogout(app, '/logout');
 
 app.get(
@@ -52,27 +65,31 @@ app.get(
 	
 	(req, res) =>
 	{
-		res.redirect(req.session.redirectToAfterLogin || '/');
+		const state = JSON.parse(base64.decode(req.query.state));
 
-		if (rooms.has(req.query.roomId))
+		if (rooms.has(state.roomId))
 		{
-			const room = rooms.get(req.query.roomId)._protooRoom;
+			const room = rooms.get(state.roomId)._protooRoom;
 
-			if (room.hasPeer(req.query.peerName))
+			if (room.hasPeer(state.peerName))
 			{
-				const peer = room.getPeer(req.query.peerName);
+				const peer = room.getPeer(state.peerName);
 
 				peer.send('auth', {
-					name    : req.user.displayName,
-					picture : req.user.photos[0]
+					name    : req.user.data.displayName,
+					picture : req.user.data.photos[0]
 				});
 			}
 		}
+
+		res.send('');
 	}
 );
 
 // Serve all files in the public folder as static files.
 app.use(express.static('public'));
+
+app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
 
 const httpsServer = https.createServer(tls, app);
 

@@ -1089,6 +1089,10 @@ export default class RoomClient
 							text : `Authenticated successfully: ${request.data}`
 						}
 					));
+
+					this.closeLoginWindow();
+
+					break;
 				}
 
 				case 'raisehand-message':
