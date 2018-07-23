@@ -129,8 +129,6 @@ export default class RoomClient
 
 	login()
 	{
-		this._dispatch(stateActions.setLoginInProgress(true));
-
 		const url = `/login?roomId=${this._room.roomId}&peerName=${this._peerName}`;
 
 		this._loginWindow = window.open(url, 'loginWindow');
