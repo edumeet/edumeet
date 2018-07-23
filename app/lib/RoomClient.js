@@ -129,8 +129,6 @@ export default class RoomClient
 
 	login()
 	{
-		this._dispatch(stateActions.setLoginInProgress(true));
-
 		const url = `/login?roomId=${this._room.roomId}&peerName=${this._peerName}`;
 
 		this._loginWindow = window.open(url, 'loginWindow');
@@ -1079,32 +1077,20 @@ export default class RoomClient
 					logger.debug('got auth event from server', request.data);
 					accept();
 
-					if (request.data.verified == true)
-					{
-						this.changeDisplayName(request.data.name);
+					this.changeDisplayName(request.data.name);
 
-						this.changeProfilePicture(request.data.picture);
-						this._dispatch(stateActions.setPicture(request.data.picture));
+					this.changeProfilePicture(request.data.picture);
+					this._dispatch(stateActions.setPicture(request.data.picture));
 
-						this._dispatch(requestActions.notify(
-							{
-								text : `Authenticated successfully: ${request.data}`
-							}
-						));
-					}
-					else
-					{
-						this._dispatch(requestActions.notify(
-							{
-								text : `Authentication failed: ${request.data}`
-							}
-						));
-					}
+					this._dispatch(requestActions.notify(
+						{
+							text : `Authenticated successfully: ${request.data}`
+						}
+					));
+
 					this.closeLoginWindow();
 
-					this._dispatch(stateActions.setLoginInProgress(false));
 					break;
-
 				}
 
 				case 'raisehand-message':

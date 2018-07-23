@@ -15,20 +15,30 @@ const gulp = require('gulp');
 const plumber = require('gulp-plumber');
 const eslint = require('gulp-eslint');
 
+const LINTING_FILES =
+[
+	'gulpfile.js',
+	'server.js',
+	'config.example.js',
+	'lib/**/*.js'
+];
+
 gulp.task('lint', () =>
 {
-	const src =
-	[
-		'gulpfile.js',
-		'server.js',
-		'config.example.js',
-		'lib/**/*.js'
-	];
 
-	return gulp.src(src)
+	return gulp.src(LINTING_FILES)
 		.pipe(plumber())
 		.pipe(eslint())
 		.pipe(eslint.format());
+});
+
+gulp.task('lint-fix', function() 
+{
+	return gulp.src(LINTING_FILES)
+		.pipe(plumber())
+		.pipe(eslint({ fix: true }))
+		.pipe(eslint.format())
+		.pipe(gulp.dest((file) => file.base));
 });
 
 gulp.task('default', gulp.series('lint'));

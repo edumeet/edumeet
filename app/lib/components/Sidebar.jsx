@@ -129,9 +129,7 @@ class Sidebar extends Component
 	
 				{me.loginEnabled ?
 					<div
-						className={classnames('button', 'login', 'off', {
-							disabled : me.loginInProgress
-						})}
+						className='button login off'
 						data-tip='Login'
 						data-type='dark'
 						onClick={() => onLogin()}
