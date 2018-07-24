@@ -23,7 +23,8 @@ const initialState =
 	restartIceInProgress  : false,
 	picture               : null,
 	selectedWebcam        : null,
-	selectedAudioDevice   : null
+	selectedAudioDevice   : null,
+	loggedIn              : false
 };
 
 const me = (state = initialState, action) =>
@@ -49,6 +50,12 @@ const me = (state = initialState, action) =>
 				loginEnabled
 			};
 		}
+
+		case 'LOGGED_IN':
+			return { ...state, loggedIn: true };
+
+		case 'USER_LOGOUT':
+			return { ...state, loggedIn: false };
 
 		case 'CHANGE_WEBCAM':
 		{

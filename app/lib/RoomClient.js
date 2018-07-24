@@ -134,6 +134,11 @@ export default class RoomClient
 		this._loginWindow = window.open(url, 'loginWindow');
 	}
 
+	logout()
+	{
+		window.location = '/logout';
+	}
+
 	closeLoginWindow()
 	{
 		this._loginWindow.close();
@@ -1081,6 +1086,7 @@ export default class RoomClient
 
 					this.changeProfilePicture(request.data.picture);
 					this._dispatch(stateActions.setPicture(request.data.picture));
+					this._dispatch(stateActions.loggedIn());
 
 					this._dispatch(requestActions.notify(
 						{

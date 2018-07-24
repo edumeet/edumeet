@@ -51,7 +51,7 @@ class Sidebar extends Component
 	{
 		const {
 			toolbarsVisible, me, screenProducer, onLogin, onShareScreen,
-			onUnShareScreen, onNeedExtension, onLeaveMeeting
+			onUnShareScreen, onNeedExtension, onLeaveMeeting, onLogout
 		} = this.props;
 
 		let screenState;
@@ -127,16 +127,24 @@ class Sidebar extends Component
 					}}
 				/>
 	
-				{me.loginEnabled ?
+				{me.loginEnabled && (me.loggedIn ? (
+					<div
+						className='button logout'
+						data-tip='Logout'
+						data-type='dark'
+						onClick={onLogout}
+					>
+						<img src={me.picture || 'resources/images/avatar-empty.jpeg'} />
+					</div>
+				) : (
 					<div
 						className='button login off'
 						data-tip='Login'
 						data-type='dark'
-						onClick={() => onLogin()}
+						onClick={onLogin}
 					/>
-					:null
-				}
-	
+				))}
+
 				<div
 					className={classnames('button', 'leave-meeting')}
 					data-tip='Leave meeting'
@@ -156,6 +164,7 @@ Sidebar.propTypes = {
 	onNeedExtension : PropTypes.func.isRequired,
 	onLeaveMeeting  : PropTypes.func.isRequired,
 	onLogin         : PropTypes.func.isRequired,
+	onLogout        : PropTypes.func.isRequired,
 	screenProducer  : appPropTypes.Producer
 };
 
@@ -172,7 +181,8 @@ const mapDispatchToProps = {
 	onShareScreen   : requestActions.enableScreenSharing,
 	onUnShareScreen : requestActions.disableScreenSharing,
 	onNeedExtension : requestActions.installExtension,
-	onLogin         : requestActions.userLogin
+	onLogin         : requestActions.userLogin,
+	onLogout        : requestActions.userLogout
 };
 
 export default connect(

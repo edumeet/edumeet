@@ -142,6 +142,13 @@ export const userLogin = () =>
 	};
 };
 
+export const userLogout = () =>
+{
+	return {
+		type : 'USER_LOGOUT'
+	};
+};
+
 export const raiseHand = () =>
 {
 	return {
