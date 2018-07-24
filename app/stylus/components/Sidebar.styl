@@ -29,6 +29,9 @@
 		transition-property: opacity, background-color;
 		transition-duration: 0.15s;
 		border-radius: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
 		+desktop() {
 			height: 36px;
@@ -53,6 +56,12 @@
 			&.off {
 				background-image: url('/resources/images/icon_login_white.svg');
 			}
+		}
+
+		&.logout > img {
+			height: 65%;
+			max-width: 65%;
+			border-radius: 50%;
 		}
 
 		&.settings {

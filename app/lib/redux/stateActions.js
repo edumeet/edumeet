@@ -444,3 +444,8 @@ export const setPeerPicture = (peerName, picture) =>
 		type    : 'SET_PEER_PICTURE',
 		payload : { peerName, picture }
 	});
+
+export const loggedIn = () =>
+	({
+		type: 'LOGGED_IN',
+	});
