@@ -149,7 +149,7 @@ const getUserInformation = async(request) => new Promise((resolve, reject) =>
 	request.user = {
 		logged_in : false
 	};
-
+	
 	store.get(request.sessionID, (err, session) => 
 	{
 		if (err)
@@ -189,7 +189,7 @@ const getUserInformation = async(request) => new Promise((resolve, reject) =>
 			request.user = user;
 			request.user.logged_in = true;
 
-			return resolve(request.user);
+			resolve(request.user);
 		});
 	});
 });
@@ -220,7 +220,7 @@ webSocketServer.on('connectionrequest', async(info, accept, reject) =>
 
 	if (user)
 	{
-		logger.info('the user which initated this request is logged in');
+		console.log('the user which initated this request is logged in');
 	}
 
 	// The client indicates the roomId and peerId in the URL query.
