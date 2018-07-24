@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import ClipboardButton from 'react-clipboard.js';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import * as stateActions from '../redux/stateActions';
@@ -98,32 +98,35 @@ class Room extends React.Component
 							})}
 						>
 							<div className='room-link'>
-								<ClipboardButton
-									component='a'
-									className='link'
-									button-href={room.url}
-									button-target='_blank'
-									data-tip='Click to copy room link'
-									data-clipboard-text={room.url}
-									onSuccess={onRoomLinkCopy}
-									onClick={(event) =>
-									{
-										// If this is a 'Open in new window/tab' don't prevent
-										// click default action.
-										if (
-											event.ctrlKey || event.shiftKey || event.metaKey ||
-											// Middle click (IE > 9 and everyone else).
-											(event.button && event.button === 1)
-										)
-										{
-											return;
-										}
-
-										event.preventDefault();
-									}}
+								<CopyToClipboard
+									text={room.url}
+									onCopy={onRoomLinkCopy}
 								>
-									invitation link
-								</ClipboardButton>
+									<a
+										className='link'
+										href={room.url}
+										target='_blank'
+										data-tip='Click to copy room link'
+										rel='noopener noreferrer'
+										onClick={(event) =>
+										{
+											// If this is a 'Open in new window/tab' don't prevent
+											// click default action.
+											if (
+												event.ctrlKey || event.shiftKey || event.metaKey ||
+													// Middle click (IE > 9 and everyone else).
+													(event.button && event.button === 1)
+											)
+											{
+												return;
+											}
+		
+											event.preventDefault();
+										}}
+									>
+										invitation link
+									</a>
+								</CopyToClipboard>
 							</div>
 						</div>
 
