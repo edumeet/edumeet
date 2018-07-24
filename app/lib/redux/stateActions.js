@@ -447,5 +447,5 @@ export const setPeerPicture = (peerName, picture) =>
 
 export const loggedIn = () =>
 	({
-		type: 'LOGGED_IN',
+		type : 'LOGGED_IN'
 	});

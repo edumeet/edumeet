@@ -144,6 +144,13 @@ class Sidebar extends Component
 						onClick={onLogin}
 					/>
 				))}
+
+				<div
+					className={classnames('button', 'leave-meeting')}
+					data-tip='Leave meeting'
+					data-type='dark'
+					onClick={() => onLeaveMeeting()}
+				/>
 			</div>
 		);
 	}
@@ -157,6 +164,7 @@ Sidebar.propTypes = {
 	onNeedExtension : PropTypes.func.isRequired,
 	onLeaveMeeting  : PropTypes.func.isRequired,
 	onLogin         : PropTypes.func.isRequired,
+	onLogout        : PropTypes.func.isRequired,
 	screenProducer  : appPropTypes.Producer
 };
 
