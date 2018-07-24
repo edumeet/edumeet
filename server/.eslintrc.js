@@ -11,9 +11,10 @@ module.exports =
 		'eslint:recommended'
 	],
 	settings: {},
+	parser: 'babel-eslint',
 	parserOptions:
 	{
-		ecmaVersion: 6,
+		ecmaVersion: 9,
 		sourceType: 'module',
 		ecmaFeatures:
 		{

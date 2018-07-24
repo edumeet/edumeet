@@ -7,7 +7,11 @@ process.title = 'multiparty-meeting-server';
 const config = require('./config');
 const fs = require('fs');
 const https = require('https');
+const redis = require('redis');
 const express = require('express');
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const cookieParser = require('cookie-parser');
 const url = require('url');
 const protooServer = require('protoo-server');
 const Logger = require('./lib/Logger');
@@ -15,6 +19,8 @@ const Room = require('./lib/Room');
 const Dataporten = require('passport-dataporten');
 const utils = require('./util');
 const base64 = require('base-64');
+
+const redisClient = redis.createClient();
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -38,6 +44,18 @@ const tls =
 };
 
 const app = express();
+
+const store = new RedisStore({
+	host   : 'localhost',
+	port   : 6379,
+	client : redisClient,
+	ttl    : 260
+});
+
+app.use(session({
+	secret : config.sessionSecret,
+	store
+}));
 
 const dataporten = new Dataporten.Setup(config.oauth2);
 
@@ -98,6 +116,84 @@ httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 	logger.info('Server running on port: ', config.listeningPort);
 });
 
+const parseCookie = (secret, header) => 
+{
+	const parse = cookieParser(secret);
+
+	const req = {
+		headers : {
+			cookie : header
+		}
+	};
+	
+	let result;
+	
+	parse(req, {}, (err) => 
+	{
+		if (err)
+		{
+			throw err;
+		}
+	
+		result = req.signedCookies || req.cookies;
+	});
+	
+	return result;
+};
+
+const getUserInformation = async(request) => new Promise((resolve, reject) =>
+{
+	request.cookie = parseCookie(config.sessionSecret, request.headers.cookie);
+	request.sessionID = request.cookie['connect.sid'] || '';
+
+	request.user = {
+		logged_in : false
+	};
+
+	store.get(request.sessionID, (err, session) => 
+	{
+		if (err)
+		{
+			return reject('error in session store');
+		}
+
+		if (!session)
+		{
+			return reject('no session found');
+		}
+
+		if (!session[dataporten.passport._key])
+		{
+			return reject('passport was not initialized');
+		}
+
+		const userKey = session[dataporten.passport._key].user;
+
+		if (typeof userKey === 'undefined') 
+		{
+			return reject('user not authorized through passport');
+		}
+
+		dataporten.passport.deserializeUser(userKey, request, (err, user) => 
+		{
+			if (err)
+			{
+				return reject('error deserializing user');
+			}
+
+			if (!user)
+			{
+				return reject('user not found');
+			}
+
+			request.user = user;
+			request.user.logged_in = true;
+
+			return resolve(request.user);
+		});
+	});
+});
+
 // Protoo WebSocket server listens to same webserver so everything is available
 // via same port
 const webSocketServer = new protooServer.WebSocketServer(httpsServer,
@@ -109,8 +205,24 @@ const webSocketServer = new protooServer.WebSocketServer(httpsServer,
 	});
 
 // Handle connections from clients.
-webSocketServer.on('connectionrequest', (info, accept, reject) =>
+webSocketServer.on('connectionrequest', async(info, accept, reject) =>
 {
+	let user;
+
+	try 
+	{
+		user = await getUserInformation(info.request);
+	}
+	catch (error) 
+	{
+		logger.warn(error);
+	}
+
+	if (user)
+	{
+		logger.info('the user which initated this request is logged in');
+	}
+
 	// The client indicates the roomId and peerId in the URL query.
 	const u = url.parse(info.request.url, true);
 	const roomId = u.query['roomId'];
