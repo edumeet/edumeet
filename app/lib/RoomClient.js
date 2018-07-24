@@ -222,6 +222,17 @@ export default class RoomClient
 			});
 	}
 
+	checkAuth()
+	{
+		logger.debug('checkAuth()');
+
+		return this._protoo.send('check-auth', {})
+			.catch((error) =>
+			{
+				logger.error('checkAuth() | failed: %o', error);
+			});
+	}
+
 	muteMic()
 	{
 		logger.debug('muteMic()');
@@ -1085,7 +1096,10 @@ export default class RoomClient
 					this.changeDisplayName(request.data.name);
 
 					this.changeProfilePicture(request.data.picture);
-					this._dispatch(stateActions.setPicture(request.data.picture));
+					this._dispatch(stateActions.setPicture(
+						request.data.photos && request.data.photos[0]
+					));
+
 					this._dispatch(stateActions.loggedIn());
 
 					this._dispatch(requestActions.notify(
@@ -1278,6 +1292,8 @@ export default class RoomClient
 				this._dispatch(stateActions.removeAllNotifications());
 
 				this.getChatHistory();
+
+				this.checkAuth();
 
 				this._dispatch(requestActions.notify(
 					{

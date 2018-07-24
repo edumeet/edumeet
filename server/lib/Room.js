@@ -88,7 +88,7 @@ class Room extends EventEmitter
 			this._mediaRoom.peers.length);
 	}
 
-	handleConnection(peerName, transport)
+	handleConnection(peerName, transport, user)
 	{
 		logger.info('handleConnection() [peerName:"%s"]', peerName);
 
@@ -105,6 +105,8 @@ class Room extends EventEmitter
 		}
 
 		const protooPeer = this._protooRoom.createPeer(peerName, transport);
+
+		protooPeer.user = user;
 
 		this._handleProtooPeer(protooPeer);
 	}
@@ -224,6 +226,18 @@ class Room extends EventEmitter
 							oldDisplayName : oldDisplayName
 						},
 						[ protooPeer ]);
+
+					break;
+				}
+
+				case 'check-auth':
+				{
+					accept();
+
+					if (protooPeer.user)
+					{
+						protooPeer.send('auth', protooPeer.user);
+					}
 
 					break;
 				}
