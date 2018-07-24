@@ -9,8 +9,8 @@ const fs = require('fs');
 const https = require('https');
 const redis = require('redis');
 const express = require('express');
-const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
+const sessionMiddleware = require('express-session');
+const RedisStore = require('connect-redis')(sessionMiddleware);
 const cookieParser = require('cookie-parser');
 const url = require('url');
 const protooServer = require('protoo-server');
@@ -52,7 +52,7 @@ const store = new RedisStore({
 	ttl    : 260
 });
 
-app.use(session({
+app.use(sessionMiddleware({
 	secret : config.sessionSecret,
 	store
 }));
@@ -76,6 +76,27 @@ app.get('/login', (req, res, next) =>
 
 dataporten.setupLogout(app, '/logout');
 
+const sendAuthToUser = (roomId, peerName, user) => 
+{
+	if (rooms.has(roomId))
+	{
+		const room = rooms.get(roomId)._protooRoom;
+
+		if (room.hasPeer(peerName))
+		{
+			const peer = room.getPeer(peerName);
+
+			peer.user = {
+				...user,
+				// eslint-disable-next-line camelcase
+				logged_in : true
+			};
+
+			peer.send('auth', user);
+		}
+	}
+};
+
 app.get(
 	'/auth-callback',
 
@@ -85,21 +106,7 @@ app.get(
 	{
 		const state = JSON.parse(base64.decode(req.query.state));
 
-		if (rooms.has(state.roomId))
-		{
-			const room = rooms.get(state.roomId)._protooRoom;
-
-			if (room.hasPeer(state.peerName))
-			{
-				const peer = room.getPeer(state.peerName);
-
-				peer.send('auth', {
-					name    : req.user.data.displayName,
-					picture : req.user.data.photos[0]
-				});
-			}
-		}
-
+		sendAuthToUser(state.roomId, state.peerName, req.user);
 		res.send('');
 	}
 );
@@ -147,6 +154,7 @@ const getUserInformation = async(request) => new Promise((resolve, reject) =>
 	request.sessionID = request.cookie['connect.sid'] || '';
 
 	request.user = {
+		// eslint-disable-next-line camelcase
 		logged_in : false
 	};
 	
@@ -174,9 +182,9 @@ const getUserInformation = async(request) => new Promise((resolve, reject) =>
 			return reject('user not authorized through passport');
 		}
 
-		dataporten.passport.deserializeUser(userKey, request, (err, user) => 
+		dataporten.passport.deserializeUser(userKey, request, (error, user) => 
 		{
-			if (err)
+			if (error)
 			{
 				return reject('error deserializing user');
 			}
@@ -187,6 +195,7 @@ const getUserInformation = async(request) => new Promise((resolve, reject) =>
 			}
 
 			request.user = user;
+			// eslint-disable-next-line camelcase
 			request.user.logged_in = true;
 
 			resolve(request.user);
@@ -216,11 +225,6 @@ webSocketServer.on('connectionrequest', async(info, accept, reject) =>
 	catch (error) 
 	{
 		logger.warn(error);
-	}
-
-	if (user)
-	{
-		console.log('the user which initated this request is logged in');
 	}
 
 	// The client indicates the roomId and peerId in the URL query.
@@ -282,5 +286,5 @@ webSocketServer.on('connectionrequest', async(info, accept, reject) =>
 
 	const transport = accept();
 
-	room.handleConnection(peerName, transport);
+	room.handleConnection(peerName, transport, user);
 });
