@@ -191,6 +191,18 @@ export const installExtension = () =>
 	};
 };
 
+export const toggleHand = (enable) =>
+{
+	if (enable)
+		return {
+			type : 'RAISE_HAND'
+		};
+	else
+		return {
+			type : 'LOWER_HAND'
+		};
+};
+
 export const sendChatMessage = (text, name, picture) =>
 {
 	const message = createNewMessage(text, 'response', name, picture);

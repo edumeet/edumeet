@@ -23,7 +23,7 @@
 	> .view-container {
 		position: relative;
 		flex-grow: 1;
-		
+
 		&.webcam {
 			order: 2;
 		}
@@ -32,7 +32,58 @@
 			order: 1;
 			max-width: 50%;
 		}
+		> .indicators {
+			position: absolute;
+			z-index: 200;
+			left: 0;
+			top: 0;
+			display: flex;
+			flex-direction:; row;
+			justify-content: flex-start;
+			align-items: center;
+			padding: 0.4vmin;
+			transition: opacity 0.3s;
 
+			> .icon {
+				flex: 0 0 auto;
+				margin: 0.2vmin;
+				border-radius: 2px;
+				background-position: center;
+				background-size: 75%;
+				background-repeat: no-repeat;
+				background-color: rgba(#000, 0.5);
+				cursor: pointer;
+				transition-property: opacity, background-color;
+				transition-duration: 0.15s;
+
+				+desktop() {
+					width: 24px;
+					height: 24px;
+					opacity: 0.85;
+
+					&:hover {
+						opacity: 1;
+					}
+				}
+
+				+mobile() {
+					width: 22px;
+					height: 22px;
+				}
+
+				&.on {
+					opacity: 1;
+				}
+
+				&.off {
+					opacity: 0.2;
+				}
+
+				&.raise-hand {
+					background-image: url('/resources/images/icon-hand-white.svg');
+				}
+			}
+		}
 		> .controls {
 			position: absolute;
 			z-index: 10;
@@ -45,11 +96,11 @@
 			padding: 0.4vmin;
 			opacity: 0;
 			transition: opacity 0.3s;
-			
+
 			&.visible {
 				opacity: 1;
 			}
-			
+
 			> .button {
 				flex: 0 0 auto;
 				margin: 0.2vmin;
