@@ -4,17 +4,7 @@ import classnames from 'classnames';
 import Spinner from 'react-spinner';
 import * as appPropTypes from './appPropTypes';
 import EditableInput from './EditableInput';
-import emotionModel from './Me/emotionModel';
-import emotionClassifier from './Me/emotionClassifier';
-import clm from 'clmtrackr';
-import pModel from './Me/model.js';
-
-// set eigenvector 9 and 11 to not be regularized. This is to better detect motion of the eyebrows
-pModel.shapeModel.nonRegularizedVectors.push(9);
-pModel.shapeModel.nonRegularizedVectors.push(11);
-
-const videoIsPlaying = (video) =>
-	!video.paused && !video.ended && video.readyState > 2;
+import EmotionDetectingVideo from './Me/EmotionDetectingVideo';
 
 export default class PeerView extends React.Component
 {
@@ -39,6 +29,8 @@ export default class PeerView extends React.Component
 
 		// Periodic timer for showing video resolution.
 		this._videoResolutionTimer = null;
+
+		this._videoRef = React.createRef();
 	}
 
 	render()
@@ -122,18 +114,31 @@ export default class PeerView extends React.Component
 					</div>
 				</div>
 
-				<video
-					ref='video'
-					className={classnames({
-						hidden  : !videoVisible,
-						'is-me' : isMe,
-						loading : videoProfile === 'none'
-					})}
-					autoPlay
-					muted={isMe}
-					width={226}
-					height={170}
-				/>
+				{clmTracking ? (
+					<EmotionDetectingVideo
+						videoRef={() => this._videoRef}
+						className={classnames({
+							hidden  : !videoVisible,
+							'is-me' : isMe,
+							loading : videoProfile === 'none'
+						})}
+						autoPlay
+						muted={isMe}
+						width={226}
+						height={170}
+					/>
+				) : (
+					<video
+						ref={this.videoRef}
+						className={classnames({
+							hidden  : !videoVisible,
+							'is-me' : isMe,
+							loading : videoProfile === 'none'
+						})}
+						autoPlay
+						muted={isMe}
+					/>
+				)}
 
 				<div className='volume-container'>
 					<div className={classnames('bar', `level${volume}`)} />
@@ -154,18 +159,11 @@ export default class PeerView extends React.Component
 		const { audioTrack, videoTrack } = this.props;
 
 		this._setTracks(audioTrack, videoTrack);
-
-		this.cTrack = new clm.tracker({ useWebGL: true });
-		this.cTrack.init(pModel);
-		this.ec = new emotionClassifier();
-		this.ec.init(emotionModel);
 	}
 
 	componentWillUnmount()
 	{
 		clearInterval(this._videoResolutionTimer);
-
-		this.cTrack.stop();
 	}
 
 	componentWillReceiveProps(nextProps)
@@ -173,28 +171,6 @@ export default class PeerView extends React.Component
 		const { audioTrack, videoTrack } = nextProps;
 
 		this._setTracks(audioTrack, videoTrack);
-		
-		if (nextProps.clmTracking && videoIsPlaying(this.refs.video) && !this.interval)
-		{
-			setTimeout(() => {
-				if (!this.interval) {
-				this.cTrack.start(this.refs.video);
-			
-				console.log('starting!!')
-			
-				this.interval = setInterval(() => {
-					const cp = this.cTrack.getCurrentParameters();
-					const er = this.ec.meanPredict(cp);
-					console.log(cp, er);
-				}, 3000);
-			}
-			}, 5000);
-		} else if (!videoTrack && this.interval)
-		{
-			this.cTrack.stop();
-			clearInterval(this.interval);
-			console.log('stopping')
-		}
 	}
 
 	_setTracks(audioTrack, videoTrack)
@@ -208,7 +184,7 @@ export default class PeerView extends React.Component
 		clearInterval(this._videoResolutionTimer);
 		this._hideVideoResolution();
 
-		const { video } = this.refs;
+		const video = this._videoRef.current;
 
 		if (audioTrack || videoTrack)
 		{
@@ -236,7 +212,7 @@ export default class PeerView extends React.Component
 		this._videoResolutionTimer = setInterval(() =>
 		{
 			const { videoWidth, videoHeight } = this.state;
-			const { video } = this.refs;
+			const video = this._videoRef.current;
 
 			// Don't re-render if nothing changed.
 			if (video.videoWidth === videoWidth && video.videoHeight === videoHeight)
