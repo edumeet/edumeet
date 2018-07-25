@@ -5,6 +5,7 @@ import emotionClassifier from './emotionClassifier';
 import clm from 'clmtrackr';
 import pModel from './model.js';
 import * as stateActions from '../../redux/stateActions';
+import { throttle } from 'lodash';
 
 // set eigenvector 9 and 11 to not be regularized. This is to better detect motion of the eyebrows
 pModel.shapeModel.nonRegularizedVectors.push(9);
@@ -12,7 +13,26 @@ pModel.shapeModel.nonRegularizedVectors.push(11);
 
 const videoIsPlaying = (video) =>
 	!video.paused && !video.ended && video.readyState > 2;
+	
+	function crop(can, a, b) {
+    // get your canvas and a context for it
+    var ctx = can.getContext('2d');
+    
+    // get the image data you want to keep.
+    var imageData = ctx.getImageData(a.x, a.y, b.x, b.y);
   
+    // create a new cavnas same as clipped size and a context
+    var newCan = document.createElement('canvas');
+    newCan.width = b.x - a.x;
+    newCan.height = b.y - a.y;
+    var newCtx = newCan.getContext('2d');
+  
+    // put the clipped image on the new canvas.
+    newCtx.putImageData(imageData, 0, 0);
+  
+    return newCan;    
+ }
+
 class EmotionDetectingVideo extends Component
 {
 	constructor(props)
@@ -35,6 +55,36 @@ class EmotionDetectingVideo extends Component
 		this.cTracker.stop();
 	}
 
+	update = throttle(() => {
+		const canvas = document.createElement('canvas');
+		canvas.width = this.videoRef.current.width;
+		canvas.height = this.videoRef.current.height;
+		
+		const context = canvas.getContext('2d');
+
+		context.drawImage(this.videoRef.current, 0, 0, 220, 150);
+
+		var positions = this.cTracker.getCurrentPosition();
+
+		const nose = positions[37];
+
+		const topLeft = {
+			x: Math.max(nose[0] - 64, 0),
+			y: Math.max(nose[1] - 64, 0)
+		};
+
+		const bottomRight = {
+			x: nose[0] + 64,
+			y: nose[1] + 64
+		};
+
+		const cropped = crop(canvas, topLeft, bottomRight);
+
+		const data = cropped.toDataURL();
+
+		this.props.setPicture(data);
+	}, 5000);
+
 	componentDidUpdate()
 	{
 		if (videoIsPlaying(this.videoRef.current) && !this.interval)
@@ -47,28 +97,17 @@ class EmotionDetectingVideo extends Component
 				const cp = this.cTracker.getCurrentParameters();
 				const er = this.ec.meanPredict(cp);
 
-				console.log(this.cTracker.getScore(), this.ec.meanPredict(cp));
-				if (this.cTracker.getScore() > 0.5)
+				if (this.cTracker.getScore() > 0.8)
 				{
-
 					// we want people to be really happy on their avatars :-)
 					// however, people are rarely happy in a conference call, so
-					// reasonably speaking, you are pretty happy when this is 0.1
-					if (er && er.find((entry) => entry.emotion === 'happy').value > 0.1)
+					// reasonably speaking, you are pretty happy when this is 0.2!
+					if (er && er.find((entry) => entry.emotion === 'happy').value > 0.2)
 					{
-						const canvas = document.createElement('canvas');
-						canvas.width = this.videoRef.current.width;
-						canvas.height = this.videoRef.current.height;
-						
-						const context = canvas.getContext('2d');
-
-						context.drawImage(this.videoRef.current, 0, 0, 220, 150);
-						const dataURL = canvas.toDataURL();
-
-						this.props.setPicture(dataURL);
+						this.update();
 					}
 				}
-			}, 5000);
+			}, 500);
 		}
 		else if (!videoIsPlaying(this.videoRef.current) && this.interval)
 		{
