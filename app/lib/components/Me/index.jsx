@@ -4,10 +4,10 @@ import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { getDeviceInfo } from 'mediasoup-client';
-import * as appPropTypes from './appPropTypes';
-import * as requestActions from '../redux/requestActions';
-import PeerView from './PeerView';
-import ScreenView from './ScreenView';
+import * as appPropTypes from '../appPropTypes';
+import * as requestActions from '../../redux/requestActions';
+import PeerView from '../PeerView';
+import ScreenView from '../ScreenView';
 
 class Me extends React.Component
 {
@@ -146,6 +146,7 @@ class Me extends React.Component
 						audioCodec={micProducer ? micProducer.codec : null}
 						videoCodec={webcamProducer ? webcamProducer.codec : null}
 						onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
+						clmTracking
 					/>
 				</div>
 
