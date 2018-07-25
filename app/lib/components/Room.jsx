@@ -34,7 +34,7 @@ class Room extends React.Component
 		this.props.setToolbarsVisible(false);
 	}, TIMEOUT);
 
-	handleMouseMove = () => 
+	handleMovement = () => 
 	{
 		// If the toolbars were hidden, show them again when
 		// the user moves their cursor.
@@ -48,12 +48,14 @@ class Room extends React.Component
 
 	componentDidMount()
 	{
-		window.addEventListener('mousemove', this.handleMouseMove);
+		window.addEventListener('mousemove', this.handleMovement);
+		window.addEventListener('touchstart', this.handleMovement);
 	}
 
 	componentWillUnmount()
 	{
-		window.removeEventListener('mousemove', this.handleMouseMove);
+		window.removeEventListener('mousemove', this.handleMovement);
+		window.removeEventListener('touchstart', this.handleMovement);
 	}
 
 	render()
