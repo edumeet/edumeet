@@ -104,8 +104,8 @@ class EmotionDetectingVideo extends Component
 	{
 		const canvas = document.createElement('canvas');
 
-		canvas.width = this.videoRef.current.width;
-		canvas.height = this.videoRef.current.height;
+		canvas.width = this.state.width;
+		canvas.height = this.state.height;
 		
 		const context = canvas.getContext('2d');
 
