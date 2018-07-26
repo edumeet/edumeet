@@ -1,6 +1,7 @@
 import
 {
-	createNewMessage
+	createNewMessage,
+	createNewFile
 } from './helper';
 
 const chatmessages = (state = [], action) =>
@@ -11,7 +12,16 @@ const chatmessages = (state = [], action) =>
 		{
 			const { text } = action.payload;
 
-			const message = createNewMessage(text, 'client', 'Me');
+			const message = createNewMessage(text, 'client', 'Me', undefined);
+
+			return [ ...state, message ];
+		}
+
+		case 'ADD_NEW_USER_FILE':
+		{
+			const { file } = action.payload;
+
+			const message = createNewFile(file, 'client', 'Me', undefined);
 
 			return [ ...state, message ];
 		}

@@ -9,3 +9,15 @@ export function createNewMessage(text, sender, name, picture)
 		picture
 	};
 }
+
+export function createNewFile(file, sender, name, picture)
+{
+	return {
+		type: 'file',
+		file,
+		time: Date.now(),
+		name,
+		sender,
+		picture
+	};
+}

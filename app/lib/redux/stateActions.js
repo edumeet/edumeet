@@ -410,6 +410,14 @@ export const addUserMessage = (text) =>
 	};
 };
 
+export const addUserFile = (file) =>
+{
+	return {
+		type: 'ADD_NEW_USER_FILE',
+		payload: { file }
+	};
+};
+
 export const addResponseMessage = (message) =>
 {
 	return {

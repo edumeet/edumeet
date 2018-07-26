@@ -2,7 +2,8 @@ import randomString from 'random-string';
 import * as stateActions from './stateActions';
 import
 {
-	createNewMessage
+	createNewMessage,
+	createNewFile
 } from './reducers/helper';
 
 export const joinRoom = (
@@ -210,6 +211,16 @@ export const sendChatMessage = (text, name, picture) =>
 	return {
 		type    : 'SEND_CHAT_MESSAGE',
 		payload : { message }
+	};
+};
+
+export const sendChatFile = (magnet, name, picture) =>
+{
+	const message = createNewFile(magnet, 'response', name, picture);
+
+	return {
+		type: 'SEND_CHAT_MESSAGE',
+		payload: { message }
 	};
 };
 

@@ -11,6 +11,7 @@
     "classnames": "^2.2.6",
     "debug": "^3.1.0",
     "domready": "^1.0.8",
+    "drag-drop": "^4.2.0",
     "fscreen": "^1.0.2",
     "hark": "^1.2.2",
     "js-cookie": "^2.2.0",
@@ -33,7 +34,8 @@
     "redux-thunk": "^2.3.0",
     "resize-observer-polyfill": "^1.5.0",
     "riek": "^1.1.0",
-    "url-parse": "^1.4.1"
+    "url-parse": "^1.4.1",
+    "webtorrent": "^0.101.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import MessageList from './MessageList';
+import FileSharing from './FileSharing';
 
 class Chat extends Component
 {
@@ -21,6 +22,9 @@ class Chat extends Component
 		return (
 			<div data-component='Chat'>
 				<MessageList />
+
+				<FileSharing />
+
 				<form
 					data-component='Sender'
 					onSubmit={(e) => { onSendMessage(e, displayName, picture); }}

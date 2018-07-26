@@ -48,30 +48,40 @@ class MessageList extends Component
 				{
 					chatmessages.map((message, i) =>
 					{
+						console.log(message);
+
 						const messageTime = new Date(message.time);
 
 						const picture = (message.sender === 'response' ?
 							message.picture : this.props.myPicture) || 'resources/images/avatar-empty.jpeg';
-
+					
 						return (
 							<div className='message' key={i}>
 								<div className={message.sender}>
 									<img className='message-avatar' src={picture} />
 
 									<div className='message-content'>
-										<div
-											className='message-text'
-											// eslint-disable-next-line react/no-danger
-											dangerouslySetInnerHTML={{ __html : marked.parse(
-												message.text,
-												{ sanitize: true, renderer: linkRenderer }
-											) }}
-										/>
+										{message.type === 'message' && (
+											<div
+												className='message-text'
+												// eslint-disable-next-line react/no-danger
+												dangerouslySetInnerHTML={{ __html : marked.parse(
+													message.text,
+													{ sanitize: true, renderer: linkRenderer }
+												) }}
+											/>
+										)}
 
-										<span className='message-time'>
-											{message.name} - {this.getTimeString(messageTime)}
-										</span>
+										{message.type === 'file' && (
+											<div>
+												{message.file.magnet}
+											</div>
+										)}
 									</div>
+
+									<span className='message-time'>
+										{message.name} - {this.getTimeString(messageTime)}
+									</span>
 								</div>
 							</div>
 						);
