@@ -14,17 +14,17 @@ class Sidebar extends Component
 
 	handleToggleFullscreen = () =>
 	{
-		if (fscreen.fullscreenElement) 
+		if (fscreen.fullscreenElement)
 		{
 			fscreen.exitFullscreen();
 		}
-		else 
+		else
 		{
 			fscreen.requestFullscreen(document.documentElement);
 		}
 	};
 
-	handleFullscreenChange = () => 
+	handleFullscreenChange = () =>
 	{
 		this.setState({
 			fullscreen : fscreen.fullscreenElement !== null
@@ -47,16 +47,16 @@ class Sidebar extends Component
 		}
 	}
 
-	render() 
+	render()
 	{
 		const {
 			toolbarsVisible, me, screenProducer, onLogin, onShareScreen,
-			onUnShareScreen, onNeedExtension, onLeaveMeeting, onLogout
+			onUnShareScreen, onNeedExtension, onLeaveMeeting, onLogout, onToggleHand
 		} = this.props;
 
 		let screenState;
 		let screenTip;
-	
+
 		if (me.needExtension)
 		{
 			screenState = 'need-extension';
@@ -77,7 +77,7 @@ class Sidebar extends Component
 			screenState = 'off';
 			screenTip = 'Start screen sharing';
 		}
-	
+
 		return (
 			<div
 				className={classnames('sidebar room-controls', {
@@ -126,7 +126,7 @@ class Sidebar extends Component
 						}
 					}}
 				/>
-	
+
 				{me.loginEnabled && (me.loggedIn ? (
 					<div
 						className='button logout'
@@ -144,6 +144,15 @@ class Sidebar extends Component
 						onClick={onLogin}
 					/>
 				))}
+				<div
+					className={classnames('button', 'raise-hand', {
+						on       : me.raiseHand,
+						disabled : me.raiseHandInProgress
+					})}
+					data-tip='Raise hand'
+					data-type='dark'
+					onClick={() => onToggleHand(!me.raiseHand)}
+				/>
 
 				<div
 					className={classnames('button', 'leave-meeting')}
@@ -162,6 +171,7 @@ Sidebar.propTypes = {
 	onShareScreen   : PropTypes.func.isRequired,
 	onUnShareScreen : PropTypes.func.isRequired,
 	onNeedExtension : PropTypes.func.isRequired,
+	onToggleHand    : PropTypes.func.isRequired,
 	onLeaveMeeting  : PropTypes.func.isRequired,
 	onLogin         : PropTypes.func.isRequired,
 	onLogout        : PropTypes.func.isRequired,
@@ -181,6 +191,7 @@ const mapDispatchToProps = {
 	onShareScreen   : requestActions.enableScreenSharing,
 	onUnShareScreen : requestActions.disableScreenSharing,
 	onNeedExtension : requestActions.installExtension,
+	onToggleHand    : requestActions.toggleHand,
 	onLogin         : requestActions.userLogin,
 	onLogout        : requestActions.userLogout
 };

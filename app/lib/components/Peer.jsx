@@ -91,6 +91,20 @@ class Peer extends Component
 				}
 
 				<div className={classnames('view-container', 'webcam')} style={style}>
+					<div className='indicators'>
+						{peer.raiseHandState ?
+							<div className={
+								classnames(
+									'icon', 'raise-hand', {
+										on  : peer.raiseHandState,
+										off : !peer.raiseHandState
+									}
+								)
+							}
+							/>
+							:null
+						}
+					</div>
 					<div
 						className={classnames('controls', {
 							visible : this.state.controlsVisible
