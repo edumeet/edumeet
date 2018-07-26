@@ -74,7 +74,7 @@ class MessageList extends Component
 										)}
 
 										{message.type === 'file' && (
-											<FileChatEntry message={message} />
+											<FileChatEntry message={message} client={this.props.client} />
 										)}
 									</div>
 

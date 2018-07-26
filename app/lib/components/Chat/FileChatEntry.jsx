@@ -4,13 +4,6 @@ import { saveAs } from 'file-saver/FileSaver';
 
 class FileChatEntry extends Component
 {
-  constructor(props)
-  {
-    super(props);
-
-    this.client = new WebTorrent();
-  }
-
   state = {
     active: false,
     numPeers: 0,
@@ -23,7 +16,7 @@ class FileChatEntry extends Component
       active: true
     });
 
-    this.client.add(this.props.message.file.magnet, (torrent) =>
+    this.props.client.add(this.props.message.file.magnet, (torrent) =>
     {
       const onProgress = () =>
       {

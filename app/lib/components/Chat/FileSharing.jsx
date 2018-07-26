@@ -17,11 +17,9 @@ class FileSharing extends Component {
 
   componentDidMount()
   {
-    this.client = new WebTorrent();
-
     dragDrop('body', (files) =>
     {
-      this.client.seed(files, (torrent) => {
+      this.props.client.seed(files, (torrent) => {
         this.notifyPeers({
           magnet: torrent.magnetURI
         });
