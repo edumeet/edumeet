@@ -136,7 +136,7 @@ class EmotionDetectingVideo extends Component
 				this.props.setPicture(data);
 
 				this.setState({
-					interval : Math.pow(weightedScore, 4) * 10 * 1000
+					interval : Math.pow(weightedScore, 4) * 15 * 1000
 				});
 
 				this.restartTracking();
