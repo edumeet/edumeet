@@ -146,7 +146,7 @@ class Me extends React.Component
 						audioCodec={micProducer ? micProducer.codec : null}
 						videoCodec={webcamProducer ? webcamProducer.codec : null}
 						onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
-						clmTracking
+						clmTracking={!me.loggedIn}
 					/>
 				</div>
 

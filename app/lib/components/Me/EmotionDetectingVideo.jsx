@@ -42,6 +42,10 @@ class EmotionDetectingVideo extends Component
 		this.videoRef = props.videoRef();
 	}
 
+	state = {
+		score: 0
+	};
+
 	componentDidMount()
 	{
 		this.cTracker = new clm.tracker({ useWebGL: true });
@@ -89,35 +93,45 @@ class EmotionDetectingVideo extends Component
 		}
 	}, 5000);
 
-	componentDidUpdate()
+	async startTracking()
 	{
-		if (videoIsPlaying(this.videoRef.current) && !this.interval)
-		{
-			this.videoRef.current.play();
-			this.cTracker.start(this.videoRef.current);
+		await this.videoRef.current.play();
+		this.cTracker.start(this.videoRef.current);
 
-			this.interval = setInterval(() =>
-			{
-				const cp = this.cTracker.getCurrentParameters();
-				const er = this.ec.meanPredict(cp);
-
-				if (this.cTracker.getScore() > 0.8)
-				{
-					// we want people to be really happy on their avatars :-)
-					// however, people are rarely happy in a conference call, so
-					// reasonably speaking, you are pretty happy when this is 0.2!
-					if (er && er.find((entry) => entry.emotion === 'happy').value > 0.2)
-					{
-						this.update();
-					}
-				}
-			}, 500);
-		}
-		else if (!videoIsPlaying(this.videoRef.current) && this.interval)
+		if (this.interval)
 		{
-			this.cTracker.stop();
 			clearInterval(this.interval);
 		}
+
+		this.interval = setInterval(() =>
+		{
+			const cp = this.cTracker.getCurrentParameters();
+			const er = this.ec.meanPredict(cp);
+			console.log('ctracker', er, this.cTracker.getScore())
+
+			const happy = er && er.find((entry) => entry.emotion === 'happy').value > 0.2;
+			const score = this.cTracker.getScore();
+
+			if (score > 0.5 && happy)
+			{
+				const weightedScore = score * 0.7 + happy * 0.3;
+
+				if (weightedScore > this.state.score)
+				{
+					this.update();
+
+					this.setState({
+						score: weightedScore
+					});
+				}
+			}
+		}, 500);
+	}
+	
+	async componentDidUpdate()
+	{
+		await this.cTracker.stop();
+		await this.startTracking();
 	}
 
 	render()
@@ -130,7 +144,6 @@ class EmotionDetectingVideo extends Component
 	}
 }
 
-console.log(stateActions.setPicture);
 const mapDispatchToProps = {
 	setPicture : stateActions.setPicture
 };
