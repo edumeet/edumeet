@@ -114,31 +114,19 @@ export default class PeerView extends React.Component
 					</div>
 				</div>
 
-				{clmTracking ? (
-					<EmotionDetectingVideo
-						videoRef={() => this._videoRef}
-						className={classnames({
-							hidden  : !videoVisible,
-							'is-me' : isMe,
-							loading : videoProfile === 'none'
-						})}
-						autoPlay
-						muted={isMe}
-						width={226}
-						height={170}
-					/>
-				) : (
-					<video
-						ref={this._videoRef}
-						className={classnames({
-							hidden  : !videoVisible,
-							'is-me' : isMe,
-							loading : videoProfile === 'none'
-						})}
-						autoPlay
-						muted={isMe}
-					/>
-				)}
+				<EmotionDetectingVideo
+					videoRef={() => this._videoRef}
+					className={classnames({
+						hidden  : !videoVisible,
+						'is-me' : isMe,
+						loading : videoProfile === 'none'
+					})}
+					autoPlay
+					muted={isMe}
+					width={226}
+					height={170}
+					clmTracking={clmTracking}
+				/>
 
 				<div className='volume-container'>
 					<div className={classnames('bar', `level${volume}`)} />

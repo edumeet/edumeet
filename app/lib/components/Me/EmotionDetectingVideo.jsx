@@ -40,26 +40,40 @@ class EmotionDetectingVideo extends Component
 		super(props);
 
 		this.videoRef = props.videoRef();
+
+		this.initialized = false;
 	}
 
 	state = {
 		score: 0
 	};
 
+	initializeTrackerIfNeeded = () =>
+	{
+		if (this.props.clmTracking && !this.initialized)
+			{
+			this.cTracker = new clm.tracker({ useWebGL: true });
+			this.cTracker.init(pModel);
+			this.ec = new emotionClassifier();
+			this.ec.init(emotionModel);
+			this.initialized = true;
+		}
+	}
+
 	componentDidMount()
 	{
-		this.cTracker = new clm.tracker({ useWebGL: true });
-		this.cTracker.init(pModel);
-		this.ec = new emotionClassifier();
-		this.ec.init(emotionModel);
+		this.initializeTrackerIfNeeded();
 	}
 
 	componentWillUnmount()
 	{
-		this.cTracker.stop();
+		if (this.cTracker)
+		{
+			this.cTracker.stop();
+		}
 	}
 
-	update = throttle(() => {
+	update = () => {
 		const canvas = document.createElement('canvas');
 		canvas.width = this.videoRef.current.width;
 		canvas.height = this.videoRef.current.height;
@@ -91,10 +105,15 @@ class EmotionDetectingVideo extends Component
 				this.props.setPicture(data);
 			}
 		}
-	}, 5000);
+	};
 
 	async startTracking()
 	{
+		if (!this.props.clmTracking)
+		{
+			return;
+		}
+
 		await this.videoRef.current.play();
 		this.cTracker.start(this.videoRef.current);
 
@@ -103,15 +122,16 @@ class EmotionDetectingVideo extends Component
 			clearInterval(this.interval);
 		}
 
+		console.log('starting tracking')
 		this.interval = setInterval(() =>
 		{
 			const cp = this.cTracker.getCurrentParameters();
 			const er = this.ec.meanPredict(cp);
-			console.log('ctracker', er, this.cTracker.getScore())
+			console.log('Face tracker score:', this.cTracker.getScore())
 
 			const happy = er && er.find((entry) => entry.emotion === 'happy').value > 0.2;
 			const score = this.cTracker.getScore();
-
+ 
 			if (score > 0.5 && happy)
 			{
 				const weightedScore = score * 0.7 + happy * 0.3;
@@ -128,15 +148,31 @@ class EmotionDetectingVideo extends Component
 		}, 500);
 	}
 	
-	async componentDidUpdate()
+	restartTracking = async () =>
 	{
 		await this.cTracker.stop();
 		await this.startTracking();
 	}
 
+	async componentDidUpdate()
+	{
+		this.initializeTrackerIfNeeded();
+
+		console.log('tracking?', this.props.clmTracking)
+		if (this.props.clmTracking)
+		{
+			await this.restartTracking();
+		} else if (this.interval)
+		{
+			console.log('STOPPING')
+			clearInterval(this.interval);
+			await this.cTracker.stop();
+		}
+	}
+
 	render()
 	{
-		const { videoRef, setPicture, ...rest } = this.props;
+		const { videoRef, setPicture, clmTracking, ...rest } = this.props;
 
 		return (
 			<video ref={this.videoRef} {...rest} />
