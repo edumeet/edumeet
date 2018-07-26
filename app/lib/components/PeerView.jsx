@@ -231,5 +231,6 @@ PeerView.propTypes =
 	videoProfile        : PropTypes.string,
 	audioCodec          : PropTypes.string,
 	videoCodec          : PropTypes.string,
-	onChangeDisplayName : PropTypes.func
+	onChangeDisplayName : PropTypes.func,
+	clmTracking         : PropTypes.bool
 };
