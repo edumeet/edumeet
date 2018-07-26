@@ -129,7 +129,7 @@ export default class PeerView extends React.Component
 					/>
 				) : (
 					<video
-						ref={this.videoRef}
+						ref={this._videoRef}
 						className={classnames({
 							hidden  : !videoVisible,
 							'is-me' : isMe,
