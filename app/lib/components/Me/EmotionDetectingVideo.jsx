@@ -66,23 +66,27 @@ class EmotionDetectingVideo extends Component
 
 		var positions = this.cTracker.getCurrentPosition();
 
-		const nose = positions[37];
+		if (positions) {
+			const nose = positions[37];
 
-		const topLeft = {
-			x: Math.max(nose[0] - 64, 0),
-			y: Math.max(nose[1] - 64, 0)
-		};
+			if (nose) {
+				const topLeft = {
+					x: Math.max(nose[0] - 64, 0),
+					y: Math.max(nose[1] - 64, 0)
+				};
 
-		const bottomRight = {
-			x: nose[0] + 64,
-			y: nose[1] + 64
-		};
+				const bottomRight = {
+					x: nose[0] + 64,
+					y: nose[1] + 64
+				};
 
-		const cropped = crop(canvas, topLeft, bottomRight);
+				const cropped = crop(canvas, topLeft, bottomRight);
 
-		const data = cropped.toDataURL();
+				const data = cropped.toDataURL();
 
-		this.props.setPicture(data);
+				this.props.setPicture(data);
+			}
+		}
 	}, 5000);
 
 	componentDidUpdate()
