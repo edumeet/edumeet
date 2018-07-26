@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import Spinner from 'react-spinner';
 import * as appPropTypes from './appPropTypes';
 import EditableInput from './EditableInput';
+import EmotionDetectingVideo from './Me/EmotionDetectingVideo';
 
 export default class PeerView extends React.Component
 {
@@ -28,6 +29,8 @@ export default class PeerView extends React.Component
 
 		// Periodic timer for showing video resolution.
 		this._videoResolutionTimer = null;
+
+		this._videoRef = React.createRef();
 	}
 
 	render()
@@ -41,7 +44,8 @@ export default class PeerView extends React.Component
 			videoProfile,
 			audioCodec,
 			videoCodec,
-			onChangeDisplayName
+			onChangeDisplayName,
+			clmTracking
 		} = this.props;
 
 		const {
@@ -110,8 +114,8 @@ export default class PeerView extends React.Component
 					</div>
 				</div>
 
-				<video
-					ref='video'
+				<EmotionDetectingVideo
+					videoRef={() => this._videoRef}
 					className={classnames({
 						hidden  : !videoVisible,
 						'is-me' : isMe,
@@ -119,6 +123,7 @@ export default class PeerView extends React.Component
 					})}
 					autoPlay
 					muted={isMe}
+					clmTracking={clmTracking}
 				/>
 
 				<div className='volume-container'>
@@ -152,7 +157,6 @@ export default class PeerView extends React.Component
 		const { audioTrack, videoTrack } = nextProps;
 
 		this._setTracks(audioTrack, videoTrack);
-
 	}
 
 	_setTracks(audioTrack, videoTrack)
@@ -166,7 +170,7 @@ export default class PeerView extends React.Component
 		clearInterval(this._videoResolutionTimer);
 		this._hideVideoResolution();
 
-		const { video } = this.refs;
+		const video = this._videoRef.current;
 
 		if (audioTrack || videoTrack)
 		{
@@ -194,7 +198,7 @@ export default class PeerView extends React.Component
 		this._videoResolutionTimer = setInterval(() =>
 		{
 			const { videoWidth, videoHeight } = this.state;
-			const { video } = this.refs;
+			const video = this._videoRef.current;
 
 			// Don't re-render if nothing changed.
 			if (video.videoWidth === videoWidth && video.videoHeight === videoHeight)
@@ -227,5 +231,6 @@ PeerView.propTypes =
 	videoProfile        : PropTypes.string,
 	audioCodec          : PropTypes.string,
 	videoCodec          : PropTypes.string,
-	onChangeDisplayName : PropTypes.func
+	onChangeDisplayName : PropTypes.func,
+	clmTracking         : PropTypes.bool
 };
