@@ -45,7 +45,8 @@ class EmotionDetectingVideo extends Component
 	}
 
 	state = {
-		score: 0
+		score: 0,
+		interval: 500
 	};
 
 	initializeTrackerIfNeeded = () =>
@@ -73,7 +74,7 @@ class EmotionDetectingVideo extends Component
 		}
 	}
 
-	update = () => {
+	update = (weightedScore) => {
 		const canvas = document.createElement('canvas');
 		canvas.width = this.videoRef.current.width;
 		canvas.height = this.videoRef.current.height;
@@ -103,6 +104,12 @@ class EmotionDetectingVideo extends Component
 				const data = cropped.toDataURL();
 
 				this.props.setPicture(data);
+
+				this.setState({
+					interval: Math.pow(weightedScore, 4) * 10 * 1000,
+				});
+
+				this.restartTracking();
 			}
 		}
 	};
@@ -138,14 +145,14 @@ class EmotionDetectingVideo extends Component
 
 				if (weightedScore > this.state.score)
 				{
-					this.update();
+					this.update(weightedScore);
 
 					this.setState({
 						score: weightedScore
 					});
 				}
 			}
-		}, 500);
+		}, this.state.interval);
 	}
 	
 	restartTracking = async () =>

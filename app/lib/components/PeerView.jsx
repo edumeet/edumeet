@@ -123,8 +123,6 @@ export default class PeerView extends React.Component
 					})}
 					autoPlay
 					muted={isMe}
-					width={226}
-					height={170}
 					clmTracking={clmTracking}
 				/>
 
