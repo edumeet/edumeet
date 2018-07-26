@@ -5,7 +5,7 @@ import emotionClassifier from './emotionClassifier';
 import clm from 'clmtrackr';
 import pModel from './model.js';
 import * as stateActions from '../../redux/stateActions';
-import { throttle } from 'lodash';
+import ResizeObserver from 'resize-observer-polyfill';
 
 // set eigenvector 9 and 11 to not be regularized. This is to better detect motion of the eyebrows
 pModel.shapeModel.nonRegularizedVectors.push(9);
@@ -46,7 +46,9 @@ class EmotionDetectingVideo extends Component
 
 	state = {
 		score: 0,
-		interval: 500
+		interval: 500,
+		width: null,
+		height: null
 	};
 
 	initializeTrackerIfNeeded = () =>
@@ -61,9 +63,27 @@ class EmotionDetectingVideo extends Component
 		}
 	}
 
+	updateDimensions = () =>
+	{
+		this.setState({
+			width: this.videoRef.current.clientWidth,
+			height: this.videoRef.current.clientHeight
+		});
+
+		if (this.props.clmTracking)
+		{
+			this.initializeTrackerIfNeeded();
+			this.restartTracking();
+		}
+	};
+
 	componentDidMount()
 	{
 		this.initializeTrackerIfNeeded();
+
+		window.addEventListener('resize', this.updateDimensions);
+		const observer = new ResizeObserver(this.updateDimensions);
+		observer.observe(this.videoRef.current);
 	}
 
 	componentWillUnmount()
@@ -72,6 +92,8 @@ class EmotionDetectingVideo extends Component
 		{
 			this.cTracker.stop();
 		}
+
+		window.removeEventListener('resize', this.updateDimensions);
 	}
 
 	update = (weightedScore) => {
@@ -129,11 +151,11 @@ class EmotionDetectingVideo extends Component
 			clearInterval(this.interval);
 		}
 
-		console.log('starting tracking')
 		this.interval = setInterval(() =>
 		{
 			const cp = this.cTracker.getCurrentParameters();
 			const er = this.ec.meanPredict(cp);
+
 			console.log('Face tracker score:', this.cTracker.getScore())
 
 			const happy = er && er.find((entry) => entry.emotion === 'happy').value > 0.2;
@@ -165,13 +187,11 @@ class EmotionDetectingVideo extends Component
 	{
 		this.initializeTrackerIfNeeded();
 
-		console.log('tracking?', this.props.clmTracking)
 		if (this.props.clmTracking)
 		{
 			await this.restartTracking();
 		} else if (this.interval)
 		{
-			console.log('STOPPING')
 			clearInterval(this.interval);
 			await this.cTracker.stop();
 		}
@@ -182,7 +202,12 @@ class EmotionDetectingVideo extends Component
 		const { videoRef, setPicture, clmTracking, ...rest } = this.props;
 
 		return (
-			<video ref={this.videoRef} {...rest} />
+			<video
+				ref={this.videoRef}
+				width={this.state.width}
+				height={this.state.height}
+				{...rest}
+			/>
 		);
 	}
 }
