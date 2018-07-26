@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import marked from 'marked';
 import { connect } from 'react-redux';
+import FileChatEntry from './FileChatEntry';
 
 const scrollToBottom = () =>
 {
@@ -73,9 +74,7 @@ class MessageList extends Component
 										)}
 
 										{message.type === 'file' && (
-											<div>
-												{message.file.magnet}
-											</div>
+											<FileChatEntry message={message} />
 										)}
 									</div>
 

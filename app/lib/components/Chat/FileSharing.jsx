@@ -49,7 +49,6 @@ const mapDispatchToProps = (dispatch) =>
   ({
     notifyPeers: (file, displayName, picture) =>
     {
-      console.log(file)
       dispatch(stateActions.addUserFile(file));
       dispatch(requestActions.sendChatFile(file, displayName, picture));
     }
