@@ -34,7 +34,6 @@
 		}
 		> .indicators {
 			position: absolute;
-			z-index: 200;
 			left: 0;
 			top: 0;
 			display: flex;
@@ -43,6 +42,7 @@
 			align-items: center;
 			padding: 0.4vmin;
 			transition: opacity 0.3s;
+			z-index: 10;
 
 			> .icon {
 				flex: 0 0 auto;
@@ -52,7 +52,6 @@
 				background-size: 75%;
 				background-repeat: no-repeat;
 				background-color: rgba(#000, 0.5);
-				cursor: pointer;
 				transition-property: opacity, background-color;
 				transition-duration: 0.15s;
 

@@ -178,11 +178,11 @@ export default class RoomClient
 			});
 	}
 
-	changeProfilePicture(picture) 
+	changeProfilePicture(picture)
 	{
 		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
 
-		this._protoo.send('change-profile-picture', { picture }).catch((error) => 
+		this._protoo.send('change-profile-picture', { picture }).catch((error) =>
 		{
 			logger.error('shareProfilePicure() | failed: %o', error);
 		});
@@ -913,11 +913,6 @@ export default class RoomClient
 			{
 				this._dispatch(
 					stateActions.setMyRaiseHandState(state));
-
-				this._dispatch(requestActions.notify(
-					{
-						text : 'raiseHand state changed'
-					}));
 				this._dispatch(
 					stateActions.setMyRaiseHandStateInProgress(false));
 			})
@@ -1806,10 +1801,11 @@ export default class RoomClient
 
 		this._dispatch(stateActions.addPeer(
 			{
-				name        : peer.name,
-				displayName : displayName,
-				device      : peer.appData.device,
-				consumers   : []
+				name           : peer.name,
+				displayName    : displayName,
+				device         : peer.appData.device,
+				raiseHandState : peer.appData.raiseHandState,
+				consumers      : []
 			}));
 
 		if (notify)

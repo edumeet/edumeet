@@ -47,6 +47,20 @@ const ListPeer = (props) =>
 			<div className='peer-info'>
 				{peer.displayName}
 			</div>
+			<div className='indicators'>
+				{peer.raiseHandState ?
+					<div className={
+						classnames(
+							'icon', 'raise-hand', {
+								on  : peer.raiseHandState,
+								off : !peer.raiseHandState
+							}
+						)
+					}
+					/>
+					:null
+				}
+			</div>
 			<div className='controls'>
 				{ screenConsumer ?
 					<div
