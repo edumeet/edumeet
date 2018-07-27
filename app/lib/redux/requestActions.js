@@ -219,8 +219,8 @@ export const sendChatFile = (magnet, name, picture) =>
 	const message = createNewFile(magnet, 'response', name, picture);
 
 	return {
-		type: 'SEND_CHAT_MESSAGE',
-		payload: { message }
+		type    : 'SEND_CHAT_MESSAGE',
+		payload : { message }
 	};
 };
 

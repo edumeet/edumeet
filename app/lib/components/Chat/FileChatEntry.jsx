@@ -1,90 +1,102 @@
 import React, { Component, Fragment } from 'react';
+import { connect } from 'react-redux';
+import { notifyAction } from '../../redux/stateActions';
 import { saveAs } from 'file-saver/FileSaver';
 import { client } from './FileSharing';
 
-const saveFile = (file) =>
-{
-  file.getBlob((err, blob) =>
-  {
-    if (err)
-    {
-      console.error('WebTorrent error');
-      return;
-    }
-
-    console.log('TRYING TO SAVE BLOB', blob)
-    saveAs(blob, file.name);
-  });
-};
-
 class FileChatEntry extends Component
 {
-  state = {
-    active: false,
-    numPeers: 0,
-    progress: 0,
-    files: null
-  };
+	state = {
+		active   : false,
+		numPeers : 0,
+		progress : 0,
+		files    : null
+	};
 
-  download = () =>
-  {
-    this.setState({
-      active: true
-    });
+	saveFile = (file) =>
+	{
+		file.getBlob((err, blob) =>
+		{
+			if (err)
+			{
+				return this.props.notify({
+					text : 'An error occurred while saving a file'
+				});
+			}
+	
+			saveAs(blob, file.name);
+		});
+	};
 
-    client.add(this.props.message.file.magnet, (torrent) =>
-    {
-      const onProgress = () =>
-      {
-        this.setState({
-          numPeers: torrent.numPeers,
-          progress: Math.round(torrent.progress * 100 * 100) / 100
-        });
-      };
+	download = () =>
+	{
+		this.setState({
+			active : true
+		});
 
-      setInterval(onProgress, 500);
-      onProgress();
+		client.add(this.props.message.file.magnet, (torrent) =>
+		{
+			const onProgress = () =>
+			{
+				this.setState({
+					numPeers : torrent.numPeers,
+					progress : Math.round(torrent.progress * 100 * 100) / 100
+				});
+			};
 
-      torrent.on('done', () => {
-        onProgress();
-        clearInterval(onProgress);
+			setInterval(onProgress, 500);
+			onProgress();
 
-        this.setState({
-          files: torrent.files
-        });
-      });
-    });
-  }
+			torrent.on('done', () => 
+			{
+				onProgress();
+				clearInterval(onProgress);
 
-  render()
-  {
-    return (
-      <Fragment>
-        <div>
-          <button onClick={this.download}>
-            append shared file to body
-          </button>
+				this.setState({
+					files : torrent.files
+				});
+			});
+		});
+	}
 
-          {this.state.active && (
-            <div>
-              peers: {this.state.numPeers}
-              progress: {this.state.progress}
-            </div>
-          )}
+	render()
+	{
+		return (
+			<Fragment>
+				<div>
+					<button onClick={this.download}>
+						append shared file to body
+					</button>
 
-          {this.state.files && (
-            <div>
-              {this.state.files.map((file, i) => (
-                <div key={i}>
-                  <button onClick={() => saveFile(file)}>download {file.name}</button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </Fragment>
-    );
-  }
+					{this.state.active && (
+						<div>
+							peers: {this.state.numPeers}
+							progress: {this.state.progress}
+						</div>
+					)}
+
+					{this.state.files && (
+						<div>
+							{this.state.files.map((file, i) => (
+								<div key={i}>
+									<button onClick={() => this.saveFile(file)}>
+										download {file.name}
+									</button>
+								</div>
+							))}
+						</div>
+					)}
+				</div>
+			</Fragment>
+		);
+	}
 }
 
-export default FileChatEntry;
+const mapDispatchToProps = {
+	notify : notifyAction
+};
+
+export default connect(
+	undefined,
+	mapDispatchToProps
+)(FileChatEntry);

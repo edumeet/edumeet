@@ -13,9 +13,9 @@ export function createNewMessage(text, sender, name, picture)
 export function createNewFile(file, sender, name, picture)
 {
 	return {
-		type: 'file',
+		type : 'file',
 		file,
-		time: Date.now(),
+		time : Date.now(),
 		name,
 		sender,
 		picture
