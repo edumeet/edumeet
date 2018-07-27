@@ -5,17 +5,9 @@ import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import MessageList from './MessageList';
 import FileSharing from './FileSharing';
-import WebTorrent from 'webtorrent';
 
 class Chat extends Component
 {
-	constructor(props)
-	{
-		super(props);
-
-		this.client = new WebTorrent();
-	}
-
 	render()
 	{
 		const {
@@ -29,9 +21,9 @@ class Chat extends Component
 
 		return (
 			<div data-component='Chat'>
-				<MessageList client={this.client} />
+				<MessageList />
 
-				<FileSharing client={this.client} />
+				<FileSharing />
 
 				<form
 					data-component='Sender'

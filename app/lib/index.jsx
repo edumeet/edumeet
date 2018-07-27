@@ -3,13 +3,6 @@ import UrlParse from 'url-parse';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import {
-	applyMiddleware as applyReduxMiddleware,
-	createStore as createReduxStore,
-	compose as composeRedux
-} from 'redux';
-import thunk from 'redux-thunk';
-import { createLogger as createReduxLogger } from 'redux-logger';
 import { getDeviceInfo } from 'mediasoup-client';
 import randomString from 'random-string';
 import Logger from './Logger';
@@ -17,48 +10,11 @@ import * as utils from './utils';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
 import * as stateActions from './redux/stateActions';
-import reducers from './redux/reducers';
-import roomClientMiddleware from './redux/roomClientMiddleware';
 import Room from './components/Room';
 import { loginEnabled } from '../config';
+import { store } from './store';
 
 const logger = new Logger();
-const reduxMiddlewares =
-[
-	thunk,
-	roomClientMiddleware
-];
-
-if (process.env.NODE_ENV === 'development')
-{
-	const reduxLogger = createReduxLogger(
-		{
-			duration  : true,
-			timestamp : false,
-			level     : 'log',
-			logErrors : true
-		});
-
-	reduxMiddlewares.push(reduxLogger);
-}
-
-const composeEnhancers =
-typeof window === 'object' &&
-window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
-	window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-		// Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
-	}) : composeRedux;
-
-const enhancer = composeEnhancers(
-	applyReduxMiddleware(...reduxMiddlewares)
-	// other store enhancers if any
-);
-
-const store = createReduxStore(
-	reducers,
-	undefined,
-	enhancer
-);
 
 domready(() =>
 {

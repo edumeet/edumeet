@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
-import WebTorrent from 'webtorrent';
 import { saveAs } from 'file-saver/FileSaver';
+import { client } from './FileSharing';
 
 const saveFile = (file) =>
 {
@@ -32,7 +32,7 @@ class FileChatEntry extends Component
       active: true
     });
 
-    this.props.client.add(this.props.message.file.magnet, (torrent) =>
+    client.add(this.props.message.file.magnet, (torrent) =>
     {
       const onProgress = () =>
       {

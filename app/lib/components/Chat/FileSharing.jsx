@@ -4,55 +4,48 @@ import WebTorrent from 'webtorrent';
 import dragDrop from 'drag-drop';
 import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
+import { store } from '../../store';
+
+export const client = new WebTorrent();
+
+const notifyPeers = (file) =>
+{
+  const { displayName, picture } = store.getState().me;
+  store.dispatch(stateActions.addUserFile(file));
+  store.dispatch(requestActions.sendChatFile(file, displayName, picture));
+};
+
+const shareFiles = (files) =>
+{
+  client.seed(files, (torrent) => {
+    notifyPeers({
+      magnet: torrent.magnetURI
+    });
+  });
+};
+
+dragDrop('body', shareFiles);
 
 class FileSharing extends Component {
-  notifyPeers = (file) =>
+  constructor(props)
   {
-    this.props.notifyPeers(
-      file,
-      this.props.displayName,
-      this.props.picture
-    );
-  };
-
-  componentDidMount()
-  {
-    dragDrop('body', (files) =>
-    {
-      this.props.client.seed(files, (torrent) => {
-        this.notifyPeers({
-          magnet: torrent.magnetURI
-        });
-      });
-    });
+    super(props);
   }
+
+  handleFileChange = (event) =>
+  {
+    if (event.target.files.length > 0)
+    {
+      shareFiles(event.target.files);
+    }
+  };
 
   render()
   {
     return (
-      <div>
-        drag & drop files to share them!!!
-      </div>
+      <input type="file" onChange={this.handleFileChange} />
     );
   }
 }
 
-const mapStateToProps = (state) =>
-  ({
-    displayName: state.me.displayName,
-    picture: state.me.picture
-  });
-
-const mapDispatchToProps = (dispatch) =>
-  ({
-    notifyPeers: (file, displayName, picture) =>
-    {
-      dispatch(stateActions.addUserFile(file));
-      dispatch(requestActions.sendChatFile(file, displayName, picture));
-    }
-  });
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(FileSharing);
+export default FileSharing;
