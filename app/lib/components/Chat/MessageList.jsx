@@ -49,8 +49,6 @@ class MessageList extends Component
 				{
 					chatmessages.map((message, i) =>
 					{
-						console.log(message);
-
 						const messageTime = new Date(message.time);
 
 						const picture = (message.sender === 'response' ?
@@ -76,11 +74,11 @@ class MessageList extends Component
 										{message.type === 'file' && (
 											<FileChatEntry message={message} />
 										)}
-									</div>
 
-									<span className='message-time'>
-										{message.name} - {this.getTimeString(messageTime)}
-									</span>
+										<span className='message-time'>
+											{message.name} - {this.getTimeString(messageTime)}
+										</span>
+									</div>
 								</div>
 							</div>
 						);
