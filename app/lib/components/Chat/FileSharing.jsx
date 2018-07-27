@@ -45,7 +45,7 @@ class FileSharing extends Component
 	render()
 	{
 		return (
-			<input type='file' onChange={this.handleFileChange} />
+			<input type='file' onChange={this.handleFileChange} multiple />
 		);
 	}
 }
