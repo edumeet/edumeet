@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import WebTorrent from 'webtorrent';
+import createTorrent from 'create-torrent';
 import dragDrop from 'drag-drop';
 import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import { store } from '../../store';
+import { promisify } from 'util';
 
 export const client = new WebTorrent();
 
@@ -15,17 +17,35 @@ const notifyPeers = (file) =>
 	store.dispatch(requestActions.sendChatFile(file, displayName, picture));
 };
 
-const shareFiles = (files) =>
+const shareFiles = async (files) =>
 {
-	client.seed(files, (torrent) => 
+	createTorrent(files, (err, torrent) =>
 	{
-		notifyPeers({
-			magnet : torrent.magnetURI
+		if (err)
+		{
+			console.error('Error creating torrent', err);
+			return;
+		}
+
+		const existingTorrent = client.get(torrent);
+
+		if (existingTorrent)
+		{
+			return notifyPeers({
+				magnet: existingTorrent.magnetURI
+			});
+		}
+	
+		client.seed(files, (newTorrent) =>
+		{
+			notifyPeers({
+				magnet : newTorrent.magnetURI
+			});
 		});
 	});
 };
 
-dragDrop('body', shareFiles);
+dragDrop('body', async (files) => await shareFiles(files));
 
 class FileSharing extends Component 
 {
@@ -36,11 +56,11 @@ class FileSharing extends Component
 		this.fileInput = React.createRef();
 	}
 
-	handleFileChange = (event) =>
+	handleFileChange = async (event) =>
 	{
 		if (event.target.files.length > 0)
 		{
-			shareFiles(event.target.files);
+			await shareFiles(event.target.files);
 		}
 	};
 

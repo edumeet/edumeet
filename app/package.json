@@ -9,6 +9,7 @@
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "classnames": "^2.2.6",
+    "create-torrent": "^3.32.1",
     "debug": "^3.1.0",
     "domready": "^1.0.8",
     "drag-drop": "^4.2.0",

@@ -28,36 +28,63 @@ class FileChatEntry extends Component
 		});
 	};
 
+	handleTorrent = (torrent) =>
+	{
+		// Torrent already done, this can happen if the
+		// same file was sent multiple times.
+		if (torrent.progress === 1)
+		{
+			this.setState({
+				files: torrent.files,
+				numPeers: torrent.numPeers,
+				progress: 1,
+				active: false
+			});
+
+			return;
+		}
+
+		const onProgress = () =>
+		{
+			this.setState({
+				numPeers : torrent.numPeers,
+				progress : torrent.progress
+			});
+		};
+
+		onProgress();
+
+		setInterval(onProgress, 500);
+
+		torrent.on('done', () => 
+		{
+			onProgress();
+			clearInterval(onProgress);
+
+			this.setState({
+				files : torrent.files,
+				active: false
+			});
+		});
+	};
+
 	download = () =>
 	{
 		this.setState({
 			active : true
 		});
+		
+		const magnet = this.props.message.file.magnet;
 
-		client.add(this.props.message.file.magnet, (torrent) =>
+		const existingTorrent = client.get(magnet);
+
+		if (existingTorrent)
 		{
-			const onProgress = () =>
-			{
-				this.setState({
-					numPeers : torrent.numPeers,
-					progress : torrent.progress
-				});
-			};
+			// Never add duplicate torrents, use the existing one instead.
+			return this.handleTorrent(existingTorrent);
+		}
 
-			setInterval(onProgress, 500);
-			onProgress();
-
-			torrent.on('done', () => 
-			{
-				onProgress();
-				clearInterval(onProgress);
-
-				this.setState({
-					files : torrent.files,
-					active: false
-				});
-			});
-		});
+		client.add(magnet, this.handleTorrent);
 	}
 
 	render()
