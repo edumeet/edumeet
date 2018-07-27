@@ -2,12 +2,28 @@ import React, { Component, Fragment } from 'react';
 import WebTorrent from 'webtorrent';
 import { saveAs } from 'file-saver/FileSaver';
 
+const saveFile = (file) =>
+{
+  file.getBlob((err, blob) =>
+  {
+    if (err)
+    {
+      console.error('WebTorrent error');
+      return;
+    }
+
+    console.log('TRYING TO SAVE BLOB', blob)
+    saveAs(blob, file.name);
+  });
+};
+
 class FileChatEntry extends Component
 {
   state = {
     active: false,
     numPeers: 0,
-    progress: 0
+    progress: 0,
+    files: null
   };
 
   download = () =>
@@ -31,17 +47,10 @@ class FileChatEntry extends Component
 
       torrent.on('done', () => {
         onProgress();
+        clearInterval(onProgress);
 
-        torrent.files.forEach((file) => {
-          file.getBlob((err, blob) => {
-            if (err)
-            {
-              console.error('webtorrent error!!!');
-              return;
-            }
-
-            saveAs(blob);
-          });
+        this.setState({
+          files: torrent.files
         });
       });
     });
@@ -60,6 +69,16 @@ class FileChatEntry extends Component
             <div>
               peers: {this.state.numPeers}
               progress: {this.state.progress}
+            </div>
+          )}
+
+          {this.state.files && (
+            <div>
+              {this.state.files.map((file, i) => (
+                <div key={i}>
+                  <button onClick={() => saveFile(file)}>download {file.name}</button>
+                </div>
+              ))}
             </div>
           )}
         </div>
