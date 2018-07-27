@@ -32,6 +32,8 @@ class FileSharing extends Component
 	constructor(props)
 	{
 		super(props);
+
+		this.fileInput = React.createRef();
 	}
 
 	handleFileChange = (event) =>
@@ -42,10 +44,27 @@ class FileSharing extends Component
 		}
 	};
 
+	handleClick = () =>
+	{
+		// We want to open the file dialog when we click a button
+		// instead of actually rendering the input element itself.
+		this.fileInput.current.click();
+	};
+
 	render()
 	{
 		return (
-			<input type='file' onChange={this.handleFileChange} multiple />
+			<div>
+				<input
+					style={{ display: 'none' }}
+					ref={this.fileInput}
+					type='file'
+					onChange={this.handleFileChange}
+					multiple
+				/>
+
+				<button onClick={this.handleClick}>share file</button>
+			</div>
 		);
 	}
 }
