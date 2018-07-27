@@ -23,12 +23,12 @@ class Chat extends Component
 			<div data-component='Chat'>
 				<MessageList />
 
-				<FileSharing />
-
 				<form
 					data-component='Sender'
 					onSubmit={(e) => { onSendMessage(e, displayName, picture); }}
 				>
+					<FileSharing />
+
 					<input
 						type='text'
 						className='new-message'
