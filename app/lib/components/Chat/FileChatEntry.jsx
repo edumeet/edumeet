@@ -40,7 +40,7 @@ class FileChatEntry extends Component
 			{
 				this.setState({
 					numPeers : torrent.numPeers,
-					progress : Math.round(torrent.progress * 100 * 100) / 100
+					progress : torrent.progress
 				});
 			};
 
@@ -53,7 +53,8 @@ class FileChatEntry extends Component
 				clearInterval(onProgress);
 
 				this.setState({
-					files : torrent.files
+					files : torrent.files,
+					active: false
 				});
 			});
 		});
@@ -64,15 +65,24 @@ class FileChatEntry extends Component
 		return (
 			<Fragment>
 				<div>
-					<button onClick={this.download}>
-						append shared file to body
-					</button>
+					{!this.state.active && !this.state.files && (
+						<Fragment>
+							<p>A new file was shared.</p>
 
-					{this.state.active && (
+							<button onClick={this.download}>
+								Download
+							</button>
+						</Fragment>
+					)}
+
+					{this.state.active && this.state.numPeers === 0 && (
 						<div>
-							peers: {this.state.numPeers}
-							progress: {this.state.progress}
+							Locating peers
 						</div>
+					)}
+
+					{this.state.active && this.state.numPeers > 0 && (
+						<progress value={this.state.progress} />
 					)}
 
 					{this.state.files && (
@@ -80,7 +90,7 @@ class FileChatEntry extends Component
 							{this.state.files.map((file, i) => (
 								<div key={i}>
 									<button onClick={() => this.saveFile(file)}>
-										download {file.name}
+										Save {file.name}
 									</button>
 								</div>
 							))}
