@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import WebTorrent from 'webtorrent';
 import createTorrent from 'create-torrent';
 import dragDrop from 'drag-drop';
+import randomString from 'random-string';
 import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import { store } from '../../store';
@@ -25,12 +26,22 @@ const notifyPeers = (file) =>
 
 const shareFiles = async (files) =>
 {
+	const notification =
+	{
+		id: randomString({ length: 6 }).toLowerCase(),
+		text: 'Creating torrent',
+		type: 'info'
+	};
+
+	store.dispatch(stateActions.addNotification(notification));
+
 	createTorrent(files, (err, torrent) =>
 	{
 		if (err)
 		{
-			console.error('Error creating torrent', err);
-			return;
+			return store.dispatch(requestActions.notify({
+				text: 'An error occured while uploading a file'
+			}));
 		}
 
 		const existingTorrent = client.get(torrent);
@@ -41,9 +52,15 @@ const shareFiles = async (files) =>
 				magnet: existingTorrent.magnetURI
 			});
 		}
-	
+		
 		client.seed(files, (newTorrent) =>
 		{
+			store.dispatch(stateActions.removeNotification(notification.id));
+			
+			store.dispatch(requestActions.notify({
+				text: 'Torrent successfully created'
+			}))
+
 			notifyPeers({
 				magnet : newTorrent.magnetURI
 			});

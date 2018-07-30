@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
-import { notifyAction } from '../../redux/stateActions';
+import * as requestActions from '../../redux/requestActions';
 import { saveAs } from 'file-saver/FileSaver';
 import { client } from './FileSharing';
 
@@ -130,7 +130,7 @@ class FileChatEntry extends Component
 }
 
 const mapDispatchToProps = {
-	notify : notifyAction
+	notify : requestActions.notify
 };
 
 export default connect(
