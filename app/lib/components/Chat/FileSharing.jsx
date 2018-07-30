@@ -5,9 +5,15 @@ import dragDrop from 'drag-drop';
 import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import { store } from '../../store';
-import { promisify } from 'util';
+import config from '../../../config';
 
-export const client = new WebTorrent();
+export const client = new WebTorrent({
+	tracker: {
+		rtcConfig: {
+			iceServers: config.turnServers
+		}
+	}
+});
 
 const notifyPeers = (file) =>
 {
