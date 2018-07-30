@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
+import magnet from 'magnet-uri';
 import * as requestActions from '../../redux/requestActions';
 import { saveAs } from 'file-saver/FileSaver';
 import { client } from './FileSharing';
@@ -95,6 +96,8 @@ class FileChatEntry extends Component
 					{!this.state.active && !this.state.files && (
 						<Fragment>
 							<p>A new file was shared.</p>
+
+							<p>{magnet.decode(this.props.message.file.magnet).dn}</p>
 
 							<button onClick={this.download}>
 								Download

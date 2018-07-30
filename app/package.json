@@ -17,6 +17,7 @@
     "fscreen": "^1.0.2",
     "hark": "^1.2.2",
     "js-cookie": "^2.2.0",
+    "magnet-uri": "^5.2.3",
     "marked": "^0.4.0",
     "mediasoup-client": "^2.1.1",
     "prop-types": "^15.6.2",
