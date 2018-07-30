@@ -95,7 +95,11 @@ class FileChatEntry extends Component
 				<div>
 					{!this.state.active && !this.state.files && (
 						<Fragment>
-							<p>A new file was shared.</p>
+							{this.props.message.sender === 'client' ? (
+								<p>You shared a file.</p>
+							) : (
+								<p>A new file was shared.</p>
+							)}
 
 							<p>{magnet.decode(this.props.message.file.magnet).dn}</p>
 
