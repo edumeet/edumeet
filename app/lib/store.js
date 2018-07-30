@@ -44,5 +44,3 @@ export const store = createStore(
 	undefined,
 	enhancer
 );
-
-console.log(store);

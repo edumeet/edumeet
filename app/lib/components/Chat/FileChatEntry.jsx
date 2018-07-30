@@ -35,10 +35,10 @@ class FileChatEntry extends Component
 		if (torrent.progress === 1)
 		{
 			this.setState({
-				files: torrent.files,
-				numPeers: torrent.numPeers,
-				progress: 1,
-				active: false
+				files    : torrent.files,
+				numPeers : torrent.numPeers,
+				progress : 1,
+				active   : false
 			});
 
 			return;
@@ -62,8 +62,8 @@ class FileChatEntry extends Component
 			clearInterval(onProgress);
 
 			this.setState({
-				files : torrent.files,
-				active: false
+				files  : torrent.files,
+				active : false
 			});
 		});
 	};

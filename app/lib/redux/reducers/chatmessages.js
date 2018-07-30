@@ -19,7 +19,7 @@ const chatmessages = (state = [], action) =>
 
 		case 'ADD_NEW_USER_FILE':
 		{
-			const { file } = action.payload;
+			const { file } = action.payload;
 
 			const message = createNewFile(file, 'client', 'Me', undefined);
 

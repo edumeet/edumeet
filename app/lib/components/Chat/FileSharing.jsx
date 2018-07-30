@@ -9,9 +9,9 @@ import { store } from '../../store';
 import config from '../../../config';
 
 export const client = new WebTorrent({
-	tracker: {
-		rtcConfig: {
-			iceServers: config.turnServers
+	tracker : {
+		rtcConfig : {
+			iceServers : config.turnServers
 		}
 	}
 });
@@ -24,13 +24,13 @@ const notifyPeers = (file) =>
 	store.dispatch(requestActions.sendChatFile(file, displayName, picture));
 };
 
-const shareFiles = async (files) =>
+const shareFiles = async(files) =>
 {
 	const notification =
 	{
-		id: randomString({ length: 6 }).toLowerCase(),
-		text: 'Creating torrent',
-		type: 'info'
+		id   : randomString({ length: 6 }).toLowerCase(),
+		text : 'Creating torrent',
+		type : 'info'
 	};
 
 	store.dispatch(stateActions.addNotification(notification));
@@ -40,7 +40,7 @@ const shareFiles = async (files) =>
 		if (err)
 		{
 			return store.dispatch(requestActions.notify({
-				text: 'An error occured while uploading a file'
+				text : 'An error occured while uploading a file'
 			}));
 		}
 
@@ -49,7 +49,7 @@ const shareFiles = async (files) =>
 		if (existingTorrent)
 		{
 			return notifyPeers({
-				magnet: existingTorrent.magnetURI
+				magnet : existingTorrent.magnetURI
 			});
 		}
 		
@@ -58,8 +58,8 @@ const shareFiles = async (files) =>
 			store.dispatch(stateActions.removeNotification(notification.id));
 			
 			store.dispatch(requestActions.notify({
-				text: 'Torrent successfully created'
-			}))
+				text : 'Torrent successfully created'
+			}));
 
 			notifyPeers({
 				magnet : newTorrent.magnetURI
@@ -68,7 +68,7 @@ const shareFiles = async (files) =>
 	});
 };
 
-dragDrop('body', async (files) => await shareFiles(files));
+dragDrop('body', async(files) => await shareFiles(files));
 
 class FileSharing extends Component 
 {
@@ -79,7 +79,7 @@ class FileSharing extends Component
 		this.fileInput = React.createRef();
 	}
 
-	handleFileChange = async (event) =>
+	handleFileChange = async(event) =>
 	{
 		if (event.target.files.length > 0)
 		{
@@ -106,7 +106,12 @@ class FileSharing extends Component
 					multiple
 				/>
 
-				<button onClick={this.handleClick}>share file</button>
+				<button
+					type='button'
+					onClick={this.handleClick}
+				>
+					share file
+				</button>
 			</div>
 		);
 	}
