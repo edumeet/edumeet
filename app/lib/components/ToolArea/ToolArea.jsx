@@ -18,7 +18,8 @@ class ToolArea extends React.Component
 	{
 		const {
 			currentToolTab,
-			unread,
+			unreadMessages,
+			unreadFiles,
 			setToolTab
 		} = this.props;
 
@@ -38,8 +39,8 @@ class ToolArea extends React.Component
 					<label htmlFor='tab-chat'>
 						Chat
 						
-						{unread > 0 && (
-							<span className='badge'>{unread}</span>
+						{unreadMessages > 0 && (
+							<span className='badge'>{unreadMessages}</span>
 						)}
 					</label>
 
@@ -54,7 +55,13 @@ class ToolArea extends React.Component
 						onChange={() => setToolTab('files')}
 						checked={currentToolTab === 'files'}
 					/>
-					<label htmlFor='tab-files'>Files</label>
+					<label htmlFor='tab-files'>
+						Files
+
+						{unreadFiles > 0 && (
+							<span className='badge'>{unreadFiles}</span>
+						)}
+					</label>
 
 					<div className='tab'>
 						<FileSharing />
@@ -102,12 +109,14 @@ ToolArea.propTypes =
 	advancedMode   : PropTypes.bool,
 	currentToolTab : PropTypes.string.isRequired,
 	setToolTab     : PropTypes.func.isRequired,
-	unread         : PropTypes.number.isRequired
+	unreadMessages : PropTypes.number.isRequired,
+	unreadFiles    : PropTypes.number.isRequired
 };
 
 const mapStateToProps = (state) => ({
 	currentToolTab : state.toolarea.currentToolTab,
-	unread         : state.toolarea.unread
+	unreadMessages : state.toolarea.unreadMessages,
+	unreadFiles    : state.toolarea.unreadFiles
 });
 
 const mapDispatchToProps = {

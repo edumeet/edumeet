@@ -50,7 +50,7 @@ const mapStateToProps = (state) =>
 	return {
 		toolAreaOpen : state.toolarea.toolAreaOpen,
 		visible      : state.room.toolbarsVisible,
-		unread       : state.toolarea.unread
+		unread       : state.toolarea.unreadMessages + state.toolarea.unreadFiles
 	};
 };
 
