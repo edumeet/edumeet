@@ -121,10 +121,14 @@ class FileChatEntry extends Component
 
 					{this.state.files && (
 						<div>
+							<p>Torrent finished downloading.</p>
+
 							{this.state.files.map((file, i) => (
 								<div key={i}>
+									{file.name}
+
 									<button onClick={() => this.saveFile(file)}>
-										Save {file.name}
+										Save
 									</button>
 								</div>
 							))}
