@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import WebTorrent from 'webtorrent';
 import createTorrent from 'create-torrent';
 import dragDrop from 'drag-drop';
@@ -7,6 +8,7 @@ import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import { store } from '../../store';
 import config from '../../../config';
+import FileEntry from './FileEntry';
 
 export const client = new WebTorrent({
 	tracker : {
@@ -20,11 +22,10 @@ const notifyPeers = (file) =>
 {
 	const { displayName, picture } = store.getState().me;
 
-	store.dispatch(stateActions.addUserFile(file));
-	store.dispatch(requestActions.sendChatFile(file, displayName, picture));
+	store.dispatch(requestActions.sendFile(file, displayName, picture));
 };
 
-const shareFiles = async(files) =>
+const shareFiles = async (files) =>
 {
 	const notification =
 	{
@@ -98,23 +99,40 @@ class FileSharing extends Component
 	{
 		return (
 			<div>
-				<input
-					style={{ display: 'none' }}
-					ref={this.fileInput}
-					type='file'
-					onChange={this.handleFileChange}
-					multiple
-				/>
+				<div>
+					<input
+						style={{ display: 'none' }}
+						ref={this.fileInput}
+						type='file'
+						onChange={this.handleFileChange}
+						multiple
+					/>
 
-				<button
-					type='button'
-					onClick={this.handleClick}
-				>
-					share file
-				</button>
+					<button
+						type='button'
+						onClick={this.handleClick}
+					>
+						share file
+					</button>
+				</div>
+
+				<div>
+					{this.props.sharing.map((entry) => (
+						<FileEntry
+							data={entry}
+						/>
+					))}
+				</div>
 			</div>
 		);
 	}
 }
 
-export default FileSharing;
+const mapStateToProps = (state) =>
+	({
+		sharing: state.sharing
+	});
+
+export default connect(
+	mapStateToProps
+)(FileSharing);

@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import magnet from 'magnet-uri';
 import * as requestActions from '../../redux/requestActions';
 import { saveAs } from 'file-saver/FileSaver';
-import { client } from './FileSharing';
+import { client } from './index';
 
-class FileChatEntry extends Component
+class FileEntry extends Component
 {
 	state = {
 		active   : false,
@@ -75,7 +75,7 @@ class FileChatEntry extends Component
 			active : true
 		});
 		
-		const magnet = this.props.message.file.magnet;
+		const magnet = this.props.data.file.magnet;
 
 		const existingTorrent = client.get(magnet);
 
@@ -95,13 +95,13 @@ class FileChatEntry extends Component
 				<div>
 					{!this.state.active && !this.state.files && (
 						<Fragment>
-							{this.props.message.sender === 'client' ? (
+							{this.props.data.me ? (
 								<p>You shared a file.</p>
 							) : (
 								<p>A new file was shared.</p>
 							)}
 
-							<p>{magnet.decode(this.props.message.file.magnet).dn}</p>
+							<p>{magnet.decode(this.props.data.file.magnet).dn}</p>
 
 							<button onClick={this.download}>
 								Download
@@ -147,4 +147,4 @@ const mapDispatchToProps = {
 export default connect(
 	undefined,
 	mapDispatchToProps
-)(FileChatEntry);
+)(FileEntry);

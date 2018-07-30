@@ -205,6 +205,22 @@ export default class RoomClient
 			});
 	}
 
+	sendFile(file)
+	{
+		logger.debug('sendFile() [file: %o]', file);
+
+		return this._protoo.send('send-file', { file })
+			.catch((error) =>
+		{
+			logger.error('sendFile() | failed: %o', error);
+
+			this._dispatch(requestActions.notify({
+				typ: 'error',
+				text: 'An error occurred while sharing a file'
+			}));
+		});
+	}
+
 	getChatHistory()
 	{
 		logger.debug('getChatHistory()');
@@ -1142,6 +1158,17 @@ export default class RoomClient
 						this._dispatch(
 							stateActions.addChatHistory(chatHistory));
 					}
+
+					break;
+				}
+
+				case 'file-receive':
+				{
+					accept();
+
+					const { file } = request.data;
+
+					this._dispatch(stateActions.addFile(file));
 
 					break;
 				}

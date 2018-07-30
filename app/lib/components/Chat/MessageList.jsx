@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import marked from 'marked';
 import { connect } from 'react-redux';
-import FileChatEntry from './FileChatEntry';
 
 const scrollToBottom = () =>
 {
@@ -60,20 +59,14 @@ class MessageList extends Component
 									<img className='message-avatar' src={picture} />
 
 									<div className='message-content'>
-										{message.type === 'message' && (
-											<div
-												className='message-text'
-												// eslint-disable-next-line react/no-danger
-												dangerouslySetInnerHTML={{ __html : marked.parse(
-													message.text,
-													{ sanitize: true, renderer: linkRenderer }
-												) }}
-											/>
-										)}
-
-										{message.type === 'file' && (
-											<FileChatEntry message={message} />
-										)}
+										<div
+											className='message-text'
+											// eslint-disable-next-line react/no-danger
+											dangerouslySetInnerHTML={{ __html : marked.parse(
+												message.text,
+												{ sanitize: true, renderer: linkRenderer }
+											) }}
+										/>
 
 										<span className='message-time'>
 											{message.name} - {this.getTimeString(messageTime)}

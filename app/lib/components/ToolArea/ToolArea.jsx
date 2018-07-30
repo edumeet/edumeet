@@ -5,6 +5,7 @@ import * as toolTabActions from '../../redux/stateActions';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import Chat from '../Chat/Chat';
 import Settings from '../Settings';
+import FileSharing from '../FileSharing';
 
 class ToolArea extends React.Component
 {
@@ -44,6 +45,19 @@ class ToolArea extends React.Component
 
 					<div className='tab'>
 						<Chat />
+					</div>
+
+					<input
+						type='radio'
+						name='tabs'
+						id='tab-files'
+						onChange={() => setToolTab('files')}
+						checked={currentToolTab === 'files'}
+					/>
+					<label htmlFor='tab-files'>Files</label>
+
+					<div className='tab'>
+						<FileSharing />
 					</div>
 
 					<input

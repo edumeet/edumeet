@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import MessageList from './MessageList';
-import FileSharing from './FileSharing';
 
 class Chat extends Component
 {
@@ -27,8 +26,6 @@ class Chat extends Component
 					data-component='Sender'
 					onSubmit={(e) => { onSendMessage(e, displayName, picture); }}
 				>
-					<FileSharing />
-
 					<input
 						type='text'
 						className='new-message'

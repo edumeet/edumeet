@@ -441,6 +441,14 @@ export const dropMessages = () =>
 	};
 };
 
+export const addFile = (payload) =>
+{
+	return {
+		type: 'ADD_FILE',
+		payload
+	};
+};
+
 export const setPicture = (picture) =>
 	({
 		type    : 'SET_PICTURE',
