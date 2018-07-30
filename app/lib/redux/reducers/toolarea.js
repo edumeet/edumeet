@@ -14,8 +14,9 @@ const toolarea = (state = initialState, action) =>
 		{
 			const toolAreaOpen = !state.toolAreaOpen;
 			const unreadMessages = toolAreaOpen && state.currentToolTab === 'chat' ? 0 : state.unreadMessages;
+			const unreadFiles = toolAreaOpen && state.currentToolTab === 'files' ? 0 : state.unreadFiles;
 
-			return { ...state, toolAreaOpen, unreadMessages };
+			return { ...state, toolAreaOpen, unreadMessages, unreadFiles };
 		}
 
 		case 'SET_TOOL_TAB':

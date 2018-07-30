@@ -1166,9 +1166,13 @@ export default class RoomClient
 				{
 					accept();
 
-					const { file } = request.data;
+					const payload = request.data.file;
 
-					this._dispatch(stateActions.addFile(file));
+					this._dispatch(stateActions.addFile(payload));
+
+					this._dispatch(requestActions.notify({
+						text: `${payload.name} shared a file`
+					}));
 
 					break;
 				}
