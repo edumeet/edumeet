@@ -25,7 +25,7 @@ const notifyPeers = (file) =>
 	store.dispatch(requestActions.sendFile(file, displayName, picture));
 };
 
-const shareFiles = async (files) =>
+const shareFiles = async(files) =>
 {
 	const notification =
 	{
@@ -98,8 +98,8 @@ class FileSharing extends Component
 	render()
 	{
 		return (
-			<div>
-				<div>
+			<div data-component='FileSharing'>
+				<div className='sharing-toolbar'>
 					<input
 						style={{ display: 'none' }}
 						ref={this.fileInput}
@@ -108,18 +108,20 @@ class FileSharing extends Component
 						multiple
 					/>
 
-					<button
+					<div
 						type='button'
 						onClick={this.handleClick}
+						className='share-file'
 					>
-						share file
-					</button>
+						<span>Share file</span>
+					</div>
 				</div>
 
-				<div>
-					{this.props.sharing.map((entry) => (
+				<div className='shared-files'>
+					{this.props.sharing.map((entry, i) => (
 						<FileEntry
 							data={entry}
+							key={i}
 						/>
 					))}
 				</div>
@@ -130,7 +132,7 @@ class FileSharing extends Component
 
 const mapStateToProps = (state) =>
 	({
-		sharing: state.sharing
+		sharing : state.sharing
 	});
 
 export default connect(

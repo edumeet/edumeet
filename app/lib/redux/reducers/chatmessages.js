@@ -1,7 +1,6 @@
 import
 {
-	createNewMessage,
-	createNewFile
+	createNewMessage
 } from './helper';
 
 const chatmessages = (state = [], action) =>

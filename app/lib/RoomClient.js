@@ -211,14 +211,14 @@ export default class RoomClient
 
 		return this._protoo.send('send-file', { file })
 			.catch((error) =>
-		{
-			logger.error('sendFile() | failed: %o', error);
+			{
+				logger.error('sendFile() | failed: %o', error);
 
-			this._dispatch(requestActions.notify({
-				typ: 'error',
-				text: 'An error occurred while sharing a file'
-			}));
-		});
+				this._dispatch(requestActions.notify({
+					typ  : 'error',
+					text : 'An error occurred while sharing a file'
+				}));
+			});
 	}
 
 	getChatHistory()
@@ -1171,7 +1171,7 @@ export default class RoomClient
 					this._dispatch(stateActions.addFile(payload));
 
 					this._dispatch(requestActions.notify({
-						text: `${payload.name} shared a file`
+						text : `${payload.name} shared a file`
 					}));
 
 					break;

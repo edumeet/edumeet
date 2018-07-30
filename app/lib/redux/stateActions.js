@@ -444,7 +444,7 @@ export const dropMessages = () =>
 export const addFile = (payload) =>
 {
 	return {
-		type: 'ADD_FILE',
+		type : 'ADD_FILE',
 		payload
 	};
 };

@@ -5,6 +5,8 @@ import * as requestActions from '../../redux/requestActions';
 import { saveAs } from 'file-saver/FileSaver';
 import { client } from './index';
 
+const DEFAULT_PICTURE = 'resources/images/avatar-empty.jpeg';
+
 class FileEntry extends Component
 {
 	state = {
@@ -91,28 +93,30 @@ class FileEntry extends Component
 	render()
 	{
 		return (
-			<Fragment>
-				<div>
+			<div className='file-entry'>
+				<img className='file-avatar' src={this.props.data.picture || DEFAULT_PICTURE} />
+	
+				<div className='file-content'>
+					{this.props.data.me ? (
+						<p>You shared a file.</p>
+					) : (
+						<p>{this.props.data.name} shared a file.</p>
+					)}
+
 					{!this.state.active && !this.state.files && (
-						<Fragment>
-							{this.props.data.me ? (
-								<p>You shared a file.</p>
-							) : (
-								<p>A new file was shared.</p>
-							)}
+						<div className='file-info'>
+							<span className='button' onClick={this.download}>
+								<img src='resources/images/download-icon.svg' />
+							</span>
 
 							<p>{magnet.decode(this.props.data.file.magnet).dn}</p>
-
-							<button onClick={this.download}>
-								Download
-							</button>
-						</Fragment>
+						</div>
 					)}
 
 					{this.state.active && this.state.numPeers === 0 && (
-						<div>
+						<p>
 							Locating peers
-						</div>
+						</p>
 					)}
 
 					{this.state.active && this.state.numPeers > 0 && (
@@ -120,22 +124,22 @@ class FileEntry extends Component
 					)}
 
 					{this.state.files && (
-						<div>
+						<Fragment>
 							<p>Torrent finished downloading.</p>
 
 							{this.state.files.map((file, i) => (
-								<div key={i}>
-									{file.name}
+								<div className='file-info' key={i}>
+									<span className='button' onClick={() => this.saveFile(file)}>
+										<img src='resources/images/save-icon.svg' />
+									</span>
 
-									<button onClick={() => this.saveFile(file)}>
-										Save
-									</button>
+									<p>{file.name}</p>
 								</div>
 							))}
-						</div>
+						</Fragment>
 					)}
 				</div>
-			</Fragment>
+			</div>
 		);
 	}
 }
