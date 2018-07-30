@@ -272,6 +272,19 @@ class Room extends EventEmitter
 					break;
 				}
 
+				case 'send-file':
+				{
+					accept();
+
+					const { file } = request.data;
+
+					this._protooRoom.spread('file-receive', {
+						file
+					}, [ protooPeer ]);
+
+					break;
+				}
+
 				case 'raisehand-message':
 				{
 					accept();
