@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import WebTorrent from 'webtorrent';
 import createTorrent from 'create-torrent';
-import dragDrop from 'drag-drop';
 import randomString from 'random-string';
 import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
@@ -26,7 +25,7 @@ const notifyPeers = (file) =>
 	store.dispatch(requestActions.sendFile(file, displayName, picture));
 };
 
-const shareFiles = async(files) =>
+export const shareFiles = async(files) =>
 {
 	const notification =
 	{
@@ -69,8 +68,6 @@ const shareFiles = async(files) =>
 		});
 	});
 };
-
-dragDrop('body', async(files) => await shareFiles(files));
 
 class FileSharing extends Component 
 {

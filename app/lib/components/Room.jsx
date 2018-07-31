@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
@@ -18,6 +18,9 @@ import Draggable from 'react-draggable';
 import { idle } from '../utils';
 import Sidebar from './Sidebar';
 import Filmstrip from './Filmstrip';
+import { configureDragDrop, HoldingOverlay } from './FileSharing/DragDropSharing';
+
+configureDragDrop();
 
 // Hide toolbars after 10 seconds of inactivity.
 const TIMEOUT = 10 * 1000;
@@ -73,102 +76,106 @@ class Room extends React.Component
 		}[room.mode];
 
 		return (
-			<Appear duration={300}>
-				<div data-component='Room'>
-					<FullScreenView advancedMode={room.advancedMode} />
-					<div
-						className='room-wrapper'
-						style={{
-							width : toolAreaOpen ? '80%' : '100%'
-						}}
-					>
-						<Notifications />
+			<Fragment>
+				<HoldingOverlay />
 
-						<ToolAreaButton />
-
-						{room.advancedMode ?
-							<div className='state' data-tip='Server status'>
-								<div className={classnames('icon', room.state)} />
-								<p className={classnames('text', room.state)}>{room.state}</p>
-							</div>
-							:null
-						}
-									
+				<Appear duration={300}>
+					<div data-component='Room'>
+						<FullScreenView advancedMode={room.advancedMode} />
 						<div
-							className={classnames('room-link-wrapper room-controls', {
-								'visible' : this.props.room.toolbarsVisible
-							})}
+							className='room-wrapper'
+							style={{
+								width : toolAreaOpen ? '80%' : '100%'
+							}}
 						>
-							<div className='room-link'>
-								<CopyToClipboard
-									text={room.url}
-									onCopy={onRoomLinkCopy}
-								>
-									<a
-										className='link'
-										href={room.url}
-										target='_blank'
-										data-tip='Click to copy room link'
-										rel='noopener noreferrer'
-										onClick={(event) =>
-										{
-											// If this is a 'Open in new window/tab' don't prevent
-											// click default action.
-											if (
-												event.ctrlKey || event.shiftKey || event.metaKey ||
-													// Middle click (IE > 9 and everyone else).
-													(event.button && event.button === 1)
-											)
-											{
-												return;
-											}
-		
-											event.preventDefault();
-										}}
-									>
-										invitation link
-									</a>
-								</CopyToClipboard>
-							</div>
-						</div>
+							<Notifications />
 
-						<View advancedMode={room.advancedMode} />
+							<ToolAreaButton />
 
-						<Draggable handle='.me-container' bounds='body' cancel='.display-name'>
+							{room.advancedMode ?
+								<div className='state' data-tip='Server status'>
+									<div className={classnames('icon', room.state)} />
+									<p className={classnames('text', room.state)}>{room.state}</p>
+								</div>
+								:null
+							}
+										
 							<div
-								className={classnames('me-container', {
-									'active-speaker' : amActiveSpeaker
+								className={classnames('room-link-wrapper room-controls', {
+									'visible' : this.props.room.toolbarsVisible
 								})}
 							>
-								<Me
+								<div className='room-link'>
+									<CopyToClipboard
+										text={room.url}
+										onCopy={onRoomLinkCopy}
+									>
+										<a
+											className='link'
+											href={room.url}
+											target='_blank'
+											data-tip='Click to copy room link'
+											rel='noopener noreferrer'
+											onClick={(event) =>
+											{
+												// If this is a 'Open in new window/tab' don't prevent
+												// click default action.
+												if (
+													event.ctrlKey || event.shiftKey || event.metaKey ||
+														// Middle click (IE > 9 and everyone else).
+														(event.button && event.button === 1)
+												)
+												{
+													return;
+												}
+			
+												event.preventDefault();
+											}}
+										>
+											invitation link
+										</a>
+									</CopyToClipboard>
+								</div>
+							</div>
+
+							<View advancedMode={room.advancedMode} />
+
+							<Draggable handle='.me-container' bounds='body' cancel='.display-name'>
+								<div
+									className={classnames('me-container', {
+										'active-speaker' : amActiveSpeaker
+									})}
+								>
+									<Me
+										advancedMode={room.advancedMode}
+									/>
+								</div>
+							</Draggable>
+
+							<Sidebar />
+
+							<ReactTooltip
+								effect='solid'
+								delayShow={100}
+								delayHide={100}
+							/>
+						</div>
+						<div
+							className='toolarea-wrapper'
+							style={{
+								width : toolAreaOpen ? '20%' : '0%'
+							}}
+						>
+							{toolAreaOpen ?
+								<ToolArea
 									advancedMode={room.advancedMode}
 								/>
-							</div>
-						</Draggable>
-
-						<Sidebar />
-
-						<ReactTooltip
-							effect='solid'
-							delayShow={100}
-							delayHide={100}
-						/>
+								:null
+							}
+						</div>
 					</div>
-					<div
-						className='toolarea-wrapper'
-						style={{
-							width : toolAreaOpen ? '20%' : '0%'
-						}}
-					>
-						{toolAreaOpen ?
-							<ToolArea
-								advancedMode={room.advancedMode}
-							/>
-							:null
-						}
-					</div>
-				</div>
-			</Appear>
+				</Appear>
+			</Fragment>
 		);
 	}
 }
