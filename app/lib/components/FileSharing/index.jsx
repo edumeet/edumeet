@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import WebTorrent from 'webtorrent';
 import createTorrent from 'create-torrent';
@@ -8,7 +9,7 @@ import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import { store } from '../../store';
 import config from '../../../config';
-import FileEntry from './FileEntry';
+import FileEntry, { FileEntryProps } from './FileEntry';
 
 export const client = new WebTorrent({
 	tracker : {
@@ -129,6 +130,10 @@ class FileSharing extends Component
 		);
 	}
 }
+
+FileSharing.propTypes = {
+	sharing : PropTypes.arrayOf(FileEntryProps.data).isRequired
+};
 
 const mapStateToProps = (state) =>
 	({

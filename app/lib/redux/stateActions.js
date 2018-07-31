@@ -452,8 +452,8 @@ export const addFile = (payload) =>
 export const addFileHistory = (fileHistory) =>
 {
 	return {
-		type: 'ADD_FILE_HISTORY',
-		payload: { fileHistory }
+		type    : 'ADD_FILE_HISTORY',
+		payload : { fileHistory }
 	};
 };
 

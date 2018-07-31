@@ -294,7 +294,7 @@ class Room extends EventEmitter
 					accept();
 
 					protooPeer.send('file-history-receive', {
-						fileHistory: this._fileHistory
+						fileHistory : this._fileHistory
 					});
 
 					break;

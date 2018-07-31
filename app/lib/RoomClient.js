@@ -248,10 +248,10 @@ export default class RoomClient
 				logger.error('getFileHistory() | failed: %o', error);
 
 				this._dispatch(requestActions.notify({
-					type: 'error',
-					text: 'Could not get file history'
+					type : 'error',
+					text : 'Could not get file history'
 				}));
-			})
+			});
 	}
 
 	muteMic()

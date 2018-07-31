@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react';
-import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import magnet from 'magnet-uri';
 import * as requestActions from '../../redux/requestActions';
 import { saveAs } from 'file-saver/FileSaver';
-import { client } from './index';
+import { client } from './index';
 
 const DEFAULT_PICTURE = 'resources/images/avatar-empty.jpeg';
 
@@ -71,13 +72,13 @@ class FileEntry extends Component
 		});
 	};
 
-	download = () =>
+	handleDownload = () =>
 	{
 		this.setState({
 			active : true
 		});
 		
-		const magnet = this.props.data.file.magnet;
+		const magnetURI = this.props.data.file.magnet;
 
 		const existingTorrent = client.get(magnet);
 
@@ -87,7 +88,7 @@ class FileEntry extends Component
 			return this.handleTorrent(existingTorrent);
 		}
 
-		client.add(magnet, this.handleTorrent);
+		client.add(magnetURI, this.handleTorrent);
 	}
 
 	render()
@@ -105,7 +106,7 @@ class FileEntry extends Component
 
 					{!this.state.active && !this.state.files && (
 						<div className='file-info'>
-							<span className='button' onClick={this.download}>
+							<span className='button' onClick={this.handleDownload}>
 								<img src='resources/images/download-icon.svg' />
 							</span>
 
@@ -143,6 +144,20 @@ class FileEntry extends Component
 		);
 	}
 }
+
+export const FileEntryProps = {
+	data : PropTypes.shape({
+		name    : PropTypes.string.isRequired,
+		picture : PropTypes.string.isRequired,
+		file    : PropTypes.shape({
+			magnet : PropTypes.string.isRequired
+		}).isRequired,
+		me : PropTypes.bool
+	}).isRequired,
+	notify : PropTypes.func.isRequired
+};
+
+FileEntry.propTypes = FileEntryProps;
 
 const mapDispatchToProps = {
 	notify : requestActions.notify
