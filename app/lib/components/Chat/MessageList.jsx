@@ -52,7 +52,7 @@ class MessageList extends Component
 
 						const picture = (message.sender === 'response' ?
 							message.picture : this.props.myPicture) || 'resources/images/avatar-empty.jpeg';
-					
+
 						return (
 							<div className='message' key={i}>
 								<div className={message.sender}>

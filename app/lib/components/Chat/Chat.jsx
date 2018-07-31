@@ -21,7 +21,6 @@ class Chat extends Component
 		return (
 			<div data-component='Chat'>
 				<MessageList />
-
 				<form
 					data-component='Sender'
 					onSubmit={(e) => { onSendMessage(e, displayName, picture); }}
