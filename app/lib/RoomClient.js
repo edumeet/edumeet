@@ -1149,16 +1149,6 @@ export default class RoomClient
 					this._dispatch(
 						stateActions.addResponseMessage({ ...chatMessage, peerName }));
 
-					const toolAreaState = this._getState().toolarea;
-
-					// Notify about the new file, unless the chat is open.
-					if (chatMessage.file && !(toolAreaState.toolAreaOpen && toolAreaState.currentToolTab === 'chat'))
-					{
-						this._dispatch(
-							requestActions.notify({ text: `${chatMessage.name} shared a file` })
-						);
-					}
-
 					break;
 				}
 
