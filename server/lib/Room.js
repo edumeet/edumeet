@@ -2,7 +2,7 @@
 
 const EventEmitter = require('events').EventEmitter;
 const protooServer = require('protoo-server');
-const WebTorrent = require('webtorrent');
+const WebTorrent = require('webtorrent-hybrid');
 const Logger = require('./Logger');
 const config = require('../config');
 
