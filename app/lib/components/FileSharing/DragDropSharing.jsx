@@ -4,11 +4,11 @@ import { shareFiles } from './index';
 
 export const configureDragDrop = () =>
 {
-  dragDrop('body', async(files) => await shareFiles(files));
+	dragDrop('body', async(files) => await shareFiles(files));
 };
 
 export const HoldingOverlay = () => (
-  <div id='holding-overlay'>
+	<div id='holding-overlay'>
     Drop files here to share them
-  </div>
+	</div>
 );

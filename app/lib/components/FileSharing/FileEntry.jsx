@@ -80,7 +80,7 @@ class FileEntry extends Component
 		
 		const magnetURI = this.props.data.file.magnet;
 
-		const existingTorrent = client.get(magnet);
+		const existingTorrent = client.get(magnetURI);
 
 		if (existingTorrent)
 		{

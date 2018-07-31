@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
@@ -18,7 +18,7 @@ import Draggable from 'react-draggable';
 import { idle } from '../utils';
 import Sidebar from './Sidebar';
 import Filmstrip from './Filmstrip';
-import { configureDragDrop, HoldingOverlay } from './FileSharing/DragDropSharing';
+import { configureDragDrop, HoldingOverlay } from './FileSharing/DragDropSharing';
 
 configureDragDrop();
 
