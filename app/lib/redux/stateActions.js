@@ -449,6 +449,14 @@ export const addFile = (payload) =>
 	};
 };
 
+export const addFileHistory = (fileHistory) =>
+{
+	return {
+		type: 'ADD_FILE_HISTORY',
+		payload: { fileHistory }
+	};
+};
+
 export const setPicture = (picture) =>
 	({
 		type    : 'SET_PICTURE',

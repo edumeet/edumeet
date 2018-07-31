@@ -8,6 +8,9 @@ const sharing = (state = [], action) =>
 		case 'ADD_FILE':
 			return [ ...state, action.payload ];
 
+		case 'ADD_FILE_HISTORY':
+			return [ ...action.payload.fileHistory, ...state ];
+
 		default:
 			return state;
 	}

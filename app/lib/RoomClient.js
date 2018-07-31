@@ -238,6 +238,22 @@ export default class RoomClient
 			});
 	}
 
+	getFileHistory()
+	{
+		logger.debug('getFileHistory()');
+
+		return this._protoo.send('file-history', {})
+			.catch((error) =>
+			{
+				logger.error('getFileHistory() | failed: %o', error);
+
+				this._dispatch(requestActions.notify({
+					type: 'error',
+					text: 'Could not get file history'
+				}));
+			})
+	}
+
 	muteMic()
 	{
 		logger.debug('muteMic()');
@@ -1177,6 +1193,22 @@ export default class RoomClient
 					break;
 				}
 
+				case 'file-history-receive':
+				{
+					accept();
+
+					const files = request.data.fileHistory;
+
+					if (files.length > 0)
+					{
+						logger.debug('Got files history');
+
+						this._dispatch(stateActions.addFileHistory(files));
+					}
+
+					break;
+				}
+
 				default:
 				{
 					logger.error('unknown protoo method "%s"', request.method);
@@ -1314,7 +1346,8 @@ export default class RoomClient
 				this._dispatch(stateActions.removeAllNotifications());
 
 				this.getChatHistory();
-
+				this.getFileHistory();
+				
 				this._dispatch(requestActions.notify(
 					{
 						text    : 'You are in the room',

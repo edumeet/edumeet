@@ -28,6 +28,8 @@ class Room extends EventEmitter
 
 		this._chatHistory = [];
 
+		this._fileHistory = [];
+
 		try
 		{
 			// Protoo Room instance.
@@ -278,9 +280,22 @@ class Room extends EventEmitter
 
 					const { file } = request.data;
 
+					this._fileHistory.push(file);
+	
 					this._protooRoom.spread('file-receive', {
 						file
 					}, [ protooPeer ]);
+
+					break;
+				}
+
+				case 'file-history':
+				{
+					accept();
+
+					protooPeer.send('file-history-receive', {
+						fileHistory: this._fileHistory
+					});
 
 					break;
 				}
