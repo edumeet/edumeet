@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import magnet from 'magnet-uri';
+import WebTorrent from 'webtorrent';
 import * as requestActions from '../../redux/requestActions';
 import { saveAs } from 'file-saver/FileSaver';
 import { client } from './index';
@@ -106,9 +107,15 @@ class FileEntry extends Component
 
 					{!this.state.active && !this.state.files && (
 						<div className='file-info'>
-							<span className='button' onClick={this.handleDownload}>
-								<img src='resources/images/download-icon.svg' />
-							</span>
+							{WebTorrent.WEBRTC_SUPPORT ? (
+								<span className='button' onClick={this.handleDownload}>
+									<img src='resources/images/download-icon.svg' />
+								</span>
+							) : (
+								<p>
+									Your browser does not support downloading files using WebTorrent.
+								</p>
+							)}
 
 							<p>{magnet.decode(this.props.data.file.magnet).dn}</p>
 						</div>

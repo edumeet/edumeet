@@ -4,13 +4,14 @@ import { connect } from 'react-redux';
 import WebTorrent from 'webtorrent';
 import createTorrent from 'create-torrent';
 import randomString from 'random-string';
+import classNames from 'classnames';
 import * as stateActions from '../../redux/stateActions';
 import * as requestActions from '../../redux/requestActions';
 import { store } from '../../store';
 import config from '../../../config';
 import FileEntry, { FileEntryProps } from './FileEntry';
 
-export const client = new WebTorrent({
+export const client = WebTorrent.WEBRTC_SUPPORT && new WebTorrent({
 	tracker : {
 		rtcConfig : {
 			iceServers : config.turnServers
@@ -25,7 +26,7 @@ const notifyPeers = (file) =>
 	store.dispatch(requestActions.sendFile(file, displayName, picture));
 };
 
-export const shareFiles = async(files) =>
+export const shareFiles = async (files) =>
 {
 	const notification =
 	{
@@ -78,7 +79,7 @@ class FileSharing extends Component
 		this.fileInput = React.createRef();
 	}
 
-	handleFileChange = async(event) =>
+	handleFileChange = async (event) =>
 	{
 		if (event.target.files.length > 0)
 		{
@@ -88,13 +89,19 @@ class FileSharing extends Component
 
 	handleClick = () =>
 	{
-		// We want to open the file dialog when we click a button
-		// instead of actually rendering the input element itself.
-		this.fileInput.current.click();
+		if (WebTorrent.WEBRTC_SUPPORT)
+		{
+			// We want to open the file dialog when we click a button
+			// instead of actually rendering the input element itself.
+			this.fileInput.current.click();
+		}
 	};
 
 	render()
 	{
+		const buttonDescription = WebTorrent.WEBRTC_SUPPORT ?
+			'Share file' : 'File sharing not supported';
+
 		return (
 			<div data-component='FileSharing'>
 				<div className='sharing-toolbar'>
@@ -109,9 +116,11 @@ class FileSharing extends Component
 					<div
 						type='button'
 						onClick={this.handleClick}
-						className='share-file'
+						className={classNames('share-file', {
+							disabled : !WebTorrent.WEBRTC_SUPPORT
+						})}
 					>
-						<span>Share file</span>
+						<span>{buttonDescription}</span>
 					</div>
 				</div>
 
