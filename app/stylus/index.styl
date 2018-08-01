@@ -71,3 +71,11 @@ body {
 		position: fixed; // Required for old IE
 	}
 }
+
+// Prevent pull-to-refresh and overscroll glow effect
+// when the app is installed as a progressive web app.
+@media (display-mode: standalone) {
+	body {
+		overscroll-behavior-y: none;
+	}
+}
