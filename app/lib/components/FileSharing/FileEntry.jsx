@@ -43,7 +43,8 @@ class FileEntry extends Component
 				files    : torrent.files,
 				numPeers : torrent.numPeers,
 				progress : 1,
-				active   : false
+				active   : false,
+				timeout  : false
 			});
 
 			return;
@@ -90,6 +91,16 @@ class FileEntry extends Component
 		}
 
 		client.add(magnetURI, this.handleTorrent);
+
+		setTimeout(() =>
+		{
+			if (this.state.active && this.state.numPeers === 0)
+			{
+				this.setState({
+					timeout : true
+				});
+			}
+		}, 10 * 1000);
 	}
 
 	render()
@@ -122,9 +133,18 @@ class FileEntry extends Component
 					)}
 
 					{this.state.active && this.state.numPeers === 0 && (
-						<p>
-							Locating peers
-						</p>
+						<Fragment>
+							<p>
+								Locating peers
+							</p>
+
+							{this.state.timeout && (
+								<p>
+									If this process takes a long time, there might not be anyone seeding
+									this torrent. Try asking someone to reupload the file that you want.
+								</p>
+							)}
+						</Fragment>
 					)}
 
 					{this.state.active && this.state.numPeers > 0 && (
