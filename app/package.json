@@ -33,7 +33,8 @@
     "redux-thunk": "^2.3.0",
     "resize-observer-polyfill": "^1.5.0",
     "riek": "^1.1.0",
-    "url-parse": "^1.4.1"
+    "url-parse": "^1.4.1",
+    "sw-precache": "^5.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

@@ -21,6 +21,7 @@ import reducers from './redux/reducers';
 import roomClientMiddleware from './redux/roomClientMiddleware';
 import Room from './components/Room';
 import { loginEnabled } from '../config';
+import registerServiceWorker from './registerServiceWorker';
 
 const logger = new Logger();
 const reduxMiddlewares =
@@ -195,3 +196,5 @@ global.recvSdp = function()
 	logger.debug(
 		global.CLIENT._recvTransport._handler._pc.localDescription.sdp);
 };
+
+registerServiceWorker();

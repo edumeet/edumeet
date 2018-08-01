@@ -190,6 +190,16 @@ gulp.task('resources', (done) =>
 	});
 });
 
+gulp.task('generate-service-worker', function(callback) 
+{
+	const swPrecache = require('sw-precache');
+
+	swPrecache.write(`${OUTPUT_DIR}/service-worker.js`, {
+		staticFileGlobs : [ `${OUTPUT_DIR }/**/*.{js,html,css,png,jpg,gif,svg,eot,ttf,woff}` ],
+		stripPrefix     : OUTPUT_DIR
+	}, callback);
+});
+
 gulp.task('bundle', () =>
 {
 	return bundle({ watch: false });
@@ -272,7 +282,8 @@ gulp.task('dist', gulp.series(
 	'bundle',
 	'html',
 	'css',
-	'resources'
+	'resources',
+	'generate-service-worker'
 ));
 
 gulp.task('live', gulp.series(
@@ -282,6 +293,7 @@ gulp.task('live', gulp.series(
 	'html',
 	'css',
 	'resources',
+	'generate-service-worker',
 	'watch',
 	'livebrowser'
 ));
