@@ -85,7 +85,7 @@ class Room extends React.Component
 						<div
 							className='room-wrapper'
 							style={{
-								width : toolAreaOpen ? '80%' : '100%'
+								width : toolAreaOpen ? '75%' : '100%'
 							}}
 						>
 							<Notifications />
@@ -163,7 +163,7 @@ class Room extends React.Component
 						<div
 							className='toolarea-wrapper'
 							style={{
-								width : toolAreaOpen ? '20%' : '0%'
+								width : toolAreaOpen ? '25%' : '0%'
 							}}
 						>
 							{toolAreaOpen ?
