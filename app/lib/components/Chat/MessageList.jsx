@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
+import { compose } from 'redux';
 import PropTypes from 'prop-types';
 import marked from 'marked';
 import { connect } from 'react-redux';
-
-const scrollToBottom = () =>
-{
-	const messagesDiv = document.getElementById('messages');
-
-	messagesDiv.scrollTop = messagesDiv.scrollHeight;
-};
+import scrollToBottom from './scrollToBottom';
 
 const linkRenderer = new marked.Renderer();
 
@@ -22,16 +17,6 @@ linkRenderer.link = (href, title, text) =>
 
 class MessageList extends Component
 {
-	componentDidMount()
-	{
-		scrollToBottom();
-	}
-
-	componentDidUpdate()
-	{
-		scrollToBottom();
-	}
-	
 	getTimeString(time)
 	{
 		return `${(time.getHours() < 10 ? '0' : '')}${time.getHours()}:${(time.getMinutes() < 10 ? '0' : '')}${time.getMinutes()}`;
@@ -96,8 +81,9 @@ const mapStateToProps = (state) =>
 	};
 };
 
-const MessageListContainer = connect(
-	mapStateToProps
+const MessageListContainer = compose(
+	connect(mapStateToProps),
+	scrollToBottom()
 )(MessageList);
 
 export default MessageListContainer;
