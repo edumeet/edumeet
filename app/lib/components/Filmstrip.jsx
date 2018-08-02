@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import * as stateActions from '../redux/stateActions';
 import Peer from './Peer';
 
 class Filmstrip extends Component
@@ -15,15 +16,32 @@ class Filmstrip extends Component
 	}
 
 	state = {
-		selectedPeerName : null,
-		lastSpeaker      : null,
-		width            : 400
+		lastSpeaker : null,
+		width       : 400
 	};
 
 	// Find the name of the peer which is currently speaking. This is either
-	// the latest active speaker, or the manually selected peer.
+	// the latest active speaker, or the manually selected peer, or, if no
+	// person has spoken yet, the first peer in the list of peers.
 	getActivePeerName = () =>
-		this.state.selectedPeerName || this.state.lastSpeaker;
+	{
+		if (this.props.selectedPeerName) 
+		{
+			return this.props.selectedPeerName;
+		}
+		
+		if (this.state.lastSpeaker)
+		{
+			return this.state.lastSpeaker;
+		}
+
+		const peerNames = Object.keys(this.props.peers);
+
+		if (peerNames.length > 0)
+		{
+			return peerNames[0];
+		}
+	};
 
 	isSharingCamera = (peerName) => this.props.peers[peerName] &&
 		this.props.peers[peerName].consumers.some((consumer) =>
@@ -92,14 +110,6 @@ class Filmstrip extends Component
 		}
 	}
 
-	handleSelectPeer = (selectedPeerName) =>
-	{
-		this.setState((oldState) => ({
-			selectedPeerName : oldState.selectedPeerName === selectedPeerName ?
-				null : selectedPeerName
-		}));
-	};
-
 	render()
 	{
 		const { peers, advancedMode } = this.props;
@@ -130,9 +140,9 @@ class Filmstrip extends Component
 						{Object.keys(peers).map((peerName) => (
 							<div
 								key={peerName}
-								onClick={() => this.handleSelectPeer(peerName)}
+								onClick={() => this.props.setSelectedPeer(peerName)}
 								className={classnames('film', {
-									selected : this.state.selectedPeerName === peerName,
+									selected : this.props.selectedPeerName === peerName,
 									active   : this.state.lastSpeaker === peerName
 								})}
 							>
@@ -156,17 +166,24 @@ Filmstrip.propTypes = {
 	advancedMode      : PropTypes.bool,
 	peers             : PropTypes.object.isRequired,
 	consumers         : PropTypes.object.isRequired,
-	myName            : PropTypes.string.isRequired
+	myName            : PropTypes.string.isRequired,
+	selectedPeerName  : PropTypes.string,
+	setSelectedPeer   : PropTypes.func.isRequired
 };
 
-const mapStateToProps = (state) =>
-	({
-		activeSpeakerName : state.room.activeSpeakerName,
-		peers             : state.peers,
-		consumers         : state.consumers,
-		myName            : state.me.name
-	});
+const mapStateToProps = (state) => ({
+	activeSpeakerName : state.room.activeSpeakerName,
+	selectedPeerName  : state.room.selectedPeerName,
+	peers             : state.peers,
+	consumers         : state.consumers,
+	myName            : state.me.name
+});
+
+const mapDispatchToProps = {
+	setSelectedPeer : stateActions.setSelectedPeer
+};
 
 export default connect(
-	mapStateToProps
+	mapStateToProps,
+	mapDispatchToProps
 )(Filmstrip);

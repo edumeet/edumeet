@@ -7,7 +7,7 @@ const ListMe = ({ me }) =>
 	const picture = me.picture || 'resources/images/avatar-empty.jpeg';
 
 	return (
-		<li className='list-item'>
+		<li className='list-item me'>
 			<div data-component='ListPeer'>
 				<img className='avatar' src={picture} />
 
