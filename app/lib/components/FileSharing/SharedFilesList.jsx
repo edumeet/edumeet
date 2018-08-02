@@ -1,33 +1,20 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import FileEntry, { FileEntryProps } from './FileEntry';
+import scrollToBottom from '../Chat/scrollToBottom';
 
-class SharedFilesList extends PureComponent
+/**
+ * This component cannot be pure, as we need to use
+ * refs to scroll to the bottom when new files arrive.
+ */
+class SharedFilesList extends Component
 {
-	constructor(props)
-	{
-		super(props);
-
-		this.listRef = React.createRef();
-	}
-
-	scrollToBottom = () =>
-	{
-		const elem = this.listRef.current;
-
-		elem.scrollTop = elem.scrollHeight;
-	};
-
-	componentDidUpdate()
-	{
-		this.scrollToBottom();
-	}
-
 	render()
 	{
 		return (
-			<div className='shared-files' ref={this.listRef}>
+			<div className='shared-files'>
 				{this.props.sharing.map((entry, i) => (
 					<FileEntry
 						data={entry}
@@ -54,6 +41,7 @@ const mapStateToProps = (state) =>
 		tabOpen : state.toolarea.currentToolTab === 'files'
 	});
 
-export default connect(
-	mapStateToProps
+export default compose(
+	connect(mapStateToProps),
+	scrollToBottom()
 )(SharedFilesList);
