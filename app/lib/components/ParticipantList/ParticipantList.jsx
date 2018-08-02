@@ -5,6 +5,7 @@ import * as requestActions from '../../redux/requestActions';
 import * as stateActions from '../../redux/stateActions';
 import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
+import ListMe from './ListMe';
 
 class ParticipantList extends React.Component
 {
@@ -23,6 +24,8 @@ class ParticipantList extends React.Component
 		return (
 			<div data-component='ParticipantList'>
 				<ul className='list'>
+					<ListMe />
+
 					{
 						peers.map((peer) =>
 						{
