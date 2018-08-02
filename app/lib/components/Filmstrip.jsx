@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import * as stateActions from '../redux/stateActions';
 import Peer from './Peer';
 
 class Filmstrip extends Component
@@ -15,15 +16,14 @@ class Filmstrip extends Component
 	}
 
 	state = {
-		selectedPeerName : null,
-		lastSpeaker      : null,
-		width            : 400
+		lastSpeaker : null,
+		width       : 400
 	};
 
 	// Find the name of the peer which is currently speaking. This is either
 	// the latest active speaker, or the manually selected peer.
 	getActivePeerName = () =>
-		this.state.selectedPeerName || this.state.lastSpeaker;
+		this.props.selectedPeerName || this.state.lastSpeaker;
 
 	isSharingCamera = (peerName) => this.props.peers[peerName] &&
 		this.props.peers[peerName].consumers.some((consumer) =>
@@ -94,10 +94,8 @@ class Filmstrip extends Component
 
 	handleSelectPeer = (selectedPeerName) =>
 	{
-		this.setState((oldState) => ({
-			selectedPeerName : oldState.selectedPeerName === selectedPeerName ?
-				null : selectedPeerName
-		}));
+		this.props.setSelectedPeer(this.props.selectedPeerName === selectedPeerName ?
+			null : selectedPeerName);
 	};
 
 	render()
@@ -132,7 +130,7 @@ class Filmstrip extends Component
 								key={peerName}
 								onClick={() => this.handleSelectPeer(peerName)}
 								className={classnames('film', {
-									selected : this.state.selectedPeerName === peerName,
+									selected : this.props.selectedPeerName === peerName,
 									active   : this.state.lastSpeaker === peerName
 								})}
 							>
@@ -156,17 +154,24 @@ Filmstrip.propTypes = {
 	advancedMode      : PropTypes.bool,
 	peers             : PropTypes.object.isRequired,
 	consumers         : PropTypes.object.isRequired,
-	myName            : PropTypes.string.isRequired
+	myName            : PropTypes.string.isRequired,
+	selectedPeerName  : PropTypes.string,
+	setSelectedPeer   : PropTypes.func.isRequired
 };
 
-const mapStateToProps = (state) =>
-	({
-		activeSpeakerName : state.room.activeSpeakerName,
-		peers             : state.peers,
-		consumers         : state.consumers,
-		myName            : state.me.name
-	});
+const mapStateToProps = (state) => ({
+	activeSpeakerName : state.room.activeSpeakerName,
+	selectedPeerName  : state.room.selectedPeerName,
+	peers             : state.peers,
+	consumers         : state.consumers,
+	myName            : state.me.name
+});
+
+const mapDispatchToProps = {
+	setSelectedPeer : stateActions.setSelectedPeer
+};
 
 export default connect(
-	mapStateToProps
+	mapStateToProps,
+	mapDispatchToProps
 )(Filmstrip);
