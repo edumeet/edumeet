@@ -72,7 +72,16 @@ const room = (state = initialState, action) =>
 			return { ...state, mode: action.payload.mode };
 
 		case 'SET_SELECTED_PEER':
-			return { ...state, selectedPeerName: action.payload.selectedPeerName };
+		{
+			const { selectedPeerName } = action.payload;
+
+			return {
+				...state,
+
+				selectedPeerName : state.selectedPeerName === selectedPeerName ?
+					null : selectedPeerName
+			};
+		}
 
 		default:
 			return state;

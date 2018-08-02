@@ -92,12 +92,6 @@ class Filmstrip extends Component
 		}
 	}
 
-	handleSelectPeer = (selectedPeerName) =>
-	{
-		this.props.setSelectedPeer(this.props.selectedPeerName === selectedPeerName ?
-			null : selectedPeerName);
-	};
-
 	render()
 	{
 		const { peers, advancedMode } = this.props;
@@ -128,7 +122,7 @@ class Filmstrip extends Component
 						{Object.keys(peers).map((peerName) => (
 							<div
 								key={peerName}
-								onClick={() => this.handleSelectPeer(peerName)}
+								onClick={() => this.props.setSelectedPeer(peerName)}
 								className={classnames('film', {
 									selected : this.props.selectedPeerName === peerName,
 									active   : this.state.lastSpeaker === peerName
