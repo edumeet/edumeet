@@ -82,12 +82,7 @@ class Room extends React.Component
 				<Appear duration={300}>
 					<div data-component='Room'>
 						<FullScreenView advancedMode={room.advancedMode} />
-						<div
-							className='room-wrapper'
-							style={{
-								width : toolAreaOpen ? '75%' : '100%'
-							}}
-						>
+						<div className='room-wrapper'>
 							<Notifications />
 
 							<ToolAreaButton />
@@ -161,10 +156,7 @@ class Room extends React.Component
 							/>
 						</div>
 						<div
-							className='toolarea-wrapper'
-							style={{
-								width : toolAreaOpen ? '25%' : '0%'
-							}}
+							className={classnames('toolarea-wrapper', { open: toolAreaOpen })}
 						>
 							{toolAreaOpen ?
 								<ToolArea

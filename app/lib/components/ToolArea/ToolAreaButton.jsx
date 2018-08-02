@@ -15,7 +15,7 @@ class ToolAreaButton extends React.Component
 		} = this.props;
 
 		return (
-			<div data-component='ToolAreaButton'>
+			<div data-component='ToolAreaButton' className={classnames({ on: toolAreaOpen })}>
 				<div
 					className={classnames('button toolarea-button room-controls', {
 						on      : toolAreaOpen,

@@ -1,14 +1,19 @@
 [data-component='ToolAreaButton'] {
 	position: absolute;
 	z-index: 101;
-	top: 20px;
-	right: 20px;
+	right: 0;
 	height: 36px;
 	width: 36px;
+	padding: 2rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	transition: right 0.3s;
+
+	&.on {
+		right: 25%;
+	}
 
 	> .button {
 		flex: 0 0 auto;
