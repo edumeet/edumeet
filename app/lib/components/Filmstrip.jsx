@@ -21,9 +21,27 @@ class Filmstrip extends Component
 	};
 
 	// Find the name of the peer which is currently speaking. This is either
-	// the latest active speaker, or the manually selected peer.
+	// the latest active speaker, or the manually selected peer, or, if no
+	// person has spoken yet, the first peer in the list of peers.
 	getActivePeerName = () =>
-		this.props.selectedPeerName || this.state.lastSpeaker;
+	{
+		if (this.props.selectedPeerName) 
+		{
+			return this.props.selectedPeerName;
+		}
+		
+		if (this.state.lastSpeaker)
+		{
+			return this.state.lastSpeaker;
+		}
+
+		const peerNames = Object.keys(this.props.peers);
+
+		if (peerNames.length > 0)
+		{
+			return peerNames[0];
+		}
+	};
 
 	isSharingCamera = (peerName) => this.props.peers[peerName] &&
 		this.props.peers[peerName].consumers.some((consumer) =>

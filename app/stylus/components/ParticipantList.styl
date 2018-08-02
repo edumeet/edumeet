@@ -12,6 +12,10 @@
 			overflow: hidden;
 			cursor: pointer;
 
+			&.me {
+				cursor: auto;
+			}
+
 			&.selected {
 				border-bottom-color: #377EFF;
 			}
@@ -21,6 +25,8 @@
 
 [data-component='ListPeer'] {
 	display: flex;
+	align-items: center;
+
 	> .indicators {
 		left: 0;
 		top: 0;
