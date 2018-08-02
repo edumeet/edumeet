@@ -5,10 +5,13 @@ import * as appPropTypes from '../appPropTypes';
 import * as stateActions from '../../redux/stateActions';
 import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
+import ListMe from './ListMe';
 
 const ParticipantList = ({ advancedMode, peers, setSelectedPeer, selectedPeerName }) => (
 	<div data-component='ParticipantList'>
 		<ul className='list'>
+			<ListMe />
+
 			{peers.map((peer) => (
 				<li
 					key={peer.name}
