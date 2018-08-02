@@ -11,7 +11,8 @@ const FullScreenView = (props) =>
 	const {
 		advancedMode,
 		consumer,
-		toggleConsumerFullscreen
+		toggleConsumerFullscreen,
+		toolbarsVisible
 	} = props;
 
 	if (!consumer)
@@ -39,7 +40,9 @@ const FullScreenView = (props) =>
 
 			<div className='controls'>
 				<div
-					className={classnames('button', 'fullscreen')}
+					className={classnames('button', 'fullscreen', 'room-controls', {
+						visible: toolbarsVisible
+					})}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
@@ -63,13 +66,15 @@ FullScreenView.propTypes =
 {
 	advancedMode             : PropTypes.bool,
 	consumer                 : appPropTypes.Consumer,
-	toggleConsumerFullscreen : PropTypes.func.isRequired
+	toggleConsumerFullscreen : PropTypes.func.isRequired,
+	toolbarsVisible          : PropTypes.bool
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		consumer : state.consumers[state.room.fullScreenConsumer]
+		consumer : state.consumers[state.room.fullScreenConsumer],
+		toolbarsVisible : state.room.toolbarsVisible
 	};
 };
 
