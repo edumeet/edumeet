@@ -27,7 +27,7 @@ class ToolAreaButton extends React.Component
 					onClick={() => toggleToolArea()}
 				/>
 
-				{unread > 0 && (
+				{!toolAreaOpen && unread > 0 && (
 					<span className={classnames('badge', { long: unread >= 10 })}>
 						{unread}
 					</span>
@@ -50,7 +50,7 @@ const mapStateToProps = (state) =>
 	return {
 		toolAreaOpen : state.toolarea.toolAreaOpen,
 		visible      : state.room.toolbarsVisible,
-		unread       : state.toolarea.unread
+		unread       : state.toolarea.unreadMessages + state.toolarea.unreadFiles
 	};
 };
 

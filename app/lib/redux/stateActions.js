@@ -410,6 +410,14 @@ export const addUserMessage = (text) =>
 	};
 };
 
+export const addUserFile = (file) =>
+{
+	return {
+		type    : 'ADD_NEW_USER_FILE',
+		payload : { file }
+	};
+};
+
 export const addResponseMessage = (message) =>
 {
 	return {
@@ -430,6 +438,22 @@ export const dropMessages = () =>
 {
 	return {
 		type : 'DROP_MESSAGES'
+	};
+};
+
+export const addFile = (payload) =>
+{
+	return {
+		type : 'ADD_FILE',
+		payload
+	};
+};
+
+export const addFileHistory = (fileHistory) =>
+{
+	return {
+		type    : 'ADD_FILE_HISTORY',
+		payload : { fileHistory }
 	};
 };
 

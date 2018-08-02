@@ -41,7 +41,7 @@ const FullScreenView = (props) =>
 			<div className='controls'>
 				<div
 					className={classnames('button', 'fullscreen', 'room-controls', {
-						visible: toolbarsVisible
+						visible : toolbarsVisible
 					})}
 					onClick={(e) =>
 					{
@@ -73,7 +73,7 @@ FullScreenView.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		consumer : state.consumers[state.room.fullScreenConsumer],
+		consumer        : state.consumers[state.room.fullScreenConsumer],
 		toolbarsVisible : state.room.toolbarsVisible
 	};
 };

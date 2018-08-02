@@ -21,6 +21,19 @@ $ cd server
 $ npm install
 ```
 
+In addition, the server requires a screen to be installed for the server
+to be able to seed shared torrent files. This is because the headless
+Electron instance used by WebTorrent expects one. This means that in order
+to run the project on a server, you need to install a virtual screen
+such as `xvfb` by running
+
+```bash
+sudo apt install xvfb
+```
+
+See [webtorrent-hybrid](https://github.com/webtorrent/webtorrent-hybrid) for
+more information about this.
+
 * Copy `config.example.js` as `config.js` and customize it for your scenario:
 
 ```bash

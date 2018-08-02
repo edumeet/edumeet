@@ -231,6 +231,12 @@ export default ({ dispatch, getState }) => (next) =>
 
 				break;
 			}
+
+			case 'SEND_FILE':
+			{
+				client.sendFile(action.payload);
+				break;
+			}
 		}
 
 		return next(action);

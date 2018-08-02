@@ -213,6 +213,14 @@ export const sendChatMessage = (text, name, picture) =>
 	};
 };
 
+export const sendFile = (file, name, picture) =>
+{
+	return {
+		type    : 'SEND_FILE',
+		payload : { file, name, picture }
+	};
+};
+
 // This returns a redux-thunk action (a function).
 export const notify = ({ type = 'info', text, timeout }) =>
 {

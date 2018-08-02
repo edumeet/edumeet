@@ -5,6 +5,7 @@ import * as toolTabActions from '../../redux/stateActions';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import Chat from '../Chat/Chat';
 import Settings from '../Settings';
+import FileSharing from '../FileSharing';
 
 class ToolArea extends React.Component
 {
@@ -17,7 +18,8 @@ class ToolArea extends React.Component
 	{
 		const {
 			currentToolTab,
-			unread,
+			unreadMessages,
+			unreadFiles,
 			setToolTab
 		} = this.props;
 
@@ -37,13 +39,32 @@ class ToolArea extends React.Component
 					<label htmlFor='tab-chat'>
 						Chat
 						
-						{unread > 0 && (
-							<span className='badge'>{unread}</span>
+						{unreadMessages > 0 && (
+							<span className='badge'>{unreadMessages}</span>
 						)}
 					</label>
 
 					<div className='tab'>
 						<Chat />
+					</div>
+
+					<input
+						type='radio'
+						name='tabs'
+						id='tab-files'
+						onChange={() => setToolTab('files')}
+						checked={currentToolTab === 'files'}
+					/>
+					<label htmlFor='tab-files'>
+						Files
+
+						{unreadFiles > 0 && (
+							<span className='badge'>{unreadFiles}</span>
+						)}
+					</label>
+
+					<div className='tab'>
+						<FileSharing />
 					</div>
 
 					<input
@@ -88,12 +109,14 @@ ToolArea.propTypes =
 	advancedMode   : PropTypes.bool,
 	currentToolTab : PropTypes.string.isRequired,
 	setToolTab     : PropTypes.func.isRequired,
-	unread         : PropTypes.number.isRequired
+	unreadMessages : PropTypes.number.isRequired,
+	unreadFiles    : PropTypes.number.isRequired
 };
 
 const mapStateToProps = (state) => ({
 	currentToolTab : state.toolarea.currentToolTab,
-	unread         : state.toolarea.unread
+	unreadMessages : state.toolarea.unreadMessages,
+	unreadFiles    : state.toolarea.unreadFiles
 });
 
 const mapDispatchToProps = {

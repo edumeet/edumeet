@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events').EventEmitter;
 const protooServer = require('protoo-server');
+const WebTorrent = require('webtorrent-hybrid');
 const Logger = require('./Logger');
 const config = require('../config');
 
@@ -10,6 +11,14 @@ const MIN_BITRATE = Math.min(50000, MAX_BITRATE);
 const BITRATE_FACTOR = 0.75;
 
 const logger = new Logger('Room');
+
+const torrentClient = new WebTorrent({
+	tracker : {
+		rtcConfig : {
+			iceServers : config.turnServers
+		}
+	}
+});
 
 class Room extends EventEmitter
 {
@@ -27,6 +36,8 @@ class Room extends EventEmitter
 		this._closed = false;
 
 		this._chatHistory = [];
+
+		this._fileHistory = [];
 
 		try
 		{
@@ -268,6 +279,37 @@ class Room extends EventEmitter
 						'chat-history-receive',
 						{ chatHistory: this._chatHistory }
 					);
+
+					break;
+				}
+
+				case 'send-file':
+				{
+					accept();
+
+					const fileData = request.data.file;
+
+					this._fileHistory.push(fileData);
+
+					if (!torrentClient.get(fileData.file.magnet))
+					{
+						torrentClient.add(fileData.file.magnet);
+					}
+
+					this._protooRoom.spread('file-receive', {
+						file : fileData
+					}, [ protooPeer ]);
+
+					break;
+				}
+
+				case 'file-history':
+				{
+					accept();
+
+					protooPeer.send('file-history-receive', {
+						fileHistory : this._fileHistory
+					});
 
 					break;
 				}
