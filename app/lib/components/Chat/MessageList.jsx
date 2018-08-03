@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
+import { compose } from 'redux';
 import PropTypes from 'prop-types';
 import marked from 'marked';
 import { connect } from 'react-redux';
-
-const scrollToBottom = () =>
-{
-	const messagesDiv = document.getElementById('messages');
-
-	messagesDiv.scrollTop = messagesDiv.scrollHeight;
-};
+import scrollToBottom from './scrollToBottom';
 
 const linkRenderer = new marked.Renderer();
 
@@ -22,16 +17,6 @@ linkRenderer.link = (href, title, text) =>
 
 class MessageList extends Component
 {
-	componentDidMount()
-	{
-		scrollToBottom();
-	}
-
-	componentDidUpdate()
-	{
-		scrollToBottom();
-	}
-	
 	getTimeString(time)
 	{
 		return `${(time.getHours() < 10 ? '0' : '')}${time.getHours()}:${(time.getMinutes() < 10 ? '0' : '')}${time.getMinutes()}`;
@@ -50,20 +35,28 @@ class MessageList extends Component
 					{
 						const messageTime = new Date(message.time);
 
+						const picture = (message.sender === 'response' ?
+							message.picture : this.props.myPicture) || 'resources/images/avatar-empty.jpeg';
+
 						return (
 							<div className='message' key={i}>
 								<div className={message.sender}>
-									<div
-										className='message-text'
-										// eslint-disable-next-line react/no-danger
-										dangerouslySetInnerHTML={{ __html : marked.parse(
-											message.text,
-											{ sanitize: true, renderer: linkRenderer }
-										) }}
-									/>
-									<span className='message-time'>
-										{message.name} - {this.getTimeString(messageTime)}
-									</span>
+									<img className='message-avatar' src={picture} />
+
+									<div className='message-content'>
+										<div
+											className='message-text'
+											// eslint-disable-next-line react/no-danger
+											dangerouslySetInnerHTML={{ __html : marked.parse(
+												message.text,
+												{ sanitize: true, renderer: linkRenderer }
+											) }}
+										/>
+
+										<span className='message-time'>
+											{message.name} - {this.getTimeString(messageTime)}
+										</span>
+									</div>
 								</div>
 							</div>
 						);
@@ -76,18 +69,21 @@ class MessageList extends Component
 
 MessageList.propTypes =
 {
-	chatmessages : PropTypes.arrayOf(PropTypes.object).isRequired
+	chatmessages : PropTypes.arrayOf(PropTypes.object).isRequired,
+	myPicture    : PropTypes.string
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		chatmessages : state.chatmessages
+		chatmessages : state.chatmessages,
+		myPicture    : state.me.picture
 	};
 };
 
-const MessageListContainer = connect(
-	mapStateToProps
+const MessageListContainer = compose(
+	connect(mapStateToProps),
+	scrollToBottom()
 )(MessageList);
 
 export default MessageListContainer;

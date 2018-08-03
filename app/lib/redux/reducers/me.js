@@ -15,13 +15,16 @@ const initialState =
 	webcamInProgress      : false,
 	audioInProgress       : false,
 	screenShareInProgress : false,
-	loginInProgress       : false,
 	loginEnabled          : false,
 	audioOnly             : false,
 	audioOnlyInProgress   : false,
 	raiseHand             : false,
 	raiseHandInProgress   : false,
-	restartIceInProgress  : false
+	restartIceInProgress  : false,
+	picture               : null,
+	selectedWebcam        : null,
+	selectedAudioDevice   : null,
+	loggedIn              : false
 };
 
 const me = (state = initialState, action) =>
@@ -46,6 +49,22 @@ const me = (state = initialState, action) =>
 				device,
 				loginEnabled
 			};
+		}
+
+		case 'LOGGED_IN':
+			return { ...state, loggedIn: true };
+
+		case 'USER_LOGOUT':
+			return { ...state, loggedIn: false };
+
+		case 'CHANGE_WEBCAM':
+		{
+			return { ...state, selectedWebcam: action.payload.deviceId };
+		}
+
+		case 'CHANGE_AUDIO_DEVICE':
+		{
+			return { ...state, selectedAudioDevice: action.payload.deviceId };
 		}
 
 		case 'SET_MEDIA_CAPABILITIES':
@@ -111,13 +130,6 @@ const me = (state = initialState, action) =>
 			return { ...state, screenShareInProgress: flag };
 		}
 
-		case 'SET_LOGIN_IN_PROGRESS':
-		{
-			const { flag } = action.payload;
-
-			return { ...state, loginInProgress: flag };
-		}
-
 		case 'SET_DISPLAY_NAME':
 		{
 			let { displayName } = action.payload;
@@ -162,6 +174,11 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, restartIceInProgress: flag };
+		}
+
+		case 'SET_PICTURE':
+		{
+			return { ...state, picture: action.payload.picture };
 		}
 
 		default:

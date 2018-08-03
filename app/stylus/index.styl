@@ -5,6 +5,7 @@ global-reset();
 @import './mixins';
 @import './fonts';
 @import './reset';
+@import './keyframes';
 
 html {
 	height: 100%;
@@ -28,27 +29,31 @@ html {
 
 body {
 	height: 100%;
+	overflow-x: hidden;
 }
 
 #multiparty-meeting {
 	height: 100%;
 	width: 100%;
-
-	// Components
-	@import './components/Room';
-	@import './components/Me';
-	@import './components/Peers';
-	@import './components/Peer';
-	@import './components/PeerView';
-	@import './components/ScreenView';
-	@import './components/Notifications';
-	@import './components/Chat';
-	@import './components/Settings';
-	@import './components/ToolArea';
-	@import './components/ParticipantList';
-	@import './components/FullScreenView';
-	@import './components/FullView';
 }
+
+// Components
+@import './components/Room';
+@import './components/Sidebar';
+@import './components/Me';
+@import './components/Peers';
+@import './components/Peer';
+@import './components/PeerView';
+@import './components/ScreenView';
+@import './components/Notifications';
+@import './components/Chat';
+@import './components/Settings';
+@import './components/ToolArea';
+@import './components/ParticipantList';
+@import './components/FullScreenView';
+@import './components/FullView';
+@import './components/Filmstrip';
+@import './components/FileSharing';
 
 // Hack to detect in JS the current media query
 #multiparty-meeting-media-query-detector {

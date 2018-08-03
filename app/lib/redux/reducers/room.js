@@ -5,7 +5,10 @@ const initialState =
 	activeSpeakerName  : null,
 	showSettings       : false,
 	advancedMode       : false,
-	fullScreenConsumer : null // ConsumerID
+	fullScreenConsumer : null, // ConsumerID
+	toolbarsVisible    : true,
+	mode               : 'democratic',
+	selectedPeerName   : null
 };
 
 const room = (state = initialState, action) =>
@@ -56,6 +59,28 @@ const room = (state = initialState, action) =>
 			const currentConsumer = state.fullScreenConsumer;
 
 			return { ...state, fullScreenConsumer: currentConsumer ? null : consumerId };
+		}
+
+		case 'SET_TOOLBARS_VISIBLE':
+		{
+			const { toolbarsVisible } = action.payload;
+
+			return { ...state, toolbarsVisible };
+		}
+
+		case 'SET_DISPLAY_MODE':
+			return { ...state, mode: action.payload.mode };
+
+		case 'SET_SELECTED_PEER':
+		{
+			const { selectedPeerName } = action.payload;
+
+			return {
+				...state,
+
+				selectedPeerName : state.selectedPeerName === selectedPeerName ?
+					null : selectedPeerName
+			};
 		}
 
 		default:

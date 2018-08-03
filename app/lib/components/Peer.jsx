@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -8,130 +8,132 @@ import * as stateActions from '../redux/stateActions';
 import PeerView from './PeerView';
 import ScreenView from './ScreenView';
 
-const Peer = (props) =>
+class Peer extends Component
 {
-	const {
-		advancedMode,
-		peer,
-		micConsumer,
-		webcamConsumer,
-		screenConsumer,
-		onMuteMic,
-		onUnmuteMic,
-		onDisableWebcam,
-		onEnableWebcam,
-		onDisableScreen,
-		onEnableScreen,
-		toggleConsumerFullscreen,
-		style
-	} = props;
+	state = {
+		controlsVisible : false
+	};
 
-	const micEnabled = (
-		Boolean(micConsumer) &&
-		!micConsumer.locallyPaused &&
-		!micConsumer.remotelyPaused
-	);
+	handleMouseOver = () =>
+	{
+		this.setState({
+			controlsVisible : true
+		});
+	};
 
-	const videoVisible = (
-		Boolean(webcamConsumer) &&
-		!webcamConsumer.locallyPaused &&
-		!webcamConsumer.remotelyPaused
-	);
+	handleMouseOut = () =>
+	{
+		this.setState({
+			controlsVisible : false
+		});
+	};
 
-	const screenVisible = (
-		Boolean(screenConsumer) &&
-		!screenConsumer.locallyPaused &&
-		!screenConsumer.remotelyPaused
-	);
+	render()
+	{
+		const {
+			advancedMode,
+			peer,
+			micConsumer,
+			webcamConsumer,
+			screenConsumer,
+			onMuteMic,
+			onUnmuteMic,
+			onDisableWebcam,
+			onEnableWebcam,
+			onDisableScreen,
+			onEnableScreen,
+			toggleConsumerFullscreen,
+			style
+		} = this.props;
 
-	let videoProfile;
+		const micEnabled = (
+			Boolean(micConsumer) &&
+			!micConsumer.locallyPaused &&
+			!micConsumer.remotelyPaused
+		);
 
-	if (webcamConsumer)
-		videoProfile = webcamConsumer.profile;
+		const videoVisible = (
+			Boolean(webcamConsumer) &&
+			!webcamConsumer.locallyPaused &&
+			!webcamConsumer.remotelyPaused
+		);
 
-	let screenProfile;
+		const screenVisible = (
+			Boolean(screenConsumer) &&
+			!screenConsumer.locallyPaused &&
+			!screenConsumer.remotelyPaused
+		);
 
-	if (screenConsumer)
-		screenProfile = screenConsumer.profile;
+		let videoProfile;
 
-	return (
-		<div
-			data-component='Peer'
-			className={classnames({
-				screen : screenConsumer
-			})}
-		>
-			{videoVisible && !webcamConsumer.supported ?
-				<div className='incompatible-video'>
-					<p>incompatible video</p>
-				</div>
-				:null
-			}
+		if (webcamConsumer)
+			videoProfile = webcamConsumer.profile;
 
-			<div className={classnames('view-container', 'webcam')} style={style}>
-				<div className='controls'>
+		let screenProfile;
+
+		if (screenConsumer)
+			screenProfile = screenConsumer.profile;
+
+		return (
+			<div
+				data-component='Peer'
+				className={classnames({
+					screen : screenConsumer
+				})}
+				onMouseOver={this.handleMouseOver}
+				onMouseOut={this.handleMouseOut}
+			>
+				{videoVisible && !webcamConsumer.supported ?
+					<div className='incompatible-video'>
+						<p>incompatible video</p>
+					</div>
+					:null
+				}
+
+				<div className={classnames('view-container', 'webcam')} style={style}>
+					<div className='indicators'>
+						{peer.raiseHandState ?
+							<div className={
+								classnames(
+									'icon', 'raise-hand', {
+										on  : peer.raiseHandState,
+										off : !peer.raiseHandState
+									}
+								)
+							}
+							/>
+							:null
+						}
+					</div>
 					<div
-						className={classnames('button', 'mic', {
-							on       : micEnabled,
-							off      : !micEnabled,
-							disabled : peer.peerAudioInProgress
+						className={classnames('controls', {
+							visible : this.state.controlsVisible
 						})}
-						onClick={(e) =>
-						{
-							e.stopPropagation();
-							micEnabled ? onMuteMic(peer.name) : onUnmuteMic(peer.name);
-						}}
-					/>
-
-					<div
-						className={classnames('button', 'webcam', {
-							on       : videoVisible,
-							off      : !videoVisible,
-							disabled : peer.peerVideoInProgress
-						})}
-						onClick={(e) =>
-						{
-							e.stopPropagation();
-							videoVisible ?
-								onDisableWebcam(peer.name) : onEnableWebcam(peer.name);
-						}}
-					/>
-
-					<div
-						className={classnames('button', 'fullscreen')}
-						onClick={(e) =>
-						{
-							e.stopPropagation();
-							toggleConsumerFullscreen(webcamConsumer);
-						}}
-					/>
-				</div>
-				<PeerView
-					advancedMode={advancedMode}
-					peer={peer}
-					audioTrack={micConsumer ? micConsumer.track : null}
-					videoTrack={webcamConsumer ? webcamConsumer.track : null}
-					videoVisible={videoVisible}
-					videoProfile={videoProfile}
-					audioCodec={micConsumer ? micConsumer.codec : null}
-					videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-				/>
-			</div>
-
-			{screenConsumer ?
-				<div className={classnames('view-container', 'screen')} style={style}>
-					<div className='controls'>
+					>
 						<div
-							className={classnames('button', 'screen', {
-								on       : screenVisible,
-								off      : !screenVisible,
-								disabled : peer.peerScreenInProgress
+							className={classnames('button', 'mic', {
+								on       : micEnabled,
+								off      : !micEnabled,
+								disabled : peer.peerAudioInProgress
 							})}
 							onClick={(e) =>
 							{
 								e.stopPropagation();
-								screenVisible ?
-									onDisableScreen(peer.name) : onEnableScreen(peer.name);
+								micEnabled ? onMuteMic(peer.name) : onUnmuteMic(peer.name);
+							}}
+						/>
+
+						<div
+							className={classnames('button', 'webcam', {
+								on       : videoVisible,
+								off      : !videoVisible,
+								disabled : peer.peerVideoInProgress
+							})}
+							onClick={(e) =>
+							{
+								e.stopPropagation();
+								videoVisible ?
+									onDisableWebcam(peer.name) : onEnableWebcam(peer.name);
 							}}
 						/>
 
@@ -140,23 +142,67 @@ const Peer = (props) =>
 							onClick={(e) =>
 							{
 								e.stopPropagation();
-								toggleConsumerFullscreen(screenConsumer);
+								toggleConsumerFullscreen(webcamConsumer);
 							}}
 						/>
 					</div>
-					<ScreenView
+					<PeerView
 						advancedMode={advancedMode}
-						screenTrack={screenConsumer ? screenConsumer.track : null}
-						screenVisible={screenVisible}
-						screenProfile={screenProfile}
-						screenCodec={screenConsumer ? screenConsumer.codec : null}
+						peer={peer}
+						audioTrack={micConsumer ? micConsumer.track : null}
+						volume={micConsumer ? micConsumer.volume : null}
+						videoTrack={webcamConsumer ? webcamConsumer.track : null}
+						videoVisible={videoVisible}
+						videoProfile={videoProfile}
+						audioCodec={micConsumer ? micConsumer.codec : null}
+						videoCodec={webcamConsumer ? webcamConsumer.codec : null}
 					/>
 				</div>
-				:null
-			}
-		</div>
-	);
-};
+
+				{screenConsumer ?
+					<div className={classnames('view-container', 'screen')} style={style}>
+						<div
+							className={classnames('controls', {
+								visible : this.state.controlsVisible
+							})}
+						>
+							<div
+								className={classnames('button', 'screen', {
+									on       : screenVisible,
+									off      : !screenVisible,
+									disabled : peer.peerScreenInProgress
+								})}
+								onClick={(e) =>
+								{
+									e.stopPropagation();
+									screenVisible ?
+										onDisableScreen(peer.name) : onEnableScreen(peer.name);
+								}}
+							/>
+
+							<div
+								className={classnames('button', 'fullscreen')}
+								onClick={(e) =>
+								{
+									e.stopPropagation();
+									toggleConsumerFullscreen(screenConsumer);
+								}}
+							/>
+						</div>
+						<ScreenView
+							advancedMode={advancedMode}
+							screenTrack={screenConsumer ? screenConsumer.track : null}
+							screenVisible={screenVisible}
+							screenProfile={screenProfile}
+							screenCodec={screenConsumer ? screenConsumer.codec : null}
+						/>
+					</div>
+					:null
+				}
+			</div>
+		);
+	}
+}
 
 Peer.propTypes =
 {
@@ -209,7 +255,7 @@ const mapDispatchToProps = (dispatch) =>
 		},
 		onEnableWebcam : (peerName) =>
 		{
-			
+
 			dispatch(requestActions.resumePeerVideo(peerName));
 		},
 		onDisableWebcam : (peerName) =>

@@ -93,6 +93,12 @@ export const toggleAdvancedMode = () =>
 	};
 };
 
+export const setDisplayMode = (mode) =>
+	({
+		type    : 'SET_DISPLAY_MODE',
+		payload : { mode }
+	});
+
 export const setAudioOnlyState = (enabled) =>
 {
 	return {
@@ -137,14 +143,6 @@ export const setMyRaiseHandState = (flag) =>
 {
 	return {
 		type    : 'SET_MY_RAISE_HAND_STATE',
-		payload : { flag }
-	};
-};
-
-export const setLoginInProgress = (flag) =>
-{
-	return {
-		type    : 'SET_LOGIN_IN_PROGRESS',
 		payload : { flag }
 	};
 };
@@ -331,6 +329,22 @@ export const setConsumerTrack = (consumerId, track) =>
 	};
 };
 
+export const setConsumerVolume = (consumerId, volume) =>
+{
+	return {
+		type    : 'SET_CONSUMER_VOLUME',
+		payload : { consumerId, volume }
+	};
+};
+
+export const setProducerVolume = (producerId, volume) =>
+{
+	return {
+		type    : 'SET_PRODUCER_VOLUME',
+		payload : { producerId, volume }
+	};
+};
+
 export const addNotification = (notification) =>
 {
 	return {
@@ -369,6 +383,11 @@ export const toggleConsumerFullscreen = (consumerId) =>
 	};
 };
 
+export const setToolbarsVisible = (toolbarsVisible) => ({
+	type    : 'SET_TOOLBARS_VISIBLE',
+	payload : { toolbarsVisible }
+});
+
 export const increaseBadge = () =>
 {
 	return {
@@ -388,6 +407,14 @@ export const addUserMessage = (text) =>
 	return {
 		type    : 'ADD_NEW_USER_MESSAGE',
 		payload : { text }
+	};
+};
+
+export const addUserFile = (file) =>
+{
+	return {
+		type    : 'ADD_NEW_USER_FILE',
+		payload : { file }
 	};
 };
 
@@ -413,3 +440,41 @@ export const dropMessages = () =>
 		type : 'DROP_MESSAGES'
 	};
 };
+
+export const addFile = (payload) =>
+{
+	return {
+		type : 'ADD_FILE',
+		payload
+	};
+};
+
+export const addFileHistory = (fileHistory) =>
+{
+	return {
+		type    : 'ADD_FILE_HISTORY',
+		payload : { fileHistory }
+	};
+};
+
+export const setPicture = (picture) =>
+	({
+		type    : 'SET_PICTURE',
+		payload : { picture }
+	});
+
+export const setPeerPicture = (peerName, picture) =>
+	({
+		type    : 'SET_PEER_PICTURE',
+		payload : { peerName, picture }
+	});
+
+export const loggedIn = () =>
+	({
+		type : 'LOGGED_IN'
+	});
+
+export const setSelectedPeer = (selectedPeerName) => ({
+	type    : 'SET_SELECTED_PEER',
+	payload : { selectedPeerName }
+});

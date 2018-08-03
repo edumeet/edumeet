@@ -142,6 +142,13 @@ export const userLogin = () =>
 	};
 };
 
+export const userLogout = () =>
+{
+	return {
+		type : 'USER_LOGOUT'
+	};
+};
+
 export const raiseHand = () =>
 {
 	return {
@@ -184,13 +191,33 @@ export const installExtension = () =>
 	};
 };
 
-export const sendChatMessage = (text, name) =>
+export const toggleHand = (enable) =>
 {
-	const message = createNewMessage(text, 'response', name);
+	if (enable)
+		return {
+			type : 'RAISE_HAND'
+		};
+	else
+		return {
+			type : 'LOWER_HAND'
+		};
+};
+
+export const sendChatMessage = (text, name, picture) =>
+{
+	const message = createNewMessage(text, 'response', name, picture);
 
 	return {
 		type    : 'SEND_CHAT_MESSAGE',
 		payload : { message }
+	};
+};
+
+export const sendFile = (file, name, picture) =>
+{
+	return {
+		type    : 'SEND_FILE',
+		payload : { file, name, picture }
 	};
 };
 

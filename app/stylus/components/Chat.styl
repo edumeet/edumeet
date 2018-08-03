@@ -61,7 +61,7 @@
 }
 
 [data-component='MessageList'] {
-	background-color: rgba(#fff, 0.9);
+	background-color: rgba(#000, 0.1);
 	height: 91vmin;
 	overflow-y: scroll;
 	padding-top: 5px;
@@ -71,43 +71,35 @@
 		margin: 5px;
 		display: flex;
 		word-wrap: break-word;
-		color: rgba(#000, 1.0)
 
 		> .client {
-			background-color: rgba(#fff, 0.9);
-			border-radius: 5px;
-			padding: 6px;
-			max-width: 215px;
-			text-align: left;
 			margin-left: auto;
-
-			> .message-text {
-				font-size: 1.3vmin;
-				color: rgba(#000, 1.0);
-			}
-
-			> .message-time {
-				font-size: 1vmin;
-				color: rgba(#777, 1.0)
-			}
 		}
 
-		> .response {
-			background-color: rgba(#fff, 0.9);
+		> .client, > .response {
+			background-color: rgba(#000, 0.1);
 			border-radius: 5px;
-			padding: 6px;
 			max-width: 215px;
-			text-align: left;
-			font-size: 1.3vmin;
+			display: flex;
+			align-items: center;
+			padding: 6px;
 
-			> .message-text {
-				font-size: 1.3vmin;
-				color: rgba(#000, 1.0);
+			> .message-avatar {
+				height: 2rem;
+				border-radius: 50%;
 			}
 
-			> .message-time {
-				font-size: 1vmin;
-				color: rgba(#777, 1.0);
+			> .message-content {
+				padding-left: 6px;
+
+				> .message-text {
+					font-size: 1.3vmin;
+				}
+
+				> .message-time {
+					font-size: 1vmin;
+					opacity: 0.8;
+				}
 			}
 		}
 	}
@@ -116,7 +108,7 @@
 [data-component='Sender'] {
 	align-items: center;
 	display: flex;
-	background-color: rgba(#fff, 0.9);
+	background-color: rgba(#000, 0.1);
 	height: 6vmin;
 	padding: 0.5vmin;
 	border-radius: 0 0 5px 5px;
@@ -125,8 +117,8 @@
 		width: 100%;
 		border: 0;
 		border-radius: 5px;
-		background-color: rgba(#fff, 0.9);
-		color: #000;
+		background-color: rgba(#000, 0.1);
+		color: #fff;
 		height: 30px;
 		padding-left: 10px;
 		font-size: 1.4vmin;

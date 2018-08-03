@@ -38,11 +38,28 @@ const ListPeer = (props) =>
 		!screenConsumer.remotelyPaused
 	);
 
+	const picture = peer.picture || 'resources/images/avatar-empty.jpeg';
+
 	return (
 		<div data-component='ListPeer'>
-			<img className='avatar' />
+			<img className='avatar' src={picture} />
+
 			<div className='peer-info'>
 				{peer.displayName}
+			</div>
+			<div className='indicators'>
+				{peer.raiseHandState ?
+					<div className={
+						classnames(
+							'icon', 'raise-hand', {
+								on  : peer.raiseHandState,
+								off : !peer.raiseHandState
+							}
+						)
+					}
+					/>
+					:null
+				}
 			</div>
 			<div className='controls'>
 				{ screenConsumer ?
@@ -67,6 +84,8 @@ const ListPeer = (props) =>
 						off      : !micEnabled,
 						disabled : peer.peerAudioInProgress
 					})}
+					style={{ opacity : micEnabled && micConsumer ? (micConsumer.volume/10)
+						+ 0.2 :1 }}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
@@ -140,7 +159,7 @@ const mapDispatchToProps = (dispatch) =>
 		},
 		onEnableWebcam : (peerName) =>
 		{
-			
+
 			dispatch(requestActions.resumePeerVideo(peerName));
 		},
 		onDisableWebcam : (peerName) =>

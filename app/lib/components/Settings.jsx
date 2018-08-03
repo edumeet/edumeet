@@ -6,75 +6,83 @@ import * as stateActions from '../redux/stateActions';
 import PropTypes from 'prop-types';
 import Dropdown from 'react-dropdown';
 
-class Settings extends React.Component
+const modes = [ {
+	value : 'democratic',
+	label : 'Democratic view'
+}, {
+	value : 'filmstrip',
+	label : 'Filmstrip view'
+} ];
+
+const findOption = (options, value) => options.find((option) => option.value === value);
+
+const Settings = ({
+	room, me, onToggleAdvancedMode, handleChangeWebcam,
+	handleChangeAudioDevice, handleChangeMode
+}) =>
 {
-	constructor(props)
-	{
-		super(props);
-	}
+	let webcams;
+	let webcamText;
 
-	render()
-	{
-		const {
-			room,
-			me,
-			handleChangeWebcam,
-			handleChangeAudioDevice,
-			onToggleAdvancedMode
-		} = this.props;
+	if (me.canChangeWebcam)
+		webcamText = 'Select camera';
+	else
+		webcamText = 'Unable to select camera';
 
-		let webcams;
-		let webcamText;
+	if (me.webcamDevices)
+		webcams = Array.from(me.webcamDevices.values());
+	else
+		webcams = [];
 
-		if (me.canChangeWebcam)
-			webcamText = 'Select camera';
-		else
-			webcamText = 'Unable to select camera';
+	let audioDevices;
+	let audioDevicesText;
 
-		if (me.webcamDevices)
-			webcams = Array.from(me.webcamDevices.values());
-		else
-			webcams = [];
+	if (me.canChangeAudioDevice)
+		audioDevicesText = 'Select audio input device';
+	else
+		audioDevicesText = 'Unable to select audio input device';
 
-		let audioDevices;
-		let audioDevicesText;
+	if (me.audioDevices)
+		audioDevices = Array.from(me.audioDevices.values());
+	else
+		audioDevices = [];
 
-		if (me.canChangeAudioDevice)
-			audioDevicesText = 'Select audio input device';
-		else
-			audioDevicesText = 'Unable to select audio input device';
+	return (
+		<div data-component='Settings'>
+			<div className='settings'>
+				<Dropdown
+					disabled={!me.canChangeWebcam}
+					options={webcams}
+					value={findOption(webcams, me.selectedWebcam)}
+					onChange={(webcam) => handleChangeWebcam(webcam.value)}
+					placeholder={webcamText}
+				/>
+			
+				<Dropdown
+					disabled={!me.canChangeAudioDevice}
+					options={audioDevices}
+					value={findOption(audioDevices, me.selectedAudioDevice)}
+					onChange={(device) => handleChangeAudioDevice(device.value)}
+					placeholder={audioDevicesText}
+				/>
 
-		if (me.audioDevices)
-			audioDevices = Array.from(me.audioDevices.values());
-		else
-			audioDevices = [];
+				<input
+					id='room-mode'
+					type='checkbox'
+					checked={room.advancedMode}
+					onChange={onToggleAdvancedMode}
+				/>
+				<label htmlFor='room-mode'>Advanced mode</label>
 
-		return (
-			<div data-component='Settings'>
-				<div className='settings'>
-					<Dropdown
-						disabled={!me.canChangeWebcam}
-						options={webcams}
-						onChange={handleChangeWebcam}
-						placeholder={webcamText}
-					/>
-					<Dropdown
-						disabled={!me.canChangeAudioDevice}
-						options={audioDevices}
-						onChange={handleChangeAudioDevice}
-						placeholder={audioDevicesText}
-					/>
-					<input
-						type='checkbox'
-						defaultChecked={room.advancedMode}
-						onChange={onToggleAdvancedMode}
-					/>
-					<span>Advanced mode</span>
-				</div>
+				<Dropdown
+					options={modes}
+					value={findOption(modes, room.mode)}
+					onChange={(mode) => handleChangeMode(mode.value)}
+				/>
 			</div>
-		);
-	}
-}
+		</div>
+	);
+};
 
 Settings.propTypes =
 {
@@ -82,7 +90,8 @@ Settings.propTypes =
 	room                    : appPropTypes.Room.isRequired,
 	handleChangeWebcam      : PropTypes.func.isRequired,
 	handleChangeAudioDevice : PropTypes.func.isRequired,
-	onToggleAdvancedMode    : PropTypes.func.isRequired
+	onToggleAdvancedMode    : PropTypes.func.isRequired,
+	handleChangeMode        : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -93,22 +102,11 @@ const mapStateToProps = (state) =>
 	};
 };
 
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		handleChangeWebcam : (device) =>
-		{
-			dispatch(requestActions.changeWebcam(device.value));
-		},
-		handleChangeAudioDevice : (device) =>
-		{
-			dispatch(requestActions.changeAudioDevice(device.value));
-		},
-		onToggleAdvancedMode : () =>
-		{
-			dispatch(stateActions.toggleAdvancedMode());
-		}
-	};
+const mapDispatchToProps = {
+	handleChangeWebcam      : requestActions.changeWebcam,
+	handleChangeAudioDevice : requestActions.changeAudioDevice,
+	onToggleAdvancedMode    : stateActions.toggleAdvancedMode,
+	handleChangeMode        : stateActions.setDisplayMode
 };
 
 const SettingsContainer = connect(

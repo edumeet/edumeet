@@ -7,7 +7,6 @@
 		left: 0;
 		height: 100%;
 		width: 100%;
-		transition: width 0.3s;
 
 		> .state {
 			position: fixed;
@@ -95,7 +94,7 @@
 		> .room-link-wrapper {
 			pointer-events: none;
 			position: absolute;
-			z-index: 1;
+			z-index: 10;
 			top: 0;
 			left: 0;
 			right: 0;
@@ -142,7 +141,7 @@
 
 		> .me-container {
 			position: fixed;
-			z-index: 100;
+			z-index: 110;
 			overflow: hidden;
 			box-shadow: 0px 5px 12px 2px rgba(#111, 0.5);
 			transition-property: border-color;
@@ -153,126 +152,44 @@
 			}
 
 			+desktop() {
-				bottom: 20px;
+				top: 20px;
 				left: 20px;
 				border: 1px solid rgba(#fff, 0.15);
 			}
 
 			+mobile() {
-				bottom: 10px;
+				top: 10px;
 				left: 10px;
 				border: 1px solid rgba(#fff, 0.25);
-			}
-		}
-
-		> .sidebar {
-			position: fixed;
-			z-index: 101;
-			top: calc(50% - 60px);
-			height: 120px;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-
-			+desktop() {
-				left: 20px;
-				width: 36px;
-			}
-
-			+mobile() {
-				left: 10px;
-				width: 32px;
-			}
-
-			> .button {
-				flex: 0 0 auto;
-				margin: 4px 0;
-				background-position: center;
-				background-size: 75%;
-				background-repeat: no-repeat;
-				background-color: rgba(#fff, 0.3);
-				cursor: pointer;
-				transition-property: opacity, background-color;
-				transition-duration: 0.15s;
-				border-radius: 100%;
-
-				+desktop() {
-					height: 36px;
-					width: 36px;
-				}
-
-				+mobile() {
-					height: 32px;
-					width: 32px;
-				}
-
-				&.on {
-					background-color: rgba(#fff, 0.7);
-				}
-
-				&.disabled {
-					pointer-events: none;
-					opacity: 0.5;
-				}
-
-				&.login {
-					&.off {
-						background-image: url('/resources/images/icon_login_white.svg');
-					}
-				}
-
-				&.settings {
-					&.off {
-						background-image: url('/resources/images/icon_settings_white.svg');
-					}
-
-					&.on {
-						background-image: url('/resources/images/icon_settings_black.svg');
-					}
-				}
-
-				&.screen {
-					&.on {
-						background-image: url('/resources/images/no-share-screen-black.svg');
-					}
-
-					&.off {
-						background-image: url('/resources/images/share-screen-white.svg');
-					}
-
-					&.unsupported {
-						background-image: url('/resources/images/no-share-screen-white.svg');
-						background-color: rgba(#d42241, 0.7);
-					}
-
-					&.need-extension {
-						background-image: url('/resources/images/share-screen-extension.svg');
-					}
-				}
-				&.raise-hand {
-					background-image: url('/resources/images/icon-hand-white.svg');
-
-					&.on {
-						background-image: url('/resources/images/icon-hand-black.svg');
-					}
-				}
-
-				&.leave-meeting {
-					background-image: url('/resources/images/leave-meeting.svg');
-				}
 			}
 		}
 	}
 
 	> .toolarea-wrapper {
 		position: fixed;
+		width: 0;
 		top: 0;
 		right: 0;
-		width: 20%;
 		height: 100%;
-		background-color: #FFF;
+		background-color: rgba(50, 50, 50, 0.9);
 		transition: width 0.3s;
+		z-index: 1000;
+	
+		&.open {
+			width: 25%;
+		}
+	}
+}
+
+.room-controls {
+	visibility: hidden;
+	animation: fade-out 0.3s;
+	opacity: 0;
+
+	&.visible {
+		visibility: visible;
+		opacity: 1;
+		animation: fade-in 0.3s;
 	}
 }
 
@@ -329,7 +246,7 @@
 	position: absolute;
 	top: 100%;
 	width: 100%;
-	z-index: 1000;
+	z-index: 120;
 	-webkit-overflow-scrolling: touch;
 }
 

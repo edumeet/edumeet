@@ -22,6 +22,15 @@ $ cp server/config.example.js server/config.js
 
 * Copy `app/config.example.js` to `app/config.js` :
 
+In addition, the server requires a screen to be installed for the server
+to be able to seed shared torrent files. This is because the headless
+Electron instance used by WebTorrent expects one.
+
+See [webtorrent-hybrid](https://github.com/webtorrent/webtorrent-hybrid) for
+more information about this.
+
+* Copy `config.example.js` as `config.js` and customize it for your scenario:
+
 ```bash
 $ cp app/config.example.js app/config.js
 ```

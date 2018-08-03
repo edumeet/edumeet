@@ -19,7 +19,7 @@
 
 		> .controls {
 			position: absolute;
-			z-index: 10;
+			z-index: 20;
 			right: 0;
 			top: 0;
 			display: flex;
@@ -27,7 +27,13 @@
 			justify-content: flex-start;
 			align-items: center;
 			padding: 0.4vmin;
+			opacity: 0;
+			transition: opacity 0.3s;
 
+			&.visible {
+				opacity: 1;
+			}
+			
 			> .button {
 				flex: 0 0 auto;
 				margin: 0.2vmin;

@@ -5,46 +5,51 @@ import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import { Appear } from './transitions';
 import Peer from './Peer';
+import ResizeObserver from 'resize-observer-polyfill';
+
+const RATIO = 1.334;
 
 class Peers extends React.Component
 {
 	constructor(props)
 	{
 		super(props);
+
 		this.state = {
 			peerWidth  : 400,
-			peerHeight : 300, 
-			ratio      : 1.334
+			peerHeight : 300
 		};
+
+		this.peersRef = React.createRef();
 	}
 
-	resizeUpdate()
+	updateDimensions = () =>
 	{
-		this.updateDimensions();
-	}
-
-	updateDimensions(props = this.props)
-	{
-		const n = props.videoStreams ? props.videoStreams : 0;
-
-		if (n == 0)
+		if (!this.peersRef.current) 
 		{
 			return;
 		}
 
-		const width = this.refs.peers.clientWidth;
-		const height = this.refs.peers.clientHeight;
+		const n = this.props.boxes;
+
+		if (n === 0)
+		{
+			return;
+		}
+
+		const width = this.peersRef.current.clientWidth;
+		const height = this.peersRef.current.clientHeight;
 
 		let x, y, space;
 
 		for (let rows = 1; rows < 100; rows = rows + 1)
 		{
 			x = width / Math.ceil(n / rows);
-			y = x / this.state.ratio;
+			y = x / RATIO;
 			if (height < (y * rows))
 			{
 				y = height / rows;
-				x = this.state.ratio * y;
+				x = RATIO * y;
 				break;
 			}
 			space = height - (y * (rows));
@@ -60,21 +65,24 @@ class Peers extends React.Component
 				peerHeight : 0.9 * y
 			});
 		}
-	}
+	};
 
 	componentDidMount()
 	{
-		window.addEventListener('resize', this.resizeUpdate.bind(this));
+		window.addEventListener('resize', this.updateDimensions);
+		const observer = new ResizeObserver(this.updateDimensions);
+
+		observer.observe(this.peersRef.current);
 	}
 
 	componentWillUnmount()
 	{
-		window.removeEventListener('resize', this.resizeUpdate.bind(this));
+		window.removeEventListener('resize', this.updateDimensions);
 	}
 
-	componentWillReceiveProps(nextProps)
+	componentDidUpdate()
 	{
-		this.updateDimensions(nextProps);
+		this.updateDimensions();
 	}
 
 	render()
@@ -82,18 +90,17 @@ class Peers extends React.Component
 		const {
 			advancedMode,
 			activeSpeakerName,
-			peers,
-			toolAreaOpen
+			peers
 		} = this.props;
 
-		const style = 
+		const style =
 		{
 			'width'  : this.state.peerWidth,
 			'height' : this.state.peerHeight
 		};
 
 		return (
-			<div data-component='Peers' ref='peers'>
+			<div data-component='Peers' ref={this.peersRef}>
 				{
 					peers.map((peer) =>
 					{
@@ -108,7 +115,6 @@ class Peers extends React.Component
 										advancedMode={advancedMode}
 										name={peer.name}
 										style={style}
-										toolAreaOpen={toolAreaOpen}
 									/>
 								</div>
 							</Appear>
@@ -121,29 +127,24 @@ class Peers extends React.Component
 }
 
 Peers.propTypes =
-{
-	advancedMode      : PropTypes.bool,
-	peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
-	videoStreams      : PropTypes.any,
-	activeSpeakerName : PropTypes.string,
-	toolAreaOpen      : PropTypes.bool
-};
+	{
+		advancedMode      : PropTypes.bool,
+		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
+		boxes             : PropTypes.number,
+		activeSpeakerName : PropTypes.string
+	};
 
 const mapStateToProps = (state) =>
 {
-	const peersArray = Object.values(state.peers);
-	const videoStreamsArray = Object.values(state.consumers);
-	const videoStreams =
-		videoStreamsArray.filter((consumer) =>
-		{
-			return (consumer.source === 'webcam' || consumer.source === 'screen');
-		}).length;
+	const peers = Object.values(state.peers);
+
+	const boxes = peers.length + Object.values(state.consumers)
+		.filter((consumer) => consumer.source === 'screen').length;
 
 	return {
-		peers             : peersArray,
-		videoStreams      : videoStreams,
-		activeSpeakerName : state.room.activeSpeakerName,
-		toolAreaOpen      : state.toolarea.toolAreaOpen
+		peers,
+		boxes,
+		activeSpeakerName : state.room.activeSpeakerName
 	};
 };
 

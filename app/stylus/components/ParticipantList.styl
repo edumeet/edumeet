@@ -7,14 +7,75 @@
 
 		> .list-item {
 			padding: 0.5vmin;
-			border-bottom: 1px solid #ddd;
+			border-bottom: 1px solid #CBCBCB;
 			width: 100%;
 			overflow: hidden;
+			cursor: pointer;
+
+			&.me {
+				cursor: auto;
+			}
+
+			&.selected {
+				border-bottom-color: #377EFF;
+			}
 		}
 	}
 }
 
 [data-component='ListPeer'] {
+	display: flex;
+	align-items: center;
+
+	> .indicators {
+		left: 0;
+		top: 0;
+		display: flex;
+		flex-direction:; row;
+		justify-content: flex-start;
+		align-items: center;
+		padding: 0.4vmin;
+		transition: opacity 0.3s;
+
+		> .icon {
+			flex: 0 0 auto;
+			margin: 0.2vmin;
+			border-radius: 2px;
+			background-position: center;
+			background-size: 75%;
+			background-repeat: no-repeat;
+			background-color: rgba(#000, 0.5);
+			transition-property: opacity, background-color;
+			transition-duration: 0.15s;
+
+			+desktop() {
+				width: 24px;
+				height: 24px;
+				opacity: 0.85;
+
+				&:hover {
+					opacity: 1;
+				}
+			}
+
+			+mobile() {
+				width: 22px;
+				height: 22px;
+			}
+
+			&.on {
+				opacity: 1;
+			}
+
+			&.off {
+				opacity: 0.2;
+			}
+
+			&.raise-hand {
+				background-image: url('/resources/images/icon-hand-white.svg');
+			}
+		}
+	}
 	> .controls {
 		float: right;
 		display: flex;
@@ -110,23 +171,16 @@
 	}
 
 	> .avatar {
-		padding: 8px 16px;
-		float: left;
-		width: auto;
-		border: none;
-		display: block;
-		outline: 0;
-		border-radius: 50%;
-		vertical-align: middle;
+    border-radius: 50%;
+    height: 2rem;
 	}
 
 	> .peer-info {
-		font-size: 1.4vmin;
-		float: left;
-		width: auto;
-		border: none;
-		display: block;
-		outline: 0;
-		padding: 0.6vmin;
+    font-size: 1.4vmin;
+    border: none;
+    display: flex;
+    padding: 1vmin;
+    flex-grow: 1;
+    align-items: center;
 	}
 }

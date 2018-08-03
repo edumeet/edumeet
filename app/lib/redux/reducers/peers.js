@@ -1,126 +1,93 @@
-const initialState = {};
+import omit from 'lodash/omit';
 
-const peers = (state = initialState, action) =>
+const peer = (state = {}, action) =>
+{
+	switch (action.type) 
+	{
+		case 'ADD_PEER':
+			return action.payload.peer;
+
+		case 'SET_PEER_DISPLAY_NAME':
+			return { ...state, displayName: action.payload.displayName };
+
+		case 'SET_PEER_VIDEO_IN_PROGRESS':
+			return { ...state, peerVideoInProgress: action.payload.flag };
+
+		case 'SET_PEER_AUDIO_IN_PROGRESS':
+			return { ...state, peerAudioInProgress: action.payload.flag };
+
+		case 'SET_PEER_SCREEN_IN_PROGRESS':
+			return { ...state, peerScreenInProgress: action.payload.flag };
+		
+		case 'SET_PEER_RAISE_HAND_STATE':
+			return { ...state, raiseHandState: action.payload.raiseHandState };
+		
+		case 'ADD_CONSUMER':
+		{
+			const consumers = [ ...state.consumers, action.payload.consumer.id ];
+
+			return { ...state, consumers };
+		}
+
+		case 'REMOVE_CONSUMER':
+		{
+			const consumers = state.consumers.filter((consumer) =>
+				consumer !== action.payload.consumerId);
+
+			return { ...state, consumers };
+		}
+
+		case 'SET_PEER_PICTURE':
+		{
+			return { ...state, picture: action.payload.picture };
+		}
+
+		default:
+			return state;
+	}
+};
+
+const peers = (state = {}, action) =>
 {
 	switch (action.type)
 	{
 		case 'ADD_PEER':
 		{
-			const { peer } = action.payload;
-
-			return { ...state, [peer.name]: peer };
+			return { ...state, [action.payload.peer.name]: peer(undefined, action) };
 		}
 
 		case 'REMOVE_PEER':
 		{
-			const { peerName } = action.payload;
-			const newState = { ...state };
-
-			delete newState[peerName];
-
-			return newState;
+			return omit(state, [ action.payload.peerName ]);
 		}
 
 		case 'SET_PEER_DISPLAY_NAME':
-		{
-			const { displayName, peerName } = action.payload;
-			const peer = state[peerName];
-
-			if (!peer)
-				throw new Error('no Peer found');
-
-			const newPeer = { ...peer, displayName };
-
-			return { ...state, [newPeer.name]: newPeer };
-		}
-
 		case 'SET_PEER_VIDEO_IN_PROGRESS':
-		{
-			const { peerName, flag } = action.payload;
-			const peer = state[peerName];
-
-			if (!peer)
-				throw new Error('no Peer found');
-
-			const newPeer = { ...peer, peerVideoInProgress: flag };
-
-			return { ...state, [newPeer.name]: newPeer };
-		}
-
 		case 'SET_PEER_AUDIO_IN_PROGRESS':
-		{
-			const { peerName, flag } = action.payload;
-			const peer = state[peerName];
-
-			if (!peer)
-				throw new Error('no Peer found');
-
-			const newPeer = { ...peer, peerAudioInProgress: flag };
-
-			return { ...state, [newPeer.name]: newPeer };
-		}
-
 		case 'SET_PEER_SCREEN_IN_PROGRESS':
-		{
-			const { peerName, flag } = action.payload;
-			const peer = state[peerName];
-
-			if (!peer)
-				throw new Error('no Peer found');
-
-			const newPeer = { ...peer, peerScreenInProgress: flag };
-
-			return { ...state, [newPeer.name]: newPeer };
-		}
-
 		case 'SET_PEER_RAISE_HAND_STATE':
-		{
-			const { peerName, raiseHandState } = action.payload;
-			const peer = state[peerName];
-
-			if (!peer)
-				throw new Error('no Peer found');
-
-			const newPeer = { ...peer, raiseHandState };
-
-			return { ...state, [newPeer.name]: newPeer };
-		}
-
+		case 'SET_PEER_PICTURE':
 		case 'ADD_CONSUMER':
 		{
-			const { consumer, peerName } = action.payload;
-			const peer = state[peerName];
+			const oldPeer = state[action.payload.peerName];
 
-			if (!peer)
-				throw new Error('no Peer found for new Consumer');
+			if (!oldPeer) 
+			{
+				throw new Error('no Peer found');
+			}
 
-			const newConsumers = [ ...peer.consumers, consumer.id ];
-			const newPeer = { ...peer, consumers: newConsumers };
-
-			return { ...state, [newPeer.name]: newPeer };
+			return { ...state, [oldPeer.name]: peer(oldPeer, action) };
 		}
-
+		
 		case 'REMOVE_CONSUMER':
 		{
-			const { consumerId, peerName } = action.payload;
-			const peer = state[peerName];
+			const oldPeer = state[action.payload.peerName];
 
 			// NOTE: This means that the Peer was closed before, so it's ok.
-			if (!peer)
+			if (!oldPeer)
 				return state;
 
-			const idx = peer.consumers.indexOf(consumerId);
-
-			if (idx === -1)
-				throw new Error('Consumer not found');
-
-			const newConsumers = peer.consumers.slice();
-
-			newConsumers.splice(idx, 1);
-
-			const newPeer = { ...peer, consumers: newConsumers };
-
-			return { ...state, [newPeer.name]: newPeer };
+			return { ...state, [oldPeer.name]: peer(oldPeer, action) };
 		}
 
 		default:

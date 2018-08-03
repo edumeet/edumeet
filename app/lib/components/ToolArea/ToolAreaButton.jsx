@@ -10,20 +10,28 @@ class ToolAreaButton extends React.Component
 	{
 		const {
 			toolAreaOpen,
-			toggleToolArea
+			toggleToolArea,
+			unread
 		} = this.props;
 
 		return (
-			<div data-component='ToolAreaButton'>
+			<div data-component='ToolAreaButton' className={classnames({ on: toolAreaOpen })}>
 				<div
-					className={classnames('button', 'toolarea-button', {
-						on : toolAreaOpen
+					className={classnames('button toolarea-button room-controls', {
+						on      : toolAreaOpen,
+						visible : this.props.visible
 					})}
 					data-tip='Toggle tool area'
 					data-type='dark'
 					data-for='globaltip'
 					onClick={() => toggleToolArea()}
 				/>
+
+				{!toolAreaOpen && unread > 0 && (
+					<span className={classnames('badge', { long: unread >= 10 })}>
+						{unread}
+					</span>
+				)}
 			</div>
 		);
 	}
@@ -32,13 +40,17 @@ class ToolAreaButton extends React.Component
 ToolAreaButton.propTypes =
 {
 	toolAreaOpen   : PropTypes.bool.isRequired,
-	toggleToolArea : PropTypes.func.isRequired
+	toggleToolArea : PropTypes.func.isRequired,
+	unread         : PropTypes.number.isRequired,
+	visible        : PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		toolAreaOpen : state.toolarea.toolAreaOpen
+		toolAreaOpen : state.toolarea.toolAreaOpen,
+		visible      : state.room.toolbarsVisible,
+		unread       : state.toolarea.unreadMessages + state.toolarea.unreadFiles
 	};
 };
 

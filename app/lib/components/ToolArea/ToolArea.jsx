@@ -1,10 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import * as stateActions from '../../redux/stateActions';
+import * as toolTabActions from '../../redux/stateActions';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import Chat from '../Chat/Chat';
 import Settings from '../Settings';
+import FileSharing from '../FileSharing';
 
 class ToolArea extends React.Component
 {
@@ -16,7 +17,9 @@ class ToolArea extends React.Component
 	render()
 	{
 		const {
-			toolarea,
+			currentToolTab,
+			unreadMessages,
+			unreadFiles,
 			setToolTab
 		} = this.props;
 
@@ -31,12 +34,37 @@ class ToolArea extends React.Component
 						{
 							setToolTab('chat');
 						}}
-						checked={toolarea.currentToolTab === 'chat'}
+						checked={currentToolTab === 'chat'}
 					/>
-					<label htmlFor='tab-chat'>Chat</label>
+					<label htmlFor='tab-chat'>
+						Chat
+						
+						{unreadMessages > 0 && (
+							<span className='badge'>{unreadMessages}</span>
+						)}
+					</label>
 
 					<div className='tab'>
 						<Chat />
+					</div>
+
+					<input
+						type='radio'
+						name='tabs'
+						id='tab-files'
+						onChange={() => setToolTab('files')}
+						checked={currentToolTab === 'files'}
+					/>
+					<label htmlFor='tab-files'>
+						Files
+
+						{unreadFiles > 0 && (
+							<span className='badge'>{unreadFiles}</span>
+						)}
+					</label>
+
+					<div className='tab'>
+						<FileSharing />
 					</div>
 
 					<input
@@ -47,7 +75,7 @@ class ToolArea extends React.Component
 						{
 							setToolTab('users');
 						}}
-						checked={toolarea.currentToolTab === 'users'}
+						checked={currentToolTab === 'users'}
 					/>
 					<label htmlFor='tab-users'>Users</label>
 
@@ -63,7 +91,7 @@ class ToolArea extends React.Component
 						{
 							setToolTab('settings');
 						}}
-						checked={toolarea.currentToolTab === 'settings'}
+						checked={currentToolTab === 'settings'}
 					/>
 					<label htmlFor='tab-settings'>Settings</label>
 
@@ -78,26 +106,21 @@ class ToolArea extends React.Component
 
 ToolArea.propTypes =
 {
-	advancedMode : PropTypes.bool,
-	toolarea     : PropTypes.object.isRequired,
-	setToolTab   : PropTypes.func.isRequired
+	advancedMode   : PropTypes.bool,
+	currentToolTab : PropTypes.string.isRequired,
+	setToolTab     : PropTypes.func.isRequired,
+	unreadMessages : PropTypes.number.isRequired,
+	unreadFiles    : PropTypes.number.isRequired
 };
 
-const mapStateToProps = (state) =>
-{
-	return {
-		toolarea : state.toolarea
-	};
-};
+const mapStateToProps = (state) => ({
+	currentToolTab : state.toolarea.currentToolTab,
+	unreadMessages : state.toolarea.unreadMessages,
+	unreadFiles    : state.toolarea.unreadFiles
+});
 
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		setToolTab : (toolTab) =>
-		{
-			dispatch(stateActions.setToolTab(toolTab));
-		}
-	};
+const mapDispatchToProps = {
+	setToolTab : toolTabActions.setToolTab
 };
 
 const ToolAreaContainer = connect(

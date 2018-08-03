@@ -3,9 +3,7 @@ import
 	createNewMessage
 } from './helper';
 
-const initialState = [];
-
-const chatmessages = (state = initialState, action) =>
+const chatmessages = (state = [], action) =>
 {
 	switch (action.type)
 	{
@@ -13,7 +11,7 @@ const chatmessages = (state = initialState, action) =>
 		{
 			const { text } = action.payload;
 
-			const message = createNewMessage(text, 'client', 'Me');
+			const message = createNewMessage(text, 'client', 'Me', undefined);
 
 			return [ ...state, message ];
 		}

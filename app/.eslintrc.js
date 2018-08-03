@@ -24,14 +24,14 @@ module.exports =
 			version: '15'
 		}
 	},
+	parser: 'babel-eslint',
 	parserOptions:
 	{
-		ecmaVersion: 6,
+		ecmaVersion: 9,
 		sourceType: 'module',
 		ecmaFeatures:
 		{
 			impliedStrict: true,
-			experimentalObjectRestSpread: true,
 			jsx: true
 		}
 	},
@@ -121,7 +121,6 @@ module.exports =
 		'no-implicit-globals': 2,
 		'no-inner-declarations': 2,
 		'no-invalid-regexp': 2,
-		'no-invalid-this': 2,
 		'no-irregular-whitespace': 2,
 		'no-lonely-if': 2,
 		'no-mixed-operators': 2,
@@ -173,7 +172,7 @@ module.exports =
 		'semi': [ 2, 'always' ],
 		'semi-spacing': 2,
 		'space-before-blocks': 2,
-		'space-before-function-paren': [ 2, 'never' ],
+		'space-before-function-paren': [ 2, { anonymous: 'never', named: 'never', 'asyncArrow': 'always'}],
 		'space-in-parens': [ 2, 'never' ],
 		'spaced-comment': [ 2, 'always' ],
 		'strict': 2,

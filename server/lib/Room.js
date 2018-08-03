@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events').EventEmitter;
 const protooServer = require('protoo-server');
+const WebTorrent = require('webtorrent-hybrid');
 const Logger = require('./Logger');
 const config = require('../config');
 
@@ -10,6 +11,14 @@ const MIN_BITRATE = Math.min(50000, MAX_BITRATE);
 const BITRATE_FACTOR = 0.75;
 
 const logger = new Logger('Room');
+
+const torrentClient = new WebTorrent({
+	tracker : {
+		rtcConfig : {
+			iceServers : config.turnServers
+		}
+	}
+});
 
 class Room extends EventEmitter
 {
@@ -27,6 +36,8 @@ class Room extends EventEmitter
 		this._closed = false;
 
 		this._chatHistory = [];
+
+		this._fileHistory = [];
 
 		try
 		{
@@ -228,6 +239,18 @@ class Room extends EventEmitter
 					break;
 				}
 
+				case 'change-profile-picture':
+				{
+					accept();
+
+					this._protooRoom.spread('profile-picture-changed', {
+						peerName : protooPeer.id,
+						picture  : request.data.picture
+					}, [ protooPeer ]);
+
+					break;
+				}
+
 				case 'chat-message':
 				{
 					accept();
@@ -260,6 +283,37 @@ class Room extends EventEmitter
 					break;
 				}
 
+				case 'send-file':
+				{
+					accept();
+
+					const fileData = request.data.file;
+
+					this._fileHistory.push(fileData);
+
+					if (!torrentClient.get(fileData.file.magnet))
+					{
+						torrentClient.add(fileData.file.magnet);
+					}
+
+					this._protooRoom.spread('file-receive', {
+						file : fileData
+					}, [ protooPeer ]);
+
+					break;
+				}
+
+				case 'file-history':
+				{
+					accept();
+
+					protooPeer.send('file-history-receive', {
+						fileHistory : this._fileHistory
+					});
+
+					break;
+				}
+
 				case 'raisehand-message':
 				{
 					accept();
@@ -267,12 +321,12 @@ class Room extends EventEmitter
 					const { raiseHandState } = request.data;
 					const { mediaPeer } = protooPeer.data;
 
-					mediaPeer.appData.raiseHand = request.data.raiseHandState;
+					mediaPeer.appData.raiseHandState = request.data.raiseHandState;
 					// Spread to others via protoo.
 					this._protooRoom.spread(
 						'raisehand-message',
 						{
-							peerName    : protooPeer.id,
+							peerName       : protooPeer.id,
 							raiseHandState : raiseHandState
 						},
 						[ protooPeer ]);

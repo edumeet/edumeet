@@ -1,6 +1,7 @@
 import protooClient from 'protoo-client';
 import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
+import hark from 'hark';
 import ScreenShare from './ScreenShare';
 import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
@@ -128,11 +129,14 @@ export default class RoomClient
 
 	login()
 	{
-		this._dispatch(stateActions.setLoginInProgress(true));
-
 		const url = `/login?roomId=${this._room.roomId}&peerName=${this._peerName}`;
 
 		this._loginWindow = window.open(url, 'loginWindow');
+	}
+
+	logout()
+	{
+		window.location = '/logout';
 	}
 
 	closeLoginWindow()
@@ -174,6 +178,16 @@ export default class RoomClient
 			});
 	}
 
+	changeProfilePicture(picture)
+	{
+		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
+
+		this._protoo.send('change-profile-picture', { picture }).catch((error) =>
+		{
+			logger.error('shareProfilePicure() | failed: %o', error);
+		});
+	}
+
 	sendChatMessage(chatMessage)
 	{
 		logger.debug('sendChatMessage() [chatMessage:"%s"]', chatMessage);
@@ -191,6 +205,22 @@ export default class RoomClient
 			});
 	}
 
+	sendFile(file)
+	{
+		logger.debug('sendFile() [file: %o]', file);
+
+		return this._protoo.send('send-file', { file })
+			.catch((error) =>
+			{
+				logger.error('sendFile() | failed: %o', error);
+
+				this._dispatch(requestActions.notify({
+					typ  : 'error',
+					text : 'An error occurred while sharing a file'
+				}));
+			});
+	}
+
 	getChatHistory()
 	{
 		logger.debug('getChatHistory()');
@@ -205,6 +235,22 @@ export default class RoomClient
 						type : 'error',
 						text : `Could not get chat history: ${error}`
 					}));
+			});
+	}
+
+	getFileHistory()
+	{
+		logger.debug('getFileHistory()');
+
+		return this._protoo.send('file-history', {})
+			.catch((error) =>
+			{
+				logger.error('getFileHistory() | failed: %o', error);
+
+				this._dispatch(requestActions.notify({
+					type : 'error',
+					text : 'Could not get file history'
+				}));
 			});
 	}
 
@@ -899,11 +945,6 @@ export default class RoomClient
 			{
 				this._dispatch(
 					stateActions.setMyRaiseHandState(state));
-
-				this._dispatch(requestActions.notify(
-					{
-						text : 'raiseHand state changed'
-					}));
 				this._dispatch(
 					stateActions.setMyRaiseHandStateInProgress(false));
 			})
@@ -1051,34 +1092,38 @@ export default class RoomClient
 					break;
 				}
 
-				// This means: server wants to change MY displayName
+				case 'profile-picture-changed':
+				{
+					accept();
+
+					const { peerName, picture } = request.data;
+
+					this._dispatch(stateActions.setPeerPicture(peerName, picture));
+
+					break;
+				}
+
+				// This means: server wants to change MY user information
 				case 'auth':
 				{
 					logger.debug('got auth event from server', request.data);
 					accept();
 
-					if (request.data.verified == true)
-					{
-						this.changeDisplayName(request.data.name);
-						this._dispatch(requestActions.notify(
-							{
-								text : `Authenticated successfully: ${request.data}`
-							}
-						));
-					}
-					else
-					{
-						this._dispatch(requestActions.notify(
-							{
-								text : `Authentication failed: ${request.data}`
-							}
-						));
-					}
+					this.changeDisplayName(request.data.name);
+
+					this.changeProfilePicture(request.data.picture);
+					this._dispatch(stateActions.setPicture(request.data.picture));
+					this._dispatch(stateActions.loggedIn());
+
+					this._dispatch(requestActions.notify(
+						{
+							text : `Authenticated successfully: ${request.data}`
+						}
+					));
+
 					this.closeLoginWindow();
 
-					this._dispatch(stateActions.setLoginInProgress(false));
 					break;
-
 				}
 
 				case 'raisehand-message':
@@ -1102,7 +1147,7 @@ export default class RoomClient
 					logger.debug('Got chat from "%s"', peerName);
 
 					this._dispatch(
-						stateActions.addResponseMessage(chatMessage));
+						stateActions.addResponseMessage({ ...chatMessage, peerName }));
 
 					break;
 				}
@@ -1118,6 +1163,37 @@ export default class RoomClient
 						logger.debug('Got chat history');
 						this._dispatch(
 							stateActions.addChatHistory(chatHistory));
+					}
+
+					break;
+				}
+
+				case 'file-receive':
+				{
+					accept();
+
+					const payload = request.data.file;
+
+					this._dispatch(stateActions.addFile(payload));
+
+					this._dispatch(requestActions.notify({
+						text : `${payload.name} shared a file`
+					}));
+
+					break;
+				}
+
+				case 'file-history-receive':
+				{
+					accept();
+
+					const files = request.data.fileHistory;
+
+					if (files.length > 0)
+					{
+						logger.debug('Got files history');
+
+						this._dispatch(stateActions.addFileHistory(files));
 					}
 
 					break;
@@ -1260,7 +1336,8 @@ export default class RoomClient
 				this._dispatch(stateActions.removeAllNotifications());
 
 				this.getChatHistory();
-
+				this.getFileHistory();
+				
 				this._dispatch(requestActions.notify(
 					{
 						text    : 'You are in the room',
@@ -1380,7 +1457,33 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
+				const stream = new MediaStream;
+
 				logger.debug('_setMicProducer() succeeded');
+				stream.addTrack(producer.track);
+				if (!stream.getAudioTracks()[0])
+					throw new Error('_setMicProducer(): given stream has no audio track');
+				producer.hark = hark(stream, { play: false });
+
+				// eslint-disable-next-line no-unused-vars
+				producer.hark.on('volume_change', (dBs, threshold) =>
+				{
+					// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+					//   Math.pow(10, dBs / 20)
+					// However it does not produce a visually useful output, so let exagerate
+					// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+					// minimize component renderings.
+					let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+					if (volume === 1)
+						volume = 0;
+
+					if (volume !== producer.volume)
+					{
+						producer.volume = volume;
+						this._dispatch(stateActions.setProducerVolume(producer.id, volume));
+					}
+				});
 			})
 			.catch((error) =>
 			{
@@ -1762,10 +1865,11 @@ export default class RoomClient
 
 		this._dispatch(stateActions.addPeer(
 			{
-				name        : peer.name,
-				displayName : displayName,
-				device      : peer.appData.device,
-				consumers   : []
+				name           : peer.name,
+				displayName    : displayName,
+				device         : peer.appData.device,
+				raiseHandState : peer.appData.raiseHandState,
+				consumers      : []
 			}));
 
 		if (notify)
@@ -1823,7 +1927,8 @@ export default class RoomClient
 				track          : null,
 				codec          : codec ? codec.name : null
 			},
-			consumer.peer.name));
+			consumer.peer.name)
+		);
 
 		consumer.on('close', (originator) =>
 		{
@@ -1833,6 +1938,43 @@ export default class RoomClient
 
 			this._dispatch(stateActions.removeConsumer(
 				consumer.id, consumer.peer.name));
+		});
+
+		consumer.on('handled', (originator) =>
+		{
+			logger.debug(
+				'consumer "handled" event [id:%s, originator:%s, consumer:%o]',
+				consumer.id, originator, consumer);
+			if (consumer.kind === 'audio')
+			{
+				const stream = new MediaStream;
+
+				stream.addTrack(consumer.track);
+				if (!stream.getAudioTracks()[0])
+					throw new Error('consumer.on("handled" | given stream has no audio track');
+
+				consumer.hark = hark(stream, { play: false });
+
+				// eslint-disable-next-line no-unused-vars
+				consumer.hark.on('volume_change', (dBs, threshold) =>
+				{
+					// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+					//   Math.pow(10, dBs / 20)
+					// However it does not produce a visually useful output, so let exagerate
+					// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+					// minimize component renderings.
+					let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+					if (volume === 1)
+						volume = 0;
+
+					if (volume !== consumer.volume)
+					{
+						consumer.volume = volume;
+						this._dispatch(stateActions.setConsumerVolume(consumer.id, volume));
+					}
+				});
+			}
 		});
 
 		consumer.on('pause', (originator) =>

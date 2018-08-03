@@ -12,6 +12,8 @@ export default class FullView extends React.Component
 		// Latest received video track.
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
+
+		this.video = React.createRef();
 	}
 
 	render()
@@ -24,7 +26,7 @@ export default class FullView extends React.Component
 		return (
 			<div data-component='FullView'>
 				<video
-					ref='video'
+					ref={this.video}
 					className={classnames({
 						hidden  : !videoVisible,
 						loading : videoProfile === 'none'
@@ -50,9 +52,9 @@ export default class FullView extends React.Component
 		this._setTracks(videoTrack);
 	}
 
-	componentWillReceiveProps(nextProps)
+	componentDidUpdate()
 	{
-		const { videoTrack } = nextProps;
+		const { videoTrack } = this.props;
 
 		this._setTracks(videoTrack);
 	}
@@ -64,15 +66,13 @@ export default class FullView extends React.Component
 
 		this._videoTrack = videoTrack;
 
-		const { video } = this.refs;
+		const video = this.video.current;
 
 		if (videoTrack)
 		{
 			const stream = new MediaStream;
 
-			if (videoTrack)
-				stream.addTrack(videoTrack);
-
+			stream.addTrack(videoTrack);
 			video.srcObject = stream;
 		}
 		else
@@ -84,7 +84,8 @@ export default class FullView extends React.Component
 
 FullView.propTypes =
 {
-	videoTrack   : PropTypes.any,
-	videoVisible : PropTypes.bool,
-	videoProfile : PropTypes.string
+	videoTrack       : PropTypes.any,
+	videoVisible     : PropTypes.bool,
+	videoProfile     : PropTypes.string,
+	toggleFullscreen : PropTypes.func.isRequired
 };
