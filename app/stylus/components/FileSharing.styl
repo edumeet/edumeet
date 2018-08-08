@@ -1,7 +1,7 @@
 [data-component='FileSharing'] {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	flex-grow: 1;
 	
 	> .sharing-toolbar {
 		> .share-file {
@@ -22,6 +22,7 @@
 	> .shared-files {
 		flex-grow: 1;
 		overflow-y: scroll;
+		margin-top: 0.5rem;
 
 		> .file-entry {
 			background-color: rgba(0,0,0,0.1);
@@ -29,7 +30,10 @@
 			width: 100%;
 			padding: 0.5rem;
 			display: flex;
-			margin-top: 0.5rem;
+
+			&:not(:first-child) {
+				margin-top: 0.5rem;
+			}
 			
 			&:last-child {
 				margin-bottom: 1.5rem;
