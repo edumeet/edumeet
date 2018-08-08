@@ -92,6 +92,7 @@ class Sidebar extends Component
 						})}
 						onClick={this.handleToggleFullscreen}
 						data-tip='Fullscreen'
+						data-place='right'
 						data-type='dark'
 					/>
 				)}
@@ -99,6 +100,7 @@ class Sidebar extends Component
 				<div
 					className={classnames('button', 'screen', screenState)}
 					data-tip={screenTip}
+					data-place='right'
 					data-type='dark'
 					onClick={() =>
 					{
@@ -131,6 +133,7 @@ class Sidebar extends Component
 					<div
 						className='button logout'
 						data-tip='Logout'
+						data-place='right'
 						data-type='dark'
 						onClick={onLogout}
 					>
@@ -140,6 +143,7 @@ class Sidebar extends Component
 					<div
 						className='button login off'
 						data-tip='Login'
+						data-place='right'
 						data-type='dark'
 						onClick={onLogin}
 					/>
@@ -150,6 +154,7 @@ class Sidebar extends Component
 						disabled : me.raiseHandInProgress
 					})}
 					data-tip='Raise hand'
+					data-place='right'
 					data-type='dark'
 					onClick={() => onToggleHand(!me.raiseHand)}
 				/>
@@ -157,6 +162,7 @@ class Sidebar extends Component
 				<div
 					className={classnames('button', 'leave-meeting')}
 					data-tip='Leave meeting'
+					data-place='right'
 					data-type='dark'
 					onClick={() => onLeaveMeeting()}
 				/>
