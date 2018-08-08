@@ -65,7 +65,6 @@ class Room extends React.Component
 	{
 		const {
 			room,
-			toolAreaOpen,
 			amActiveSpeaker,
 			onRoomLinkCopy
 		} = this.props;
@@ -155,16 +154,8 @@ class Room extends React.Component
 								delayHide={100}
 							/>
 						</div>
-						<div
-							className={classnames('toolarea-wrapper', { open: toolAreaOpen })}
-						>
-							{toolAreaOpen ?
-								<ToolArea
-									advancedMode={room.advancedMode}
-								/>
-								:null
-							}
-						</div>
+
+						<ToolArea />
 					</div>
 				</Appear>
 			</Fragment>
