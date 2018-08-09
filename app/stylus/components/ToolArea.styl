@@ -11,6 +11,12 @@
 	&.open {
 		display: block;
 	}
+
+	+desktop() {
+		&.open {
+			display: none;
+		}
+	}
 }
 
 [data-component='ToolAreaButton'] {
@@ -40,10 +46,6 @@
 		&.open {
 			width: 60%;
 		}
-	}
-	
-	.toolarea-shade.open {
-		display: none;
 	}
 }
 
@@ -81,7 +83,7 @@
 	right: 0;
 	height: 36px;
 	width: 36px;
-	padding: 2rem;
+	margin: 2rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -157,7 +159,7 @@
 	top: 0;
 	right: 0;
 	height: 100%;
-	background-color: rgba(50, 50, 50, 0.9);
+	background: rgba(50, 50, 50, 0.9);
 	transition: width 0.3s;
 	z-index: 1010;
 	display: flex;

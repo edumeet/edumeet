@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import * as toolTabActions from '../../redux/stateActions';
+import * as stateActions from '../../redux/stateActions';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import Chat from '../Chat/Chat';
 import Settings from '../Settings';
@@ -22,7 +22,8 @@ class ToolArea extends React.Component
 			currentToolTab,
 			toolAreaOpen,
 			unreadMessages,
-			unreadFiles
+			unreadFiles,
+			toggleToolArea
 		} = this.props;
 
 		const VisibleTab = {
@@ -38,6 +39,7 @@ class ToolArea extends React.Component
 					className={classNames('toolarea-shade', {
 						open : toolAreaOpen
 					})}
+					onClick={toggleToolArea}
 				/>
 
 				<div
@@ -86,7 +88,8 @@ ToolArea.propTypes =
 	setToolTab     : PropTypes.func.isRequired,
 	unreadMessages : PropTypes.number.isRequired,
 	unreadFiles    : PropTypes.number.isRequired,
-	toolAreaOpen   : PropTypes.bool
+	toolAreaOpen   : PropTypes.bool,
+	toggleToolArea : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -97,7 +100,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-	setToolTab : toolTabActions.setToolTab
+	setToolTab     : stateActions.setToolTab,
+	toggleToolArea : stateActions.toggleToolArea
 };
 
 const ToolAreaContainer = connect(
