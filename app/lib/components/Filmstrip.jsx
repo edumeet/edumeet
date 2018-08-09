@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
+import debounce from 'lodash/debounce';
 import classnames from 'classnames';
 import * as stateActions from '../redux/stateActions';
 import Peer from './Peer';
@@ -59,7 +60,7 @@ class Filmstrip extends Component
 		return ratio;
 	};
 
-	updateDimensions = () =>
+	updateDimensions = debounce(() =>
 	{
 		const container = this.activePeerContainer.current;
 
@@ -78,7 +79,7 @@ class Filmstrip extends Component
 				width
 			});
 		}
-	};
+	}, 200);
 
 	componentDidMount()
 	{
