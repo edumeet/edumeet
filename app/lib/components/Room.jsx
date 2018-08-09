@@ -49,24 +49,16 @@ class Room extends React.Component
 		this.waitForHide();
 	}
 
-	handleTouchMove = (event) =>
-	{
-		event.preventDefault();
-		event.stopPropagation();
-	};
-
 	componentDidMount()
 	{
 		window.addEventListener('mousemove', this.handleMovement);
 		window.addEventListener('touchstart', this.handleMovement);
-		document.body.addEventListener('touchmove', this.handleTouchMove, false);
 	}
 
 	componentWillUnmount()
 	{
 		window.removeEventListener('mousemove', this.handleMovement);
 		window.removeEventListener('touchstart', this.handleMovement);
-		document.body.removeEventListener('touchmove', this.handleTouchMove);
 	}
 
 	render()
