@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import debounce from 'lodash/debounce';
 import * as appPropTypes from './appPropTypes';
 import { Appear } from './transitions';
 import Peer from './Peer';
@@ -23,7 +24,7 @@ class Peers extends React.Component
 		this.peersRef = React.createRef();
 	}
 
-	updateDimensions = () =>
+	updateDimensions = debounce(() =>
 	{
 		if (!this.peersRef.current) 
 		{
@@ -65,7 +66,7 @@ class Peers extends React.Component
 				peerHeight : 0.9 * y
 			});
 		}
-	};
+	}, 200);
 
 	componentDidMount()
 	{
