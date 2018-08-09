@@ -157,12 +157,16 @@
 	top: 0;
 	right: 0;
 	height: 100%;
-	background-color: rgba(50, 50, 50, 0.9);
+	background: rgba(0, 0, 0, 0.25);
 	transition: width 0.3s;
 	z-index: 1010;
 	display: flex;
 	flex-direction: column;
 	border-left: 1px solid #222;
+
+	+desktop() {
+		background: rgba(50, 50, 50, 0.9);
+	}
 
 	> .tab-headers {
 		display: flex;
