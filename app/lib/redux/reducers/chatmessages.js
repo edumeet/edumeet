@@ -11,7 +11,7 @@ const chatmessages = (state = [], action) =>
 		{
 			const { text } = action.payload;
 
-			const message = createNewMessage(text, 'client', 'Me');
+			const message = createNewMessage(text, 'client', 'Me', undefined);
 
 			return [ ...state, message ];
 		}

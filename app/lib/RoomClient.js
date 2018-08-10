@@ -178,11 +178,11 @@ export default class RoomClient
 			});
 	}
 
-	changeProfilePicture(picture) 
+	changeProfilePicture(picture)
 	{
 		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
 
-		this._protoo.send('change-profile-picture', { picture }).catch((error) => 
+		this._protoo.send('change-profile-picture', { picture }).catch((error) =>
 		{
 			logger.error('shareProfilePicure() | failed: %o', error);
 		});
@@ -205,6 +205,22 @@ export default class RoomClient
 			});
 	}
 
+	sendFile(file)
+	{
+		logger.debug('sendFile() [file: %o]', file);
+
+		return this._protoo.send('send-file', { file })
+			.catch((error) =>
+			{
+				logger.error('sendFile() | failed: %o', error);
+
+				this._dispatch(requestActions.notify({
+					typ  : 'error',
+					text : 'An error occurred while sharing a file'
+				}));
+			});
+	}
+
 	getChatHistory()
 	{
 		logger.debug('getChatHistory()');
@@ -219,6 +235,22 @@ export default class RoomClient
 						type : 'error',
 						text : `Could not get chat history: ${error}`
 					}));
+			});
+	}
+
+	getFileHistory()
+	{
+		logger.debug('getFileHistory()');
+
+		return this._protoo.send('file-history', {})
+			.catch((error) =>
+			{
+				logger.error('getFileHistory() | failed: %o', error);
+
+				this._dispatch(requestActions.notify({
+					type : 'error',
+					text : 'Could not get file history'
+				}));
 			});
 	}
 
@@ -913,11 +945,6 @@ export default class RoomClient
 			{
 				this._dispatch(
 					stateActions.setMyRaiseHandState(state));
-
-				this._dispatch(requestActions.notify(
-					{
-						text : 'raiseHand state changed'
-					}));
 				this._dispatch(
 					stateActions.setMyRaiseHandStateInProgress(false));
 			})
@@ -1141,6 +1168,37 @@ export default class RoomClient
 					break;
 				}
 
+				case 'file-receive':
+				{
+					accept();
+
+					const payload = request.data.file;
+
+					this._dispatch(stateActions.addFile(payload));
+
+					this._dispatch(requestActions.notify({
+						text : `${payload.name} shared a file`
+					}));
+
+					break;
+				}
+
+				case 'file-history-receive':
+				{
+					accept();
+
+					const files = request.data.fileHistory;
+
+					if (files.length > 0)
+					{
+						logger.debug('Got files history');
+
+						this._dispatch(stateActions.addFileHistory(files));
+					}
+
+					break;
+				}
+
 				default:
 				{
 					logger.error('unknown protoo method "%s"', request.method);
@@ -1278,7 +1336,8 @@ export default class RoomClient
 				this._dispatch(stateActions.removeAllNotifications());
 
 				this.getChatHistory();
-
+				this.getFileHistory();
+				
 				this._dispatch(requestActions.notify(
 					{
 						text    : 'You are in the room',
@@ -1806,10 +1865,11 @@ export default class RoomClient
 
 		this._dispatch(stateActions.addPeer(
 			{
-				name        : peer.name,
-				displayName : displayName,
-				device      : peer.appData.device,
-				consumers   : []
+				name           : peer.name,
+				displayName    : displayName,
+				device         : peer.appData.device,
+				raiseHandState : peer.appData.raiseHandState,
+				consumers      : []
 			}));
 
 		if (notify)

@@ -6,10 +6,15 @@ import * as appPropTypes from './appPropTypes';
 import * as stateActions from '../redux/stateActions';
 import { Appear } from './transitions';
 
-const Notifications = ({ notifications, onClick }) =>
+const Notifications = ({ notifications, onClick, toolAreaOpen }) =>
 {
 	return (
-		<div data-component='Notifications'>
+		<div
+			data-component='Notifications'
+			className={classnames({
+				'toolarea-open' : toolAreaOpen
+			})}
+		>
 			{
 				notifications.map((notification) =>
 				{
@@ -33,14 +38,18 @@ const Notifications = ({ notifications, onClick }) =>
 Notifications.propTypes =
 {
 	notifications : PropTypes.arrayOf(appPropTypes.Notification).isRequired,
-	onClick       : PropTypes.func.isRequired
+	onClick       : PropTypes.func.isRequired,
+	toolAreaOpen  : PropTypes.bool
 };
 
 const mapStateToProps = (state) =>
 {
 	const { notifications } = state;
 
-	return { notifications };
+	return {
+		notifications,
+		toolAreaOpen : state.toolarea.toolAreaOpen
+	};
 };
 
 const mapDispatchToProps = (dispatch) =>

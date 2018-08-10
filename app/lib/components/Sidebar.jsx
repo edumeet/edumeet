@@ -14,17 +14,17 @@ class Sidebar extends Component
 
 	handleToggleFullscreen = () =>
 	{
-		if (fscreen.fullscreenElement) 
+		if (fscreen.fullscreenElement)
 		{
 			fscreen.exitFullscreen();
 		}
-		else 
+		else
 		{
 			fscreen.requestFullscreen(document.documentElement);
 		}
 	};
 
-	handleFullscreenChange = () => 
+	handleFullscreenChange = () =>
 	{
 		this.setState({
 			fullscreen : fscreen.fullscreenElement !== null
@@ -47,16 +47,16 @@ class Sidebar extends Component
 		}
 	}
 
-	render() 
+	render()
 	{
 		const {
 			toolbarsVisible, me, screenProducer, onLogin, onShareScreen,
-			onUnShareScreen, onNeedExtension, onLeaveMeeting, onLogout
+			onUnShareScreen, onNeedExtension, onLeaveMeeting, onLogout, onToggleHand
 		} = this.props;
 
 		let screenState;
 		let screenTip;
-	
+
 		if (me.needExtension)
 		{
 			screenState = 'need-extension';
@@ -77,7 +77,7 @@ class Sidebar extends Component
 			screenState = 'off';
 			screenTip = 'Start screen sharing';
 		}
-	
+
 		return (
 			<div
 				className={classnames('sidebar room-controls', {
@@ -92,6 +92,7 @@ class Sidebar extends Component
 						})}
 						onClick={this.handleToggleFullscreen}
 						data-tip='Fullscreen'
+						data-place='right'
 						data-type='dark'
 					/>
 				)}
@@ -99,6 +100,7 @@ class Sidebar extends Component
 				<div
 					className={classnames('button', 'screen', screenState)}
 					data-tip={screenTip}
+					data-place='right'
 					data-type='dark'
 					onClick={() =>
 					{
@@ -126,11 +128,12 @@ class Sidebar extends Component
 						}
 					}}
 				/>
-	
+
 				{me.loginEnabled && (me.loggedIn ? (
 					<div
 						className='button logout'
 						data-tip='Logout'
+						data-place='right'
 						data-type='dark'
 						onClick={onLogout}
 					>
@@ -140,14 +143,26 @@ class Sidebar extends Component
 					<div
 						className='button login off'
 						data-tip='Login'
+						data-place='right'
 						data-type='dark'
 						onClick={onLogin}
 					/>
 				))}
+				<div
+					className={classnames('button', 'raise-hand', {
+						on       : me.raiseHand,
+						disabled : me.raiseHandInProgress
+					})}
+					data-tip='Raise hand'
+					data-place='right'
+					data-type='dark'
+					onClick={() => onToggleHand(!me.raiseHand)}
+				/>
 
 				<div
 					className={classnames('button', 'leave-meeting')}
 					data-tip='Leave meeting'
+					data-place='right'
 					data-type='dark'
 					onClick={() => onLeaveMeeting()}
 				/>
@@ -162,6 +177,7 @@ Sidebar.propTypes = {
 	onShareScreen   : PropTypes.func.isRequired,
 	onUnShareScreen : PropTypes.func.isRequired,
 	onNeedExtension : PropTypes.func.isRequired,
+	onToggleHand    : PropTypes.func.isRequired,
 	onLeaveMeeting  : PropTypes.func.isRequired,
 	onLogin         : PropTypes.func.isRequired,
 	onLogout        : PropTypes.func.isRequired,
@@ -181,6 +197,7 @@ const mapDispatchToProps = {
 	onShareScreen   : requestActions.enableScreenSharing,
 	onUnShareScreen : requestActions.disableScreenSharing,
 	onNeedExtension : requestActions.installExtension,
+	onToggleHand    : requestActions.toggleHand,
 	onLogin         : requestActions.userLogin,
 	onLogout        : requestActions.userLogout
 };

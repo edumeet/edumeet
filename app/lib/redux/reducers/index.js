@@ -8,6 +8,7 @@ import notifications from './notifications';
 import chatmessages from './chatmessages';
 import chatbehavior from './chatbehavior';
 import toolarea from './toolarea';
+import sharing from './sharing';
 
 const reducers = combineReducers(
 	{
@@ -19,7 +20,8 @@ const reducers = combineReducers(
 		notifications,
 		chatmessages,
 		chatbehavior,
-		toolarea
+		toolarea,
+		sharing
 	});
 
 export default reducers;

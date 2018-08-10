@@ -1,14 +1,92 @@
+.toolarea-shade {
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
+	display: none;
+
+	&.open {
+		display: block;
+	}
+}
+
+[data-component='ToolAreaButton'] {
+	&.on {
+		right: 80%;
+	}
+}
+
+[data-component='ToolArea'] {
+	&.open {
+		width: 80%;
+	}
+
+	.toolarea-shade.open {
+		display: block;
+	}
+}
+
+@media (min-width: 600px) {
+	[data-component='ToolAreaButton'] {
+		&.on {
+			right: 60%;
+		}
+	}
+
+	[data-component='ToolArea'] {
+		&.open {
+			width: 60%;
+		}
+	}
+	
+	.toolarea-shade.open {
+		display: none;
+	}
+}
+
+@media (min-width: 900px) {
+	[data-component='ToolAreaButton'] {
+		&.on {
+			right: 40%;
+		}
+	}
+
+	[data-component='ToolArea'] {
+		&.open {
+			width: 40%;
+		}
+	}
+}
+
+@media (min-width: 1500px) {
+	[data-component='ToolAreaButton'] {
+		&.on {
+			right: 25%;
+		}
+	}
+
+	[data-component='ToolArea'] {
+		&.open {
+			width: 25%;
+		}
+	}
+}
+
 [data-component='ToolAreaButton'] {
 	position: absolute;
-	z-index: 101;
-	top: 20px;
-	right: 20px;
+	z-index: 1020;
+	right: 0;
 	height: 36px;
 	width: 36px;
+	padding: 2rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	transition: right 0.3s;
 
 	> .button {
 		flex: 0 0 auto;
@@ -74,58 +152,51 @@
 	width: 100%;
 	height: 100%;
 	color: #fff;
+	position: fixed;
+	width: 0;
+	top: 0;
+	right: 0;
+	height: 100%;
+	background-color: rgba(50, 50, 50, 0.9);
+	transition: width 0.3s;
+	z-index: 1010;
+	display: flex;
+	flex-direction: column;
+	border-left: 1px solid #222;
 
-	> .tabs {
+	> .tab-headers {
 		display: flex;
-		flex-wrap: wrap;
-		height: 100%;
+		background: rgba(0, 0, 0, 0.1);
+		flex-shrink: 0;
 
-		> label {
-			order: 1;
-			display: block;
-			padding: 1vmin 0 0.8vmin 0;
+		> .tab-header {
+			flex-grow: 1;
 			cursor: pointer;
-			background: rgba(0,0,0,0.3);
-			font-weight: bold;
-			transition: background ease 0.2s;
+			padding: 1rem;
+			font-size: 1.2rem;
 			text-align: center;
-			width: 33.33%;
-			font-size: 1.3vmin;
-			height: 3vmin;
+
+			&.checked {
+				background: rgba(0, 0, 0, 0.3);
+			}
 
 			> .badge {
-				padding: 0.1vmin 1vmin;
+				padding: 0.2rem 0.6rem;
 				text-align: center;
 				font-weight: 300;
-				font-size: 1.2vmin;
+				font-size: 1rem;
 				color: #fff;
 				background-color: #b12525;
 				border-radius: 2px;
 				margin-left: 1vmin;
 			}
 		}
+	}
 
-		> .tab {
-			order: 99;
-			flex-grow: 1;
-			width: 100%;
-			height: 100%;
-			display: none;
-			padding: 1vmin;
-			background: rgba(0,0,0,0.1);
-		}
-
-		> input[type="radio"] {
-			display: none;
-		}
-
-		> input[type="radio"]:checked + label {
-			background: rgba(0,0,0,0.1);
-		}
-
-		> input[type="radio"]:checked + label + .tab {
-			display: block;
-			background: rgba(0,0,0,0.1);
-		}
+	> .tab {
+		flex-grow: 1;
+		padding: 0.5rem;
+		display: flex;
+		flex-direction: column;
 	}
 }

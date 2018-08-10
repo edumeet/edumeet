@@ -2,7 +2,8 @@ const initialState =
 {
 	toolAreaOpen   : false,
 	currentToolTab : 'chat', // chat, settings, users
-	unread         : 0
+	unreadMessages : 0,
+	unreadFiles    : 0
 };
 
 const toolarea = (state = initialState, action) =>
@@ -12,17 +13,19 @@ const toolarea = (state = initialState, action) =>
 		case 'TOGGLE_TOOL_AREA':
 		{
 			const toolAreaOpen = !state.toolAreaOpen;
-			const unread = toolAreaOpen && state.currentToolTab === 'chat' ? 0 : state.unread;
+			const unreadMessages = toolAreaOpen && state.currentToolTab === 'chat' ? 0 : state.unreadMessages;
+			const unreadFiles = toolAreaOpen && state.currentToolTab === 'files' ? 0 : state.unreadFiles;
 
-			return { ...state, toolAreaOpen, unread };
+			return { ...state, toolAreaOpen, unreadMessages, unreadFiles };
 		}
 
 		case 'SET_TOOL_TAB':
 		{
 			const { toolTab } = action.payload;
-			const unread = toolTab === 'chat' ? 0 : state.unread;
+			const unreadMessages = toolTab === 'chat' ? 0 : state.unreadMessages;
+			const unreadFiles = toolTab === 'files' ? 0 : state.unreadFiles;
 
-			return { ...state, currentToolTab: toolTab, unread };
+			return { ...state, currentToolTab: toolTab, unreadMessages, unreadFiles };
 		}
 
 		case 'ADD_NEW_RESPONSE_MESSAGE':
@@ -32,7 +35,17 @@ const toolarea = (state = initialState, action) =>
 				return state;
 			}
 
-			return { ...state, unread: state.unread + 1 };
+			return { ...state, unreadMessages: state.unreadMessages + 1 };
+		}
+
+		case 'ADD_FILE':
+		{
+			if (state.toolAreaOpen && state.currentToolTab === 'files')
+			{
+				return state;
+			}
+
+			return { ...state, unreadFiles: state.unreadFiles + 1 };
 		}
 
 		default:

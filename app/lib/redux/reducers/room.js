@@ -7,7 +7,8 @@ const initialState =
 	advancedMode       : false,
 	fullScreenConsumer : null, // ConsumerID
 	toolbarsVisible    : true,
-	mode               : 'democratic'
+	mode               : 'democratic',
+	selectedPeerName   : null
 };
 
 const room = (state = initialState, action) =>
@@ -69,6 +70,18 @@ const room = (state = initialState, action) =>
 
 		case 'SET_DISPLAY_MODE':
 			return { ...state, mode: action.payload.mode };
+
+		case 'SET_SELECTED_PEER':
+		{
+			const { selectedPeerName } = action.payload;
+
+			return {
+				...state,
+
+				selectedPeerName : state.selectedPeerName === selectedPeerName ?
+					null : selectedPeerName
+			};
+		}
 
 		default:
 			return state;

@@ -1,15 +1,20 @@
 [data-component='Notifications'] {
 	position: absolute;
-	z-index: 9999;
+	z-index: 1010;
 	pointer-events: none;
-	top: 0;
-	right: 65px;
+	top: 45px;
+	right: 0;
 	bottom: 0;
 	padding: 20px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-end;
+	transition: right 0.3s;
+	
+	&.toolarea-open {
+		right: 25%;
+	}
 
 	+desktop() {
 		padding: 10px;

@@ -191,6 +191,18 @@ export const installExtension = () =>
 	};
 };
 
+export const toggleHand = (enable) =>
+{
+	if (enable)
+		return {
+			type : 'RAISE_HAND'
+		};
+	else
+		return {
+			type : 'LOWER_HAND'
+		};
+};
+
 export const sendChatMessage = (text, name, picture) =>
 {
 	const message = createNewMessage(text, 'response', name, picture);
@@ -198,6 +210,14 @@ export const sendChatMessage = (text, name, picture) =>
 	return {
 		type    : 'SEND_CHAT_MESSAGE',
 		payload : { message }
+	};
+};
+
+export const sendFile = (file, name, picture) =>
+{
+	return {
+		type    : 'SEND_FILE',
+		payload : { file, name, picture }
 	};
 };
 

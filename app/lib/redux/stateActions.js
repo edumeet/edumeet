@@ -410,6 +410,14 @@ export const addUserMessage = (text) =>
 	};
 };
 
+export const addUserFile = (file) =>
+{
+	return {
+		type    : 'ADD_NEW_USER_FILE',
+		payload : { file }
+	};
+};
+
 export const addResponseMessage = (message) =>
 {
 	return {
@@ -433,6 +441,22 @@ export const dropMessages = () =>
 	};
 };
 
+export const addFile = (payload) =>
+{
+	return {
+		type : 'ADD_FILE',
+		payload
+	};
+};
+
+export const addFileHistory = (fileHistory) =>
+{
+	return {
+		type    : 'ADD_FILE_HISTORY',
+		payload : { fileHistory }
+	};
+};
+
 export const setPicture = (picture) =>
 	({
 		type    : 'SET_PICTURE',
@@ -449,3 +473,8 @@ export const loggedIn = () =>
 	({
 		type : 'LOGGED_IN'
 	});
+
+export const setSelectedPeer = (selectedPeerName) => ({
+	type    : 'SET_SELECTED_PEER',
+	payload : { selectedPeerName }
+});

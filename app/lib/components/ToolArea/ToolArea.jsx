@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import * as toolTabActions from '../../redux/stateActions';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import Chat from '../Chat/Chat';
 import Settings from '../Settings';
+import FileSharing from '../FileSharing';
+import TabHeader from './TabHeader';
 
 class ToolArea extends React.Component
 {
@@ -17,68 +20,61 @@ class ToolArea extends React.Component
 	{
 		const {
 			currentToolTab,
-			unread,
-			setToolTab
+			toolAreaOpen,
+			unreadMessages,
+			unreadFiles
 		} = this.props;
 
+		const VisibleTab = {
+			chat     : Chat,
+			files    : FileSharing,
+			users    : ParticipantList,
+			settings : Settings
+		}[currentToolTab];
+
 		return (
-			<div data-component='ToolArea'>
-				<div className='tabs'>
-					<input
-						type='radio'
-						name='tabs'
-						id='tab-chat'
-						onChange={() =>
-						{
-							setToolTab('chat');
-						}}
-						checked={currentToolTab === 'chat'}
-					/>
-					<label htmlFor='tab-chat'>
-						Chat
-						
-						{unread > 0 && (
-							<span className='badge'>{unread}</span>
-						)}
-					</label>
+			<Fragment>
+				<div
+					className={classNames('toolarea-shade', {
+						open : toolAreaOpen
+					})}
+				/>
 
-					<div className='tab'>
-						<Chat />
+				<div
+					data-component='ToolArea' 
+					className={classNames({
+						open : toolAreaOpen
+					})}
+				>
+					<div className='tab-headers'>
+						<TabHeader
+							id='chat'
+							name='Chat'
+							badge={unreadMessages}
+						/>
+
+						<TabHeader
+							id='files'
+							name='Files'
+							badge={unreadFiles}
+						/>
+
+						<TabHeader
+							id='users'
+							name='Users'
+						/>
+
+						<TabHeader
+							id='settings'
+							name='Settings'
+						/>
 					</div>
 
-					<input
-						type='radio'
-						name='tabs'
-						id='tab-users'
-						onChange={() =>
-						{
-							setToolTab('users');
-						}}
-						checked={currentToolTab === 'users'}
-					/>
-					<label htmlFor='tab-users'>Users</label>
-
 					<div className='tab'>
-						<ParticipantList />
-					</div>
-
-					<input
-						type='radio'
-						name='tabs'
-						id='tab-settings'
-						onChange={() =>
-						{
-							setToolTab('settings');
-						}}
-						checked={currentToolTab === 'settings'}
-					/>
-					<label htmlFor='tab-settings'>Settings</label>
-
-					<div className='tab'>
-						<Settings />
+						<VisibleTab />
 					</div>
 				</div>
-			</div>
+			</Fragment>
 		);
 	}
 }
@@ -88,12 +84,16 @@ ToolArea.propTypes =
 	advancedMode   : PropTypes.bool,
 	currentToolTab : PropTypes.string.isRequired,
 	setToolTab     : PropTypes.func.isRequired,
-	unread         : PropTypes.number.isRequired
+	unreadMessages : PropTypes.number.isRequired,
+	unreadFiles    : PropTypes.number.isRequired,
+	toolAreaOpen   : PropTypes.bool
 };
 
 const mapStateToProps = (state) => ({
 	currentToolTab : state.toolarea.currentToolTab,
-	unread         : state.toolarea.unread
+	unreadMessages : state.toolarea.unreadMessages,
+	unreadFiles    : state.toolarea.unreadFiles,
+	toolAreaOpen   : state.toolarea.toolAreaOpen
 });
 
 const mapDispatchToProps = {
