@@ -1,4 +1,4 @@
-export function getProtooUrl(peerName, roomId)
+export function getSignalingUrl(peerName, roomId)
 {
 	const hostname = window.location.hostname;
 	const port = window.location.port;

@@ -9,7 +9,6 @@ const fs = require('fs');
 const https = require('https');
 const express = require('express');
 const url = require('url');
-const protooServer = require('protoo-server');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const Dataporten = require('passport-dataporten');
@@ -98,29 +97,18 @@ httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 	logger.info('Server running on port: ', config.listeningPort);
 });
 
-// Protoo WebSocket server listens to same webserver so everything is available
-// via same port
-const webSocketServer = new protooServer.WebSocketServer(httpsServer,
-	{
-		maxReceivedFrameSize     : 960000, // 960 KBytes.
-		maxReceivedMessageSize   : 960000,
-		fragmentOutgoingMessages : true,
-		fragmentationThreshold   : 960000
-	});
+const io = require('socket.io')(httpsServer);
 
 // Handle connections from clients.
-webSocketServer.on('connectionrequest', (info, accept, reject) =>
+io.on('connection', (socket) =>
 {
-	// The client indicates the roomId and peerId in the URL query.
-	const u = url.parse(info.request.url, true);
-	const roomId = u.query['roomId'];
-	const peerName = u.query['peerName'];
+	const { roomId, peerName } = socket.handshake.query;
 
 	if (!roomId || !peerName)
 	{
 		logger.warn('connection request without roomId and/or peerName');
 
-		reject(400, 'Connection request without roomId and/or peerName');
+		socket.disconnect(true);
 
 		return;
 	}
@@ -145,7 +133,7 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		{
 			logger.error('error creating a new Room: %s', error);
 
-			reject(error);
+			socket.disconnect(true);
 
 			return;
 		}
@@ -156,6 +144,11 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		}, 30000);
 
 		rooms.set(roomId, room);
+
+		room.on('active-speaker', (message) =>
+		{
+			io.to(roomId).emit('active-speaker', message);
+		});
 
 		room.on('close', () =>
 		{
@@ -168,7 +161,8 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		room = rooms.get(roomId);
 	}
 
-	const transport = accept();
+	socket.join(roomId);
+	socket.room = roomId;
 
-	room.handleConnection(peerName, transport);
+	room.handleConnection(peerName, socket);
 });

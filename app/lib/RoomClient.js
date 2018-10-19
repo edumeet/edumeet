@@ -1,9 +1,9 @@
-import protooClient from 'protoo-client';
+import io from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
 import hark from 'hark';
 import ScreenShare from './ScreenShare';
-import { getProtooUrl } from './urlFactory';
+import { getSignalingUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
 import * as stateActions from './redux/stateActions';
@@ -37,8 +37,7 @@ export default class RoomClient
 			'constructor() [roomId:"%s", peerName:"%s", displayName:"%s", device:%s]',
 			roomId, peerName, displayName, device.flag);
 
-		const protooUrl = getProtooUrl(peerName, roomId);
-		const protooTransport = new protooClient.WebSocketTransport(protooUrl);
+		const signalingUrl = getSignalingUrl(peerName, roomId);
 
 		// window element to external login site
 		this._loginWindow;
@@ -64,8 +63,8 @@ export default class RoomClient
 		// My peer name.
 		this._peerName = peerName;
 
-		// protoo-client Peer instance.
-		this._protoo = new protooClient.Peer(protooTransport);
+		// Socket.io peer connection
+		this._signalingSocket = io(signalingUrl);
 
 		// mediasoup-client Room instance.
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
@@ -120,9 +119,9 @@ export default class RoomClient
 		// Leave the mediasoup Room.
 		this._room.leave();
 
-		// Close protoo Peer (wait a bit so mediasoup-client can send
+		// Close signaling Peer (wait a bit so mediasoup-client can send
 		// the 'leaveRoom' notification).
-		setTimeout(() => this._protoo.close(), 250);
+		setTimeout(() => this._signalingSocket.close(), 250);
 
 		this._dispatch(stateActions.setRoomState('closed'));
 	}
@@ -144,6 +143,57 @@ export default class RoomClient
 		this._loginWindow.close();
 	}
 
+	timeoutCallback(callback)
+	{
+		let called = false;
+
+		const interval = setTimeout(
+			() =>
+			{
+				if (called)
+					return;
+				called = true;
+				callback(new Error('Callback timeout'));
+			},
+			5000
+		);
+
+		return (...args) =>
+		{
+			if (called)
+				return;
+			called = true;
+			clearTimeout(interval);
+
+			callback(...args);
+		};
+	}
+
+	sendRequest(method, data)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			if (!this._signalingSocket)
+			{
+				reject('No socket connection.');
+			}
+			else
+			{
+				this._signalingSocket.emit(method, data, this.timeoutCallback((err, response) =>
+				{
+					if (err)
+					{
+						reject(err);
+					}
+					else
+					{
+						resolve(response);
+					}
+				}));
+			}
+		});
+	}
+
 	changeDisplayName(displayName)
 	{
 		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
@@ -151,7 +201,7 @@ export default class RoomClient
 		// Store in cookie.
 		cookiesManager.setUser({ displayName });
 
-		return this._protoo.send('change-display-name', { displayName })
+		return this.sendRequest('change-display-name', { displayName })
 			.then(() =>
 			{
 				this._dispatch(
@@ -171,7 +221,7 @@ export default class RoomClient
 						type : 'error',
 						text : `Could not change display name: ${error}`
 					}));
-
+			
 				// We need to refresh the component for it to render the previous
 				// displayName again.
 				this._dispatch(stateActions.setDisplayName());
@@ -182,7 +232,7 @@ export default class RoomClient
 	{
 		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
 
-		this._protoo.send('change-profile-picture', { picture }).catch((error) =>
+		return this.sendRequest('change-profile-picture', { picture }).catch((error) =>
 		{
 			logger.error('shareProfilePicure() | failed: %o', error);
 		});
@@ -192,7 +242,7 @@ export default class RoomClient
 	{
 		logger.debug('sendChatMessage() [chatMessage:"%s"]', chatMessage);
 
-		return this._protoo.send('chat-message', { chatMessage })
+		return this.sendRequest('chat-message', { chatMessage })
 			.catch((error) =>
 			{
 				logger.error('sendChatMessage() | failed: %o', error);
@@ -209,7 +259,7 @@ export default class RoomClient
 	{
 		logger.debug('sendFile() [file: %o]', file);
 
-		return this._protoo.send('send-file', { file })
+		return this.sendRequest('send-file', { file })
 			.catch((error) =>
 			{
 				logger.error('sendFile() | failed: %o', error);
@@ -225,7 +275,7 @@ export default class RoomClient
 	{
 		logger.debug('getChatHistory()');
 
-		return this._protoo.send('chat-history', {})
+		return this.sendRequest('chat-history', {})
 			.catch((error) =>
 			{
 				logger.error('getChatHistory() | failed: %o', error);
@@ -242,7 +292,7 @@ export default class RoomClient
 	{
 		logger.debug('getFileHistory()');
 
-		return this._protoo.send('file-history', {})
+		return this.sendRequest('file-history', {})
 			.catch((error) =>
 			{
 				logger.error('getFileHistory() | failed: %o', error);
@@ -940,7 +990,7 @@ export default class RoomClient
 		this._dispatch(
 			stateActions.setMyRaiseHandStateInProgress(true));
 
-		return this._protoo.send('raisehand-message', { raiseHandState: state })
+		return this.sendRequest('raisehand-message', { raiseHandState: state })
 			.then(() =>
 			{
 				this._dispatch(
@@ -997,16 +1047,16 @@ export default class RoomClient
 	{
 		this._dispatch(stateActions.setRoomState('connecting'));
 
-		this._protoo.on('open', () =>
+		this._signalingSocket.on('connect', () =>
 		{
-			logger.debug('protoo Peer "open" event');
+			logger.debug('signaling Peer "connect" event');
 
 			this._joinRoom({ displayName, device });
 		});
 
-		this._protoo.on('disconnected', () =>
+		this._signalingSocket.on('disconnect', () =>
 		{
-			logger.warn('protoo Peer "disconnected" event');
+			logger.warn('signaling Peer "disconnect" event');
 
 			this._dispatch(requestActions.notify(
 				{
@@ -1015,196 +1065,142 @@ export default class RoomClient
 				}));
 
 			// Leave Room.
-			try { this._room.remoteClose({ cause: 'protoo disconnected' }); }
+			try { this._room.remoteClose({ cause: 'signaling disconnected' }); }
 			catch (error) {}
 
 			this._dispatch(stateActions.setRoomState('connecting'));
 		});
 
-		this._protoo.on('close', () =>
+		this._signalingSocket.on('close', () =>
 		{
 			if (this._closed)
 				return;
 
-			logger.warn('protoo Peer "close" event');
+			logger.warn('signaling Peer "close" event');
 
 			this.close();
 		});
 
-		this._protoo.on('request', (request, accept, reject) =>
+		this._signalingSocket.on('mediasoup-notification', (data) =>
 		{
-			logger.debug(
-				'_handleProtooRequest() [method:%s, data:%o]',
-				request.method, request.data);
+			const notification = data;
 
-			switch (request.method)
+			this._room.receiveNotification(notification);
+		});
+
+		this._signalingSocket.on('active-speaker', (data) =>
+		{
+			const { peerName } = data;
+
+			this._dispatch(
+				stateActions.setRoomActiveSpeaker(peerName));
+		});
+
+		this._signalingSocket.on('display-name-changed', (data) =>
+		{
+			// eslint-disable-next-line no-shadow
+			const { peerName, displayName, oldDisplayName } = data;
+
+			// NOTE: Hack, we shouldn't do this, but this is just a demo.
+			const peer = this._room.getPeerByName(peerName);
+
+			if (!peer)
 			{
-				case 'mediasoup-notification':
+				logger.error('peer not found');
+
+				return;
+			}
+
+			peer.appData.displayName = displayName;
+
+			this._dispatch(
+				stateActions.setPeerDisplayName(displayName, peerName));
+
+			this._dispatch(requestActions.notify(
 				{
-					accept();
+					text : `${oldDisplayName} is now ${displayName}`
+				}));
+		});
 
-					const notification = request.data;
+		this._signalingSocket.on('profile-picture-changed', (data) =>
+		{
+			const { peerName, picture } = data;
 
-					this._room.receiveNotification(notification);
+			this._dispatch(stateActions.setPeerPicture(peerName, picture));
+		});
 
-					break;
-				}
+		// This means: server wants to change MY user information
+		this._signalingSocket.on('auth', (data) =>
+		{
+			logger.debug('got auth event from server', data);
 
-				case 'active-speaker':
+			this.changeDisplayName(data.name);
+
+			this.changeProfilePicture(data.picture);
+			this._dispatch(stateActions.setPicture(data.picture));
+			this._dispatch(stateActions.loggedIn());
+
+			this._dispatch(requestActions.notify(
 				{
-					accept();
-
-					const { peerName } = request.data;
-
-					this._dispatch(
-						stateActions.setRoomActiveSpeaker(peerName));
-
-					break;
+					text : `Authenticated successfully: ${data}`
 				}
+			));
 
-				case 'display-name-changed':
-				{
-					accept();
+			this.closeLoginWindow();
+		});
 
-					// eslint-disable-next-line no-shadow
-					const { peerName, displayName, oldDisplayName } = request.data;
+		this._signalingSocket.on('raisehand-message', (data) =>
+		{
+			const { peerName, raiseHandState } = data;
 
-					// NOTE: Hack, we shouldn't do this, but this is just a demo.
-					const peer = this._room.getPeerByName(peerName);
+			logger.debug('Got raiseHandState from "%s"', peerName);
 
-					if (!peer)
-					{
-						logger.error('peer not found');
+			this._dispatch(
+				stateActions.setPeerRaiseHandState(peerName, raiseHandState));
+		});
 
-						break;
-					}
+		this._signalingSocket.on('chat-message-receive', (data) =>
+		{
+			const { peerName, chatMessage } = data;
 
-					peer.appData.displayName = displayName;
+			logger.debug('Got chat from "%s"', peerName);
 
-					this._dispatch(
-						stateActions.setPeerDisplayName(displayName, peerName));
+			this._dispatch(
+				stateActions.addResponseMessage({ ...chatMessage, peerName }));
+		});
 
-					this._dispatch(requestActions.notify(
-						{
-							text : `${oldDisplayName} is now ${displayName}`
-						}));
+		this._signalingSocket.on('chat-history-receive', (data) =>
+		{
+			const { chatHistory } = data;
 
-					break;
-				}
+			if (chatHistory.length > 0)
+			{
+				logger.debug('Got chat history');
+				this._dispatch(
+					stateActions.addChatHistory(chatHistory));
+			}
+		});
 
-				case 'profile-picture-changed':
-				{
-					accept();
+		this._signalingSocket.on('file-receive', (data) =>
+		{
+			const payload = data.file;
 
-					const { peerName, picture } = request.data;
+			this._dispatch(stateActions.addFile(payload));
 
-					this._dispatch(stateActions.setPeerPicture(peerName, picture));
+			this._dispatch(requestActions.notify({
+				text : `${payload.name} shared a file`
+			}));
+		});
 
-					break;
-				}
+		this._signalingSocket.on('file-history-receive', (data) =>
+		{
+			const files = data.fileHistory;
 
-				// This means: server wants to change MY user information
-				case 'auth':
-				{
-					logger.debug('got auth event from server', request.data);
-					accept();
+			if (files.length > 0)
+			{
+				logger.debug('Got files history');
 
-					this.changeDisplayName(request.data.name);
-
-					this.changeProfilePicture(request.data.picture);
-					this._dispatch(stateActions.setPicture(request.data.picture));
-					this._dispatch(stateActions.loggedIn());
-
-					this._dispatch(requestActions.notify(
-						{
-							text : `Authenticated successfully: ${request.data}`
-						}
-					));
-
-					this.closeLoginWindow();
-
-					break;
-				}
-
-				case 'raisehand-message':
-				{
-					accept();
-					const { peerName, raiseHandState } = request.data;
-
-					logger.debug('Got raiseHandState from "%s"', peerName);
-
-					this._dispatch(
-						stateActions.setPeerRaiseHandState(peerName, raiseHandState));
-					break;
-				}
-
-				case 'chat-message-receive':
-				{
-					accept();
-
-					const { peerName, chatMessage } = request.data;
-
-					logger.debug('Got chat from "%s"', peerName);
-
-					this._dispatch(
-						stateActions.addResponseMessage({ ...chatMessage, peerName }));
-
-					break;
-				}
-
-				case 'chat-history-receive':
-				{
-					accept();
-
-					const { chatHistory } = request.data;
-
-					if (chatHistory.length > 0)
-					{
-						logger.debug('Got chat history');
-						this._dispatch(
-							stateActions.addChatHistory(chatHistory));
-					}
-
-					break;
-				}
-
-				case 'file-receive':
-				{
-					accept();
-
-					const payload = request.data.file;
-
-					this._dispatch(stateActions.addFile(payload));
-
-					this._dispatch(requestActions.notify({
-						text : `${payload.name} shared a file`
-					}));
-
-					break;
-				}
-
-				case 'file-history-receive':
-				{
-					accept();
-
-					const files = request.data.fileHistory;
-
-					if (files.length > 0)
-					{
-						logger.debug('Got files history');
-
-						this._dispatch(stateActions.addFileHistory(files));
-					}
-
-					break;
-				}
-
-				default:
-				{
-					logger.error('unknown protoo method "%s"', request.method);
-
-					reject(404, 'unknown method');
-				}
+				this._dispatch(stateActions.addFileHistory(files));
 			}
 		});
 	}
@@ -1213,7 +1209,7 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
-		// NOTE: We allow rejoining (room.join()) the same mediasoup Room when Protoo
+		// NOTE: We allow rejoining (room.join()) the same mediasoup Room when
 		// WebSocket re-connects, so we must clean existing event listeners. Otherwise
 		// they will be called twice after the reconnection.
 		this._room.removeAllListeners();
@@ -1235,7 +1231,7 @@ export default class RoomClient
 			logger.debug(
 				'sending mediasoup request [method:%s]:%o', request.method, request);
 
-			this._protoo.send('mediasoup-request', request)
+			this.sendRequest('mediasoup-request', request)
 				.then(callback)
 				.catch(errback);
 		});
@@ -1246,7 +1242,7 @@ export default class RoomClient
 				'sending mediasoup notification [method:%s]:%o',
 				notification.method, notification);
 
-			this._protoo.send('mediasoup-notification', notification)
+			this.sendRequest('mediasoup-notification', notification)
 				.catch((error) =>
 				{
 					logger.warn('could not send mediasoup notification:%o', error);
