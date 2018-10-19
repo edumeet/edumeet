@@ -64,7 +64,7 @@
     "gulp-rename": "^1.4.0",
     "gulp-stylus": "^2.7.0",
     "gulp-touch-cmd": "0.0.1",
-    "gulp-uglify": "^3.0.1",
+    "gulp-uglify-es": "^1.0.4",
     "gulp-util": "^3.0.8",
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
