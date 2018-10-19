@@ -263,10 +263,16 @@ class Room extends EventEmitter
 			);
 		});
 
-		signalingPeer.socket.on('chat-history', (request, cb) =>
+		signalingPeer.socket.on('server-history', (request, cb) =>
 		{
 			// Return to sender
-			cb(null, { chatHistory: this._chatHistory });
+			cb(
+				null,
+				{
+					chatHistory : this._chatHistory,
+					fileHistory : this._fileHistory
+				}
+			);
 		});
 
 		signalingPeer.socket.on('send-file', (request, cb) =>
@@ -290,12 +296,6 @@ class Room extends EventEmitter
 					file : fileData
 				}
 			);
-		});
-
-		signalingPeer.socket.on('file-history', (request, cb) =>
-		{
-			// Return to sender
-			cb(null, { fileHistory : this._fileHistory });
 		});
 
 		signalingPeer.socket.on('raisehand-message', (request, cb) =>

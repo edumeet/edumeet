@@ -271,14 +271,17 @@ export default class RoomClient
 			});
 	}
 
-	getChatHistory()
+	getServerHistory()
 	{
-		logger.debug('getChatHistory()');
+		logger.debug('getServerHistory()');
 
-		return this.sendRequest('chat-history')
+		return this.sendRequest('server-history')
 			.then((response) =>
 			{
-				const { chatHistory } = response;
+				const {
+					chatHistory,
+					fileHistory
+				} = response;
 
 				if (chatHistory.length > 0)
 				{
@@ -286,27 +289,6 @@ export default class RoomClient
 					this._dispatch(
 						stateActions.addChatHistory(chatHistory));
 				}
-			})
-			.catch((error) =>
-			{
-				logger.error('getChatHistory() | failed: %o', error);
-
-				this._dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : `Could not get chat history: ${error}`
-					}));
-			});
-	}
-
-	getFileHistory()
-	{
-		logger.debug('getFileHistory()');
-
-		return this.sendRequest('file-history')
-			.then((response) =>
-			{
-				const { fileHistory } = response;
 
 				if (fileHistory.length > 0)
 				{
@@ -317,12 +299,13 @@ export default class RoomClient
 			})
 			.catch((error) =>
 			{
-				logger.error('getFileHistory() | failed: %o', error);
+				logger.error('getServerHistory() | failed: %o', error);
 
-				this._dispatch(requestActions.notify({
-					type : 'error',
-					text : 'Could not get file history'
-				}));
+				this._dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : `Could not get chat history: ${error}`
+					}));
 			});
 	}
 
@@ -1329,8 +1312,7 @@ export default class RoomClient
 				// Clean all the existing notifcations.
 				this._dispatch(stateActions.removeAllNotifications());
 
-				this.getChatHistory();
-				this.getFileHistory();
+				this.getServerHistory();
 				
 				this._dispatch(requestActions.notify(
 					{
