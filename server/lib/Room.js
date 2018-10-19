@@ -215,7 +215,7 @@ class Room extends EventEmitter
 			cb(null);
 
 			const { displayName } = request;
-			const mediaPeer  = this._mediaRoom.getPeerByName(peerName);
+			const mediaPeer  = this._mediaRoom.getPeerByName(signalingPeer.peerName);
 			const oldDisplayName = mediaPeer.appData.displayName;
 
 			mediaPeer.appData.displayName = displayName;
