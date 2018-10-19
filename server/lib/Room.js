@@ -265,14 +265,8 @@ class Room extends EventEmitter
 
 		signalingPeer.socket.on('chat-history', (request, cb) =>
 		{
-			// Return no error
-			cb(null);
-
-			// Return to socket
-			signalingPeer.socket.emit(
-				'chat-history-receive',
-				{ chatHistory: this._chatHistory }
-			);
+			// Return to sender
+			cb(null, { chatHistory: this._chatHistory });
 		});
 
 		signalingPeer.socket.on('send-file', (request, cb) =>
@@ -300,16 +294,8 @@ class Room extends EventEmitter
 
 		signalingPeer.socket.on('file-history', (request, cb) =>
 		{
-			// Return no error
-			cb(null);
-
-			// Return to socket
-			signalingPeer.socket.emit(
-				'file-history-receive',
-				{
-					fileHistory : this._fileHistory
-				}
-			);
+			// Return to sender
+			cb(null, { fileHistory : this._fileHistory });
 		});
 
 		signalingPeer.socket.on('raisehand-message', (request, cb) =>

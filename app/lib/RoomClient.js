@@ -275,7 +275,18 @@ export default class RoomClient
 	{
 		logger.debug('getChatHistory()');
 
-		return this.sendRequest('chat-history', {})
+		return this.sendRequest('chat-history')
+			.then((response) =>
+			{
+				const { chatHistory } = response;
+
+				if (chatHistory.length > 0)
+				{
+					logger.debug('Got chat history');
+					this._dispatch(
+						stateActions.addChatHistory(chatHistory));
+				}
+			})
 			.catch((error) =>
 			{
 				logger.error('getChatHistory() | failed: %o', error);
@@ -292,7 +303,18 @@ export default class RoomClient
 	{
 		logger.debug('getFileHistory()');
 
-		return this.sendRequest('file-history', {})
+		return this.sendRequest('file-history')
+			.then((response) =>
+			{
+				const { fileHistory } = response;
+
+				if (fileHistory.length > 0)
+				{
+					logger.debug('Got files history');
+
+					this._dispatch(stateActions.addFileHistory(fileHistory));
+				}
+			})
 			.catch((error) =>
 			{
 				logger.error('getFileHistory() | failed: %o', error);
@@ -1169,18 +1191,6 @@ export default class RoomClient
 				stateActions.addResponseMessage({ ...chatMessage, peerName }));
 		});
 
-		this._signalingSocket.on('chat-history-receive', (data) =>
-		{
-			const { chatHistory } = data;
-
-			if (chatHistory.length > 0)
-			{
-				logger.debug('Got chat history');
-				this._dispatch(
-					stateActions.addChatHistory(chatHistory));
-			}
-		});
-
 		this._signalingSocket.on('file-receive', (data) =>
 		{
 			const payload = data.file;
@@ -1190,18 +1200,6 @@ export default class RoomClient
 			this._dispatch(requestActions.notify({
 				text : `${payload.name} shared a file`
 			}));
-		});
-
-		this._signalingSocket.on('file-history-receive', (data) =>
-		{
-			const files = data.fileHistory;
-
-			if (files.length > 0)
-			{
-				logger.debug('Got files history');
-
-				this._dispatch(stateActions.addFileHistory(files));
-			}
 		});
 	}
 
