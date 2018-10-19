@@ -1,7 +1,6 @@
 'use strict';
 
 const EventEmitter = require('events').EventEmitter;
-const protooServer = require('protoo-server');
 const WebTorrent = require('webtorrent-hybrid');
 const Logger = require('./Logger');
 const config = require('../config');
@@ -39,11 +38,10 @@ class Room extends EventEmitter
 
 		this._fileHistory = [];
 
+		this._signalingPeers = new Map();
+
 		try
 		{
-			// Protoo Room instance.
-			this._protooRoom = new protooServer.Room();
-
 			// mediasoup Room instance.
 			this._mediaRoom = mediaServer.Room(config.mediasoup.mediaCodecs);
 		}
@@ -75,9 +73,14 @@ class Room extends EventEmitter
 
 		this._closed = true;
 
-		// Close the protoo Room.
-		if (this._protooRoom)
-			this._protooRoom.close();
+		// Close the signalingPeers
+		if (this._signalingPeers)
+			for (let peer of this._signalingPeers)
+			{
+				peer.socket.disconnect();
+			};
+
+		this._signalingPeers.clear();
 
 		// Close the mediasoup Room.
 		if (this._mediaRoom)
@@ -93,31 +96,32 @@ class Room extends EventEmitter
 			return;
 
 		logger.info(
-			'logStatus() [room id:"%s", protoo peers:%s, mediasoup peers:%s]',
+			'logStatus() [room id:"%s", peers:%s, mediasoup peers:%s]',
 			this._roomId,
-			this._protooRoom.peers.length,
+			this._signalingPeers.length,
 			this._mediaRoom.peers.length);
 	}
 
-	handleConnection(peerName, transport)
+	handleConnection(peerName, socket)
 	{
 		logger.info('handleConnection() [peerName:"%s"]', peerName);
 
-		if (this._protooRoom.hasPeer(peerName))
+		if (this._signalingPeers.has(peerName))
 		{
 			logger.warn(
 				'handleConnection() | there is already a peer with same peerName, ' +
 				'closing the previous one [peerName:"%s"]',
 				peerName);
 
-			const protooPeer = this._protooRoom.getPeer(peerName);
+			const signalingPeer = this._signalingPeers.get(peerName);
 
-			protooPeer.close();
+			signalingPeer.socket.disconnect();
+			this._signalingPeers.delete(peerName);
 		}
 
-		const protooPeer = this._protooRoom.createPeer(peerName, transport);
+		const signalingPeer = { peerName : peerName, socket : socket };
 
-		this._handleProtooPeer(protooPeer);
+		this._handleSignalingPeer(signalingPeer);
 	}
 
 	_handleMediaRoom()
@@ -173,8 +177,8 @@ class Room extends EventEmitter
 				}
 			}
 
-			// Spread to others via protoo.
-			this._protooRoom.spread(
+			// Spread to room
+			this.emit(
 				'active-speaker',
 				{
 					peerName : activePeer ? activePeer.name : null
@@ -182,172 +186,156 @@ class Room extends EventEmitter
 		});
 	}
 
-	_handleProtooPeer(protooPeer)
+	_handleSignalingPeer(signalingPeer)
 	{
-		logger.debug('_handleProtooPeer() [peer:"%s"]', protooPeer.id);
+		logger.debug('_handleSignalingPeer() [peer:"%s"]', signalingPeer.id);
 
-		protooPeer.on('request', (request, accept, reject) =>
+		signalingPeer.socket.on('mediasoup-request', (request, cb) =>
 		{
-			logger.debug(
-				'protoo "request" event [method:%s, peer:"%s"]',
-				request.method, protooPeer.id);
+			const mediasoupRequest = request;
 
-			switch (request.method)
-			{
-				case 'mediasoup-request':
-				{
-					const mediasoupRequest = request.data;
-
-					this._handleMediasoupClientRequest(
-						protooPeer, mediasoupRequest, accept, reject);
-
-					break;
-				}
-
-				case 'mediasoup-notification':
-				{
-					accept();
-
-					const mediasoupNotification = request.data;
-
-					this._handleMediasoupClientNotification(
-						protooPeer, mediasoupNotification);
-
-					break;
-				}
-
-				case 'change-display-name':
-				{
-					accept();
-
-					const { displayName } = request.data;
-					const { mediaPeer } = protooPeer.data;
-					const oldDisplayName = mediaPeer.appData.displayName;
-
-					mediaPeer.appData.displayName = displayName;
-
-					// Spread to others via protoo.
-					this._protooRoom.spread(
-						'display-name-changed',
-						{
-							peerName       : protooPeer.id,
-							displayName    : displayName,
-							oldDisplayName : oldDisplayName
-						},
-						[ protooPeer ]);
-
-					break;
-				}
-
-				case 'change-profile-picture':
-				{
-					accept();
-
-					this._protooRoom.spread('profile-picture-changed', {
-						peerName : protooPeer.id,
-						picture  : request.data.picture
-					}, [ protooPeer ]);
-
-					break;
-				}
-
-				case 'chat-message':
-				{
-					accept();
-
-					const { chatMessage } = request.data;
-
-					this._chatHistory.push(chatMessage);
-
-					// Spread to others via protoo.
-					this._protooRoom.spread(
-						'chat-message-receive',
-						{
-							peerName    : protooPeer.id,
-							chatMessage : chatMessage
-						},
-						[ protooPeer ]);
-
-					break;
-				}
-
-				case 'chat-history':
-				{
-					accept();
-
-					protooPeer.send(
-						'chat-history-receive',
-						{ chatHistory: this._chatHistory }
-					);
-
-					break;
-				}
-
-				case 'send-file':
-				{
-					accept();
-
-					const fileData = request.data.file;
-
-					this._fileHistory.push(fileData);
-
-					if (!torrentClient.get(fileData.file.magnet))
-					{
-						torrentClient.add(fileData.file.magnet);
-					}
-
-					this._protooRoom.spread('file-receive', {
-						file : fileData
-					}, [ protooPeer ]);
-
-					break;
-				}
-
-				case 'file-history':
-				{
-					accept();
-
-					protooPeer.send('file-history-receive', {
-						fileHistory : this._fileHistory
-					});
-
-					break;
-				}
-
-				case 'raisehand-message':
-				{
-					accept();
-
-					const { raiseHandState } = request.data;
-					const { mediaPeer } = protooPeer.data;
-
-					mediaPeer.appData.raiseHandState = request.data.raiseHandState;
-					// Spread to others via protoo.
-					this._protooRoom.spread(
-						'raisehand-message',
-						{
-							peerName       : protooPeer.id,
-							raiseHandState : raiseHandState
-						},
-						[ protooPeer ]);
-
-					break;
-				}
-
-				default:
-				{
-					logger.error('unknown request.method "%s"', request.method);
-
-					reject(400, `unknown request.method "${request.method}"`);
-				}
-			}
+			this._handleMediasoupClientRequest(
+				signalingPeer, mediasoupRequest, cb);
 		});
 
-		protooPeer.on('close', () =>
+		signalingPeer.socket.on('mediasoup-notification', (request, cb) =>
 		{
-			logger.debug('protoo Peer "close" event [peer:"%s"]', protooPeer.id);
+			// Return no error
+			cb(null);
 
-			const { mediaPeer } = protooPeer.data;
+			const mediasoupNotification = request;
+
+			this._handleMediasoupClientNotification(
+				signalingPeer, mediasoupNotification);
+		});
+
+		signalingPeer.socket.on('change-display-name', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			const { displayName } = request;
+			const mediaPeer  = this._mediaRoom.getPeerByName(peerName);
+			const oldDisplayName = mediaPeer.appData.displayName;
+
+			mediaPeer.appData.displayName = displayName;
+
+			signalingPeer.socket.broadcast.to(this._roomId).emit(
+				'display-name-changed',
+				{
+					peerName       : signalingPeer.peerName,
+					displayName    : displayName,
+					oldDisplayName : oldDisplayName
+				}
+			);
+		});
+
+		signalingPeer.socket.on('change-profile-picture', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			signalingPeer.socket.broadcast.to(this._roomId).emit(
+				'profile-picture-changed',
+				{
+					peerName : signalingPeer.peerName,
+					picture  : request.picture
+				}
+			);
+		});
+
+		signalingPeer.socket.on('chat-message', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			const { chatMessage } = request;
+
+			this._chatHistory.push(chatMessage);
+
+			// Spread to others
+			signalingPeer.socket.broadcast.to(this._roomId).emit(
+				'chat-message-receive',
+				{
+					peerName    : signalingPeer.peerName,
+					chatMessage : chatMessage
+				}
+			);
+		});
+
+		signalingPeer.socket.on('chat-history', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			// Return to socket
+			signalingPeer.socket.emit(
+				'chat-history-receive',
+				{ chatHistory: this._chatHistory }
+			);
+		});
+
+		signalingPeer.socket.on('send-file', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			const fileData = request.data.file;
+
+			this._fileHistory.push(fileData);
+
+			if (!torrentClient.get(fileData.file.magnet))
+			{
+				torrentClient.add(fileData.file.magnet);
+			}
+
+			// Spread to others
+			signalingPeer.socket.broadcast.to(this._roomId).emit(
+				'file-receive',
+				{
+					file : fileData
+				}
+			);
+		});
+
+		signalingPeer.socket.on('file-history', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			// Return to socket
+			signalingPeer.socket.emit(
+				'file-history-receive',
+				{
+					fileHistory : this._fileHistory
+				}
+			);
+		});
+
+		signalingPeer.socket.on('raisehand-message', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			const { raiseHandState } = request.data;
+			const { mediaPeer } = signalingPeer;
+
+			mediaPeer.appData.raiseHandState = request.data.raiseHandState;
+			// Spread to others
+			signalingPeer.socket.broadcast.to(this._roomId).emit(
+				'raisehand-message',
+				{
+					peerName       : signalingPeer.peerName,
+					raiseHandState : raiseHandState
+				},
+			);
+		});
+
+		signalingPeer.socket.on('disconnect', () =>
+		{
+			logger.debug('Peer "close" event [peer:"%s"]', signalingPeer.peerName);
+
+			const mediaPeer  = this._mediaRoom.getPeerByName(signalingPeer.peerName);
 
 			if (mediaPeer && !mediaPeer.closed)
 				mediaPeer.close();
@@ -371,12 +359,11 @@ class Room extends EventEmitter
 		});
 	}
 
-	_handleMediaPeer(protooPeer, mediaPeer)
+	_handleMediaPeer(signalingPeer, mediaPeer)
 	{
 		mediaPeer.on('notify', (notification) =>
 		{
-			protooPeer.send('mediasoup-notification', notification)
-				.catch(() => {});
+			signalingPeer.socket.emit('mediasoup-notification', notification);
 		});
 
 		mediaPeer.on('newtransport', (transport) =>
@@ -424,12 +411,11 @@ class Room extends EventEmitter
 		// Notify about the existing active speaker.
 		if (this._currentActiveSpeaker)
 		{
-			protooPeer.send(
+			signalingPeer.socket.emit(
 				'active-speaker',
 				{
 					peerName : this._currentActiveSpeaker.name
-				})
-				.catch(() => {});
+				});
 		}
 	}
 
@@ -495,19 +481,19 @@ class Room extends EventEmitter
 			consumer.setPreferredProfile('low');
 	}
 
-	_handleMediasoupClientRequest(protooPeer, request, accept, reject)
+	_handleMediasoupClientRequest(signalingPeer, request, cb)
 	{
 		logger.debug(
 			'mediasoup-client request [method:%s, peer:"%s"]',
-			request.method, protooPeer.id);
+			request.method, signalingPeer.peerName);
 
 		switch (request.method)
 		{
 			case 'queryRoom':
 			{
 				this._mediaRoom.receiveRequest(request)
-					.then((response) => accept(response))
-					.catch((error) => reject(500, error.toString()));
+					.then((response) => cb(null, response))
+					.catch((error) => cb(error.toString()));
 
 				break;
 			}
@@ -517,15 +503,15 @@ class Room extends EventEmitter
 				// TODO: Handle appData. Yes?
 				const { peerName } = request;
 
-				if (peerName !== protooPeer.id)
+				if (peerName !== signalingPeer.peerName)
 				{
-					reject(403, 'that is not your corresponding mediasoup Peer name');
+					cb('that is not your corresponding mediasoup Peer name');
 
 					break;
 				}
-				else if (protooPeer.data.mediaPeer)
+				else if (signalingPeer.mediaPeer)
 				{
-					reject(500, 'already have a mediasoup Peer');
+					cb('already have a mediasoup Peer');
 
 					break;
 				}
@@ -533,18 +519,18 @@ class Room extends EventEmitter
 				this._mediaRoom.receiveRequest(request)
 					.then((response) =>
 					{
-						accept(response);
+						cb(null, response);
 
 						// Get the newly created mediasoup Peer.
 						const mediaPeer = this._mediaRoom.getPeerByName(peerName);
 
-						protooPeer.data.mediaPeer = mediaPeer;
+						signalingPeer.mediaPeer = mediaPeer;
 
-						this._handleMediaPeer(protooPeer, mediaPeer);
+						this._handleMediaPeer(signalingPeer, mediaPeer);
 					})
 					.catch((error) =>
 					{
-						reject(500, error.toString());
+						cb(error.toString());
 					});
 
 				break;
@@ -552,7 +538,7 @@ class Room extends EventEmitter
 
 			default:
 			{
-				const { mediaPeer } = protooPeer.data;
+				const { mediaPeer } = signalingPeer;
 
 				if (!mediaPeer)
 				{
@@ -560,25 +546,25 @@ class Room extends EventEmitter
 						'cannot handle mediasoup request, no mediasoup Peer [method:"%s"]',
 						request.method);
 
-					reject(400, 'no mediasoup Peer');
+					cb('no mediasoup Peer');
 				}
 
 				mediaPeer.receiveRequest(request)
-					.then((response) => accept(response))
-					.catch((error) => reject(500, error.toString()));
+					.then((response) => cb(null, response))
+					.catch((error) => cb(error.toString()));
 			}
 		}
 	}
 
-	_handleMediasoupClientNotification(protooPeer, notification)
+	_handleMediasoupClientNotification(signalingPeer, notification)
 	{
 		logger.debug(
 			'mediasoup-client notification [method:%s, peer:"%s"]',
-			notification.method, protooPeer.id);
+			notification.method, signalingPeer.peerName);
 
 		// NOTE: mediasoup-client just sends notifications with target 'peer',
 		// so first of all, get the mediasoup Peer.
-		const { mediaPeer } = protooPeer.data;
+		const { mediaPeer } = signalingPeer;
 
 		if (!mediaPeer)
 		{

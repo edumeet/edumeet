@@ -21,7 +21,6 @@
     "marked": "^0.4.0",
     "mediasoup-client": "^2.1.1",
     "prop-types": "^15.6.2",
-    "protoo-client": "^3.0.0",
     "random-string": "^0.2.0",
     "react": "^16.4.2",
     "react-copy-to-clipboard": "^5.0.1",
