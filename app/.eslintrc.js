@@ -9,7 +9,8 @@ module.exports =
 	plugins:
 	[
 		'import',
-		'react'
+		'react',
+		'jsx-control-statements'
 	],
 	extends:
 	[
@@ -21,13 +22,13 @@ module.exports =
 		react:
 		{
 			pragma: 'React',
-			version: '15'
+			version: '16'
 		}
 	},
-	parser: 'babel-eslint',
+	parser: "babel-eslint",
 	parserOptions:
 	{
-		ecmaVersion: 9,
+		ecmaVersion: 2018,
 		sourceType: 'module',
 		ecmaFeatures:
 		{
@@ -177,6 +178,7 @@ module.exports =
 		'spaced-comment': [ 2, 'always' ],
 		'strict': 2,
 		'valid-typeof': 2,
+		'eol-last': 0,
 		'yoda': 2,
 		// eslint-plugin-import options.
 		'import/extensions': 2,
@@ -197,7 +199,7 @@ module.exports =
 		'react/jsx-no-bind': 0,
 		'react/jsx-no-duplicate-props': 2,
 		'react/jsx-no-literals': 0,
-		'react/jsx-no-undef': 2,
+		'react/jsx-no-undef': 0,
 		'react/jsx-pascal-case': 2,
 		'react/jsx-sort-prop-types': 0,
 		'react/jsx-sort-props': 0,
@@ -214,7 +216,7 @@ module.exports =
 		'react/no-string-refs': 0,
 		'react/no-unknown-property': 2,
 		'react/prefer-es6-class': 2,
-		'react/prop-types': 2,
+		'react/prop-types': [ 2, { skipUndeclared: true } ],
 		'react/react-in-jsx-scope': 2,
 		'react/self-closing-comp': 2,
 		'react/sort-comp': 0,

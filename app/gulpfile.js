@@ -77,10 +77,7 @@ function bundle(options)
 			// required to be true only for watchify.
 			fullPaths    : watch
 		})
-		.transform('babelify',
-			{
-				presets : [ 'env', 'react-app' ]
-			})
+		.transform('babelify')
 		.transform(envify(
 			{
 				NODE_ENV : process.env.NODE_ENV,
