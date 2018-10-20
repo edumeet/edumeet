@@ -7,7 +7,19 @@
 	],
 	"presets":
 	[
-		"@babel/env",
+		[
+			"@babel/preset-env",
+			{
+				"targets": {
+					"browsers": [
+						"chrome >= 67",
+						"edge >= 17",
+						"firefox >= 60",
+						"safari >= 12"
+					]
+				}
+			}
+		],
 		"@babel/react"
 	]
 }
