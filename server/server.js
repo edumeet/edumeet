@@ -97,6 +97,19 @@ httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 	logger.info('Server running on port: ', config.listeningPort);
 });
 
+const httpServer = app.createServer();
+
+// set up a route to redirect http to https
+http.get('*', (req, res) =>
+{
+	res.redirect('https://' + req.headers.host + req.url);
+})
+
+httpServer.listen(config.listeningRedirectPort, '0.0.0.0', () =>
+{
+	logger.info('Server redirecting port: ', config.listeningRedirectPort);
+});
+
 const io = require('socket.io')(httpsServer);
 
 // Handle connections from clients.
