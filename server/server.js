@@ -97,7 +97,7 @@ httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 	logger.info('Server running on port: ', config.listeningPort);
 });
 
-const httpServer = app.createServer();
+const httpServer = express.createServer();
 
 // set up a route to redirect http to https
 http.get('*', (req, res) =>
