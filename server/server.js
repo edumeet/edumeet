@@ -7,6 +7,7 @@ process.title = 'multiparty-meeting-server';
 const config = require('./config');
 const fs = require('fs');
 const https = require('https');
+const http = require('http');
 const express = require('express');
 const url = require('url');
 const Logger = require('./lib/Logger');
@@ -39,6 +40,18 @@ const tls =
 const app = express();
 
 const dataporten = new Dataporten.Setup(config.oauth2);
+
+app.all('*', (req, res, next) =>
+{
+	if(req.headers['x-forwarded-proto'] == 'http')
+	{
+		res.redirect('https://' + req.hostname + req.url);
+	}
+	else
+	{
+		return next();
+	}
+});
 
 app.use(dataporten.passport.initialize());
 app.use(dataporten.passport.session());
@@ -97,13 +110,7 @@ httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 	logger.info('Server running on port: ', config.listeningPort);
 });
 
-const httpServer = express.createServer();
-
-// set up a route to redirect http to https
-http.get('*', (req, res) =>
-{
-	res.redirect('https://' + req.headers.host + req.url);
-})
+const httpServer = http.createServer(app);
 
 httpServer.listen(config.listeningRedirectPort, '0.0.0.0', () =>
 {
