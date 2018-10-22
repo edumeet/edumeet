@@ -21,7 +21,7 @@ const torrentClient = new WebTorrent({
 
 class Room extends EventEmitter
 {
-	constructor(roomId, mediaServer)
+	constructor(roomId, mediaServer, io)
 	{
 		logger.info('constructor() [roomId:"%s"]', roomId);
 
@@ -37,6 +37,8 @@ class Room extends EventEmitter
 		this._chatHistory = [];
 
 		this._fileHistory = [];
+
+		this._io = io;
 
 		this._signalingPeers = new Map();
 
@@ -177,10 +179,7 @@ class Room extends EventEmitter
 				}
 			}
 
-			// Spread to room
-			this.emit(
-				'active-speaker',
-				{
+			this._io.to(this._roomId).emit('active-speaker', {
 					peerName : activePeer ? activePeer.name : null
 				});
 		});

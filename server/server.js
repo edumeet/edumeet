@@ -145,7 +145,7 @@ io.on('connection', (socket) =>
 
 		try
 		{
-			room = new Room(roomId, mediaServer);
+			room = new Room(roomId, mediaServer, io);
 
 			global.APP_ROOM = room;
 		}
@@ -164,11 +164,6 @@ io.on('connection', (socket) =>
 		}, 30000);
 
 		rooms.set(roomId, room);
-
-		room.on('active-speaker', (message) =>
-		{
-			io.to(roomId).emit('active-speaker', message);
-		});
 
 		room.on('close', () =>
 		{
