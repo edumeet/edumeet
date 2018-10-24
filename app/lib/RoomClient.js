@@ -19,7 +19,8 @@ const ROOM_OPTIONS =
 {
 	requestTimeout   : requestTimeout,
 	transportOptions : transportOptions,
-	turnServers      : turnServers
+	turnServers      : turnServers,
+	lastN            : 2
 };
 
 const VIDEO_CONSTRAINS =
@@ -69,6 +70,12 @@ export default class RoomClient
 		// mediasoup-client Room instance.
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
 		this._room.roomId = roomId;
+
+		// LastN speakers
+		this._lastNSpeakers = ROOM_OPTIONS.lastN;
+
+		// Array of lastN speakers
+		this._lastN = [];
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -280,7 +287,8 @@ export default class RoomClient
 		{
 			const {
 				chatHistory,
-				fileHistory
+				fileHistory,
+				lastN
 			} = await this.sendRequest('server-history');
 
 			if (chatHistory.length > 0)
@@ -295,6 +303,19 @@ export default class RoomClient
 				logger.debug('Got files history');
 
 				this._dispatch(stateActions.addFileHistory(fileHistory));
+			}
+
+			if (lastN.length > 0)
+			{
+				logger.debug('Got lastN');
+
+				const index = lastN.indexOf(this._peerName);
+
+				lastN.splice(index, 1);
+
+				this._lastN = lastN;
+
+				this.updateSpeakers();
 			}
 		}
 		catch (error)
@@ -317,6 +338,74 @@ export default class RoomClient
 		logger.debug('unmuteMic()');
 
 		this._micProducer.resume();
+	}
+
+	// Resumes consumers based on lastN speakers
+	async updateSpeakers()
+	{
+		logger.debug('updateSpeakers()');
+
+		try
+		{
+			const speakers = this._lastN.slice(0, this._lastNSpeakers);
+
+			speakers.forEach((peerName) =>
+			{
+				const peer = this._room.getPeerByName(peerName);
+
+				if (peer)
+				{
+					for (const consumer of peer.consumers)
+					{
+						if (consumer.appData.source !== 'webcam' ||
+							!consumer.supported ||
+							!consumer.locallyPaused)
+							continue;
+
+						consumer.resume();
+					}
+				}
+			});
+		}
+		catch(error)
+		{
+			logger.error('updateSpeakers() failed: %o', error);
+		}
+	}
+
+	handleActiveSpeaker(peerName)
+	{
+		logger.debug('handleActiveSpeaker() [peerName:"%s"]', peerName);
+
+		const index = this._lastN.indexOf(peerName);
+
+		if (index > -1) // We have this speaker in the list, move to front
+		{
+			if (index >= this._lastNSpeakers) // We need to remove someone
+			{
+				const removePeer = this._lastN[this._lastNSpeakers - 1];
+
+				this.pausePeerVideo(removePeer);
+			}
+
+			this._lastN.splice(index, 1);
+			this._lastN = [ peerName ].concat(this._lastN);
+
+			this.updateSpeakers();
+		}
+		else // We don't have this speaker in the list, should not happen
+		{
+			if (this._lastN.length >= this._lastNSpeakers)
+			{
+				const removePeer = this._lastN[this._lastNSpeakers - 1];
+
+				this.pausePeerVideo(removePeer);
+			}
+
+			this._lastN = [ peerName ].concat(this._lastN);
+
+			this.updateSpeakers();
+		}
 	}
 
 	installExtension()
@@ -1099,6 +1188,13 @@ export default class RoomClient
 			logger.debug(
 				'room "newpeer" event [name:"%s", peer:%o]', peer.name, peer);
 
+			const index = this._lastN.indexOf(peer.name);
+
+			if (index === -1) // We don't have this peer in the list, add
+			{
+				this._lastN.push(peer.name);
+			}
+
 			this._handlePeer(peer);
 		});
 
@@ -1139,31 +1235,20 @@ export default class RoomClient
 				}));
 
 			// Don't produce if explicitely requested to not to do it.
-			if (!this._produce)
-				return;
+			if (this._produce)
+			{
+				if (this._room.canSend('audio'))
+					await this._setMicProducer();
 
-			// NOTE: Don't depend on this Promise to continue (so we don't do return).
-			Promise.resolve()
-				// Add our mic.
-				.then(() =>
+					// Add our webcam (unless the cookie says no).
+				if (this._room.canSend('video'))
 				{
-					if (!this._room.canSend('audio'))
-						return;
-
-					this._setMicProducer()
-						.catch(() => {});
-				})
-				// Add our webcam (unless the cookie says no).
-				.then(() =>
-				{
-					if (!this._room.canSend('video'))
-						return;
-
 					const devicesCookie = cookiesManager.getDevices();
 
 					if (!devicesCookie || devicesCookie.webcamEnabled)
-						this.enableWebcam();
-				});
+						await this.enableWebcam();
+				}
+			}
 
 			this._dispatch(stateActions.setRoomState('connected'));
 
@@ -1661,6 +1746,14 @@ export default class RoomClient
 
 			this._dispatch(stateActions.removePeer(peer.name));
 
+			const index = this._lastN.indexOf(peer.name);
+
+			if (index > -1) // We have this peer in the list, remove
+			{
+				this._lastN.splice(index, 1);
+				this.updateSpeakers();
+			}
+
 			if (this._room.joined)
 			{
 				this.notify(`${peer.appData.displayName} left the room`);
@@ -1775,6 +1868,11 @@ export default class RoomClient
 			// Pause it if video and we are in audio-only mode.
 			if (consumer.kind === 'video' && this._getState().me.audioOnly)
 				consumer.pause('audio-only-mode');
+
+			const index = this._lastN.indexOf(consumer.peer.name);
+
+			if (consumer.kind === 'video' && ((index >= this._lastNSpeakers) || (index === -1)))
+				consumer.pause('not-speaker');
 
 			consumer.receive(this._recvTransport)
 				.then((track) =>
