@@ -367,7 +367,7 @@ export default class RoomClient
 				}
 			});
 		}
-		catch(error)
+		catch (error)
 		{
 			logger.error('updateSpeakers() failed: %o', error);
 		}
@@ -1061,6 +1061,9 @@ export default class RoomClient
 
 			this._dispatch(
 				stateActions.setRoomActiveSpeaker(peerName));
+
+			if (peerName && peerName !== this._peerName)
+				this.handleActiveSpeaker(peerName);
 		});
 
 		this._signalingSocket.on('display-name-changed', (data) =>
@@ -1240,7 +1243,7 @@ export default class RoomClient
 				if (this._room.canSend('audio'))
 					await this._setMicProducer();
 
-					// Add our webcam (unless the cookie says no).
+				// Add our webcam (unless the cookie says no).
 				if (this._room.canSend('video'))
 				{
 					const devicesCookie = cookiesManager.getDevices();
