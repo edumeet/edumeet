@@ -38,10 +38,6 @@ class Peer extends Component
 			screenConsumer,
 			onMuteMic,
 			onUnmuteMic,
-			onDisableWebcam,
-			onEnableWebcam,
-			onDisableScreen,
-			onEnableScreen,
 			toggleConsumerFullscreen,
 			style
 		} = this.props;
@@ -90,6 +86,13 @@ class Peer extends Component
 					:null
 				}
 
+				{!videoVisible ?
+					<div className='paused-video'>
+						<p>this video is paused</p>
+					</div>
+					:null
+				}
+
 				<div className={classnames('view-container', 'webcam')} style={style}>
 					<div className='indicators'>
 						{peer.raiseHandState ?
@@ -124,20 +127,6 @@ class Peer extends Component
 						/>
 
 						<div
-							className={classnames('button', 'webcam', {
-								on       : videoVisible,
-								off      : !videoVisible,
-								disabled : peer.peerVideoInProgress
-							})}
-							onClick={(e) =>
-							{
-								e.stopPropagation();
-								videoVisible ?
-									onDisableWebcam(peer.name) : onEnableWebcam(peer.name);
-							}}
-						/>
-
-						<div
 							className={classnames('button', 'fullscreen')}
 							onClick={(e) =>
 							{
@@ -146,6 +135,7 @@ class Peer extends Component
 							}}
 						/>
 					</div>
+
 					<PeerView
 						advancedMode={advancedMode}
 						peer={peer}
@@ -165,20 +155,6 @@ class Peer extends Component
 								visible : this.state.controlsVisible
 							})}
 						>
-							<div
-								className={classnames('button', 'screen', {
-									on       : screenVisible,
-									off      : !screenVisible,
-									disabled : peer.peerScreenInProgress
-								})}
-								onClick={(e) =>
-								{
-									e.stopPropagation();
-									screenVisible ?
-										onDisableScreen(peer.name) : onEnableScreen(peer.name);
-								}}
-							/>
-
 							<div
 								className={classnames('button', 'fullscreen')}
 								onClick={(e) =>
@@ -212,12 +188,8 @@ Peer.propTypes =
 	screenConsumer           : appPropTypes.Consumer,
 	onMuteMic                : PropTypes.func.isRequired,
 	onUnmuteMic              : PropTypes.func.isRequired,
-	onEnableWebcam           : PropTypes.func.isRequired,
-	onDisableWebcam          : PropTypes.func.isRequired,
 	streamDimensions         : PropTypes.object,
 	style                    : PropTypes.object,
-	onEnableScreen           : PropTypes.func.isRequired,
-	onDisableScreen          : PropTypes.func.isRequired,
 	toggleConsumerFullscreen : PropTypes.func.isRequired
 };
 
@@ -251,23 +223,6 @@ const mapDispatchToProps = (dispatch) =>
 		onUnmuteMic : (peerName) =>
 		{
 			dispatch(requestActions.unmutePeerAudio(peerName));
-		},
-		onEnableWebcam : (peerName) =>
-		{
-
-			dispatch(requestActions.resumePeerVideo(peerName));
-		},
-		onDisableWebcam : (peerName) =>
-		{
-			dispatch(requestActions.pausePeerVideo(peerName));
-		},
-		onEnableScreen : (peerName) =>
-		{
-			dispatch(requestActions.resumePeerScreen(peerName));
-		},
-		onDisableScreen : (peerName) =>
-		{
-			dispatch(requestActions.pausePeerScreen(peerName));
 		},
 		toggleConsumerFullscreen : (consumer) =>
 		{

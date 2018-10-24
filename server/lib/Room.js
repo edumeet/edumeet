@@ -298,7 +298,7 @@ class Room extends EventEmitter
 			// Return no error
 			cb(null);
 
-			const fileData = request.data.file;
+			const fileData = request.file;
 
 			this._fileHistory.push(fileData);
 
@@ -321,10 +321,10 @@ class Room extends EventEmitter
 			// Return no error
 			cb(null);
 
-			const { raiseHandState } = request.data;
+			const { raiseHandState } = request;
 			const { mediaPeer } = signalingPeer;
 
-			mediaPeer.appData.raiseHandState = request.data.raiseHandState;
+			mediaPeer.appData.raiseHandState = request.raiseHandState;
 			// Spread to others
 			signalingPeer.socket.broadcast.to(this._roomId).emit(
 				'raisehand-message',
