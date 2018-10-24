@@ -474,7 +474,14 @@ export const loggedIn = () =>
 		type : 'LOGGED_IN'
 	});
 
-export const setSelectedPeer = (selectedPeerName) => ({
-	type    : 'SET_SELECTED_PEER',
-	payload : { selectedPeerName }
-});
+export const setSelectedPeer = (selectedPeerName) =>
+	({
+		type    : 'SET_SELECTED_PEER',
+		payload : { selectedPeerName }
+	});
+
+export const setLastN = (lastN) =>
+	({
+		type    : 'SET_LASTN',
+		payload : { lastN }
+	});

@@ -349,6 +349,8 @@ export default class RoomClient
 		{
 			const speakers = this._lastN.slice(0, this._lastNSpeakers);
 
+			this._dispatch(stateActions.setLastN(speakers));
+
 			speakers.forEach((peerName) =>
 			{
 				const peer = this._room.getPeerByName(peerName);
@@ -1196,6 +1198,7 @@ export default class RoomClient
 			if (index === -1) // We don't have this peer in the list, add
 			{
 				this._lastN.push(peer.name);
+				this.updateSpeakers();
 			}
 
 			this._handlePeer(peer);

@@ -8,7 +8,8 @@ const initialState =
 	fullScreenConsumer : null, // ConsumerID
 	toolbarsVisible    : true,
 	mode               : 'democratic',
-	selectedPeerName   : null
+	selectedPeerName   : null,
+	lastN              : null
 };
 
 const room = (state = initialState, action) =>
@@ -81,6 +82,13 @@ const room = (state = initialState, action) =>
 				selectedPeerName : state.selectedPeerName === selectedPeerName ?
 					null : selectedPeerName
 			};
+		}
+
+		case 'SET_LASTN':
+		{
+			const { lastN } = action.payload;
+
+			return { ...state, lastN };
 		}
 
 		default:
