@@ -82,6 +82,7 @@ class Room extends React.Component
 					<div data-component='Room'>
 						<FullScreenView advancedMode={room.advancedMode} />
 						<div className='room-wrapper'>
+							<div data-component='Logo' />
 							<Notifications />
 
 							<ToolAreaButton />
