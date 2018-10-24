@@ -149,7 +149,6 @@ class Peer extends Component
 					<PeerView
 						advancedMode={advancedMode}
 						peer={peer}
-						audioTrack={micConsumer ? micConsumer.track : null}
 						volume={micConsumer ? micConsumer.volume : null}
 						videoTrack={webcamConsumer ? webcamConsumer.track : null}
 						videoVisible={videoVisible}

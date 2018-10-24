@@ -10,6 +10,7 @@ import * as stateActions from '../redux/stateActions';
 import { Appear } from './transitions';
 import Me from './Me';
 import Peers from './Peers';
+import AudioPeers from './PeerAudio/AudioPeers';
 import Notifications from './Notifications';
 import ToolAreaButton from './ToolArea/ToolAreaButton';
 import ToolArea from './ToolArea/ToolArea';
@@ -82,6 +83,8 @@ class Room extends React.Component
 					<div data-component='Room'>
 						<FullScreenView advancedMode={room.advancedMode} />
 						<div className='room-wrapper'>
+							<AudioPeers />
+
 							<Notifications />
 
 							<ToolAreaButton />
