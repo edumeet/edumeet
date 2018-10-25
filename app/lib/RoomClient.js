@@ -3,6 +3,7 @@ import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
 import hark from 'hark';
 import ScreenShare from './ScreenShare';
+import LastN from './LastN';
 import { getSignalingUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
@@ -75,7 +76,7 @@ export default class RoomClient
 		this._lastNSpeakers = ROOM_OPTIONS.lastN;
 
 		// Array of lastN speakers
-		this._lastN = [];
+		this._lastN = new LastN(this._lastNSpeakers, this._room);
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -309,13 +310,12 @@ export default class RoomClient
 			{
 				logger.debug('Got lastN');
 
+				// Remove our self from list
 				const index = lastN.indexOf(this._peerName);
 
 				lastN.splice(index, 1);
 
-				this._lastN = lastN;
-
-				this.updateSpeakers();
+				this._lastN.addSpeakerList(lastN);
 			}
 		}
 		catch (error)
@@ -340,22 +340,16 @@ export default class RoomClient
 		this._micProducer.resume();
 	}
 
-	// Resumes consumers based on lastN speakers
-	async updateSpeakers()
+	// Updated consumers based on lastN
+	async updateSpeakers(speakers)
 	{
 		logger.debug('updateSpeakers()');
 
 		try
 		{
-			const speakers = this._lastN.slice(0, this._lastNSpeakers);
-
-			this._dispatch(stateActions.setLastN(speakers));
-
-			speakers.forEach((peerName) =>
+			for (const peer of this._room.peers)
 			{
-				const peer = this._room.getPeerByName(peerName);
-
-				if (peer)
+				if (speakers.indexOf(peer.name) > -1) // Resume video for speaker
 				{
 					for (const consumer of peer.consumers)
 					{
@@ -364,49 +358,26 @@ export default class RoomClient
 							!consumer.locallyPaused)
 							continue;
 
-						consumer.resume();
+						await consumer.resume();
 					}
 				}
-			});
+				else // Pause video for everybody else
+				{
+					for (const consumer of peer.consumers)
+					{
+						if (consumer.appData.source !== 'webcam' ||
+							!consumer.supported ||
+							consumer.locallyPaused)
+							continue;
+
+						await consumer.pause();
+					}
+				}
+			}
 		}
 		catch (error)
 		{
 			logger.error('updateSpeakers() failed: %o', error);
-		}
-	}
-
-	handleActiveSpeaker(peerName)
-	{
-		logger.debug('handleActiveSpeaker() [peerName:"%s"]', peerName);
-
-		const index = this._lastN.indexOf(peerName);
-
-		if (index > -1) // We have this speaker in the list, move to front
-		{
-			if (index >= this._lastNSpeakers) // We need to remove someone
-			{
-				const removePeer = this._lastN[this._lastNSpeakers - 1];
-
-				this.pausePeerVideo(removePeer);
-			}
-
-			this._lastN.splice(index, 1);
-			this._lastN = [ peerName ].concat(this._lastN);
-
-			this.updateSpeakers();
-		}
-		else // We don't have this speaker in the list, should not happen
-		{
-			if (this._lastN.length >= this._lastNSpeakers)
-			{
-				const removePeer = this._lastN[this._lastNSpeakers - 1];
-
-				this.pausePeerVideo(removePeer);
-			}
-
-			this._lastN = [ peerName ].concat(this._lastN);
-
-			this.updateSpeakers();
 		}
 	}
 
@@ -575,6 +546,8 @@ export default class RoomClient
 			this._dispatch(
 				stateActions.setProducerTrack(this._micProducer.id, newTrack));
 
+			cookiesManager.setAudioDevice({ audioDeviceId: deviceId });
+
 			await this._updateAudioDevices();
 		}
 		catch (error)
@@ -628,6 +601,8 @@ export default class RoomClient
 
 			this._dispatch(
 				stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+
+			cookiesManager.setVideoDevice({ videoDeviceId: deviceId });
 
 			await this._updateWebcams();
 		}
@@ -1065,7 +1040,7 @@ export default class RoomClient
 				stateActions.setRoomActiveSpeaker(peerName));
 
 			if (peerName && peerName !== this._peerName)
-				this.handleActiveSpeaker(peerName);
+				this._lastN.handleActiveSpeaker(peerName);
 		});
 
 		this._signalingSocket.on('display-name-changed', (data) =>
@@ -1193,14 +1168,6 @@ export default class RoomClient
 			logger.debug(
 				'room "newpeer" event [name:"%s", peer:%o]', peer.name, peer);
 
-			const index = this._lastN.indexOf(peer.name);
-
-			if (index === -1) // We don't have this peer in the list, add
-			{
-				this._lastN.push(peer.name);
-				this.updateSpeakers();
-			}
-
 			this._handlePeer(peer);
 		});
 
@@ -1262,8 +1229,14 @@ export default class RoomClient
 			this._dispatch(stateActions.removeAllNotifications());
 
 			this.getServerHistory();
-				
+
 			this.notify('You are in the room');
+
+			this._lastN.on('lastn-updated', (lastN) =>
+			{
+				this._dispatch(stateActions.setLastN(lastN));
+				this.updateSpeakers(lastN);
+			});
 
 			const peers = this._room.peers;
 
@@ -1271,6 +1244,8 @@ export default class RoomClient
 			{
 				this._handlePeer(peer, { notify: false });
 			}
+
+			this._lastN.start();
 		}
 		catch (error)
 		{
@@ -1298,9 +1273,27 @@ export default class RoomClient
 
 			await this._updateAudioDevices();
 
+			const devicesCookie = cookiesManager.getDevices();
+
+			let audioDeviceId;
+
+			if (devicesCookie)
+				audioDeviceId = devicesCookie.audioDeviceId;
+
 			logger.debug('_setMicProducer() | calling getUserMedia()');
 
-			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			let stream;
+
+			if (this._audioDevices.has(audioDeviceId))
+				stream = await navigator.mediaDevices.getUserMedia(
+					{
+						audio :
+						{
+							deviceId : { exact: audioDeviceId }
+						}
+					});
+			else
+				stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
 			const track = stream.getAudioTracks()[0];
 
@@ -1519,16 +1512,35 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no webcam devices');
 
+			const devicesCookie = cookiesManager.getDevices();
+
+			let videoDeviceId;
+
+			if (devicesCookie)
+				videoDeviceId = devicesCookie.videoDeviceId;
+
 			logger.debug('_setWebcamProducer() | calling getUserMedia()');
 
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					video :
+			let stream;
+
+			if (this._webcams.has(videoDeviceId))
+				stream = await navigator.mediaDevices.getUserMedia(
 					{
-						deviceId : { exact: device.deviceId },
-						...VIDEO_CONSTRAINS
-					}
-				});
+						video :
+						{
+							deviceId : { exact: videoDeviceId },
+							...VIDEO_CONSTRAINS
+						}
+					});
+			else
+				stream = await navigator.mediaDevices.getUserMedia(
+					{
+						video :
+						{
+							deviceId : { exact: device.deviceId },
+							...VIDEO_CONSTRAINS
+						}
+					});
 
 			const track = stream.getVideoTracks()[0];
 
@@ -1641,9 +1653,6 @@ export default class RoomClient
 				this._audioDevice.device = array[0];
 
 			this._dispatch(
-				stateActions.setCanChangeWebcam(this._webcams.size >= 2));
-
-			this._dispatch(
 				stateActions.setCanChangeAudioDevice(len >= 2));
 			if (len >= 1)
 				this._dispatch(
@@ -1689,9 +1698,6 @@ export default class RoomClient
 				this._webcam.device = null;
 			else if (!this._webcams.has(currentWebcamId))
 				this._webcam.device = array[0];
-
-			this._dispatch(
-				stateActions.setCanChangeWebcam(this._webcams.size >= 2));
 
 			this._dispatch(
 				stateActions.setCanChangeWebcam(len >= 2));
@@ -1751,14 +1757,6 @@ export default class RoomClient
 				peer.name, originator);
 
 			this._dispatch(stateActions.removePeer(peer.name));
-
-			const index = this._lastN.indexOf(peer.name);
-
-			if (index > -1) // We have this peer in the list, remove
-			{
-				this._lastN.splice(index, 1);
-				this.updateSpeakers();
-			}
 
 			if (this._room.joined)
 			{
@@ -1871,14 +1869,13 @@ export default class RoomClient
 		// Receive the consumer (if we can).
 		if (consumer.supported)
 		{
-			// Pause it if video and we are in audio-only mode.
-			if (consumer.kind === 'video' && this._getState().me.audioOnly)
-				consumer.pause('audio-only-mode');
-
-			const index = this._lastN.indexOf(consumer.peer.name);
-
-			if (consumer.kind === 'video' && ((index >= this._lastNSpeakers) || (index === -1)))
+			if (consumer.kind === 'video' &&
+				Object.keys(this._room.peers).length > this._lastNSpeakers)
+			{ // Start paused
+				logger.debug(
+					'consumer paused by default');
 				consumer.pause('not-speaker');
+			}
 
 			consumer.receive(this._recvTransport)
 				.then((track) =>
