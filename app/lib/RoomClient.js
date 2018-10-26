@@ -353,9 +353,7 @@ export default class RoomClient
 				{
 					for (const consumer of peer.consumers)
 					{
-						if (consumer.appData.source !== 'webcam' ||
-							!consumer.supported ||
-							!consumer.locallyPaused)
+						if (consumer.kind !== 'video' || !consumer.supported)
 							continue;
 
 						await consumer.resume();
@@ -365,12 +363,10 @@ export default class RoomClient
 				{
 					for (const consumer of peer.consumers)
 					{
-						if (consumer.appData.source !== 'webcam' ||
-							!consumer.supported ||
-							consumer.locallyPaused)
+						if (consumer.kind !== 'video')
 							continue;
 
-						await consumer.pause();
+						await consumer.pause('not-speaker');
 					}
 				}
 			}
@@ -1835,8 +1831,7 @@ export default class RoomClient
 		// Receive the consumer (if we can).
 		if (consumer.supported)
 		{
-			if (consumer.kind === 'video' &&
-				Object.keys(this._room.peers).length > this._lastNSpeakers)
+			if (consumer.kind === 'video' && !this._lastN.peerInLastN(consumer.peer.name))
 			{ // Start paused
 				logger.debug(
 					'consumer paused by default');

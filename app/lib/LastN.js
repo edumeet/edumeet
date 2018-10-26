@@ -31,6 +31,18 @@ export default class LastN extends EventEmitter
 		this._lastNUpdated();
 	}
 
+	peerInLastN(peerName)
+	{
+		if (this._started)
+		{
+			return this._currentLastN.indexOf(peerName) !== -1;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	_handleRoom()
 	{
 		this._room.on('newpeer', (peer) =>
