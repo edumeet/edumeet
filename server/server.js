@@ -43,14 +43,12 @@ const dataporten = new Dataporten.Setup(config.oauth2);
 
 app.all('*', (req, res, next) =>
 {
-	if(req.headers['x-forwarded-proto'] == 'http')
-	{
-		res.redirect('https://' + req.hostname + req.url);
-	}
-	else
+	if(req.secure)
 	{
 		return next();
 	}
+
+	res.redirect('https://' + req.hostname + req.url);
 });
 
 app.use(dataporten.passport.initialize());
