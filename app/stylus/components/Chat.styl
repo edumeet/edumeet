@@ -54,21 +54,33 @@
 [data-component='Sender'] {
 	display: flex;
 	background-color: #fff;
-	padding: 1rem;
+	color: #000;
 	flex-shrink: 0;
-	border-radius: 5px;
 	margin-top: 0.5rem;
 	height: 3rem;
-	box-shadow: 0vmin 0.3vmin 1vmin 0.2vmin rgba(17,17,17,0.5);
 
 	> .new-message {
-		width: 100%;
+		width: 80%;
+		box-shadow: 0vmin 0vmin 1vmin 0vmin rgba(17,17,17,0.5);
 		border: 0;
-		color: #000;
 		font-size: 1rem;
+		margin-right: 1vmin;
+		border-radius: 0.5vmin;
+		padding-left: 1vmin;
+		color: #000;
 
 		&.focus {
 			outline: none;
 		}
+	}
+
+	> .send {
+		width: 20%;
+		box-shadow: 0vmin 0vmin 1vmin 0vmin rgba(17,17,17,0.5);
+		border: 0;
+		background-color: #aef;
+		color: #000;
+		font-size: 1rem;
+		border-radius: 0.5vmin;
 	}
 }
