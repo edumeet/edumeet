@@ -1273,27 +1273,9 @@ export default class RoomClient
 
 			await this._updateAudioDevices();
 
-			const devicesCookie = cookiesManager.getDevices();
-
-			let audioDeviceId;
-
-			if (devicesCookie)
-				audioDeviceId = devicesCookie.audioDeviceId;
-
 			logger.debug('_setMicProducer() | calling getUserMedia()');
 
-			let stream;
-
-			if (this._audioDevices.has(audioDeviceId))
-				stream = await navigator.mediaDevices.getUserMedia(
-					{
-						audio :
-						{
-							deviceId : { exact: audioDeviceId }
-						}
-					});
-			else
-				stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
 			const track = stream.getAudioTracks()[0];
 
@@ -1512,35 +1494,16 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no webcam devices');
 
-			const devicesCookie = cookiesManager.getDevices();
-
-			let videoDeviceId;
-
-			if (devicesCookie)
-				videoDeviceId = devicesCookie.videoDeviceId;
-
 			logger.debug('_setWebcamProducer() | calling getUserMedia()');
 
-			let stream;
-
-			if (this._webcams.has(videoDeviceId))
-				stream = await navigator.mediaDevices.getUserMedia(
+			const stream = await navigator.mediaDevices.getUserMedia(
+				{
+					video :
 					{
-						video :
-						{
-							deviceId : { exact: videoDeviceId },
-							...VIDEO_CONSTRAINS
-						}
-					});
-			else
-				stream = await navigator.mediaDevices.getUserMedia(
-					{
-						video :
-						{
-							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS
-						}
-					});
+						deviceId : { exact: device.deviceId },
+						...VIDEO_CONSTRAINS
+					}
+				});
 
 			const track = stream.getVideoTracks()[0];
 
