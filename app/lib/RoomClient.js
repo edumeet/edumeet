@@ -1334,9 +1334,12 @@ export default class RoomClient
 				logger.debug('mic Producer "unhandled" event');
 			});
 
-			if (!stream.getAudioTracks()[0])
+			const harkStream = new MediaStream;
+
+			harkStream.addTrack(producer.track);
+			if (!harkStream.getAudioTracks()[0])
 				throw new Error('_setMicProducer(): given stream has no audio track');
-			producer.hark = hark(stream, { play: false });
+			producer.hark = hark(harkStream, { play: false });
 
 			// eslint-disable-next-line no-unused-vars
 			producer.hark.on('volume_change', (dBs, threshold) =>
