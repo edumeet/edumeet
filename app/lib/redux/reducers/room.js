@@ -9,7 +9,7 @@ const initialState =
 	toolbarsVisible    : true,
 	mode               : 'democratic',
 	selectedPeerName   : null,
-	lastN              : []
+	spotlights         : []
 };
 
 const room = (state = initialState, action) =>
@@ -84,11 +84,11 @@ const room = (state = initialState, action) =>
 			};
 		}
 
-		case 'SET_LASTN':
+		case 'SET_SPOTLIGHTS':
 		{
-			const { lastN } = action.payload;
+			const { spotlights } = action.payload;
 
-			return { ...state, lastN };
+			return { ...state, spotlights };
 		}
 
 		default:

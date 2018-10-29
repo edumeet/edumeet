@@ -494,8 +494,8 @@ export const setSelectedPeer = (selectedPeerName) =>
 		payload : { selectedPeerName }
 	});
 
-export const setLastN = (lastN) =>
+export const setSpotlights = (spotlights) =>
 	({
-		type    : 'SET_LASTN',
-		payload : { lastN }
+		type    : 'SET_SPOTLIGHTS',
+		payload : { spotlights }
 	});

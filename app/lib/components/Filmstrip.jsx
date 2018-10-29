@@ -114,7 +114,7 @@ class Filmstrip extends Component
 
 	render()
 	{
-		const { peers, advancedMode, lastN, lastNLength } = this.props;
+		const { peers, advancedMode, spotlights, spotlightsLength } = this.props;
 
 		const activePeerName = this.getActivePeerName();
 
@@ -143,7 +143,7 @@ class Filmstrip extends Component
 							Object.keys(peers).map((peerName) =>
 							{
 								return (
-									lastN.find((lastNElement) => lastNElement === peerName)?
+									spotlights.find((spotlightsElement) => spotlightsElement === peerName)?
 										<div
 											key={peerName}
 											onClick={() => this.props.setSelectedPeer(peerName)}
@@ -166,9 +166,9 @@ class Filmstrip extends Component
 					</div>
 				</div>
 				<div className='hidden-peer-container'>
-					{ (lastNLength<Object.keys(peers).length)?
+					{ (spotlightsLength<Object.keys(peers).length)?
 						<HiddenPeers
-							lastNLength={Object.keys(peers).length-lastNLength}
+							spotlightsLength={Object.keys(peers).length-spotlightsLength}
 						/>:null
 					}
 				</div>
@@ -186,13 +186,13 @@ Filmstrip.propTypes = {
 	myName            : PropTypes.string.isRequired,
 	selectedPeerName  : PropTypes.string,
 	setSelectedPeer   : PropTypes.func.isRequired,
-	lastNLength       : PropTypes.number,
-	lastN             : PropTypes.array.isRequired
+	spotlightsLength  : PropTypes.number,
+	spotlights        : PropTypes.array.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
-	const lastNLength = state.room.lastN ? state.room.lastN.length : 0;
+	const spotlightsLength = state.room.spotlights ? state.room.spotlights.length : 0;
 
 	return {
 		activeSpeakerName : state.room.activeSpeakerName,
@@ -200,8 +200,8 @@ const mapStateToProps = (state) =>
 		peers             : state.peers,
 		consumers         : state.consumers,
 		myName            : state.me.name,
-		lastN             : state.room.lastN,
-		lastNLength
+		spotlights        : state.room.spotlights,
+		spotlightsLength
 	};
 };
 
