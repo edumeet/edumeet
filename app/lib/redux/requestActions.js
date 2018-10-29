@@ -221,6 +221,14 @@ export const sendFile = (file, name, picture) =>
 	};
 };
 
+export const setSelectedPeer = (selectedPeerName) =>
+{
+	return {
+		type    : 'REQUEST_SELECTED_PEER',
+		payload : { selectedPeerName }
+	};
+};
+
 // This returns a redux-thunk action (a function).
 export const notify = ({ type = 'info', text, timeout }) =>
 {
