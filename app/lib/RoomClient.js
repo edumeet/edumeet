@@ -3,7 +3,7 @@ import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
 import hark from 'hark';
 import ScreenShare from './ScreenShare';
-import LastN from './LastN';
+import Spotlights from './Spotlights';
 import { getSignalingUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
@@ -21,7 +21,7 @@ const ROOM_OPTIONS =
 	requestTimeout   : requestTimeout,
 	transportOptions : transportOptions,
 	turnServers      : turnServers,
-	lastN            : 2
+	maxSpotlights    : 4
 };
 
 const VIDEO_CONSTRAINS =
@@ -72,11 +72,11 @@ export default class RoomClient
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
 		this._room.roomId = roomId;
 
-		// LastN speakers
-		this._lastNSpeakers = ROOM_OPTIONS.lastN;
+		// Max spotlights
+		this._maxSpotlights = ROOM_OPTIONS.maxSpotlights;
 
-		// Array of lastN speakers
-		this._lastN = new LastN(this._lastNSpeakers, this._room);
+		// Manager of spotlight
+		this._spotlights = new Spotlights(this._maxSpotlights, this._room);
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -315,7 +315,7 @@ export default class RoomClient
 
 				lastN.splice(index, 1);
 
-				this._lastN.addSpeakerList(lastN);
+				this._spotlights.addSpeakerList(lastN);
 			}
 		}
 		catch (error)
@@ -340,16 +340,16 @@ export default class RoomClient
 		this._micProducer.resume();
 	}
 
-	// Updated consumers based on lastN
-	async updateSpeakers(speakers)
+	// Updated consumers based on spotlights
+	async updateSpotlights(spotlights)
 	{
-		logger.debug('updateSpeakers()');
+		logger.debug('updateSpotlights()');
 
 		try
 		{
 			for (const peer of this._room.peers)
 			{
-				if (speakers.indexOf(peer.name) > -1) // Resume video for speaker
+				if (spotlights.indexOf(peer.name) > -1) // Resume video for speaker
 				{
 					for (const consumer of peer.consumers)
 					{
@@ -373,7 +373,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('updateSpeakers() failed: %o', error);
+			logger.error('updateSpotlights() failed: %o', error);
 		}
 	}
 
@@ -1036,7 +1036,7 @@ export default class RoomClient
 				stateActions.setRoomActiveSpeaker(peerName));
 
 			if (peerName && peerName !== this._peerName)
-				this._lastN.handleActiveSpeaker(peerName);
+				this._spotlights.handleActiveSpeaker(peerName);
 		});
 
 		this._signalingSocket.on('display-name-changed', (data) =>
@@ -1228,10 +1228,10 @@ export default class RoomClient
 
 			this.notify('You are in the room');
 
-			this._lastN.on('lastn-updated', (lastN) =>
+			this._spotlights.on('spotlights-updated', (spotlights) =>
 			{
-				this._dispatch(stateActions.setLastN(lastN));
-				this.updateSpeakers(lastN);
+				this._dispatch(stateActions.setSpotlights(spotlights));
+				this.updateSpotlights(spotlights);
 			});
 
 			const peers = this._room.peers;
@@ -1241,7 +1241,7 @@ export default class RoomClient
 				this._handlePeer(peer, { notify: false });
 			}
 
-			this._lastN.start();
+			this._spotlights.start();
 		}
 		catch (error)
 		{
@@ -1831,7 +1831,8 @@ export default class RoomClient
 		// Receive the consumer (if we can).
 		if (consumer.supported)
 		{
-			if (consumer.kind === 'video' && !this._lastN.peerInLastN(consumer.peer.name))
+			if (consumer.kind === 'video' &&
+				!this._spotlights.peerInSpotlights(consumer.peer.name))
 			{ // Start paused
 				logger.debug(
 					'consumer paused by default');

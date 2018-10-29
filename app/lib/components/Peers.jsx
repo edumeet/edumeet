@@ -93,8 +93,8 @@ class Peers extends React.Component
 			advancedMode,
 			activeSpeakerName,
 			peers,
-			lastN,
-			lastNLength
+			spotlights,
+			spotlightsLength
 		} = this.props;
 
 		const style =
@@ -109,8 +109,8 @@ class Peers extends React.Component
 					peers.map((peer) =>
 					{
 						return (
-							(lastN.find(function(lastNElement)
-							{ return lastNElement == peer.name; }))?
+							(spotlights.find(function(spotlightsElement)
+							{ return spotlightsElement == peer.name; }))?
 								<Appear key={peer.name} duration={1000}>
 									<div
 										className={classnames('peer-container', {
@@ -129,9 +129,9 @@ class Peers extends React.Component
 					})
 				}
 				<div className='hidden-peer-container'>
-					{ (lastNLength<peers.length)?
+					{ (spotlightsLength<peers.length)?
 						<HiddenPeers
-							lastNLength={peers.length-lastNLength}
+							spotlightsLength={peers.length-spotlightsLength}
 						/>:null
 					}
 				</div>
@@ -146,24 +146,24 @@ Peers.propTypes =
 		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 		boxes             : PropTypes.number,
 		activeSpeakerName : PropTypes.string,
-		lastNLength       : PropTypes.number,
-		lastN             : PropTypes.array.isRequired
+		spotlightsLength  : PropTypes.number,
+		spotlights        : PropTypes.array.isRequired
 	};
 
 const mapStateToProps = (state) =>
 {
 	const peers = Object.values(state.peers);
-	const lastN = state.room.lastN;
-	const lastNLength = lastN ? state.room.lastN.length : 0;
-	const boxes = lastNLength + Object.values(state.consumers)
+	const spotlights = state.room.spotlights;
+	const spotlightsLength = spotlights ? state.room.spotlights.length : 0;
+	const boxes = spotlightsLength + Object.values(state.consumers)
 		.filter((consumer) => consumer.source === 'screen').length;
 
 	return {
 		peers,
 		boxes,
 		activeSpeakerName : state.room.activeSpeakerName,
-		lastN,
-		lastNLength
+		spotlights,
+		spotlightsLength
 	};
 };
 
