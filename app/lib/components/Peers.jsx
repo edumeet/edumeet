@@ -6,6 +6,7 @@ import debounce from 'lodash/debounce';
 import * as appPropTypes from './appPropTypes';
 import { Appear } from './transitions';
 import Peer from './Peer';
+import HiddenPeers from './HiddenPeers';
 import ResizeObserver from 'resize-observer-polyfill';
 
 const RATIO = 1.334;
@@ -26,7 +27,7 @@ class Peers extends React.Component
 
 	updateDimensions = debounce(() =>
 	{
-		if (!this.peersRef.current) 
+		if (!this.peersRef.current)
 		{
 			return;
 		}
@@ -91,7 +92,9 @@ class Peers extends React.Component
 		const {
 			advancedMode,
 			activeSpeakerName,
-			peers
+			peers,
+			lastN,
+			lastNLength
 		} = this.props;
 
 		const style =
@@ -106,22 +109,32 @@ class Peers extends React.Component
 					peers.map((peer) =>
 					{
 						return (
-							<Appear key={peer.name} duration={1000}>
-								<div
-									className={classnames('peer-container', {
-										'active-speaker' : peer.name === activeSpeakerName
-									})}
-								>
-									<Peer
-										advancedMode={advancedMode}
-										name={peer.name}
-										style={style}
-									/>
-								</div>
-							</Appear>
+							(lastN.find(function(lastNElement)
+							{ return lastNElement == peer.name; }))?
+								<Appear key={peer.name} duration={1000}>
+									<div
+										className={classnames('peer-container', {
+											'active-speaker' : peer.name === activeSpeakerName
+										})}
+									>
+										<Peer
+											advancedMode={advancedMode}
+											name={peer.name}
+											style={style}
+										/>
+									</div>
+								</Appear>
+								:null
 						);
 					})
 				}
+				<div className='hidden-peer-container'>
+					{ (lastNLength<peers.length)?
+						<HiddenPeers
+							lastNLength={peers.length-lastNLength}
+						/>:null
+					}
+				</div>
 			</div>
 		);
 	}
@@ -132,20 +145,25 @@ Peers.propTypes =
 		advancedMode      : PropTypes.bool,
 		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 		boxes             : PropTypes.number,
-		activeSpeakerName : PropTypes.string
+		activeSpeakerName : PropTypes.string,
+		lastNLength       : PropTypes.number,
+		lastN             : PropTypes.array.isRequired
 	};
 
 const mapStateToProps = (state) =>
 {
 	const peers = Object.values(state.peers);
-
-	const boxes = peers.length + Object.values(state.consumers)
+	const lastN = state.room.lastN;
+	const lastNLength = lastN ? state.room.lastN.length : 0;
+	const boxes = lastNLength + Object.values(state.consumers)
 		.filter((consumer) => consumer.source === 'screen').length;
 
 	return {
 		peers,
 		boxes,
-		activeSpeakerName : state.room.activeSpeakerName
+		activeSpeakerName : state.room.activeSpeakerName,
+		lastN,
+		lastNLength
 	};
 };
 

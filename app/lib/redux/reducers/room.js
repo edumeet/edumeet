@@ -9,7 +9,7 @@ const initialState =
 	toolbarsVisible    : true,
 	mode               : 'democratic',
 	selectedPeerName   : null,
-	lastN              : null
+	lastN              : []
 };
 
 const room = (state = initialState, action) =>

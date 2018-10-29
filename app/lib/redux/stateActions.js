@@ -161,6 +161,20 @@ export const toggleToolArea = () =>
 	};
 };
 
+export const openToolArea = () =>
+{
+	return {
+		type : 'OPEN_TOOL_AREA'
+	};
+};
+
+export const closeToolArea = () =>
+{
+	return {
+		type : 'CLOSE_TOOL_AREA'
+	};
+};
+
 export const setToolTab = (toolTab) =>
 {
 	return {

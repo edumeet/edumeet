@@ -19,6 +19,22 @@ const toolarea = (state = initialState, action) =>
 			return { ...state, toolAreaOpen, unreadMessages, unreadFiles };
 		}
 
+		case 'OPEN_TOOL_AREA':
+		{
+			const toolAreaOpen = true;
+			const unreadMessages = state.currentToolTab === 'chat' ? 0 : state.unreadMessages;
+			const unreadFiles = state.currentToolTab === 'files' ? 0 : state.unreadFiles;
+
+			return { ...state, toolAreaOpen, unreadMessages, unreadFiles };
+		}
+
+		case 'CLOSE_TOOL_AREA':
+		{
+			const toolAreaOpen = false;
+
+			return { ...state, toolAreaOpen };
+		}
+
 		case 'SET_TOOL_TAB':
 		{
 			const { toolTab } = action.payload;
@@ -30,7 +46,7 @@ const toolarea = (state = initialState, action) =>
 
 		case 'ADD_NEW_RESPONSE_MESSAGE':
 		{
-			if (state.toolAreaOpen && state.currentToolTab === 'chat') 
+			if (state.toolAreaOpen && state.currentToolTab === 'chat')
 			{
 				return state;
 			}
