@@ -38,7 +38,9 @@ class HiddenPeers extends Component
 			>
 				<div data-component='HiddenPeersView'>
 					<div className='view-container' onClick={() => openUsersTab()}>
-						<p>+{lastNLength} <br /> participant(s)</p>
+						<p>+{lastNLength} <br /> participant
+							{(lastNLength === 1) ? null : 's'}
+						</p>
 					</div>
 				</div>
 			</div>
