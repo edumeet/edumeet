@@ -65,6 +65,9 @@ export default class RoomClient
 		// My peer name.
 		this._peerName = peerName;
 
+		// Alert sound
+		this._soundAlert = new Audio('/resources/sounds/notify.mp3');
+
 		// Socket.io peer connection
 		this._signalingSocket = io(signalingUrl);
 
@@ -1112,6 +1115,23 @@ export default class RoomClient
 
 			this._dispatch(
 				stateActions.addResponseMessage({ ...chatMessage, peerName }));
+
+			if (!this._getState().toolarea.toolAreaOpen ||
+				(this._getState().toolarea.toolAreaOpen &&
+				this._getState().toolarea.currentToolTab !== 'chat')) // Make sound
+			{
+				const alertPromise = this._soundAlert.play();
+
+				if (alertPromise !== undefined)
+				{
+					alertPromise
+						.then()
+						.catch((error) =>
+						{
+							logger.error('_soundAlert.play() | failed: %o', error);
+						});
+				}
+			}
 		});
 
 		this._signalingSocket.on('file-receive', (data) =>
@@ -1172,6 +1192,18 @@ export default class RoomClient
 		{
 			logger.debug(
 				'room "newpeer" event [name:"%s", peer:%o]', peer.name, peer);
+
+			const alertPromise = this._soundAlert.play();
+
+			if (alertPromise !== undefined)
+			{
+				alertPromise
+					.then()
+					.catch((error) =>
+					{
+						logger.error('_soundAlert.play() | failed: %o', error);
+					});
+			}
 
 			this._handlePeer(peer);
 		});
