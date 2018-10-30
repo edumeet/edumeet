@@ -6,7 +6,7 @@
 }
 
 [data-component='MessageList'] {
-	overflow-y: scroll;
+	overflow-y: auto;
 	flex-grow: 1;
 
 	> .message {
@@ -47,6 +47,23 @@
 					opacity: 0.8;
 				}
 			}
+		}
+	}
+
+	> .empty {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		padding-top: 20vmin;
+
+		> p {
+			padding: 6px 12px;
+			border-radius: 6px;
+			user-select: none;
+			pointer-events: none;
+			font-size: 20px;
+			color: #000;
 		}
 	}
 }
