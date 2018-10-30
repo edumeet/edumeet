@@ -1,9 +1,10 @@
 [data-component='ParticipantList'] {
 	width: 100%;
+	overflow-y: auto;
+	padding: 6px;
 
 	> .list {
-		box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2), \
-					0 4px 20px 0 rgba(0,0,0,0.19);
+		box-shadow: 0 2px 5px 2px rgba(0,0,0,0.2);
 		background-color: #fff;
 
 		> .list-header {
@@ -22,7 +23,7 @@
 			}
 
 			&.selected {
-				border-bottom-color: #377EFF;
+				background-color: #377eff;
 			}
 		}
 	}
