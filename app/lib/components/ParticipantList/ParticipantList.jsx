@@ -7,32 +7,68 @@ import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
 
-const ParticipantList = ({ advancedMode, peers, setSelectedPeer, selectedPeerName }) => (
-	<div data-component='ParticipantList'>
-		<ul className='list'>
-			<ListMe />
+const ParticipantList =
+	({
+		advancedMode,
+		peers,
+		setSelectedPeer,
+		selectedPeerName,
+		spotlights
+	}) => (
+		<div data-component='ParticipantList'>
+			<ul className='list'>
+				<li className='list-header'>Me:</li>
+				<ListMe />
+			</ul>
+			<br />
+			<ul className='list'>
+				<li className='list-header'>Participants in Spotlight:</li>
+				{peers.filter((peer) =>
+				{
+					return (spotlights.find((spotlight) =>
+					{ return (spotlight === peer.name); }));
+				}).map((peer) => (
+					<li
+						key={peer.name}
+						className={classNames('list-item', {
+							selected : peer.name === selectedPeerName
+						})}
+						onClick={() => setSelectedPeer(peer.name)}
+					>
+						<ListPeer name={peer.name} advancedMode={advancedMode} />
+					</li>
+				))}
+			</ul>
+			<br />
+			<ul className='list'>
+				<li className='list-header'>Passive Participants:</li>
+				{peers.filter((peer) =>
+				{
+					return !(spotlights.find((spotlight) =>
+					{ return (spotlight === peer.name); }));
+				}).map((peer) => (
+					<li
+						key={peer.name}
+						className={classNames('list-item', {
+							selected : peer.name === selectedPeerName
+						})}
+						onClick={() => setSelectedPeer(peer.name)}
+					>
+						<ListPeer name={peer.name} advancedMode={advancedMode} />
+					</li>
+				))}
+			</ul>
 
-			{peers.map((peer) => (
-				<li
-					key={peer.name}
-					className={classNames('list-item', {
-						selected : peer.name === selectedPeerName
-					})}
-					onClick={() => setSelectedPeer(peer.name)}
-				>
-					<ListPeer name={peer.name} advancedMode={advancedMode} />
-				</li>
-			))}
-		</ul>
-	</div>
-);
+		</div>
+	);
 
 ParticipantList.propTypes =
 {
 	advancedMode     : PropTypes.bool,
 	peers            : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 	setSelectedPeer  : PropTypes.func.isRequired,
-	selectedPeerName : PropTypes.string
+	selectedPeerName : PropTypes.string,
+	spotlights       : PropTypes.array.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -41,7 +77,8 @@ const mapStateToProps = (state) =>
 
 	return {
 		peers            : peersArray,
-		selectedPeerName : state.room.selectedPeerName
+		selectedPeerName : state.room.selectedPeerName,
+		spotlights       : state.room.spotlights
 	};
 };
 
