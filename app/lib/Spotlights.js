@@ -50,6 +50,16 @@ export default class Spotlights extends EventEmitter
 
 		const index = this._selectedSpotlights.indexOf(peerName);
 		
+		if (index !== -1)
+		{
+			this._selectedSpotlights = [];
+		}
+		else
+		{
+			this._selectedSpotlights = [ peerName ];
+		}
+
+		/*
 		if (index === -1) // We don't have this peer in the list, adding
 		{
 			this._selectedSpotlights.push(peerName);
@@ -58,6 +68,7 @@ export default class Spotlights extends EventEmitter
 		{
 			this._selectedSpotlights.splice(index, 1);
 		}
+		*/
 
 		if (this._started)
 			this._spotlightsUpdated();
