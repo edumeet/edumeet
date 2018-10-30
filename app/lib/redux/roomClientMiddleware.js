@@ -237,6 +237,15 @@ export default ({ dispatch, getState }) => (next) =>
 				client.sendFile(action.payload);
 				break;
 			}
+
+			case 'REQUEST_SELECTED_PEER':
+			{
+				const { selectedPeerName } = action.payload;
+
+				client.setSelectedPeer(selectedPeerName);
+
+				break;
+			}
 		}
 
 		return next(action);

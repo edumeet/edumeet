@@ -4,7 +4,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
 import debounce from 'lodash/debounce';
 import classnames from 'classnames';
-import * as stateActions from '../redux/stateActions';
+import * as requestActions from '../redux/requestActions';
 import Peer from './Peer';
 import HiddenPeers from './HiddenPeers';
 
@@ -206,7 +206,7 @@ const mapStateToProps = (state) =>
 };
 
 const mapDispatchToProps = {
-	setSelectedPeer : stateActions.setSelectedPeer
+	setSelectedPeer : requestActions.setSelectedPeer
 };
 
 export default connect(

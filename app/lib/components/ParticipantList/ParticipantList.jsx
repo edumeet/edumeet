@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
-import * as stateActions from '../../redux/stateActions';
+import * as requestActions from '../../redux/requestActions';
 import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
@@ -46,7 +46,7 @@ const mapStateToProps = (state) =>
 };
 
 const mapDispatchToProps = {
-	setSelectedPeer : stateActions.setSelectedPeer
+	setSelectedPeer : requestActions.setSelectedPeer
 };
 
 const ParticipantListContainer = connect(

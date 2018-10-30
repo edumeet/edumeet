@@ -12,6 +12,7 @@ export default class Spotlights extends EventEmitter
 		this._room = room;
 		this._maxSpotlights = maxSpotlights;
 		this._peerList = [];
+		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
 		this._started = false;
 	}
@@ -43,6 +44,25 @@ export default class Spotlights extends EventEmitter
 		}
 	}
 
+	setPeerSpotlight(peerName)
+	{
+		logger.debug('setPeerSpotlight() [peerName:"%s"]', peerName);
+
+		const index = this._selectedSpotlights.indexOf(peerName);
+		
+		if (index === -1) // We don't have this peer in the list, adding
+		{
+			this._selectedSpotlights.push(peerName);
+		}
+		else // We have this peer, remove
+		{
+			this._selectedSpotlights.splice(index, 1);
+		}
+
+		if (this._started)
+			this._spotlightsUpdated();
+	}
+
 	_handleRoom()
 	{
 		this._room.on('newpeer', (peer) =>
@@ -69,14 +89,21 @@ export default class Spotlights extends EventEmitter
 		{
 			peer.on('close', () =>
 			{
-				const index = this._peerList.indexOf(peer.name);
+				let index = this._peerList.indexOf(peer.name);
 
-				if (index > -1) // We have this peer in the list, remove
+				if (index !== -1) // We have this peer in the list, remove
 				{
 					this._peerList.splice(index, 1);
-
-					this._spotlightsUpdated();
 				}
+
+				index = this._selectedSpotlights.indexOf(peer.name);
+
+				if (index !== -1) // We have this peer in the list, remove
+				{
+					this._selectedSpotlights.splice(index, 1);
+				}
+
+				this._spotlightsUpdated();
 			});
 
 			logger.debug('_handlePeer() | adding peer [peerName:"%s"]', peer.name);
@@ -104,15 +131,26 @@ export default class Spotlights extends EventEmitter
 
 	_spotlightsUpdated()
 	{
+		let spotlights;
+
+		if (this._selectedSpotlights.length > 0)
+		{
+			spotlights = [ ...new Set([ ...this._selectedSpotlights, ...this._peerList ]) ];
+		}
+		else
+		{
+			spotlights = this._peerList;
+		}
+
 		if (
 			!this._arraysEqual(
-				this._currentSpotlights, this._peerList.slice(0, this._maxSpotlights)
+				this._currentSpotlights, spotlights.slice(0, this._maxSpotlights)
 			)
 		)
 		{
 			logger.debug('_spotlightsUpdated() | spotlights updated, emitting');
 
-			this._currentSpotlights = this._peerList.slice(0, this._maxSpotlights);
+			this._currentSpotlights = spotlights.slice(0, this._maxSpotlights);
 			this.emit('spotlights-updated', this._currentSpotlights);
 		}
 		else

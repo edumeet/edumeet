@@ -673,6 +673,16 @@ export default class RoomClient
 			stateActions.setWebcamInProgress(false));
 	}
 
+	setSelectedPeer(peerName)
+	{
+		logger.debug('setSelectedPeer() [peerName:"%s"]', peerName);
+
+		this._spotlights.setPeerSpotlight(peerName);
+
+		this._dispatch(
+			stateActions.setSelectedPeer(peerName));
+	}
+
 	async mutePeerAudio(peerName)
 	{
 		logger.debug('mutePeerAudio() [peerName:"%s"]', peerName);
