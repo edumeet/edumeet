@@ -453,7 +453,6 @@ export default class RoomClient
 
 		try
 		{
-			await this._updateWebcams();
 			await this._setWebcamProducer();
 		}
 		catch (error)
@@ -1275,10 +1274,6 @@ export default class RoomClient
 
 		try
 		{
-			logger.debug('_setMicProducer() | calling _updateAudioDevices()');
-
-			await this._updateAudioDevices();
-
 			logger.debug('_setMicProducer() | calling getUserMedia()');
 
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1304,6 +1299,10 @@ export default class RoomClient
 					track          : producer.track,
 					codec          : producer.rtpParameters.codecs[0].name
 				}));
+
+			logger.debug('_setMicProducer() | calling _updateAudioDevices()');
+
+			await this._updateAudioDevices();
 
 			producer.on('close', (originator) =>
 			{
@@ -1498,18 +1497,12 @@ export default class RoomClient
 
 		try
 		{
-			const { device } = this._webcam;
-
-			if (!device)
-				throw new Error('no webcam devices');
-
 			logger.debug('_setWebcamProducer() | calling getUserMedia()');
 
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					video :
 					{
-						deviceId : { exact: device.deviceId },
 						...VIDEO_CONSTRAINS
 					}
 				});
@@ -1531,13 +1524,14 @@ export default class RoomClient
 				{
 					id             : producer.id,
 					source         : 'webcam',
-					deviceLabel    : device.label,
-					type           : this._getWebcamType(device),
 					locallyPaused  : producer.locallyPaused,
 					remotelyPaused : producer.remotelyPaused,
 					track          : producer.track,
 					codec          : producer.rtpParameters.codecs[0].name
 				}));
+
+			logger.debug('_setWebcamProducer() | calling _updateWebcams()');
+			await this._updateWebcams();
 
 			producer.on('close', (originator) =>
 			{
@@ -1680,22 +1674,6 @@ export default class RoomClient
 		catch (error)
 		{
 			logger.error('_updateWebcams() failed:%o', error);
-		}
-	}
-
-	_getWebcamType(device)
-	{
-		if (/(back|rear)/i.test(device.label))
-		{
-			logger.debug('_getWebcamType() | it seems to be a back camera');
-
-			return 'back';
-		}
-		else
-		{
-			logger.debug('_getWebcamType() | it seems to be a front camera');
-
-			return 'front';
 		}
 	}
 
