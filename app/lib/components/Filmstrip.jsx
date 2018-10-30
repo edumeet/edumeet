@@ -168,7 +168,7 @@ class Filmstrip extends Component
 				<div className='hidden-peer-container'>
 					{ (spotlightsLength<Object.keys(peers).length)?
 						<HiddenPeers
-							spotlightsLength={Object.keys(peers).length-spotlightsLength}
+							hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
 						/>:null
 					}
 				</div>

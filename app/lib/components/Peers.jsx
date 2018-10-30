@@ -131,7 +131,7 @@ class Peers extends React.Component
 				<div className='hidden-peer-container'>
 					{ (spotlightsLength<peers.length)?
 						<HiddenPeers
-							spotlightsLength={peers.length-spotlightsLength}
+							hiddenPeersCount={peers.length-spotlightsLength}
 						/>:null
 					}
 				</div>

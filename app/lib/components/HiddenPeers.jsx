@@ -26,7 +26,7 @@ class HiddenPeers extends Component
 	render()
 	{
 		const {
-			lastNLength,
+			hiddenPeersCount,
 			openUsersTab
 		} = this.props;
 
@@ -38,8 +38,8 @@ class HiddenPeers extends Component
 			>
 				<div data-component='HiddenPeersView'>
 					<div className='view-container' onClick={() => openUsersTab()}>
-						<p>+{lastNLength} <br /> participant
-							{(lastNLength === 1) ? null : 's'}
+						<p>+{hiddenPeersCount} <br /> participant
+							{(hiddenPeersCount === 1) ? null : 's'}
 						</p>
 					</div>
 				</div>
@@ -50,8 +50,8 @@ class HiddenPeers extends Component
 
 HiddenPeers.propTypes =
 {
-	lastNLength  : PropTypes.number,
-	openUsersTab : PropTypes.func.isRequired
+	hiddenPeersCount : PropTypes.number,
+	openUsersTab     : PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = (dispatch) =>
