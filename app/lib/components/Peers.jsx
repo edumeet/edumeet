@@ -114,14 +114,17 @@ class Peers extends React.Component
 								<Appear key={peer.name} duration={1000}>
 									<div
 										className={classnames('peer-container', {
+											'selected'       : this.props.selectedPeerName === peer.name,
 											'active-speaker' : peer.name === activeSpeakerName
 										})}
 									>
-										<Peer
-											advancedMode={advancedMode}
-											name={peer.name}
-											style={style}
-										/>
+										<div className='peer-content'>
+											<Peer
+												advancedMode={advancedMode}
+												name={peer.name}
+												style={style}
+											/>
+										</div>
 									</div>
 								</Appear>
 								:null
@@ -146,6 +149,7 @@ Peers.propTypes =
 		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 		boxes             : PropTypes.number,
 		activeSpeakerName : PropTypes.string,
+		selectedPeerName  : PropTypes.string,
 		spotlightsLength  : PropTypes.number,
 		spotlights        : PropTypes.array.isRequired
 	};
@@ -162,6 +166,7 @@ const mapStateToProps = (state) =>
 		peers,
 		boxes,
 		activeSpeakerName : state.room.activeSpeakerName,
+		selectedPeerName  : state.room.selectedPeerName,
 		spotlights,
 		spotlightsLength
 	};
