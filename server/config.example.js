@@ -16,15 +16,6 @@ module.exports =
 	},
 	// Listening port for https server.
 	listeningPort : 3443,
-	turnServers   : [
-		{
-			urls : [
-				'turn:example.com:443?transport=tcp'
-			],
-			username   : 'example',
-			credential : 'example'
-		}
-	],
 	mediasoup :
 	{
 		// mediasoup Server settings.
