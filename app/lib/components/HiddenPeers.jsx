@@ -29,7 +29,7 @@ class HiddenPeers extends Component
 				this.timeout = setTimeout(() =>
 				{
 					this.setState({ className: '' });
-				}, 1000);
+				}, 2000);
 			});
 		}
 	}
