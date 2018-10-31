@@ -1,7 +1,6 @@
 'use strict';
 
 const EventEmitter = require('events').EventEmitter;
-const WebTorrent = require('webtorrent-hybrid');
 const Logger = require('./Logger');
 const config = require('../config');
 
@@ -10,14 +9,6 @@ const MIN_BITRATE = Math.min(50000, MAX_BITRATE);
 const BITRATE_FACTOR = 0.75;
 
 const logger = new Logger('Room');
-
-const torrentClient = new WebTorrent({
-	tracker : {
-		rtcConfig : {
-			iceServers : config.turnServers
-		}
-	}
-});
 
 class Room extends EventEmitter
 {
@@ -39,7 +30,6 @@ class Room extends EventEmitter
 		this._fileHistory = [];
 
 		this._lastN = [];
-
 
 		this._io = io;
 
@@ -326,11 +316,6 @@ class Room extends EventEmitter
 			const fileData = request.file;
 
 			this._fileHistory.push(fileData);
-
-			if (!torrentClient.get(fileData.file.magnet))
-			{
-				torrentClient.add(fileData.file.magnet);
-			}
 
 			// Spread to others
 			signalingPeer.socket.broadcast.to(this._roomId).emit(
