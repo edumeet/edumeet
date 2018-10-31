@@ -133,7 +133,31 @@ class Room extends EventEmitter
 			this._lastN.push(peerName);
 		}
 
+		this._signalingPeers.set(peerName, signalingPeer);
+
 		this._handleSignalingPeer(signalingPeer);
+	}
+
+	authCallback(data)
+	{
+		logger.debug('authCallback()');
+
+		const {
+			peerName,
+			name,
+			picture
+		} = data;
+
+		const signalingPeer = this._signalingPeers.get(peerName);
+
+		if (signalingPeer)
+		{
+			signalingPeer.socket.emit('auth',
+			{
+				name    : name,
+				picture : picture
+			});
+		}
 	}
 
 	_handleMediaRoom()
