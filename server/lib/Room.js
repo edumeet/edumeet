@@ -82,7 +82,8 @@ class Room extends EventEmitter
 		if (this._signalingPeers)
 			for (let peer of this._signalingPeers)
 			{
-				peer.socket.disconnect();
+				if (peer.socket)
+					peer.socket.disconnect();
 			};
 
 		this._signalingPeers.clear();

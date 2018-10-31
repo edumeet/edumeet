@@ -4,6 +4,7 @@ import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import CookieConsent from 'react-cookie-consent';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import * as stateActions from '../redux/stateActions';
@@ -81,7 +82,12 @@ class Room extends React.Component
 
 				<Appear duration={300}>
 					<div data-component='Room'>
+						<CookieConsent>
+							This website uses cookies to enhance the user experience.
+						</CookieConsent>
+
 						<FullScreenView advancedMode={room.advancedMode} />
+
 						<div className='room-wrapper'>
 							<AudioPeers />
 

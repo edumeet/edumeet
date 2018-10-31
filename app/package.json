@@ -23,6 +23,7 @@
     "prop-types": "^15.6.2",
     "random-string": "^0.2.0",
     "react": "^16.5.2",
+    "react-cookie-consent": "^1.9.0",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.5.2",
     "react-draggable": "^3.0.5",
