@@ -4,8 +4,9 @@ import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
 import debounce from 'lodash/debounce';
 import classnames from 'classnames';
-import * as stateActions from '../redux/stateActions';
+import * as requestActions from '../redux/requestActions';
 import Peer from './Peer';
+import HiddenPeers from './HiddenPeers';
 
 class Filmstrip extends Component
 {
@@ -26,11 +27,11 @@ class Filmstrip extends Component
 	// person has spoken yet, the first peer in the list of peers.
 	getActivePeerName = () =>
 	{
-		if (this.props.selectedPeerName) 
+		if (this.props.selectedPeerName)
 		{
 			return this.props.selectedPeerName;
 		}
-		
+
 		if (this.state.lastSpeaker)
 		{
 			return this.state.lastSpeaker;
@@ -52,7 +53,7 @@ class Filmstrip extends Component
 	{
 		let ratio = 4 / 3;
 
-		if (this.isSharingCamera(this.getActivePeerName())) 
+		if (this.isSharingCamera(this.getActivePeerName()))
 		{
 			ratio *= 2;
 		}
@@ -70,11 +71,11 @@ class Filmstrip extends Component
 
 			let width = container.clientWidth;
 
-			if (width / ratio > container.clientHeight) 
+			if (width / ratio > container.clientHeight)
 			{
 				width = container.clientHeight * ratio;
 			}
-			
+
 			this.setState({
 				width
 			});
@@ -113,7 +114,7 @@ class Filmstrip extends Component
 
 	render()
 	{
-		const { peers, advancedMode } = this.props;
+		const { peers, advancedMode, spotlights, spotlightsLength } = this.props;
 
 		const activePeerName = this.getActivePeerName();
 
@@ -138,25 +139,40 @@ class Filmstrip extends Component
 
 				<div className='filmstrip'>
 					<div className='filmstrip-content'>
-						{Object.keys(peers).map((peerName) => (
-							<div
-								key={peerName}
-								onClick={() => this.props.setSelectedPeer(peerName)}
-								className={classnames('film', {
-									selected : this.props.selectedPeerName === peerName,
-									active   : this.state.lastSpeaker === peerName
-								})}
-							>
-								<div className='film-content'>
-									<Peer
-										advancedMode={advancedMode}
-										name={peerName}
-									/>
-								</div>
-							</div>
-						))}
+						{
+							Object.keys(peers).map((peerName) =>
+							{
+								return (
+									spotlights.find((spotlightsElement) => spotlightsElement === peerName)?
+										<div
+											key={peerName}
+											onClick={() => this.props.setSelectedPeer(peerName)}
+											className={classnames('film', {
+												selected : this.props.selectedPeerName === peerName,
+												active   : this.state.lastSpeaker === peerName
+											})}
+										>
+											<div className='film-content'>
+												<Peer
+													advancedMode={advancedMode}
+													name={peerName}
+												/>
+											</div>
+										</div>
+										:null
+								);
+							})
+						}
 					</div>
 				</div>
+				<div className='hidden-peer-container'>
+					{ (spotlightsLength<Object.keys(peers).length)?
+						<HiddenPeers
+							hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
+						/>:null
+					}
+				</div>
+
 			</div>
 		);
 	}
@@ -169,19 +185,28 @@ Filmstrip.propTypes = {
 	consumers         : PropTypes.object.isRequired,
 	myName            : PropTypes.string.isRequired,
 	selectedPeerName  : PropTypes.string,
-	setSelectedPeer   : PropTypes.func.isRequired
+	setSelectedPeer   : PropTypes.func.isRequired,
+	spotlightsLength  : PropTypes.number,
+	spotlights        : PropTypes.array.isRequired
 };
 
-const mapStateToProps = (state) => ({
-	activeSpeakerName : state.room.activeSpeakerName,
-	selectedPeerName  : state.room.selectedPeerName,
-	peers             : state.peers,
-	consumers         : state.consumers,
-	myName            : state.me.name
-});
+const mapStateToProps = (state) =>
+{
+	const spotlightsLength = state.room.spotlights ? state.room.spotlights.length : 0;
+
+	return {
+		activeSpeakerName : state.room.activeSpeakerName,
+		selectedPeerName  : state.room.selectedPeerName,
+		peers             : state.peers,
+		consumers         : state.consumers,
+		myName            : state.me.name,
+		spotlights        : state.room.spotlights,
+		spotlightsLength
+	};
+};
 
 const mapDispatchToProps = {
-	setSelectedPeer : stateActions.setSelectedPeer
+	setSelectedPeer : requestActions.setSelectedPeer
 };
 
 export default connect(

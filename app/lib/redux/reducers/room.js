@@ -8,7 +8,8 @@ const initialState =
 	fullScreenConsumer : null, // ConsumerID
 	toolbarsVisible    : true,
 	mode               : 'democratic',
-	selectedPeerName   : null
+	selectedPeerName   : null,
+	spotlights         : []
 };
 
 const room = (state = initialState, action) =>
@@ -81,6 +82,13 @@ const room = (state = initialState, action) =>
 				selectedPeerName : state.selectedPeerName === selectedPeerName ?
 					null : selectedPeerName
 			};
+		}
+
+		case 'SET_SPOTLIGHTS':
+		{
+			const { spotlights } = action.payload;
+
+			return { ...state, spotlights };
 		}
 
 		default:

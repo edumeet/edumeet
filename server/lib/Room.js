@@ -1,7 +1,6 @@
 'use strict';
 
 const EventEmitter = require('events').EventEmitter;
-const WebTorrent = require('webtorrent-hybrid');
 const Logger = require('./Logger');
 const config = require('../config');
 
@@ -10,14 +9,6 @@ const MIN_BITRATE = Math.min(50000, MAX_BITRATE);
 const BITRATE_FACTOR = 0.75;
 
 const logger = new Logger('Room');
-
-const torrentClient = new WebTorrent({
-	tracker : {
-		rtcConfig : {
-			iceServers : config.turnServers
-		}
-	}
-});
 
 class Room extends EventEmitter
 {
@@ -37,6 +28,8 @@ class Room extends EventEmitter
 		this._chatHistory = [];
 
 		this._fileHistory = [];
+
+		this._lastN = [];
 
 		this._io = io;
 
@@ -79,7 +72,8 @@ class Room extends EventEmitter
 		if (this._signalingPeers)
 			for (let peer of this._signalingPeers)
 			{
-				peer.socket.disconnect();
+				if (peer.socket)
+					peer.socket.disconnect();
 			};
 
 		this._signalingPeers.clear();
@@ -123,7 +117,38 @@ class Room extends EventEmitter
 
 		const signalingPeer = { peerName : peerName, socket : socket };
 
+		const index = this._lastN.indexOf(peerName);
+
+		if (index === -1) // We don't have this peer, add to end
+		{
+			this._lastN.push(peerName);
+		}
+
+		this._signalingPeers.set(peerName, signalingPeer);
+
 		this._handleSignalingPeer(signalingPeer);
+	}
+
+	authCallback(data)
+	{
+		logger.debug('authCallback()');
+
+		const {
+			peerName,
+			name,
+			picture
+		} = data;
+
+		const signalingPeer = this._signalingPeers.get(peerName);
+
+		if (signalingPeer)
+		{
+			signalingPeer.socket.emit('auth',
+			{
+				name    : name,
+				picture : picture
+			});
+		}
 	}
 
 	_handleMediaRoom()
@@ -139,6 +164,14 @@ class Room extends EventEmitter
 				logger.info('new active speaker [peerName:"%s"]', activePeer.name);
 
 				this._currentActiveSpeaker = activePeer;
+
+				const index = this._lastN.indexOf(activePeer.name);
+
+				if (index > -1) // We have this speaker in the list, move to front
+				{
+					this._lastN.splice(index, 1);
+					this._lastN = [activePeer.name].concat(this._lastN);
+				}
 
 				const activeVideoProducer = activePeer.producers
 					.find((producer) => producer.kind === 'video');
@@ -269,7 +302,8 @@ class Room extends EventEmitter
 				null,
 				{
 					chatHistory : this._chatHistory,
-					fileHistory : this._fileHistory
+					fileHistory : this._fileHistory,
+					lastN       : this._lastN
 				}
 			);
 		});
@@ -279,14 +313,9 @@ class Room extends EventEmitter
 			// Return no error
 			cb(null);
 
-			const fileData = request.data.file;
+			const fileData = request.file;
 
 			this._fileHistory.push(fileData);
-
-			if (!torrentClient.get(fileData.file.magnet))
-			{
-				torrentClient.add(fileData.file.magnet);
-			}
 
 			// Spread to others
 			signalingPeer.socket.broadcast.to(this._roomId).emit(
@@ -302,10 +331,10 @@ class Room extends EventEmitter
 			// Return no error
 			cb(null);
 
-			const { raiseHandState } = request.data;
+			const { raiseHandState } = request;
 			const { mediaPeer } = signalingPeer;
 
-			mediaPeer.appData.raiseHandState = request.data.raiseHandState;
+			mediaPeer.appData.raiseHandState = request.raiseHandState;
 			// Spread to others
 			signalingPeer.socket.broadcast.to(this._roomId).emit(
 				'raisehand-message',
@@ -324,6 +353,13 @@ class Room extends EventEmitter
 
 			if (mediaPeer && !mediaPeer.closed)
 				mediaPeer.close();
+
+			const index = this._lastN.indexOf(signalingPeer.peerName);
+
+			if (index > -1) // We have this peer in the list, remove
+			{
+				this._lastN.splice(index, 1);
+			}
 
 			// If this is the latest peer in the room, close the room.
 			// However wait a bit (for reconnections).

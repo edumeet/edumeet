@@ -22,3 +22,13 @@ export function setDevices({ webcamEnabled })
 {
 	jsCookie.set(DEVICES_COOKIE, { webcamEnabled });
 }
+
+export function setAudioDevice({ audioDeviceId })
+{
+	jsCookie.set(DEVICES_COOKIE, { audioDeviceId });
+}
+
+export function setVideoDevice({ videoDeviceId })
+{
+	jsCookie.set(DEVICES_COOKIE, { videoDeviceId });
+}

@@ -34,6 +34,11 @@ class Chat extends Component
 						autoFocus={autofocus}
 						autoComplete='off'
 					/>
+					<input
+						type='submit'
+						className='send'
+						value='Send'
+					/>
 				</form>
 			</div>
 		);

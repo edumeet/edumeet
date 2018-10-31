@@ -43,14 +43,12 @@ const dataporten = new Dataporten.Setup(config.oauth2);
 
 app.all('*', (req, res, next) =>
 {
-	if(req.headers['x-forwarded-proto'] == 'http')
-	{
-		res.redirect('https://' + req.hostname + req.url);
-	}
-	else
+	if(req.secure)
 	{
 		return next();
 	}
+
+	res.redirect('https://' + req.hostname + req.url);
 });
 
 app.use(dataporten.passport.initialize());
@@ -72,26 +70,23 @@ dataporten.setupLogout(app, '/logout');
 
 app.get(
 	'/auth-callback',
-
 	dataporten.passport.authenticate('dataporten', { failureRedirect: '/login' }),
-	
 	(req, res) =>
 	{
 		const state = JSON.parse(base64.decode(req.query.state));
 
 		if (rooms.has(state.roomId))
 		{
-			const room = rooms.get(state.roomId)._protooRoom;
-
-			if (room.hasPeer(state.peerName))
+			const data =
 			{
-				const peer = room.getPeer(state.peerName);
+				peerName : state.peerName,
+				name     : req.user.data.displayName,
+				picture  : req.user.data.photos[0]
+			};
 
-				peer.send('auth', {
-					name    : req.user.data.displayName,
-					picture : req.user.data.photos[0]
-				});
-			}
+			const room = rooms.get(state.roomId);
+
+			room.authCallback(data);
 		}
 
 		res.send('');

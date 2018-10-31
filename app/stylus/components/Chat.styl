@@ -6,7 +6,7 @@
 }
 
 [data-component='MessageList'] {
-	overflow-y: scroll;
+	overflow-y: auto;
 	flex-grow: 1;
 
 	> .message {
@@ -49,25 +49,55 @@
 			}
 		}
 	}
+
+	> .empty {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		padding-top: 20vmin;
+
+		> p {
+			padding: 6px 12px;
+			border-radius: 6px;
+			user-select: none;
+			pointer-events: none;
+			font-size: 20px;
+			color: #000;
+		}
+	}
 }
 
 [data-component='Sender'] {
 	display: flex;
-	background-color: rgba(0, 0, 0, 0.1);
-	padding: 1rem;
+	background-color: #fff;
+	color: #000;
 	flex-shrink: 0;
-	border-radius: 5px;
 	margin-top: 0.5rem;
 	height: 3rem;
 
 	> .new-message {
-		width: 100%;
+		width: 80%;
+		box-shadow: 0vmin 0vmin 1vmin 0vmin rgba(17,17,17,0.5);
 		border: 0;
-		color: #FFF;
 		font-size: 1rem;
+		margin-right: 1vmin;
+		border-radius: 0.5vmin;
+		padding-left: 1vmin;
+		color: #000;
 
 		&.focus {
 			outline: none;
 		}
+	}
+
+	> .send {
+		width: 20%;
+		box-shadow: 0vmin 0vmin 1vmin 0vmin rgba(17,17,17,0.5);
+		border: 0;
+		background-color: #aef;
+		color: #000;
+		font-size: 1rem;
+		border-radius: 0.5vmin;
 	}
 }

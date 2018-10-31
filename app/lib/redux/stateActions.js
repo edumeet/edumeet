@@ -161,6 +161,20 @@ export const toggleToolArea = () =>
 	};
 };
 
+export const openToolArea = () =>
+{
+	return {
+		type : 'OPEN_TOOL_AREA'
+	};
+};
+
+export const closeToolArea = () =>
+{
+	return {
+		type : 'CLOSE_TOOL_AREA'
+	};
+};
+
 export const setToolTab = (toolTab) =>
 {
 	return {
@@ -474,7 +488,14 @@ export const loggedIn = () =>
 		type : 'LOGGED_IN'
 	});
 
-export const setSelectedPeer = (selectedPeerName) => ({
-	type    : 'SET_SELECTED_PEER',
-	payload : { selectedPeerName }
-});
+export const setSelectedPeer = (selectedPeerName) =>
+	({
+		type    : 'SET_SELECTED_PEER',
+		payload : { selectedPeerName }
+	});
+
+export const setSpotlights = (spotlights) =>
+	({
+		type    : 'SET_SPOTLIGHTS',
+		payload : { spotlights }
+	});

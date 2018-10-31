@@ -30,7 +30,7 @@ class MessageList extends Component
 
 		return (
 			<div data-component='MessageList' id='messages'>
-				{
+				{ chatmessages.length > 0 ?
 					chatmessages.map((message, i) =>
 					{
 						const messageTime = new Date(message.time);
@@ -61,6 +61,9 @@ class MessageList extends Component
 							</div>
 						);
 					})
+					:<div className='empty'>
+						<p>No one has said anything yet...</p>
+					</div>
 				}
 			</div>
 		);

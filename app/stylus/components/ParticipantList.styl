@@ -1,10 +1,16 @@
 [data-component='ParticipantList'] {
 	width: 100%;
+	overflow-y: auto;
+	padding: 6px;
 
 	> .list {
-	box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2), \
-					0 4px 20px 0 rgba(0,0,0,0.19);
+		box-shadow: 0 2px 5px 2px rgba(0,0,0,0.2);
+		background-color: #fff;
 
+		> .list-header {
+			padding: 0.5rem;
+			font-weight: bolder;
+		}
 		> .list-item {
 			padding: 0.5rem;
 			border-bottom: 1px solid #CBCBCB;
@@ -17,7 +23,7 @@
 			}
 
 			&.selected {
-				border-bottom-color: #377EFF;
+				background-color: #377eff;
 			}
 		}
 	}
@@ -25,7 +31,6 @@
 
 [data-component='ListPeer'] {
 	display: flex;
-	align-items: center;
 
 	> .indicators {
 		left: 0;
@@ -73,6 +78,41 @@
 			&.raise-hand {
 				background-image: url('/resources/images/icon-hand-white.svg');
 			}
+		}
+	}
+	> .volume-container {
+		float: right;
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		width: 1vmin;
+		position: relative;
+		background-size: 75%;
+
+		> .bar {
+			flex: 0 0 auto;
+			margin: 0.3rem;
+			background-size: 75%;
+			background-repeat: no-repeat;
+			cursor: pointer;
+			transition-property: opacity, background-color;
+			width: 3px;
+			border-radius: 6px;
+			transition-duration: 0.25s;
+			position: absolute;
+			bottom: 0px;
+
+			&.level0  { height: 0;    background-color: rgba(#000, 0.8); }
+			&.level1  { height: 0.2vh;  background-color: rgba(#000, 0.8); }
+			&.level2  { height: 0.4vh;  background-color: rgba(#000, 0.8); }
+			&.level3  { height: 0.6vh;  background-color: rgba(#000, 0.8); }
+			&.level4  { height: 0.8vh;  background-color: rgba(#000, 0.8); }
+			&.level5  { height: 1.0vh;  background-color: rgba(#000, 0.8); }
+			&.level6  { height: 1.2vh;  background-color: rgba(#000, 0.8); }
+			&.level7  { height: 1.4vh;  background-color: rgba(#000, 0.8); }
+			&.level8  { height: 1.6vh;  background-color: rgba(#000, 0.8); }
+			&.level9  { height: 1.8vh;  background-color: rgba(#000, 0.8); }
+			&.level10 { height: 2.0vh;  background-color: rgba(#000, 0.8); }
 		}
 	}
 	> .controls {

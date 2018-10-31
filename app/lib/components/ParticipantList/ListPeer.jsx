@@ -10,12 +10,9 @@ const ListPeer = (props) =>
 	const {
 		peer,
 		micConsumer,
-		webcamConsumer,
 		screenConsumer,
 		onMuteMic,
 		onUnmuteMic,
-		onDisableWebcam,
-		onEnableWebcam,
 		onDisableScreen,
 		onEnableScreen
 	} = props;
@@ -24,12 +21,6 @@ const ListPeer = (props) =>
 		Boolean(micConsumer) &&
 		!micConsumer.locallyPaused &&
 		!micConsumer.remotelyPaused
-	);
-
-	const videoVisible = (
-		Boolean(webcamConsumer) &&
-		!webcamConsumer.locallyPaused &&
-		!webcamConsumer.remotelyPaused
 	);
 
 	const screenVisible = (
@@ -61,6 +52,9 @@ const ListPeer = (props) =>
 					:null
 				}
 			</div>
+			<div className='volume-container'>
+				<div className={classnames('bar', `level${micEnabled && micConsumer ? micConsumer.volume:0}`)} />
+			</div>
 			<div className='controls'>
 				{ screenConsumer ?
 					<div
@@ -84,26 +78,10 @@ const ListPeer = (props) =>
 						off      : !micEnabled,
 						disabled : peer.peerAudioInProgress
 					})}
-					style={{ opacity : micEnabled && micConsumer ? (micConsumer.volume/10)
-						+ 0.2 :1 }}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
 						micEnabled ? onMuteMic(peer.name) : onUnmuteMic(peer.name);
-					}}
-				/>
-
-				<div
-					className={classnames('button', 'webcam', {
-						on       : videoVisible,
-						off      : !videoVisible,
-						disabled : peer.peerVideoInProgress
-					})}
-					onClick={(e) =>
-					{
-						e.stopPropagation();
-						videoVisible ?
-							onDisableWebcam(peer.name) : onEnableWebcam(peer.name);
 					}}
 				/>
 			</div>
