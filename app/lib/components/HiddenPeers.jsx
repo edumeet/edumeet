@@ -1,27 +1,38 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import * as stateActions from '../redux/stateActions';
 
 class HiddenPeers extends Component
 {
-	state = {
-		controlsVisible : false
-	};
-
-	handleMouseOver = () =>
+	constructor(props)
 	{
-		this.setState({
-			controlsVisible : true
-		});
-	};
+		super(props);
+		this.state = { className: '' };
+	}
 
-	handleMouseOut = () =>
+	componentDidUpdate(prevProps)
 	{
-		this.setState({
-			controlsVisible : false
-		});
-	};
+		const { hiddenPeersCount } = this.props;
+
+		if (hiddenPeersCount !== prevProps.hiddenPeersCount)
+		{
+			// eslint-disable-next-line react/no-did-update-set-state
+			this.setState({ className: 'pulse' }, () =>
+			{
+				if (this.timeout)
+				{
+					clearTimeout(this.timeout);
+				}
+
+				this.timeout = setTimeout(() =>
+				{
+					this.setState({ className: '' });
+				}, 1000);
+			});
+		}
+	}
 
 	render()
 	{
@@ -33,11 +44,12 @@ class HiddenPeers extends Component
 		return (
 			<div
 				data-component='HiddenPeers'
+				className={this.state.className}
 				onMouseOver={this.handleMouseOver}
 				onMouseOut={this.handleMouseOut}
 			>
 				<div data-component='HiddenPeersView'>
-					<div className='view-container' onClick={() => openUsersTab()}>
+					<div className={classnames('view-container', this.state.className)} onClick={() => openUsersTab()}>
 						<p>+{hiddenPeersCount} <br /> participant
 							{(hiddenPeersCount === 1) ? null : 's'}
 						</p>
