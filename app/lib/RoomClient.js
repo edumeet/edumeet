@@ -1141,6 +1141,23 @@ export default class RoomClient
 			this._dispatch(stateActions.addFile(payload));
 
 			this.notify(`${payload.name} shared a file`);
+
+			if (!this._getState().toolarea.toolAreaOpen ||
+				(this._getState().toolarea.toolAreaOpen &&
+				this._getState().toolarea.currentToolTab !== 'files')) // Make sound
+			{
+				const alertPromise = this._soundAlert.play();
+
+				if (alertPromise !== undefined)
+				{
+					alertPromise
+						.then()
+						.catch((error) =>
+						{
+							logger.error('_soundAlert.play() | failed: %o', error);
+						});
+				}
+			}
 		});
 	}
 
