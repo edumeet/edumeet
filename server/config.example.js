@@ -15,7 +15,7 @@ module.exports =
 		key  : `${__dirname}/certs/mediasoup-demo.localhost.key.pem`
 	},
 	// Listening port for https server.
-	listeningPort : 3443,
+	listeningPort : 443,
 	turnServers   : [
 		{
 			urls : [
