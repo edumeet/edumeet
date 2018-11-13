@@ -62,14 +62,6 @@ export const setAudioDevices = (devices) =>
 	};
 };
 
-export const setCanChangeWebcam = (flag) =>
-{
-	return {
-		type    : 'SET_CAN_CHANGE_WEBCAM',
-		payload : flag
-	};
-};
-
 export const setWebcamDevices = (devices) =>
 {
 	return {
