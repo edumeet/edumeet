@@ -1730,8 +1730,6 @@ export default class RoomClient
 			else if (!this._webcams.has(currentWebcamId))
 				this._webcam.device = array[0];
 
-			this._dispatch(
-				stateActions.setCanChangeWebcam(len >= 2));
 			if (len >= 1)
 				this._dispatch(
 					stateActions.setWebcamDevices(this._webcams));

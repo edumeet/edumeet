@@ -18,7 +18,6 @@
     device               : { flag: 'firefox', name: 'Firefox', version: '61' },
     canSendMic           : true,
     canSendWebcam        : true,
-    canChangeWebcam      : false,
     webcamInProgress     : false,
     audioOnly            : false,
     audioOnlyInProgress  : false,
