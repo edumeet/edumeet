@@ -115,6 +115,8 @@ export default class RoomClient
 
 		this._screenSharingProducer = null;
 
+		this._startKeyListener();
+
 		this._join({ displayName, device });
 	}
 
@@ -135,6 +137,33 @@ export default class RoomClient
 		setTimeout(() => this._signalingSocket.close(), 250);
 
 		this._dispatch(stateActions.setRoomState('closed'));
+	}
+
+	_startKeyListener()
+	{
+		// Add keypress event listner on document
+		document.addEventListener('keypress', (event) =>
+		{
+			const key = String.fromCharCode(event.keyCode);
+
+			const source = event.target;
+
+			const exclude = [ 'input', 'textarea' ];
+
+			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
+			{
+				logger.debug('keyPress() [key:"%s"]', key);
+
+				switch (key)
+				{
+					case 'a': // Activate advanced mode
+					{
+						this._dispatch(stateActions.toggleAdvancedMode());
+						this.notify('Toggled advanced mode.');
+					}
+				}
+			}
+		});
 	}
 
 	login()
