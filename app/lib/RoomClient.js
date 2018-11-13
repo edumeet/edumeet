@@ -154,6 +154,21 @@ export default class RoomClient
 		this._loginWindow.close();
 	}
 
+	_soundNotification()
+	{
+		const alertPromise = this._soundAlert.play();
+
+		if (alertPromise !== undefined)
+		{
+			alertPromise
+				.then()
+				.catch((error) =>
+				{
+					logger.error('_soundAlert.play() | failed: %o', error);
+				});
+		}
+	}
+
 	notify(text)
 	{
 		this._dispatch(requestActions.notify({ text: text }));
@@ -223,13 +238,13 @@ export default class RoomClient
 
 			this._dispatch(stateActions.setDisplayName(displayName));
 
-			this.notify('Display name changed');
+			this.notify(`Your display name changed to ${displayName}.`);
 		}
 		catch (error)
 		{
 			logger.error('changeDisplayName() | failed: %o', error);
 
-			this.notify(`Could not change display name: ${error}`);
+			this.notify('An error occured while changing your display name.');
 
 			// We need to refresh the component for it to render the previous
 			// displayName again.
@@ -263,7 +278,7 @@ export default class RoomClient
 		{
 			logger.error('sendChatMessage() | failed: %o', error);
 
-			this.notify(`Could not send chat: ${error}`);
+			this.notify('An error occured while sending chat message.');
 		}
 	}
 
@@ -279,7 +294,7 @@ export default class RoomClient
 		{
 			logger.error('sendFile() | failed: %o', error);
 
-			this.notify('An error occurred while sharing a file');
+			this.notify('An error occurred while sharing file.');
 		}
 	}
 
@@ -325,7 +340,7 @@ export default class RoomClient
 		{
 			logger.error('getServerHistory() | failed: %o', error);
 
-			this.notify(`Could not get chat history: ${error}`);
+			this.notify('An error occured while getting server history.');
 		}
 	}
 
@@ -965,7 +980,7 @@ export default class RoomClient
 		{
 			logger.error('sendRaiseHandState() | failed: %o', error);
 
-			this.notify(`Could not change raise hand state: ${error}`);
+			this.notify(`An error occured while ${state ? 'raising' : 'lowering'} hand.`);
 
 			// We need to refresh the component for it to render changed state
 			this._dispatch(stateActions.setMyRaiseHandState(!state));
@@ -1014,7 +1029,7 @@ export default class RoomClient
 		{
 			logger.warn('signaling Peer "disconnect" event');
 
-			this.notify('WebSocket disconnected');
+			this.notify('You are disconnected.');
 
 			// Leave Room.
 			try { this._room.remoteClose({ cause: 'signaling disconnected' }); }
@@ -1054,7 +1069,7 @@ export default class RoomClient
 		this._signalingSocket.on('display-name-changed', (data) =>
 		{
 			// eslint-disable-next-line no-shadow
-			const { peerName, displayName, oldDisplayName } = data;
+			const { peerName, displayName } = data;
 
 			// NOTE: Hack, we shouldn't do this, but this is just a demo.
 			const peer = this._room.getPeerByName(peerName);
@@ -1066,12 +1081,14 @@ export default class RoomClient
 				return;
 			}
 
+			const oldDisplayName = peer.appData.displayName;
+
 			peer.appData.displayName = displayName;
 
 			this._dispatch(
 				stateActions.setPeerDisplayName(displayName, peerName));
 
-			this.notify(`${oldDisplayName} is now ${displayName}`);
+			this.notify(`${oldDisplayName} changed their display name to ${displayName}.`);
 		});
 
 		this._signalingSocket.on('profile-picture-changed', (data) =>
@@ -1092,7 +1109,7 @@ export default class RoomClient
 			this._dispatch(stateActions.setPicture(data.picture));
 			this._dispatch(stateActions.loggedIn());
 
-			this.notify(`Authenticated successfully: ${data}`);
+			this.notify('You are logged in.');
 
 			this.closeLoginWindow();
 		});
@@ -1102,6 +1119,18 @@ export default class RoomClient
 			const { peerName, raiseHandState } = data;
 
 			logger.debug('Got raiseHandState from "%s"', peerName);
+
+			// NOTE: Hack, we shouldn't do this, but this is just a demo.
+			const peer = this._room.getPeerByName(peerName);
+
+			if (!peer)
+			{
+				logger.error('peer not found');
+
+				return;
+			}
+
+			this.notify(`${peer.appData.displayName} ${raiseHandState ? 'raised' : 'lowered'} their hand.`);
 
 			this._dispatch(
 				stateActions.setPeerRaiseHandState(peerName, raiseHandState));
@@ -1120,43 +1149,33 @@ export default class RoomClient
 				(this._getState().toolarea.toolAreaOpen &&
 				this._getState().toolarea.currentToolTab !== 'chat')) // Make sound
 			{
-				const alertPromise = this._soundAlert.play();
-
-				if (alertPromise !== undefined)
-				{
-					alertPromise
-						.then()
-						.catch((error) =>
-						{
-							logger.error('_soundAlert.play() | failed: %o', error);
-						});
-				}
+				this._soundNotification();
 			}
 		});
 
 		this._signalingSocket.on('file-receive', (data) =>
 		{
-			const payload = data.file;
+			const { peerName, file } = data;
 
-			this._dispatch(stateActions.addFile(payload));
+			// NOTE: Hack, we shouldn't do this, but this is just a demo.
+			const peer = this._room.getPeerByName(peerName);
 
-			this.notify(`${payload.name} shared a file`);
+			if (!peer)
+			{
+				logger.error('peer not found');
+
+				return;
+			}
+
+			this._dispatch(stateActions.addFile(file));
+
+			this.notify(`${peer.appData.displayName} shared a file.`);
 
 			if (!this._getState().toolarea.toolAreaOpen ||
 				(this._getState().toolarea.toolAreaOpen &&
 				this._getState().toolarea.currentToolTab !== 'files')) // Make sound
 			{
-				const alertPromise = this._soundAlert.play();
-
-				if (alertPromise !== undefined)
-				{
-					alertPromise
-						.then()
-						.catch((error) =>
-						{
-							logger.error('_soundAlert.play() | failed: %o', error);
-						});
-				}
+				this._soundNotification();
 			}
 		});
 	}
@@ -1210,17 +1229,7 @@ export default class RoomClient
 			logger.debug(
 				'room "newpeer" event [name:"%s", peer:%o]', peer.name, peer);
 
-			const alertPromise = this._soundAlert.play();
-
-			if (alertPromise !== undefined)
-			{
-				alertPromise
-					.then()
-					.catch((error) =>
-					{
-						logger.error('_soundAlert.play() | failed: %o', error);
-					});
-			}
+			this._soundNotification();
 
 			this._handlePeer(peer);
 		});
@@ -1284,7 +1293,7 @@ export default class RoomClient
 
 			this.getServerHistory();
 
-			this.notify('You are in the room');
+			this.notify('You have joined the room.');
 
 			this._spotlights.on('spotlights-updated', (spotlights) =>
 			{
@@ -1305,7 +1314,7 @@ export default class RoomClient
 		{
 			logger.error('_joinRoom() failed:%o', error);
 
-			this.notify(`Could not join the room: ${error.toString()}`);
+			this.notify('An error occured while joining the room.');
 
 			this.close();
 		}
@@ -1419,7 +1428,7 @@ export default class RoomClient
 		{
 			logger.error('_setMicProducer() failed:%o', error);
 
-			this.notify(`Mic producer failed: ${error.name}:${error.message}`);
+			this.notify('An error occured while accessing your microphone.');
 
 			if (producer)
 				producer.close();
@@ -1525,7 +1534,14 @@ export default class RoomClient
 		{
 			logger.error('_setScreenShareProducer() failed:%o', error);
 
-			this.notify(`Screen share producer failed: ${error.name}:${error.message}`);
+			if (error.name === 'NotAllowedError') // Request to share denied by user
+			{
+				this.notify('Request to start sharing your screen was denied.');
+			}
+			else // Some other error
+			{
+				this.notify('An error occured while starting to share your screen.');
+			}
 
 			if (producer)
 				producer.close();
@@ -1623,7 +1639,7 @@ export default class RoomClient
 		{
 			logger.error('_setWebcamProducer() failed:%o', error);
 
-			this.notify(`Webcam producer failed: ${error.name}:${error.message}`);
+			this.notify('An error occured while accessing your camera.');
 
 			if (producer)
 				producer.close();
@@ -1741,7 +1757,7 @@ export default class RoomClient
 
 		if (notify)
 		{
-			this.notify(`${displayName} joined the room`);
+			this.notify(`${displayName} joined the room.`);
 		}
 
 		for (const consumer of peer.consumers)
@@ -1759,7 +1775,7 @@ export default class RoomClient
 
 			if (this._room.joined)
 			{
-				this.notify(`${peer.appData.displayName} left the room`);
+				this.notify(`${displayName} left the room.`);
 			}
 		});
 
