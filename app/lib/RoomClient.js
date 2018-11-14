@@ -16,7 +16,7 @@ import {
 
 const logger = new Logger('RoomClient');
 
-const ROOM_OPTIONS =
+let ROOM_OPTIONS =
 {
 	requestTimeout   : requestTimeout,
 	transportOptions : transportOptions,
@@ -70,6 +70,9 @@ export default class RoomClient
 
 		// Socket.io peer connection
 		this._signalingSocket = io(signalingUrl);
+
+		if (this._device.flag === 'firefox')
+			ROOM_OPTIONS = Object.assign({ iceTransportPolicy: 'relay' }, ROOM_OPTIONS);
 
 		// mediasoup-client Room instance.
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
@@ -160,6 +163,21 @@ export default class RoomClient
 					{
 						this._dispatch(stateActions.toggleAdvancedMode());
 						this.notify('Toggled advanced mode.');
+						break;
+					}
+
+					case '1': // Set democratic view
+					{
+						this._dispatch(stateActions.setDisplayMode('democratic'));
+						this.notify('Changed layout to democratic view.');
+						break;
+					}
+
+					case '2': // Set filmstrip view
+					{
+						this._dispatch(stateActions.setDisplayMode('filmstrip'));
+						this.notify('Changed layout to filmstrip view.');
+						break;
 					}
 				}
 			}
@@ -213,9 +231,9 @@ export default class RoomClient
 				if (called)
 					return;
 				called = true;
-				callback(new Error('Callback timeout'));
+				callback(new Error('Request timeout.'));
 			},
-			5000
+			ROOM_OPTIONS.requestTimeout
 		);
 
 		return (...args) =>

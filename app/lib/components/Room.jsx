@@ -16,6 +16,7 @@ import Notifications from './Notifications';
 import ToolAreaButton from './ToolArea/ToolAreaButton';
 import ToolArea from './ToolArea/ToolArea';
 import FullScreenView from './FullScreenView';
+import VideoWindow from './VideoWindow/VideoWindow';
 import Draggable from 'react-draggable';
 import { idle } from '../utils';
 import Sidebar from './Sidebar';
@@ -87,6 +88,8 @@ class Room extends React.Component
 						</CookieConsent>
 
 						<FullScreenView advancedMode={room.advancedMode} />
+
+						<VideoWindow advancedMode={room.advancedMode} />
 
 						<div className='room-wrapper'>
 							<div data-component='Logo' />
