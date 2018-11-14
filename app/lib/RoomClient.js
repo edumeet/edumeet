@@ -147,7 +147,7 @@ export default class RoomClient
 		// Add keypress event listner on document
 		document.addEventListener('keypress', (event) =>
 		{
-			const key = String.fromCharCode(event.keyCode);
+			const key = String.fromCharCode(event.which);
 
 			const source = event.target;
 
