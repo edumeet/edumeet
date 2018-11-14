@@ -29,7 +29,6 @@ class ToolAreaButton extends React.Component
 					})}
 					data-tip='Toggle tool area'
 					data-type='dark'
-					data-for='globaltip'
 					onClick={() => toggleToolArea()}
 				/>
 
