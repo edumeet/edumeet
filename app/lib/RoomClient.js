@@ -601,6 +601,34 @@ export default class RoomClient
 
 			const newTrack = await this._micProducer.replaceTrack(track);
 
+			const harkStream = new MediaStream;
+
+			harkStream.addTrack(newTrack);
+			if (!harkStream.getAudioTracks()[0])
+				throw new Error('changeAudioDevice(): given stream has no audio track');
+			if (this._micProducer.hark != null) this._micProducer.hark.stop();
+			this._micProducer.hark = hark(harkStream, { play: false });
+
+			// eslint-disable-next-line no-unused-vars
+			this._micProducer.hark.on('volume_change', (dBs, threshold) =>
+			{
+				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+				//   Math.pow(10, dBs / 20)
+				// However it does not produce a visually useful output, so let exagerate
+				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+				// minimize component renderings.
+				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+				if (volume === 1)
+					volume = 0;
+
+				if (volume !== this._micProducer.volume)
+				{
+					this._micProducer.volume = volume;
+					this._dispatch(stateActions.setProducerVolume(this._micProducer.id, volume));
+				}
+			});
+
 			track.stop();
 
 			this._dispatch(
