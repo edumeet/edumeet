@@ -581,8 +581,6 @@ export default class RoomClient
 
 			const track = stream.getAudioTracks()[0];
 
-			const oldTrack = this._micProducer.track;
-
 			const newTrack = await this._micProducer.replaceTrack(track);
 
 			const harkStream = new MediaStream;
