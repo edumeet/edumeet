@@ -40,7 +40,7 @@ const FullScreenView = (props) =>
 
 			<div className='controls'>
 				<div
-					className={classnames('button', 'fullscreen', 'room-controls', {
+					className={classnames('button', 'exitfullscreen', 'room-controls', {
 						visible : toolbarsVisible
 					})}
 					onClick={(e) =>

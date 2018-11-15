@@ -4,46 +4,52 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
-import fscreen from 'fscreen';
+import FullScreen from './FullScreen';
 
 class Sidebar extends Component
 {
-	state = {
-		fullscreen : false
-	};
+	constructor(props)
+	{
+		super(props);
+
+		this.fullscreen = new FullScreen(document);
+		this.state = {
+			fullscreen : false
+		};
+	}
 
 	handleToggleFullscreen = () =>
 	{
-		if (fscreen.fullscreenElement)
+		if (this.fullscreen.fullscreenElement)
 		{
-			fscreen.exitFullscreen();
+			this.fullscreen.exitFullscreen();
 		}
 		else
 		{
-			fscreen.requestFullscreen(document.documentElement);
+			this.fullscreen.requestFullscreen(document.documentElement);
 		}
 	};
 
 	handleFullscreenChange = () =>
 	{
 		this.setState({
-			fullscreen : fscreen.fullscreenElement !== null
+			fullscreen : this.fullscreen.fullscreenElement !== null
 		});
 	};
 
 	componentDidMount()
 	{
-		if (fscreen.fullscreenEnabled)
+		if (this.fullscreen.fullscreenEnabled)
 		{
-			fscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
+			this.fullscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
 		}
 	}
 
 	componentWillUnmount()
 	{
-		if (fscreen.fullscreenEnabled)
+		if (this.fullscreen.fullscreenEnabled)
 		{
-			fscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
+			this.fullscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
 		}
 	}
 
@@ -85,7 +91,7 @@ class Sidebar extends Component
 				})}
 				data-component='Sidebar'
 			>
-				{fscreen.fullscreenEnabled && (
+				{this.fullscreen.fullscreenEnabled && (
 					<div
 						className={classnames('button', 'fullscreen', {
 							on : this.state.fullscreen
