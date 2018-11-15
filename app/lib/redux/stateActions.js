@@ -389,6 +389,14 @@ export const toggleConsumerFullscreen = (consumerId) =>
 	};
 };
 
+export const toggleConsumerWindow = (consumerId) =>
+{
+	return {
+		type    : 'TOGGLE_WINDOW_CONSUMER',
+		payload : { consumerId }
+	};
+};
+
 export const setToolbarsVisible = (toolbarsVisible) => ({
 	type    : 'SET_TOOLBARS_VISIBLE',
 	payload : { toolbarsVisible }

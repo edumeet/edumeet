@@ -84,8 +84,7 @@ export default class FullView extends React.Component
 
 FullView.propTypes =
 {
-	videoTrack       : PropTypes.any,
-	videoVisible     : PropTypes.bool,
-	videoProfile     : PropTypes.string,
-	toggleFullscreen : PropTypes.func.isRequired
+	videoTrack   : PropTypes.any,
+	videoVisible : PropTypes.bool,
+	videoProfile : PropTypes.string
 };
