@@ -5,7 +5,6 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: rgba(0, 0, 0, 0.6);
 	display: none;
 
 	&.open {
@@ -14,7 +13,8 @@
 
 	+desktop() {
 		&.open {
-			display: none;
+			background: rgba(0, 0, 0, 0.3);
+			display: block;
 		}
 	}
 }
@@ -33,6 +33,36 @@
 	.toolarea-shade.open {
 		display: block;
 	}
+	> .button {
+		background-position: center;
+		background-size: 100%;
+		background-repeat: no-repeat;
+		background-color: rgba(#aef);
+		cursor: pointer;
+		border-radius: 15%;
+		padding: 1px;
+
+		+desktop() {
+			height: 36px;
+			width: 18px;
+		}
+
+		+mobile() {
+			height: 32px;
+			width: 16px;
+		}
+		&.toolarea-close-button {
+			background-image: url('/resources/images/arrow_right.svg');
+			position: absolute;
+			top: 50%;
+			left: -22px;
+			display: none;
+			&.on {
+				display: block;
+		}
+		}
+	}
+
 }
 
 @media (min-width: 600px) {
@@ -127,6 +157,10 @@
 			&.on {
 				background-image: url('/resources/images/icon_tool_area_black.svg');
 			}
+		}
+
+		&.toolarea-close-button {
+			background-image: url('/resources/images/arrow_right.svg');
 		}
 	}
 

@@ -58,7 +58,7 @@ Chat.propTypes =
 Chat.defaultProps =
 {
 	senderPlaceHolder : 'Type a message...',
-	autofocus         : true,
+	autofocus         : false,
 	displayName       : null
 };
 

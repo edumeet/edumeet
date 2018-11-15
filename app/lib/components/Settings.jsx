@@ -22,12 +22,6 @@ const Settings = ({
 }) =>
 {
 	let webcams;
-	let webcamText;
-
-	if (me.canChangeWebcam)
-		webcamText = 'Select camera';
-	else
-		webcamText = 'Unable to select camera';
 
 	if (me.webcamDevices)
 		webcams = Array.from(me.webcamDevices.values());
@@ -51,13 +45,12 @@ const Settings = ({
 		<div data-component='Settings'>
 			<div className='settings'>
 				<Dropdown
-					disabled={!me.canChangeWebcam}
 					options={webcams}
 					value={findOption(webcams, me.selectedWebcam)}
 					onChange={(webcam) => handleChangeWebcam(webcam.value)}
-					placeholder={webcamText}
+					placeholder={'Select camera'}
 				/>
-			
+
 				<Dropdown
 					disabled={!me.canChangeAudioDevice}
 					options={audioDevices}

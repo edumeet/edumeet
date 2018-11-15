@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import Spinner from 'react-spinner';
 
-export default class PeerView extends React.Component
+export default class ScreenView extends React.Component
 {
 	constructor(props)
 	{
@@ -157,7 +157,7 @@ export default class PeerView extends React.Component
 	}
 }
 
-PeerView.propTypes =
+ScreenView.propTypes =
 {
 	isMe          : PropTypes.bool,
 	advancedMode  : PropTypes.bool,

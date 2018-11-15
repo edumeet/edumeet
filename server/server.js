@@ -9,6 +9,7 @@ const fs = require('fs');
 const https = require('https');
 const http = require('http');
 const express = require('express');
+const compression = require('compression');
 const url = require('url');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
@@ -38,6 +39,8 @@ const tls =
 };
 
 const app = express();
+
+app.use(compression());
 
 const dataporten = new Dataporten.Setup(config.oauth2);
 

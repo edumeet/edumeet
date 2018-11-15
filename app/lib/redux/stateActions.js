@@ -62,14 +62,6 @@ export const setAudioDevices = (devices) =>
 	};
 };
 
-export const setCanChangeWebcam = (flag) =>
-{
-	return {
-		type    : 'SET_CAN_CHANGE_WEBCAM',
-		payload : flag
-	};
-};
-
 export const setWebcamDevices = (devices) =>
 {
 	return {
@@ -393,6 +385,14 @@ export const toggleConsumerFullscreen = (consumerId) =>
 {
 	return {
 		type    : 'TOGGLE_FULLSCREEN_CONSUMER',
+		payload : { consumerId }
+	};
+};
+
+export const toggleConsumerWindow = (consumerId) =>
+{
+	return {
+		type    : 'TOGGLE_WINDOW_CONSUMER',
 		payload : { consumerId }
 	};
 };

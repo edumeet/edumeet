@@ -6,6 +6,7 @@ const initialState =
 	showSettings       : false,
 	advancedMode       : false,
 	fullScreenConsumer : null, // ConsumerID
+	windowConsumer     : null, // ConsumerID
 	toolbarsVisible    : true,
 	mode               : 'democratic',
 	selectedPeerName   : null,
@@ -60,6 +61,17 @@ const room = (state = initialState, action) =>
 			const currentConsumer = state.fullScreenConsumer;
 
 			return { ...state, fullScreenConsumer: currentConsumer ? null : consumerId };
+		}
+
+		case 'TOGGLE_WINDOW_CONSUMER':
+		{
+			const { consumerId } = action.payload;
+			const currentConsumer = state.windowConsumer;
+
+			if (currentConsumer === consumerId)
+				return { ...state, windowConsumer: null };
+			else
+				return { ...state, windowConsumer: consumerId };
 		}
 
 		case 'SET_TOOLBARS_VISIBLE':

@@ -321,7 +321,8 @@ class Room extends EventEmitter
 			signalingPeer.socket.broadcast.to(this._roomId).emit(
 				'file-receive',
 				{
-					file : fileData
+					peerName : signalingPeer.peerName,
+					file     : fileData
 				}
 			);
 		});
@@ -334,7 +335,7 @@ class Room extends EventEmitter
 			const { raiseHandState } = request;
 			const { mediaPeer } = signalingPeer;
 
-			mediaPeer.appData.raiseHandState = request.raiseHandState;
+			mediaPeer.appData.raiseHandState = raiseHandState;
 			// Spread to others
 			signalingPeer.socket.broadcast.to(this._roomId).emit(
 				'raisehand-message',

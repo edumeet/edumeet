@@ -2,8 +2,14 @@
 
 A WebRTC meeting service using [mediasoup](https://mediasoup.org) as its backend.
 
-Try it online at https://akademia.no. You can add /roomname to the URL for specifying a room.
+Try it online at https://letsmeet.no. You can add /roomname to the URL for specifying a room.
 
+## Features
+* Audio/Video
+* Chat
+* Screen sharing
+* File sharing
+* Different video layouts
 
 ## Installation
 
@@ -21,15 +27,6 @@ $ cp server/config.example.js server/config.js
 ```
 
 * Copy `app/config.example.js` to `app/config.js` :
-
-In addition, the server requires a screen to be installed for the server
-to be able to seed shared torrent files. This is because the headless
-Electron instance used by WebTorrent expects one.
-
-See [webtorrent-hybrid](https://github.com/webtorrent/webtorrent-hybrid) for
-more information about this.
-
-* Copy `config.example.js` as `config.js` and customize it for your scenario:
 
 ```bash
 $ cp app/config.example.js app/config.js
@@ -72,7 +69,7 @@ $ node server.js
 
 ## Deploy it in a server
 
-* Stop your locally running server. Copy systemd-service file `multiparty-meeting.service` to `/etc/systemd/system/` and dobbel check location path settings:
+* Stop your locally running server. Copy systemd-service file `multiparty-meeting.service` to `/etc/systemd/system/` and check location path settings:
 ```bash
 $ cp multiparty-meeting.service /etc/systemd/system/
 $ edit /etc/systemd/system/multiparty-meeting.service
@@ -97,7 +94,6 @@ $ systemctl enable multiparty-meeting
 * 40000-49999/udp/tcp (media ports - adjustable in `server/config.js`)
 
 * If you want your service running at standard ports 80/443 you should:
-  * Make a redirect from HTTP port 80 to HTTPS (with Apache/NGINX) 
   * Configure a forwarding rule with iptables from port 443 to your configured service port (default 3443)
 
 

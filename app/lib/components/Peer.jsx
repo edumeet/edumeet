@@ -39,6 +39,7 @@ class Peer extends Component
 			onMuteMic,
 			onUnmuteMic,
 			toggleConsumerFullscreen,
+			toggleConsumerWindow,
 			style
 		} = this.props;
 
@@ -127,6 +128,15 @@ class Peer extends Component
 						/>
 
 						<div
+							className={classnames('button', 'newwindow')}
+							onClick={(e) =>
+							{
+								e.stopPropagation();
+								toggleConsumerWindow(webcamConsumer);
+							}}
+						/>
+
+						<div
 							className={classnames('button', 'fullscreen')}
 							onClick={(e) =>
 							{
@@ -155,6 +165,15 @@ class Peer extends Component
 								visible : this.state.controlsVisible
 							})}
 						>
+							<div
+								className={classnames('button', 'newwindow')}
+								onClick={(e) =>
+								{
+									e.stopPropagation();
+									toggleConsumerWindow(screenConsumer);
+								}}
+							/>
+
 							<div
 								className={classnames('button', 'fullscreen')}
 								onClick={(e) =>
@@ -190,7 +209,8 @@ Peer.propTypes =
 	onUnmuteMic              : PropTypes.func.isRequired,
 	streamDimensions         : PropTypes.object,
 	style                    : PropTypes.object,
-	toggleConsumerFullscreen : PropTypes.func.isRequired
+	toggleConsumerFullscreen : PropTypes.func.isRequired,
+	toggleConsumerWindow     : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state, { name }) =>
@@ -228,6 +248,11 @@ const mapDispatchToProps = (dispatch) =>
 		{
 			if (consumer)
 				dispatch(stateActions.toggleConsumerFullscreen(consumer.id));
+		},
+		toggleConsumerWindow : (consumer) =>
+		{
+			if (consumer)
+				dispatch(stateActions.toggleConsumerWindow(consumer.id));
 		}
 	};
 };
