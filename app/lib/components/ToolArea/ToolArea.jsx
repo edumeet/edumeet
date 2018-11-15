@@ -23,7 +23,8 @@ class ToolArea extends React.Component
 			toolAreaOpen,
 			unreadMessages,
 			unreadFiles,
-			toggleToolArea
+			toggleToolArea,
+			closeToolArea
 		} = this.props;
 
 		const VisibleTab = {
@@ -43,11 +44,17 @@ class ToolArea extends React.Component
 				/>
 
 				<div
-					data-component='ToolArea' 
+					data-component='ToolArea'
 					className={classNames({
 						open : toolAreaOpen
 					})}
 				>
+					<div
+						className={classNames('toolarea-close-button button', {
+							on : toolAreaOpen
+						})}
+						onClick={closeToolArea}
+					/>
 					<div className='tab-headers'>
 						<TabHeader
 							id='chat'
@@ -89,7 +96,8 @@ ToolArea.propTypes =
 	unreadMessages : PropTypes.number.isRequired,
 	unreadFiles    : PropTypes.number.isRequired,
 	toolAreaOpen   : PropTypes.bool,
-	toggleToolArea : PropTypes.func.isRequired
+	toggleToolArea : PropTypes.func.isRequired,
+	closeToolArea  : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -101,7 +109,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
 	setToolTab     : stateActions.setToolTab,
-	toggleToolArea : stateActions.toggleToolArea
+	toggleToolArea : stateActions.toggleToolArea,
+	closeToolArea  : stateActions.closeToolArea
 };
 
 const ToolAreaContainer = connect(

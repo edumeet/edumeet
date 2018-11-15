@@ -27,7 +27,7 @@ class ToolAreaButton extends React.Component
 					className={classnames('button toolarea-button', {
 						on : toolAreaOpen
 					})}
-					data-tip='Toggle tool area'
+					data-tip='Open tool box'
 					data-type='dark'
 					onClick={() => toggleToolArea()}
 				/>
