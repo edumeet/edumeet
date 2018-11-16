@@ -40,7 +40,8 @@ class Peer extends Component
 			onUnmuteMic,
 			toggleConsumerFullscreen,
 			toggleConsumerWindow,
-			style
+			style,
+			windowConsumer
 		} = this.props;
 
 		const micEnabled = (
@@ -128,7 +129,9 @@ class Peer extends Component
 						/>
 
 						<div
-							className={classnames('button', 'newwindow')}
+							className={classnames('button', 'newwindow', {
+								disabled : webcamConsumer && (windowConsumer === webcamConsumer.id)
+							})}
 							onClick={(e) =>
 							{
 								e.stopPropagation();
@@ -205,6 +208,7 @@ Peer.propTypes =
 	micConsumer              : appPropTypes.Consumer,
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
+	windowConsumer           : PropTypes.number,
 	onMuteMic                : PropTypes.func.isRequired,
 	onUnmuteMic              : PropTypes.func.isRequired,
 	streamDimensions         : PropTypes.object,
@@ -229,7 +233,8 @@ const mapStateToProps = (state, { name }) =>
 		peer,
 		micConsumer,
 		webcamConsumer,
-		screenConsumer
+		screenConsumer,
+		windowConsumer : state.room.windowConsumer
 	};
 };
 
