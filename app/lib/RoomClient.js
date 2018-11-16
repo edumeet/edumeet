@@ -179,6 +179,13 @@ export default class RoomClient
 						this.notify('Changed layout to filmstrip view.');
 						break;
 					}
+
+					case 'm': // Toggle microphone
+					{
+						this.toggleMic();
+						this.notify('Muted/unmuted your microphone.');
+						break;
+					}
 				}
 			}
 		});
@@ -389,6 +396,16 @@ export default class RoomClient
 
 			this.notify('An error occured while getting server history.');
 		}
+	}
+
+	toggleMic()
+	{
+		logger.debug('toggleMic()');
+
+		if (this._micProducer.locallyPaused)
+			this.unmuteMic();
+		else
+			this.muteMic();
 	}
 
 	muteMic()
