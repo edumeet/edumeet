@@ -2,12 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Meet</title>
+    <title>Multiparty Meeting</title>
   </head>
   <style>
     body{
       margin:auto;
-      padding:0.5em;
+      padding:0.5vmin;
       text-align:center;
       position: fixed;
       left: 50%;
@@ -18,50 +18,50 @@
 	    background-attachment: fixed;
 	    background-position: center;
 	    background-size: cover;
-	    background-repeat: no-repeat;
+	    background-repeat: repeat;
     }
 		input:hover {opacity:0.9;}
     input[type=text]{
-			font-size: 3vh;
-	    padding: 1.5vh;
+			font-size: 1.5em;
+	    padding: 1.5vmin;
 	    background-color: rgba(0,0,0,0.3);
 	    border: 0;
 	    color: #fff;
-	    margin: 0.6vh;
+	    margin: 0.8vmin;
 	    width: 50%;
     }
 
 		button:hover {background-color: #28bd7b;}
 		button{
-			font-size: 3vh;
-	    padding: 1.5vh;
-	    margin: 0.6vh;
+			font-size: 1.5em;
+	    padding: 1.5vmin;
+	    margin: 0.8vmin;
 	    background-color: #38cd8b;
-	    border-radius: 1.2vh;
+	    border-radius: 1.8vmin;
 	    color: #fff;
 			border: 0;
 		}
 		img{
-			height: 10vh;
+			height: 15vmin;
 		}
   </style>
   <body>
     <a>
-      <img class='logoStartscreen' src='/resources/images/logo.svg'></img><br>
+      <img src='/resources/images/logo.svg'></img><br>
     </a>
     <input id="room" type="text" onkeypress="checkEnter(event)" value="" placeholder="your room name">
-    <button onclick = "start(location.href)">Start room</button>
+    <button onclick = "start(location.href)">Go to room</button>
   </body>
   <script>
     var room = document.getElementById("room");
     var stateObj = { foo: "bar" };
     room.addEventListener("input", function(e) {
       console.log(e.charCode);
-      history.replaceState(stateObj, "meet", "/"+room.value);
+      history.replaceState(stateObj, "Multiparty Meeting", "/"+room.value);
     },true);
     room.focus();
     function start(target){
-      location.href;history.replaceState(stateObj, "meet", "/");
+      location.href;history.replaceState(stateObj, "Multiparty Meeting", "/");
       window.location = target;
     }
     function checkEnter(event){
