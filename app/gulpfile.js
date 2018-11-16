@@ -137,7 +137,7 @@ gulp.task('lint', () =>
 		.pipe(eslint.format());
 });
 
-gulp.task('lint-fix', function() 
+gulp.task('lint-fix', function()
 {
 	return gulp.src(LINTING_FILES)
 		.pipe(plumber())
@@ -168,7 +168,7 @@ gulp.task('css', () =>
 
 gulp.task('html', () =>
 {
-	return gulp.src('index.html')
+	return gulp.src('*.html')
 		.pipe(change(changeHTML))
 		.pipe(gulp.dest(OUTPUT_DIR));
 });
@@ -241,7 +241,7 @@ gulp.task('browser', (done) =>
 gulp.task('watch', (done) =>
 {
 	// Watch changes in HTML.
-	gulp.watch([ 'index.html' ], gulp.series(
+	gulp.watch([ '*.html' ], gulp.series(
 		'html'
 	));
 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Meet</title>
+  </head>
+  <style>
+    body{
+      margin:auto;
+      padding:0.5em;
+      text-align:center;
+      position: fixed;
+      left: 50%;
+      top: 40%;
+			width: 90%;
+      transform: translate(-50%, 0%);
+      background-image: url('/resources/images/background.svg');
+	    background-attachment: fixed;
+	    background-position: center;
+	    background-size: cover;
+	    background-repeat: no-repeat;
+    }
+		input:hover {opacity:0.9;}
+    input[type=text]{
+			font-size: 3vh;
+	    padding: 1.5vh;
+	    background-color: rgba(0,0,0,0.3);
+	    border: 0;
+	    color: #fff;
+	    margin: 0.6vh;
+	    width: 50%;
+    }
+
+		button:hover {background-color: #28bd7b;}
+		button{
+			font-size: 3vh;
+	    padding: 1.5vh;
+	    margin: 0.6vh;
+	    background-color: #38cd8b;
+	    border-radius: 1.2vh;
+	    color: #fff;
+			border: 0;
+		}
+		img{
+			height: 10vh;
+		}
+  </style>
+  <body>
+    <a>
+      <img class='logoStartscreen' src='/resources/images/logo.svg'></img><br>
+    </a>
+    <input id="room" type="text" onkeypress="checkEnter(event)" value="" placeholder="your room name">
+    <button onclick = "start(location.href)">Start room</button>
+  </body>
+  <script>
+    var room = document.getElementById("room");
+    var stateObj = { foo: "bar" };
+    room.addEventListener("input", function(e) {
+      console.log(e.charCode);
+      history.replaceState(stateObj, "meet", "/"+room.value);
+    },true);
+    room.focus();
+    function start(target){
+      location.href;history.replaceState(stateObj, "meet", "/");
+      window.location = target;
+    }
+    function checkEnter(event){
+      var x = event.charCode || event.keyCode;
+      if (x == 13 ) {
+        start(location.href);
+      }
+    }
+  </script>
+</html>
