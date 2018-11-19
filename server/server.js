@@ -57,7 +57,7 @@ app.all('*', (req, res, next) =>
 app.use(dataporten.passport.initialize());
 app.use(dataporten.passport.session());
 
-app.get('/login', (req, res, next) => 
+app.get('/login', (req, res, next) =>
 {
 	dataporten.passport.authenticate('dataporten', {
 		state : base64.encode(JSON.stringify({
@@ -65,11 +65,16 @@ app.get('/login', (req, res, next) =>
 			peerName : req.query.peerName,
 			code     : utils.random(10)
 		}))
-		
+
 	})(req, res, next);
 });
 
 dataporten.setupLogout(app, '/logout');
+
+app.get('/', function (req, res) {
+   console.log(req.url);
+   res.sendFile(`${__dirname}/public/chooseRoom.html`);
+})
 
 app.get(
 	'/auth-callback',
