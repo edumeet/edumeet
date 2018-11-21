@@ -15,14 +15,14 @@ class Me extends React.Component
 		controlsVisible : false
 	};
 
-	handleMouseOver = () => 
+	handleMouseOver = () =>
 	{
 		this.setState({
 			controlsVisible : true
 		});
 	};
 
-	handleMouseOut = () => 
+	handleMouseOut = () =>
 	{
 		this.setState({
 			controlsVisible : false
@@ -108,13 +108,11 @@ class Me extends React.Component
 			>
 				<div className={classnames('view-container', 'webcam')}>
 					{connected ?
-						<div className={classnames('controls', {
-							visible : this.state.controlsVisible
-						})}
-						>
+						<div className={classnames('controls', 'visible')}>
 							<div
 								className={classnames('button', 'mic', micState, {
-									disabled : me.audioInProgress
+									disabled : me.audioInProgress,
+									visible  : micState == 'off' || this.state.controlsVisible
 								})}
 								onClick={() =>
 								{
@@ -124,7 +122,8 @@ class Me extends React.Component
 
 							<div
 								className={classnames('button', 'webcam', webcamState, {
-									disabled : me.webcamInProgress
+									disabled : me.webcamInProgress,
+									visible  : webcamState == 'off' || this.state.controlsVisible
 								})}
 								onClick={() =>
 								{
