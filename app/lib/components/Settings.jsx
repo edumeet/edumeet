@@ -5,6 +5,7 @@ import * as requestActions from '../redux/requestActions';
 import * as stateActions from '../redux/stateActions';
 import PropTypes from 'prop-types';
 import Dropdown from 'react-dropdown';
+import ReactTooltip from 'react-tooltip';
 
 const modes = [ {
 	value : 'democratic',
@@ -58,20 +59,34 @@ const Settings = ({
 					onChange={(device) => handleChangeAudioDevice(device.value)}
 					placeholder={audioDevicesText}
 				/>
-
-				<input
-					id='room-mode'
-					type='checkbox'
-					checked={room.advancedMode}
-					onChange={onToggleAdvancedMode}
+				<ReactTooltip
+					effect='solid'
 				/>
-				<label htmlFor='room-mode'>Advanced mode</label>
+				<div
+					data-tip='keyboard shortcut: &lsquo;a&lsquo;'
+					data-type='dark'
+					data-place='left'
+				>
+					<input
+						id='room-mode'
+						type='checkbox'
+						checked={room.advancedMode}
+						onChange={onToggleAdvancedMode}
+					/>
+					<label htmlFor='room-mode'>Advanced mode</label>
+				</div>
 
-				<Dropdown
-					options={modes}
-					value={findOption(modes, room.mode)}
-					onChange={(mode) => handleChangeMode(mode.value)}
-				/>
+				<div
+					data-tip='keyboard shortcut: type a digit'
+					data-type='dark'
+					data-place='left'
+				>
+					<Dropdown
+						options={modes}
+						value={findOption(modes, room.mode)}
+						onChange={(mode) => handleChangeMode(mode.value)}
+					/>
+				</div>
 			</div>
 		</div>
 	);

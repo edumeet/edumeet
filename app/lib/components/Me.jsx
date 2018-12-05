@@ -110,6 +110,10 @@ class Me extends React.Component
 					{connected ?
 						<div className={classnames('controls', 'visible')}>
 							<div
+								data-tip='keyboard shortcut: &lsquo;m&lsquo;'
+								data-type='dark'
+								data-place='bottom'
+								data-for='me'
 								className={classnames('button', 'mic', micState, {
 									disabled : me.audioInProgress,
 									visible  : micState == 'off' || this.state.controlsVisible
@@ -119,7 +123,10 @@ class Me extends React.Component
 									micState === 'on' ? onMuteMic() : onUnmuteMic();
 								}}
 							/>
-
+							<ReactTooltip
+								id='me'
+								effect='solid'
+							/>
 							<div
 								className={classnames('button', 'webcam', webcamState, {
 									disabled : me.webcamInProgress,
@@ -158,15 +165,6 @@ class Me extends React.Component
 							screenCodec={screenProducer ? screenProducer.codec : null}
 						/>
 					</div>
-					:null
-				}
-
-				{this._tooltip ?
-					<ReactTooltip
-						effect='solid'
-						delayShow={100}
-						delayHide={100}
-					/>
 					:null
 				}
 			</div>
