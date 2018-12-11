@@ -179,6 +179,13 @@ export default class RoomClient
 						this.notify('Changed layout to filmstrip view.');
 						break;
 					}
+
+					case 'm': // Toggle microphone
+					{
+						this.toggleMic();
+						this.notify('Muted/unmuted your microphone.');
+						break;
+					}
 				}
 			}
 		});
@@ -389,6 +396,16 @@ export default class RoomClient
 
 			this.notify('An error occured while getting server history.');
 		}
+	}
+
+	toggleMic()
+	{
+		logger.debug('toggleMic()');
+
+		if (this._micProducer.locallyPaused)
+			this.unmuteMic();
+		else
+			this.muteMic();
 	}
 
 	muteMic()
@@ -1349,7 +1366,7 @@ export default class RoomClient
 			if (this._produce)
 			{
 				if (this._room.canSend('audio'))
-					await this._setMicProducer();
+					this._setMicProducer();
 
 				// Add our webcam (unless the cookie says no).
 				if (this._room.canSend('video'))
@@ -1357,7 +1374,7 @@ export default class RoomClient
 					const devicesCookie = cookiesManager.getDevices();
 
 					if (!devicesCookie || devicesCookie.webcamEnabled)
-						await this.enableWebcam();
+						this.enableWebcam();
 				}
 			}
 

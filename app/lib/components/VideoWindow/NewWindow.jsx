@@ -165,7 +165,7 @@ class NewWindow extends React.PureComponent
 	{
 		if (this.window)
 		{
-			if (this.fullscreen.fullscreenEnabled)
+			if (this.fullscreen && this.fullscreen.fullscreenEnabled)
 			{
 				this.fullscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
 			}

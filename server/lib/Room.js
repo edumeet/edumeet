@@ -346,6 +346,25 @@ class Room extends EventEmitter
 			);
 		});
 
+		signalingPeer.socket.on('request-consumer-keyframe', (request, cb) =>
+		{
+			cb(null);
+
+			const { consumerId } = request;
+			const mediaPeer  = this._mediaRoom.getPeerByName(signalingPeer.peerName);
+			const consumer = mediaPeer.consumers
+				.find((_consumer) => _consumer.id === consumerId);
+			
+			if (!consumer)
+			{
+				logger.warn('consumer with id "%s" not found', consumerId);
+				
+				return;
+			}
+			
+			consumer.requestKeyFrame();
+		});
+
 		signalingPeer.socket.on('disconnect', () =>
 		{
 			logger.debug('Peer "close" event [peer:"%s"]', signalingPeer.peerName);

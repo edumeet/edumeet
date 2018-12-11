@@ -11,6 +11,8 @@ Try it online at https://letsmeet.no. You can add /roomname to the URL for speci
 * File sharing
 * Different video layouts
 
+There is also a SIP gateway that can be found [here](https://github.com/havfo/multiparty-meeting-sipgw). To test it, call: roomname@letsmeet.no.
+
 ## Installation
 
 * Clone the project:

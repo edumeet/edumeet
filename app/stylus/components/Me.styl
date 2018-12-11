@@ -33,7 +33,7 @@
 			&.visible {
 				opacity: 1;
 			}
-			
+
 			> .button {
 				flex: 0 0 auto;
 				margin: 0.2vmin;
@@ -43,13 +43,17 @@
 				background-repeat: no-repeat;
 				background-color: rgba(#000, 0.5);
 				cursor: pointer;
+				opacity: 0;
 				transition-property: opacity, background-color;
 				transition-duration: 0.15s;
+
+				&.visible {
+					opacity: 0.85;
+				}
 
 				+desktop() {
 					width: 24px;
 					height: 24px;
-					opacity: 0.85;
 
 					&:hover {
 						opacity: 1;
