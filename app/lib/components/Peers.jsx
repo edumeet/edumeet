@@ -2,9 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import debounce from 'lodash/debounce';
 import * as appPropTypes from './appPropTypes';
 import { Appear } from './transitions';
 import Peer from './Peer';
+import HiddenPeers from './HiddenPeers';
 import ResizeObserver from 'resize-observer-polyfill';
 
 const RATIO = 1.334;
@@ -23,9 +25,9 @@ class Peers extends React.Component
 		this.peersRef = React.createRef();
 	}
 
-	updateDimensions = () =>
+	updateDimensions = debounce(() =>
 	{
-		if (!this.peersRef.current) 
+		if (!this.peersRef.current)
 		{
 			return;
 		}
@@ -65,7 +67,7 @@ class Peers extends React.Component
 				peerHeight : 0.9 * y
 			});
 		}
-	};
+	}, 200);
 
 	componentDidMount()
 	{
@@ -90,7 +92,9 @@ class Peers extends React.Component
 		const {
 			advancedMode,
 			activeSpeakerName,
-			peers
+			peers,
+			spotlights,
+			spotlightsLength
 		} = this.props;
 
 		const style =
@@ -105,22 +109,35 @@ class Peers extends React.Component
 					peers.map((peer) =>
 					{
 						return (
-							<Appear key={peer.name} duration={1000}>
-								<div
-									className={classnames('peer-container', {
-										'active-speaker' : peer.name === activeSpeakerName
-									})}
-								>
-									<Peer
-										advancedMode={advancedMode}
-										name={peer.name}
-										style={style}
-									/>
-								</div>
-							</Appear>
+							(spotlights.find(function(spotlightsElement)
+							{ return spotlightsElement == peer.name; }))?
+								<Appear key={peer.name} duration={1000}>
+									<div
+										className={classnames('peer-container', {
+											'selected'       : this.props.selectedPeerName === peer.name,
+											'active-speaker' : peer.name === activeSpeakerName
+										})}
+									>
+										<div className='peer-content'>
+											<Peer
+												advancedMode={advancedMode}
+												name={peer.name}
+												style={style}
+											/>
+										</div>
+									</div>
+								</Appear>
+								:null
 						);
 					})
 				}
+				<div className='hidden-peer-container'>
+					{ (spotlightsLength<peers.length)?
+						<HiddenPeers
+							hiddenPeersCount={peers.length-spotlightsLength}
+						/>:null
+					}
+				</div>
 			</div>
 		);
 	}
@@ -131,20 +148,27 @@ Peers.propTypes =
 		advancedMode      : PropTypes.bool,
 		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
 		boxes             : PropTypes.number,
-		activeSpeakerName : PropTypes.string
+		activeSpeakerName : PropTypes.string,
+		selectedPeerName  : PropTypes.string,
+		spotlightsLength  : PropTypes.number,
+		spotlights        : PropTypes.array.isRequired
 	};
 
 const mapStateToProps = (state) =>
 {
 	const peers = Object.values(state.peers);
-
-	const boxes = peers.length + Object.values(state.consumers)
+	const spotlights = state.room.spotlights;
+	const spotlightsLength = spotlights ? state.room.spotlights.length : 0;
+	const boxes = spotlightsLength + Object.values(state.consumers)
 		.filter((consumer) => consumer.source === 'screen').length;
 
 	return {
 		peers,
 		boxes,
-		activeSpeakerName : state.room.activeSpeakerName
+		activeSpeakerName : state.room.activeSpeakerName,
+		selectedPeerName  : state.room.selectedPeerName,
+		spotlights,
+		spotlightsLength
 	};
 };
 

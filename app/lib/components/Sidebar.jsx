@@ -4,46 +4,52 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
-import fscreen from 'fscreen';
+import FullScreen from './FullScreen';
 
 class Sidebar extends Component
 {
-	state = {
-		fullscreen : false
-	};
+	constructor(props)
+	{
+		super(props);
+
+		this.fullscreen = new FullScreen(document);
+		this.state = {
+			fullscreen : false
+		};
+	}
 
 	handleToggleFullscreen = () =>
 	{
-		if (fscreen.fullscreenElement)
+		if (this.fullscreen.fullscreenElement)
 		{
-			fscreen.exitFullscreen();
+			this.fullscreen.exitFullscreen();
 		}
 		else
 		{
-			fscreen.requestFullscreen(document.documentElement);
+			this.fullscreen.requestFullscreen(document.documentElement);
 		}
 	};
 
 	handleFullscreenChange = () =>
 	{
 		this.setState({
-			fullscreen : fscreen.fullscreenElement !== null
+			fullscreen : this.fullscreen.fullscreenElement !== null
 		});
 	};
 
 	componentDidMount()
 	{
-		if (fscreen.fullscreenEnabled)
+		if (this.fullscreen.fullscreenEnabled)
 		{
-			fscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
+			this.fullscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
 		}
 	}
 
 	componentWillUnmount()
 	{
-		if (fscreen.fullscreenEnabled)
+		if (this.fullscreen.fullscreenEnabled)
 		{
-			fscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
+			this.fullscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
 		}
 	}
 
@@ -85,13 +91,14 @@ class Sidebar extends Component
 				})}
 				data-component='Sidebar'
 			>
-				{fscreen.fullscreenEnabled && (
+				{this.fullscreen.fullscreenEnabled && (
 					<div
 						className={classnames('button', 'fullscreen', {
 							on : this.state.fullscreen
 						})}
 						onClick={this.handleToggleFullscreen}
 						data-tip='Fullscreen'
+						data-place='right'
 						data-type='dark'
 					/>
 				)}
@@ -99,6 +106,7 @@ class Sidebar extends Component
 				<div
 					className={classnames('button', 'screen', screenState)}
 					data-tip={screenTip}
+					data-place='right'
 					data-type='dark'
 					onClick={() =>
 					{
@@ -131,6 +139,7 @@ class Sidebar extends Component
 					<div
 						className='button logout'
 						data-tip='Logout'
+						data-place='right'
 						data-type='dark'
 						onClick={onLogout}
 					>
@@ -140,6 +149,7 @@ class Sidebar extends Component
 					<div
 						className='button login off'
 						data-tip='Login'
+						data-place='right'
 						data-type='dark'
 						onClick={onLogin}
 					/>
@@ -150,6 +160,7 @@ class Sidebar extends Component
 						disabled : me.raiseHandInProgress
 					})}
 					data-tip='Raise hand'
+					data-place='right'
 					data-type='dark'
 					onClick={() => onToggleHand(!me.raiseHand)}
 				/>
@@ -157,6 +168,7 @@ class Sidebar extends Component
 				<div
 					className={classnames('button', 'leave-meeting')}
 					data-tip='Leave meeting'
+					data-place='right'
 					data-type='dark'
 					onClick={() => onLeaveMeeting()}
 				/>

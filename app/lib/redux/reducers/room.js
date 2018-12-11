@@ -6,9 +6,11 @@ const initialState =
 	showSettings       : false,
 	advancedMode       : false,
 	fullScreenConsumer : null, // ConsumerID
+	windowConsumer     : null, // ConsumerID
 	toolbarsVisible    : true,
 	mode               : 'democratic',
-	selectedPeerName   : null
+	selectedPeerName   : null,
+	spotlights         : []
 };
 
 const room = (state = initialState, action) =>
@@ -61,6 +63,17 @@ const room = (state = initialState, action) =>
 			return { ...state, fullScreenConsumer: currentConsumer ? null : consumerId };
 		}
 
+		case 'TOGGLE_WINDOW_CONSUMER':
+		{
+			const { consumerId } = action.payload;
+			const currentConsumer = state.windowConsumer;
+
+			if (currentConsumer === consumerId)
+				return { ...state, windowConsumer: null };
+			else
+				return { ...state, windowConsumer: consumerId };
+		}
+
 		case 'SET_TOOLBARS_VISIBLE':
 		{
 			const { toolbarsVisible } = action.payload;
@@ -81,6 +94,13 @@ const room = (state = initialState, action) =>
 				selectedPeerName : state.selectedPeerName === selectedPeerName ?
 					null : selectedPeerName
 			};
+		}
+
+		case 'SET_SPOTLIGHTS':
+		{
+			const { spotlights } = action.payload;
+
+			return { ...state, spotlights };
 		}
 
 		default:

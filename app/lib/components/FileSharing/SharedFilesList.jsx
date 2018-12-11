@@ -13,14 +13,21 @@ class SharedFilesList extends Component
 {
 	render()
 	{
+		const { sharing } = this.props;
+
 		return (
 			<div className='shared-files'>
-				{this.props.sharing.map((entry, i) => (
-					<FileEntry
-						data={entry}
-						key={i}
-					/>
-				))}
+				{ sharing.length > 0 ?
+					sharing.map((entry, i) => (
+						<FileEntry
+							data={entry}
+							key={i}
+						/>
+					))
+					:<div className='empty'>
+						<p>No one has shared files yet...</p>
+					</div>
+				}
 			</div>
 		);
 	}

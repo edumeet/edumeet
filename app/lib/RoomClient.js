@@ -1,9 +1,10 @@
-import protooClient from 'protoo-client';
+import io from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
 import hark from 'hark';
 import ScreenShare from './ScreenShare';
-import { getProtooUrl } from './urlFactory';
+import Spotlights from './Spotlights';
+import { getSignalingUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as requestActions from './redux/requestActions';
 import * as stateActions from './redux/stateActions';
@@ -15,11 +16,12 @@ import {
 
 const logger = new Logger('RoomClient');
 
-const ROOM_OPTIONS =
+let ROOM_OPTIONS =
 {
 	requestTimeout   : requestTimeout,
 	transportOptions : transportOptions,
-	turnServers      : turnServers
+	turnServers      : turnServers,
+	maxSpotlights    : 4
 };
 
 const VIDEO_CONSTRAINS =
@@ -37,8 +39,7 @@ export default class RoomClient
 			'constructor() [roomId:"%s", peerName:"%s", displayName:"%s", device:%s]',
 			roomId, peerName, displayName, device.flag);
 
-		const protooUrl = getProtooUrl(peerName, roomId);
-		const protooTransport = new protooClient.WebSocketTransport(protooUrl);
+		const signalingUrl = getSignalingUrl(peerName, roomId);
 
 		// window element to external login site
 		this._loginWindow;
@@ -64,12 +65,24 @@ export default class RoomClient
 		// My peer name.
 		this._peerName = peerName;
 
-		// protoo-client Peer instance.
-		this._protoo = new protooClient.Peer(protooTransport);
+		// Alert sound
+		this._soundAlert = new Audio('/resources/sounds/notify.mp3');
+
+		// Socket.io peer connection
+		this._signalingSocket = io(signalingUrl);
+
+		if (this._device.flag === 'firefox')
+			ROOM_OPTIONS = Object.assign({ iceTransportPolicy: 'relay' }, ROOM_OPTIONS);
 
 		// mediasoup-client Room instance.
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
 		this._room.roomId = roomId;
+
+		// Max spotlights
+		this._maxSpotlights = ROOM_OPTIONS.maxSpotlights;
+
+		// Manager of spotlight
+		this._spotlights = new Spotlights(this._maxSpotlights, this._room);
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -105,6 +118,8 @@ export default class RoomClient
 
 		this._screenSharingProducer = null;
 
+		this._startKeyListener();
+
 		this._join({ displayName, device });
 	}
 
@@ -120,11 +135,60 @@ export default class RoomClient
 		// Leave the mediasoup Room.
 		this._room.leave();
 
-		// Close protoo Peer (wait a bit so mediasoup-client can send
+		// Close signaling Peer (wait a bit so mediasoup-client can send
 		// the 'leaveRoom' notification).
-		setTimeout(() => this._protoo.close(), 250);
+		setTimeout(() => this._signalingSocket.close(), 250);
 
 		this._dispatch(stateActions.setRoomState('closed'));
+	}
+
+	_startKeyListener()
+	{
+		// Add keypress event listner on document
+		document.addEventListener('keypress', (event) =>
+		{
+			const key = String.fromCharCode(event.which);
+
+			const source = event.target;
+
+			const exclude = [ 'input', 'textarea' ];
+
+			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
+			{
+				logger.debug('keyPress() [key:"%s"]', key);
+
+				switch (key)
+				{
+					case 'a': // Activate advanced mode
+					{
+						this._dispatch(stateActions.toggleAdvancedMode());
+						this.notify('Toggled advanced mode.');
+						break;
+					}
+
+					case '1': // Set democratic view
+					{
+						this._dispatch(stateActions.setDisplayMode('democratic'));
+						this.notify('Changed layout to democratic view.');
+						break;
+					}
+
+					case '2': // Set filmstrip view
+					{
+						this._dispatch(stateActions.setDisplayMode('filmstrip'));
+						this.notify('Changed layout to filmstrip view.');
+						break;
+					}
+
+					case 'm': // Toggle microphone
+					{
+						this.toggleMic();
+						this.notify('Muted/unmuted your microphone.');
+						break;
+					}
+				}
+			}
+		});
 	}
 
 	login()
@@ -144,114 +208,204 @@ export default class RoomClient
 		this._loginWindow.close();
 	}
 
-	changeDisplayName(displayName)
+	_soundNotification()
+	{
+		const alertPromise = this._soundAlert.play();
+
+		if (alertPromise !== undefined)
+		{
+			alertPromise
+				.then()
+				.catch((error) =>
+				{
+					logger.error('_soundAlert.play() | failed: %o', error);
+				});
+		}
+	}
+
+	notify(text)
+	{
+		this._dispatch(requestActions.notify({ text: text }));
+	}
+
+	timeoutCallback(callback)
+	{
+		let called = false;
+
+		const interval = setTimeout(
+			() =>
+			{
+				if (called)
+					return;
+				called = true;
+				callback(new Error('Request timeout.'));
+			},
+			ROOM_OPTIONS.requestTimeout
+		);
+
+		return (...args) =>
+		{
+			if (called)
+				return;
+			called = true;
+			clearTimeout(interval);
+
+			callback(...args);
+		};
+	}
+
+	sendRequest(method, data)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			if (!this._signalingSocket)
+			{
+				reject('No socket connection.');
+			}
+			else
+			{
+				this._signalingSocket.emit(method, data, this.timeoutCallback((err, response) =>
+				{
+					if (err)
+					{
+						reject(err);
+					}
+					else
+					{
+						resolve(response);
+					}
+				}));
+			}
+		});
+	}
+
+	async changeDisplayName(displayName)
 	{
 		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
 
 		// Store in cookie.
 		cookiesManager.setUser({ displayName });
 
-		return this._protoo.send('change-display-name', { displayName })
-			.then(() =>
-			{
-				this._dispatch(
-					stateActions.setDisplayName(displayName));
+		try
+		{
+			await this.sendRequest('change-display-name', { displayName });
 
-				this._dispatch(requestActions.notify(
-					{
-						text : 'Display name changed'
-					}));
-			})
-			.catch((error) =>
-			{
-				logger.error('changeDisplayName() | failed: %o', error);
+			this._dispatch(stateActions.setDisplayName(displayName));
 
-				this._dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : `Could not change display name: ${error}`
-					}));
+			this.notify(`Your display name changed to ${displayName}.`);
+		}
+		catch (error)
+		{
+			logger.error('changeDisplayName() | failed: %o', error);
 
-				// We need to refresh the component for it to render the previous
-				// displayName again.
-				this._dispatch(stateActions.setDisplayName());
-			});
+			this.notify('An error occured while changing your display name.');
+
+			// We need to refresh the component for it to render the previous
+			// displayName again.
+			this._dispatch(stateActions.setDisplayName());
+		}
 	}
 
-	changeProfilePicture(picture)
+	async changeProfilePicture(picture)
 	{
 		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
 
-		this._protoo.send('change-profile-picture', { picture }).catch((error) =>
+		try
+		{
+			await this.sendRequest('change-profile-picture', { picture });
+		}
+		catch (error)
 		{
 			logger.error('shareProfilePicure() | failed: %o', error);
-		});
+		}
 	}
 
-	sendChatMessage(chatMessage)
+	async sendChatMessage(chatMessage)
 	{
 		logger.debug('sendChatMessage() [chatMessage:"%s"]', chatMessage);
 
-		return this._protoo.send('chat-message', { chatMessage })
-			.catch((error) =>
-			{
-				logger.error('sendChatMessage() | failed: %o', error);
+		try
+		{
+			await this.sendRequest('chat-message', { chatMessage });
+		}
+		catch (error)
+		{
+			logger.error('sendChatMessage() | failed: %o', error);
 
-				this._dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : `Could not send chat: ${error}`
-					}));
-			});
+			this.notify('An error occured while sending chat message.');
+		}
 	}
 
-	sendFile(file)
+	async sendFile(file)
 	{
 		logger.debug('sendFile() [file: %o]', file);
 
-		return this._protoo.send('send-file', { file })
-			.catch((error) =>
-			{
-				logger.error('sendFile() | failed: %o', error);
+		try
+		{
+			await this.sendRequest('send-file', { file });
+		}
+		catch (error)
+		{
+			logger.error('sendFile() | failed: %o', error);
 
-				this._dispatch(requestActions.notify({
-					typ  : 'error',
-					text : 'An error occurred while sharing a file'
-				}));
-			});
+			this.notify('An error occurred while sharing file.');
+		}
 	}
 
-	getChatHistory()
+	async getServerHistory()
 	{
-		logger.debug('getChatHistory()');
+		logger.debug('getServerHistory()');
 
-		return this._protoo.send('chat-history', {})
-			.catch((error) =>
+		try
+		{
+			const {
+				chatHistory,
+				fileHistory,
+				lastN
+			} = await this.sendRequest('server-history');
+
+			if (chatHistory.length > 0)
 			{
-				logger.error('getChatHistory() | failed: %o', error);
+				logger.debug('Got chat history');
+				this._dispatch(
+					stateActions.addChatHistory(chatHistory));
+			}
 
-				this._dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : `Could not get chat history: ${error}`
-					}));
-			});
+			if (fileHistory.length > 0)
+			{
+				logger.debug('Got files history');
+
+				this._dispatch(stateActions.addFileHistory(fileHistory));
+			}
+
+			if (lastN.length > 0)
+			{
+				logger.debug('Got lastN');
+
+				// Remove our self from list
+				const index = lastN.indexOf(this._peerName);
+
+				lastN.splice(index, 1);
+
+				this._spotlights.addSpeakerList(lastN);
+			}
+		}
+		catch (error)
+		{
+			logger.error('getServerHistory() | failed: %o', error);
+
+			this.notify('An error occured while getting server history.');
+		}
 	}
 
-	getFileHistory()
+	toggleMic()
 	{
-		logger.debug('getFileHistory()');
+		logger.debug('toggleMic()');
 
-		return this._protoo.send('file-history', {})
-			.catch((error) =>
-			{
-				logger.error('getFileHistory() | failed: %o', error);
-
-				this._dispatch(requestActions.notify({
-					type : 'error',
-					text : 'Could not get file history'
-				}));
-			});
+		if (this._micProducer.locallyPaused)
+			this.unmuteMic();
+		else
+			this.muteMic();
 	}
 
 	muteMic()
@@ -266,6 +420,43 @@ export default class RoomClient
 		logger.debug('unmuteMic()');
 
 		this._micProducer.resume();
+	}
+
+	// Updated consumers based on spotlights
+	async updateSpotlights(spotlights)
+	{
+		logger.debug('updateSpotlights()');
+
+		try
+		{
+			for (const peer of this._room.peers)
+			{
+				if (spotlights.indexOf(peer.name) > -1) // Resume video for speaker
+				{
+					for (const consumer of peer.consumers)
+					{
+						if (consumer.kind !== 'video' || !consumer.supported)
+							continue;
+
+						await consumer.resume();
+					}
+				}
+				else // Pause video for everybody else
+				{
+					for (const consumer of peer.consumers)
+					{
+						if (consumer.kind !== 'video')
+							continue;
+
+						await consumer.pause('not-speaker');
+					}
+				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('updateSpotlights() failed: %o', error);
+		}
 	}
 
 	installExtension()
@@ -315,253 +506,221 @@ export default class RoomClient
 			});
 	}
 
-	enableScreenSharing()
+	async enableScreenSharing()
 	{
 		logger.debug('enableScreenSharing()');
 
-		this._dispatch(
-			stateActions.setScreenShareInProgress(true));
+		this._dispatch(stateActions.setScreenShareInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				return this._setScreenShareProducer();
-			})
-			.then(() =>
-			{
-				this._dispatch(
-					stateActions.setScreenShareInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('enableScreenSharing() | failed: %o', error);
+		try
+		{
+			await this._setScreenShareProducer();
+		}
+		catch (error)
+		{
+			logger.error('enableScreenSharing() | failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setScreenShareInProgress(false));
-			});
+		this._dispatch(stateActions.setScreenShareInProgress(false));
 	}
 
-	enableWebcam()
+	async enableWebcam()
 	{
 		logger.debug('enableWebcam()');
 
 		// Store in cookie.
 		cookiesManager.setDevices({ webcamEnabled: true });
 
-		this._dispatch(
-			stateActions.setWebcamInProgress(true));
+		this._dispatch(stateActions.setWebcamInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				return this._updateWebcams();
-			})
-			.then(() =>
-			{
-				return this._setWebcamProducer();
-			})
-			.then(() =>
-			{
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('enableWebcam() | failed: %o', error);
+		try
+		{
+			await this._setWebcamProducer();
+		}
+		catch (error)
+		{
+			logger.error('enableWebcam() | failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			});
+		this._dispatch(stateActions.setWebcamInProgress(false));
 	}
 
-	disableScreenSharing()
+	async disableScreenSharing()
 	{
 		logger.debug('disableScreenSharing()');
 
-		this._dispatch(
-			stateActions.setScreenShareInProgress(true));
+		this._dispatch(stateActions.setScreenShareInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				this._screenSharingProducer.close();
+		try
+		{
+			await this._screenSharingProducer.close();
+		}
+		catch (error)
+		{
+			logger.error('disableScreenSharing() | failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setScreenShareInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('disableScreenSharing() | failed: %o', error);
-
-				this._dispatch(
-					stateActions.setScreenShareInProgress(false));
-			});
+		this._dispatch(stateActions.setScreenShareInProgress(false));
 	}
 
-	disableWebcam()
+	async disableWebcam()
 	{
 		logger.debug('disableWebcam()');
 
 		// Store in cookie.
 		cookiesManager.setDevices({ webcamEnabled: false });
 
-		this._dispatch(
-			stateActions.setWebcamInProgress(true));
+		this._dispatch(stateActions.setWebcamInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				this._webcamProducer.close();
+		try
+		{
+			this._webcamProducer.close();
+		}
+		catch (error)
+		{
+			logger.error('disableWebcam() | failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('disableWebcam() | failed: %o', error);
-
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			});
+		this._dispatch(stateActions.setWebcamInProgress(false));
 	}
 
-	changeAudioDevice(deviceId)
+	async changeAudioDevice(deviceId)
 	{
 		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
 
 		this._dispatch(
 			stateActions.setAudioInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				this._audioDevice.device = this._audioDevices.get(deviceId);
+		try
+		{
+			this._audioDevice.device = this._audioDevices.get(deviceId);
 
-				logger.debug(
-					'changeAudioDevice() | new selected webcam [device:%o]',
-					this._audioDevice.device);
-			})
-			.then(() =>
-			{
-				const { device } = this._audioDevice;
+			logger.debug(
+				'changeAudioDevice() | new selected webcam [device:%o]',
+				this._audioDevice.device);
 
-				if (!device)
-					throw new Error('no audio devices');
+			const { device } = this._audioDevice;
 
-				logger.debug('changeAudioDevice() | calling getUserMedia()');
+			if (!device)
+				throw new Error('no audio devices');
 
-				return navigator.mediaDevices.getUserMedia(
+			logger.debug('changeAudioDevice() | calling getUserMedia()');
+
+			const stream = await navigator.mediaDevices.getUserMedia(
+				{
+					audio :
 					{
-						audio :
-						{
-							deviceId : { exact: device.deviceId }
-						}
-					});
-			})
-			.then((stream) =>
-			{
-				const track = stream.getAudioTracks()[0];
+						deviceId : { exact: device.deviceId }
+					}
+				});
 
-				return this._micProducer.replaceTrack(track)
-					.then((newTrack) =>
-					{
-						track.stop();
+			const track = stream.getAudioTracks()[0];
 
-						return newTrack;
-					});
-			})
-			.then((newTrack) =>
-			{
-				this._dispatch(
-					stateActions.setProducerTrack(this._micProducer.id, newTrack));
+			const newTrack = await this._micProducer.replaceTrack(track);
 
-				return this._updateAudioDevices();
-			})
-			.then(() =>
-			{
-				this._dispatch(
-					stateActions.setAudioInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('changeAudioDevice() failed: %o', error);
+			const harkStream = new MediaStream;
 
-				this._dispatch(
-					stateActions.setAudioInProgress(false));
+			harkStream.addTrack(newTrack);
+			if (!harkStream.getAudioTracks()[0])
+				throw new Error('changeAudioDevice(): given stream has no audio track');
+			if (this._micProducer.hark != null) this._micProducer.hark.stop();
+			this._micProducer.hark = hark(harkStream, { play: false });
+
+			// eslint-disable-next-line no-unused-vars
+			this._micProducer.hark.on('volume_change', (dBs, threshold) =>
+			{
+				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+				//   Math.pow(10, dBs / 20)
+				// However it does not produce a visually useful output, so let exagerate
+				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+				// minimize component renderings.
+				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+				if (volume === 1)
+					volume = 0;
+
+				if (volume !== this._micProducer.volume)
+				{
+					this._micProducer.volume = volume;
+					this._dispatch(stateActions.setProducerVolume(this._micProducer.id, volume));
+				}
 			});
+
+			track.stop();
+
+			this._dispatch(
+				stateActions.setProducerTrack(this._micProducer.id, newTrack));
+
+			cookiesManager.setAudioDevice({ audioDeviceId: deviceId });
+
+			await this._updateAudioDevices();
+		}
+		catch (error)
+		{
+			logger.error('changeAudioDevice() failed: %o', error);
+		}
+
+		this._dispatch(
+			stateActions.setAudioInProgress(false));
 	}
 
-	changeWebcam(deviceId)
+	async changeWebcam(deviceId)
 	{
 		logger.debug('changeWebcam() [deviceId: %s]', deviceId);
 
 		this._dispatch(
 			stateActions.setWebcamInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				this._webcam.device = this._webcams.get(deviceId);
+		try
+		{
+			this._webcam.device = this._webcams.get(deviceId);
 
-				logger.debug(
-					'changeWebcam() | new selected webcam [device:%o]',
-					this._webcam.device);
+			logger.debug(
+				'changeWebcam() | new selected webcam [device:%o]',
+				this._webcam.device);
 
-				// Reset video resolution to HD.
-				this._webcam.resolution = 'hd';
-			})
-			.then(() =>
-			{
-				const { device } = this._webcam;
+			// Reset video resolution to HD.
+			this._webcam.resolution = 'hd';
 
-				if (!device)
-					throw new Error('no webcam devices');
+			const { device } = this._webcam;
 
-				logger.debug('changeWebcam() | calling getUserMedia()');
+			if (!device)
+				throw new Error('no webcam devices');
 
-				return navigator.mediaDevices.getUserMedia(
+			logger.debug('changeWebcam() | calling getUserMedia()');
+
+			const stream = await navigator.mediaDevices.getUserMedia(
+				{
+					video :
 					{
-						video :
-						{
-							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS
-						}
-					});
-			})
-			.then((stream) =>
-			{
-				const track = stream.getVideoTracks()[0];
+						deviceId : { exact: device.deviceId },
+						...VIDEO_CONSTRAINS
+					}
+				});
 
-				return this._webcamProducer.replaceTrack(track)
-					.then((newTrack) =>
-					{
-						track.stop();
+			const track = stream.getVideoTracks()[0];
 
-						return newTrack;
-					});
-			})
-			.then((newTrack) =>
-			{
-				this._dispatch(
-					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+			const newTrack = await this._webcamProducer.replaceTrack(track);
 
-				return this._updateWebcams();
-			})
-			.then(() =>
-			{
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('changeWebcam() failed: %o', error);
+			track.stop();
 
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			});
+			this._dispatch(
+				stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+
+			cookiesManager.setVideoDevice({ videoDeviceId: deviceId });
+
+			await this._updateWebcams();
+		}
+		catch (error)
+		{
+			logger.error('changeWebcam() failed: %o', error);
+		}
+
+		this._dispatch(
+			stateActions.setWebcamInProgress(false));
 	}
 
-	changeWebcamResolution()
+	async changeWebcamResolution()
 	{
 		logger.debug('changeWebcamResolution()');
 
@@ -571,649 +730,553 @@ export default class RoomClient
 		this._dispatch(
 			stateActions.setWebcamInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				oldResolution = this._webcam.resolution;
+		try
+		{
+			oldResolution = this._webcam.resolution;
 
-				switch (oldResolution)
+			switch (oldResolution)
+			{
+				case 'qvga':
+					newResolution = 'vga';
+					break;
+				case 'vga':
+					newResolution = 'hd';
+					break;
+				case 'hd':
+					newResolution = 'qvga';
+					break;
+			}
+
+			this._webcam.resolution = newResolution;
+
+			const { device } = this._webcam;
+
+			logger.debug('changeWebcamResolution() | calling getUserMedia()');
+
+			const stream = await navigator.mediaDevices.getUserMedia(
 				{
-					case 'qvga':
-						newResolution = 'vga';
-						break;
-					case 'vga':
-						newResolution = 'hd';
-						break;
-					case 'hd':
-						newResolution = 'qvga';
-						break;
-				}
-
-				this._webcam.resolution = newResolution;
-			})
-			.then(() =>
-			{
-				const { device } = this._webcam;
-
-				logger.debug('changeWebcamResolution() | calling getUserMedia()');
-
-				return navigator.mediaDevices.getUserMedia(
+					video :
 					{
-						video :
-						{
-							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS
-						}
-					});
-			})
-			.then((stream) =>
-			{
-				const track = stream.getVideoTracks()[0];
+						deviceId : { exact: device.deviceId },
+						...VIDEO_CONSTRAINS
+					}
+				});
 
-				return this._webcamProducer.replaceTrack(track)
-					.then((newTrack) =>
-					{
-						track.stop();
+			const track = stream.getVideoTracks()[0];
 
-						return newTrack;
-					});
-			})
-			.then((newTrack) =>
-			{
-				this._dispatch(
-					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+			const newTrack = await this._webcamProducer.replaceTrack(track);
 
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('changeWebcamResolution() failed: %o', error);
+			track.stop();
 
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
+			this._dispatch(
+				stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+		}
+		catch (error)
+		{
+			logger.error('changeWebcamResolution() failed: %o', error);
 
-				this._webcam.resolution = oldResolution;
-			});
+			this._webcam.resolution = oldResolution;
+		}
+
+		this._dispatch(
+			stateActions.setWebcamInProgress(false));
 	}
 
-	mutePeerAudio(peerName)
+	setSelectedPeer(peerName)
+	{
+		logger.debug('setSelectedPeer() [peerName:"%s"]', peerName);
+
+		this._spotlights.setPeerSpotlight(peerName);
+
+		this._dispatch(
+			stateActions.setSelectedPeer(peerName));
+	}
+
+	async mutePeerAudio(peerName)
 	{
 		logger.debug('mutePeerAudio() [peerName:"%s"]', peerName);
 
 		this._dispatch(
 			stateActions.setPeerAudioInProgress(peerName, true));
 
-		return Promise.resolve()
-			.then(() =>
+		try
+		{
+			for (const peer of this._room.peers)
 			{
-				for (const peer of this._room.peers)
+				if (peer.name === peerName)
 				{
-					if (peer.name === peerName)
+					for (const consumer of peer.consumers)
 					{
-						for (const consumer of peer.consumers)
-						{
-							if (consumer.appData.source !== 'mic')
-								continue;
+						if (consumer.appData.source !== 'mic')
+							continue;
 
-							consumer.pause('mute-audio');
-						}
+						await consumer.pause('mute-audio');
 					}
 				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('mutePeerAudio() failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setPeerAudioInProgress(peerName, false));
-			})
-			.catch((error) =>
-			{
-				logger.error('mutePeerAudio() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setPeerAudioInProgress(peerName, false));
-			});
+		this._dispatch(
+			stateActions.setPeerAudioInProgress(peerName, false));
 	}
 
-	unmutePeerAudio(peerName)
+	async unmutePeerAudio(peerName)
 	{
 		logger.debug('unmutePeerAudio() [peerName:"%s"]', peerName);
 
 		this._dispatch(
 			stateActions.setPeerAudioInProgress(peerName, true));
 
-		return Promise.resolve()
-			.then(() =>
+		try
+		{
+			for (const peer of this._room.peers)
 			{
-				for (const peer of this._room.peers)
+				if (peer.name === peerName)
 				{
-					if (peer.name === peerName)
+					for (const consumer of peer.consumers)
 					{
-						for (const consumer of peer.consumers)
-						{
-							if (consumer.appData.source !== 'mic' || !consumer.supported)
-								continue;
+						if (consumer.appData.source !== 'mic' || !consumer.supported)
+							continue;
 
-							consumer.resume();
-						}
+						await consumer.resume();
 					}
 				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('unmutePeerAudio() failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setPeerAudioInProgress(peerName, false));
-			})
-			.catch((error) =>
-			{
-				logger.error('unmutePeerAudio() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setPeerAudioInProgress(peerName, false));
-			});
+		this._dispatch(
+			stateActions.setPeerAudioInProgress(peerName, false));
 	}
 
-	pausePeerVideo(peerName)
+	async pausePeerVideo(peerName)
 	{
 		logger.debug('pausePeerVideo() [peerName:"%s"]', peerName);
 
 		this._dispatch(
 			stateActions.setPeerVideoInProgress(peerName, true));
 
-		return Promise.resolve()
-			.then(() =>
+		try
+		{
+			for (const peer of this._room.peers)
 			{
-				for (const peer of this._room.peers)
+				if (peer.name === peerName)
 				{
-					if (peer.name === peerName)
+					for (const consumer of peer.consumers)
 					{
-						for (const consumer of peer.consumers)
-						{
-							if (consumer.appData.source !== 'webcam')
-								continue;
+						if (consumer.appData.source !== 'webcam')
+							continue;
 
-							consumer.pause('pause-video');
-						}
+						await consumer.pause('pause-video');
 					}
 				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('pausePeerVideo() failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setPeerVideoInProgress(peerName, false));
-			})
-			.catch((error) =>
-			{
-				logger.error('pausePeerVideo() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setPeerVideoInProgress(peerName, false));
-			});
+		this._dispatch(
+			stateActions.setPeerVideoInProgress(peerName, false));
 	}
 
-	resumePeerVideo(peerName)
+	async resumePeerVideo(peerName)
 	{
 		logger.debug('resumePeerVideo() [peerName:"%s"]', peerName);
 
 		this._dispatch(
 			stateActions.setPeerVideoInProgress(peerName, true));
 
-		return Promise.resolve()
-			.then(() =>
+		try
+		{
+			for (const peer of this._room.peers)
 			{
-				for (const peer of this._room.peers)
+				if (peer.name === peerName)
 				{
-					if (peer.name === peerName)
+					for (const consumer of peer.consumers)
 					{
-						for (const consumer of peer.consumers)
-						{
-							if (consumer.appData.source !== 'webcam' || !consumer.supported)
-								continue;
+						if (consumer.appData.source !== 'webcam' || !consumer.supported)
+							continue;
 
-							consumer.resume();
-						}
+						await consumer.resume();
 					}
 				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('resumePeerVideo() failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setPeerVideoInProgress(peerName, false));
-			})
-			.catch((error) =>
-			{
-				logger.error('resumePeerVideo() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setPeerVideoInProgress(peerName, false));
-			});
+		this._dispatch(
+			stateActions.setPeerVideoInProgress(peerName, false));
 	}
 
-	pausePeerScreen(peerName)
+	async pausePeerScreen(peerName)
 	{
 		logger.debug('pausePeerScreen() [peerName:"%s"]', peerName);
 
 		this._dispatch(
 			stateActions.setPeerScreenInProgress(peerName, true));
 
-		return Promise.resolve()
-			.then(() =>
+		try
+		{
+			for (const peer of this._room.peers)
 			{
-				for (const peer of this._room.peers)
+				if (peer.name === peerName)
 				{
-					if (peer.name === peerName)
+					for (const consumer of peer.consumers)
 					{
-						for (const consumer of peer.consumers)
-						{
-							if (consumer.appData.source !== 'screen')
-								continue;
+						if (consumer.appData.source !== 'screen')
+							continue;
 
-							consumer.pause('pause-screen');
-						}
+						await consumer.pause('pause-screen');
 					}
 				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('pausePeerScreen() failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setPeerScreenInProgress(peerName, false));
-			})
-			.catch((error) =>
-			{
-				logger.error('pausePeerScreen() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setPeerScreenInProgress(peerName, false));
-			});
+		this._dispatch(
+			stateActions.setPeerScreenInProgress(peerName, false));
 	}
 
-	resumePeerScreen(peerName)
+	async resumePeerScreen(peerName)
 	{
 		logger.debug('resumePeerScreen() [peerName:"%s"]', peerName);
 
 		this._dispatch(
 			stateActions.setPeerScreenInProgress(peerName, true));
 
-		return Promise.resolve()
-			.then(() =>
+		try
+		{
+			for (const peer of this._room.peers)
 			{
-				for (const peer of this._room.peers)
+				if (peer.name === peerName)
 				{
-					if (peer.name === peerName)
+					for (const consumer of peer.consumers)
 					{
-						for (const consumer of peer.consumers)
-						{
-							if (consumer.appData.source !== 'screen' || !consumer.supported)
-								continue;
+						if (consumer.appData.source !== 'screen' || !consumer.supported)
+							continue;
 
-							consumer.resume();
-						}
+						await consumer.resume();
 					}
 				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('resumePeerScreen() failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setPeerScreenInProgress(peerName, false));
-			})
-			.catch((error) =>
-			{
-				logger.error('resumePeerScreen() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setPeerScreenInProgress(peerName, false));
-			});
+		this._dispatch(
+			stateActions.setPeerScreenInProgress(peerName, false));
 	}
 
-	enableAudioOnly()
+	async enableAudioOnly()
 	{
 		logger.debug('enableAudioOnly()');
 
 		this._dispatch(
 			stateActions.setAudioOnlyInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				if (this._webcamProducer)
-					this._webcamProducer.close();
+		try
+		{
+			if (this._webcamProducer)
+				await this._webcamProducer.close();
 
-				for (const peer of this._room.peers)
+			for (const peer of this._room.peers)
+			{
+				for (const consumer of peer.consumers)
 				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.kind !== 'video')
-							continue;
+					if (consumer.kind !== 'video')
+						continue;
 
-						consumer.pause('audio-only-mode');
-					}
+					await consumer.pause('audio-only-mode');
 				}
+			}
 
-				this._dispatch(
-					stateActions.setAudioOnlyState(true));
+			this._dispatch(
+				stateActions.setAudioOnlyState(true));
+		}
+		catch (error)
+		{
+			logger.error('enableAudioOnly() failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setAudioOnlyInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('enableAudioOnly() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setAudioOnlyInProgress(false));
-			});
+		this._dispatch(
+			stateActions.setAudioOnlyInProgress(false));
 	}
 
-	disableAudioOnly()
+	async disableAudioOnly()
 	{
 		logger.debug('disableAudioOnly()');
 
 		this._dispatch(
 			stateActions.setAudioOnlyInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
+		try
+		{
+			if (!this._webcamProducer && this._room.canSend('video'))
+				await this.enableWebcam();
+
+			for (const peer of this._room.peers)
 			{
-				if (!this._webcamProducer && this._room.canSend('video'))
-					return this.enableWebcam();
-			})
-			.then(() =>
-			{
-				for (const peer of this._room.peers)
+				for (const consumer of peer.consumers)
 				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.kind !== 'video' || !consumer.supported)
-							continue;
+					if (consumer.kind !== 'video' || !consumer.supported)
+						continue;
 
-						consumer.resume();
-					}
+					await consumer.resume();
 				}
+			}
 
-				this._dispatch(
-					stateActions.setAudioOnlyState(false));
+			this._dispatch(
+				stateActions.setAudioOnlyState(false));
+		}
+		catch (error)
+		{
+			logger.error('disableAudioOnly() failed: %o', error);
+		}
 
-				this._dispatch(
-					stateActions.setAudioOnlyInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('disableAudioOnly() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setAudioOnlyInProgress(false));
-			});
+		this._dispatch(
+			stateActions.setAudioOnlyInProgress(false));
 	}
 
-	sendRaiseHandState(state)
+	async sendRaiseHandState(state)
 	{
 		logger.debug('sendRaiseHandState: ', state);
 
 		this._dispatch(
 			stateActions.setMyRaiseHandStateInProgress(true));
 
-		return this._protoo.send('raisehand-message', { raiseHandState: state })
-			.then(() =>
-			{
-				this._dispatch(
-					stateActions.setMyRaiseHandState(state));
-				this._dispatch(
-					stateActions.setMyRaiseHandStateInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('sendRaiseHandState() | failed: %o', error);
+		try
+		{
+			await this.sendRequest('raisehand-message', { raiseHandState: state });
 
-				this._dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : `Could not change raise hand state: ${error}`
-					}));
+			this._dispatch(
+				stateActions.setMyRaiseHandState(state));
+		}
+		catch (error)
+		{
+			logger.error('sendRaiseHandState() | failed: %o', error);
 
-				// We need to refresh the component for it to render changed state
-				this._dispatch(stateActions.setMyRaiseHandState(!state));
-				this._dispatch(
-					stateActions.setMyRaiseHandStateInProgress(false));
-			});
+			this.notify(`An error occured while ${state ? 'raising' : 'lowering'} hand.`);
+
+			// We need to refresh the component for it to render changed state
+			this._dispatch(stateActions.setMyRaiseHandState(!state));
+		}
+
+		this._dispatch(
+			stateActions.setMyRaiseHandStateInProgress(false));
 	}
 
-	restartIce()
+	async restartIce()
 	{
 		logger.debug('restartIce()');
 
 		this._dispatch(
 			stateActions.setRestartIceInProgress(true));
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				this._room.restartIce();
+		try
+		{
+			await this._room.restartIce();
+		}
+		catch (error)
+		{
+			logger.error('restartIce() failed: %o', error);
+		}
 
-				// Make it artificially longer.
-				setTimeout(() =>
-				{
-					this._dispatch(
-						stateActions.setRestartIceInProgress(false));
-				}, 500);
-			})
-			.catch((error) =>
-			{
-				logger.error('restartIce() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setRestartIceInProgress(false));
-			});
+		// Make it artificially longer.
+		setTimeout(() =>
+		{
+			this._dispatch(
+				stateActions.setRestartIceInProgress(false));
+		}, 500);
 	}
 
 	_join({ displayName, device })
 	{
 		this._dispatch(stateActions.setRoomState('connecting'));
 
-		this._protoo.on('open', () =>
+		this._signalingSocket.on('connect', () =>
 		{
-			logger.debug('protoo Peer "open" event');
+			logger.debug('signaling Peer "connect" event');
 
 			this._joinRoom({ displayName, device });
 		});
 
-		this._protoo.on('disconnected', () =>
+		this._signalingSocket.on('disconnect', () =>
 		{
-			logger.warn('protoo Peer "disconnected" event');
+			logger.warn('signaling Peer "disconnect" event');
 
-			this._dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : 'WebSocket disconnected'
-				}));
+			this.notify('You are disconnected.');
 
 			// Leave Room.
-			try { this._room.remoteClose({ cause: 'protoo disconnected' }); }
+			try { this._room.remoteClose({ cause: 'signaling disconnected' }); }
 			catch (error) {}
 
 			this._dispatch(stateActions.setRoomState('connecting'));
 		});
 
-		this._protoo.on('close', () =>
+		this._signalingSocket.on('close', () =>
 		{
 			if (this._closed)
 				return;
 
-			logger.warn('protoo Peer "close" event');
+			logger.warn('signaling Peer "close" event');
 
 			this.close();
 		});
 
-		this._protoo.on('request', (request, accept, reject) =>
+		this._signalingSocket.on('mediasoup-notification', (data) =>
 		{
-			logger.debug(
-				'_handleProtooRequest() [method:%s, data:%o]',
-				request.method, request.data);
+			const notification = data;
 
-			switch (request.method)
+			this._room.receiveNotification(notification);
+		});
+
+		this._signalingSocket.on('active-speaker', (data) =>
+		{
+			const { peerName } = data;
+
+			this._dispatch(
+				stateActions.setRoomActiveSpeaker(peerName));
+
+			if (peerName && peerName !== this._peerName)
+				this._spotlights.handleActiveSpeaker(peerName);
+		});
+
+		this._signalingSocket.on('display-name-changed', (data) =>
+		{
+			// eslint-disable-next-line no-shadow
+			const { peerName, displayName } = data;
+
+			// NOTE: Hack, we shouldn't do this, but this is just a demo.
+			const peer = this._room.getPeerByName(peerName);
+
+			if (!peer)
 			{
-				case 'mediasoup-notification':
-				{
-					accept();
+				logger.error('peer not found');
 
-					const notification = request.data;
+				return;
+			}
 
-					this._room.receiveNotification(notification);
+			const oldDisplayName = peer.appData.displayName;
 
-					break;
-				}
+			peer.appData.displayName = displayName;
 
-				case 'active-speaker':
-				{
-					accept();
+			this._dispatch(
+				stateActions.setPeerDisplayName(displayName, peerName));
 
-					const { peerName } = request.data;
+			this.notify(`${oldDisplayName} changed their display name to ${displayName}.`);
+		});
 
-					this._dispatch(
-						stateActions.setRoomActiveSpeaker(peerName));
+		this._signalingSocket.on('profile-picture-changed', (data) =>
+		{
+			const { peerName, picture } = data;
 
-					break;
-				}
+			this._dispatch(stateActions.setPeerPicture(peerName, picture));
+		});
 
-				case 'display-name-changed':
-				{
-					accept();
+		// This means: server wants to change MY user information
+		this._signalingSocket.on('auth', (data) =>
+		{
+			logger.debug('got auth event from server', data);
 
-					// eslint-disable-next-line no-shadow
-					const { peerName, displayName, oldDisplayName } = request.data;
+			this.changeDisplayName(data.name);
 
-					// NOTE: Hack, we shouldn't do this, but this is just a demo.
-					const peer = this._room.getPeerByName(peerName);
+			this.changeProfilePicture(data.picture);
+			this._dispatch(stateActions.setPicture(data.picture));
+			this._dispatch(stateActions.loggedIn());
 
-					if (!peer)
-					{
-						logger.error('peer not found');
+			this.notify('You are logged in.');
 
-						break;
-					}
+			this.closeLoginWindow();
+		});
 
-					peer.appData.displayName = displayName;
+		this._signalingSocket.on('raisehand-message', (data) =>
+		{
+			const { peerName, raiseHandState } = data;
 
-					this._dispatch(
-						stateActions.setPeerDisplayName(displayName, peerName));
+			logger.debug('Got raiseHandState from "%s"', peerName);
 
-					this._dispatch(requestActions.notify(
-						{
-							text : `${oldDisplayName} is now ${displayName}`
-						}));
+			// NOTE: Hack, we shouldn't do this, but this is just a demo.
+			const peer = this._room.getPeerByName(peerName);
 
-					break;
-				}
+			if (!peer)
+			{
+				logger.error('peer not found');
 
-				case 'profile-picture-changed':
-				{
-					accept();
+				return;
+			}
 
-					const { peerName, picture } = request.data;
+			this.notify(`${peer.appData.displayName} ${raiseHandState ? 'raised' : 'lowered'} their hand.`);
 
-					this._dispatch(stateActions.setPeerPicture(peerName, picture));
+			this._dispatch(
+				stateActions.setPeerRaiseHandState(peerName, raiseHandState));
+		});
 
-					break;
-				}
+		this._signalingSocket.on('chat-message-receive', (data) =>
+		{
+			const { peerName, chatMessage } = data;
 
-				// This means: server wants to change MY user information
-				case 'auth':
-				{
-					logger.debug('got auth event from server', request.data);
-					accept();
+			logger.debug('Got chat from "%s"', peerName);
 
-					this.changeDisplayName(request.data.name);
+			this._dispatch(
+				stateActions.addResponseMessage({ ...chatMessage, peerName }));
 
-					this.changeProfilePicture(request.data.picture);
-					this._dispatch(stateActions.setPicture(request.data.picture));
-					this._dispatch(stateActions.loggedIn());
+			if (!this._getState().toolarea.toolAreaOpen ||
+				(this._getState().toolarea.toolAreaOpen &&
+				this._getState().toolarea.currentToolTab !== 'chat')) // Make sound
+			{
+				this._soundNotification();
+			}
+		});
 
-					this._dispatch(requestActions.notify(
-						{
-							text : `Authenticated successfully: ${request.data}`
-						}
-					));
+		this._signalingSocket.on('file-receive', (data) =>
+		{
+			const { peerName, file } = data;
 
-					this.closeLoginWindow();
+			// NOTE: Hack, we shouldn't do this, but this is just a demo.
+			const peer = this._room.getPeerByName(peerName);
 
-					break;
-				}
+			if (!peer)
+			{
+				logger.error('peer not found');
 
-				case 'raisehand-message':
-				{
-					accept();
-					const { peerName, raiseHandState } = request.data;
+				return;
+			}
 
-					logger.debug('Got raiseHandState from "%s"', peerName);
+			this._dispatch(stateActions.addFile(file));
 
-					this._dispatch(
-						stateActions.setPeerRaiseHandState(peerName, raiseHandState));
-					break;
-				}
+			this.notify(`${peer.appData.displayName} shared a file.`);
 
-				case 'chat-message-receive':
-				{
-					accept();
-
-					const { peerName, chatMessage } = request.data;
-
-					logger.debug('Got chat from "%s"', peerName);
-
-					this._dispatch(
-						stateActions.addResponseMessage({ ...chatMessage, peerName }));
-
-					break;
-				}
-
-				case 'chat-history-receive':
-				{
-					accept();
-
-					const { chatHistory } = request.data;
-
-					if (chatHistory.length > 0)
-					{
-						logger.debug('Got chat history');
-						this._dispatch(
-							stateActions.addChatHistory(chatHistory));
-					}
-
-					break;
-				}
-
-				case 'file-receive':
-				{
-					accept();
-
-					const payload = request.data.file;
-
-					this._dispatch(stateActions.addFile(payload));
-
-					this._dispatch(requestActions.notify({
-						text : `${payload.name} shared a file`
-					}));
-
-					break;
-				}
-
-				case 'file-history-receive':
-				{
-					accept();
-
-					const files = request.data.fileHistory;
-
-					if (files.length > 0)
-					{
-						logger.debug('Got files history');
-
-						this._dispatch(stateActions.addFileHistory(files));
-					}
-
-					break;
-				}
-
-				default:
-				{
-					logger.error('unknown protoo method "%s"', request.method);
-
-					reject(404, 'unknown method');
-				}
+			if (!this._getState().toolarea.toolAreaOpen ||
+				(this._getState().toolarea.toolAreaOpen &&
+				this._getState().toolarea.currentToolTab !== 'files')) // Make sound
+			{
+				this._soundNotification();
 			}
 		});
 	}
 
-	_joinRoom({ displayName, device })
+	async _joinRoom({ displayName, device })
 	{
 		logger.debug('_joinRoom()');
 
-		// NOTE: We allow rejoining (room.join()) the same mediasoup Room when Protoo
+		// NOTE: We allow rejoining (room.join()) the same mediasoup Room when
 		// WebSocket re-connects, so we must clean existing event listeners. Otherwise
 		// they will be called twice after the reconnection.
 		this._room.removeAllListeners();
@@ -1235,7 +1298,7 @@ export default class RoomClient
 			logger.debug(
 				'sending mediasoup request [method:%s]:%o', request.method, request);
 
-			this._protoo.send('mediasoup-request', request)
+			this.sendRequest('mediasoup-request', request)
 				.then(callback)
 				.catch(errback);
 		});
@@ -1246,7 +1309,7 @@ export default class RoomClient
 				'sending mediasoup notification [method:%s]:%o',
 				notification.method, notification);
 
-			this._protoo.send('mediasoup-notification', notification)
+			this.sendRequest('mediasoup-notification', notification)
 				.catch((error) =>
 				{
 					logger.warn('could not send mediasoup notification:%o', error);
@@ -1258,604 +1321,514 @@ export default class RoomClient
 			logger.debug(
 				'room "newpeer" event [name:"%s", peer:%o]', peer.name, peer);
 
+			this._soundNotification();
+
 			this._handlePeer(peer);
 		});
 
-		this._room.join(this._peerName, { displayName, device })
-			.then(() =>
+		try
+		{
+			await this._room.join(this._peerName, { displayName, device });
+
+			this._sendTransport =
+				this._room.createTransport('send', { media: 'SEND_MIC_WEBCAM' });
+
+			this._sendTransport.on('close', (originator) =>
 			{
-				// Create Transport for sending.
-				this._sendTransport =
-					this._room.createTransport('send', { media: 'SEND_MIC_WEBCAM' });
-
-				this._sendTransport.on('close', (originator) =>
-				{
-					logger.debug(
-						'Transport "close" event [originator:%s]', originator);
-				});
-
-				// Create Transport for receiving.
-				this._recvTransport =
-					this._room.createTransport('recv', { media: 'RECV' });
-
-				this._recvTransport.on('close', (originator) =>
-				{
-					logger.debug(
-						'receiving Transport "close" event [originator:%s]', originator);
-				});
-			})
-			.then(() =>
-			{
-				// Set our media capabilities.
-				this._dispatch(stateActions.setMediaCapabilities(
-					{
-						canSendMic    : this._room.canSend('audio'),
-						canSendWebcam : this._room.canSend('video')
-					}));
-				this._dispatch(stateActions.setScreenCapabilities(
-					{
-						canShareScreen : this._room.canSend('video') &&
-							this._screenSharing.isScreenShareAvailable(),
-						needExtension : this._screenSharing.needExtension()
-					}));
-			})
-			.then(() =>
-			{
-				// Don't produce if explicitely requested to not to do it.
-				if (!this._produce)
-					return;
-
-				// NOTE: Don't depend on this Promise to continue (so we don't do return).
-				Promise.resolve()
-					// Add our mic.
-					.then(() =>
-					{
-						if (!this._room.canSend('audio'))
-							return;
-
-						this._setMicProducer()
-							.catch(() => {});
-					})
-					// Add our webcam (unless the cookie says no).
-					.then(() =>
-					{
-						if (!this._room.canSend('video'))
-							return;
-
-						const devicesCookie = cookiesManager.getDevices();
-
-						if (!devicesCookie || devicesCookie.webcamEnabled)
-							this.enableWebcam();
-					});
-			})
-			.then(() =>
-			{
-				this._dispatch(stateActions.setRoomState('connected'));
-
-				// Clean all the existing notifcations.
-				this._dispatch(stateActions.removeAllNotifications());
-
-				this.getChatHistory();
-				this.getFileHistory();
-				
-				this._dispatch(requestActions.notify(
-					{
-						text    : 'You are in the room',
-						timeout : 5000
-					}));
-
-				const peers = this._room.peers;
-
-				for (const peer of peers)
-				{
-					this._handlePeer(peer, { notify: false });
-				}
-			})
-			.catch((error) =>
-			{
-				logger.error('_joinRoom() failed:%o', error);
-
-				this._dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : `Could not join the room: ${error.toString()}`
-					}));
-
-				this.close();
+				logger.debug(
+					'Transport "close" event [originator:%s]', originator);
 			});
+
+			// Create Transport for receiving.
+			this._recvTransport =
+				this._room.createTransport('recv', { media: 'RECV' });
+
+			this._recvTransport.on('close', (originator) =>
+			{
+				logger.debug(
+					'receiving Transport "close" event [originator:%s]', originator);
+			});
+
+			// Set our media capabilities.
+			this._dispatch(stateActions.setMediaCapabilities(
+				{
+					canSendMic    : this._room.canSend('audio'),
+					canSendWebcam : this._room.canSend('video')
+				}));
+			this._dispatch(stateActions.setScreenCapabilities(
+				{
+					canShareScreen : this._room.canSend('video') &&
+						this._screenSharing.isScreenShareAvailable(),
+					needExtension : this._screenSharing.needExtension()
+				}));
+
+			// Don't produce if explicitely requested to not to do it.
+			if (this._produce)
+			{
+				if (this._room.canSend('audio'))
+					this._setMicProducer();
+
+				// Add our webcam (unless the cookie says no).
+				if (this._room.canSend('video'))
+				{
+					const devicesCookie = cookiesManager.getDevices();
+
+					if (!devicesCookie || devicesCookie.webcamEnabled)
+						this.enableWebcam();
+				}
+			}
+
+			this._dispatch(stateActions.setRoomState('connected'));
+
+			// Clean all the existing notifcations.
+			this._dispatch(stateActions.removeAllNotifications());
+
+			this.getServerHistory();
+
+			this.notify('You have joined the room.');
+
+			this._spotlights.on('spotlights-updated', (spotlights) =>
+			{
+				this._dispatch(stateActions.setSpotlights(spotlights));
+				this.updateSpotlights(spotlights);
+			});
+
+			const peers = this._room.peers;
+
+			for (const peer of peers)
+			{
+				this._handlePeer(peer, { notify: false });
+			}
+
+			this._spotlights.start();
+		}
+		catch (error)
+		{
+			logger.error('_joinRoom() failed:%o', error);
+
+			this.notify('An error occured while joining the room.');
+
+			this.close();
+		}
 	}
 
-	_setMicProducer()
+	async _setMicProducer()
 	{
 		if (!this._room.canSend('audio'))
-		{
-			return Promise.reject(
-				new Error('cannot send audio'));
-		}
+			throw new Error('cannot send audio');
 
 		if (this._micProducer)
-		{
-			return Promise.reject(
-				new Error('mic Producer already exists'));
-		}
+			throw new Error('mic Producer already exists');
 
 		let producer;
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				logger.debug('_setMicProducer() | calling _updateAudioDevices()');
+		try
+		{
+			logger.debug('_setMicProducer() | calling getUserMedia()');
 
-				return this._updateAudioDevices();
-			})
-			.then(() =>
-			{
-				logger.debug('_setMicProducer() | calling getUserMedia()');
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-				return navigator.mediaDevices.getUserMedia({ audio: true });
-			})
-			.then((stream) =>
-			{
-				const track = stream.getAudioTracks()[0];
+			const track = stream.getAudioTracks()[0];
 
-				producer = this._room.createProducer(track, null, { source: 'mic' });
+			producer = this._room.createProducer(track, null, { source: 'mic' });
 
-				// No need to keep original track.
-				track.stop();
+			// No need to keep original track.
+			track.stop();
 
-				// Send it.
-				return producer.send(this._sendTransport);
-			})
-			.then(() =>
-			{
-				this._micProducer = producer;
+			// Send it.
+			await producer.send(this._sendTransport);
 
-				this._dispatch(stateActions.addProducer(
-					{
-						id             : producer.id,
-						source         : 'mic',
-						locallyPaused  : producer.locallyPaused,
-						remotelyPaused : producer.remotelyPaused,
-						track          : producer.track,
-						codec          : producer.rtpParameters.codecs[0].name
-					}));
+			this._micProducer = producer;
 
-				producer.on('close', (originator) =>
+			this._dispatch(stateActions.addProducer(
 				{
-					logger.debug(
-						'mic Producer "close" event [originator:%s]', originator);
+					id             : producer.id,
+					source         : 'mic',
+					locallyPaused  : producer.locallyPaused,
+					remotelyPaused : producer.remotelyPaused,
+					track          : producer.track,
+					codec          : producer.rtpParameters.codecs[0].name
+				}));
 
-					this._micProducer = null;
-					this._dispatch(stateActions.removeProducer(producer.id));
-				});
+			logger.debug('_setMicProducer() | calling _updateAudioDevices()');
 
-				producer.on('pause', (originator) =>
-				{
-					logger.debug(
-						'mic Producer "pause" event [originator:%s]', originator);
+			await this._updateAudioDevices();
 
-					this._dispatch(stateActions.setProducerPaused(producer.id, originator));
-				});
-
-				producer.on('resume', (originator) =>
-				{
-					logger.debug(
-						'mic Producer "resume" event [originator:%s]', originator);
-
-					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
-				});
-
-				producer.on('handled', () =>
-				{
-					logger.debug('mic Producer "handled" event');
-				});
-
-				producer.on('unhandled', () =>
-				{
-					logger.debug('mic Producer "unhandled" event');
-				});
-			})
-			.then(() =>
+			producer.on('close', (originator) =>
 			{
-				const stream = new MediaStream;
+				logger.debug(
+					'mic Producer "close" event [originator:%s]', originator);
 
-				logger.debug('_setMicProducer() succeeded');
-				stream.addTrack(producer.track);
-				if (!stream.getAudioTracks()[0])
-					throw new Error('_setMicProducer(): given stream has no audio track');
-				producer.hark = hark(stream, { play: false });
-
-				// eslint-disable-next-line no-unused-vars
-				producer.hark.on('volume_change', (dBs, threshold) =>
-				{
-					// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-					//   Math.pow(10, dBs / 20)
-					// However it does not produce a visually useful output, so let exagerate
-					// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-					// minimize component renderings.
-					let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-					if (volume === 1)
-						volume = 0;
-
-					if (volume !== producer.volume)
-					{
-						producer.volume = volume;
-						this._dispatch(stateActions.setProducerVolume(producer.id, volume));
-					}
-				});
-			})
-			.catch((error) =>
-			{
-				logger.error('_setMicProducer() failed:%o', error);
-
-				this._dispatch(requestActions.notify(
-					{
-						text : `Mic producer failed: ${error.name}:${error.message}`
-					}));
-
-				if (producer)
-					producer.close();
-
-				throw error;
+				this._micProducer = null;
+				this._dispatch(stateActions.removeProducer(producer.id));
 			});
+
+			producer.on('pause', (originator) =>
+			{
+				logger.debug(
+					'mic Producer "pause" event [originator:%s]', originator);
+
+				this._dispatch(stateActions.setProducerPaused(producer.id, originator));
+			});
+
+			producer.on('resume', (originator) =>
+			{
+				logger.debug(
+					'mic Producer "resume" event [originator:%s]', originator);
+
+				this._dispatch(stateActions.setProducerResumed(producer.id, originator));
+			});
+
+			producer.on('handled', () =>
+			{
+				logger.debug('mic Producer "handled" event');
+			});
+
+			producer.on('unhandled', () =>
+			{
+				logger.debug('mic Producer "unhandled" event');
+			});
+
+			const harkStream = new MediaStream;
+
+			harkStream.addTrack(producer.track);
+			if (!harkStream.getAudioTracks()[0])
+				throw new Error('_setMicProducer(): given stream has no audio track');
+			producer.hark = hark(harkStream, { play: false });
+
+			// eslint-disable-next-line no-unused-vars
+			producer.hark.on('volume_change', (dBs, threshold) =>
+			{
+				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+				//   Math.pow(10, dBs / 20)
+				// However it does not produce a visually useful output, so let exagerate
+				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+				// minimize component renderings.
+				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+				if (volume === 1)
+					volume = 0;
+
+				if (volume !== producer.volume)
+				{
+					producer.volume = volume;
+					this._dispatch(stateActions.setProducerVolume(producer.id, volume));
+				}
+			});
+		}
+		catch (error)
+		{
+			logger.error('_setMicProducer() failed:%o', error);
+
+			this.notify('An error occured while accessing your microphone.');
+
+			if (producer)
+				producer.close();
+
+			throw error;
+		}
 	}
 
-	_setScreenShareProducer()
+	async _setScreenShareProducer()
 	{
 		if (!this._room.canSend('video'))
-		{
-			return Promise.reject(
-				new Error('cannot send screen'));
-		}
+			throw new Error('cannot send screen');
 
 		let producer;
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				const available = this._screenSharing.isScreenShareAvailable() &&
-					!this._screenSharing.needExtension();
+		try
+		{
+			const available = this._screenSharing.isScreenShareAvailable() &&
+				!this._screenSharing.needExtension();
 
-				if (!available)
-					throw new Error('screen sharing not available');
+			if (!available)
+				throw new Error('screen sharing not available');
 
-				logger.debug('_setScreenShareProducer() | calling getUserMedia()');
+			logger.debug('_setScreenShareProducer() | calling getUserMedia()');
 
-				return this._screenSharing.start({
-					width     : 1280,
-					height    : 720,
-					frameRate : 3
-				});
-			})
-			.then((stream) =>
-			{
-				const track = stream.getVideoTracks()[0];
-
-				producer = this._room.createProducer(
-					track, { simulcast: false }, { source: 'screen' });
-
-				// No need to keep original track.
-				track.stop();
-
-				// Send it.
-				return producer.send(this._sendTransport);
-			})
-			.then(() =>
-			{
-				this._screenSharingProducer = producer;
-
-				this._dispatch(stateActions.addProducer(
-					{
-						id             : producer.id,
-						source         : 'screen',
-						deviceLabel    : 'screen',
-						type           : 'screen',
-						locallyPaused  : producer.locallyPaused,
-						remotelyPaused : producer.remotelyPaused,
-						track          : producer.track,
-						codec          : producer.rtpParameters.codecs[0].name
-					}));
-
-				producer.on('close', (originator) =>
-				{
-					logger.debug(
-						'webcam Producer "close" event [originator:%s]', originator);
-
-					this._screenSharingProducer = null;
-					this._dispatch(stateActions.removeProducer(producer.id));
-				});
-
-				producer.on('trackended', (originator) =>
-				{
-					logger.debug(
-						'webcam Producer "trackended" event [originator:%s]', originator);
-
-					this.disableScreenSharing();
-				});
-
-				producer.on('pause', (originator) =>
-				{
-					logger.debug(
-						'webcam Producer "pause" event [originator:%s]', originator);
-
-					this._dispatch(stateActions.setProducerPaused(producer.id, originator));
-				});
-
-				producer.on('resume', (originator) =>
-				{
-					logger.debug(
-						'webcam Producer "resume" event [originator:%s]', originator);
-
-					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
-				});
-
-				producer.on('handled', () =>
-				{
-					logger.debug('webcam Producer "handled" event');
-				});
-
-				producer.on('unhandled', () =>
-				{
-					logger.debug('webcam Producer "unhandled" event');
-				});
-			})
-			.then(() =>
-			{
-				logger.debug('_setScreenShareProducer() succeeded');
-			})
-			.catch((error) =>
-			{
-				logger.error('_setScreenShareProducer() failed:%o', error);
-
-				this._dispatch(requestActions.notify(
-					{
-						text : `Screen share producer failed: ${error.name}:${error.message}`
-					}));
-
-				if (producer)
-					producer.close();
-
-				throw error;
+			const stream = await this._screenSharing.start({
+				width     : 1280,
+				height    : 720,
+				frameRate : 3
 			});
+
+			const track = stream.getVideoTracks()[0];
+
+			producer = this._room.createProducer(
+				track, { simulcast: false }, { source: 'screen' });
+
+			// No need to keep original track.
+			track.stop();
+
+			// Send it.
+			await producer.send(this._sendTransport);
+
+			this._screenSharingProducer = producer;
+
+			this._dispatch(stateActions.addProducer(
+				{
+					id             : producer.id,
+					source         : 'screen',
+					deviceLabel    : 'screen',
+					type           : 'screen',
+					locallyPaused  : producer.locallyPaused,
+					remotelyPaused : producer.remotelyPaused,
+					track          : producer.track,
+					codec          : producer.rtpParameters.codecs[0].name
+				}));
+
+			producer.on('close', (originator) =>
+			{
+				logger.debug(
+					'webcam Producer "close" event [originator:%s]', originator);
+
+				this._screenSharingProducer = null;
+				this._dispatch(stateActions.removeProducer(producer.id));
+			});
+
+			producer.on('trackended', (originator) =>
+			{
+				logger.debug(
+					'webcam Producer "trackended" event [originator:%s]', originator);
+
+				this.disableScreenSharing();
+			});
+
+			producer.on('pause', (originator) =>
+			{
+				logger.debug(
+					'webcam Producer "pause" event [originator:%s]', originator);
+
+				this._dispatch(stateActions.setProducerPaused(producer.id, originator));
+			});
+
+			producer.on('resume', (originator) =>
+			{
+				logger.debug(
+					'webcam Producer "resume" event [originator:%s]', originator);
+
+				this._dispatch(stateActions.setProducerResumed(producer.id, originator));
+			});
+
+			producer.on('handled', () =>
+			{
+				logger.debug('webcam Producer "handled" event');
+			});
+
+			producer.on('unhandled', () =>
+			{
+				logger.debug('webcam Producer "unhandled" event');
+			});
+
+			logger.debug('_setScreenShareProducer() succeeded');
+		}
+		catch (error)
+		{
+			logger.error('_setScreenShareProducer() failed:%o', error);
+
+			if (error.name === 'NotAllowedError') // Request to share denied by user
+			{
+				this.notify('Request to start sharing your screen was denied.');
+			}
+			else // Some other error
+			{
+				this.notify('An error occured while starting to share your screen.');
+			}
+
+			if (producer)
+				producer.close();
+
+			throw error;
+		}
 	}
 
-	_setWebcamProducer()
+	async _setWebcamProducer()
 	{
 		if (!this._room.canSend('video'))
-		{
-			return Promise.reject(
-				new Error('cannot send video'));
-		}
+			throw new Error('cannot send video');
 
 		if (this._webcamProducer)
-		{
-			return Promise.reject(
-				new Error('webcam Producer already exists'));
-		}
+			throw new Error('webcam Producer already exists');
 
 		let producer;
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				const { device } = this._webcam;
+		try
+		{
+			logger.debug('_setWebcamProducer() | calling getUserMedia()');
 
-				if (!device)
-					throw new Error('no webcam devices');
-
-				logger.debug('_setWebcamProducer() | calling getUserMedia()');
-
-				return navigator.mediaDevices.getUserMedia(
+			const stream = await navigator.mediaDevices.getUserMedia(
+				{
+					video :
 					{
-						video :
-						{
-							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS
-						}
-					});
-			})
-			.then((stream) =>
+						...VIDEO_CONSTRAINS
+					}
+				});
+
+			const track = stream.getVideoTracks()[0];
+
+			producer = this._room.createProducer(
+				track, { simulcast: this._useSimulcast }, { source: 'webcam' });
+
+			// No need to keep original track.
+			track.stop();
+
+			// Send it.
+			await producer.send(this._sendTransport);
+
+			this._webcamProducer = producer;
+
+			this._dispatch(stateActions.addProducer(
+				{
+					id             : producer.id,
+					source         : 'webcam',
+					locallyPaused  : producer.locallyPaused,
+					remotelyPaused : producer.remotelyPaused,
+					track          : producer.track,
+					codec          : producer.rtpParameters.codecs[0].name
+				}));
+
+			logger.debug('_setWebcamProducer() | calling _updateWebcams()');
+			await this._updateWebcams();
+
+			producer.on('close', (originator) =>
 			{
-				const track = stream.getVideoTracks()[0];
+				logger.debug(
+					'webcam Producer "close" event [originator:%s]', originator);
 
-				producer = this._room.createProducer(
-					track, { simulcast: this._useSimulcast }, { source: 'webcam' });
-
-				// No need to keep original track.
-				track.stop();
-
-				// Send it.
-				return producer.send(this._sendTransport);
-			})
-			.then(() =>
-			{
-				this._webcamProducer = producer;
-
-				const { device } = this._webcam;
-
-				this._dispatch(stateActions.addProducer(
-					{
-						id             : producer.id,
-						source         : 'webcam',
-						deviceLabel    : device.label,
-						type           : this._getWebcamType(device),
-						locallyPaused  : producer.locallyPaused,
-						remotelyPaused : producer.remotelyPaused,
-						track          : producer.track,
-						codec          : producer.rtpParameters.codecs[0].name
-					}));
-
-				producer.on('close', (originator) =>
-				{
-					logger.debug(
-						'webcam Producer "close" event [originator:%s]', originator);
-
-					this._webcamProducer = null;
-					this._dispatch(stateActions.removeProducer(producer.id));
-				});
-
-				producer.on('pause', (originator) =>
-				{
-					logger.debug(
-						'webcam Producer "pause" event [originator:%s]', originator);
-
-					this._dispatch(stateActions.setProducerPaused(producer.id, originator));
-				});
-
-				producer.on('resume', (originator) =>
-				{
-					logger.debug(
-						'webcam Producer "resume" event [originator:%s]', originator);
-
-					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
-				});
-
-				producer.on('handled', () =>
-				{
-					logger.debug('webcam Producer "handled" event');
-				});
-
-				producer.on('unhandled', () =>
-				{
-					logger.debug('webcam Producer "unhandled" event');
-				});
-			})
-			.then(() =>
-			{
-				logger.debug('_setWebcamProducer() succeeded');
-			})
-			.catch((error) =>
-			{
-				logger.error('_setWebcamProducer() failed:%o', error);
-
-				this._dispatch(requestActions.notify(
-					{
-						text : `Webcam producer failed: ${error.name}:${error.message}`
-					}));
-
-				if (producer)
-					producer.close();
-
-				throw error;
+				this._webcamProducer = null;
+				this._dispatch(stateActions.removeProducer(producer.id));
 			});
+
+			producer.on('pause', (originator) =>
+			{
+				logger.debug(
+					'webcam Producer "pause" event [originator:%s]', originator);
+
+				this._dispatch(stateActions.setProducerPaused(producer.id, originator));
+			});
+
+			producer.on('resume', (originator) =>
+			{
+				logger.debug(
+					'webcam Producer "resume" event [originator:%s]', originator);
+
+				this._dispatch(stateActions.setProducerResumed(producer.id, originator));
+			});
+
+			producer.on('handled', () =>
+			{
+				logger.debug('webcam Producer "handled" event');
+			});
+
+			producer.on('unhandled', () =>
+			{
+				logger.debug('webcam Producer "unhandled" event');
+			});
+
+			logger.debug('_setWebcamProducer() succeeded');
+		}
+		catch (error)
+		{
+			logger.error('_setWebcamProducer() failed:%o', error);
+
+			this.notify('An error occured while accessing your camera.');
+
+			if (producer)
+				producer.close();
+
+			throw error;
+		}
 	}
 
-	_updateAudioDevices()
+	async _updateAudioDevices()
 	{
 		logger.debug('_updateAudioDevices()');
 
 		// Reset the list.
 		this._audioDevices = new Map();
 
-		return Promise.resolve()
-			.then(() =>
+		try
+		{
+			logger.debug('_updateAudioDevices() | calling enumerateDevices()');
+
+			const devices = await navigator.mediaDevices.enumerateDevices();
+
+			for (const device of devices)
 			{
-				logger.debug('_updateAudioDevices() | calling enumerateDevices()');
+				if (device.kind !== 'audioinput')
+					continue;
 
-				return navigator.mediaDevices.enumerateDevices();
-			})
-			.then((devices) =>
-			{
-				for (const device of devices)
-				{
-					if (device.kind !== 'audioinput')
-						continue;
+				device.value = device.deviceId;
 
-					device.value = device.deviceId;
+				this._audioDevices.set(device.deviceId, device);
+			}
 
-					this._audioDevices.set(device.deviceId, device);
-				}
-			})
-			.then(() =>
-			{
-				const array = Array.from(this._audioDevices.values());
-				const len = array.length;
-				const currentAudioDeviceId =
-					this._audioDevice.device ? this._audioDevice.device.deviceId : undefined;
+			const array = Array.from(this._audioDevices.values());
+			const len = array.length;
+			const currentAudioDeviceId =
+				this._audioDevice.device ? this._audioDevice.device.deviceId : undefined;
 
-				logger.debug('_updateAudioDevices() [audiodevices:%o]', array);
+			logger.debug('_updateAudioDevices() [audiodevices:%o]', array);
 
-				if (len === 0)
-					this._audioDevice.device = null;
-				else if (!this._audioDevices.has(currentAudioDeviceId))
-					this._audioDevice.device = array[0];
+			if (len === 0)
+				this._audioDevice.device = null;
+			else if (!this._audioDevices.has(currentAudioDeviceId))
+				this._audioDevice.device = array[0];
 
+			this._dispatch(
+				stateActions.setCanChangeAudioDevice(len >= 2));
+			if (len >= 1)
 				this._dispatch(
-					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
-
-				this._dispatch(
-					stateActions.setCanChangeAudioDevice(len >= 2));
-				if (len >= 1)
-					this._dispatch(
-						stateActions.setAudioDevices(this._audioDevices));
-			});
+					stateActions.setAudioDevices(this._audioDevices));
+		}
+		catch (error)
+		{
+			logger.error('_updateAudioDevices() failed:%o', error);
+		}
 	}
 
-	_updateWebcams()
+	async _updateWebcams()
 	{
 		logger.debug('_updateWebcams()');
 
 		// Reset the list.
 		this._webcams = new Map();
 
-		return Promise.resolve()
-			.then(() =>
-			{
-				logger.debug('_updateWebcams() | calling enumerateDevices()');
-
-				return navigator.mediaDevices.enumerateDevices();
-			})
-			.then((devices) =>
-			{
-				for (const device of devices)
-				{
-					if (device.kind !== 'videoinput')
-						continue;
-
-					device.value = device.deviceId;
-
-					this._webcams.set(device.deviceId, device);
-				}
-			})
-			.then(() =>
-			{
-				const array = Array.from(this._webcams.values());
-				const len = array.length;
-				const currentWebcamId =
-					this._webcam.device ? this._webcam.device.deviceId : undefined;
-
-				logger.debug('_updateWebcams() [webcams:%o]', array);
-
-				if (len === 0)
-					this._webcam.device = null;
-				else if (!this._webcams.has(currentWebcamId))
-					this._webcam.device = array[0];
-
-				this._dispatch(
-					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
-
-				this._dispatch(
-					stateActions.setCanChangeWebcam(len >= 2));
-				if (len >= 1)
-					this._dispatch(
-						stateActions.setWebcamDevices(this._webcams));
-			});
-	}
-
-	_getWebcamType(device)
-	{
-		if (/(back|rear)/i.test(device.label))
+		try
 		{
-			logger.debug('_getWebcamType() | it seems to be a back camera');
+			logger.debug('_updateWebcams() | calling enumerateDevices()');
 
-			return 'back';
+			const devices = await navigator.mediaDevices.enumerateDevices();
+
+			for (const device of devices)
+			{
+				if (device.kind !== 'videoinput')
+					continue;
+
+				device.value = device.deviceId;
+
+				this._webcams.set(device.deviceId, device);
+			}
+
+			const array = Array.from(this._webcams.values());
+			const len = array.length;
+			const currentWebcamId =
+				this._webcam.device ? this._webcam.device.deviceId : undefined;
+
+			logger.debug('_updateWebcams() [webcams:%o]', array);
+
+			if (len === 0)
+				this._webcam.device = null;
+			else if (!this._webcams.has(currentWebcamId))
+				this._webcam.device = array[0];
+
+			if (len >= 1)
+				this._dispatch(
+					stateActions.setWebcamDevices(this._webcams));
 		}
-		else
+		catch (error)
 		{
-			logger.debug('_getWebcamType() | it seems to be a front camera');
-
-			return 'front';
+			logger.error('_updateWebcams() failed:%o', error);
 		}
 	}
 
@@ -1874,10 +1847,7 @@ export default class RoomClient
 
 		if (notify)
 		{
-			this._dispatch(requestActions.notify(
-				{
-					text : `${displayName} joined the room`
-				}));
+			this.notify(`${displayName} joined the room.`);
 		}
 
 		for (const consumer of peer.consumers)
@@ -1895,10 +1865,7 @@ export default class RoomClient
 
 			if (this._room.joined)
 			{
-				this._dispatch(requestActions.notify(
-					{
-						text : `${peer.appData.displayName} left the room`
-					}));
+				this.notify(`${displayName} left the room.`);
 			}
 		});
 
@@ -2007,9 +1974,13 @@ export default class RoomClient
 		// Receive the consumer (if we can).
 		if (consumer.supported)
 		{
-			// Pause it if video and we are in audio-only mode.
-			if (consumer.kind === 'video' && this._getState().me.audioOnly)
-				consumer.pause('audio-only-mode');
+			if (consumer.kind === 'video' &&
+				!this._spotlights.peerInSpotlights(consumer.peer.name))
+			{ // Start paused
+				logger.debug(
+					'consumer paused by default');
+				consumer.pause('not-speaker');
+			}
 
 			consumer.receive(this._recvTransport)
 				.then((track) =>

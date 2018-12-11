@@ -1,17 +1,16 @@
 [data-component='FileSharing'] {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	flex-grow: 1;
 	
 	> .sharing-toolbar {
 		> .share-file {
 			cursor: pointer;
 			width: 100%;
-			background: #252525;
-			border: 1px solid #151515;
+			background: #aef;
 			padding: 1rem;
-			border-bottom: 5px solid #151515;
-			border-radius: 3px 3px 0 0;
+			border-radius: 1vmin;
+			box-shadow: 0vmin 0vmin 1vmin 0vmin rgba(17,17,17,0.5);
 
 			&.disabled {
 				cursor: not-allowed;
@@ -21,7 +20,8 @@
 
 	> .shared-files {
 		flex-grow: 1;
-		overflow-y: scroll;
+		overflow-y: auto;
+		margin-top: 0.5rem;
 
 		> .file-entry {
 			background-color: rgba(0,0,0,0.1);
@@ -29,7 +29,10 @@
 			width: 100%;
 			padding: 0.5rem;
 			display: flex;
-			margin-top: 0.5rem;
+
+			&:not(:first-child) {
+				margin-top: 0.5rem;
+			}
 			
 			&:last-child {
 				margin-bottom: 1.5rem;
@@ -70,6 +73,23 @@
 						padding-left: 0.5rem;
 					}
 				}
+			}
+		}
+
+		> .empty {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			padding-top: 20vmin;
+
+			> p {
+				padding: 6px 12px;
+				border-radius: 6px;
+				user-select: none;
+				pointer-events: none;
+				font-size: 20px;
+				color: #000;
 			}
 		}
 	}

@@ -155,17 +155,20 @@ function handleTransport(transport, baseEvent, stream)
 
 	const statsInterval = setInterval(() =>
 	{
-		transport.getStats()
-			.then((stats) =>
-			{
-				emit(
-					Object.assign({}, baseEvent,
-						{
-							event : 'transport.stats',
-							stats : stats
-						}),
-					stream);
-			});
+		if (typeof transport.getStats === 'function')
+		{
+			transport.getStats()
+				.then((stats) =>
+				{
+					emit(
+						Object.assign({}, baseEvent,
+							{
+								event : 'transport.stats',
+								stats : stats
+							}),
+						stream);
+				});
+		}
 	}, STATS_INTERVAL);
 
 	transport.on('close', (originator) =>

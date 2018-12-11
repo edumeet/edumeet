@@ -8,7 +8,7 @@ const config = require('./config');
 // mediasoup server.
 const mediaServer = mediasoup.Server(
 	{
-		numWorkers       : 1,
+		numWorkers       : null,
 		logLevel         : config.mediasoup.logLevel,
 		logTags          : config.mediasoup.logTags,
 		rtcIPv4          : config.mediasoup.rtcIPv4,

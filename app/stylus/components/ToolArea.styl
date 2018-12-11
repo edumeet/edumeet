@@ -1,19 +1,211 @@
+.toolarea-shade {
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+
+	&.open {
+		display: block;
+	}
+
+	+desktop() {
+		&.open {
+			background: rgba(0, 0, 0, 0.3);
+			display: block;
+		}
+	}
+}
+
+[data-component='ToolAreaButton'] {
+	&.on {
+		right: 80%;
+	}
+}
+
+[data-component='ToolArea'] {
+	&.open {
+		width: 80%;
+	}
+
+	.toolarea-shade.open {
+		display: block;
+	}
+	> .button {
+		background-position: center;
+		background-size: 100%;
+		background-repeat: no-repeat;
+		background-color: rgba(#aef);
+		cursor: pointer;
+		border-radius: 15%;
+		padding: 1px;
+
+		+desktop() {
+			height: 36px;
+			width: 18px;
+		}
+
+		+mobile() {
+			height: 32px;
+			width: 16px;
+		}
+		&.toolarea-close-button {
+			background-image: url('/resources/images/arrow_right.svg');
+			position: absolute;
+			top: 50%;
+			left: -22px;
+			display: none;
+			&.on {
+				display: block;
+		}
+		}
+	}
+
+	> .toolarea-button {
+		text-align: center;
+		writing-mode: vertical-rl;
+		text-orientation: mixed;
+		list-style: none;
+		height: 115px;
+		width: 35px;
+		left: -35px;
+		top: 50%;
+		transform: translate(0, -50%);
+		position: absolute;
+		cursor: pointer;
+
+		> .badge {
+			border-radius: 50%;
+			writing-mode: horizontal-tb;
+			font-size: 1rem;
+			background: #b12525;
+			color: #fff;
+			text-align: center;
+			margin-top: -10px;
+			line-height: 1rem;
+			margin-left: -0px;
+			position: absolute;
+			padding: 0.2rem 0.4rem;
+			top: 0;
+			left: 0;
+
+			&.long {
+				border-radius: 25% / 50%;
+				margin-top: -13px;
+				margin-left: -4px;
+			}
+		}
+
+		> .content {
+			border: 1px solid #AAA;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			border-bottom-left-radius: 6px;
+			border-top-left-radius: 6px;
+			background: #FFF;
+			color: #333;
+			z-index: 2;
+			border-right-color: #FFF;
+
+			&:before, &:after {
+				border: 1px solid #AAA;
+				position: absolute;
+				width: 6px;
+				height: 6px;
+				content: "";
+			}
+
+			&:before {
+				top: -6px;
+				right: 0;
+				border-bottom-right-radius: 6px;
+				border-width: 0px 1px 1px 0px;
+				box-shadow: 0px 3px 0 #FFF;
+			}
+
+			&:after {
+				bottom: -6px;
+				right: 0;
+				border-top-right-radius: 6px;
+				border-width: 1px 1px 0px 0px;
+				box-shadow: 0px -3px 0 #FFF;
+			}
+
+			> .toolarea-icon {
+				background-position: center;
+				background-size: 75%;
+				background-repeat: no-repeat;
+				border-radius: 100%;
+				height: 32px;
+				width: 32px;
+
+				background-image: url('/resources/images/icon_tool_area_black.svg');
+			}
+
+			> p {
+				padding: 9px;
+			}
+		}
+	}
+}
+
+@media (min-width: 600px) {
+	[data-component='ToolAreaButton'] {
+		&.on {
+			right: 60%;
+		}
+	}
+
+	[data-component='ToolArea'] {
+		&.open {
+			width: 60%;
+		}
+	}
+}
+
+@media (min-width: 900px) {
+	[data-component='ToolAreaButton'] {
+		&.on {
+			right: 40%;
+		}
+	}
+
+	[data-component='ToolArea'] {
+		&.open {
+			width: 40%;
+		}
+	}
+}
+
+@media (min-width: 1500px) {
+	[data-component='ToolAreaButton'] {
+		&.on {
+			right: 25%;
+		}
+	}
+
+	[data-component='ToolArea'] {
+		&.open {
+			width: 25%;
+		}
+	}
+}
+
 [data-component='ToolAreaButton'] {
 	position: absolute;
-	z-index: 1000;
+	z-index: 1020;
 	right: 0;
 	height: 36px;
 	width: 36px;
-	padding: 2rem;
+	margin: 2rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	transition: right 0.3s;
-
-	&.on {
-		right: 25%;
-	}
 
 	> .button {
 		flex: 0 0 auto;
@@ -78,59 +270,55 @@
 [data-component='ToolArea'] {
 	width: 100%;
 	height: 100%;
-	color: #fff;
+	color: #000;
+	position: fixed;
+	width: 0;
+	top: 0;
+	right: 0;
+	height: 100%;
+	background: #fff;
+	transition: width 0.3s;
+	z-index: 1010;
+	display: flex;
+	flex-direction: column;
+	border-left: 1px solid #222;
 
-	> .tabs {
+	> .tab-headers {
 		display: flex;
-		flex-wrap: wrap;
-		height: 100%;
+		background: #ddd;
+		flex-shrink: 0;
 
-		> label {
-			order: 1;
-			display: block;
-			padding: 1vmin 0 0.8vmin 0;
+		> .tab-header {
+			flex-grow: 1;
 			cursor: pointer;
-			background: rgba(0,0,0,0.3);
-			font-weight: bold;
-			transition: background ease 0.2s;
+			padding: 1rem;
+			font-size: 1.2rem;
 			text-align: center;
-			width: 25%;
-			font-size: 1.3vmin;
-			height: 3vmin;
+
+			&.checked {
+				background: #fff;
+				border-radius: 1vmin 1vmin 0vmin 0vmin;
+				box-shadow: 0.5vmin 0vmin 1vmin -0.5vmin #aaa;
+			}
 
 			> .badge {
-				padding: 0.1vmin 1vmin;
+				padding: 0.2rem 0.6rem;
 				text-align: center;
 				font-weight: 300;
-				font-size: 1.2vmin;
+				font-size: 1rem;
 				color: #fff;
 				background-color: #b12525;
 				border-radius: 2px;
 				margin-left: 1vmin;
 			}
 		}
+	}
 
-		> .tab {
-			order: 99;
-			flex-grow: 1;
-			width: 100%;
-			height: 100%;
-			display: none;
-			padding: 1vmin;
-			background: rgba(0,0,0,0.1);
-		}
-
-		> input[type="radio"] {
-			display: none;
-		}
-
-		> input[type="radio"]:checked + label {
-			background: rgba(0,0,0,0.1);
-		}
-
-		> input[type="radio"]:checked + label + .tab {
-			display: block;
-			background: rgba(0,0,0,0.1);
-		}
+	> .tab {
+		flex-grow: 1;
+		padding: 0.5rem;
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
 	}
 }

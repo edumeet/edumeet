@@ -9,18 +9,10 @@ global-reset();
 
 html {
 	height: 100%;
-	box-sizing: border-box;
-	background-image: url('/resources/images/background.svg');
-	background-attachment: fixed;
-	background-position: center;
-	background-size: cover;
-	background-repeat: no-repeat;
 	font-family: 'Roboto';
 	font-weight: 300;
-
-	+desktop() {
-		font-size: 16px;
-	}
+	overflow-x: hidden;
+	overflow-y: hidden;
 
 	+mobile() {
 		font-size: 12px;
@@ -30,6 +22,17 @@ html {
 body {
 	height: 100%;
 	overflow-x: hidden;
+	overflow-y: hidden;
+	background-color: #333;
+
+	+desktop() {
+		font-size: 16px;
+		background-image: url('/resources/images/background.svg');
+		background-attachment: fixed;
+		background-position: center;
+		background-size: cover;
+		background-repeat: no-repeat;
+	}
 }
 
 #multiparty-meeting {
@@ -39,11 +42,13 @@ body {
 
 // Components
 @import './components/Room';
+@import './components/Logo';
 @import './components/Sidebar';
 @import './components/Me';
 @import './components/Peers';
 @import './components/Peer';
 @import './components/PeerView';
+@import './components/HiddenPeersView';
 @import './components/ScreenView';
 @import './components/Notifications';
 @import './components/Chat';
@@ -54,6 +59,7 @@ body {
 @import './components/FullView';
 @import './components/Filmstrip';
 @import './components/FileSharing';
+@import './components/AudioPeers';
 
 // Hack to detect in JS the current media query
 #multiparty-meeting-media-query-detector {

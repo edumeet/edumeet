@@ -11,19 +11,24 @@ class ToolAreaButton extends React.Component
 		const {
 			toolAreaOpen,
 			toggleToolArea,
-			unread
+			unread,
+			visible
 		} = this.props;
 
 		return (
-			<div data-component='ToolAreaButton' className={classnames({ on: toolAreaOpen })}>
+			<div
+				data-component='ToolAreaButton'
+				className={classnames('room-controls', {
+					on : toolAreaOpen,
+					visible
+				})}
+			>
 				<div
-					className={classnames('button toolarea-button room-controls', {
-						on      : toolAreaOpen,
-						visible : this.props.visible
+					className={classnames('button toolarea-button', {
+						on : toolAreaOpen
 					})}
-					data-tip='Toggle tool area'
+					data-tip='Open tools'
 					data-type='dark'
-					data-for='globaltip'
 					onClick={() => toggleToolArea()}
 				/>
 

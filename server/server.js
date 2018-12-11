@@ -7,9 +7,10 @@ process.title = 'multiparty-meeting-server';
 const config = require('./config');
 const fs = require('fs');
 const https = require('https');
+const http = require('http');
 const express = require('express');
+const compression = require('compression');
 const url = require('url');
-const protooServer = require('protoo-server');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const Dataporten = require('passport-dataporten');
@@ -39,12 +40,24 @@ const tls =
 
 const app = express();
 
+app.use(compression());
+
 const dataporten = new Dataporten.Setup(config.oauth2);
+
+app.all('*', (req, res, next) =>
+{
+	if(req.secure)
+	{
+		return next();
+	}
+
+	res.redirect('https://' + req.hostname + req.url);
+});
 
 app.use(dataporten.passport.initialize());
 app.use(dataporten.passport.session());
 
-app.get('/login', (req, res, next) => 
+app.get('/login', (req, res, next) =>
 {
 	dataporten.passport.authenticate('dataporten', {
 		state : base64.encode(JSON.stringify({
@@ -52,34 +65,36 @@ app.get('/login', (req, res, next) =>
 			peerName : req.query.peerName,
 			code     : utils.random(10)
 		}))
-		
+
 	})(req, res, next);
 });
 
 dataporten.setupLogout(app, '/logout');
 
+app.get('/', function (req, res) {
+   console.log(req.url);
+   res.sendFile(`${__dirname}/public/chooseRoom.html`);
+})
+
 app.get(
 	'/auth-callback',
-
 	dataporten.passport.authenticate('dataporten', { failureRedirect: '/login' }),
-	
 	(req, res) =>
 	{
 		const state = JSON.parse(base64.decode(req.query.state));
 
 		if (rooms.has(state.roomId))
 		{
-			const room = rooms.get(state.roomId)._protooRoom;
-
-			if (room.hasPeer(state.peerName))
+			const data =
 			{
-				const peer = room.getPeer(state.peerName);
+				peerName : state.peerName,
+				name     : req.user.data.displayName,
+				picture  : req.user.data.photos[0]
+			};
 
-				peer.send('auth', {
-					name    : req.user.data.displayName,
-					picture : req.user.data.photos[0]
-				});
-			}
+			const room = rooms.get(state.roomId);
+
+			room.authCallback(data);
 		}
 
 		res.send('');
@@ -98,29 +113,25 @@ httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 	logger.info('Server running on port: ', config.listeningPort);
 });
 
-// Protoo WebSocket server listens to same webserver so everything is available
-// via same port
-const webSocketServer = new protooServer.WebSocketServer(httpsServer,
-	{
-		maxReceivedFrameSize     : 960000, // 960 KBytes.
-		maxReceivedMessageSize   : 960000,
-		fragmentOutgoingMessages : true,
-		fragmentationThreshold   : 960000
-	});
+const httpServer = http.createServer(app);
+
+httpServer.listen(config.listeningRedirectPort, '0.0.0.0', () =>
+{
+	logger.info('Server redirecting port: ', config.listeningRedirectPort);
+});
+
+const io = require('socket.io')(httpsServer);
 
 // Handle connections from clients.
-webSocketServer.on('connectionrequest', (info, accept, reject) =>
+io.on('connection', (socket) =>
 {
-	// The client indicates the roomId and peerId in the URL query.
-	const u = url.parse(info.request.url, true);
-	const roomId = u.query['roomId'];
-	const peerName = u.query['peerName'];
+	const { roomId, peerName } = socket.handshake.query;
 
 	if (!roomId || !peerName)
 	{
 		logger.warn('connection request without roomId and/or peerName');
 
-		reject(400, 'Connection request without roomId and/or peerName');
+		socket.disconnect(true);
 
 		return;
 	}
@@ -137,7 +148,7 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 
 		try
 		{
-			room = new Room(roomId, mediaServer);
+			room = new Room(roomId, mediaServer, io);
 
 			global.APP_ROOM = room;
 		}
@@ -145,7 +156,7 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		{
 			logger.error('error creating a new Room: %s', error);
 
-			reject(error);
+			socket.disconnect(true);
 
 			return;
 		}
@@ -168,7 +179,8 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		room = rooms.get(roomId);
 	}
 
-	const transport = accept();
+	socket.join(roomId);
+	socket.room = roomId;
 
-	room.handleConnection(peerName, transport);
+	room.handleConnection(peerName, socket);
 });

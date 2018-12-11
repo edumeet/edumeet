@@ -4,16 +4,19 @@ import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import CookieConsent from 'react-cookie-consent';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import * as stateActions from '../redux/stateActions';
 import { Appear } from './transitions';
 import Me from './Me';
 import Peers from './Peers';
+import AudioPeers from './PeerAudio/AudioPeers';
 import Notifications from './Notifications';
-import ToolAreaButton from './ToolArea/ToolAreaButton';
+// import ToolAreaButton from './ToolArea/ToolAreaButton';
 import ToolArea from './ToolArea/ToolArea';
 import FullScreenView from './FullScreenView';
+import VideoWindow from './VideoWindow/VideoWindow';
 import Draggable from 'react-draggable';
 import { idle } from '../utils';
 import Sidebar from './Sidebar';
@@ -32,16 +35,16 @@ class Room extends React.Component
 	 * given amount of time has passed since the
 	 * last time the cursor was moved.
 	 */
-	waitForHide = idle(() => 
+	waitForHide = idle(() =>
 	{
 		this.props.setToolbarsVisible(false);
 	}, TIMEOUT);
 
-	handleMovement = () => 
+	handleMovement = () =>
 	{
 		// If the toolbars were hidden, show them again when
 		// the user moves their cursor.
-		if (!this.props.room.toolbarsVisible) 
+		if (!this.props.room.toolbarsVisible)
 		{
 			this.props.setToolbarsVisible(true);
 		}
@@ -65,7 +68,6 @@ class Room extends React.Component
 	{
 		const {
 			room,
-			toolAreaOpen,
 			amActiveSpeaker,
 			onRoomLinkCopy
 		} = this.props;
@@ -81,11 +83,19 @@ class Room extends React.Component
 
 				<Appear duration={300}>
 					<div data-component='Room'>
-						<FullScreenView advancedMode={room.advancedMode} />
-						<div className='room-wrapper'>
-							<Notifications />
+						<CookieConsent>
+							This website uses cookies to enhance the user experience.
+						</CookieConsent>
 
-							<ToolAreaButton />
+						<FullScreenView advancedMode={room.advancedMode} />
+
+						<VideoWindow advancedMode={room.advancedMode} />
+
+						<div className='room-wrapper'>
+							<div data-component='Logo' />
+							<AudioPeers />
+
+							<Notifications />
 
 							{room.advancedMode ?
 								<div className='state' data-tip='Server status'>
@@ -94,7 +104,7 @@ class Room extends React.Component
 								</div>
 								:null
 							}
-										
+
 							<div
 								className={classnames('room-link-wrapper room-controls', {
 									'visible' : this.props.room.toolbarsVisible
@@ -123,7 +133,7 @@ class Room extends React.Component
 												{
 													return;
 												}
-			
+
 												event.preventDefault();
 											}}
 										>
@@ -155,16 +165,8 @@ class Room extends React.Component
 								delayHide={100}
 							/>
 						</div>
-						<div
-							className={classnames('toolarea-wrapper', { open: toolAreaOpen })}
-						>
-							{toolAreaOpen ?
-								<ToolArea
-									advancedMode={room.advancedMode}
-								/>
-								:null
-							}
-						</div>
+
+						<ToolArea />
 					</div>
 				</Appear>
 			</Fragment>

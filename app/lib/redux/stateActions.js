@@ -62,14 +62,6 @@ export const setAudioDevices = (devices) =>
 	};
 };
 
-export const setCanChangeWebcam = (flag) =>
-{
-	return {
-		type    : 'SET_CAN_CHANGE_WEBCAM',
-		payload : flag
-	};
-};
-
 export const setWebcamDevices = (devices) =>
 {
 	return {
@@ -158,6 +150,20 @@ export const toggleToolArea = () =>
 {
 	return {
 		type : 'TOGGLE_TOOL_AREA'
+	};
+};
+
+export const openToolArea = () =>
+{
+	return {
+		type : 'OPEN_TOOL_AREA'
+	};
+};
+
+export const closeToolArea = () =>
+{
+	return {
+		type : 'CLOSE_TOOL_AREA'
 	};
 };
 
@@ -383,6 +389,14 @@ export const toggleConsumerFullscreen = (consumerId) =>
 	};
 };
 
+export const toggleConsumerWindow = (consumerId) =>
+{
+	return {
+		type    : 'TOGGLE_WINDOW_CONSUMER',
+		payload : { consumerId }
+	};
+};
+
 export const setToolbarsVisible = (toolbarsVisible) => ({
 	type    : 'SET_TOOLBARS_VISIBLE',
 	payload : { toolbarsVisible }
@@ -474,7 +488,14 @@ export const loggedIn = () =>
 		type : 'LOGGED_IN'
 	});
 
-export const setSelectedPeer = (selectedPeerName) => ({
-	type    : 'SET_SELECTED_PEER',
-	payload : { selectedPeerName }
-});
+export const setSelectedPeer = (selectedPeerName) =>
+	({
+		type    : 'SET_SELECTED_PEER',
+		payload : { selectedPeerName }
+	});
+
+export const setSpotlights = (spotlights) =>
+	({
+		type    : 'SET_SPOTLIGHTS',
+		payload : { spotlights }
+	});

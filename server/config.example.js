@@ -15,7 +15,11 @@ module.exports =
 		key  : `${__dirname}/certs/mediasoup-demo.localhost.key.pem`
 	},
 	// Listening port for https server.
-	listeningPort : 3443,
+	listeningPort : 443,
+	// Any http request is redirected to https.
+	// Listening port for http server. 
+	listeningRedirectPort : 80,
+	// STUN/TURN 
 	turnServers   : [
 		{
 			urls : [
@@ -59,20 +63,22 @@ module.exports =
 					useinbandfec : 1
 				}
 			},
-			{
-				kind      : 'video',
-				name      : 'VP8',
-				clockRate : 90000
-			}
 			// {
-			// 	kind       : 'video',
-			// 	name       : 'H264',
-			// 	clockRate  : 90000,
-			// 	parameters :
-			// 	{
-			// 		'packetization-mode' : 1
-			// 	}
+			// 	kind      : 'video',
+			// 	name      : 'VP8',
+			// 	clockRate : 90000
 			// }
+			{
+				kind       : 'video',
+				name       : 'H264',
+				clockRate  : 90000,
+				parameters :
+				{
+					'packetization-mode'      : 1,
+					'profile-level-id'        : '42e01f',
+					'level-asymmetry-allowed' : 1
+				}
+			}
 		],
 		// mediasoup per Peer max sending bitrate (in bps).
 		maxBitrate : 500000

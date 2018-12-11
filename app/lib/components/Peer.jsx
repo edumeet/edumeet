@@ -38,12 +38,10 @@ class Peer extends Component
 			screenConsumer,
 			onMuteMic,
 			onUnmuteMic,
-			onDisableWebcam,
-			onEnableWebcam,
-			onDisableScreen,
-			onEnableScreen,
 			toggleConsumerFullscreen,
-			style
+			toggleConsumerWindow,
+			style,
+			windowConsumer
 		} = this.props;
 
 		const micEnabled = (
@@ -90,6 +88,13 @@ class Peer extends Component
 					:null
 				}
 
+				{!videoVisible ?
+					<div className='paused-video'>
+						<p>this video is paused</p>
+					</div>
+					:null
+				}
+
 				<div className={classnames('view-container', 'webcam')} style={style}>
 					<div className='indicators'>
 						{peer.raiseHandState ?
@@ -124,16 +129,14 @@ class Peer extends Component
 						/>
 
 						<div
-							className={classnames('button', 'webcam', {
-								on       : videoVisible,
-								off      : !videoVisible,
-								disabled : peer.peerVideoInProgress
+							className={classnames('button', 'newwindow', {
+								disabled : !videoVisible ||
+									(windowConsumer === webcamConsumer.id)
 							})}
 							onClick={(e) =>
 							{
 								e.stopPropagation();
-								videoVisible ?
-									onDisableWebcam(peer.name) : onEnableWebcam(peer.name);
+								toggleConsumerWindow(webcamConsumer);
 							}}
 						/>
 
@@ -146,10 +149,10 @@ class Peer extends Component
 							}}
 						/>
 					</div>
+
 					<PeerView
 						advancedMode={advancedMode}
 						peer={peer}
-						audioTrack={micConsumer ? micConsumer.track : null}
 						volume={micConsumer ? micConsumer.volume : null}
 						videoTrack={webcamConsumer ? webcamConsumer.track : null}
 						videoVisible={videoVisible}
@@ -167,16 +170,11 @@ class Peer extends Component
 							})}
 						>
 							<div
-								className={classnames('button', 'screen', {
-									on       : screenVisible,
-									off      : !screenVisible,
-									disabled : peer.peerScreenInProgress
-								})}
+								className={classnames('button', 'newwindow')}
 								onClick={(e) =>
 								{
 									e.stopPropagation();
-									screenVisible ?
-										onDisableScreen(peer.name) : onEnableScreen(peer.name);
+									toggleConsumerWindow(screenConsumer);
 								}}
 							/>
 
@@ -211,15 +209,13 @@ Peer.propTypes =
 	micConsumer              : appPropTypes.Consumer,
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
+	windowConsumer           : PropTypes.number,
 	onMuteMic                : PropTypes.func.isRequired,
 	onUnmuteMic              : PropTypes.func.isRequired,
-	onEnableWebcam           : PropTypes.func.isRequired,
-	onDisableWebcam          : PropTypes.func.isRequired,
 	streamDimensions         : PropTypes.object,
 	style                    : PropTypes.object,
-	onEnableScreen           : PropTypes.func.isRequired,
-	onDisableScreen          : PropTypes.func.isRequired,
-	toggleConsumerFullscreen : PropTypes.func.isRequired
+	toggleConsumerFullscreen : PropTypes.func.isRequired,
+	toggleConsumerWindow     : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state, { name }) =>
@@ -238,7 +234,8 @@ const mapStateToProps = (state, { name }) =>
 		peer,
 		micConsumer,
 		webcamConsumer,
-		screenConsumer
+		screenConsumer,
+		windowConsumer : state.room.windowConsumer
 	};
 };
 
@@ -253,27 +250,15 @@ const mapDispatchToProps = (dispatch) =>
 		{
 			dispatch(requestActions.unmutePeerAudio(peerName));
 		},
-		onEnableWebcam : (peerName) =>
-		{
-
-			dispatch(requestActions.resumePeerVideo(peerName));
-		},
-		onDisableWebcam : (peerName) =>
-		{
-			dispatch(requestActions.pausePeerVideo(peerName));
-		},
-		onEnableScreen : (peerName) =>
-		{
-			dispatch(requestActions.resumePeerScreen(peerName));
-		},
-		onDisableScreen : (peerName) =>
-		{
-			dispatch(requestActions.pausePeerScreen(peerName));
-		},
 		toggleConsumerFullscreen : (consumer) =>
 		{
 			if (consumer)
 				dispatch(stateActions.toggleConsumerFullscreen(consumer.id));
+		},
+		toggleConsumerWindow : (consumer) =>
+		{
+			if (consumer)
+				dispatch(stateActions.toggleConsumerWindow(consumer.id));
 		}
 	};
 };

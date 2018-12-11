@@ -34,6 +34,11 @@ class Chat extends Component
 						autoFocus={autofocus}
 						autoComplete='off'
 					/>
+					<input
+						type='submit'
+						className='send'
+						value='Send'
+					/>
 				</form>
 			</div>
 		);
@@ -53,7 +58,7 @@ Chat.propTypes =
 Chat.defaultProps =
 {
 	senderPlaceHolder : 'Type a message...',
-	autofocus         : true,
+	autofocus         : false,
 	displayName       : null
 };
 

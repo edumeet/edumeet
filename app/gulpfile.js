@@ -26,7 +26,7 @@ const touch = require('gulp-touch-cmd');
 const browserify = require('browserify');
 const watchify = require('watchify');
 const envify = require('envify/custom');
-const uglify = require('gulp-uglify');
+const uglify = require('gulp-uglify-es').default;
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const del = require('del');
@@ -77,10 +77,7 @@ function bundle(options)
 			// required to be true only for watchify.
 			fullPaths    : watch
 		})
-		.transform('babelify',
-			{
-				presets : [ 'env', 'react-app' ]
-			})
+		.transform('babelify')
 		.transform(envify(
 			{
 				NODE_ENV : process.env.NODE_ENV,
@@ -140,7 +137,7 @@ gulp.task('lint', () =>
 		.pipe(eslint.format());
 });
 
-gulp.task('lint-fix', function() 
+gulp.task('lint-fix', function()
 {
 	return gulp.src(LINTING_FILES)
 		.pipe(plumber())
@@ -171,7 +168,7 @@ gulp.task('css', () =>
 
 gulp.task('html', () =>
 {
-	return gulp.src('index.html')
+	return gulp.src('*.html')
 		.pipe(change(changeHTML))
 		.pipe(gulp.dest(OUTPUT_DIR));
 });
@@ -244,7 +241,7 @@ gulp.task('browser', (done) =>
 gulp.task('watch', (done) =>
 {
 	// Watch changes in HTML.
-	gulp.watch([ 'index.html' ], gulp.series(
+	gulp.watch([ '*.html' ], gulp.series(
 		'html'
 	));
 

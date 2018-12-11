@@ -18,6 +18,9 @@ if (process.env.NODE_ENV === 'development')
 {
 	const reduxLogger = createLogger(
 		{
+			// filter VOLUME level actions from log
+			predicate : (getState, action) => ! (action.type == 'SET_PRODUCER_VOLUME'
+				|| action.type == 'SET_CONSUMER_VOLUME'),
 			duration  : true,
 			timestamp : false,
 			level     : 'log',

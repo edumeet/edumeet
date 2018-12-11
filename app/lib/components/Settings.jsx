@@ -5,6 +5,7 @@ import * as requestActions from '../redux/requestActions';
 import * as stateActions from '../redux/stateActions';
 import PropTypes from 'prop-types';
 import Dropdown from 'react-dropdown';
+import ReactTooltip from 'react-tooltip';
 
 const modes = [ {
 	value : 'democratic',
@@ -22,12 +23,6 @@ const Settings = ({
 }) =>
 {
 	let webcams;
-	let webcamText;
-
-	if (me.canChangeWebcam)
-		webcamText = 'Select camera';
-	else
-		webcamText = 'Unable to select camera';
 
 	if (me.webcamDevices)
 		webcams = Array.from(me.webcamDevices.values());
@@ -51,13 +46,12 @@ const Settings = ({
 		<div data-component='Settings'>
 			<div className='settings'>
 				<Dropdown
-					disabled={!me.canChangeWebcam}
 					options={webcams}
 					value={findOption(webcams, me.selectedWebcam)}
 					onChange={(webcam) => handleChangeWebcam(webcam.value)}
-					placeholder={webcamText}
+					placeholder={'Select camera'}
 				/>
-			
+
 				<Dropdown
 					disabled={!me.canChangeAudioDevice}
 					options={audioDevices}
@@ -65,20 +59,34 @@ const Settings = ({
 					onChange={(device) => handleChangeAudioDevice(device.value)}
 					placeholder={audioDevicesText}
 				/>
-
-				<input
-					id='room-mode'
-					type='checkbox'
-					checked={room.advancedMode}
-					onChange={onToggleAdvancedMode}
+				<ReactTooltip
+					effect='solid'
 				/>
-				<label htmlFor='room-mode'>Advanced mode</label>
+				<div
+					data-tip='keyboard shortcut: &lsquo;a&lsquo;'
+					data-type='dark'
+					data-place='left'
+				>
+					<input
+						id='room-mode'
+						type='checkbox'
+						checked={room.advancedMode}
+						onChange={onToggleAdvancedMode}
+					/>
+					<label htmlFor='room-mode'>Advanced mode</label>
+				</div>
 
-				<Dropdown
-					options={modes}
-					value={findOption(modes, room.mode)}
-					onChange={(mode) => handleChangeMode(mode.value)}
-				/>
+				<div
+					data-tip='keyboard shortcut: type a digit'
+					data-type='dark'
+					data-place='left'
+				>
+					<Dropdown
+						options={modes}
+						value={findOption(modes, room.mode)}
+						onChange={(mode) => handleChangeMode(mode.value)}
+					/>
+				</div>
 			</div>
 		</div>
 	);
