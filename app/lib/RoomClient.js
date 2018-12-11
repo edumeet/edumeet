@@ -1366,7 +1366,7 @@ export default class RoomClient
 			if (this._produce)
 			{
 				if (this._room.canSend('audio'))
-					await this._setMicProducer();
+					this._setMicProducer();
 
 				// Add our webcam (unless the cookie says no).
 				if (this._room.canSend('video'))
@@ -1374,7 +1374,7 @@ export default class RoomClient
 					const devicesCookie = cookiesManager.getDevices();
 
 					if (!devicesCookie || devicesCookie.webcamEnabled)
-						await this.enableWebcam();
+						this.enableWebcam();
 				}
 			}
 
