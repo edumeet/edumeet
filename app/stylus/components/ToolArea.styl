@@ -63,6 +63,93 @@
 		}
 	}
 
+	> .toolarea-button {
+		text-align: center;
+		writing-mode: vertical-rl;
+		text-orientation: mixed;
+		list-style: none;
+		height: 115px;
+		width: 35px;
+		left: -35px;
+		top: 50%;
+		transform: translate(0, -50%);
+		position: absolute;
+		cursor: pointer;
+
+		> .badge {
+			border-radius: 50%;
+			writing-mode: horizontal-tb;
+			font-size: 1rem;
+			background: #b12525;
+			color: #fff;
+			text-align: center;
+			margin-top: -10px;
+			line-height: 1rem;
+			margin-left: -0px;
+			position: absolute;
+			padding: 0.2rem 0.4rem;
+			top: 0;
+			left: 0;
+
+			&.long {
+				border-radius: 25% / 50%;
+				margin-top: -13px;
+				margin-left: -4px;
+			}
+		}
+
+		> .content {
+			border: 1px solid #AAA;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			border-bottom-left-radius: 6px;
+			border-top-left-radius: 6px;
+			background: #FFF;
+			color: #333;
+			z-index: 2;
+			border-right-color: #FFF;
+
+			&:before, &:after {
+				border: 1px solid #AAA;
+				position: absolute;
+				width: 6px;
+				height: 6px;
+				content: "";
+			}
+
+			&:before {
+				top: -6px;
+				right: 0;
+				border-bottom-right-radius: 6px;
+				border-width: 0px 1px 1px 0px;
+				box-shadow: 0px 3px 0 #FFF;
+			}
+
+			&:after {
+				bottom: -6px;
+				right: 0;
+				border-top-right-radius: 6px;
+				border-width: 1px 1px 0px 0px;
+				box-shadow: 0px -3px 0 #FFF;
+			}
+
+			> .toolarea-icon {
+				background-position: center;
+				background-size: 75%;
+				background-repeat: no-repeat;
+				border-radius: 100%;
+				height: 32px;
+				width: 32px;
+
+				background-image: url('/resources/images/icon_tool_area_black.svg');
+			}
+
+			> p {
+				padding: 9px;
+			}
+		}
+	}
 }
 
 @media (min-width: 600px) {

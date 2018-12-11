@@ -13,7 +13,7 @@ import Me from './Me';
 import Peers from './Peers';
 import AudioPeers from './PeerAudio/AudioPeers';
 import Notifications from './Notifications';
-import ToolAreaButton from './ToolArea/ToolAreaButton';
+// import ToolAreaButton from './ToolArea/ToolAreaButton';
 import ToolArea from './ToolArea/ToolArea';
 import FullScreenView from './FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
@@ -96,8 +96,6 @@ class Room extends React.Component
 							<AudioPeers />
 
 							<Notifications />
-
-							<ToolAreaButton />
 
 							{room.advancedMode ?
 								<div className='state' data-tip='Server status'>

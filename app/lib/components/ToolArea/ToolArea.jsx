@@ -24,7 +24,7 @@ class ToolArea extends React.Component
 			unreadMessages,
 			unreadFiles,
 			toggleToolArea,
-			closeToolArea
+			unread
 		} = this.props;
 
 		const VisibleTab = {
@@ -50,11 +50,21 @@ class ToolArea extends React.Component
 					})}
 				>
 					<div
-						className={classNames('toolarea-close-button button', {
-							on : toolAreaOpen
-						})}
-						onClick={closeToolArea}
-					/>
+						className='toolarea-button'
+						onClick={toggleToolArea}
+					>
+						<span className='content'>
+							<div
+								className='toolarea-icon'
+							/>
+							<p>Toolbox</p>
+						</span>
+						{!toolAreaOpen && unread > 0 && (
+							<span className={classNames('badge', { long: unread >= 10 })}>
+								{unread}
+							</span>
+						)}
+					</div>
 					<div className='tab-headers'>
 						<TabHeader
 							id='chat'
@@ -97,14 +107,17 @@ ToolArea.propTypes =
 	unreadFiles    : PropTypes.number.isRequired,
 	toolAreaOpen   : PropTypes.bool,
 	toggleToolArea : PropTypes.func.isRequired,
-	closeToolArea  : PropTypes.func.isRequired
+	closeToolArea  : PropTypes.func.isRequired,
+	unread         : PropTypes.number.isRequired
 };
 
 const mapStateToProps = (state) => ({
 	currentToolTab : state.toolarea.currentToolTab,
 	unreadMessages : state.toolarea.unreadMessages,
 	unreadFiles    : state.toolarea.unreadFiles,
-	toolAreaOpen   : state.toolarea.toolAreaOpen
+	toolAreaOpen   : state.toolarea.toolAreaOpen,
+	unread         : state.toolarea.unreadMessages +
+		state.toolarea.unreadFiles
 });
 
 const mapDispatchToProps = {
