@@ -130,7 +130,8 @@ class Peer extends Component
 
 						<div
 							className={classnames('button', 'newwindow', {
-								disabled : webcamConsumer && (windowConsumer === webcamConsumer.id)
+								disabled : !videoVisible ||
+									(windowConsumer === webcamConsumer.id)
 							})}
 							onClick={(e) =>
 							{
