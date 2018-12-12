@@ -17,17 +17,23 @@ class SharedFilesList extends Component
 
 		return (
 			<div className='shared-files'>
-				{ sharing.length > 0 ?
-					sharing.map((entry, i) => (
-						<FileEntry
-							data={entry}
-							key={i}
-						/>
-					))
-					:<div className='empty'>
-						<p>No one has shared files yet...</p>
-					</div>
-				}
+				<Choose>
+					<When condition={sharing.length > 0}>
+						{
+							sharing.map((entry, i) => (
+								<FileEntry
+									data={entry}
+									key={i}
+								/>
+							))
+						}
+					</When>
+					<Otherwise>
+						<div className='empty'>
+							<p>No one has shared files yet...</p>
+						</div>
+					</Otherwise>
+				</Choose>
 			</div>
 		);
 	}

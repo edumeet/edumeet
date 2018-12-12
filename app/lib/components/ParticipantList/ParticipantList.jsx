@@ -2,16 +2,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
-import * as requestActions from '../../redux/requestActions';
+import { withRoomContext } from '../../RoomContext';
 import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
 
 const ParticipantList =
 	({
+		roomClient,
 		advancedMode,
 		peers,
-		setSelectedPeer,
 		selectedPeerName,
 		spotlights
 	}) => (
@@ -33,7 +33,7 @@ const ParticipantList =
 						className={classNames('list-item', {
 							selected : peer.name === selectedPeerName
 						})}
-						onClick={() => setSelectedPeer(peer.name)}
+						onClick={() => roomClient.setSelectedPeer(peer.name)}
 					>
 						<ListPeer name={peer.name} advancedMode={advancedMode} />
 					</li>
@@ -52,7 +52,7 @@ const ParticipantList =
 						className={classNames('list-item', {
 							selected : peer.name === selectedPeerName
 						})}
-						onClick={() => setSelectedPeer(peer.name)}
+						onClick={() => roomClient.setSelectedPeer(peer.name)}
 					>
 						<ListPeer name={peer.name} advancedMode={advancedMode} />
 					</li>
@@ -64,9 +64,9 @@ const ParticipantList =
 
 ParticipantList.propTypes =
 {
+	roomClient       : PropTypes.any.isRequired,
 	advancedMode     : PropTypes.bool,
 	peers            : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
-	setSelectedPeer  : PropTypes.func.isRequired,
 	selectedPeerName : PropTypes.string,
 	spotlights       : PropTypes.array.isRequired
 };
@@ -82,13 +82,8 @@ const mapStateToProps = (state) =>
 	};
 };
 
-const mapDispatchToProps = {
-	setSelectedPeer : requestActions.setSelectedPeer
-};
-
-const ParticipantListContainer = connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(ParticipantList);
+const ParticipantListContainer = withRoomContext(connect(
+	mapStateToProps
+)(ParticipantList));
 
 export default ParticipantListContainer;

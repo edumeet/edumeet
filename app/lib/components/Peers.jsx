@@ -108,35 +108,36 @@ class Peers extends React.Component
 				{
 					peers.map((peer) =>
 					{
-						return (
-							(spotlights.find(function(spotlightsElement)
-							{ return spotlightsElement == peer.name; }))?
-								<Appear key={peer.name} duration={1000}>
-									<div
-										className={classnames('peer-container', {
-											'selected'       : this.props.selectedPeerName === peer.name,
-											'active-speaker' : peer.name === activeSpeakerName
-										})}
-									>
-										<div className='peer-content'>
-											<Peer
-												advancedMode={advancedMode}
-												name={peer.name}
-												style={style}
-											/>
-										</div>
+						<If
+							condition={
+								spotlights.find((spotlightsElement) => spotlightsElement === peer.name)
+							}
+						>
+							<Appear key={peer.name} duration={1000}>
+								<div
+									className={classnames('peer-container', {
+										'selected'       : this.props.selectedPeerName === peer.name,
+										'active-speaker' : peer.name === activeSpeakerName
+									})}
+								>
+									<div className='peer-content'>
+										<Peer
+											advancedMode={advancedMode}
+											name={peer.name}
+											style={style}
+										/>
 									</div>
-								</Appear>
-								:null
-						);
+								</div>
+							</Appear>
+						</If>;
 					})
 				}
 				<div className='hidden-peer-container'>
-					{ (spotlightsLength<peers.length)?
+					<If condition={spotlightsLength < peers.length}>
 						<HiddenPeers
 							hiddenPeersCount={peers.length-spotlightsLength}
-						/>:null
-					}
+						/>
+					</If>
 				</div>
 			</div>
 		);

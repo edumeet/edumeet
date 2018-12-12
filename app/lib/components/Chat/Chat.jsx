@@ -1,17 +1,28 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import * as stateActions from '../../redux/stateActions';
-import * as requestActions from '../../redux/requestActions';
+import { withRoomContext } from '../../RoomContext';
 import MessageList from './MessageList';
 
 class Chat extends Component
 {
+	createNewMessage(text, sender, name, picture)
+	{
+		return {
+			type : 'message',
+			text,
+			time : Date.now(),
+			name,
+			sender,
+			picture
+		};
+	}
+
 	render()
 	{
 		const {
+			roomClient,
 			senderPlaceHolder,
-			onSendMessage,
 			disabledInput,
 			autofocus,
 			displayName,
@@ -23,7 +34,19 @@ class Chat extends Component
 				<MessageList />
 				<form
 					data-component='Sender'
-					onSubmit={(e) => { onSendMessage(e, displayName, picture); }}
+					onSubmit={(e) =>
+					{
+						e.preventDefault();
+						const userInput = e.target.message.value;
+
+						if (userInput)
+						{
+							const message = this.createNewMessage(userInput, 'response', displayName, picture);
+
+							roomClient.sendChatMessage(message);
+						}
+						e.target.message.value = '';
+					}}
 				>
 					<input
 						type='text'
@@ -47,8 +70,8 @@ class Chat extends Component
 
 Chat.propTypes =
 {
+	roomClient        : PropTypes.any.isRequired,
 	senderPlaceHolder : PropTypes.string,
-	onSendMessage     : PropTypes.func,
 	disabledInput     : PropTypes.bool,
 	autofocus         : PropTypes.bool,
 	displayName       : PropTypes.string,
@@ -71,27 +94,8 @@ const mapStateToProps = (state) =>
 	};
 };
 
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		onSendMessage : (event, displayName, picture) =>
-		{
-			event.preventDefault();
-			const userInput = event.target.message.value;
-
-			if (userInput)
-			{
-				dispatch(stateActions.addUserMessage(userInput));
-				dispatch(requestActions.sendChatMessage(userInput, displayName, picture));
-			}
-			event.target.message.value = '';
-		}
-	};
-};
-
-const ChatContainer = connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(Chat);
+const ChatContainer = withRoomContext(connect(
+	mapStateToProps
+)(Chat));
 
 export default ChatContainer;

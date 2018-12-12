@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { getDeviceInfo } from 'mediasoup-client';
 import * as appPropTypes from './appPropTypes';
-import * as requestActions from '../redux/requestActions';
+import { withRoomContext } from '../RoomContext';
 import PeerView from './PeerView';
 import ScreenView from './ScreenView';
 
@@ -46,17 +46,13 @@ class Me extends React.Component
 	render()
 	{
 		const {
+			roomClient,
 			connected,
 			me,
 			advancedMode,
 			micProducer,
 			webcamProducer,
-			screenProducer,
-			onChangeDisplayName,
-			onMuteMic,
-			onUnmuteMic,
-			onEnableWebcam,
-			onDisableWebcam
+			screenProducer
 		} = this.props;
 
 		let micState;
@@ -107,7 +103,7 @@ class Me extends React.Component
 				onMouseOut={this.handleMouseOut}
 			>
 				<div className={classnames('view-container', 'webcam')}>
-					{connected ?
+					<If condition={connected}>
 						<div className={classnames('controls', 'visible')}>
 							<div
 								data-tip='keyboard shortcut: &lsquo;m&lsquo;'
@@ -120,7 +116,9 @@ class Me extends React.Component
 								})}
 								onClick={() =>
 								{
-									micState === 'on' ? onMuteMic() : onUnmuteMic();
+									micState === 'on' ?
+										roomClient.muteMic() :
+										roomClient.unmuteMic();
 								}}
 							/>
 							<ReactTooltip
@@ -134,12 +132,13 @@ class Me extends React.Component
 								})}
 								onClick={() =>
 								{
-									webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
+									webcamState === 'on' ?
+										roomClient.disableWebcam() :
+										roomClient.enableWebcam();
 								}}
 							/>
 						</div>
-						:null
-					}
+					</If>
 
 					<PeerView
 						isMe
@@ -151,11 +150,14 @@ class Me extends React.Component
 						videoVisible={videoVisible}
 						audioCodec={micProducer ? micProducer.codec : null}
 						videoCodec={webcamProducer ? webcamProducer.codec : null}
-						onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
+						onChangeDisplayName={(displayName) =>
+						{
+							roomClient.changeDisplayName(displayName);
+						}}
 					/>
 				</div>
 
-				{screenProducer ?
+				<If condition={screenProducer}>
 					<div className={classnames('view-container', 'screen')}>
 						<ScreenView
 							isMe
@@ -165,8 +167,7 @@ class Me extends React.Component
 							screenCodec={screenProducer ? screenProducer.codec : null}
 						/>
 					</div>
-					:null
-				}
+				</If>
 			</div>
 		);
 	}
@@ -204,17 +205,13 @@ class Me extends React.Component
 
 Me.propTypes =
 {
-	connected           : PropTypes.bool.isRequired,
-	advancedMode        : PropTypes.bool,
-	me                  : appPropTypes.Me.isRequired,
-	micProducer         : appPropTypes.Producer,
-	webcamProducer      : appPropTypes.Producer,
-	screenProducer      : appPropTypes.Producer,
-	onChangeDisplayName : PropTypes.func.isRequired,
-	onMuteMic           : PropTypes.func.isRequired,
-	onUnmuteMic         : PropTypes.func.isRequired,
-	onEnableWebcam      : PropTypes.func.isRequired,
-	onDisableWebcam     : PropTypes.func.isRequired
+	roomClient     : PropTypes.any.isRequired,
+	connected      : PropTypes.bool.isRequired,
+	advancedMode   : PropTypes.bool,
+	me             : appPropTypes.Me.isRequired,
+	micProducer    : appPropTypes.Producer,
+	webcamProducer : appPropTypes.Producer,
+	screenProducer : appPropTypes.Producer
 };
 
 const mapStateToProps = (state) =>
@@ -236,23 +233,8 @@ const mapStateToProps = (state) =>
 	};
 };
 
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		onChangeDisplayName : (displayName) =>
-		{
-			dispatch(requestActions.changeDisplayName(displayName));
-		},
-		onMuteMic       : () => dispatch(requestActions.muteMic()),
-		onUnmuteMic     : () => dispatch(requestActions.unmuteMic()),
-		onEnableWebcam  : () => dispatch(requestActions.enableWebcam()),
-		onDisableWebcam : () => dispatch(requestActions.disableWebcam())
-	};
-};
-
-const MeContainer = connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(Me);
+const MeContainer = withRoomContext(connect(
+	mapStateToProps
+)(Me));
 
 export default MeContainer;

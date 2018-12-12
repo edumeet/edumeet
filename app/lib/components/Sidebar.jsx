@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
-import * as requestActions from '../redux/requestActions';
+import { withRoomContext } from '../RoomContext';
 import FullScreen from './FullScreen';
 
 class Sidebar extends Component
@@ -56,8 +56,10 @@ class Sidebar extends Component
 	render()
 	{
 		const {
-			toolbarsVisible, me, screenProducer, onLogin, onShareScreen,
-			onUnShareScreen, onNeedExtension, onLeaveMeeting, onLogout, onToggleHand
+			roomClient,
+			toolbarsVisible,
+			me,
+			screenProducer
 		} = this.props;
 
 		let screenState;
@@ -91,7 +93,7 @@ class Sidebar extends Component
 				})}
 				data-component='Sidebar'
 			>
-				{this.fullscreen.fullscreenEnabled && (
+				<If condition={this.fullscreen.fullscreenEnabled}>
 					<div
 						className={classnames('button', 'fullscreen', {
 							on : this.state.fullscreen
@@ -101,7 +103,7 @@ class Sidebar extends Component
 						data-place='right'
 						data-type='dark'
 					/>
-				)}
+				</If>
 
 				<div
 					className={classnames('button', 'screen', screenState)}
@@ -114,17 +116,17 @@ class Sidebar extends Component
 						{
 							case 'on':
 							{
-								onUnShareScreen();
+								roomClient.disableScreenSharing();
 								break;
 							}
 							case 'off':
 							{
-								onShareScreen();
+								roomClient.enableScreenSharing();
 								break;
 							}
 							case 'need-extension':
 							{
-								onNeedExtension();
+								roomClient.installExtension();
 								break;
 							}
 							default:
@@ -135,25 +137,30 @@ class Sidebar extends Component
 					}}
 				/>
 
-				{me.loginEnabled && (me.loggedIn ? (
-					<div
-						className='button logout'
-						data-tip='Logout'
-						data-place='right'
-						data-type='dark'
-						onClick={onLogout}
-					>
-						<img src={me.picture || 'resources/images/avatar-empty.jpeg'} />
-					</div>
-				) : (
-					<div
-						className='button login off'
-						data-tip='Login'
-						data-place='right'
-						data-type='dark'
-						onClick={onLogin}
-					/>
-				))}
+				<If condition={me.loginEnabled}>
+					<Choose>
+						<When condition={me.loggedIn}>
+							<div
+								className='button logout'
+								data-tip='Logout'
+								data-place='right'
+								data-type='dark'
+								onClick={() => roomClient.logout()}
+							>
+								<img src={me.picture || 'resources/images/avatar-empty.jpeg'} />
+							</div>
+						</When>
+						<Otherwise>
+							<div
+								className='button login off'
+								data-tip='Login'
+								data-place='right'
+								data-type='dark'
+								onClick={() => roomClient.login()}
+							/>
+						</Otherwise>
+					</Choose>
+				</If>
 				<div
 					className={classnames('button', 'raise-hand', {
 						on       : me.raiseHand,
@@ -162,7 +169,7 @@ class Sidebar extends Component
 					data-tip='Raise hand'
 					data-place='right'
 					data-type='dark'
-					onClick={() => onToggleHand(!me.raiseHand)}
+					onClick={() => roomClient.sendRaiseHandState(!me.raiseHand)}
 				/>
 
 				<div
@@ -170,7 +177,7 @@ class Sidebar extends Component
 					data-tip='Leave meeting'
 					data-place='right'
 					data-type='dark'
-					onClick={() => onLeaveMeeting()}
+					onClick={() => roomClient.close()}
 				/>
 			</div>
 		);
@@ -178,15 +185,9 @@ class Sidebar extends Component
 }
 
 Sidebar.propTypes = {
+	roomClient      : PropTypes.any.isRequired,
 	toolbarsVisible : PropTypes.bool.isRequired,
 	me              : appPropTypes.Me.isRequired,
-	onShareScreen   : PropTypes.func.isRequired,
-	onUnShareScreen : PropTypes.func.isRequired,
-	onNeedExtension : PropTypes.func.isRequired,
-	onToggleHand    : PropTypes.func.isRequired,
-	onLeaveMeeting  : PropTypes.func.isRequired,
-	onLogin         : PropTypes.func.isRequired,
-	onLogout        : PropTypes.func.isRequired,
 	screenProducer  : appPropTypes.Producer
 };
 
@@ -198,17 +199,6 @@ const mapStateToProps = (state) =>
 		me : state.me
 	});
 
-const mapDispatchToProps = {
-	onLeaveMeeting  : requestActions.leaveRoom,
-	onShareScreen   : requestActions.enableScreenSharing,
-	onUnShareScreen : requestActions.disableScreenSharing,
-	onNeedExtension : requestActions.installExtension,
-	onToggleHand    : requestActions.toggleHand,
-	onLogin         : requestActions.userLogin,
-	onLogout        : requestActions.userLogout
-};
-
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(Sidebar);
+export default withRoomContext(connect(
+	mapStateToProps
+)(Sidebar));

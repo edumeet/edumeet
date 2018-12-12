@@ -110,29 +110,34 @@ class FileEntry extends Component
 				<img className='file-avatar' src={this.props.data.picture || DEFAULT_PICTURE} />
 	
 				<div className='file-content'>
-					{this.props.data.me ? (
-						<p>You shared a file.</p>
-					) : (
-						<p>{this.props.data.name} shared a file.</p>
-					)}
+					<Choose>
+						<When condition={this.props.data.me}>
+							<p>You shared a file.</p>
+						</When>
+						<Otherwise>
+							<p>{this.props.data.name} shared a file.</p>
+						</Otherwise>
+					</Choose>
 
-					{!this.state.active && !this.state.files && (
+					<If condition={!this.state.active && !this.state.files}>
 						<div className='file-info'>
-							{WebTorrent.WEBRTC_SUPPORT ? (
-								<span className='button' onClick={this.handleDownload}>
-									<img src='resources/images/download-icon.svg' />
-								</span>
-							) : (
-								<p>
-									Your browser does not support downloading files using WebTorrent.
-								</p>
-							)}
-
+							<Choose>
+								<When condition={WebTorrent.WEBRTC_SUPPORT}>
+									<span className='button' onClick={this.handleDownload}>
+										<img src='resources/images/download-icon.svg' />
+									</span>
+								</When>
+								<Otherwise>
+									<p>
+										Your browser does not support downloading files using WebTorrent.
+									</p>
+								</Otherwise>
+							</Choose>
 							<p>{magnet.decode(this.props.data.file.magnet).dn}</p>
 						</div>
-					)}
+					</If>
 
-					{this.state.active && this.state.numPeers === 0 && (
+					<If condition={this.state.active && this.state.numPeers === 0}>
 						<Fragment>
 							<p>
 								Locating peers
@@ -145,13 +150,13 @@ class FileEntry extends Component
 								</p>
 							)}
 						</Fragment>
-					)}
+					</If>
 
-					{this.state.active && this.state.numPeers > 0 && (
+					<If condition={this.state.active && this.state.numPeers > 0}>
 						<progress value={this.state.progress} />
-					)}
+					</If>
 
-					{this.state.files && (
+					<If condition={this.state.files}>
 						<Fragment>
 							<p>Torrent finished downloading.</p>
 
@@ -165,7 +170,7 @@ class FileEntry extends Component
 								</div>
 							))}
 						</Fragment>
-					)}
+					</If>
 				</div>
 			</div>
 		);

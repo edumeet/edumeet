@@ -35,12 +35,11 @@ export default class FullView extends React.Component
 					muted={Boolean(true)}
 				/>
 
-				{videoProfile === 'none' ?
+				<If condition={videoProfile === 'none'}>
 					<div className='spinner-container'>
 						<Spinner />
 					</div>
-					:null
-				}
+				</If>
 			</div>
 		);
 	}

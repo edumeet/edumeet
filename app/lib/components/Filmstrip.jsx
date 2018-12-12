@@ -4,7 +4,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
 import debounce from 'lodash/debounce';
 import classnames from 'classnames';
-import * as requestActions from '../redux/requestActions';
+import { withRoomContext } from '../RoomContext';
 import Peer from './Peer';
 import HiddenPeers from './HiddenPeers';
 
@@ -114,14 +114,20 @@ class Filmstrip extends Component
 
 	render()
 	{
-		const { peers, advancedMode, spotlights, spotlightsLength } = this.props;
+		const {
+			roomClient,
+			peers,
+			advancedMode,
+			spotlights,
+			spotlightsLength
+		} = this.props;
 
 		const activePeerName = this.getActivePeerName();
 
 		return (
 			<div data-component='Filmstrip'>
 				<div className='active-peer-container' ref={this.activePeerContainer}>
-					{peers[activePeerName] && (
+					<If condition={peers[activePeerName]}>
 						<div
 							className='active-peer'
 							style={{
@@ -134,7 +140,7 @@ class Filmstrip extends Component
 								name={activePeerName}
 							/>
 						</div>
-					)}
+					</If>
 				</div>
 
 				<div className='filmstrip'>
@@ -142,35 +148,37 @@ class Filmstrip extends Component
 						{
 							Object.keys(peers).map((peerName) =>
 							{
-								return (
-									spotlights.find((spotlightsElement) => spotlightsElement === peerName)?
-										<div
-											key={peerName}
-											onClick={() => this.props.setSelectedPeer(peerName)}
-											className={classnames('film', {
-												selected : this.props.selectedPeerName === peerName,
-												active   : this.state.lastSpeaker === peerName
-											})}
-										>
-											<div className='film-content'>
-												<Peer
-													advancedMode={advancedMode}
-													name={peerName}
-												/>
-											</div>
+								<If
+									condition={
+										spotlights.find((spotlightsElement) => spotlightsElement === peerName)
+									}
+								>
+									<div
+										key={peerName}
+										onClick={() => roomClient.setSelectedPeer(peerName)}
+										className={classnames('film', {
+											selected : this.props.selectedPeerName === peerName,
+											active   : this.state.lastSpeaker === peerName
+										})}
+									>
+										<div className='film-content'>
+											<Peer
+												advancedMode={advancedMode}
+												name={peerName}
+											/>
 										</div>
-										:null
-								);
+									</div>
+								</If>;
 							})
 						}
 					</div>
 				</div>
 				<div className='hidden-peer-container'>
-					{ (spotlightsLength<Object.keys(peers).length)?
+					<If condition={(spotlightsLength<Object.keys(peers).length)}>
 						<HiddenPeers
 							hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
-						/>:null
-					}
+						/>
+					</If>
 				</div>
 
 			</div>
@@ -179,13 +187,13 @@ class Filmstrip extends Component
 }
 
 Filmstrip.propTypes = {
+	roomClient        : PropTypes.any.isRequired,
 	activeSpeakerName : PropTypes.string,
 	advancedMode      : PropTypes.bool,
 	peers             : PropTypes.object.isRequired,
 	consumers         : PropTypes.object.isRequired,
 	myName            : PropTypes.string.isRequired,
 	selectedPeerName  : PropTypes.string,
-	setSelectedPeer   : PropTypes.func.isRequired,
 	spotlightsLength  : PropTypes.number,
 	spotlights        : PropTypes.array.isRequired
 };
@@ -205,11 +213,7 @@ const mapStateToProps = (state) =>
 	};
 };
 
-const mapDispatchToProps = {
-	setSelectedPeer : requestActions.setSelectedPeer
-};
-
-export default connect(
+export default withRoomContext(connect(
 	mapStateToProps,
-	mapDispatchToProps
-)(Filmstrip);
+	undefined
+)(Filmstrip));

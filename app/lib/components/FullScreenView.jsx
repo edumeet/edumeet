@@ -31,12 +31,11 @@ const FullScreenView = (props) =>
 
 	return (
 		<div data-component='FullScreenView'>
-			{consumerVisible && !consumer.supported ?
+			<If condition={consumerVisible && !consumer.supported}>
 				<div className='incompatible-video'>
 					<p>incompatible video</p>
 				</div>
-				:null
-			}
+			</If>
 
 			<div className='controls'>
 				<div

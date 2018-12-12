@@ -2,6 +2,7 @@
 	"plugins":
 	[
 		"@babel/plugin-proposal-object-rest-spread",
+		"jsx-control-statements",
 		"@babel/plugin-proposal-class-properties",
 		"@babel/plugin-transform-runtime"
 	],

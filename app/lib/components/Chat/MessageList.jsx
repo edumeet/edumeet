@@ -30,41 +30,47 @@ class MessageList extends Component
 
 		return (
 			<div data-component='MessageList' id='messages'>
-				{ chatmessages.length > 0 ?
-					chatmessages.map((message, i) =>
-					{
-						const messageTime = new Date(message.time);
+				<Choose>
+					<When condition={chatmessages.length > 0}>
+						{
+							chatmessages.map((message, i) =>
+							{
+								const messageTime = new Date(message.time);
 
-						const picture = (message.sender === 'response' ?
-							message.picture : this.props.myPicture) || 'resources/images/avatar-empty.jpeg';
+								const picture = (message.sender === 'response' ?
+									message.picture : this.props.myPicture) || 'resources/images/avatar-empty.jpeg';
 
-						return (
-							<div className='message' key={i}>
-								<div className={message.sender}>
-									<img className='message-avatar' src={picture} />
+								return (
+									<div className='message' key={i}>
+										<div className={message.sender}>
+											<img className='message-avatar' src={picture} />
 
-									<div className='message-content'>
-										<div
-											className='message-text'
-											// eslint-disable-next-line react/no-danger
-											dangerouslySetInnerHTML={{ __html : marked.parse(
-												message.text,
-												{ sanitize: true, renderer: linkRenderer }
-											) }}
-										/>
+											<div className='message-content'>
+												<div
+													className='message-text'
+													// eslint-disable-next-line react/no-danger
+													dangerouslySetInnerHTML={{ __html : marked.parse(
+														message.text,
+														{ sanitize: true, renderer: linkRenderer }
+													) }}
+												/>
 
-										<span className='message-time'>
-											{message.name} - {this.getTimeString(messageTime)}
-										</span>
+												<span className='message-time'>
+													{message.name} - {this.getTimeString(messageTime)}
+												</span>
+											</div>
+										</div>
 									</div>
-								</div>
-							</div>
-						);
-					})
-					:<div className='empty'>
-						<p>No one has said anything yet...</p>
-					</div>
-				}
+								);
+							})
+						}
+					</When>
+					<Otherwise>
+						<div className='empty'>
+							<p>No one has said anything yet...</p>
+						</div>
+					</Otherwise>
+				</Choose>
 			</div>
 		);
 	}

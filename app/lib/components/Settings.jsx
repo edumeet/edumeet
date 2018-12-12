@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as appPropTypes from './appPropTypes';
-import * as requestActions from '../redux/requestActions';
+import { withRoomContext } from '../RoomContext';
 import * as stateActions from '../redux/stateActions';
 import PropTypes from 'prop-types';
 import Dropdown from 'react-dropdown';
@@ -18,8 +18,11 @@ const modes = [ {
 const findOption = (options, value) => options.find((option) => option.value === value);
 
 const Settings = ({
-	room, me, onToggleAdvancedMode, handleChangeWebcam,
-	handleChangeAudioDevice, handleChangeMode
+	roomClient,
+	room,
+	me,
+	onToggleAdvancedMode,
+	handleChangeMode
 }) =>
 {
 	let webcams;
@@ -48,7 +51,7 @@ const Settings = ({
 				<Dropdown
 					options={webcams}
 					value={findOption(webcams, me.selectedWebcam)}
-					onChange={(webcam) => handleChangeWebcam(webcam.value)}
+					onChange={(webcam) => roomClient.changeWebcam(webcam.value)}
 					placeholder={'Select camera'}
 				/>
 
@@ -56,7 +59,7 @@ const Settings = ({
 					disabled={!me.canChangeAudioDevice}
 					options={audioDevices}
 					value={findOption(audioDevices, me.selectedAudioDevice)}
-					onChange={(device) => handleChangeAudioDevice(device.value)}
+					onChange={(device) => roomClient.changeAudioDevice(device.value)}
 					placeholder={audioDevicesText}
 				/>
 				<ReactTooltip
@@ -94,12 +97,11 @@ const Settings = ({
 
 Settings.propTypes =
 {
-	me                      : appPropTypes.Me.isRequired,
-	room                    : appPropTypes.Room.isRequired,
-	handleChangeWebcam      : PropTypes.func.isRequired,
-	handleChangeAudioDevice : PropTypes.func.isRequired,
-	onToggleAdvancedMode    : PropTypes.func.isRequired,
-	handleChangeMode        : PropTypes.func.isRequired
+	roomClient           : PropTypes.any.isRequired,
+	me                   : appPropTypes.Me.isRequired,
+	room                 : appPropTypes.Room.isRequired,
+	onToggleAdvancedMode : PropTypes.func.isRequired,
+	handleChangeMode     : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -111,15 +113,13 @@ const mapStateToProps = (state) =>
 };
 
 const mapDispatchToProps = {
-	handleChangeWebcam      : requestActions.changeWebcam,
-	handleChangeAudioDevice : requestActions.changeAudioDevice,
-	onToggleAdvancedMode    : stateActions.toggleAdvancedMode,
-	handleChangeMode        : stateActions.setDisplayMode
+	onToggleAdvancedMode : stateActions.toggleAdvancedMode,
+	handleChangeMode     : stateActions.setDisplayMode
 };
 
-const SettingsContainer = connect(
+const SettingsContainer = withRoomContext(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(Settings);
+)(Settings));
 
 export default SettingsContainer;

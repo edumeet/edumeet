@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
-import * as requestActions from '../redux/requestActions';
+import { withRoomContext } from '../RoomContext';
 import * as stateActions from '../redux/stateActions';
 import PeerView from './PeerView';
 import ScreenView from './ScreenView';
@@ -31,13 +31,12 @@ class Peer extends Component
 	render()
 	{
 		const {
+			roomClient,
 			advancedMode,
 			peer,
 			micConsumer,
 			webcamConsumer,
 			screenConsumer,
-			onMuteMic,
-			onUnmuteMic,
 			toggleConsumerFullscreen,
 			toggleConsumerWindow,
 			style,
@@ -81,23 +80,21 @@ class Peer extends Component
 				onMouseOver={this.handleMouseOver}
 				onMouseOut={this.handleMouseOut}
 			>
-				{videoVisible && !webcamConsumer.supported ?
+				<If condition={videoVisible && !webcamConsumer.supported}>
 					<div className='incompatible-video'>
 						<p>incompatible video</p>
 					</div>
-					:null
-				}
+				</If>
 
-				{!videoVisible ?
+				<If condition={!videoVisible}>
 					<div className='paused-video'>
 						<p>this video is paused</p>
 					</div>
-					:null
-				}
+				</If>
 
 				<div className={classnames('view-container', 'webcam')} style={style}>
 					<div className='indicators'>
-						{peer.raiseHandState ?
+						<If condition={peer.raiseHandState}>
 							<div className={
 								classnames(
 									'icon', 'raise-hand', {
@@ -107,8 +104,7 @@ class Peer extends Component
 								)
 							}
 							/>
-							:null
-						}
+						</If>
 					</div>
 					<div
 						className={classnames('controls', {
@@ -124,7 +120,9 @@ class Peer extends Component
 							onClick={(e) =>
 							{
 								e.stopPropagation();
-								micEnabled ? onMuteMic(peer.name) : onUnmuteMic(peer.name);
+								micEnabled ?
+									roomClient.mutePeerAudio(peer.name) :
+									roomClient.unmutePeerAudio(peer.name);
 							}}
 						/>
 
@@ -162,7 +160,7 @@ class Peer extends Component
 					/>
 				</div>
 
-				{screenConsumer ?
+				<If condition={screenConsumer}>
 					<div className={classnames('view-container', 'screen')} style={style}>
 						<div
 							className={classnames('controls', {
@@ -195,8 +193,7 @@ class Peer extends Component
 							screenCodec={screenConsumer ? screenConsumer.codec : null}
 						/>
 					</div>
-					:null
-				}
+				</If>
 			</div>
 		);
 	}
@@ -204,14 +201,13 @@ class Peer extends Component
 
 Peer.propTypes =
 {
+	roomClient               : PropTypes.any.isRequired,
 	advancedMode             : PropTypes.bool,
 	peer                     : appPropTypes.Peer.isRequired,
 	micConsumer              : appPropTypes.Consumer,
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
 	windowConsumer           : PropTypes.number,
-	onMuteMic                : PropTypes.func.isRequired,
-	onUnmuteMic              : PropTypes.func.isRequired,
 	streamDimensions         : PropTypes.object,
 	style                    : PropTypes.object,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
@@ -242,14 +238,6 @@ const mapStateToProps = (state, { name }) =>
 const mapDispatchToProps = (dispatch) =>
 {
 	return {
-		onMuteMic : (peerName) =>
-		{
-			dispatch(requestActions.mutePeerAudio(peerName));
-		},
-		onUnmuteMic : (peerName) =>
-		{
-			dispatch(requestActions.unmutePeerAudio(peerName));
-		},
 		toggleConsumerFullscreen : (consumer) =>
 		{
 			if (consumer)
@@ -263,9 +251,9 @@ const mapDispatchToProps = (dispatch) =>
 	};
 };
 
-const PeerContainer = connect(
+const PeerContainer = withRoomContext(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(Peer);
+)(Peer));
 
 export default PeerContainer;

@@ -13,7 +13,6 @@ import Me from './Me';
 import Peers from './Peers';
 import AudioPeers from './PeerAudio/AudioPeers';
 import Notifications from './Notifications';
-// import ToolAreaButton from './ToolArea/ToolAreaButton';
 import ToolArea from './ToolArea/ToolArea';
 import FullScreenView from './FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
@@ -97,13 +96,12 @@ class Room extends React.Component
 
 							<Notifications />
 
-							{room.advancedMode ?
+							<If condition={room.advancedMode}>
 								<div className='state' data-tip='Server status'>
 									<div className={classnames('icon', room.state)} />
 									<p className={classnames('text', room.state)}>{room.state}</p>
 								</div>
-								:null
-							}
+							</If>
 
 							<div
 								className={classnames('room-link-wrapper room-controls', {

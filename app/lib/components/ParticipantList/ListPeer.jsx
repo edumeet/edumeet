@@ -3,18 +3,15 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
-import * as requestActions from '../../redux/requestActions';
+import { withRoomContext } from '../../RoomContext';
 
 const ListPeer = (props) =>
 {
 	const {
+		roomClient,
 		peer,
 		micConsumer,
-		screenConsumer,
-		onMuteMic,
-		onUnmuteMic,
-		onDisableScreen,
-		onEnableScreen
+		screenConsumer
 	} = props;
 
 	const micEnabled = (
@@ -39,7 +36,7 @@ const ListPeer = (props) =>
 				{peer.displayName}
 			</div>
 			<div className='indicators'>
-				{peer.raiseHandState ?
+				<If condition={peer.raiseHandState}>
 					<div className={
 						classnames(
 							'icon', 'raise-hand', {
@@ -49,14 +46,13 @@ const ListPeer = (props) =>
 						)
 					}
 					/>
-					:null
-				}
+				</If>
 			</div>
 			<div className='volume-container'>
 				<div className={classnames('bar', `level${micEnabled && micConsumer ? micConsumer.volume:0}`)} />
 			</div>
 			<div className='controls'>
-				{ screenConsumer ?
+				<If condition={screenConsumer}>
 					<div
 						className={classnames('button', 'screen', {
 							on       : screenVisible,
@@ -67,11 +63,11 @@ const ListPeer = (props) =>
 						{
 							e.stopPropagation();
 							screenVisible ?
-								onDisableScreen(peer.name) : onEnableScreen(peer.name);
+								roomClient.pausePeerScreen(peer.name) :
+								roomClient.resumePeerScreen(peer.name);
 						}}
 					/>
-					:null
-				}
+				</If>
 				<div
 					className={classnames('button', 'mic', {
 						on       : micEnabled,
@@ -81,7 +77,9 @@ const ListPeer = (props) =>
 					onClick={(e) =>
 					{
 						e.stopPropagation();
-						micEnabled ? onMuteMic(peer.name) : onUnmuteMic(peer.name);
+						micEnabled ?
+							roomClient.mutePeerAudio(peer.name) :
+							roomClient.unmutePeerAudio(peer.name);
 					}}
 				/>
 			</div>
@@ -91,17 +89,12 @@ const ListPeer = (props) =>
 
 ListPeer.propTypes =
 {
-	advancedMode    : PropTypes.bool,
-	peer            : appPropTypes.Peer.isRequired,
-	micConsumer     : appPropTypes.Consumer,
-	webcamConsumer  : appPropTypes.Consumer,
-	screenConsumer  : appPropTypes.Consumer,
-	onMuteMic       : PropTypes.func.isRequired,
-	onUnmuteMic     : PropTypes.func.isRequired,
-	onEnableWebcam  : PropTypes.func.isRequired,
-	onDisableWebcam : PropTypes.func.isRequired,
-	onEnableScreen  : PropTypes.func.isRequired,
-	onDisableScreen : PropTypes.func.isRequired
+	roomClient     : PropTypes.any.isRequired,
+	advancedMode   : PropTypes.bool,
+	peer           : appPropTypes.Peer.isRequired,
+	micConsumer    : appPropTypes.Consumer,
+	webcamConsumer : appPropTypes.Consumer,
+	screenConsumer : appPropTypes.Consumer
 };
 
 const mapStateToProps = (state, { name }) =>
@@ -124,40 +117,8 @@ const mapStateToProps = (state, { name }) =>
 	};
 };
 
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		onMuteMic : (peerName) =>
-		{
-			dispatch(requestActions.mutePeerAudio(peerName));
-		},
-		onUnmuteMic : (peerName) =>
-		{
-			dispatch(requestActions.unmutePeerAudio(peerName));
-		},
-		onEnableWebcam : (peerName) =>
-		{
-
-			dispatch(requestActions.resumePeerVideo(peerName));
-		},
-		onDisableWebcam : (peerName) =>
-		{
-			dispatch(requestActions.pausePeerVideo(peerName));
-		},
-		onEnableScreen : (peerName) =>
-		{
-			dispatch(requestActions.resumePeerScreen(peerName));
-		},
-		onDisableScreen : (peerName) =>
-		{
-			dispatch(requestActions.pausePeerScreen(peerName));
-		}
-	};
-};
-
-const ListPeerContainer = connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(ListPeer);
+const ListPeerContainer = withRoomContext(connect(
+	mapStateToProps
+)(ListPeer));
 
 export default ListPeerContainer;

@@ -41,25 +41,21 @@ export default class ScreenView extends React.Component
 		return (
 			<div data-component='ScreenView'>
 				<div className='info'>
-					{advancedMode ?
+					<If condition={advancedMode}>
 						<div className={classnames('media', { 'is-me': isMe })}>
-							{screenVisible ?
+							<If condition={screenVisible}>
 								<div className='box'>
-									{screenCodec ?
+									<If condition={screenCodec}>
 										<p className='codec'>{screenCodec} {screenProfile}</p>
-										:null
-									}
+									</If>
 
-									{(screenVisible && screenWidth !== null) ?
+									<If condition={(screenVisible && screenWidth !== null)}>
 										<p className='resolution'>{screenWidth}x{screenHeight}</p>
-										:null
-									}
+									</If>
 								</div>
-								:null
-							}
+							</If>
 						</div>
-						:null
-					}
+					</If>
 				</div>
 
 				<video
@@ -73,12 +69,11 @@ export default class ScreenView extends React.Component
 					muted={Boolean(true)}
 				/>
 
-				{screenProfile === 'none' ?
+				<If condition={screenProfile === 'none'}>
 					<div className='spinner-container'>
 						<Spinner />
 					</div>
-					:null
-				}
+				</If>
 			</div>
 		);
 	}
