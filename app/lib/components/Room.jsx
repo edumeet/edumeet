@@ -20,9 +20,6 @@ import Draggable from 'react-draggable';
 import { idle } from '../utils';
 import Sidebar from './Sidebar';
 import Filmstrip from './Filmstrip';
-import { configureDragDrop, HoldingOverlay } from './FileSharing/DragDropSharing';
-
-configureDragDrop();
 
 // Hide toolbars after 10 seconds of inactivity.
 const TIMEOUT = 10 * 1000;
@@ -78,8 +75,6 @@ class Room extends React.Component
 
 		return (
 			<Fragment>
-				<HoldingOverlay />
-
 				<Appear duration={300}>
 					<div data-component='Room'>
 						<CookieConsent>

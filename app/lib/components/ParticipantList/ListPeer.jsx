@@ -63,8 +63,8 @@ const ListPeer = (props) =>
 						{
 							e.stopPropagation();
 							screenVisible ?
-								roomClient.pausePeerScreen(peer.name) :
-								roomClient.resumePeerScreen(peer.name);
+								roomClient.modifyPeerConsumer(peer.name, 'screen', true) :
+								roomClient.modifyPeerConsumer(peer.name, 'screen', false);
 						}}
 					/>
 				</If>
@@ -78,8 +78,8 @@ const ListPeer = (props) =>
 					{
 						e.stopPropagation();
 						micEnabled ?
-							roomClient.mutePeerAudio(peer.name) :
-							roomClient.unmutePeerAudio(peer.name);
+							roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
+							roomClient.modifyPeerConsumer(peer.name, 'mic', false);
 					}}
 				/>
 			</div>

@@ -1,5 +1,8 @@
 import io from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
+import WebTorrent from 'webtorrent';
+import createTorrent from 'create-torrent';
+import { saveAs } from 'file-saver/FileSaver';
 import Logger from './Logger';
 import hark from 'hark';
 import ScreenShare from './ScreenShare';
@@ -61,6 +64,9 @@ export default class RoomClient
 		// Whether we should produce.
 		this._produce = produce;
 
+		// Torrent support
+		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
+
 		// Whether simulcast should be used.
 		this._useSimulcast = useSimulcast;
 
@@ -82,6 +88,15 @@ export default class RoomClient
 		// mediasoup-client Room instance.
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
 		this._room.roomId = roomId;
+
+		// Our WebTorrent client
+		this._webTorrent = this._torrentSupport && new WebTorrent({
+			tracker : {
+				rtcConfig : {
+					iceServers : ROOM_OPTIONS.turnServers
+				}
+			}
+		});
 
 		// Max spotlights
 		this._maxSpotlights = ROOM_OPTIONS.maxSpotlights;
@@ -344,7 +359,128 @@ export default class RoomClient
 		}
 	}
 
-	async sendFile(file)
+	saveFile(file)
+	{
+		file.getBlob((err, blob) =>
+		{
+			if (err)
+			{
+				return this.props.notify({
+					text : 'An error occurred while saving a file'
+				});
+			}
+	
+			saveAs(blob, file.name);
+		});
+	}
+
+	handleDownload(magnetUri)
+	{
+		store.dispatch(
+			stateActions.setFileActive(magnetUri));
+
+		const existingTorrent = this._webTorrent.get(magnetUri);
+
+		if (existingTorrent)
+		{
+			// Never add duplicate torrents, use the existing one instead.
+			return this._handleTorrent(existingTorrent);
+		}
+
+		this._webTorrent.add(magnetUri, this._handleTorrent);
+	}
+
+	_handleTorrent(torrent)
+	{
+		// Torrent already done, this can happen if the
+		// same file was sent multiple times.
+		if (torrent.progress === 1)
+		{
+
+			store.dispatch(
+				stateActions.setFileDone(
+					torrent.magnetURI,
+					torrent.files
+				));
+
+			return;
+		}
+
+		torrent.on('download', () =>
+		{
+			store.dispatch(
+				stateActions.setFileProgress(
+					torrent.magnetURI,
+					torrent.progress
+				));
+		});
+
+		torrent.on('done', () => 
+		{
+			store.dispatch(
+				stateActions.setFileDone(
+					torrent.magnetURI,
+					torrent.files
+				));
+		});
+	}
+
+	async shareFiles(files)
+	{
+		this.notify('Creating torrent');
+
+		createTorrent(files, (err, torrent) =>
+		{
+			if (err)
+			{
+				return this.notify(
+					'An error occured while uploading a file'
+				);
+			}
+
+			const existingTorrent = this._webTorrent.get(torrent);
+
+			if (existingTorrent)
+			{
+				const { displayName, picture } = store.getState().me;
+
+				const file = {
+					magnetUri : existingTorrent.magnetURI,
+					displayName,
+					picture
+				};
+
+				return this._sendFile(file);
+			}
+
+			this._webTorrent.seed(files, (newTorrent) =>
+			{
+				this.notify(
+					'Torrent successfully created'
+				);
+
+				const { displayName, picture } = store.getState().me;
+				const file = {
+					magnetUri : newTorrent.magnetURI,
+					displayName,
+					picture
+				};
+
+				store.dispatch(stateActions.addFile(
+					{
+						magnetUri   : file.magnetUri,
+						displayName : displayName,
+						picture     : picture,
+						me          : true
+					}));
+
+				this._sendFile(file);
+			});
+		});
+	}
+
+	// { file, name, picture }
+	async _sendFile(file)
 	{
 		logger.debug('sendFile() [file: %o]', file);
 
@@ -728,68 +864,6 @@ export default class RoomClient
 			stateActions.setWebcamInProgress(false));
 	}
 
-	async changeWebcamResolution()
-	{
-		logger.debug('changeWebcamResolution()');
-
-		let oldResolution;
-		let newResolution;
-
-		store.dispatch(
-			stateActions.setWebcamInProgress(true));
-
-		try
-		{
-			oldResolution = this._webcam.resolution;
-
-			switch (oldResolution)
-			{
-				case 'qvga':
-					newResolution = 'vga';
-					break;
-				case 'vga':
-					newResolution = 'hd';
-					break;
-				case 'hd':
-					newResolution = 'qvga';
-					break;
-			}
-
-			this._webcam.resolution = newResolution;
-
-			const { device } = this._webcam;
-
-			logger.debug('changeWebcamResolution() | calling getUserMedia()');
-
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					video :
-					{
-						deviceId : { exact: device.deviceId },
-						...VIDEO_CONSTRAINS
-					}
-				});
-
-			const track = stream.getVideoTracks()[0];
-
-			const newTrack = await this._webcamProducer.replaceTrack(track);
-
-			track.stop();
-
-			store.dispatch(
-				stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
-		}
-		catch (error)
-		{
-			logger.error('changeWebcamResolution() failed: %o', error);
-
-			this._webcam.resolution = oldResolution;
-		}
-
-		store.dispatch(
-			stateActions.setWebcamInProgress(false));
-	}
-
 	setSelectedPeer(peerName)
 	{
 		logger.debug('setSelectedPeer() [peerName:"%s"]', peerName);
@@ -800,266 +874,59 @@ export default class RoomClient
 			stateActions.setSelectedPeer(peerName));
 	}
 
-	async mutePeerAudio(peerName)
+	// type: mic/webcam/screen
+	// mute: true/false
+	modifyPeerConsumer(peerName, type, mute)
 	{
-		logger.debug('mutePeerAudio() [peerName:"%s"]', peerName);
+		logger.debug(
+			'modifyPeerConsumer() [peerName:"%s", type:"%s"]',
+			peerName,
+			type
+		);
 
-		store.dispatch(
-			stateActions.setPeerAudioInProgress(peerName, true));
-
-		try
-		{
-			for (const peer of this._room.peers)
-			{
-				if (peer.name === peerName)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.appData.source !== 'mic')
-							continue;
-
-						await consumer.pause('mute-audio');
-					}
-				}
-			}
-		}
-		catch (error)
-		{
-			logger.error('mutePeerAudio() failed: %o', error);
-		}
-
-		store.dispatch(
-			stateActions.setPeerAudioInProgress(peerName, false));
-	}
-
-	async unmutePeerAudio(peerName)
-	{
-		logger.debug('unmutePeerAudio() [peerName:"%s"]', peerName);
-
-		store.dispatch(
-			stateActions.setPeerAudioInProgress(peerName, true));
-
-		try
-		{
-			for (const peer of this._room.peers)
-			{
-				if (peer.name === peerName)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.appData.source !== 'mic' || !consumer.supported)
-							continue;
-
-						await consumer.resume();
-					}
-				}
-			}
-		}
-		catch (error)
-		{
-			logger.error('unmutePeerAudio() failed: %o', error);
-		}
-
-		store.dispatch(
-			stateActions.setPeerAudioInProgress(peerName, false));
-	}
-
-	async pausePeerVideo(peerName)
-	{
-		logger.debug('pausePeerVideo() [peerName:"%s"]', peerName);
-
-		store.dispatch(
-			stateActions.setPeerVideoInProgress(peerName, true));
-
-		try
-		{
-			for (const peer of this._room.peers)
-			{
-				if (peer.name === peerName)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.appData.source !== 'webcam')
-							continue;
-
-						await consumer.pause('pause-video');
-					}
-				}
-			}
-		}
-		catch (error)
-		{
-			logger.error('pausePeerVideo() failed: %o', error);
-		}
-
-		store.dispatch(
-			stateActions.setPeerVideoInProgress(peerName, false));
-	}
-
-	async resumePeerVideo(peerName)
-	{
-		logger.debug('resumePeerVideo() [peerName:"%s"]', peerName);
-
-		store.dispatch(
-			stateActions.setPeerVideoInProgress(peerName, true));
-
-		try
-		{
-			for (const peer of this._room.peers)
-			{
-				if (peer.name === peerName)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.appData.source !== 'webcam' || !consumer.supported)
-							continue;
-
-						await consumer.resume();
-					}
-				}
-			}
-		}
-		catch (error)
-		{
-			logger.error('resumePeerVideo() failed: %o', error);
-		}
-
-		store.dispatch(
-			stateActions.setPeerVideoInProgress(peerName, false));
-	}
-
-	async pausePeerScreen(peerName)
-	{
-		logger.debug('pausePeerScreen() [peerName:"%s"]', peerName);
-
-		store.dispatch(
-			stateActions.setPeerScreenInProgress(peerName, true));
-
-		try
-		{
-			for (const peer of this._room.peers)
-			{
-				if (peer.name === peerName)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.appData.source !== 'screen')
-							continue;
-
-						await consumer.pause('pause-screen');
-					}
-				}
-			}
-		}
-		catch (error)
-		{
-			logger.error('pausePeerScreen() failed: %o', error);
-		}
-
-		store.dispatch(
-			stateActions.setPeerScreenInProgress(peerName, false));
-	}
-
-	async resumePeerScreen(peerName)
-	{
-		logger.debug('resumePeerScreen() [peerName:"%s"]', peerName);
-
-		store.dispatch(
-			stateActions.setPeerScreenInProgress(peerName, true));
-
-		try
-		{
-			for (const peer of this._room.peers)
-			{
-				if (peer.name === peerName)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.appData.source !== 'screen' || !consumer.supported)
-							continue;
-
-						await consumer.resume();
-					}
-				}
-			}
-		}
-		catch (error)
-		{
-			logger.error('resumePeerScreen() failed: %o', error);
-		}
-
-		store.dispatch(
-			stateActions.setPeerScreenInProgress(peerName, false));
-	}
-
-	async enableAudioOnly()
-	{
-		logger.debug('enableAudioOnly()');
-
-		store.dispatch(
-			stateActions.setAudioOnlyInProgress(true));
-
-		try
-		{
-			if (this._webcamProducer)
-				await this._webcamProducer.close();
-
-			for (const peer of this._room.peers)
-			{
-				for (const consumer of peer.consumers)
-				{
-					if (consumer.kind !== 'video')
-						continue;
-
-					await consumer.pause('audio-only-mode');
-				}
-			}
-
+		if (type === 'mic')
 			store.dispatch(
-				stateActions.setAudioOnlyState(true));
-		}
-		catch (error)
-		{
-			logger.error('enableAudioOnly() failed: %o', error);
-		}
-
-		store.dispatch(
-			stateActions.setAudioOnlyInProgress(false));
-	}
-
-	async disableAudioOnly()
-	{
-		logger.debug('disableAudioOnly()');
-
-		store.dispatch(
-			stateActions.setAudioOnlyInProgress(true));
+				stateActions.setPeerAudioInProgress(peerName, true));
+		else if (type === 'webcam')
+			store.dispatch(
+				stateActions.setPeerVideoInProgress(peerName, true));
+		else if (type === 'screen')
+			store.dispatch(
+				stateActions.setPeerScreenInProgress(peerName, true));
 
 		try
 		{
-			if (!this._webcamProducer && this._room.canSend('video'))
-				await this.enableWebcam();
-
 			for (const peer of this._room.peers)
 			{
-				for (const consumer of peer.consumers)
+				if (peer.name === peerName)
 				{
-					if (consumer.kind !== 'video' || !consumer.supported)
-						continue;
+					for (const consumer of peer.consumers)
+					{
+						if (consumer.appData.source !== type || !consumer.supported)
+							continue;
 
-					await consumer.resume();
+						if (mute)
+							consumer.pause(`mute-${type}`);
+						else
+							consumer.resume();
+					}
 				}
 			}
-
-			store.dispatch(
-				stateActions.setAudioOnlyState(false));
 		}
 		catch (error)
 		{
-			logger.error('disableAudioOnly() failed: %o', error);
+			logger.error('modifyPeerConsumer() failed: %o', error);
 		}
 
-		store.dispatch(
-			stateActions.setAudioOnlyInProgress(false));
+		if (type === 'mic')
+			store.dispatch(
+				stateActions.setPeerAudioInProgress(peerName, false));
+		else if (type === 'webcam')
+			store.dispatch(
+				stateActions.setPeerVideoInProgress(peerName, false));
+		else if (type === 'screen')
+			store.dispatch(
+				stateActions.setPeerScreenInProgress(peerName, false));
 	}
 
 	async sendRaiseHandState(state)
@@ -1337,6 +1204,9 @@ export default class RoomClient
 		try
 		{
 			await this._room.join(this._peerName, { displayName, device });
+
+			store.dispatch(
+				stateActions.setFileSharingSupported(this._torrentSupport));
 
 			this._sendTransport =
 				this._room.createTransport('send', { media: 'SEND_MIC_WEBCAM' });

@@ -6,7 +6,7 @@ import * as stateActions from '../../redux/stateActions';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import Chat from '../Chat/Chat';
 import Settings from '../Settings';
-import FileSharing from '../FileSharing';
+import FileSharing from '../FileSharing/FileSharing';
 import TabHeader from './TabHeader';
 
 class ToolArea extends React.Component

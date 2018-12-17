@@ -145,14 +145,11 @@ class Filmstrip extends Component
 
 				<div className='filmstrip'>
 					<div className='filmstrip-content'>
+						{ Object.keys(peers).map((peerName) =>
 						{
-							Object.keys(peers).map((peerName) =>
+							if (spotlights.find((spotlightsElement) => spotlightsElement === peerName))
 							{
-								<If
-									condition={
-										spotlights.find((spotlightsElement) => spotlightsElement === peerName)
-									}
-								>
+								return (
 									<div
 										key={peerName}
 										onClick={() => roomClient.setSelectedPeer(peerName)}
@@ -168,9 +165,9 @@ class Filmstrip extends Component
 											/>
 										</div>
 									</div>
-								</If>;
-							})
-						}
+								);
+							}
+						})}
 					</div>
 				</div>
 				<div className='hidden-peer-container'>

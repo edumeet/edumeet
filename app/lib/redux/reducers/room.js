@@ -3,6 +3,7 @@ const initialState =
 	url                : null,
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	activeSpeakerName  : null,
+	torrentSupport     : false,
 	showSettings       : false,
 	advancedMode       : false,
 	fullScreenConsumer : null, // ConsumerID
@@ -39,6 +40,13 @@ const room = (state = initialState, action) =>
 			const { peerName } = action.payload;
 
 			return { ...state, activeSpeakerName: peerName };
+		}
+
+		case 'FILE_SHARING_SUPPORTED':
+		{
+			const { supported } = action.payload;
+
+			return { ...state, torrentSupport: supported };
 		}
 
 		case 'TOGGLE_SETTINGS':

@@ -1,6 +1,4 @@
-const initialState = [];
-
-const notifications = (state = initialState, action) =>
+const notifications = (state = [], action) =>
 {
 	switch (action.type)
 	{

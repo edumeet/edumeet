@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import debounce from 'lodash/debounce';
-import * as appPropTypes from './appPropTypes';
 import { Appear } from './transitions';
 import Peer from './Peer';
 import HiddenPeers from './HiddenPeers';
@@ -105,33 +104,30 @@ class Peers extends React.Component
 
 		return (
 			<div data-component='Peers' ref={this.peersRef}>
+				{ Object.keys(peers).map((peerName) =>
 				{
-					peers.map((peer) =>
+					if (spotlights.find((spotlightsElement) => spotlightsElement === peerName))
 					{
-						<If
-							condition={
-								spotlights.find((spotlightsElement) => spotlightsElement === peer.name)
-							}
-						>
-							<Appear key={peer.name} duration={1000}>
+						return (
+							<Appear key={peerName} duration={1000}>
 								<div
 									className={classnames('peer-container', {
-										'selected'       : this.props.selectedPeerName === peer.name,
-										'active-speaker' : peer.name === activeSpeakerName
+										'selected'       : this.props.selectedPeerName === peerName,
+										'active-speaker' : peerName === activeSpeakerName
 									})}
 								>
 									<div className='peer-content'>
 										<Peer
 											advancedMode={advancedMode}
-											name={peer.name}
+											name={peerName}
 											style={style}
 										/>
 									</div>
 								</div>
 							</Appear>
-						</If>;
-					})
-				}
+						);
+					}
+				})}
 				<div className='hidden-peer-container'>
 					<If condition={spotlightsLength < peers.length}>
 						<HiddenPeers
@@ -147,7 +143,7 @@ class Peers extends React.Component
 Peers.propTypes =
 	{
 		advancedMode      : PropTypes.bool,
-		peers             : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
+		peers             : PropTypes.object.isRequired,
 		boxes             : PropTypes.number,
 		activeSpeakerName : PropTypes.string,
 		selectedPeerName  : PropTypes.string,
@@ -157,14 +153,13 @@ Peers.propTypes =
 
 const mapStateToProps = (state) =>
 {
-	const peers = Object.values(state.peers);
 	const spotlights = state.room.spotlights;
 	const spotlightsLength = spotlights ? state.room.spotlights.length : 0;
 	const boxes = spotlightsLength + Object.values(state.consumers)
 		.filter((consumer) => consumer.source === 'screen').length;
 
 	return {
-		peers,
+		peers             : state.peers,
 		boxes,
 		activeSpeakerName : state.room.activeSpeakerName,
 		selectedPeerName  : state.room.selectedPeerName,

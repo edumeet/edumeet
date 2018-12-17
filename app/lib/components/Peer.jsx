@@ -121,8 +121,8 @@ class Peer extends Component
 							{
 								e.stopPropagation();
 								micEnabled ?
-									roomClient.mutePeerAudio(peer.name) :
-									roomClient.unmutePeerAudio(peer.name);
+									roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
+									roomClient.modifyPeerConsumer(peer.name, 'mic', false);
 							}}
 						/>
 
