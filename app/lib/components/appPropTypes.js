@@ -76,3 +76,16 @@ export const Message = PropTypes.shape(
 		text      : PropTypes.string,
 		sender    : PropTypes.string
 	});
+
+export const FileEntryProps = PropTypes.shape(
+	{
+		data : PropTypes.shape({
+			name    : PropTypes.string.isRequired,
+			picture : PropTypes.string,
+			file    : PropTypes.shape({
+				magnet : PropTypes.string.isRequired
+			}).isRequired,
+			me : PropTypes.bool
+		}).isRequired,
+		notify : PropTypes.func.isRequired
+	});

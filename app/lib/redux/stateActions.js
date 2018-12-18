@@ -70,6 +70,14 @@ export const setWebcamDevices = (devices) =>
 	};
 };
 
+export const setFileSharingSupported = (supported) =>
+{
+	return {
+		type    : 'FILE_SHARING_SUPPORTED',
+		payload : { supported }
+	};
+};
+
 export const setDisplayName = (displayName) =>
 {
 	return {
@@ -455,11 +463,11 @@ export const dropMessages = () =>
 	};
 };
 
-export const addFile = (payload) =>
+export const addFile = (file) =>
 {
 	return {
-		type : 'ADD_FILE',
-		payload
+		type    : 'ADD_FILE',
+		payload : { file }
 	};
 };
 
@@ -468,6 +476,38 @@ export const addFileHistory = (fileHistory) =>
 	return {
 		type    : 'ADD_FILE_HISTORY',
 		payload : { fileHistory }
+	};
+};
+
+export const setFileActive = (magnetUri) =>
+{
+	return {
+		type    : 'SET_FILE_ACTIVE',
+		payload : { magnetUri }
+	};
+};
+
+export const setFileInActive = (magnetUri) =>
+{
+	return {
+		type    : 'SET_FILE_INACTIVE',
+		payload : { magnetUri }
+	};
+};
+
+export const setFileProgress = (magnetUri, progress) =>
+{
+	return {
+		type    : 'SET_FILE_PROGRESS',
+		payload : { magnetUri, progress }
+	};
+};
+
+export const setFileDone = (magnetUri, sharedFiles) =>
+{
+	return {
+		type    : 'SET_FILE_DONE',
+		payload : { magnetUri, sharedFiles }
 	};
 };
 

@@ -7,14 +7,19 @@ import { getDeviceInfo } from 'mediasoup-client';
 import randomString from 'random-string';
 import Logger from './Logger';
 import * as utils from './utils';
+import RoomClient from './RoomClient';
+import RoomContext from './RoomContext';
 import * as cookiesManager from './cookiesManager';
-import * as requestActions from './redux/requestActions';
 import * as stateActions from './redux/stateActions';
 import Room from './components/Room';
 import { loginEnabled } from '../config';
 import { store } from './store';
 
 const logger = new Logger();
+
+let roomClient;
+
+RoomClient.init({ store });
 
 domready(() =>
 {
@@ -93,39 +98,38 @@ function run()
 		device.version = undefined;
 	}
 
-	// NOTE: I don't like this.
 	store.dispatch(
 		stateActions.setRoomUrl(roomUrl));
 
-	// NOTE: I don't like this.
 	store.dispatch(
 		stateActions.setMe({ peerName, displayName, displayNameSet, device, loginEnabled }));
 
-	// NOTE: I don't like this.
-	store.dispatch(
-		requestActions.joinRoom(
-			{ roomId, peerName, displayName, device, useSimulcast, produce }));
+	roomClient = new RoomClient(
+		{ roomId, peerName, displayName, device, useSimulcast, produce });
 
 	render(
 		<Provider store={store}>
-			<Room />
+			<RoomContext.Provider value={roomClient}>
+				<Room />
+			</RoomContext.Provider>
 		</Provider>,
 		document.getElementById('multiparty-meeting')
 	);
 }
 
 // TODO: Debugging stuff.
+global.CLIENT = roomClient;
 
 setInterval(() =>
 {
-	if (!global.CLIENT._room.peers[0])
+	if (!roomClient._room.peers[0])
 	{
 		delete global.CONSUMER;
 
 		return;
 	}
 
-	const peer = global.CLIENT._room.peers[0];
+	const peer = roomClient._room.peers[0];
 
 	global.CONSUMER = peer.consumers[peer.consumers.length - 1];
 }, 2000);
@@ -134,20 +138,20 @@ global.sendSdp = function()
 {
 	logger.debug('---------- SEND_TRANSPORT LOCAL SDP OFFER:');
 	logger.debug(
-		global.CLIENT._sendTransport._handler._pc.localDescription.sdp);
+		roomClient._sendTransport._handler._pc.localDescription.sdp);
 
 	logger.debug('---------- SEND_TRANSPORT REMOTE SDP ANSWER:');
 	logger.debug(
-		global.CLIENT._sendTransport._handler._pc.remoteDescription.sdp);
+		roomClient._sendTransport._handler._pc.remoteDescription.sdp);
 };
 
 global.recvSdp = function()
 {
 	logger.debug('---------- RECV_TRANSPORT REMOTE SDP OFFER:');
 	logger.debug(
-		global.CLIENT._recvTransport._handler._pc.remoteDescription.sdp);
+		roomClient._recvTransport._handler._pc.remoteDescription.sdp);
 
 	logger.debug('---------- RECV_TRANSPORT LOCAL SDP ANSWER:');
 	logger.debug(
-		global.CLIENT._recvTransport._handler._pc.localDescription.sdp);
+		roomClient._recvTransport._handler._pc.localDescription.sdp);
 };

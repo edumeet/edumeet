@@ -6,15 +6,13 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	background-color: rgba(#2a4b58, 0.9);
-	background-image: url('/resources/images/buddy.svg');
+	background-color: var(--peer-bg-color);
+	background-image: var(--peer-empty-avatar);
 	background-position: bottom;
 	background-size: auto 85%;
 	background-repeat: no-repeat;
 
 	> .info {
-		$backgroundTint = #000;
-
 		position: absolute;
 		z-index: 10;
 		top: 0.6vmin;
@@ -178,7 +176,7 @@
 		user-select: none;
 		transition-property: opacity;
 		transition-duration: .15s;
-		background-color: rgba(#000, 0.75);
+		background-color: var(--peer-video-bg-color);
 
 		&.is-me {
 			transform: scaleX(-1);
@@ -225,37 +223,4 @@
 			&.level10 { height: 100%; background-color: rgba(#000,   0.65); }
 		}
 	}
-
-	> .spinner-container {
-		position: absolute;
-		top: 0
-		bottom: 0;
-		left: 0;
-		right: 0;
-		background-color: rgba(#000, 0.75);
-
-		.react-spinner {
-			position: relative;
-			width: 48px;
-			height: 48px;
-			top: 50%;
-			left: 50%;
-
-			.react-spinner_bar {
-				position: absolute;
-				width: 20%;
-				height: 7.8%;
-				top: -3.9%;
-				left: -10%;
-				animation: PeerView-spinner 1.2s linear infinite;
-				border-radius: 5px;
-				background-color: rgba(#fff, 0.5);
-			}
-		}
-	}
-}
-
-@keyframes PeerView-spinner {
-	0% { opacity: 1; }
-	100% { opacity: 0.15; }
 }

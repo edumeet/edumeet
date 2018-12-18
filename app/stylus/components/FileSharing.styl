@@ -7,10 +7,14 @@
 		> .share-file {
 			cursor: pointer;
 			width: 100%;
-			background: #aef;
+			background: var(--filesharing-bg-color);
 			padding: 1rem;
 			border-radius: 1vmin;
 			box-shadow: 0vmin 0vmin 1vmin 0vmin rgba(17,17,17,0.5);
+
+			&:hover {
+				opacity: 0.85;
+			}
 
 			&.disabled {
 				cursor: not-allowed;
