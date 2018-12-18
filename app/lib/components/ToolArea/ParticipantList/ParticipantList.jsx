@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import * as appPropTypes from '../appPropTypes';
-import { withRoomContext } from '../../RoomContext';
+import * as appPropTypes from '../../appPropTypes';
+import { withRoomContext } from '../../../RoomContext';
 import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';

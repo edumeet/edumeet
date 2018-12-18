@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRoomContext } from '../../RoomContext';
+import { withRoomContext } from '../../../RoomContext';
 import magnet from 'magnet-uri';
 
 const DEFAULT_PICTURE = 'resources/images/avatar-empty.jpeg';

@@ -2,8 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import * as appPropTypes from '../appPropTypes';
-import { withRoomContext } from '../../RoomContext';
+import * as appPropTypes from '../../appPropTypes';
+import { withRoomContext } from '../../../RoomContext';
 
 const ListPeer = (props) =>
 {

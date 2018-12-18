@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import * as stateActions from '../redux/stateActions';
+import * as stateActions from '../../redux/stateActions';
 
 class HiddenPeers extends Component
 {
@@ -29,7 +29,7 @@ class HiddenPeers extends Component
 				this.timeout = setTimeout(() =>
 				{
 					this.setState({ className: '' });
-				}, 2000);
+				}, 500);
 			});
 		}
 	}
@@ -42,18 +42,11 @@ class HiddenPeers extends Component
 		} = this.props;
 
 		return (
-			<div
-				data-component='HiddenPeers'
-				className={this.state.className}
-				onMouseOver={this.handleMouseOver}
-				onMouseOut={this.handleMouseOut}
-			>
-				<div data-component='HiddenPeersView'>
-					<div className={classnames('view-container', this.state.className)} onClick={() => openUsersTab()}>
-						<p>+{hiddenPeersCount} <br /> participant
-							{(hiddenPeersCount === 1) ? null : 's'}
-						</p>
-					</div>
+			<div data-component='HiddenPeers'>
+				<div className={classnames('view-container', this.state.className)} onClick={() => openUsersTab()}>
+					<p>+{hiddenPeersCount} <br /> participant
+						{(hiddenPeersCount === 1) ? null : 's'}
+					</p>
 				</div>
 			</div>
 		);

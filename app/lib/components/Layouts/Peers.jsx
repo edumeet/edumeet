@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import debounce from 'lodash/debounce';
-import { Appear } from './transitions';
-import Peer from './Peer';
-import HiddenPeers from './HiddenPeers';
+import { Appear } from '../transitions';
+import Peer from '../Containers/Peer';
+import HiddenPeers from '../Containers/HiddenPeers';
 import ResizeObserver from 'resize-observer-polyfill';
 
 const RATIO = 1.334;
@@ -129,9 +129,9 @@ class Peers extends React.Component
 					}
 				})}
 				<div className='hidden-peer-container'>
-					<If condition={spotlightsLength < peers.length}>
+					<If condition={spotlightsLength < Object.keys(peers).length}>
 						<HiddenPeers
-							hiddenPeersCount={peers.length-spotlightsLength}
+							hiddenPeersCount={Object.keys(peers).length - spotlightsLength}
 						/>
 					</If>
 				</div>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { withRoomContext } from '../../RoomContext';
+import { withRoomContext } from '../../../RoomContext';
 import MessageList from './MessageList';
 
 class Chat extends Component

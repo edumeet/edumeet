@@ -3,7 +3,7 @@ import { compose } from 'redux';
 import PropTypes from 'prop-types';
 import marked from 'marked';
 import { connect } from 'react-redux';
-import scrollToBottom from './scrollToBottom';
+import scrollToBottom from '../scrollToBottom';
 
 const linkRenderer = new marked.Renderer();
 

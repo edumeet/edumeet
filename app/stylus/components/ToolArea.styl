@@ -27,35 +27,6 @@
 	.toolarea-shade.open {
 		display: block;
 	}
-	> .button {
-		background-position: center;
-		background-size: 100%;
-		background-repeat: no-repeat;
-		background-color: rgba(#aef);
-		cursor: pointer;
-		border-radius: 15%;
-		padding: 1px;
-
-		+desktop() {
-			height: 36px;
-			width: 18px;
-		}
-
-		+mobile() {
-			height: 32px;
-			width: 16px;
-		}
-		&.toolarea-close-button {
-			background-image: url('/resources/images/arrow_right.svg');
-			position: absolute;
-			top: 50%;
-			left: -22px;
-			display: none;
-			&.on {
-				display: block;
-		}
-		}
-	}
 
 	> .toolarea-button {
 		text-align: center;

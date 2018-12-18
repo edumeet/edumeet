@@ -365,11 +365,9 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				return this.props.notify({
-					text : 'An error occurred while saving a file'
-				});
+				return this.notify('An error occurred while saving a file');
 			}
-	
+
 			saveAs(blob, file.name);
 		});
 	}
@@ -396,23 +394,27 @@ export default class RoomClient
 		// same file was sent multiple times.
 		if (torrent.progress === 1)
 		{
-
-			store.dispatch(
+			return store.dispatch(
 				stateActions.setFileDone(
 					torrent.magnetURI,
 					torrent.files
 				));
-
-			return;
 		}
+
+		let lastMove = 0;
 
 		torrent.on('download', () =>
 		{
-			store.dispatch(
-				stateActions.setFileProgress(
-					torrent.magnetURI,
-					torrent.progress
-				));
+			if (Date.now() - lastMove > 1000)
+			{
+				store.dispatch(
+					stateActions.setFileProgress(
+						torrent.magnetURI,
+						torrent.progress
+					));
+
+				lastMove = Date.now();
+			}
 		});
 
 		torrent.on('done', () => 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Me } from '../appPropTypes';
+import { Me } from '../../appPropTypes';
 
 const ListMe = ({ me }) =>
 {

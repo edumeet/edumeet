@@ -2,8 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import * as appPropTypes from './appPropTypes';
-import * as stateActions from '../redux/stateActions';
+import * as appPropTypes from '../appPropTypes';
+import * as stateActions from '../../redux/stateActions';
 import FullView from './FullView';
 
 const FullScreenView = (props) =>

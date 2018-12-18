@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { withRoomContext } from '../../RoomContext';
+import { withRoomContext } from '../../../RoomContext';
 import FileList from './FileList';
 
 class FileSharing extends Component

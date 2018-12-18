@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import Spinner from 'react-spinner';
-import * as appPropTypes from './appPropTypes';
-import EditableInput from './EditableInput';
+import * as appPropTypes from '../appPropTypes';
+import EditableInput from '../Controls/EditableInput';
 
 export default class PeerView extends React.Component
 {
@@ -122,12 +121,6 @@ export default class PeerView extends React.Component
 				<div className='volume-container'>
 					<div className={classnames('bar', `level${volume}`)} />
 				</div>
-
-				<If condition={videoProfile === 'none'}>
-					<div className='spinner-container'>
-						<Spinner />
-					</div>
-				</If>
 			</div>
 		);
 	}

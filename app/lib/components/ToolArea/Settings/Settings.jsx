@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import * as appPropTypes from './appPropTypes';
-import { withRoomContext } from '../RoomContext';
-import * as stateActions from '../redux/stateActions';
+import * as appPropTypes from '../../appPropTypes';
+import { withRoomContext } from '../../../RoomContext';
+import * as stateActions from '../../../redux/stateActions';
 import PropTypes from 'prop-types';
 import Dropdown from 'react-dropdown';
 import ReactTooltip from 'react-tooltip';
@@ -46,50 +46,48 @@ const Settings = ({
 		audioDevices = [];
 
 	return (
-		<div data-component='Settings'>
-			<div className='settings'>
-				<Dropdown
-					options={webcams}
-					value={findOption(webcams, me.selectedWebcam)}
-					onChange={(webcam) => roomClient.changeWebcam(webcam.value)}
-					placeholder={'Select camera'}
-				/>
+		<div className='settings'>
+			<Dropdown
+				options={webcams}
+				value={findOption(webcams, me.selectedWebcam)}
+				onChange={(webcam) => roomClient.changeWebcam(webcam.value)}
+				placeholder={'Select camera'}
+			/>
 
-				<Dropdown
-					disabled={!me.canChangeAudioDevice}
-					options={audioDevices}
-					value={findOption(audioDevices, me.selectedAudioDevice)}
-					onChange={(device) => roomClient.changeAudioDevice(device.value)}
-					placeholder={audioDevicesText}
+			<Dropdown
+				disabled={!me.canChangeAudioDevice}
+				options={audioDevices}
+				value={findOption(audioDevices, me.selectedAudioDevice)}
+				onChange={(device) => roomClient.changeAudioDevice(device.value)}
+				placeholder={audioDevicesText}
+			/>
+			<ReactTooltip
+				effect='solid'
+			/>
+			<div
+				data-tip='keyboard shortcut: &lsquo;a&lsquo;'
+				data-type='dark'
+				data-place='left'
+			>
+				<input
+					id='room-mode'
+					type='checkbox'
+					checked={room.advancedMode}
+					onChange={onToggleAdvancedMode}
 				/>
-				<ReactTooltip
-					effect='solid'
-				/>
-				<div
-					data-tip='keyboard shortcut: &lsquo;a&lsquo;'
-					data-type='dark'
-					data-place='left'
-				>
-					<input
-						id='room-mode'
-						type='checkbox'
-						checked={room.advancedMode}
-						onChange={onToggleAdvancedMode}
-					/>
-					<label htmlFor='room-mode'>Advanced mode</label>
-				</div>
+				<label htmlFor='room-mode'>Advanced mode</label>
+			</div>
 
-				<div
-					data-tip='keyboard shortcut: type a digit'
-					data-type='dark'
-					data-place='left'
-				>
-					<Dropdown
-						options={modes}
-						value={findOption(modes, room.mode)}
-						onChange={(mode) => handleChangeMode(mode.value)}
-					/>
-				</div>
+			<div
+				data-tip='keyboard shortcut: type a digit'
+				data-type='dark'
+				data-place='left'
+			>
+				<Dropdown
+					options={modes}
+					value={findOption(modes, room.mode)}
+					onChange={(mode) => handleChangeMode(mode.value)}
+				/>
 			</div>
 		</div>
 	);

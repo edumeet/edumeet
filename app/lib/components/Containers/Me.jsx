@@ -4,10 +4,10 @@ import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { getDeviceInfo } from 'mediasoup-client';
-import * as appPropTypes from './appPropTypes';
-import { withRoomContext } from '../RoomContext';
-import PeerView from './PeerView';
-import ScreenView from './ScreenView';
+import * as appPropTypes from '../appPropTypes';
+import { withRoomContext } from '../../RoomContext';
+import PeerView from '../VideoContainers/PeerView';
+import ScreenView from '../VideoContainers/ScreenView';
 
 class Me extends React.Component
 {

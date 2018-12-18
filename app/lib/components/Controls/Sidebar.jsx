@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import * as appPropTypes from './appPropTypes';
-import { withRoomContext } from '../RoomContext';
-import FullScreen from './FullScreen';
+import * as appPropTypes from '../appPropTypes';
+import { withRoomContext } from '../../RoomContext';
+import FullScreen from '../FullScreen';
 
 class Sidebar extends Component
 {

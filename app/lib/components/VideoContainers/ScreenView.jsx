@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import Spinner from 'react-spinner';
 
 export default class ScreenView extends React.Component
 {
@@ -68,12 +67,6 @@ export default class ScreenView extends React.Component
 					autoPlay
 					muted={Boolean(true)}
 				/>
-
-				<If condition={screenProfile === 'none'}>
-					<div className='spinner-container'>
-						<Spinner />
-					</div>
-				</If>
 			</div>
 		);
 	}

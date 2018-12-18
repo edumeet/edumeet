@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import * as appPropTypes from './appPropTypes';
-import { withRoomContext } from '../RoomContext';
-import * as stateActions from '../redux/stateActions';
-import PeerView from './PeerView';
-import ScreenView from './ScreenView';
+import * as appPropTypes from '../appPropTypes';
+import { withRoomContext } from '../../RoomContext';
+import * as stateActions from '../../redux/stateActions';
+import PeerView from '../VideoContainers/PeerView';
+import ScreenView from '../VideoContainers/ScreenView';
 
 class Peer extends Component
 {
@@ -139,7 +139,9 @@ class Peer extends Component
 						/>
 
 						<div
-							className={classnames('button', 'fullscreen')}
+							className={classnames('button', 'fullscreen', {
+								disabled : !videoVisible
+							})}
 							onClick={(e) =>
 							{
 								e.stopPropagation();
@@ -168,7 +170,10 @@ class Peer extends Component
 							})}
 						>
 							<div
-								className={classnames('button', 'newwindow')}
+								className={classnames('button', 'newwindow', {
+									disabled : !screenVisible ||
+										(windowConsumer === screenConsumer.id)
+								})}
 								onClick={(e) =>
 								{
 									e.stopPropagation();
@@ -177,7 +182,9 @@ class Peer extends Component
 							/>
 
 							<div
-								className={classnames('button', 'fullscreen')}
+								className={classnames('button', 'fullscreen', {
+									disabled : !screenVisible
+								})}
 								onClick={(e) =>
 								{
 									e.stopPropagation();

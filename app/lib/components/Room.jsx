@@ -9,17 +9,17 @@ import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../redux/requestActions';
 import * as stateActions from '../redux/stateActions';
 import { Appear } from './transitions';
-import Me from './Me';
-import Peers from './Peers';
+import Me from './Containers/Me';
+import Peers from './Layouts/Peers';
 import AudioPeers from './PeerAudio/AudioPeers';
 import Notifications from './Notifications';
 import ToolArea from './ToolArea/ToolArea';
-import FullScreenView from './FullScreenView';
+import FullScreenView from './VideoContainers/FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
 import Draggable from 'react-draggable';
 import { idle } from '../utils';
-import Sidebar from './Sidebar';
-import Filmstrip from './Filmstrip';
+import Sidebar from './Controls/Sidebar';
+import Filmstrip from './Layouts/Filmstrip';
 
 // Hide toolbars after 10 seconds of inactivity.
 const TIMEOUT = 10 * 1000;

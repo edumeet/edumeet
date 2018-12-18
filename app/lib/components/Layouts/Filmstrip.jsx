@@ -4,9 +4,9 @@ import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
 import debounce from 'lodash/debounce';
 import classnames from 'classnames';
-import { withRoomContext } from '../RoomContext';
-import Peer from './Peer';
-import HiddenPeers from './HiddenPeers';
+import { withRoomContext } from '../../RoomContext';
+import Peer from '../Containers/Peer';
+import HiddenPeers from '../Containers/HiddenPeers';
 
 class Filmstrip extends Component
 {

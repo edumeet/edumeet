@@ -6,8 +6,8 @@
 
 	> .view-container {
 		position: relative;
-		width: 20vmin;
-		height: 15vmin;
+		width: var(--me-width);
+		height: var(--me-height);
 
 		&.webcam {
 			order: 2;
@@ -23,9 +23,7 @@
 			right: 0;
 			top: 0;
 			display: flex;
-			flex-direction:; row;
-			justify-content: flex-start;
-			align-items: center;
+			flex-direction: row;
 			padding: 0.4vmin;
 			opacity: 0;
 			transition: opacity 0.3s;
@@ -41,28 +39,20 @@
 				background-position: center;
 				background-size: 75%;
 				background-repeat: no-repeat;
-				background-color: rgba(#000, 0.5);
+				background-color: var(--media-control-button-color);
 				cursor: pointer;
 				opacity: 0;
 				transition-property: opacity, background-color;
 				transition-duration: 0.15s;
+				width: var(--media-control-button-size);
+				height: var(--media-control-button-size);
+
+				&:hover {
+					opacity: 1;
+				}
 
 				&.visible {
 					opacity: 0.85;
-				}
-
-				+desktop() {
-					width: 24px;
-					height: 24px;
-
-					&:hover {
-						opacity: 1;
-					}
-				}
-
-				+mobile() {
-					width: 22px;
-					height: 22px;
 				}
 
 				&.unsupported {
@@ -71,11 +61,15 @@
 
 				&.disabled {
 					pointer-events: none;
-					opacity: 0.5;
+					background-color: var(--media-control-botton-disabled);
 				}
 
 				&.on {
-					background-color: rgba(#fff, 0.7);
+					background-color: var(--media-control-botton-on);
+				}
+
+				&.off {
+					background-color: var(--media-control-botton-off);
 				}
 
 				&.mic {
@@ -85,7 +79,6 @@
 
 					&.off {
 						background-image: url('/resources/images/icon_remote_mic_white_off.svg');
-						background-color: rgba(#d42241, 0.7);
 					}
 
 					&.unsupported {
@@ -100,32 +93,11 @@
 
 					&.off {
 						background-image: url('/resources/images/icon_remote_webcam_white_off.svg');
-						background-color: rgba(#d42241, 0.7);
 					}
 
 					&.unsupported {
 						background-image: url('/resources/images/icon_webcam_white_unsupported.svg');
 					}
-				}
-
-				&.screen {
-					&.on {
-						background-image: url('/resources/images/share-screen-black.svg');
-					}
-
-					&.off {
-						background-image: url('/resources/images/no-share-screen-white.svg');
-						background-color: rgba(#d42241, 0.7);
-					}
-
-					&.unsupported {
-						background-image: url('/resources/images/no-share-screen-white.svg');
-					}
-				}
-
-				&.fullscreen {
-					background-image: url('/resources/images/icon_fullscreen_black.svg');
-					background-color: rgba(#fff, 0.7);
 				}
 			}
 		}

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { compose } from 'redux';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import scrollToBottom from '../Chat/scrollToBottom';
+import scrollToBottom from '../scrollToBottom';
 import File from './File';
 
 class FileList extends Component

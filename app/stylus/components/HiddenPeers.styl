@@ -1,4 +1,4 @@
-[data-component='HiddenPeersView'] {
+[data-component='HiddenPeers'] {
 	height: 100%;
 	width: 100%;
 	display: flex;
@@ -31,6 +31,8 @@
 		background-position: bottom;
 		background-size: auto 85%;
 		background-repeat: no-repeat;
+		border: var(--peer-border);
+		box-shadow: var(--peer-shadow);
 		text-align: center;
 		vertical-align: middle;
 		line-height: 1.8vmin;
@@ -39,55 +41,28 @@
 		animation: none;
 
 		&.pulse {
-			animation: pulse 2s;
+			animation: pulse 0.5s;
 		}
 	}
 
 	.view-container>p{
 		transform: translate(0%,50%);
 	}
-
-	.view-container,
-	.view-container::before,
-	.view-container::after {
-		/* Add shadow to distinguish sheets from one another */
-		box-shadow: 2px 1px 1px rgba(0,0,0,0.15);
-	}
-
-	.view-container::before,
-	.view-container::after {
-		content: "";
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		background-color: #2a4b58;
-	}
-
-	/* Second sheet of paper */
-	.view-container::before {
-		left: .7vmin;
-		top: .7vmin;
-		z-index: -1;
-	}
-
-	/* Third sheet of paper */
-	.view-container::after {
-		left: 1.4vmin;
-		top: 1.4vmin;
-		z-index: -2;
-	}
 }
 
 @keyframes pulse {
-	0% {
-		box-shadow: 0 0 0 0 rgba(255, 255, 255, 1.0);
+	0%
+	{
+		transform: scale3d(1, 1, 1);
 	}
 
-	70% {
-		box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+	50%
+	{
+		transform: scale3d(1.2, 1.2, 1.2);
 	}
 
-	100% {
-		box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+	100%
+	{
+		transform: scale3d(1, 1, 1);
 	}
 }
