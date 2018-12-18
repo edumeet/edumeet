@@ -65,6 +65,7 @@ export default class ScreenView extends React.Component
 						loading : screenProfile === 'none'
 					})}
 					autoPlay
+					playsInline
 					muted={Boolean(true)}
 				/>
 			</div>

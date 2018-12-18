@@ -31,6 +31,7 @@ export default class FullView extends React.Component
 						loading : videoProfile === 'none'
 					})}
 					autoPlay
+					playsInline
 					muted={Boolean(true)}
 				/>
 			</div>
