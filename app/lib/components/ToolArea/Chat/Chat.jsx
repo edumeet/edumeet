@@ -23,7 +23,6 @@ class Chat extends Component
 		const {
 			roomClient,
 			senderPlaceHolder,
-			disabledInput,
 			autofocus,
 			displayName,
 			picture
@@ -53,7 +52,6 @@ class Chat extends Component
 						className='new-message'
 						name='message'
 						placeholder={senderPlaceHolder}
-						disabled={disabledInput}
 						autoFocus={autofocus}
 						autoComplete='off'
 					/>
@@ -72,7 +70,6 @@ Chat.propTypes =
 {
 	roomClient        : PropTypes.any.isRequired,
 	senderPlaceHolder : PropTypes.string,
-	disabledInput     : PropTypes.bool,
 	autofocus         : PropTypes.bool,
 	displayName       : PropTypes.string,
 	picture           : PropTypes.string
@@ -88,9 +85,8 @@ Chat.defaultProps =
 const mapStateToProps = (state) =>
 {
 	return {
-		disabledInput : state.chatbehavior.disabledInput,
-		displayName   : state.me.displayName,
-		picture       : state.me.picture
+		displayName : state.me.displayName,
+		picture     : state.me.picture
 	};
 };
 

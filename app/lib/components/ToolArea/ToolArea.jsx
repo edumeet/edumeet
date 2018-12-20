@@ -59,11 +59,11 @@ class ToolArea extends React.Component
 							/>
 							<p>Toolbox</p>
 						</span>
-						{!toolAreaOpen && unread > 0 && (
+						<If condition={!toolAreaOpen && unread > 0}>
 							<span className={classNames('badge', { long: unread >= 10 })}>
 								{unread}
 							</span>
-						)}
+						</If>
 					</div>
 					<div className='tab-headers'>
 						<TabHeader

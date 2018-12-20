@@ -16,9 +16,9 @@ const ListMe = ({ me }) =>
 				</div>
 
 				<div className='indicators'>
-					{me.raisedHand && (
+					<If condition={me.raisedHand}>
 						<div className='icon raise-hand on' />
-					)}
+					</If>
 				</div>
 			</div>
 		</li>
