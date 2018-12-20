@@ -1,0 +1,68 @@
+[data-component='HiddenPeers'] {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	> .info {
+		$backgroundTint = #000;
+		position: absolute;
+		z-index: 10;
+		top: 0.6vmin;
+		left: 0.6vmin;
+		bottom: 0;
+		right: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+
+	> .view-container {
+		width: 12vmin;
+		height: 9vmin;
+		position: absolute;
+		bottom: 3%;
+		right: 3%;
+		color: #aaa;
+		cursor: pointer;
+		background-image: url('/resources/images/buddy.svg');
+		background-color: rgba(#2a4b58, 1);
+		background-position: bottom;
+		background-size: auto 85%;
+		background-repeat: no-repeat;
+		border: var(--peer-border);
+		box-shadow: var(--peer-shadow);
+		text-align: center;
+		vertical-align: middle;
+		line-height: 1.8vmin;
+		font-size: 1.7vmin;
+		font-weight: bolder;
+		animation: none;
+
+		&.pulse {
+			animation: pulse 0.5s;
+		}
+	}
+
+	.view-container>p{
+		transform: translate(0%,50%);
+	}
+}
+
+@keyframes pulse {
+	0%
+	{
+		transform: scale3d(1, 1, 1);
+	}
+
+	50%
+	{
+		transform: scale3d(1.2, 1.2, 1.2);
+	}
+
+	100%
+	{
+		transform: scale3d(1, 1, 1);
+	}
+}

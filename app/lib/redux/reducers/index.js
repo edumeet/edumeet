@@ -6,9 +6,8 @@ import peers from './peers';
 import consumers from './consumers';
 import notifications from './notifications';
 import chatmessages from './chatmessages';
-import chatbehavior from './chatbehavior';
 import toolarea from './toolarea';
-import sharing from './sharing';
+import files from './files';
 
 const reducers = combineReducers(
 	{
@@ -19,9 +18,8 @@ const reducers = combineReducers(
 		consumers,
 		notifications,
 		chatmessages,
-		chatbehavior,
 		toolarea,
-		sharing
+		files
 	});
 
 export default reducers;

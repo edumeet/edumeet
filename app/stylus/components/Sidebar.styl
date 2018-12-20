@@ -1,8 +1,8 @@
 [data-component='Sidebar'] {
 	position: fixed;
 	z-index: 500;
-	top: calc(50% - 60px);
-	height: 120px;
+	top: 50%;
+	transform: translate(0%, -50%);
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -24,7 +24,7 @@
 		background-position: center;
 		background-size: 75%;
 		background-repeat: no-repeat;
-		background-color: rgba(#fff, 0.3);
+		background-color: var(--circle-button-color);
 		cursor: pointer;
 		transition-property: opacity, background-color;
 		transition-duration: 0.15s;
@@ -32,24 +32,20 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-
-		+desktop() {
-			height: 2.5em;
-			width: 2.5em;
-		}
-
-		+mobile() {
-			height: 2.5em;
-			width: 2.5em;
-		}
+		height: var(--circle-button-size);
+		width: var(--circle-button-size);
 
 		&.on {
-			background-color: rgba(#fff, 0.7);
+			background-color: var(--circle-button-toggled-color);
+		}
+
+		&.unsupported {
+			background-color: var(--circle-button-unsupported-color);
 		}
 
 		&.disabled {
 			pointer-events: none;
-			opacity: 0.5;
+			background-color: var(--circle-button-diabled-color);
 		}
 
 		&.login {
@@ -93,7 +89,6 @@
 
 			&.unsupported {
 				background-image: url('/resources/images/no-share-screen-white.svg');
-				background-color: rgba(#d42241, 0.7);
 			}
 
 			&.need-extension {

@@ -4,7 +4,7 @@ import NewWindow from './NewWindow';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../appPropTypes';
 import * as stateActions from '../../redux/stateActions';
-import FullView from '../FullView';
+import FullView from '../VideoContainers/FullView';
 
 const VideoWindow = (props) =>
 {

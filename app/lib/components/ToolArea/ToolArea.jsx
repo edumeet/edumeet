@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import * as stateActions from '../../redux/stateActions';
-import ParticipantList from '../ParticipantList/ParticipantList';
-import Chat from '../Chat/Chat';
-import Settings from '../Settings';
-import FileSharing from '../FileSharing';
+import ParticipantList from './ParticipantList/ParticipantList';
+import Chat from './Chat/Chat';
+import Settings from './Settings/Settings';
+import FileSharing from './FileSharing/FileSharing';
 import TabHeader from './TabHeader';
 
 class ToolArea extends React.Component
@@ -59,11 +59,11 @@ class ToolArea extends React.Component
 							/>
 							<p>Toolbox</p>
 						</span>
-						{!toolAreaOpen && unread > 0 && (
+						<If condition={!toolAreaOpen && unread > 0}>
 							<span className={classNames('badge', { long: unread >= 10 })}>
 								{unread}
 							</span>
-						)}
+						</If>
 					</div>
 					<div className='tab-headers'>
 						<TabHeader

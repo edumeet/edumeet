@@ -13,9 +13,9 @@ const TabHeader = ({ currentToolTab, setToolTab, id, name, badge }) => (
 	>
 		{name}
 
-		{badge > 0 && (
+		<If condition={badge > 0}>
 			<span className='badge'>{badge}</span>
-		)}
+		</If>
 	</div>
 );
 

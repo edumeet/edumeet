@@ -1,6 +1,6 @@
 {
   "name": "multiparty-meeting",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "multiparty meeting service",
   "author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
@@ -47,6 +47,7 @@
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
+    "babel-plugin-jsx-control-statements": "^3.2.8",
     "babel-eslint": "^10.0.1",
     "babelify": "^10.0.0",
     "browser-sync": "^2.26.3",

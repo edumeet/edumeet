@@ -23,7 +23,7 @@
 		}
 
 		> .client, > .response {
-			background-color: rgba(#000, 0.1);
+			background-color: var(--chat-message-color);
 			border-radius: 5px;
 			max-width: 85%;
 			display: flex;
@@ -70,8 +70,8 @@
 
 [data-component='Sender'] {
 	display: flex;
-	background-color: #fff;
-	color: #000;
+	background-color: var(--chat-input-bg-color);
+	color: var(--chat-input-text-color);
 	flex-shrink: 0;
 	margin-top: 0.5rem;
 	height: 3rem;
@@ -84,7 +84,6 @@
 		margin-right: 1vmin;
 		border-radius: 0.5vmin;
 		padding-left: 1vmin;
-		color: #000;
 
 		&.focus {
 			outline: none;
@@ -95,8 +94,7 @@
 		width: 20%;
 		box-shadow: 0vmin 0vmin 1vmin 0vmin rgba(17,17,17,0.5);
 		border: 0;
-		background-color: #aef;
-		color: #000;
+		background-color: var(--chat-send-bg-color);
 		font-size: 1rem;
 		border-radius: 0.5vmin;
 	}
