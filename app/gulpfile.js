@@ -272,6 +272,16 @@ gulp.task('dist', gulp.series(
 	'resources'
 ));
 
+gulp.task('dist-watch', gulp.series(
+	'clean',
+	'lint',
+	'bundle:watch',
+	'html',
+	'css',
+	'resources',
+	'watch',
+));
+
 gulp.task('live', gulp.series(
 	'clean',
 	'lint',
