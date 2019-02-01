@@ -1,5 +1,3 @@
-import { getBrowserType } from './utils';
-
 class ChromeScreenShare
 {
 	constructor()
@@ -104,6 +102,57 @@ class ChromeScreenShare
 			constraints.video.mandatory.maxFrameRate = options.frameRate;
 			constraints.video.mandatory.minFrameRate = options.frameRate;
 		}
+
+		return constraints;
+	}
+}
+
+class Chrome72ScreenShare
+{
+	constructor()
+	{
+		this._stream = null;
+	}
+
+	start(options = {})
+	{
+		const constraints = this._toConstraints(options);
+
+		return navigator.mediaDevices.getDisplayMedia(constraints)
+			.then((stream) =>
+			{
+				this._stream = stream;
+
+				return Promise.resolve(stream);
+			});
+	}
+
+	stop()
+	{
+		if (this._stream instanceof MediaStream === false)
+		{
+			return;
+		}
+
+		this._stream.getTracks().forEach((track) => track.stop());
+		this._stream = null;
+	}
+
+	isScreenShareAvailable()
+	{
+		return true;
+	}
+
+	needExtension()
+	{
+		return false;
+	}
+
+	_toConstraints()
+	{
+		const constraints = {
+			video : true
+		};
 
 		return constraints;
 	}
@@ -255,9 +304,9 @@ class DefaultScreenShare
 
 export default class ScreenShare
 {
-	static create()
+	static create(device)
 	{
-		switch (getBrowserType())
+		switch (device.flag)
 		{
 			case 'firefox':
 			{
@@ -265,9 +314,12 @@ export default class ScreenShare
 			}
 			case 'chrome':
 			{
-				return new ChromeScreenShare();
+				if (device.version < 72.0)
+					return new ChromeScreenShare();
+				else
+					return new Chrome72ScreenShare();
 			}
-			case 'edge':
+			case 'msedge':
 			{
 				return new EdgeScreenShare();
 			}

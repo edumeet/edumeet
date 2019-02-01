@@ -134,7 +134,7 @@ export default class RoomClient
 			device : null
 		};
 
-		this._screenSharing = ScreenShare.create();
+		this._screenSharing = ScreenShare.create(device);
 
 		this._screenSharingProducer = null;
 
