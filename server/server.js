@@ -4,7 +4,7 @@
 
 process.title = 'multiparty-meeting-server';
 
-const config = require('./config');
+const config = require('./config/config');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');

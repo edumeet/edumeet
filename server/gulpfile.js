@@ -19,7 +19,7 @@ const LINTING_FILES =
 [
 	'gulpfile.js',
 	'server.js',
-	'config.example.js',
+	'config/config.example.js',
 	'lib/**/*.js'
 ];
 

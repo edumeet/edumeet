@@ -2,7 +2,7 @@
 
 const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
-const config = require('../config');
+const config = require('../config/config');
 
 const MAX_BITRATE = config.mediasoup.maxBitrate || 1000000;
 const MIN_BITRATE = Math.min(50000, MAX_BITRATE);
