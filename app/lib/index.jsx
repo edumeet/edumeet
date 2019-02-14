@@ -12,7 +12,7 @@ import RoomContext from './RoomContext';
 import * as cookiesManager from './cookiesManager';
 import * as stateActions from './redux/stateActions';
 import Room from './components/Room';
-import { loginEnabled } from '../config';
+import { loginEnabled } from '../config/config';
 import { store } from './store';
 
 const logger = new Logger();
