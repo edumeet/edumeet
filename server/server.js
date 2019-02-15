@@ -178,7 +178,6 @@ io.on('connection', (socket) =>
 		room = rooms.get(roomId);
 	}
 
-	socket.join(roomId);
 	socket.room = roomId;
 
 	room.handleConnection(peerName, socket);

@@ -122,7 +122,10 @@ class Room extends EventEmitter
 		{
 			socket.emit('room-locked');
 			socket.disconnect(true);
+			return;
 		}
+
+		socket.join(this._roomId);
 
 		const signalingPeer = { peerName : peerName, socket : socket };
 
@@ -137,6 +140,11 @@ class Room extends EventEmitter
 
 		this._handleSignalingPeer(signalingPeer);
 		socket.emit('room-ready');
+	}
+
+	isLocked()
+	{
+		return this._locked;
 	}
 
 	authCallback(data)
