@@ -25,6 +25,9 @@ class Room extends EventEmitter
 		// Closed flag.
 		this._closed = false;
 
+		// Locked flag.
+		this._locked = false;
+
 		this._chatHistory = [];
 
 		this._fileHistory = [];
@@ -102,6 +105,7 @@ class Room extends EventEmitter
 	{
 		logger.info('handleConnection() [peerName:"%s"]', peerName);
 
+		// This will allow reconnects to join despite lock
 		if (this._signalingPeers.has(peerName))
 		{
 			logger.warn(
@@ -113,6 +117,11 @@ class Room extends EventEmitter
 
 			signalingPeer.socket.disconnect();
 			this._signalingPeers.delete(peerName);
+		}
+		else if (this._locked) // Don't allow connections to a locked room
+		{
+			socket.emit('room-locked');
+			socket.disconnect(true);
 		}
 
 		const signalingPeer = { peerName : peerName, socket : socket };
@@ -127,6 +136,7 @@ class Room extends EventEmitter
 		this._signalingPeers.set(peerName, signalingPeer);
 
 		this._handleSignalingPeer(signalingPeer);
+		socket.emit('room-ready');
 	}
 
 	authCallback(data)
@@ -304,6 +314,38 @@ class Room extends EventEmitter
 					chatHistory : this._chatHistory,
 					fileHistory : this._fileHistory,
 					lastN       : this._lastN
+				}
+			);
+		});
+
+		signalingPeer.socket.on('lock-room', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			this._locked = true;
+
+			// Spread to others
+			signalingPeer.socket.broadcast.to(this._roomId).emit(
+				'lock-room',
+				{
+					peerName : signalingPeer.peerName
+				}
+			);
+		});
+
+		signalingPeer.socket.on('unlock-room', (request, cb) =>
+		{
+			// Return no error
+			cb(null);
+
+			this._locked = false;
+
+			// Spread to others
+			signalingPeer.socket.broadcast.to(this._roomId).emit(
+				'unlock-room',
+				{
+					peerName : signalingPeer.peerName
 				}
 			);
 		});

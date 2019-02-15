@@ -59,11 +59,13 @@ class Sidebar extends Component
 			roomClient,
 			toolbarsVisible,
 			me,
-			screenProducer
+			screenProducer,
+			locked
 		} = this.props;
 
 		let screenState;
 		let screenTip;
+		let lockState = 'unlocked';
 
 		if (me.needExtension)
 		{
@@ -84,6 +86,11 @@ class Sidebar extends Component
 		{
 			screenState = 'off';
 			screenTip = 'Start screen sharing';
+		}
+
+		if (locked)
+		{
+			lockState = 'locked';
 		}
 
 		return (
@@ -162,6 +169,25 @@ class Sidebar extends Component
 					</Choose>
 				</If>
 				<div
+					className={classnames('button', 'lock', lockState, {
+						on : locked
+					})}
+					data-tip={`Room is ${lockState}`}
+					data-place='right'
+					data-type='dark'
+					onClick={() =>
+					{
+						if (locked)
+						{
+							roomClient.unlockRoom();
+						}
+						else
+						{
+							roomClient.lockRoom();
+						}
+					}}
+				/>
+				<div
 					className={classnames('button', 'raise-hand', {
 						on       : me.raiseHand,
 						disabled : me.raiseHandInProgress
@@ -188,7 +214,8 @@ Sidebar.propTypes = {
 	roomClient      : PropTypes.any.isRequired,
 	toolbarsVisible : PropTypes.bool.isRequired,
 	me              : appPropTypes.Me.isRequired,
-	screenProducer  : appPropTypes.Producer
+	screenProducer  : appPropTypes.Producer,
+	locked          : PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -196,7 +223,8 @@ const mapStateToProps = (state) =>
 		toolbarsVisible : state.room.toolbarsVisible,
 		screenProducer  : Object.values(state.producers)
 			.find((producer) => producer.source === 'screen'),
-		me : state.me
+		me     : state.me,
+		locked : state.room.locked
 	});
 
 export default withRoomContext(connect(

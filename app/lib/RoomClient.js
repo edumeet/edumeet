@@ -990,8 +990,20 @@ export default class RoomClient
 		this._signalingSocket.on('connect', () =>
 		{
 			logger.debug('signaling Peer "connect" event');
+		});
+
+		this._signalingSocket.on('room-ready', () =>
+		{
+			logger.debug('signaling Peer "room-ready" event');
 
 			this._joinRoom({ displayName, device });
+		});
+
+		this._signalingSocket.on('room-locked', () =>
+		{
+			logger.debug('signaling Peer "room-locked" event');
+
+			store.dispatch(stateActions.setRoomLockedOut());
 		});
 
 		this._signalingSocket.on('disconnect', () =>
@@ -1024,10 +1036,34 @@ export default class RoomClient
 			this._room.receiveNotification(notification);
 		});
 
-		this._signalingSocket.on('active-speaker', (data) =>
+		this._signalingSocket.on('lock-room', ({ peerName }) =>
 		{
-			const { peerName } = data;
+			store.dispatch(
+				stateActions.setRoomLocked());
 
+			const peer = this._room.getPeerByName(peerName);
+
+			if (peer)
+			{
+				this.notify(`${peer.appData.displayName} locked the room.`);
+			}
+		});
+
+		this._signalingSocket.on('unlock-room', ({ peerName }) =>
+		{
+			store.dispatch(
+				stateActions.setRoomUnLocked());
+
+			const peer = this._room.getPeerByName(peerName);
+
+			if (peer)
+			{
+				this.notify(`${peer.appData.displayName} unlocked the room.`);
+			}
+		});
+
+		this._signalingSocket.on('active-speaker', ({ peerName }) =>
+		{
 			store.dispatch(
 				stateActions.setRoomActiveSpeaker(peerName));
 
@@ -1035,11 +1071,8 @@ export default class RoomClient
 				this._spotlights.handleActiveSpeaker(peerName);
 		});
 
-		this._signalingSocket.on('display-name-changed', (data) =>
+		this._signalingSocket.on('display-name-changed', ({ peerName, displayName: name }) =>
 		{
-			// eslint-disable-next-line no-shadow
-			const { peerName, displayName } = data;
-
 			// NOTE: Hack, we shouldn't do this, but this is just a demo.
 			const peer = this._room.getPeerByName(peerName);
 
@@ -1050,20 +1083,18 @@ export default class RoomClient
 				return;
 			}
 
-			const oldDisplayName = peer.appData.displayName;
+			const oldDisplayName = peer.appData.name;
 
-			peer.appData.displayName = displayName;
+			peer.appData.displayName = name;
 
 			store.dispatch(
-				stateActions.setPeerDisplayName(displayName, peerName));
+				stateActions.setPeerDisplayName(name, peerName));
 
-			this.notify(`${oldDisplayName} changed their display name to ${displayName}.`);
+			this.notify(`${oldDisplayName} changed their display name to ${name}.`);
 		});
 
-		this._signalingSocket.on('profile-picture-changed', (data) =>
+		this._signalingSocket.on('profile-picture-changed', ({ peerName, picture }) =>
 		{
-			const { peerName, picture } = data;
-
 			store.dispatch(stateActions.setPeerPicture(peerName, picture));
 		});
 
@@ -1289,6 +1320,42 @@ export default class RoomClient
 			this.notify('An error occured while joining the room.');
 
 			this.close();
+		}
+	}
+
+	async lockRoom()
+	{
+		logger.debug('lockRoom()');
+
+		try
+		{
+			await this.sendRequest('lock-room');
+
+			store.dispatch(
+				stateActions.setRoomLocked());
+			this.notify('You locked the room.');
+		}
+		catch (error)
+		{
+			logger.error('lockRoom() | failed: %o', error);
+		}
+	}
+
+	async unlockRoom()
+	{
+		logger.debug('unlockRoom()');
+
+		try
+		{
+			await this.sendRequest('unlock-room');
+
+			store.dispatch(
+				stateActions.setRoomUnLocked());
+			this.notify('You unlocked the room.');
+		}
+		catch (error)
+		{
+			logger.error('unlockRoom() | failed: %o', error);
 		}
 	}
 

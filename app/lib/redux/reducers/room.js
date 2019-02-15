@@ -2,6 +2,8 @@ const initialState =
 {
 	url                : null,
 	state              : 'new', // new/connecting/connected/disconnected/closed,
+	locked             : false,
+	lockedOut          : false,
 	activeSpeakerName  : null,
 	torrentSupport     : false,
 	showSettings       : false,
@@ -33,6 +35,21 @@ const room = (state = initialState, action) =>
 				return { ...state, state: roomState };
 			else
 				return { ...state, state: roomState, activeSpeakerName: null };
+		}
+
+		case 'SET_ROOM_LOCKED':
+		{
+			return { ...state, locked: true };
+		}
+
+		case 'SET_ROOM_UNLOCKED':
+		{
+			return { ...state, locked: false };
+		}
+
+		case 'SET_ROOM_LOCKED_OUT':
+		{
+			return { ...state, lockedOut: true };
 		}
 
 		case 'SET_ROOM_ACTIVE_SPEAKER':

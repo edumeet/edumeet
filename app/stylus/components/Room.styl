@@ -1,6 +1,20 @@
 [data-component='Room'] {
 	AppearFadeIn(300ms);
 
+	> .locked-out {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translateX(-50%) translateY(-50%);
+		width: 30vw;
+		text-align: center;
+		font-family: 'Roboto';
+		font-size: 2.5em;
+		box-shadow: 0px 5px 12px 2px rgba(17, 17, 17, 0.5);
+		background-color: #fff;
+		padding: 2vmin;
+	}
+
 	> .room-wrapper {
 		position: absolute;
 		top: 0;
