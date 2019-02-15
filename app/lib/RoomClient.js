@@ -15,7 +15,7 @@ import {
 	turnServers,
 	requestTimeout,
 	transportOptions
-} from '../config';
+} from '../config/config';
 
 const logger = new Logger('RoomClient');
 

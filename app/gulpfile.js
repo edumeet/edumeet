@@ -46,7 +46,8 @@ const BANNER_OPTIONS =
 	currentYear : (new Date()).getFullYear()
 };
 const OUTPUT_DIR = '../server/public';
-const appOptions = require('./config');
+const appOptions = require('./config/config');
+const SERVER_CONFIG = '../server/config/config';
 
 // Set Node 'development' environment (unless externally set).
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
@@ -199,7 +200,7 @@ gulp.task('bundle:watch', () =>
 
 gulp.task('livebrowser', (done) =>
 {
-	const config = require('../server/config');
+	const config = require(SERVER_CONFIG);
 
 	browserSync(
 		{
@@ -220,7 +221,7 @@ gulp.task('livebrowser', (done) =>
 
 gulp.task('browser', (done) =>
 {
-	const config = require('../server/config');
+	const config = require(SERVER_CONFIG);
 
 	browserSync(
 		{
