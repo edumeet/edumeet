@@ -73,97 +73,114 @@ class Room extends React.Component
 			democratic : Peers
 		}[room.mode];
 
-		return (
-			<Fragment>
-				<Appear duration={300}>
-					<div data-component='Room'>
-						<CookieConsent>
-							This website uses cookies to enhance the user experience.
-						</CookieConsent>
-
-						<FullScreenView advancedMode={room.advancedMode} />
-
-						<VideoWindow advancedMode={room.advancedMode} />
-
-						<div className='room-wrapper'>
-							<div data-component='Logo' />
-							<AudioPeers />
-
-							<Notifications />
-
-							<If condition={room.advancedMode}>
-								<div className='state' data-tip='Server status'>
-									<div className={classnames('icon', room.state)} />
-									<p className={classnames('text', room.state)}>{room.state}</p>
-								</div>
-							</If>
-
-							<div
-								className={classnames('room-link-wrapper room-controls', {
-									'visible' : this.props.room.toolbarsVisible
-								})}
-							>
-								<div className='room-link'>
-									<CopyToClipboard
-										text={room.url}
-										onCopy={onRoomLinkCopy}
-									>
-										<a
-											className='link'
-											href={room.url}
-											target='_blank'
-											data-tip='Click to copy room link'
-											rel='noopener noreferrer'
-											onClick={(event) =>
-											{
-												// If this is a 'Open in new window/tab' don't prevent
-												// click default action.
-												if (
-													event.ctrlKey || event.shiftKey || event.metaKey ||
-														// Middle click (IE > 9 and everyone else).
-														(event.button && event.button === 1)
-												)
-												{
-													return;
-												}
-
-												event.preventDefault();
-											}}
-										>
-											invitation link
-										</a>
-									</CopyToClipboard>
-								</div>
+		if (room.lockedOut)
+		{
+			return (
+				<Fragment>
+					<Appear duration={300}>
+						<div data-component='Room'>
+							<div className='locked-out'>
+								This room is locked at the moment, try again later.
 							</div>
-
-							<View advancedMode={room.advancedMode} />
-
-							<Draggable handle='.me-container' bounds='body' cancel='.display-name'>
+						</div>
+					</Appear>
+				</Fragment>
+			);
+		}
+		else
+		{
+			return (
+				<Fragment>
+					<Appear duration={300}>
+						<div data-component='Room'>
+							<CookieConsent>
+								This website uses cookies to enhance the user experience.
+							</CookieConsent>
+	
+							<FullScreenView advancedMode={room.advancedMode} />
+	
+							<VideoWindow advancedMode={room.advancedMode} />
+	
+							<div className='room-wrapper'>
+								<div data-component='Logo' />
+								<AudioPeers />
+	
+								<Notifications />
+	
+								<If condition={room.advancedMode}>
+									<div className='state' data-tip='Server status'>
+										<div className={classnames('icon', room.state)} />
+										<p className={classnames('text', room.state)}>{room.state}</p>
+									</div>
+								</If>
+	
 								<div
-									className={classnames('me-container', {
-										'active-speaker' : amActiveSpeaker
+									className={classnames('room-link-wrapper room-controls', {
+										'visible' : this.props.room.toolbarsVisible
 									})}
 								>
-									<Me
-										advancedMode={room.advancedMode}
-									/>
+									<div className='room-link'>
+										<CopyToClipboard
+											text={room.url}
+											onCopy={onRoomLinkCopy}
+										>
+											<a
+												className='link'
+												href={room.url}
+												target='_blank'
+												data-tip='Click to copy room link'
+												rel='noopener noreferrer'
+												onClick={(event) =>
+												{
+													// If this is a 'Open in new window/tab' don't prevent
+													// click default action.
+													if (
+														event.ctrlKey || event.shiftKey || event.metaKey ||
+															// Middle click (IE > 9 and everyone else).
+															(event.button && event.button === 1)
+													)
+													{
+														return;
+													}
+	
+													event.preventDefault();
+												}}
+											>
+												invitation link
+											</a>
+										</CopyToClipboard>
+									</div>
 								</div>
-							</Draggable>
-
-							<Sidebar />
-
-							<ReactTooltip
-								effect='solid'
-								delayShow={100}
-								delayHide={100}
-							/>
+	
+								<View advancedMode={room.advancedMode} />
+	
+								<Draggable handle='.me-container' bounds='body' cancel='.display-name'>
+									<div
+										className={classnames('me-container', {
+											'active-speaker' : amActiveSpeaker
+										})}
+									>
+										<Me
+											advancedMode={room.advancedMode}
+										/>
+									</div>
+								</Draggable>
+	
+								<Sidebar />
+	
+								<ReactTooltip
+									effect='solid'
+									delayShow={100}
+									delayHide={100}
+								/>
+							</div>
+	
+							<ToolArea />
 						</div>
-
-						<ToolArea />
-					</div>
-				</Appear>
-			</Fragment>
-		);
+					</Appear>
+				</Fragment>
+			);
+		}
 	}
 }
 

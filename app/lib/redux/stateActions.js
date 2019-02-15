@@ -22,6 +22,27 @@ export const setRoomActiveSpeaker = (peerName) =>
 	};
 };
 
+export const setRoomLocked = () =>
+{
+	return {
+		type : 'SET_ROOM_LOCKED'
+	};
+};
+
+export const setRoomUnLocked = () =>
+{
+	return {
+		type : 'SET_ROOM_UNLOCKED'
+	};
+};
+
+export const setRoomLockedOut = () =>
+{
+	return {
+		type : 'SET_ROOM_LOCKED_OUT'
+	};
+};
+
 export const setMe = ({ peerName, displayName, displayNameSet, device, loginEnabled }) =>
 {
 	return {
