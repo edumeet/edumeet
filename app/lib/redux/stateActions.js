@@ -43,6 +43,14 @@ export const setRoomLockedOut = () =>
 	};
 };
 
+export const setAudioSuspended = ({ audioSuspended }) =>
+{
+	return {
+		type    : 'SET_AUDIO_SUSPENDED',
+		payload : { audioSuspended }
+	};
+};
+
 export const setMe = ({ peerName, displayName, displayNameSet, device, loginEnabled }) =>
 {
 	return {

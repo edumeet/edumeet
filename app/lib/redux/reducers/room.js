@@ -4,6 +4,7 @@ const initialState =
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
 	lockedOut          : false,
+	audioSuspended     : false,
 	activeSpeakerName  : null,
 	torrentSupport     : false,
 	showSettings       : false,
@@ -50,6 +51,13 @@ const room = (state = initialState, action) =>
 		case 'SET_ROOM_LOCKED_OUT':
 		{
 			return { ...state, lockedOut: true };
+		}
+
+		case 'SET_AUDIO_SUSPENDED':
+		{
+			const { audioSuspended } = action.payload;
+
+			return { ...state, audioSuspended };
 		}
 
 		case 'SET_ROOM_ACTIVE_SPEAKER':
