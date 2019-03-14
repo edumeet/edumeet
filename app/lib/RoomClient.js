@@ -77,7 +77,7 @@ export default class RoomClient
 		this._peerName = peerName;
 
 		// My display name
-		this._displayName = peerName;
+		this._displayName = displayName;
 
 		// Alert sound
 		this._soundAlert = new Audio('/resources/sounds/notify.mp3');
