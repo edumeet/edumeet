@@ -53,7 +53,7 @@ export default class RoomClient
 			'constructor() [roomId:"%s", peerName:"%s", displayName:"%s", device:%s]',
 			roomId, peerName, displayName, device.flag);
 
-		const signalingUrl = getSignalingUrl(peerName, roomId);
+		this._signalingUrl = getSignalingUrl(peerName, roomId);
 
 		// window element to external login site
 		this._loginWindow;
@@ -76,18 +76,21 @@ export default class RoomClient
 		// My peer name.
 		this._peerName = peerName;
 
+		// My display name
+		this._displayName = peerName;
+
 		// Alert sound
 		this._soundAlert = new Audio('/resources/sounds/notify.mp3');
 
+		// AudioContext
+		this._audioContext;
+
 		// Socket.io peer connection
-		this._signalingSocket = io(signalingUrl);
+		this._signalingSocket = null;
 
-		if (this._device.flag === 'firefox')
-			ROOM_OPTIONS = Object.assign({ iceTransportPolicy: 'relay' }, ROOM_OPTIONS);
-
-		// mediasoup-client Room instance.
-		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
-		this._room.roomId = roomId;
+		// The mediasoup room instance
+		this._room = null;
+		this._roomId = roomId;
 
 		// Our WebTorrent client
 		this._webTorrent = this._torrentSupport && new WebTorrent({
@@ -102,7 +105,7 @@ export default class RoomClient
 		this._maxSpotlights = ROOM_OPTIONS.maxSpotlights;
 
 		// Manager of spotlight
-		this._spotlights = new Spotlights(this._maxSpotlights, this._room);
+		this._spotlights = null;
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -140,7 +143,9 @@ export default class RoomClient
 
 		this._startKeyListener();
 
-		this._join({ displayName, device });
+		this._audioContext = null;
+
+		this.join();
 	}
 
 	close()
@@ -983,8 +988,36 @@ export default class RoomClient
 		}, 500);
 	}
 
-	_join({ displayName, device })
+	async resumeAudio()
 	{
+		logger.debug('resumeAudio()');
+		try
+		{
+			await this._audioContext.resume();
+
+			store.dispatch(
+				stateActions.setAudioSuspended({ audioSuspended: false }));
+
+		}
+		catch (error)
+		{
+			logger.error('resumeAudioJoin() failed: %o', error);
+		}
+	}
+
+	join()
+	{
+		this._signalingSocket = io(this._signalingUrl);
+
+		if (this._device.flag === 'firefox')
+			ROOM_OPTIONS = Object.assign({ iceTransportPolicy: 'relay' }, ROOM_OPTIONS);
+
+		// mediasoup-client Room instance.
+		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
+		this._room.roomId = this._roomId;
+
+		this._spotlights = new Spotlights(this._maxSpotlights, this._room);
+
 		store.dispatch(stateActions.setRoomState('connecting'));
 
 		this._signalingSocket.on('connect', () =>
@@ -996,7 +1029,7 @@ export default class RoomClient
 		{
 			logger.debug('signaling Peer "room-ready" event');
 
-			this._joinRoom({ displayName, device });
+			this._joinRoom();
 		});
 
 		this._signalingSocket.on('room-locked', () =>
@@ -1180,7 +1213,7 @@ export default class RoomClient
 		});
 	}
 
-	async _joinRoom({ displayName, device })
+	async _joinRoom()
 	{
 		logger.debug('_joinRoom()');
 
@@ -1236,7 +1269,13 @@ export default class RoomClient
 
 		try
 		{
-			await this._room.join(this._peerName, { displayName, device });
+			await this._room.join(
+				this._peerName,
+				{
+					displayName : this._displayName,
+					device      : this._device
+				}
+			);
 
 			store.dispatch(
 				stateActions.setFileSharingSupported(this._torrentSupport));
@@ -1277,7 +1316,7 @@ export default class RoomClient
 			if (this._produce)
 			{
 				if (this._room.canSend('audio'))
-					this._setMicProducer();
+					await this._setMicProducer();
 
 				// Add our webcam (unless the cookie says no).
 				if (this._room.canSend('video'))
@@ -1285,7 +1324,7 @@ export default class RoomClient
 					const devicesCookie = cookiesManager.getDevices();
 
 					if (!devicesCookie || devicesCookie.webcamEnabled)
-						this.enableWebcam();
+						await this.enableWebcam();
 				}
 			}
 
@@ -1462,6 +1501,14 @@ export default class RoomClient
 					store.dispatch(stateActions.setProducerVolume(producer.id, volume));
 				}
 			});
+
+			this._audioContext = new AudioContext();
+
+			// We need to provoke user interaction to get permission from browser to start audio
+			if (this._audioContext.state === 'suspended')
+			{
+				store.dispatch(stateActions.setAudioSuspended({ audioSuspended: true }));
+			}
 		}
 		catch (error)
 		{
@@ -1472,7 +1519,6 @@ export default class RoomClient
 			if (producer)
 				producer.close();
 
-			throw error;
 		}
 	}
 

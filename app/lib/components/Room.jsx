@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
+import { withRoomContext } from '../RoomContext';
 import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -63,6 +64,7 @@ class Room extends React.Component
 	render()
 	{
 		const {
+			roomClient,
 			room,
 			amActiveSpeaker,
 			onRoomLinkCopy
@@ -73,7 +75,31 @@ class Room extends React.Component
 			democratic : Peers
 		}[room.mode];
 
-		if (room.lockedOut)
+		if (room.audioSuspended)
+		{
+			return (
+				<Fragment>
+					<Appear duration={300}>
+						<div data-component='Room'>
+							<div className='sound-suspended'>
+								This webpage required sound and video to play, please click to allow.
+								<div
+									onClick={() =>
+									{
+										roomClient.notify('Joining.');
+										roomClient.resumeAudio();
+									}}
+									className='button'
+								>
+									<span>Allow</span>
+								</div>
+							</div>
+						</div>
+					</Appear>
+				</Fragment>
+			);
+		}
+		else if (room.lockedOut)
 		{
 			return (
 				<Fragment>
@@ -186,6 +212,7 @@ class Room extends React.Component
 
 Room.propTypes =
 {
+	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
 	me                 : appPropTypes.Me.isRequired,
 	amActiveSpeaker    : PropTypes.bool.isRequired,
@@ -228,9 +255,9 @@ const mapDispatchToProps = (dispatch) =>
 	};
 };
 
-const RoomContainer = connect(
+const RoomContainer = withRoomContext(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(Room);
+)(Room));
 
 export default RoomContainer;
