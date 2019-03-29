@@ -33,7 +33,7 @@ const styles = (theme) =>
 		},
 		fab :
 		{
-			margin: theme.spacing.unit
+			margin : theme.spacing.unit
 		}
 	});
 

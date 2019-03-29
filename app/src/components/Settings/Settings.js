@@ -12,23 +12,52 @@ import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = (theme) =>
 	({
 		root :
 		{
 		},
-		device :
+		dialogPaper :
 		{
-			width   : '20vw',
+			width                          : '30vw',
+			[theme.breakpoints.down('lg')] :
+			{
+				width : '40vw'
+			},
+			[theme.breakpoints.down('md')] :
+			{
+				width : '50vw'
+			},
+			[theme.breakpoints.down('sm')] :
+			{
+				width : '70vw'
+			},
+			[theme.breakpoints.down('xs')] :
+			{
+				width : '90vw'
+			}
+		},
+		setting :
+		{
 			padding : theme.spacing.unit * 2
 		},
 		formControl :
 		{
-			display : 'flex',
+			display : 'flex'
 		}
 	});
+
+const modes = [ {
+	value : 'democratic',
+	label : 'Democratic view'
+}, {
+	value : 'filmstrip',
+	label : 'Filmstrip view'
+} ];
 
 const Settings = ({
 	roomClient,
@@ -59,13 +88,20 @@ const Settings = ({
 			className={classes.root}
 			open={room.settingsOpen}
 			onClose={() => handleCloseSettings({ settingsOpen: false })}
+			classes={{
+				paper : classes.dialogPaper
+			}}
 		>
-			<DialogTitle id="form-dialog-title">Settings</DialogTitle>
-			<form className={classes.device} autoComplete='off'>
+			<DialogTitle id='form-dialog-title'>Settings</DialogTitle>
+			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
 					<Select
 						value={me.selectedWebcam || ''}
-						onChange={(event) => event.target.value ? roomClient.changeWebcam(event.target.value) : null }
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								roomClient.changeWebcam(event.target.value);
+						}}
 						displayEmpty
 						name='Camera'
 						autoWidth
@@ -85,11 +121,15 @@ const Settings = ({
 					</FormHelperText>
 				</FormControl>
 			</form>
-			<form className={classes.device} autoComplete='off'>
+			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
 					<Select
 						value={me.selectedAudioDevice || ''}
-						onChange={(event) => event.target.value ? roomClient.changeAudioDevice(event.target.value) : null }
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								roomClient.changeAudioDevice(event.target.value);
+						}}
 						displayEmpty
 						name='Audio device'
 						autoWidth
@@ -113,11 +153,37 @@ const Settings = ({
 					</FormHelperText>
 				</FormControl>
 			</form>
+			<FormControlLabel
+				className={classes.setting}
+				control={<Checkbox checked={room.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
+				label='Advanced mode'
+			/>
+			<form className={classes.setting} autoComplete='off'>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={room.mode || ''}
+						onChange={(event) => handleChangeMode(event.target.value)}
+						name='Room mode'
+						autoWidth
+						className={classes.selectEmpty}
+					>
+						{ modes.map((mode, index) =>
+						{
+							return (
+								<MenuItem key={index} value={mode.value}>{mode.label}</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						Select room layout
+					</FormHelperText>
+				</FormControl>
+			</form>
 			<DialogActions>
 				<Button onClick={() => handleCloseSettings({ settingsOpen: false })} color='primary'>
 					Close
 				</Button>
-          	</DialogActions>
+			</DialogActions>
 		</Dialog>
 	);
 };
@@ -129,6 +195,7 @@ Settings.propTypes =
 	room                 : appPropTypes.Room.isRequired,
 	onToggleAdvancedMode : PropTypes.func.isRequired,
 	handleChangeMode     : PropTypes.func.isRequired,
+	handleCloseSettings  : PropTypes.func.isRequired,
 	classes              : PropTypes.object.isRequired
 };
 

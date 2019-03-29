@@ -25,6 +25,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import Notifications from './Notifications/Notifications';
 import MeetingDrawer from './MeetingDrawer/MeetingDrawer';
 import Democratic from './MeetingViews/Democratic';
+import Filmstrip from './MeetingViews/Filmstrip';
 import Me from './Containers/Me';
 import AudioPeers from './PeerAudio/AudioPeers';
 import FullScreenView from './VideoContainers/FullScreenView';
@@ -123,9 +124,10 @@ class Room extends Component
 
 		this.fullscreen = new FullScreen(document);
 
-		this.state = {
-			drawerOpen         : false,
-			fullscreen         : false
+		this.state =
+		{
+			drawerOpen : false,
+			fullscreen : false
 		};
 	}
 
@@ -202,12 +204,20 @@ class Room extends Component
 			theme
 		} = this.props;
 
+		const View =
+		{
+			filmstrip  : Filmstrip,
+			democratic : Democratic
+		}[room.mode];
+
 		if (room.audioSuspended)
 		{
 			return (
 				<div className={classes.root}>
 					<Paper className={classes.message}>
-						<Typography>This webpage required sound and video to play, please click to allow.</Typography>
+						<Typography>
+							This webpage required sound and video to play, please click to allow.
+						</Typography>
 						<Button
 							variant='contained'
 							onClick={() =>
@@ -302,7 +312,9 @@ class Room extends Component
 									<IconButton
 										aria-label='Account'
 										color='inherit'
-										onClick={() => me.loggedIn ? roomClient.logout() : roomClient.login() }
+										onClick={() => {
+											me.loggedIn ? roomClient.logout() : roomClient.login();
+										}}
 									>
 										<AccountCircle />
 									</IconButton>
@@ -327,7 +339,9 @@ class Room extends Component
 							</SwipeableDrawer>
 						</Hidden>
 					</nav>
-					<Democratic advancedMode={room.advancedMode} />
+
+					<View advancedMode={room.advancedMode} />
+
 					<Draggable handle='.me-handle' bounds='body' cancel='.display-name'>
 						<div
 							className={classnames(classes.meContainer, 'me-handle', {
