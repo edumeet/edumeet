@@ -1,7 +1,6 @@
 node_modules/
 
-/app/config/
-!/app/config/config.example.js
+/app/public/config.js
 /server/config/
 !/server/config/config.example.js
 /server/public/

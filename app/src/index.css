@@ -1,0 +1,69 @@
+:root {
+	--background: url('./images/background.svg');
+	--background-color: rgba(114, 119, 143, 1.0);
+
+	--circle-button-color: rgba(255, 255, 255, 0.3);
+	--circle-button-toggled-color: rgba(255, 255, 255, 0.7);
+	--circle-button-unsupported-color: rgba(212, 34, 65, 0.7);
+	--circle-button-diabled-color: rgba(255, 255, 255, 0.5);
+	--circle-button-size: 2.5em;
+
+	--media-control-button-color: rgba(255, 255, 255, 0.85);
+	--media-control-botton-on: rgba(255, 255, 255, 0.7);
+	--media-control-botton-off: rgba(212, 34, 65, 0.7);
+	--media-control-botton-disabled: rgba(255, 255, 255, 0.5);
+	--media-control-button-size: 1.5em;
+
+	--me-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12);
+	--me-border: 1px solid rgba(255, 255, 255, 0.15);
+	--me-width: 20vmin;
+	--me-height: 15vmin;
+
+	--peer-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12);
+	--peer-border: 1px solid rgba(255, 255, 255, 0.15);
+	--peer-empty-avatar: url('./images/buddy.svg');
+	--peer-bg-color: rgba(42, 75, 88, 0.9);
+	--peer-video-bg-color: rgba(0, 0, 0, 0.75);
+
+	--chat-message-color: rgba(0, 0, 0, 0.1);
+	--chat-input-bg-color: rgba(255, 255, 255, 1.0);
+	--chat-input-text-color: rgba(0, 0, 0, 1.0);
+	--chat-send-bg-color: rgba(170, 238, 255, 1.0);
+
+	--filesharing-bg-color: rgba(170, 238, 255, 1.0);
+
+	--notification-info-bg-color: rgba(10, 29, 38, 0.75);
+	--notification-info-text-color: rgba(255, 255, 255, 0.65);
+	--notification-error-bg-color: rgba(255, 25, 20, 0.65);
+	--notification-error-text-color: rgba(255, 255, 255, 0.85);
+
+	--active-speaker-border-color: rgba(255, 255, 255, 1.0);
+	--selected-peer-border-color: rgba(55, 126, 255, 1.0);
+}
+
+html
+{
+	height: 100%;
+	width: 100%;
+	font-family: 'Roboto';
+	font-weight: 300;
+}
+
+body
+{
+	height: 100%;
+	width: 100%;
+	font-size: 16px;
+	background-color: var(--background-color);
+	background-image: var(--background);
+	background-attachment: fixed;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+#multiparty-meeting
+{
+	height: 100%;
+	width: 100%;
+}

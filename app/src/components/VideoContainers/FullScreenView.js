@@ -1,0 +1,163 @@
+import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
+import { withStyles } from '@material-ui/core/styles';
+import * as appPropTypes from '../appPropTypes';
+import * as stateActions from '../../actions/stateActions';
+import FullView from './FullView';
+import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
+
+const styles = () =>
+	({
+		root :
+		{
+			position : 'absolute',
+			top      : 0,
+			left     : 0,
+			height   : '100%',
+			width    : '100%',
+			zIndex   : 20000
+		},
+		controls :
+		{
+			position       : 'absolute',
+			zIndex         : 20020,
+			right          : 0,
+			top            : 0,
+			display        : 'flex',
+			flexDirection  : 'row',
+			justifyContent : 'flex-start',
+			alignItems     : 'center',
+			padding        : '0.4vmin'
+		},
+		button :
+		{
+			flex               : '0 0 auto',
+			margin             : '0.2vmin',
+			borderRadius       : 2,
+			backgroundColor    : 'rgba(255, 255, 255, 0.7)',
+			cursor             : 'pointer',
+			transitionProperty : 'opacity, background-color',
+			transitionDuration : '0.15s',
+			width              : '5vmin',
+			height             : '5vmin'
+		},
+		icon :
+		{
+			fontSize : '5vmin'
+		},
+		incompatibleVideo :
+		{
+			position       : 'absolute',
+			zIndex         : 20010,
+			top            : 0,
+			bottom         : 0,
+			left           : 0,
+			right          : 0,
+			display        : 'flex',
+			flexDirection  : 'column',
+			justifyContent : 'center',
+			alignItems     : 'center',
+			'& p'          :
+			{
+				padding       : '6px 12px',
+				borderRadius  : 6,
+				userSelect    : 'none',
+				pointerEvents : 'none',
+				fontSize      : 15,
+				color         : 'rgba(255, 255, 255, 0.55)'
+			}
+		}
+	});
+
+const FullScreenView = (props) =>
+{
+	const {
+		advancedMode,
+		consumer,
+		toggleConsumerFullscreen,
+		toolbarsVisible,
+		classes
+	} = props;
+
+	if (!consumer)
+		return null;
+
+	const consumerVisible = (
+		Boolean(consumer) &&
+		!consumer.locallyPaused &&
+		!consumer.remotelyPaused
+	);
+
+	let consumerProfile;
+
+	if (consumer)
+		consumerProfile = consumer.profile;
+
+	return (
+		<div className={classes.root}>
+			{ consumerVisible && !consumer.supported ?
+				<div className={classes.incompatibleVideo}>
+					<p>incompatible video</p>
+				</div>
+				:null
+			}
+
+			<div className={classes.controls}>
+				<div
+					className={classnames(classes.button, 'room-controls', {
+						visible : toolbarsVisible
+					})}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+						toggleConsumerFullscreen(consumer);
+					}}
+				>
+					<FullScreenExitIcon className={classes.icon} />
+				</div>
+			</div>
+
+			<FullView
+				advancedMode={advancedMode}
+				videoTrack={consumer ? consumer.track : null}
+				videoVisible={consumerVisible}
+				videoProfile={consumerProfile}
+			/>
+		</div>
+	);
+};
+
+FullScreenView.propTypes =
+{
+	advancedMode             : PropTypes.bool,
+	consumer                 : appPropTypes.Consumer,
+	toggleConsumerFullscreen : PropTypes.func.isRequired,
+	toolbarsVisible          : PropTypes.bool,
+	classes                  : PropTypes.object.isRequired
+};
+
+const mapStateToProps = (state) =>
+{
+	return {
+		consumer        : state.consumers[state.room.fullScreenConsumer],
+		toolbarsVisible : state.room.toolbarsVisible
+	};
+};
+
+const mapDispatchToProps = (dispatch) =>
+{
+	return {
+		toggleConsumerFullscreen : (consumer) =>
+		{
+			if (consumer)
+				dispatch(stateActions.toggleConsumerFullscreen(consumer.id));
+		}
+	};
+};
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(withStyles(styles)(FullScreenView));
