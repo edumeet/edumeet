@@ -37,7 +37,7 @@ const styles = () =>
 		}
 	});
 
-class FullView extends React.Component
+class FullView extends React.PureComponent
 {
 	constructor(props)
 	{

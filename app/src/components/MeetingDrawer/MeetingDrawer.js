@@ -30,7 +30,7 @@ const styles = (theme) =>
 		}
 	});
 
-class MeetingDrawer extends React.Component
+class MeetingDrawer extends React.PureComponent
 {
 	handleChange = (event, value) =>
 	{

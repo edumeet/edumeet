@@ -86,7 +86,7 @@ const styles = () =>
 		}
 	});
 
-class Me extends React.Component
+class Me extends React.PureComponent
 {
 	state = {
 		controlsVisible : false

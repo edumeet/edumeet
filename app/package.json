@@ -24,7 +24,6 @@
 		"react-draggable": "^3.2.1",
 		"react-redux": "^6.0.1",
 		"react-scripts": "2.1.8",
-		"react-swipeable-views": "^0.13.1",
 		"react-tooltip": "^3.10.0",
 		"redux": "^4.0.1",
 		"redux-logger": "^3.0.6",

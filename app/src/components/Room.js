@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
@@ -116,7 +116,7 @@ const styles = (theme) =>
 		}
 	});
 
-class Room extends Component
+class Room extends React.PureComponent
 {
 	constructor(props)
 	{

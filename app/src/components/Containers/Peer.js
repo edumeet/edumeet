@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -136,7 +136,7 @@ const styles = () =>
 		}
 	});
 
-class Peer extends Component
+class Peer extends React.PureComponent
 {
 	state = {
 		controlsVisible : false

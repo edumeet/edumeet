@@ -210,7 +210,7 @@ const styles = (theme) =>
 		}
 	});
 
-class PeerView extends React.Component
+class PeerView extends React.PureComponent
 {
 	constructor(props)
 	{

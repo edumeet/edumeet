@@ -45,7 +45,7 @@ const styles = (theme) =>
 		}
 	});
 
-class ParticipantList extends React.Component
+class ParticipantList extends React.PureComponent
 {
 	componentDidMount()
 	{

@@ -18,7 +18,7 @@ const styles = (theme) =>
 		}
 	});
 
-class MessageList extends React.Component
+class MessageList extends React.PureComponent
 {
 	componentDidMount()
 	{
@@ -29,6 +29,13 @@ class MessageList extends React.Component
 	{
 		return this.node.scrollTop
 			+ this.node.offsetHeight === this.node.scrollHeight;
+	}
+
+	shouldComponentUpdate(nextProps)
+	{
+		if (nextProps.chatmessages.length !== this.props.chatmessages.length)
+			return true;
+		return false;
 	}
 
 	componentDidUpdate(prevProps, prevState, shouldScroll)

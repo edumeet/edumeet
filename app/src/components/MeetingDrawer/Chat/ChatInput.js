@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -28,7 +28,7 @@ const styles = (theme) =>
 		}
 	});
 
-class ChatInput extends Component
+class ChatInput extends React.PureComponent
 {
 	constructor(props)
 	{

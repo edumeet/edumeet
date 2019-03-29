@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
@@ -87,7 +87,7 @@ const styles = (theme) =>
 		}
 	});
 
-class Filmstrip extends Component
+class Filmstrip extends React.PureComponent
 {
 	constructor(props)
 	{

@@ -45,7 +45,7 @@ const styles = (theme) =>
 		}
 	});
 
-class Democratic extends React.Component
+class Democratic extends React.PureComponent
 {
 	constructor(props)
 	{

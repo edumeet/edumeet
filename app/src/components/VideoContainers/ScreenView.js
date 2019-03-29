@@ -83,7 +83,7 @@ const styles = () =>
 		}
 	});
 
-class ScreenView extends React.Component
+class ScreenView extends React.PureComponent
 {
 	constructor(props)
 	{

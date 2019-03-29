@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../RoomContext';
@@ -49,7 +49,7 @@ const styles = (theme) =>
 		}
 	});
 
-class File extends Component
+class File extends React.PureComponent
 {
 	render()
 	{
