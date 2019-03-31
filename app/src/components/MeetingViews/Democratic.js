@@ -11,7 +11,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 const RATIO = 1.334;
 const PADDING = 100;
 
-const styles = (theme) =>
+const styles = () =>
 	({
 		root :
 		{
@@ -162,7 +162,7 @@ class Democratic extends React.PureComponent
 					}
 					else
 					{
-						return('');
+						return ('');
 					}
 				})}
 				{ spotlightsLength < Object.keys(peers).length ?

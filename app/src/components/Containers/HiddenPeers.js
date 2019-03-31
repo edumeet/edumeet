@@ -30,7 +30,7 @@ const styles = () =>
 			fontSize           : '1.7vmin',
 			fontWeight         : 'bolder',
 			animation          : 'none',
-			'&.pulse' :
+			'&.pulse'          :
 			{
 				animation : 'pulse 0.5s'
 			}
@@ -91,7 +91,10 @@ class HiddenPeers extends React.PureComponent
 		} = this.props;
 
 		return (
-			<div className={classnames(classes.root, this.state.className)} onClick={() => openUsersTab()}>
+			<div
+				className={classnames(classes.root, this.state.className)}
+				onClick={() => openUsersTab()}
+			>
 				<p>+{hiddenPeersCount} <br /> participant
 					{(hiddenPeersCount === 1) ? null : 's'}
 				</p>

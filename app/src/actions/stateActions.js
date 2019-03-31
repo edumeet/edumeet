@@ -52,10 +52,10 @@ export const setAudioSuspended = ({ audioSuspended }) =>
 };
 
 export const setSettingsOpen = ({ settingsOpen }) =>
-({
-	type    : 'SET_SETTINGS_OPEN',
-	payload : { settingsOpen }
-});
+	({
+		type    : 'SET_SETTINGS_OPEN',
+		payload : { settingsOpen }
+	});
 
 export const setMe = ({ peerName, displayName, displayNameSet, device, loginEnabled }) =>
 {

@@ -35,6 +35,7 @@ class MessageList extends React.PureComponent
 	{
 		if (nextProps.chatmessages.length !== this.props.chatmessages.length)
 			return true;
+
 		return false;
 	}
 
@@ -55,6 +56,7 @@ class MessageList extends React.PureComponent
 	{
 		const {
 			chatmessages,
+			myPicture,
 			classes
 		} = this.props;
 	
@@ -66,7 +68,7 @@ class MessageList extends React.PureComponent
 						const messageTime = new Date(message.time);
 
 						const picture = (message.sender === 'response' ?
-							message.picture : this.props.myPicture) || EmptyAvatar;
+							message.picture : myPicture) || EmptyAvatar;
 
 						return (
 							<Message
@@ -88,12 +90,14 @@ class MessageList extends React.PureComponent
 MessageList.propTypes =
 {
 	chatmessages : PropTypes.array,
+	myPicture    : PropTypes.string,
 	classes      : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
-({
-	chatmessages : state.chatmessages
-});
+	({
+		chatmessages : state.chatmessages,
+		myPicture    : state.me.picture
+	});
 
 export default connect(mapStateToProps, null)(withStyles(styles)(MessageList));

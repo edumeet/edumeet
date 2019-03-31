@@ -51,7 +51,7 @@ const styles = () =>
 			zIndex         : 20,
 			opacity        : 0,
 			transition     : 'opacity 0.3s',
-			'&.visible'   :
+			'&.visible'    :
 			{
 				opacity : 1
 			}
@@ -68,7 +68,7 @@ const styles = () =>
 			cursor             : 'pointer',
 			transitionProperty : 'opacity, background-color',
 			transitionDuration : '0.15s',
-			'&:hover' :
+			'&:hover'          :
 			{
 				opacity : 1
 			},

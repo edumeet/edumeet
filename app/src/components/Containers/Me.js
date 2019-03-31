@@ -34,20 +34,20 @@ const styles = () =>
 			},
 			'&.screen' :
 			{
-				order    : 1
+				order : 1
 			}
 		},
 		controls :
 		{
-			position       : 'absolute',
-			right          : 0,
-			top            : 0,
-			display        : 'flex',
-			flexDirection  : 'row',
-			padding        : '0.4vmin',
-			zIndex         : 20,
-			opacity        : 0,
-			transition     : 'opacity 0.3s',
+			position      : 'absolute',
+			right         : 0,
+			top           : 0,
+			display       : 'flex',
+			flexDirection : 'row',
+			padding       : '0.4vmin',
+			zIndex        : 20,
+			opacity       : 0,
+			transition    : 'opacity 0.3s',
 			'&.visible'   :
 			{
 				opacity : 1
@@ -62,7 +62,7 @@ const styles = () =>
 			width           : 'var(--media-control-button-size)',
 			height          : 'var(--media-control-button-size)',
 			backgroundColor : 'var(--media-control-button-color)',
-			'&:hover'    :
+			'&:hover'       :
 			{
 				opacity : 1
 			},

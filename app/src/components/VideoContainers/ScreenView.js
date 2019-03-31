@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 const styles = () =>
 	({
-		root:
+		root :
 		{
 			position           : 'relative',
 			flex               : '100 100 auto',
@@ -30,7 +30,7 @@ const styles = () =>
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
 			backgroundColor    : 'var(--peer-video-bg-color)',
-			'&.is-me' :
+			'&.is-me'          :
 			{
 				transform : 'scaleX(-1)'
 			},
@@ -69,11 +69,11 @@ const styles = () =>
 			backgroundColor : 'rgba(0, 0, 0, 0.25)',
 			'& p'           :
 			{
-				userSelect     : 'none',
-				pointerEvents  : 'none',
-				margin         : 0,
-				color          : 'rgba(255, 255, 255, 0.7)',
-				fontSize       : 10,
+				userSelect    : 'none',
+				pointerEvents : 'none',
+				margin        : 0,
+				color         : 'rgba(255, 255, 255, 0.7)',
+				fontSize      : 10,
 
 				'&:last-child' :
 				{

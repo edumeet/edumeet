@@ -9,7 +9,7 @@ import { withRoomContext } from '../../RoomContext';
 import Peer from '../Containers/Peer';
 import HiddenPeers from '../Containers/HiddenPeers';
 
-const styles = (theme) =>
+const styles = () =>
 	({
 		root :
 		{
@@ -70,11 +70,11 @@ const styles = (theme) =>
 		},
 		filmContent :
 		{
-			height   : '100%',
-			width    : '100%',
-			border   : '1px solid rgba(255,255,255,0.15)',
-			maxWidth : 'calc(18vh * (4 / 3))',
-			cursor   : 'pointer',
+			height      : '100%',
+			width       : '100%',
+			border      : '1px solid rgba(255,255,255,0.15)',
+			maxWidth    : 'calc(18vh * (4 / 3))',
+			cursor      : 'pointer',
 			'& .screen' :
 			{
 				maxWidth : 'calc(18vh * (2 * 4 / 3))',

@@ -36,7 +36,7 @@ const styles = (theme) =>
 			cursor       : 'pointer',
 			'&.selected' :
 			{
-				backgroundColor: 'rgba(55, 126, 255, 1)'
+				backgroundColor : 'rgba(55, 126, 255, 1)'
 			},
 			'&:not(:last-child)' :
 			{

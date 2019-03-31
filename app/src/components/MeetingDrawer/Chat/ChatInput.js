@@ -41,14 +41,14 @@ class ChatInput extends React.PureComponent
 	}
 
 	createNewMessage = (text, sender, name, picture) =>
-	({
-		type : 'message',
-		text,
-		time : Date.now(),
-		name,
-		sender,
-		picture
-	});
+		({
+			type : 'message',
+			text,
+			time : Date.now(),
+			name,
+			sender,
+			picture
+		});
 
 	handleChange = (e) =>
 	{
@@ -121,10 +121,10 @@ ChatInput.propTypes =
 };
 
 const mapStateToProps = (state) =>
-({
-	displayName : state.me.displayName,
-	picture     : state.me.picture
-});
+	({
+		displayName : state.me.displayName,
+		picture     : state.me.picture
+	});
 
 export default withRoomContext(
 	connect(mapStateToProps)(withStyles(styles)(ChatInput))

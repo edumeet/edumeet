@@ -57,16 +57,14 @@ class MeetingDrawer extends React.PureComponent
 						variant='fullWidth'
 					>
 						<Tab
-							label=
-							{
+							label={
 								<Badge color='secondary' badgeContent={unreadMessages}>
 									Chat
 								</Badge>
 							}
 						/>
 						<Tab
-							label=
-							{
+							label={
 								<Badge color='secondary' badgeContent={unreadFiles}>
 									File sharing
 								</Badge>
@@ -99,7 +97,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-	setToolTab     : stateActions.setToolTab
+	setToolTab : stateActions.setToolTab
 };
 
 export default connect(

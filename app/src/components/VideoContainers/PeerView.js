@@ -5,9 +5,9 @@ import { withStyles } from '@material-ui/core/styles';
 import * as appPropTypes from '../appPropTypes';
 import EditableInput from '../Controls/EditableInput';
 
-const styles = (theme) =>
+const styles = () =>
 	({
-		root:
+		root :
 		{
 			position           : 'relative',
 			flex               : '100 100 auto',
@@ -32,7 +32,7 @@ const styles = (theme) =>
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
 			backgroundColor    : 'var(--peer-video-bg-color)',
-			'&.is-me' :
+			'&.is-me'          :
 			{
 				transform : 'scaleX(-1)'
 			},
@@ -71,11 +71,11 @@ const styles = (theme) =>
 			backgroundColor : 'rgba(0, 0, 0, 0.25)',
 			'& p'           :
 			{
-				userSelect     : 'none',
-				pointerEvents  : 'none',
-				margin         : 0,
-				color          : 'rgba(255, 255, 255, 0.7)',
-				fontSize       : 10,
+				userSelect    : 'none',
+				pointerEvents : 'none',
+				margin        : 0,
+				color         : 'rgba(255, 255, 255, 0.7)',
+				fontSize      : 10,
 
 				'&:last-child' :
 				{
@@ -108,24 +108,24 @@ const styles = (theme) =>
 		},
 		displayNameStatic :
 		{
-			userSelect         : 'none',
-			cursor             : 'text',
-			fontSize           : 14,
-			fontWeight         : 400,
-			color              : 'rgba(255, 255, 255, 0.85)',
-			'&:hover' :
+			userSelect : 'none',
+			cursor     : 'text',
+			fontSize   : 14,
+			fontWeight : 400,
+			color      : 'rgba(255, 255, 255, 0.85)',
+			'&:hover'  :
 			{
-				backgroundColor: 'rgb(174, 255, 0, 0.25)'
+				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
 		},
 		deviceInfo :
 		{
-			marginTop          : '0.4vmin',
-			display            : 'flex',
-			flexDirection      : 'row',
-			justifyContent     : 'flex-start',
-			alignItems         : 'flex-end',
-			'& span' :
+			marginTop      : '0.4vmin',
+			display        : 'flex',
+			flexDirection  : 'row',
+			justifyContent : 'flex-start',
+			alignItems     : 'flex-end',
+			'& span'       :
 			{
 				userSelect    : 'none',
 				pointerEvents : 'none',
@@ -143,7 +143,7 @@ const styles = (theme) =>
 			display        : 'flex',
 			flexDirection  : 'column',
 			justifyContent : 'center',
-			alignItems     : 'center',
+			alignItems     : 'center'
 		},
 		volumeBar :
 		{
@@ -157,52 +157,52 @@ const styles = (theme) =>
 				height          : 0,
 				backgroundColor : 'rgba(255, 255, 0, 0.65)'
 			},
-			'&.level1'         :
+			'&.level1' :
 			{
 				height          : '10%',
 				backgroundColor : 'rgba(255, 255, 0, 0.65)'
 			},
-			'&.level2'         :
+			'&.level2' :
 			{
 				height          : '20%',
 				backgroundColor : 'rgba(255, 255, 0, 0.65)'
 			},
-			'&.level3'         :
+			'&.level3' :
 			{
 				height          : '30%',
 				backgroundColor : 'rgba(255, 255, 0, 0.65)'
 			},
-			'&.level4'         :
+			'&.level4' :
 			{
 				height          : '40%',
 				backgroundColor : 'rgba(255, 165, 0, 0.65)'
 			},
-			'&.level5'         :
+			'&.level5' :
 			{
 				height          : '50%',
 				backgroundColor : 'rgba(255, 165, 0, 0.65)'
 			},
-			'&.level6'         :
+			'&.level6' :
 			{
 				height          : '60%',
 				backgroundColor : 'rgba(255, 0, 0, 0.65)'
 			},
-			'&.level7'         :
+			'&.level7' :
 			{
 				height          : '70%',
 				backgroundColor : 'rgba(255, 0, 0, 0.65)'
 			},
-			'&.level8'         :
+			'&.level8' :
 			{
 				height          : '80%',
 				backgroundColor : 'rgba(0, 0, 0, 0.65)'
 			},
-			'&.level9'         :
+			'&.level9' :
 			{
 				height          : '90%',
 				backgroundColor : 'rgba(0, 0, 0, 0.65)'
 			},
-			'&.level10'         :
+			'&.level10' :
 			{
 				height          : '100%',
 				backgroundColor : 'rgba(0, 0, 0, 0.65)'

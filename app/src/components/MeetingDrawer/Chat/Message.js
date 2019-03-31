@@ -26,7 +26,7 @@ const styles = (theme) =>
 		},
 		selfMessage :
 		{
-			marginLeft : 'auto',
+			marginLeft : 'auto'
 		},
 		remoteMessage :
 		{
@@ -48,7 +48,7 @@ const styles = (theme) =>
 			borderRadius : '50%',
 			height       : '2rem',
 			alignSelf    : 'center'
-		},
+		}
 	});
 
 const Message = (props) =>
@@ -88,12 +88,12 @@ const Message = (props) =>
 
 Message.propTypes =
 {
-	self      : PropTypes.bool,
-	picture   : PropTypes.string,
-	text      : PropTypes.string,
-	time      : PropTypes.string,
-	name      : PropTypes.string,
-	classes   : PropTypes.object.isRequired
+	self    : PropTypes.bool,
+	picture : PropTypes.string,
+	text    : PropTypes.string,
+	time    : PropTypes.string,
+	name    : PropTypes.string,
+	classes : PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(Message);

@@ -28,9 +28,9 @@ AudioPeers.propTypes =
 };
 
 const mapStateToProps = (state) =>
-({
-	peers : state.peers
-});
+	({
+		peers : state.peers
+	});
 
 const AudioPeersContainer = connect(
 	mapStateToProps

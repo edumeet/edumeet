@@ -16,11 +16,11 @@ const styles = () =>
 	({
 		root :
 		{
-			padding      : '0.5rem',
-			width        : '100%',
-			overflow     : 'hidden',
-			cursor       : 'auto',
-			display      : 'flex'
+			padding  : '0.5rem',
+			width    : '100%',
+			overflow : 'hidden',
+			cursor   : 'auto',
+			display  : 'flex'
 		},
 		listPeer :
 		{

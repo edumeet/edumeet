@@ -59,9 +59,11 @@ function run()
 
 	const peerName = randomString({ length: 8 }).toLowerCase();
 	const urlParser = new UrlParse(window.location.href, true);
+
 	let roomId = (urlParser.pathname).substr(1)
 		? (urlParser.pathname).substr(1).toLowerCase() : urlParser.query.roomId.toLowerCase();
 	const produce = urlParser.query.produce !== 'false';
+
 	let displayName = urlParser.query.displayName;
 	const useSimulcast = urlParser.query.simulcast === 'true';
 
@@ -94,6 +96,7 @@ function run()
 
 	// Get displayName from cookie (if not already given as param).
 	const userCookie = cookiesManager.getUser() || {};
+
 	let displayNameSet;
 
 	if (!displayName)
@@ -116,7 +119,14 @@ function run()
 		stateActions.setRoomUrl(roomUrl));
 
 	store.dispatch(
-		stateActions.setMe({ peerName, displayName, displayNameSet, device, loginEnabled: window.config.loginEnabled }));
+		stateActions.setMe({
+			peerName,
+			displayName,
+			displayNameSet,
+			device,
+			loginEnabled : window.config.loginEnabled
+		})
+	);
 
 	roomClient = new RoomClient(
 		{ roomId, peerName, displayName, device, useSimulcast, produce });
