@@ -7,6 +7,7 @@ import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import Fab from '@material-ui/core/Fab';
+import Tooltip from '@material-ui/core/Tooltip';
 // import Avatar from '@material-ui/core/Avatar';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
@@ -78,41 +79,67 @@ const Sidebar = (props) =>
 
 	let micState;
 
-	if (!me.canSendMic)
+	let micTip;
+
+	if (!me.canSendMic || !micProducer)
+	{
 		micState = 'unsupported';
-	else if (!micProducer)
-		micState = 'unsupported';
+		micTip = 'Audio unsupported';
+	}
 	else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
+	{
 		micState = 'on';
+		micTip = 'Mute audio';
+	}
 	else
+	{
 		micState = 'off';
+		micTip = 'Unmute audio';
+	}
 
 	let webcamState;
 
+	let webcamTip;
+
 	if (!me.canSendWebcam)
+	{
 		webcamState = 'unsupported';
+		webcamTip = 'Video unsupported';
+	}
 	else if (webcamProducer)
+	{
 		webcamState = 'on';
+		webcamTip = 'Stop video';
+	}
 	else
+	{
 		webcamState = 'off';
+		webcamTip = 'Start video';
+	}
 
 	let screenState;
+
+	let screenTip;
 
 	if (me.needExtension)
 	{
 		screenState = 'need-extension';
+		screenTip = 'Install screen sharing extension';
 	}
 	else if (!me.canShareScreen)
 	{
 		screenState = 'unsupported';
+		screenTip = 'Screen sharing not supported';
 	}
 	else if (screenProducer)
 	{
 		screenState = 'on';
+		screenTip = 'Stop screen sharing';
 	}
 	else
 	{
 		screenState = 'off';
+		screenTip = 'Start screen sharing';
 	}
 
 	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -123,111 +150,122 @@ const Sidebar = (props) =>
 				classnames(classes.root, toolbarsVisible ? classes.show : classes.hide)
 			}
 		>
-			<Fab
-				aria-label='Mute mic'
-				className={classes.fab}
-				color={micState === 'on' ? 'default' : 'secondary'}
-				size={smallScreen ? 'large' : 'medium'}
-				onClick={() =>
-				{
-					micState === 'on' ?
-						roomClient.muteMic() :
-						roomClient.unmuteMic();
-				}}
-			>
-				{ micState === 'on' ?
-					<MicIcon />
-					:
-					<MicOffIcon />
-				}
-			</Fab>
-			<Fab
-				aria-label='Mute video'
-				className={classes.fab}
-				color={webcamState === 'on' ? 'default' : 'secondary'}
-				size={smallScreen ? 'large' : 'medium'}
-				onClick={() =>
-				{
-					webcamState === 'on' ?
-						roomClient.disableWebcam() :
-						roomClient.enableWebcam();
-				}}
-			>
-				{ webcamState === 'on' ?
-					<VideoIcon />
-					:
-					<VideoOffIcon />
-				}
-			</Fab>
-			<Fab
-				aria-label='Share screen'
-				className={classes.fab}
-				disabled={!me.canShareScreen || me.screenShareInProgress}
-				color={screenState === 'on' ? 'primary' : 'default'}
-				size={smallScreen ? 'large' : 'medium'}
-				onClick={() =>
-				{
-					switch (screenState)
+			<Tooltip title={micTip} placement={smallScreen ? 'top' : 'right'}>
+				<Fab
+					aria-label='Mute mic'
+					className={classes.fab}
+					color={micState === 'on' ? 'default' : 'secondary'}
+					size={smallScreen ? 'large' : 'medium'}
+					onClick={() =>
 					{
-						case 'on':
-						{
-							roomClient.disableScreenSharing();
-							break;
-						}
-						case 'off':
-						{
-							roomClient.enableScreenSharing();
-							break;
-						}
-						case 'need-extension':
-						{
-							roomClient.installExtension();
-							break;
-						}
-						default:
-						{
-							break;
-						}
+						micState === 'on' ?
+							roomClient.muteMic() :
+							roomClient.unmuteMic();
+					}}
+				>
+					{ micState === 'on' ?
+						<MicIcon />
+						:
+						<MicOffIcon />
 					}
-				}}
-			>
-				{ screenState === 'on' || screenState === 'unsupported' ?
-					<ScreenOffIcon/>
-					:null
-				}
-				{ screenState === 'off' ?
-					<ScreenIcon/>
-					:null
-				}
-				{ screenState === 'need-extension' ?
-					<ExtensionIcon/>
-					:null
-				}
-			</Fab>
+				</Fab>
+			</Tooltip>
+			<Tooltip title={webcamTip} placement={smallScreen ? 'top' : 'right'}>
+				<Fab
+					aria-label='Mute video'
+					className={classes.fab}
+					color={webcamState === 'on' ? 'default' : 'secondary'}
+					size={smallScreen ? 'large' : 'medium'}
+					onClick={() =>
+					{
+						webcamState === 'on' ?
+							roomClient.disableWebcam() :
+							roomClient.enableWebcam();
+					}}
+				>
+					{ webcamState === 'on' ?
+						<VideoIcon />
+						:
+						<VideoOffIcon />
+					}
+				</Fab>
+			</Tooltip>
+			<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'right'}>
+				<Fab
+					aria-label='Share screen'
+					className={classes.fab}
+					disabled={!me.canShareScreen || me.screenShareInProgress}
+					color={screenState === 'on' ? 'primary' : 'default'}
+					size={smallScreen ? 'large' : 'medium'}
+					onClick={() =>
+					{
+						switch (screenState)
+						{
+							case 'on':
+							{
+								roomClient.disableScreenSharing();
+								break;
+							}
+							case 'off':
+							{
+								roomClient.enableScreenSharing();
+								break;
+							}
+							case 'need-extension':
+							{
+								roomClient.installExtension();
+								break;
+							}
+							default:
+							{
+								break;
+							}
+						}
+					}}
+				>
+					{ screenState === 'on' || screenState === 'unsupported' ?
+						<ScreenOffIcon/>
+						:null
+					}
+					{ screenState === 'off' ?
+						<ScreenIcon/>
+						:null
+					}
+					{ screenState === 'need-extension' ?
+						<ExtensionIcon/>
+						:null
+					}
+				</Fab>
+			</Tooltip>
 
-			<Fab
-				aria-label='Room lock'
-				className={classes.fab}
-				color={locked ? 'primary' : 'default'}
-				size={smallScreen ? 'large' : 'medium'}
-				onClick={() =>
-				{
-					if (locked)
-					{
-						roomClient.unlockRoom();
-					}
-					else
-					{
-						roomClient.lockRoom();
-					}
-				}}
+			<Tooltip
+				title={locked ? 'Unlock room' : 'Lock room'}
+				placement={smallScreen ? 'top' : 'right'}
 			>
-				{ locked ?
-					<LockIcon />
-					:
-					<LockOpenIcon />
-				}
-			</Fab>
+				<Fab
+					aria-label='Room lock'
+					className={classes.fab}
+					color={locked ? 'primary' : 'default'}
+					size={smallScreen ? 'large' : 'medium'}
+					onClick={() =>
+					{
+						if (locked)
+						{
+							roomClient.unlockRoom();
+						}
+						else
+						{
+							roomClient.lockRoom();
+						}
+					}}
+				>
+					{ locked ?
+						<LockIcon />
+						:
+						<LockOpenIcon />
+					}
+				</Fab>
+			</Tooltip>
 
 			{ /* <Fab
 				aria-label='Raise hand'
@@ -240,15 +278,17 @@ const Sidebar = (props) =>
 				<Avatar alt='Hand' src={me.raiseHand ? HandOn : HandOff} />
 			</Fab>  */ }
 
-			<Fab
-				aria-label='Leave meeting'
-				className={classes.fab}
-				color='secondary'
-				size={smallScreen ? 'large' : 'medium'}
-				onClick={() => roomClient.close()}
-			>
-				<LeaveIcon />
-			</Fab>
+			<Tooltip title='Leave meeting' placement={smallScreen ? 'top' : 'right'}>
+				<Fab
+					aria-label='Leave meeting'
+					className={classes.fab}
+					color='secondary'
+					size={smallScreen ? 'large' : 'medium'}
+					onClick={() => roomClient.close()}
+				>
+					<LeaveIcon />
+				</Fab>
+			</Tooltip>
 		</div>
 	);
 };
