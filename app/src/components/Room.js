@@ -60,6 +60,16 @@ const styles = (theme) =>
 			margin  : 0,
 			padding : 0
 		},
+		show :
+		{
+			opacity    : 1,
+			transition : 'opacity .5s'
+		},
+		hide :
+		{
+			opacity    : 0,
+			transition : 'opacity .5s'
+		},
 		toolbar     : theme.mixins.toolbar,
 		drawerPaper :
 		{
@@ -262,6 +272,7 @@ class Room extends React.PureComponent
 
 					<AppBar
 						position='fixed'
+						className={room.toolbarsVisible ? classes.show : classes.hide}
 					>
 						<Toolbar>
 							<Badge

@@ -34,7 +34,17 @@ const styles = (theme) =>
 		fab :
 		{
 			margin : theme.spacing.unit
-		}
+		},
+		show :
+		{
+			opacity    : 1,
+			transition : 'opacity .5s'
+		},
+		hide :
+		{
+			opacity    : 0,
+			transition : 'opacity .5s'
+		},
 	});
 
 class Sidebar extends React.PureComponent
@@ -71,9 +81,9 @@ class Sidebar extends React.PureComponent
 
 		return (
 			<div
-				className={classnames(classes.root, 'room-controls', {
-					'visible' : toolbarsVisible
-				})}
+				className={
+					classnames(classes.root, toolbarsVisible ? classes.show : classes.hide)
+				}
 			>
 				<Fab
 					aria-label='Share screen'
