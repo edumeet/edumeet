@@ -1,12 +1,5 @@
 :root {
-	--background: url('./images/background.jpg');
 	--background-color: rgba(114, 119, 143, 1.0);
-
-	--circle-button-color: rgba(255, 255, 255, 0.3);
-	--circle-button-toggled-color: rgba(255, 255, 255, 0.7);
-	--circle-button-unsupported-color: rgba(212, 34, 65, 0.7);
-	--circle-button-diabled-color: rgba(255, 255, 255, 0.5);
-	--circle-button-size: 2.5em;
 
 	--media-control-button-color: rgba(255, 255, 255, 0.85);
 	--media-control-botton-on: rgba(255, 255, 255, 0.7);
@@ -25,18 +18,6 @@
 	--peer-bg-color: rgba(42, 75, 88, 0.9);
 	--peer-video-bg-color: rgba(0, 0, 0, 0.75);
 
-	--chat-message-color: rgba(0, 0, 0, 0.1);
-	--chat-input-bg-color: rgba(255, 255, 255, 1.0);
-	--chat-input-text-color: rgba(0, 0, 0, 1.0);
-	--chat-send-bg-color: rgba(170, 238, 255, 1.0);
-
-	--filesharing-bg-color: rgba(170, 238, 255, 1.0);
-
-	--notification-info-bg-color: rgba(10, 29, 38, 0.75);
-	--notification-info-text-color: rgba(255, 255, 255, 0.65);
-	--notification-error-bg-color: rgba(255, 25, 20, 0.65);
-	--notification-error-text-color: rgba(255, 255, 255, 0.85);
-
 	--active-speaker-border-color: rgba(255, 255, 255, 1.0);
 	--selected-peer-border-color: rgba(55, 126, 255, 1.0);
 }
@@ -54,12 +35,6 @@ body
 	height: 100%;
 	width: 100%;
 	font-size: 16px;
-	background-color: var(--background-color);
-	background-image: var(--background);
-	background-attachment: fixed;
-	background-position: center;
-	background-size: cover;
-	background-repeat: no-repeat;
 }
 
 #multiparty-meeting

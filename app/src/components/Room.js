@@ -42,9 +42,15 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			display : 'flex',
-			width   : '100%',
-			height  : '100%'
+			display              : 'flex',
+			width                : '100%',
+			height               : '100%',
+			backgroundColor      : 'var(--background-color)',
+			backgroundImage      : `url(${window.config.background})`,
+			backgroundAttachment : 'fixed',
+			backgroundPosition   : 'center',
+			backgroundSize       : 'cover',
+			backgroundRepeat     : 'no-repeat'
 		},
 		message :
 		{
@@ -59,6 +65,10 @@ const styles = (theme) =>
 		{
 			margin  : 0,
 			padding : 0
+		},
+		logo :
+		{
+			marginLeft : 20
 		},
 		show :
 		{
@@ -288,6 +298,10 @@ class Room extends React.PureComponent
 									<MenuIcon />
 								</IconButton>
 							</Badge>
+							{ window.config.logo ?
+								<img alt='Logo' className={classes.logo} src={window.config.logo} />
+								:null
+							}
 							<Typography
 								className={classes.title}
 								variant='h6'

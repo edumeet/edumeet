@@ -1,8 +1,9 @@
+// eslint-disable-next-line
 var config =
 {
 	loginEnabled    : false,
 	developmentPort : 3443,
-	turnServers : [
+	turnServers     : [
 		{
 			urls : [
 				'turn:turn.example.com:443?transport=tcp'
@@ -16,8 +17,11 @@ var config =
 	{
 		tcp : true
 	},
-	lastN : 4,
-	theme :
+	lastN      : 4,
+	background : 'images/background.jpg',
+	// Add file and uncomment for adding logo to appbar
+	// logo       : 'images/logo.svg',
+	theme      :
 	{
 		palette :
 		{
