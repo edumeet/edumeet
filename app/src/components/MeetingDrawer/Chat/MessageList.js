@@ -18,7 +18,7 @@ const styles = (theme) =>
 		}
 	});
 
-class MessageList extends React.PureComponent
+class MessageList extends React.Component
 {
 	componentDidMount()
 	{

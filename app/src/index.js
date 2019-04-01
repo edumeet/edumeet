@@ -32,19 +32,7 @@ let roomClient;
 
 RoomClient.init({ store });
 
-const theme = createMuiTheme({
-	palette :
-	{
-		primary :
-		{
-			main : '#313131'
-		}
-	},
-	typography :
-	{
-		useNextVariants : true
-	}
-});
+const theme = createMuiTheme(window.config.theme);
 
 domready(() =>
 {

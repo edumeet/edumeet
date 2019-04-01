@@ -16,5 +16,40 @@ var config =
 	{
 		tcp : true
 	},
-	lastN : 4
+	lastN : 4,
+	theme :
+	{
+		palette :
+		{
+			primary :
+			{
+				main : '#313131'
+			}
+		},
+		overrides :
+		{
+			MuiAppBar :
+			{
+				colorPrimary :
+				{
+					backgroundColor : '#313131'
+				}
+			},
+			MuiFab :
+			{
+				primary :
+				{
+					backgroundColor : '#5F9B2D',
+					'&:hover'       :
+					{
+						backgroundColor : '#518029'
+					}
+				}
+			}
+		},
+		typography :
+		{
+			useNextVariants : true
+		}
+	}
 };

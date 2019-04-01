@@ -44,7 +44,7 @@ const styles = (theme) =>
 		{
 			opacity    : 0,
 			transition : 'opacity .5s'
-		},
+		}
 	});
 
 class Sidebar extends React.PureComponent
@@ -89,7 +89,7 @@ class Sidebar extends React.PureComponent
 					aria-label='Share screen'
 					className={classes.fab}
 					disabled={!me.canShareScreen || me.screenShareInProgress}
-					color={screenState === 'on' ? 'secondary' : 'default'}
+					color={screenState === 'on' ? 'primary' : 'default'}
 					
 					onClick={() =>
 					{
@@ -134,7 +134,7 @@ class Sidebar extends React.PureComponent
 				<Fab
 					aria-label='Room lock'
 					className={classes.fab}
-					color={locked ? 'secondary' : 'default'}
+					color={locked ? 'primary' : 'default'}
 					onClick={() =>
 					{
 						if (locked)
@@ -158,7 +158,7 @@ class Sidebar extends React.PureComponent
 					aria-label='Raise hand'
 					className={classes.fab}
 					disabled={me.raiseHandInProgress}
-					color={me.raiseHand ? 'secondary' : 'default'}
+					color={me.raiseHand ? 'primary' : 'default'}
 					onClick={() => roomClient.sendRaiseHandState(!me.raiseHand)}
 				>
 					<Avatar alt='Hand' src={me.raiseHand ? HandOn : HandOff} />
