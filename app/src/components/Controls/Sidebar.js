@@ -167,7 +167,8 @@ class Sidebar extends React.PureComponent
 	}
 }
 
-Sidebar.propTypes = {
+Sidebar.propTypes =
+{
 	roomClient      : PropTypes.any.isRequired,
 	toolbarsVisible : PropTypes.bool.isRequired,
 	me              : appPropTypes.Me.isRequired,

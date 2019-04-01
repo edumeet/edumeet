@@ -22,7 +22,8 @@ const styles = (theme) =>
 		{
 			display      : 'flex',
 			marginBottom : theme.spacing.unit,
-			padding      : theme.spacing.unit
+			padding      : theme.spacing.unit,
+			flexShrink   : 0
 		},
 		selfMessage :
 		{
