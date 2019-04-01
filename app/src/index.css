@@ -1,17 +1,6 @@
 :root {
 	--background-color: rgba(114, 119, 143, 1.0);
 
-	--media-control-button-color: rgba(255, 255, 255, 0.85);
-	--media-control-botton-on: rgba(255, 255, 255, 0.7);
-	--media-control-botton-off: rgba(212, 34, 65, 0.7);
-	--media-control-botton-disabled: rgba(255, 255, 255, 0.5);
-	--media-control-button-size: 1.5em;
-
-	--me-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12);
-	--me-border: 1px solid rgba(255, 255, 255, 0.15);
-	--me-width: 20vmin;
-	--me-height: 15vmin;
-
 	--peer-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12);
 	--peer-border: 1px solid rgba(255, 255, 255, 0.15);
 	--peer-empty-avatar: url('./images/buddy.svg');

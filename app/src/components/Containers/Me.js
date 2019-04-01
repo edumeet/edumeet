@@ -9,10 +9,6 @@ import { getDeviceInfo } from 'mediasoup-client';
 import * as appPropTypes from '../appPropTypes';
 import PeerView from '../VideoContainers/PeerView';
 import ScreenView from '../VideoContainers/ScreenView';
-import MicIcon from '@material-ui/icons/Mic';
-import MicOffIcon from '@material-ui/icons/MicOff';
-import VideoIcon from '@material-ui/icons/Videocam';
-import VideoOffIcon from '@material-ui/icons/VideocamOff';
 
 const styles = () =>
 	({
@@ -35,53 +31,6 @@ const styles = () =>
 			'&.screen' :
 			{
 				order : 1
-			}
-		},
-		controls :
-		{
-			position      : 'absolute',
-			right         : 0,
-			top           : 0,
-			display       : 'flex',
-			flexDirection : 'row',
-			padding       : '0.4vmin',
-			zIndex        : 20,
-			opacity       : 0,
-			transition    : 'opacity 0.3s',
-			'&.visible'   :
-			{
-				opacity : 1
-			}
-		},
-		button :
-		{
-			flex            : '0 0 auto',
-			margin          : '0.2vmin',
-			borderRadius    : 2,
-			opacity         : 0.85,
-			width           : 'var(--media-control-button-size)',
-			height          : 'var(--media-control-button-size)',
-			backgroundColor : 'var(--media-control-button-color)',
-			'&:hover'       :
-			{
-				opacity : 1
-			},
-			'&.unsupported' :
-			{
-				pointerEvents : 'none'
-			},
-			'&.disabled' :
-			{
-				pointerEvents   : 'none',
-				backgroundColor : 'var(--media-control-botton-disabled)'
-			},
-			'&.on' :
-			{
-				backgroundColor : 'var(--media-control-botton-on)'
-			},
-			'&.off' :
-			{
-				backgroundColor : 'var(--media-control-botton-off)'
 			}
 		}
 	});
@@ -124,34 +73,14 @@ class Me extends React.PureComponent
 	{
 		const {
 			roomClient,
-			connected,
 			me,
+			style,
 			advancedMode,
 			micProducer,
 			webcamProducer,
 			screenProducer,
 			classes
 		} = this.props;
-
-		let micState;
-
-		if (!me.canSendMic)
-			micState = 'unsupported';
-		else if (!micProducer)
-			micState = 'unsupported';
-		else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
-			micState = 'on';
-		else
-			micState = 'off';
-
-		let webcamState;
-
-		if (!me.canSendWebcam)
-			webcamState = 'unsupported';
-		else if (webcamProducer)
-			webcamState = 'on';
-		else
-			webcamState = 'off';
 
 		const videoVisible = (
 			Boolean(webcamProducer) &&
@@ -180,57 +109,7 @@ class Me extends React.PureComponent
 				onMouseOver={this.handleMouseOver}
 				onMouseOut={this.handleMouseOut}
 			>
-				<div className={classnames(classes.viewContainer, 'webcam')}>
-					{ connected ?
-						<div className={classnames(classes.controls, 'visible')}>
-							<div
-								data-tip='keyboard shortcut: &lsquo;m&lsquo;'
-								data-type='dark'
-								data-place='bottom'
-								data-for='me'
-								className={classnames(classes.button, 'mic', micState, {
-									disabled : me.audioInProgress,
-									visible  : micState === 'off' || this.state.controlsVisible
-								})}
-								onClick={() =>
-								{
-									micState === 'on' ?
-										roomClient.muteMic() :
-										roomClient.unmuteMic();
-								}}
-							>
-								{ micState === 'on' ?
-									<MicIcon />
-									:
-									<MicOffIcon />
-								}
-							</div>
-							<ReactTooltip
-								id='me'
-								effect='solid'
-							/>
-							<div
-								className={classnames(classes.button, 'webcam', webcamState, {
-									disabled : me.webcamInProgress,
-									visible  : webcamState === 'off' || this.state.controlsVisible
-								})}
-								onClick={() =>
-								{
-									webcamState === 'on' ?
-										roomClient.disableWebcam() :
-										roomClient.enableWebcam();
-								}}
-							>
-								{ webcamState === 'on' ?
-									<VideoIcon />
-									:
-									<VideoOffIcon />
-								}
-							</div>
-						</div>
-						:null
-					}
-
+				<div className={classnames(classes.viewContainer, 'webcam')} style={style}>
 					<PeerView
 						isMe
 						advancedMode={advancedMode}
@@ -249,7 +128,7 @@ class Me extends React.PureComponent
 				</div>
 
 				{ screenProducer ?
-					<div className={classnames(classes.viewContainer, 'screen')}>
+					<div className={classnames(classes.viewContainer, 'screen')} style={style}>
 						<ScreenView
 							isMe
 							advancedMode={advancedMode}
@@ -304,6 +183,7 @@ Me.propTypes =
 	micProducer    : appPropTypes.Producer,
 	webcamProducer : appPropTypes.Producer,
 	screenProducer : appPropTypes.Producer,
+	style          : PropTypes.object,
 	classes        : PropTypes.object.isRequired
 };
 

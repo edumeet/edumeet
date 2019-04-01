@@ -5,11 +5,12 @@ import classnames from 'classnames';
 import debounce from 'lodash/debounce';
 import { withStyles } from '@material-ui/core/styles';
 import Peer from '../Containers/Peer';
+import Me from '../Containers/Me';
 import HiddenPeers from '../Containers/HiddenPeers';
 import ResizeObserver from 'resize-observer-polyfill';
 
 const RATIO = 1.334;
-const PADDING = 100;
+const PADDING = 60;
 
 const styles = () =>
 	({
@@ -23,7 +24,7 @@ const styles = () =>
 			justifyContent : 'center',
 			alignItems     : 'center',
 			alignContent   : 'center',
-			paddingTop     : 70,
+			paddingTop     : 30,
 			paddingBottom  : 30
 		},
 		peerContainer :
@@ -126,6 +127,7 @@ class Democratic extends React.PureComponent
 		const {
 			advancedMode,
 			activeSpeakerName,
+			amActiveSpeaker,
 			peers,
 			spotlights,
 			spotlightsLength,
@@ -140,6 +142,16 @@ class Democratic extends React.PureComponent
 
 		return (
 			<div className={classes.root} ref={this.peersRef}>
+				<div
+					className={classnames(classes.peerContainer, 'me-handle', {
+						'active-speaker' : amActiveSpeaker
+					})}
+				>
+					<Me
+						advancedMode={advancedMode}
+						style={style}
+					/>
+				</div>
 				{ Object.keys(peers).map((peerName) =>
 				{
 					if (spotlights.find((spotlightsElement) => spotlightsElement === peerName))
@@ -181,6 +193,7 @@ Democratic.propTypes =
 		advancedMode      : PropTypes.bool,
 		peers             : PropTypes.object.isRequired,
 		boxes             : PropTypes.number,
+		amActiveSpeaker   : PropTypes.bool.isRequired,
 		activeSpeakerName : PropTypes.string,
 		selectedPeerName  : PropTypes.string,
 		spotlightsLength  : PropTypes.number,
@@ -193,13 +206,15 @@ const mapStateToProps = (state) =>
 	const spotlights = state.room.spotlights;
 	const spotlightsLength = spotlights ? state.room.spotlights.length : 0;
 	const boxes = spotlightsLength + Object.values(state.consumers)
-		.filter((consumer) => consumer.source === 'screen').length;
+		.filter((consumer) => consumer.source === 'screen').length + Object.values(state.producers)
+		.filter((producer) => producer.source === 'screen').length + 1;
 
 	return {
 		peers             : state.peers,
 		boxes,
 		activeSpeakerName : state.room.activeSpeakerName,
 		selectedPeerName  : state.room.selectedPeerName,
+		amActiveSpeaker   : state.me.name === state.room.activeSpeakerName,
 		spotlights,
 		spotlightsLength
 	};

@@ -5,15 +5,17 @@ import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
+import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
 import * as stateActions from '../../actions/stateActions';
 import PeerView from '../VideoContainers/PeerView';
 import ScreenView from '../VideoContainers/ScreenView';
+import Fab from '@material-ui/core/Fab';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import NewWindowIcon from '@material-ui/icons/OpenInNew';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 
-const styles = () =>
+const styles = (theme) =>
 	({
 		root :
 		{
@@ -23,6 +25,10 @@ const styles = () =>
 			flexDirection : 'row',
 			flex          : '100 100 auto',
 			position      : 'relative'
+		},
+		fab :
+		{
+			margin : theme.spacing.unit
 		},
 		viewContainer :
 		{
@@ -40,54 +46,21 @@ const styles = () =>
 		},
 		controls :
 		{
-			position       : 'absolute',
-			right          : 0,
-			top            : 0,
-			display        : 'flex',
-			flexDirection  : 'row',
-			justifyContent : 'flex-start',
-			alignItems     : 'center',
-			padding        : '0.4vmin',
-			zIndex         : 20,
-			opacity        : 0,
-			transition     : 'opacity 0.3s',
-			'&.visible'    :
+			position        : 'absolute',
+			width           : '100%',
+			height          : '100%',
+			backgroundColor : 'rgba(0, 0, 0, 0.3)',
+			display         : 'flex',
+			flexDirection   : 'row',
+			justifyContent  : 'center',
+			alignItems      : 'center',
+			padding         : '0.4vmin',
+			zIndex          : 20,
+			opacity         : 0,
+			transition      : 'opacity 0.3s',
+			'&:hover'       :
 			{
 				opacity : 1
-			}
-		},
-		button :
-		{
-			flex               : '0 0 auto',
-			margin             : '0.2vmin',
-			borderRadius       : 2,
-			opacity            : 0.85,
-			width              : 'var(--media-control-button-size)',
-			height             : 'var(--media-control-button-size)',
-			backgroundColor    : 'var(--media-control-button-color)',
-			cursor             : 'pointer',
-			transitionProperty : 'opacity, background-color',
-			transitionDuration : '0.15s',
-			'&:hover'          :
-			{
-				opacity : 1
-			},
-			'&.unsupported' :
-			{
-				pointerEvents : 'none'
-			},
-			'&.disabled' :
-			{
-				pointerEvents   : 'none',
-				backgroundColor : 'var(--media-control-botton-disabled)'
-			},
-			'&.on' :
-			{
-				backgroundColor : 'var(--media-control-botton-on)'
-			},
-			'&.off' :
-			{
-				backgroundColor : 'var(--media-control-botton-off)'
 			}
 		},
 		pausedVideo :
@@ -136,207 +109,186 @@ const styles = () =>
 		}
 	});
 
-class Peer extends React.PureComponent
+const Peer = (props) =>
 {
-	state = {
-		controlsVisible : false
-	};
+	const {
+		roomClient,
+		advancedMode,
+		peer,
+		micConsumer,
+		webcamConsumer,
+		screenConsumer,
+		toggleConsumerFullscreen,
+		toggleConsumerWindow,
+		style,
+		windowConsumer,
+		classes,
+		theme
+	} = props;
 
-	handleMouseOver = () =>
-	{
-		this.setState({
-			controlsVisible : true
-		});
-	};
+	const micEnabled = (
+		Boolean(micConsumer) &&
+		!micConsumer.locallyPaused &&
+		!micConsumer.remotelyPaused
+	);
 
-	handleMouseOut = () =>
-	{
-		this.setState({
-			controlsVisible : false
-		});
-	};
+	const videoVisible = (
+		Boolean(webcamConsumer) &&
+		!webcamConsumer.locallyPaused &&
+		!webcamConsumer.remotelyPaused
+	);
 
-	render()
-	{
-		const {
-			roomClient,
-			advancedMode,
-			peer,
-			micConsumer,
-			webcamConsumer,
-			screenConsumer,
-			toggleConsumerFullscreen,
-			toggleConsumerWindow,
-			style,
-			windowConsumer,
-			classes
-		} = this.props;
+	const screenVisible = (
+		Boolean(screenConsumer) &&
+		!screenConsumer.locallyPaused &&
+		!screenConsumer.remotelyPaused
+	);
 
-		const micEnabled = (
-			Boolean(micConsumer) &&
-			!micConsumer.locallyPaused &&
-			!micConsumer.remotelyPaused
-		);
+	let videoProfile;
 
-		const videoVisible = (
-			Boolean(webcamConsumer) &&
-			!webcamConsumer.locallyPaused &&
-			!webcamConsumer.remotelyPaused
-		);
+	if (webcamConsumer)
+		videoProfile = webcamConsumer.profile;
 
-		const screenVisible = (
-			Boolean(screenConsumer) &&
-			!screenConsumer.locallyPaused &&
-			!screenConsumer.remotelyPaused
-		);
+	let screenProfile;
 
-		let videoProfile;
+	if (screenConsumer)
+		screenProfile = screenConsumer.profile;
 
-		if (webcamConsumer)
-			videoProfile = webcamConsumer.profile;
+	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-		let screenProfile;
+	return (
+		<div
+			className={classnames(classes.root, {
+				screen : screenConsumer
+			})}
+		>
+			{ videoVisible && !webcamConsumer.supported ?
+				<div className={classes.incompatibleVideo}>
+					<p>incompatible video</p>
+				</div>
+				:null
+			}
 
-		if (screenConsumer)
-			screenProfile = screenConsumer.profile;
+			{ !videoVisible ?
+				<div className={classes.pausedVideo}>
+					<p>this video is paused</p>
+				</div>
+				:null
+			}
 
-		return (
-			<div
-				className={classnames(classes.root, {
-					screen : screenConsumer
-				})}
-				onMouseOver={this.handleMouseOver}
-				onMouseOut={this.handleMouseOut}
-			>
-				{ videoVisible && !webcamConsumer.supported ?
-					<div className={classes.incompatibleVideo}>
-						<p>incompatible video</p>
-					</div>
-					:null
-				}
-
-				{ !videoVisible ?
-					<div className={classes.pausedVideo}>
-						<p>this video is paused</p>
-					</div>
-					:null
-				}
-
-				<div className={classnames(classes.viewContainer, 'webcam')} style={style}>
-					<div
-						className={classnames(classes.controls, {
-							visible : this.state.controlsVisible
-						})}
+			<div className={classnames(classes.viewContainer, 'webcam')} style={style}>
+				<div
+					className={classes.controls}
+				>
+					<Fab
+						aria-label='Mute mic'
+						className={classes.fab}
+						color={micEnabled ? 'default' : 'secondary'}
+						onClick={() =>
+						{
+							micEnabled ?
+								roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
+								roomClient.modifyPeerConsumer(peer.name, 'mic', false);
+						}}
 					>
-						<div
-							className={classnames(classes.button, {
-								on       : micEnabled,
-								off      : !micEnabled,
-								disabled : peer.peerAudioInProgress
-							})}
-							onClick={(e) =>
-							{
-								e.stopPropagation();
-								micEnabled ?
-									roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
-									roomClient.modifyPeerConsumer(peer.name, 'mic', false);
-							}}
-						>
-							{ micEnabled ?
-								<MicIcon />
-								:
-								<MicOffIcon />
-							}
-						</div>
+						{ micEnabled ?
+							<MicIcon />
+							:
+							<MicOffIcon />
+						}
+					</Fab>
 
-						<div
-							className={classnames(classes.button, {
-								disabled : !videoVisible ||
-									(windowConsumer === webcamConsumer.id)
-							})}
-							onClick={(e) =>
+					{ !smallScreen ?
+						<Fab
+							aria-label='New window'
+							className={classes.fab}
+							disabled={
+								!videoVisible ||
+								(windowConsumer === webcamConsumer.id)
+							}
+							onClick={() =>
 							{
-								e.stopPropagation();
 								toggleConsumerWindow(webcamConsumer);
 							}}
 						>
 							<NewWindowIcon />
-						</div>
+						</Fab>
+						:null
+					}
 
-						<div
-							className={classnames(classes.button, 'fullscreen', {
-								disabled : !videoVisible
-							})}
-							onClick={(e) =>
-							{
-								e.stopPropagation();
-								toggleConsumerFullscreen(webcamConsumer);
-							}}
-						>
-							<FullScreenIcon />
-						</div>
-					</div>
-
-					<PeerView
-						advancedMode={advancedMode}
-						peer={peer}
-						volume={micConsumer ? micConsumer.volume : null}
-						videoTrack={webcamConsumer ? webcamConsumer.track : null}
-						videoVisible={videoVisible}
-						videoProfile={videoProfile}
-						audioCodec={micConsumer ? micConsumer.codec : null}
-						videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-					/>
+					<Fab
+						aria-label='Fullscreen'
+						className={classes.fab}
+						disabled={!videoVisible}
+						onClick={() =>
+						{
+							toggleConsumerFullscreen(webcamConsumer);
+						}}
+					>
+						<FullScreenIcon />
+					</Fab>
 				</div>
 
-				{ screenConsumer ?
-					<div className={classnames(classes.viewContainer, 'screen')} style={style}>
-						<div
-							className={classnames(classes.controls, {
-								visible : this.state.controlsVisible
-							})}
-						>
-							<div
-								className={classnames(classes.button, 'newwindow', {
-									disabled : !screenVisible ||
-										(windowConsumer === screenConsumer.id)
-								})}
-								onClick={(e) =>
+				<PeerView
+					advancedMode={advancedMode}
+					peer={peer}
+					volume={micConsumer ? micConsumer.volume : null}
+					videoTrack={webcamConsumer ? webcamConsumer.track : null}
+					videoVisible={videoVisible}
+					videoProfile={videoProfile}
+					audioCodec={micConsumer ? micConsumer.codec : null}
+					videoCodec={webcamConsumer ? webcamConsumer.codec : null}
+				/>
+			</div>
+
+			{ screenConsumer ?
+				<div className={classnames(classes.viewContainer, 'screen')} style={style}>
+					<div
+						className={classes.controls}
+					>
+						{ !smallScreen ?
+							<Fab
+								aria-label='New window'
+								className={classes.fab}
+								disabled={
+									!screenVisible ||
+									(windowConsumer === screenConsumer.id)
+								}
+								onClick={() =>
 								{
-									e.stopPropagation();
 									toggleConsumerWindow(screenConsumer);
 								}}
 							>
 								<NewWindowIcon />
-							</div>
+							</Fab>
+							:null
+						}
 
-							<div
-								className={classnames(classes.button, 'fullscreen', {
-									disabled : !screenVisible
-								})}
-								onClick={(e) =>
-								{
-									e.stopPropagation();
-									toggleConsumerFullscreen(screenConsumer);
-								}}
-							>
-								<FullScreenIcon />
-							</div>
-						</div>
-						<ScreenView
-							advancedMode={advancedMode}
-							screenTrack={screenConsumer ? screenConsumer.track : null}
-							screenVisible={screenVisible}
-							screenProfile={screenProfile}
-							screenCodec={screenConsumer ? screenConsumer.codec : null}
-						/>
+						<Fab
+							aria-label='Fullscreen'
+							className={classes.fab}
+							disabled={!screenVisible}
+							onClick={() =>
+							{
+								toggleConsumerFullscreen(screenConsumer);
+							}}
+						>
+							<FullScreenIcon />
+						</Fab>
 					</div>
-					:null
-				}
-			</div>
-		);
-	}
-}
+					<ScreenView
+						advancedMode={advancedMode}
+						screenTrack={screenConsumer ? screenConsumer.track : null}
+						screenVisible={screenVisible}
+						screenProfile={screenProfile}
+						screenCodec={screenConsumer ? screenConsumer.codec : null}
+					/>
+				</div>
+				:null
+			}
+		</div>
+	);
+};
 
 Peer.propTypes =
 {
@@ -351,7 +303,8 @@ Peer.propTypes =
 	style                    : PropTypes.object,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
-	classes                  : PropTypes.object
+	classes                  : PropTypes.object.isRequired,
+	theme                    : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state, { name }) =>
@@ -394,4 +347,4 @@ const mapDispatchToProps = (dispatch) =>
 export default withRoomContext(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(withStyles(styles)(Peer)));
+)(withStyles(styles, { withTheme: true })(Peer)));

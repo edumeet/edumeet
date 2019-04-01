@@ -2,11 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
-import classnames from 'classnames';
+// import classnames from 'classnames';
 import { withRoomContext } from '../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as stateActions from '../actions/stateActions';
-import Draggable from 'react-draggable';
+// import Draggable from 'react-draggable';
 import { idle } from '../utils';
 import FullScreen from './FullScreen';
 import CookieConsent from 'react-cookie-consent';
@@ -26,7 +26,7 @@ import Notifications from './Notifications/Notifications';
 import MeetingDrawer from './MeetingDrawer/MeetingDrawer';
 import Democratic from './MeetingViews/Democratic';
 import Filmstrip from './MeetingViews/Filmstrip';
-import Me from './Containers/Me';
+// import Me from './Containers/Me';
 import AudioPeers from './PeerAudio/AudioPeers';
 import FullScreenView from './VideoContainers/FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
@@ -68,7 +68,12 @@ const styles = (theme) =>
 		},
 		logo :
 		{
-			marginLeft : 20
+			display                      : 'none',
+			marginLeft                   : 20,
+			[theme.breakpoints.up('sm')] :
+			{
+				display : 'block'
+			}
 		},
 		show :
 		{
@@ -126,8 +131,8 @@ const styles = (theme) =>
 			boxShadow          : 'var(--me-shadow)',
 			transitionProperty : 'border-color',
 			transitionDuration : '0.15s',
-			top                : '8%',
-			left               : '1%',
+			top                : '5em',
+			left               : '1em',
 			border             : 'var(--me-border)',
 			'&.active-speaker' :
 			{
@@ -215,7 +220,7 @@ class Room extends React.PureComponent
 			roomClient,
 			room,
 			me,
-			amActiveSpeaker,
+			// amActiveSpeaker,
 			setSettingsOpen,
 			toolAreaOpen,
 			toggleToolArea,
@@ -337,7 +342,8 @@ class Room extends React.PureComponent
 									<IconButton
 										aria-label='Account'
 										color='inherit'
-										onClick={() => {
+										onClick={() => 
+{
 											me.loggedIn ? roomClient.logout() : roomClient.login();
 										}}
 									>
@@ -367,6 +373,7 @@ class Room extends React.PureComponent
 
 					<View advancedMode={room.advancedMode} />
 
+					{ /*
 					<Draggable handle='.me-handle' bounds='body' cancel='.display-name'>
 						<div
 							className={classnames(classes.meContainer, 'me-handle', {
@@ -378,6 +385,7 @@ class Room extends React.PureComponent
 							/>
 						</div>
 					</Draggable>
+					*/ }
 
 					<Sidebar />
 
@@ -393,7 +401,7 @@ Room.propTypes =
 	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
 	me                 : appPropTypes.Me.isRequired,
-	amActiveSpeaker    : PropTypes.bool.isRequired,
+	// amActiveSpeaker    : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	screenProducer     : appPropTypes.Producer,
 	setToolbarsVisible : PropTypes.func.isRequired,
@@ -411,13 +419,13 @@ const mapStateToProps = (state) =>
 		producersArray.find((producer) => producer.source === 'screen');
 
 	return {
-		room            : state.room,
-		me              : state.me,
-		amActiveSpeaker : state.me.name === state.room.activeSpeakerName,
-		screenProducer  : screenProducer,
-		toolAreaOpen    : state.toolarea.toolAreaOpen,
-		unread          : state.toolarea.unreadMessages +
+		room           : state.room,
+		me             : state.me,
+		screenProducer : screenProducer,
+		toolAreaOpen   : state.toolarea.toolAreaOpen,
+		unread         : state.toolarea.unreadMessages +
 			state.toolarea.unreadFiles
+		// amActiveSpeaker : state.me.name === state.room.activeSpeakerName,
 	};
 };
 
