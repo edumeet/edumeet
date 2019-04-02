@@ -126,7 +126,6 @@ class Democratic extends React.PureComponent
 	{
 		const {
 			advancedMode,
-			activeSpeakerName,
 			amActiveSpeaker,
 			peers,
 			spotlights,
@@ -143,7 +142,7 @@ class Democratic extends React.PureComponent
 		return (
 			<div className={classes.root} ref={this.peersRef}>
 				<div
-					className={classnames(classes.peerContainer, 'me-handle', {
+					className={classnames(classes.peerContainer, {
 						'active-speaker' : amActiveSpeaker
 					})}
 				>
@@ -157,19 +156,12 @@ class Democratic extends React.PureComponent
 					if (spotlights.find((spotlightsElement) => spotlightsElement === peerName))
 					{
 						return (
-							<div
+							<Peer
 								key={peerName}
-								className={classnames(classes.peerContainer, {
-									'selected'       : this.props.selectedPeerName === peerName,
-									'active-speaker' : peerName === activeSpeakerName
-								})}
-							>
-								<Peer
-									advancedMode={advancedMode}
-									name={peerName}
-									style={style}
-								/>
-							</div>
+								advancedMode={advancedMode}
+								name={peerName}
+								style={style}
+							/>
 						);
 					}
 					else

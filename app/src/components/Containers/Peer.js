@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -19,12 +19,34 @@ const styles = (theme) =>
 	({
 		root :
 		{
+			overflow    : 'hidden',
+			flex        : '0 0 auto',
+			margin      : 6,
+			boxShadow   : 'var(--peer-shadow)',
+			border      : 'var(--peer-border)',
+			touchAction : 'none',
+			'&.webcam'  :
+			{
+				order : 2
+			},
+			'&.screen' :
+			{
+				order : 1
+			},
+			'&.hover' :
+			{
+				boxShadow : '0px 1px 3px rgba(0, 0, 0, 0.05) inset, 0px 0px 8px rgba(82, 168, 236, 0.9)'
+			}
+		},
+		peerContainer :
+		{
 			width         : '100%',
 			height        : '100%',
 			display       : 'flex',
 			flexDirection : 'row',
 			flex          : '100 100 auto',
-			position      : 'relative'
+			position      : 'relative',
+			touchAction   : 'none'
 		},
 		fab :
 		{
@@ -58,7 +80,8 @@ const styles = (theme) =>
 			zIndex          : 20,
 			opacity         : 0,
 			transition      : 'opacity 0.3s',
-			'&:hover'       :
+			touchAction     : 'none',
+			'&.hover'       :
 			{
 				opacity : 1
 			}
@@ -111,6 +134,16 @@ const styles = (theme) =>
 
 const Peer = (props) =>
 {
+	const [ hover, setHover ] = useState(false);
+	const [ webcamHover, setWebcamHover ] = useState(false);
+	const [ screenHover, setScreenHover ] = useState(false);
+
+	let touchTimeout = null;
+
+	let touchWebcamTimeout = null;
+
+	let touchScreenTimeout = null;
+
 	const {
 		roomClient,
 		advancedMode,
@@ -157,136 +190,234 @@ const Peer = (props) =>
 	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 	return (
-		<div
-			className={classnames(classes.root, {
-				screen : screenConsumer
-			})}
-		>
-			{ videoVisible && !webcamConsumer.supported ?
-				<div className={classes.incompatibleVideo}>
-					<p>incompatible video</p>
-				</div>
-				:null
-			}
+		<React.Fragment>
+			<div
+				className={classnames(classes.root, 'webcam', hover ? 'hover' : null)}
+				onMouseOver={() => setHover(true)}
+				onMouseOut={() => setHover(false)}
+				onTouchStart={() =>
+				{
+					if (touchTimeout)
+						clearTimeout(touchTimeout);
 
-			{ !videoVisible ?
-				<div className={classes.pausedVideo}>
-					<p>this video is paused</p>
-				</div>
-				:null
-			}
+					setHover(true);
+				}}
+				onTouchEnd={() =>
+				{
+					if (touchTimeout)
+						clearTimeout(touchTimeout);
 
-			<div className={classnames(classes.viewContainer, 'webcam')} style={style}>
-				<div
-					className={classes.controls}
-				>
-					<Fab
-						aria-label='Mute mic'
-						className={classes.fab}
-						color={micEnabled ? 'default' : 'secondary'}
-						onClick={() =>
-						{
-							micEnabled ?
-								roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
-								roomClient.modifyPeerConsumer(peer.name, 'mic', false);
-						}}
-					>
-						{ micEnabled ?
-							<MicIcon />
-							:
-							<MicOffIcon />
-						}
-					</Fab>
-
-					{ !smallScreen ?
-						<Fab
-							aria-label='New window'
-							className={classes.fab}
-							disabled={
-								!videoVisible ||
-								(windowConsumer === webcamConsumer.id)
-							}
-							onClick={() =>
-							{
-								toggleConsumerWindow(webcamConsumer);
-							}}
-						>
-							<NewWindowIcon />
-						</Fab>
+					touchTimeout = setTimeout(() =>
+					{
+						setHover(false);
+					}, 2000);
+				}}
+			>
+				<div className={classes.peerContainer}>
+					{ videoVisible && !webcamConsumer.supported ?
+						<div className={classes.incompatibleVideo}>
+							<p>incompatible video</p>
+						</div>
 						:null
 					}
 
-					<Fab
-						aria-label='Fullscreen'
-						className={classes.fab}
-						disabled={!videoVisible}
-						onClick={() =>
-						{
-							toggleConsumerFullscreen(webcamConsumer);
-						}}
-					>
-						<FullScreenIcon />
-					</Fab>
-				</div>
+					{ !videoVisible ?
+						<div className={classes.pausedVideo}>
+							<p>this video is paused</p>
+						</div>
+						:null
+					}
 
-				<PeerView
-					advancedMode={advancedMode}
-					peer={peer}
-					volume={micConsumer ? micConsumer.volume : null}
-					videoTrack={webcamConsumer ? webcamConsumer.track : null}
-					videoVisible={videoVisible}
-					videoProfile={videoProfile}
-					audioCodec={micConsumer ? micConsumer.codec : null}
-					videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-				/>
+					<div className={classnames(classes.viewContainer)} style={style}>
+						<div
+							className={classnames(classes.controls, webcamHover ? 'hover' : null)}
+							onMouseOver={() => setWebcamHover(true)}
+							onMouseOut={() => setWebcamHover(false)}
+							onTouchStart={() =>
+							{
+								if (touchWebcamTimeout)
+									clearTimeout(touchWebcamTimeout);
+			
+								setWebcamHover(true);
+							}}
+							onTouchEnd={() =>
+							{
+								if (touchWebcamTimeout)
+									clearTimeout(touchWebcamTimeout);
+			
+								touchWebcamTimeout = setTimeout(() =>
+								{
+									setWebcamHover(false);
+								}, 2000);
+							}}
+						>
+							<Fab
+								aria-label='Mute mic'
+								className={classes.fab}
+								color={micEnabled ? 'default' : 'secondary'}
+								onClick={() =>
+								{
+									micEnabled ?
+										roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
+										roomClient.modifyPeerConsumer(peer.name, 'mic', false);
+								}}
+							>
+								{ micEnabled ?
+									<MicIcon />
+									:
+									<MicOffIcon />
+								}
+							</Fab>
+
+							{ !smallScreen ?
+								<Fab
+									aria-label='New window'
+									className={classes.fab}
+									disabled={
+										!videoVisible ||
+										(windowConsumer === webcamConsumer.id)
+									}
+									onClick={() =>
+									{
+										toggleConsumerWindow(webcamConsumer);
+									}}
+								>
+									<NewWindowIcon />
+								</Fab>
+								:null
+							}
+
+							<Fab
+								aria-label='Fullscreen'
+								className={classes.fab}
+								disabled={!videoVisible}
+								onClick={() =>
+								{
+									toggleConsumerFullscreen(webcamConsumer);
+								}}
+							>
+								<FullScreenIcon />
+							</Fab>
+						</div>
+
+						<PeerView
+							advancedMode={advancedMode}
+							peer={peer}
+							volume={micConsumer ? micConsumer.volume : null}
+							videoTrack={webcamConsumer ? webcamConsumer.track : null}
+							videoVisible={videoVisible}
+							videoProfile={videoProfile}
+							audioCodec={micConsumer ? micConsumer.codec : null}
+							videoCodec={webcamConsumer ? webcamConsumer.codec : null}
+						/>
+					</div>
+				</div>
 			</div>
 
 			{ screenConsumer ?
-				<div className={classnames(classes.viewContainer, 'screen')} style={style}>
-					<div
-						className={classes.controls}
-					>
-						{ !smallScreen ?
-							<Fab
-								aria-label='New window'
-								className={classes.fab}
-								disabled={
-									!screenVisible ||
-									(windowConsumer === screenConsumer.id)
-								}
-								onClick={() =>
-								{
-									toggleConsumerWindow(screenConsumer);
-								}}
-							>
-								<NewWindowIcon />
-							</Fab>
+				<div
+					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
+					onMouseOver={() => setHover(true)}
+					onMouseOut={() => setHover(false)}
+					onTouchStart={() =>
+					{
+						if (touchTimeout)
+							clearTimeout(touchTimeout);
+	
+						setHover(true);
+					}}
+					onTouchEnd={() =>
+					{
+						if (touchTimeout)
+							clearTimeout(touchTimeout);
+	
+						touchTimeout = setTimeout(() =>
+						{
+							setHover(false);
+						}, 2000);
+					}}
+				>
+					<div className={classes.peerContainer}>
+						{ screenVisible && !screenConsumer.supported ?
+							<div className={classes.incompatibleVideo}>
+								<p>incompatible video</p>
+							</div>
 							:null
 						}
 
-						<Fab
-							aria-label='Fullscreen'
-							className={classes.fab}
-							disabled={!screenVisible}
-							onClick={() =>
-							{
-								toggleConsumerFullscreen(screenConsumer);
-							}}
-						>
-							<FullScreenIcon />
-						</Fab>
+						{ !screenVisible ?
+							<div className={classes.pausedVideo}>
+								<p>this video is paused</p>
+							</div>
+							:null
+						}
+						<div className={classnames(classes.viewContainer)} style={style}>
+							<div
+								className={classnames(classes.controls, screenHover ? 'hover' : null)}
+								onMouseOver={() => setScreenHover(true)}
+								onMouseOut={() => setScreenHover(false)}
+								onTouchStart={() =>
+								{
+									if (touchScreenTimeout)
+										clearTimeout(touchScreenTimeout);
+				
+									setScreenHover(true);
+								}}
+								onTouchEnd={() =>
+								{
+
+									if (touchScreenTimeout)
+										clearTimeout(touchScreenTimeout);
+				
+									touchScreenTimeout = setTimeout(() =>
+									{
+										setScreenHover(false);
+									}, 2000);
+								}}
+							>
+								{ !smallScreen ?
+									<Fab
+										aria-label='New window'
+										className={classes.fab}
+										disabled={
+											!screenVisible ||
+											(windowConsumer === screenConsumer.id)
+										}
+										onClick={() =>
+										{
+											toggleConsumerWindow(screenConsumer);
+										}}
+									>
+										<NewWindowIcon />
+									</Fab>
+									:null
+								}
+
+								<Fab
+									aria-label='Fullscreen'
+									className={classes.fab}
+									disabled={!screenVisible}
+									onClick={() =>
+									{
+										toggleConsumerFullscreen(screenConsumer);
+									}}
+								>
+									<FullScreenIcon />
+								</Fab>
+							</div>
+							<ScreenView
+								advancedMode={advancedMode}
+								screenTrack={screenConsumer ? screenConsumer.track : null}
+								screenVisible={screenVisible}
+								screenProfile={screenProfile}
+								screenCodec={screenConsumer ? screenConsumer.codec : null}
+							/>
+						</div>
 					</div>
-					<ScreenView
-						advancedMode={advancedMode}
-						screenTrack={screenConsumer ? screenConsumer.track : null}
-						screenVisible={screenVisible}
-						screenProfile={screenProfile}
-						screenCodec={screenConsumer ? screenConsumer.codec : null}
-					/>
 				</div>
 				:null
 			}
-		</div>
+		</React.Fragment>
 	);
 };
 
