@@ -17,6 +17,7 @@ html
 	width: 100%;
 	font-family: 'Roboto';
 	font-weight: 300;
+	margin : 0;
 }
 
 body
@@ -24,6 +25,7 @@ body
 	height: 100%;
 	width: 100%;
 	font-size: 16px;
+	margin: 0;
 }
 
 #multiparty-meeting

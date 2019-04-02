@@ -2,11 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
-// import classnames from 'classnames';
 import { withRoomContext } from '../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as stateActions from '../actions/stateActions';
-// import Draggable from 'react-draggable';
 import { idle } from '../utils';
 import FullScreen from './FullScreen';
 import CookieConsent from 'react-cookie-consent';
@@ -26,7 +24,6 @@ import Notifications from './Notifications/Notifications';
 import MeetingDrawer from './MeetingDrawer/MeetingDrawer';
 import Democratic from './MeetingViews/Democratic';
 import Filmstrip from './MeetingViews/Filmstrip';
-// import Me from './Containers/Me';
 import AudioPeers from './PeerAudio/AudioPeers';
 import FullScreenView from './VideoContainers/FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
@@ -54,12 +51,16 @@ const styles = (theme) =>
 		},
 		message :
 		{
-			position  : 'fixed',
-			top       : '50%',
-			left      : '50%',
-			transform : 'translateX(-50%) translateY(-50%)',
-			width     : '30vw',
-			padding   : 'theme.unit.spacing * 2'
+			position       : 'absolute',
+			display        : 'flex',
+			top            : '50%',
+			left           : '50%',
+			transform      : 'translateX(-50%) translateY(-50%)',
+			width          : '30vw',
+			padding        : theme.spacing.unit * 2,
+			flexDirection  : 'column',
+			justifyContent : 'center',
+			alignItems     : 'center'
 		},
 		menuButton :
 		{
@@ -220,7 +221,6 @@ class Room extends React.PureComponent
 			roomClient,
 			room,
 			me,
-			// amActiveSpeaker,
 			setSettingsOpen,
 			toolAreaOpen,
 			toggleToolArea,
@@ -240,7 +240,7 @@ class Room extends React.PureComponent
 			return (
 				<div className={classes.root}>
 					<Paper className={classes.message}>
-						<Typography>
+						<Typography variant='h2'>
 							This webpage required sound and video to play, please click to allow.
 						</Typography>
 						<Button
@@ -262,7 +262,7 @@ class Room extends React.PureComponent
 			return (
 				<div className={classes.root}>
 					<Paper className={classes.message}>
-						<Typography>This room is locked at the moment, try again later.</Typography>
+						<Typography variant='h2'>This room is locked at the moment, try again later.</Typography>
 					</Paper>
 				</div>
 			);
@@ -343,7 +343,7 @@ class Room extends React.PureComponent
 										aria-label='Account'
 										color='inherit'
 										onClick={() => 
-{
+										{
 											me.loggedIn ? roomClient.logout() : roomClient.login();
 										}}
 									>
