@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
+import { makePeerConsumerSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
@@ -423,26 +424,21 @@ Peer.propTypes =
 	theme                    : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state, { name }) =>
+const makeMapStateToProps = () =>
 {
-	const peer = state.peers[name];
-	const consumersArray = peer.consumers
-		.map((consumerId) => state.consumers[consumerId]);
-	const micConsumer =
-		consumersArray.find((consumer) => consumer.source === 'mic');
-	const webcamConsumer =
-		consumersArray.find((consumer) => consumer.source === 'webcam');
-	const screenConsumer =
-		consumersArray.find((consumer) => consumer.source === 'screen');
+	const getPeerConsumers = makePeerConsumerSelector();
 
-	return {
-		peer,
-		micConsumer,
-		webcamConsumer,
-		screenConsumer,
-		windowConsumer : state.room.windowConsumer,
-		activeSpeaker  : name === state.room.activeSpeakerName
+	const mapStateToProps = (state, props) =>
+	{
+		return {
+			peer           : state.peers[props.name],
+			...getPeerConsumers(state, props),
+			windowConsumer : state.room.windowConsumer,
+			activeSpeaker  : props.name === state.room.activeSpeakerName
+		};
 	};
+
+	return mapStateToProps;
 };
 
 const mapDispatchToProps = (dispatch) =>
@@ -462,6 +458,6 @@ const mapDispatchToProps = (dispatch) =>
 };
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	mapDispatchToProps
 )(withStyles(styles, { withTheme: true })(Peer)));

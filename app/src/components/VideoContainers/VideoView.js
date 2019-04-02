@@ -42,7 +42,8 @@ const styles = () =>
 			},
 			'&.contain' :
 			{
-				objectFit : 'contain'
+				objectFit       : 'contain',
+				backgroundColor : 'rgba(0, 0, 0, 1)'
 			}
 		},
 		info :

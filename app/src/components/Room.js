@@ -18,6 +18,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import Avatar from '@material-ui/core/Avatar';
 import Badge from '@material-ui/core/Badge';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Notifications from './Notifications/Notifications';
@@ -152,7 +153,6 @@ class Room extends React.PureComponent
 
 		this.state =
 		{
-			drawerOpen : false,
 			fullscreen : false
 		};
 	}
@@ -220,7 +220,9 @@ class Room extends React.PureComponent
 		const {
 			roomClient,
 			room,
-			me,
+			myPicture,
+			loggedIn,
+			loginEnabled,
 			setSettingsOpen,
 			toolAreaOpen,
 			toggleToolArea,
@@ -338,16 +340,20 @@ class Room extends React.PureComponent
 								>
 									<SettingsIcon />
 								</IconButton>
-								{ me.loginEnabled ?
+								{ loginEnabled ?
 									<IconButton
 										aria-label='Account'
 										color='inherit'
 										onClick={() => 
 										{
-											me.loggedIn ? roomClient.logout() : roomClient.login();
+											loggedIn ? roomClient.logout() : roomClient.login();
 										}}
 									>
-										<AccountCircle />
+										{ myPicture ?
+											<Avatar src={myPicture} />
+											:
+											<AccountCircle />
+										}
 									</IconButton>
 									:null
 								}
@@ -373,20 +379,6 @@ class Room extends React.PureComponent
 
 					<View advancedMode={room.advancedMode} />
 
-					{ /*
-					<Draggable handle='.me-handle' bounds='body' cancel='.display-name'>
-						<div
-							className={classnames(classes.meContainer, 'me-handle', {
-								'active-speaker' : amActiveSpeaker
-							})}
-						>
-							<Me
-								advancedMode={room.advancedMode}
-							/>
-						</div>
-					</Draggable>
-					*/ }
-
 					<Sidebar />
 
 					<Settings />
@@ -400,10 +392,10 @@ Room.propTypes =
 {
 	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
-	me                 : appPropTypes.Me.isRequired,
-	// amActiveSpeaker    : PropTypes.bool.isRequired,
+	myPicture          : PropTypes.string,
+	loggedIn           : PropTypes.bool.isRequired,
+	loginEnabled       : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
-	screenProducer     : appPropTypes.Producer,
 	setToolbarsVisible : PropTypes.func.isRequired,
 	setSettingsOpen    : PropTypes.func.isRequired,
 	toggleToolArea     : PropTypes.func.isRequired,
@@ -413,25 +405,18 @@ Room.propTypes =
 };
 
 const mapStateToProps = (state) =>
-{
-	const producersArray = Object.values(state.producers);
-	const screenProducer =
-		producersArray.find((producer) => producer.source === 'screen');
-
-	return {
-		room           : state.room,
-		me             : state.me,
-		screenProducer : screenProducer,
-		toolAreaOpen   : state.toolarea.toolAreaOpen,
-		unread         : state.toolarea.unreadMessages +
+	({
+		room         : state.room,
+		loggedIn     : state.me.loggedIn,
+		loginEnabled : state.me.loginEnabled,
+		myPicture    : state.me.picture,
+		toolAreaOpen : state.toolarea.toolAreaOpen,
+		unread       : state.toolarea.unreadMessages +
 			state.toolarea.unreadFiles
-		// amActiveSpeaker : state.me.name === state.room.activeSpeakerName,
-	};
-};
+	});
 
 const mapDispatchToProps = (dispatch) =>
-{
-	return {
+	({
 		setToolbarsVisible : (visible) =>
 		{
 			dispatch(stateActions.setToolbarsVisible(visible));
@@ -444,8 +429,7 @@ const mapDispatchToProps = (dispatch) =>
 		{
 			dispatch(stateActions.toggleToolArea());
 		}
-	};
-};
+	});
 
 export default withRoomContext(connect(
 	mapStateToProps,

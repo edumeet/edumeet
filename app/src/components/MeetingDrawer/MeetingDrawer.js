@@ -30,64 +30,71 @@ const styles = (theme) =>
 			width           : '100%',
 			height          : '100%',
 			backgroundColor : theme.palette.background.paper
+		},
+		appBar :
+		{
+			display       : 'flex',
+			flexDirection : 'row'
+		},
+		tabsHeader :
+		{
+			flexGrow : 1
 		}
 	});
 
-class MeetingDrawer extends React.PureComponent
+const MeetingDrawer = (props) =>
 {
-	handleChange = (event, value) =>
-	{
-		this.props.setToolTab(tabs[value]);
-	};
+	const {
+		currentToolTab,
+		unreadMessages,
+		unreadFiles,
+		closeDrawer,
+		setToolTab,
+		classes,
+		theme
+	} = props;
 
-	render()
-	{
-		const {
-			currentToolTab,
-			unreadMessages,
-			unreadFiles,
-			closeDrawer,
-			classes,
-			theme
-		} = this.props;
-
-		return (
-			<div className={classes.root}>
-				<AppBar position='static' color='default'>
-					<Tabs
-						value={tabs.indexOf(currentToolTab)}
-						onChange={this.handleChange}
-						indicatorColor='primary'
-						textColor='primary'
-						variant='fullWidth'
-					>
-						<Tab
-							label={
-								<Badge color='secondary' badgeContent={unreadMessages}>
-									Chat
-								</Badge>
-							}
-						/>
-						<Tab
-							label={
-								<Badge color='secondary' badgeContent={unreadFiles}>
-									File sharing
-								</Badge>
-							}
-						/>
-						<Tab label='Participants' />
-						<IconButton onClick={closeDrawer}>
-							{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-						</IconButton>
-					</Tabs>
-				</AppBar>
-				{currentToolTab === 'chat' && <Chat />}
-				{currentToolTab === 'files' && <FileSharing />}
-				{currentToolTab === 'users' && <ParticipantList />}
-			</div>
-		);
-	}
-}
+	return (
+		<div className={classes.root}>
+			<AppBar
+				position='static'
+				color='default'
+				className={classes.appBar}
+			>
+				<Tabs
+					className={classes.tabsHeader}
+					value={tabs.indexOf(currentToolTab)}
+					onChange={(event, value) => setToolTab(tabs[value])}
+					indicatorColor='primary'
+					textColor='primary'
+					variant='fullWidth'
+				>
+					<Tab
+						label={
+							<Badge color='secondary' badgeContent={unreadMessages}>
+								Chat
+							</Badge>
+						}
+					/>
+					<Tab
+						label={
+							<Badge color='secondary' badgeContent={unreadFiles}>
+								File sharing
+							</Badge>
+						}
+					/>
+					<Tab label='Participants' />
+				</Tabs>
+				<IconButton onClick={closeDrawer}>
+					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+				</IconButton>
+			</AppBar>
+			{currentToolTab === 'chat' && <Chat />}
+			{currentToolTab === 'files' && <FileSharing />}
+			{currentToolTab === 'users' && <ParticipantList />}
+		</div>
+	);
+};
 
 MeetingDrawer.propTypes =
 {

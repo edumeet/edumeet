@@ -1,19 +1,24 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { micConsumerSelector } from '../Selectors';
 import PropTypes from 'prop-types';
-import AudioPeer from './AudioPeer';
+import PeerAudio from './PeerAudio';
 
-const AudioPeers = ({ peers }) =>
+const AudioPeers = (props) =>
 {
+	const {
+		micConsumers
+	} = props;
+
 	return (
 		<div data-component='AudioPeers'>
 			{
-				Object.values(peers).map((peer) =>
+				micConsumers.map((micConsumer) =>
 				{
 					return (
-						<AudioPeer
-							key={peer.name}
-							name={peer.name}
+						<PeerAudio
+							key={micConsumer.id}
+							audioTrack={micConsumer.track}
 						/>
 					);
 				})
@@ -24,12 +29,12 @@ const AudioPeers = ({ peers }) =>
 
 AudioPeers.propTypes =
 {
-	peers : PropTypes.object
+	micConsumers : PropTypes.array
 };
 
 const mapStateToProps = (state) =>
 	({
-		peers : state.peers
+		micConsumers : micConsumerSelector(state)
 	});
 
 const AudioPeersContainer = connect(

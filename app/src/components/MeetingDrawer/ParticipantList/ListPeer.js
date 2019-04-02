@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { makePeerConsumerSelector } from '../../Selectors';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -269,26 +270,21 @@ ListPeer.propTypes =
 	classes        : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state, { name }) =>
+const makeMapStateToProps = () =>
 {
-	const peer = state.peers[name];
-	const consumersArray = peer.consumers
-		.map((consumerId) => state.consumers[consumerId]);
-	const micConsumer =
-		consumersArray.find((consumer) => consumer.source === 'mic');
-	const webcamConsumer =
-		consumersArray.find((consumer) => consumer.source === 'webcam');
-	const screenConsumer =
-		consumersArray.find((consumer) => consumer.source === 'screen');
+	const getPeerConsumers = makePeerConsumerSelector();
 
-	return {
-		peer,
-		micConsumer,
-		webcamConsumer,
-		screenConsumer
+	const mapStateToProps = (state, props) =>
+	{
+		return {
+			peer : state.peers[props.name],
+			...getPeerConsumers(state, props)
+		};
 	};
+
+	return mapStateToProps;
 };
 
 export default withRoomContext(connect(
-	mapStateToProps
+	makeMapStateToProps
 )(withStyles(styles)(ListPeer)));

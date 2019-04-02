@@ -5,8 +5,8 @@ import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import * as appPropTypes from '../appPropTypes';
 import * as stateActions from '../../actions/stateActions';
-import FullView from './FullView';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
+import VideoView from './VideoView';
 
 const styles = () =>
 	({
@@ -41,7 +41,12 @@ const styles = () =>
 			transitionProperty : 'opacity, background-color',
 			transitionDuration : '0.15s',
 			width              : '5vmin',
-			height             : '5vmin'
+			height             : '5vmin',
+			opacity            : 0,
+			'&.visible'        :
+			{
+				opacity : 1
+			}
 		},
 		icon :
 		{
@@ -106,7 +111,7 @@ const FullScreenView = (props) =>
 
 			<div className={classes.controls}>
 				<div
-					className={classnames(classes.button, 'room-controls', {
+					className={classnames(classes.button, {
 						visible : toolbarsVisible
 					})}
 					onClick={(e) =>
@@ -119,8 +124,9 @@ const FullScreenView = (props) =>
 				</div>
 			</div>
 
-			<FullView
+			<VideoView
 				advancedMode={advancedMode}
+				videoContain
 				videoTrack={consumer ? consumer.track : null}
 				videoVisible={consumerVisible}
 				videoProfile={consumerProfile}
@@ -139,23 +145,19 @@ FullScreenView.propTypes =
 };
 
 const mapStateToProps = (state) =>
-{
-	return {
+	({
 		consumer        : state.consumers[state.room.fullScreenConsumer],
 		toolbarsVisible : state.room.toolbarsVisible
-	};
-};
+	});
 
 const mapDispatchToProps = (dispatch) =>
-{
-	return {
+	({
 		toggleConsumerFullscreen : (consumer) =>
 		{
 			if (consumer)
 				dispatch(stateActions.toggleConsumerFullscreen(consumer.id));
 		}
-	};
-};
+	});
 
 export default connect(
 	mapStateToProps,

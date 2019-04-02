@@ -1,5 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {
+	peersSelector,
+	videoBoxesSelector,
+	spotlightsSelector,
+	spotlightsLengthSelector
+} from '../Selectors';
 import PropTypes from 'prop-types';
 import debounce from 'lodash/debounce';
 import { withStyles } from '@material-ui/core/styles';
@@ -159,28 +165,22 @@ class Democratic extends React.PureComponent
 }
 
 Democratic.propTypes =
-	{
-		advancedMode     : PropTypes.bool,
-		peers            : PropTypes.object.isRequired,
-		boxes            : PropTypes.number,
-		spotlightsLength : PropTypes.number,
-		spotlights       : PropTypes.array.isRequired,
-		classes          : PropTypes.object.isRequired
-	};
+{
+	advancedMode     : PropTypes.bool,
+	peers            : PropTypes.object.isRequired,
+	boxes            : PropTypes.number,
+	spotlightsLength : PropTypes.number,
+	spotlights       : PropTypes.array.isRequired,
+	classes          : PropTypes.object.isRequired
+};
 
 const mapStateToProps = (state) =>
 {
-	const spotlights = state.room.spotlights;
-	const spotlightsLength = spotlights ? state.room.spotlights.length : 0;
-	const boxes = spotlightsLength + Object.values(state.consumers)
-		.filter((consumer) => consumer.source === 'screen').length + Object.values(state.producers)
-		.filter((producer) => producer.source === 'screen').length + 1;
-
 	return {
-		peers : state.peers,
-		boxes,
-		spotlights,
-		spotlightsLength
+		peers            : peersSelector(state),
+		boxes            : videoBoxesSelector(state),
+		spotlights       : spotlightsSelector(state),
+		spotlightsLength : spotlightsLengthSelector(state)
 	};
 };
 

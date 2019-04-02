@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { meProducersSelector } from '../Selectors';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -133,21 +134,11 @@ Me.propTypes =
 
 const mapStateToProps = (state) =>
 {
-	const producersArray = Object.values(state.producers);
-	const micProducer =
-		producersArray.find((producer) => producer.source === 'mic');
-	const webcamProducer =
-		producersArray.find((producer) => producer.source === 'webcam');
-	const screenProducer =
-		producersArray.find((producer) => producer.source === 'screen');
-
 	return {
-		connected      : state.room.state === 'connected',
-		me             : state.me,
-		micProducer    : micProducer,
-		webcamProducer : webcamProducer,
-		screenProducer : screenProducer,
-		activeSpeaker  : state.me.name === state.room.activeSpeakerName
+		connected     : state.room.state === 'connected',
+		me            : state.me,
+		...meProducersSelector(state),
+		activeSpeaker : state.me.name === state.room.activeSpeakerName
 	};
 };
 
