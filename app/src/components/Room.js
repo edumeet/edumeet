@@ -366,7 +366,7 @@ class Room extends React.PureComponent
 									paper : classes.drawerPaper
 								}}
 							>
-								<MeetingDrawer />
+								<MeetingDrawer closeDrawer={toggleToolArea} />
 							</SwipeableDrawer>
 						</Hidden>
 					</nav>

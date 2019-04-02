@@ -10,6 +10,9 @@ import Badge from '@material-ui/core/Badge';
 import Chat from './Chat/Chat';
 import FileSharing from './FileSharing/FileSharing';
 import ParticipantList from './ParticipantList/ParticipantList';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import IconButton from '@material-ui/core/IconButton';
 
 const tabs =
 [
@@ -43,7 +46,9 @@ class MeetingDrawer extends React.PureComponent
 			currentToolTab,
 			unreadMessages,
 			unreadFiles,
-			classes
+			closeDrawer,
+			classes,
+			theme
 		} = this.props;
 
 		return (
@@ -71,6 +76,9 @@ class MeetingDrawer extends React.PureComponent
 							}
 						/>
 						<Tab label='Participants' />
+						<IconButton onClick={closeDrawer}>
+							{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+						</IconButton>
 					</Tabs>
 				</AppBar>
 				{currentToolTab === 'chat' && <Chat />}
@@ -87,7 +95,9 @@ MeetingDrawer.propTypes =
 	setToolTab     : PropTypes.func.isRequired,
 	unreadMessages : PropTypes.number.isRequired,
 	unreadFiles    : PropTypes.number.isRequired,
-	classes        : PropTypes.object.isRequired
+	closeDrawer    : PropTypes.func.isRequired,
+	classes        : PropTypes.object.isRequired,
+	theme          : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -103,4 +113,4 @@ const mapDispatchToProps = {
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(withStyles(styles)(MeetingDrawer));
+)(withStyles(styles, { withTheme: true })(MeetingDrawer));
