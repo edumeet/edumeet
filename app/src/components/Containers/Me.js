@@ -2,10 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { getDeviceInfo } from 'mediasoup-client';
 import * as appPropTypes from '../appPropTypes';
 import VideoView from '../VideoContainers/VideoView';
 
@@ -45,72 +43,34 @@ const styles = () =>
 		}
 	});
 
-class Me extends React.PureComponent
+const Me = (props) =>
 {
-	state = {
-		controlsVisible : false
-	};
+	const {
+		roomClient,
+		me,
+		activeSpeaker,
+		style,
+		advancedMode,
+		micProducer,
+		webcamProducer,
+		screenProducer,
+		classes
+	} = props;
 
-	handleMouseOver = () =>
-	{
-		this.setState({
-			controlsVisible : true
-		});
-	};
+	const videoVisible = (
+		Boolean(webcamProducer) &&
+		!webcamProducer.locallyPaused &&
+		!webcamProducer.remotelyPaused
+	);
 
-	handleMouseOut = () =>
-	{
-		this.setState({
-			controlsVisible : false
-		});
-	};
+	const screenVisible = (
+		Boolean(screenProducer) &&
+		!screenProducer.locallyPaused &&
+		!screenProducer.remotelyPaused
+	);
 
-	constructor(props)
-	{
-		super(props);
-
-		this._mounted = false;
-		this._rootNode = null;
-		this._tooltip = true;
-
-		// TODO: Issue when using react-tooltip in Edge:
-		//   https://github.com/wwayne/react-tooltip/issues/328
-		if (getDeviceInfo().flag === 'msedge')
-			this._tooltip = false;
-	}
-
-	render()
-	{
-		const {
-			roomClient,
-			me,
-			activeSpeaker,
-			style,
-			advancedMode,
-			micProducer,
-			webcamProducer,
-			screenProducer,
-			classes
-		} = this.props;
-
-		const videoVisible = (
-			Boolean(webcamProducer) &&
-			!webcamProducer.locallyPaused &&
-			!webcamProducer.remotelyPaused
-		);
-
-		const screenVisible = (
-			Boolean(screenProducer) &&
-			!screenProducer.locallyPaused &&
-			!screenProducer.remotelyPaused
-		);
-
-		let tip;
-
-		if (!me.displayNameSet)
-			tip = 'Click on your name to change it';
-
-		return (
+	return (
+		<React.Fragment>
 			<div
 				className={
 					classnames(
@@ -118,12 +78,6 @@ class Me extends React.PureComponent
 						activeSpeaker ? 'active-speaker' : null
 					)
 				}
-				ref={(node) => (this._rootNode = node)}
-				data-tip={tip}
-				data-tip-disable={!tip}
-				data-type='dark'
-				onMouseOver={this.handleMouseOver}
-				onMouseOut={this.handleMouseOut}
 			>
 				<div className={classnames(classes.viewContainer, 'webcam')} style={style}>
 					<VideoView
@@ -143,53 +97,25 @@ class Me extends React.PureComponent
 						}}
 					/>
 				</div>
-
-				{ screenProducer ?
+			</div>
+			{ screenProducer ?
+				<div className={classes.root}>
 					<div className={classnames(classes.viewContainer, 'screen')} style={style}>
 						<VideoView
 							isMe
 							advancedMode={advancedMode}
+							videoContain
 							videoTrack={screenProducer ? screenProducer.track : null}
 							videoVisible={screenVisible}
 							videoCodec={screenProducer ? screenProducer.codec : null}
 						/>
 					</div>
-					:null
-				}
-			</div>
-		);
-	}
-
-	componentDidMount()
-	{
-		this._mounted = true;
-
-		if (this._tooltip)
-		{
-			setTimeout(() =>
-			{
-				if (!this._mounted || this.props.me.displayNameSet)
-					return;
-
-				ReactTooltip.show(this._rootNode);
-			}, 4000);
-		}
-	}
-
-	componentWillUnmount()
-	{
-		this._mounted = false;
-	}
-
-	componentWillReceiveProps(nextProps)
-	{
-		if (this._tooltip)
-		{
-			if (nextProps.me.displayNameSet)
-				ReactTooltip.hide(this._rootNode);
-		}
-	}
-}
+				</div>
+				:null
+			}
+		</React.Fragment>
+	);
+};
 
 Me.propTypes =
 {

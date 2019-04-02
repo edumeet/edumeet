@@ -39,6 +39,10 @@ const styles = () =>
 			'&.loading' :
 			{
 				filter : 'blur(5px)'
+			},
+			'&.contain' :
+			{
+				objectFit : 'contain'
 			}
 		},
 		info :
@@ -237,6 +241,7 @@ class VideoView extends React.PureComponent
 			peer,
 			volume,
 			showPeerInfo,
+			videoContain,
 			advancedMode,
 			videoVisible,
 			videoProfile,
@@ -317,7 +322,8 @@ class VideoView extends React.PureComponent
 					className={classnames(classes.video, {
 						hidden  : !videoVisible,
 						'is-me' : isMe,
-						loading : videoProfile === 'none'
+						loading : videoProfile === 'none',
+						contain : videoContain
 					})}
 					autoPlay
 					playsInline
@@ -416,6 +422,7 @@ VideoView.propTypes =
 	peer : PropTypes.oneOfType(
 		[ appPropTypes.Me, appPropTypes.Peer ]),
 	showPeerInfo        : PropTypes.bool,
+	videoContain        : PropTypes.bool,
 	advancedMode        : PropTypes.bool,
 	audioTrack          : PropTypes.any,
 	volume              : PropTypes.number,

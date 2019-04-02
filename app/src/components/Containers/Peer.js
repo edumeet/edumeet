@@ -59,8 +59,7 @@ const styles = (theme) =>
 			},
 			'&.screen' :
 			{
-				order    : 1,
-				maxWidth : '50%'
+				order : 1
 			}
 		},
 		controls :
@@ -391,6 +390,7 @@ const Peer = (props) =>
 							</div>
 							<VideoView
 								advancedMode={advancedMode}
+								videoContain
 								videoTrack={screenConsumer ? screenConsumer.track : null}
 								videoVisible={screenVisible}
 								videoProfile={screenProfile}
