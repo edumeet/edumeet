@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import debounce from 'lodash/debounce';
 import { withStyles } from '@material-ui/core/styles';
 import Peer from '../Containers/Peer';
@@ -29,23 +28,6 @@ const styles = () =>
 			paddingBottom  : 10,
 			paddingLeft    : 10,
 			paddingRight   : 10
-		},
-		peerContainer :
-		{
-			overflow           : 'hidden',
-			flex               : '0 0 auto',
-			margin             : 6,
-			boxShadow          : 'var(--peer-shadow)',
-			border             : 'var(--peer-border)',
-			transitionProperty : 'border-color',
-			'&.active-speaker' :
-			{
-				borderColor : 'var(--active-speaker-border-color)'
-			},
-			'&.selected' :
-			{
-				borderColor : 'var(--selected-peer-border-color)'
-			}
 		}
 	});
 
@@ -129,9 +111,6 @@ class Democratic extends React.PureComponent
 	{
 		const {
 			advancedMode,
-			amActiveSpeaker,
-			activeSpeakerName,
-			selectedPeerName,
 			peers,
 			spotlights,
 			spotlightsLength,
@@ -181,15 +160,12 @@ class Democratic extends React.PureComponent
 
 Democratic.propTypes =
 	{
-		advancedMode      : PropTypes.bool,
-		peers             : PropTypes.object.isRequired,
-		boxes             : PropTypes.number,
-		amActiveSpeaker   : PropTypes.bool.isRequired,
-		activeSpeakerName : PropTypes.string,
-		selectedPeerName  : PropTypes.string,
-		spotlightsLength  : PropTypes.number,
-		spotlights        : PropTypes.array.isRequired,
-		classes           : PropTypes.object.isRequired
+		advancedMode     : PropTypes.bool,
+		peers            : PropTypes.object.isRequired,
+		boxes            : PropTypes.number,
+		spotlightsLength : PropTypes.number,
+		spotlights       : PropTypes.array.isRequired,
+		classes          : PropTypes.object.isRequired
 	};
 
 const mapStateToProps = (state) =>
@@ -201,11 +177,8 @@ const mapStateToProps = (state) =>
 		.filter((producer) => producer.source === 'screen').length + 1;
 
 	return {
-		peers             : state.peers,
+		peers : state.peers,
 		boxes,
-		activeSpeakerName : state.room.activeSpeakerName,
-		selectedPeerName  : state.room.selectedPeerName,
-		amActiveSpeaker   : state.me.name === state.room.activeSpeakerName,
 		spotlights,
 		spotlightsLength
 	};
