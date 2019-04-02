@@ -7,17 +7,27 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { getDeviceInfo } from 'mediasoup-client';
 import * as appPropTypes from '../appPropTypes';
-import PeerView from '../VideoContainers/PeerView';
-import ScreenView from '../VideoContainers/ScreenView';
+import VideoView from '../VideoContainers/VideoView';
 
 const styles = () =>
 	({
 		root :
 		{
-			display       : 'flex',
-			flexDirection : 'row',
-			flex          : '100 100 auto',
-			position      : 'relative'
+			display            : 'flex',
+			flexDirection      : 'row',
+			margin             : 6,
+			flex               : '0 0 auto',
+			boxShadow          : 'var(--peer-shadow)',
+			border             : 'var(--peer-border)',
+			backgroundColor    : 'var(--peer-bg-color)',
+			backgroundImage    : 'var(--peer-empty-avatar)',
+			backgroundPosition : 'bottom',
+			backgroundSize     : 'auto 85%',
+			backgroundRepeat   : 'no-repeat',
+			'&.active-speaker' :
+			{
+				borderColor : 'var(--active-speaker-border-color)'
+			}
 		},
 		viewContainer :
 		{
@@ -74,6 +84,7 @@ class Me extends React.PureComponent
 		const {
 			roomClient,
 			me,
+			activeSpeaker,
 			style,
 			advancedMode,
 			micProducer,
@@ -101,7 +112,12 @@ class Me extends React.PureComponent
 
 		return (
 			<div
-				className={classes.root}
+				className={
+					classnames(
+						classes.root,
+						activeSpeaker ? 'active-speaker' : null
+					)
+				}
 				ref={(node) => (this._rootNode = node)}
 				data-tip={tip}
 				data-tip-disable={!tip}
@@ -110,10 +126,11 @@ class Me extends React.PureComponent
 				onMouseOut={this.handleMouseOut}
 			>
 				<div className={classnames(classes.viewContainer, 'webcam')} style={style}>
-					<PeerView
+					<VideoView
 						isMe
 						advancedMode={advancedMode}
 						peer={me}
+						showPeerInfo
 						audioTrack={micProducer ? micProducer.track : null}
 						volume={micProducer ? micProducer.volume : null}
 						videoTrack={webcamProducer ? webcamProducer.track : null}
@@ -129,12 +146,12 @@ class Me extends React.PureComponent
 
 				{ screenProducer ?
 					<div className={classnames(classes.viewContainer, 'screen')} style={style}>
-						<ScreenView
+						<VideoView
 							isMe
 							advancedMode={advancedMode}
-							screenTrack={screenProducer ? screenProducer.track : null}
-							screenVisible={screenVisible}
-							screenCodec={screenProducer ? screenProducer.codec : null}
+							videoTrack={screenProducer ? screenProducer.track : null}
+							videoVisible={screenVisible}
+							videoCodec={screenProducer ? screenProducer.codec : null}
 						/>
 					</div>
 					:null
@@ -180,6 +197,7 @@ Me.propTypes =
 	connected      : PropTypes.bool.isRequired,
 	advancedMode   : PropTypes.bool,
 	me             : appPropTypes.Me.isRequired,
+	activeSpeaker  : PropTypes.bool,
 	micProducer    : appPropTypes.Producer,
 	webcamProducer : appPropTypes.Producer,
 	screenProducer : appPropTypes.Producer,
@@ -202,7 +220,8 @@ const mapStateToProps = (state) =>
 		me             : state.me,
 		micProducer    : micProducer,
 		webcamProducer : webcamProducer,
-		screenProducer : screenProducer
+		screenProducer : screenProducer,
+		activeSpeaker  : state.me.name === state.room.activeSpeakerName
 	};
 };
 

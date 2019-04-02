@@ -9,18 +9,13 @@ const styles = () =>
 	({
 		root :
 		{
-			position           : 'relative',
-			flex               : '100 100 auto',
-			height             : '100%',
-			width              : '100%',
-			display            : 'flex',
-			flexDirection      : 'column',
-			overflow           : 'hidden',
-			backgroundColor    : 'var(--peer-bg-color)',
-			backgroundImage    : 'var(--peer-empty-avatar)',
-			backgroundPosition : 'bottom',
-			backgroundSize     : 'auto 85%',
-			backgroundRepeat   : 'no-repeat'
+			position      : 'relative',
+			flex          : '100 100 auto',
+			height        : '100%',
+			width         : '100%',
+			display       : 'flex',
+			flexDirection : 'column',
+			overflow      : 'hidden'
 		},
 		video :
 		{
@@ -210,7 +205,7 @@ const styles = () =>
 		}
 	});
 
-class PeerView extends React.PureComponent
+class VideoView extends React.PureComponent
 {
 	constructor(props)
 	{
@@ -241,6 +236,7 @@ class PeerView extends React.PureComponent
 			isMe,
 			peer,
 			volume,
+			showPeerInfo,
 			advancedMode,
 			videoVisible,
 			videoProfile,
@@ -280,37 +276,40 @@ class PeerView extends React.PureComponent
 						:null
 					}
 
-					<div className={classes.peer}>
-						{ isMe ?
-							<EditableInput
-								value={peer.displayName}
-								propName='displayName'
-								className={classnames(classes.displayNameEdit, 'display-name')}
-								classLoading='loading'
-								classInvalid='invalid'
-								shouldBlockWhileLoading
-								editProps={{
-									maxLength   : 30,
-									autoCorrect : false,
-									spellCheck  : false
-								}}
-								onChange={({ displayName }) => onChangeDisplayName(displayName)}
-							/>
-							:
-							<span className={classes.displayNameStatic}>
-								{peer.displayName}
-							</span>
-						}
-
-						{ advancedMode ?
-							<div className={classes.deviceInfo}>
-								<span>
-									{peer.device.name} {Math.floor(peer.device.version) || null}
+					{ showPeerInfo ?
+						<div className={classes.peer}>
+							{ isMe ?
+								<EditableInput
+									value={peer.displayName}
+									propName='displayName'
+									className={classnames(classes.displayNameEdit, 'display-name')}
+									classLoading='loading'
+									classInvalid='invalid'
+									shouldBlockWhileLoading
+									editProps={{
+										maxLength   : 30,
+										autoCorrect : false,
+										spellCheck  : false
+									}}
+									onChange={({ displayName }) => onChangeDisplayName(displayName)}
+								/>
+								:
+								<span className={classes.displayNameStatic}>
+									{peer.displayName}
 								</span>
-							</div>
-							:null
-						}
-					</div>
+							}
+
+							{ advancedMode ?
+								<div className={classes.deviceInfo}>
+									<span>
+										{peer.device.name} {Math.floor(peer.device.version) || null}
+									</span>
+								</div>
+								:null
+							}
+						</div>
+						:null
+					}
 				</div>
 
 				<video
@@ -411,11 +410,12 @@ class PeerView extends React.PureComponent
 	}
 }
 
-PeerView.propTypes =
+VideoView.propTypes =
 {
 	isMe : PropTypes.bool,
 	peer : PropTypes.oneOfType(
-		[ appPropTypes.Me, appPropTypes.Peer ]).isRequired,
+		[ appPropTypes.Me, appPropTypes.Peer ]),
+	showPeerInfo        : PropTypes.bool,
 	advancedMode        : PropTypes.bool,
 	audioTrack          : PropTypes.any,
 	volume              : PropTypes.number,
@@ -428,4 +428,4 @@ PeerView.propTypes =
 	classes             : PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(PeerView);
+export default withStyles(styles)(VideoView);

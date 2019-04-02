@@ -7,8 +7,7 @@ import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
 import * as stateActions from '../../actions/stateActions';
-import PeerView from '../VideoContainers/PeerView';
-import ScreenView from '../VideoContainers/ScreenView';
+import VideoView from '../VideoContainers/VideoView';
 import Fab from '@material-ui/core/Fab';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
@@ -19,13 +18,17 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			overflow    : 'hidden',
-			flex        : '0 0 auto',
-			margin      : 6,
-			boxShadow   : 'var(--peer-shadow)',
-			border      : 'var(--peer-border)',
-			touchAction : 'none',
-			'&.webcam'  :
+			flex               : '0 0 auto',
+			margin             : 6,
+			boxShadow          : 'var(--peer-shadow)',
+			border             : 'var(--peer-border)',
+			touchAction        : 'none',
+			backgroundColor    : 'var(--peer-bg-color)',
+			backgroundImage    : 'var(--peer-empty-avatar)',
+			backgroundPosition : 'bottom',
+			backgroundSize     : 'auto 85%',
+			backgroundRepeat   : 'no-repeat',
+			'&.webcam'         :
 			{
 				order : 2
 			},
@@ -36,17 +39,11 @@ const styles = (theme) =>
 			'&.hover' :
 			{
 				boxShadow : '0px 1px 3px rgba(0, 0, 0, 0.05) inset, 0px 0px 8px rgba(82, 168, 236, 0.9)'
+			},
+			'&.active-speaker' :
+			{
+				borderColor : 'var(--active-speaker-border-color)'
 			}
-		},
-		peerContainer :
-		{
-			width         : '100%',
-			height        : '100%',
-			display       : 'flex',
-			flexDirection : 'row',
-			flex          : '100 100 auto',
-			position      : 'relative',
-			touchAction   : 'none'
 		},
 		fab :
 		{
@@ -86,32 +83,8 @@ const styles = (theme) =>
 				opacity : 1
 			}
 		},
-		pausedVideo :
+		videoInfo :
 		{
-			position       : 'absolute',
-			zIndex         : 11,
-			top            : 0,
-			bottom         : 0,
-			left           : 0,
-			right          : 0,
-			display        : 'flex',
-			flexDirection  : 'column',
-			justifyContent : 'center',
-			alignItems     : 'center',
-			'& p'          :
-			{
-				padding       : '6px 12px',
-				borderRadius  : 6,
-				userSelect    : 'none',
-				pointerEvents : 'none',
-				fontSize      : 20,
-				color         : 'rgba(255, 255, 255, 0.55)'
-			}
-		},
-		incompatibleVideo :
-		{
-			position       : 'absolute',
-			zIndex         : 10,
 			top            : 0,
 			bottom         : 0,
 			left           : 0,
@@ -148,6 +121,7 @@ const Peer = (props) =>
 		roomClient,
 		advancedMode,
 		peer,
+		activeSpeaker,
 		micConsumer,
 		webcamConsumer,
 		screenConsumer,
@@ -192,7 +166,14 @@ const Peer = (props) =>
 	return (
 		<React.Fragment>
 			<div
-				className={classnames(classes.root, 'webcam', hover ? 'hover' : null)}
+				className={
+					classnames(
+						classes.root,
+						'webcam',
+						hover ? 'hover' : null,
+						activeSpeaker ? 'active-speaker' : null
+					)
+				}
 				onMouseOver={() => setHover(true)}
 				onMouseOut={() => setHover(false)}
 				onTouchStart={() =>
@@ -213,21 +194,21 @@ const Peer = (props) =>
 					}, 2000);
 				}}
 			>
-				<div className={classes.peerContainer}>
-					{ videoVisible && !webcamConsumer.supported ?
-						<div className={classes.incompatibleVideo}>
-							<p>incompatible video</p>
-						</div>
-						:null
-					}
+				{ videoVisible && !webcamConsumer.supported ?
+					<div className={classes.videoInfo} style={style}>
+						<p>incompatible video</p>
+					</div>
+					:null
+				}
 
-					{ !videoVisible ?
-						<div className={classes.pausedVideo}>
-							<p>this video is paused</p>
-						</div>
-						:null
-					}
+				{ !videoVisible ?
+					<div className={classes.videoInfo} style={style}>
+						<p>this video is paused</p>
+					</div>
+					:null
+				}
 
+				{ videoVisible && webcamConsumer.supported ?
 					<div className={classnames(classes.viewContainer)} style={style}>
 						<div
 							className={classnames(classes.controls, webcamHover ? 'hover' : null)}
@@ -300,9 +281,10 @@ const Peer = (props) =>
 							</Fab>
 						</div>
 
-						<PeerView
+						<VideoView
 							advancedMode={advancedMode}
 							peer={peer}
+							showPeerInfo
 							volume={micConsumer ? micConsumer.volume : null}
 							videoTrack={webcamConsumer ? webcamConsumer.track : null}
 							videoVisible={videoVisible}
@@ -311,7 +293,8 @@ const Peer = (props) =>
 							videoCodec={webcamConsumer ? webcamConsumer.codec : null}
 						/>
 					</div>
-				</div>
+					:null
+				}
 			</div>
 
 			{ screenConsumer ?
@@ -337,20 +320,21 @@ const Peer = (props) =>
 						}, 2000);
 					}}
 				>
-					<div className={classes.peerContainer}>
-						{ screenVisible && !screenConsumer.supported ?
-							<div className={classes.incompatibleVideo}>
-								<p>incompatible video</p>
-							</div>
-							:null
-						}
+					{ screenVisible && !screenConsumer.supported ?
+						<div className={classes.videoInfo} style={style}>
+							<p>incompatible video</p>
+						</div>
+						:null
+					}
 
-						{ !screenVisible ?
-							<div className={classes.pausedVideo}>
-								<p>this video is paused</p>
-							</div>
-							:null
-						}
+					{ !screenVisible ?
+						<div className={classes.videoInfo} style={style}>
+							<p>this video is paused</p>
+						</div>
+						:null
+					}
+
+					{ screenVisible && screenConsumer.supported ?
 						<div className={classnames(classes.viewContainer)} style={style}>
 							<div
 								className={classnames(classes.controls, screenHover ? 'hover' : null)}
@@ -405,15 +389,16 @@ const Peer = (props) =>
 									<FullScreenIcon />
 								</Fab>
 							</div>
-							<ScreenView
+							<VideoView
 								advancedMode={advancedMode}
-								screenTrack={screenConsumer ? screenConsumer.track : null}
-								screenVisible={screenVisible}
-								screenProfile={screenProfile}
-								screenCodec={screenConsumer ? screenConsumer.codec : null}
+								videoTrack={screenConsumer ? screenConsumer.track : null}
+								videoVisible={screenVisible}
+								videoProfile={screenProfile}
+								videoCodec={screenConsumer ? screenConsumer.codec : null}
 							/>
 						</div>
-					</div>
+						:null
+					}
 				</div>
 				:null
 			}
@@ -430,7 +415,7 @@ Peer.propTypes =
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
 	windowConsumer           : PropTypes.number,
-	streamDimensions         : PropTypes.object,
+	activeSpeaker            : PropTypes.bool,
 	style                    : PropTypes.object,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
@@ -455,7 +440,8 @@ const mapStateToProps = (state, { name }) =>
 		micConsumer,
 		webcamConsumer,
 		screenConsumer,
-		windowConsumer : state.room.windowConsumer
+		windowConsumer : state.room.windowConsumer,
+		activeSpeaker  : name === state.room.activeSpeakerName
 	};
 };
 

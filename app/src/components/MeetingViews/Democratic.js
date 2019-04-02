@@ -130,6 +130,8 @@ class Democratic extends React.PureComponent
 		const {
 			advancedMode,
 			amActiveSpeaker,
+			activeSpeakerName,
+			selectedPeerName,
 			peers,
 			spotlights,
 			spotlightsLength,
@@ -144,16 +146,10 @@ class Democratic extends React.PureComponent
 
 		return (
 			<div className={classes.root} ref={this.peersRef}>
-				<div
-					className={classnames(classes.peerContainer, {
-						'active-speaker' : amActiveSpeaker
-					})}
-				>
-					<Me
-						advancedMode={advancedMode}
-						style={style}
-					/>
-				</div>
+				<Me
+					advancedMode={advancedMode}
+					style={style}
+				/>
 				{ Object.keys(peers).map((peerName) =>
 				{
 					if (spotlights.find((spotlightsElement) => spotlightsElement === peerName))
