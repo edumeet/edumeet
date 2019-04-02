@@ -51,20 +51,20 @@ const styles = (theme) =>
 		}
 	});
 
-const modes = [ {
+/* const modes = [ {
 	value : 'democratic',
 	label : 'Democratic view'
 }, {
 	value : 'filmstrip',
 	label : 'Filmstrip view'
-} ];
+} ]; */
 
 const Settings = ({
 	roomClient,
 	room,
 	me,
 	onToggleAdvancedMode,
-	handleChangeMode,
+	// handleChangeMode,
 	handleCloseSettings,
 	classes
 }) =>
@@ -158,7 +158,7 @@ const Settings = ({
 				control={<Checkbox checked={room.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
 				label='Advanced mode'
 			/>
-			<form className={classes.setting} autoComplete='off'>
+			{ /* <form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
 					<Select
 						value={room.mode || ''}
@@ -178,7 +178,7 @@ const Settings = ({
 						Select room layout
 					</FormHelperText>
 				</FormControl>
-			</form>
+			</form> */ }
 			<DialogActions>
 				<Button onClick={() => handleCloseSettings({ settingsOpen: false })} color='primary'>
 					Close

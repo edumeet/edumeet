@@ -10,7 +10,8 @@ import HiddenPeers from '../Containers/HiddenPeers';
 import ResizeObserver from 'resize-observer-polyfill';
 
 const RATIO = 1.334;
-const PADDING = 60;
+const PADDING_V = 50;
+const PADDING_H = 20;
 
 const styles = () =>
 	({
@@ -24,8 +25,10 @@ const styles = () =>
 			justifyContent : 'center',
 			alignItems     : 'center',
 			alignContent   : 'center',
-			paddingTop     : 30,
-			paddingBottom  : 30
+			paddingTop     : 40,
+			paddingBottom  : 10,
+			paddingLeft    : 10,
+			paddingRight   : 10
 		},
 		peerContainer :
 		{
@@ -74,8 +77,8 @@ class Democratic extends React.PureComponent
 			return;
 		}
 
-		const width = this.peersRef.current.clientWidth;
-		const height = this.peersRef.current.clientHeight - PADDING;
+		const width = this.peersRef.current.clientWidth - PADDING_H;
+		const height = this.peersRef.current.clientHeight - PADDING_V;
 
 		let x, y, space;
 
