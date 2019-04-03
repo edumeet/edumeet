@@ -2,10 +2,15 @@ import { createSelector } from 'reselect';
 
 const producersSelect = (state) => state.producers;
 const consumersSelect = (state) => state.consumers;
-
-export const spotlightsSelector = (state) => state.room.spotlights;
-
+const spotlightsSelector = (state) => state.room.spotlights;
 const peersSelector = (state) => state.peers;
+const getPeerConsumers = (state, props) =>
+	(state.peers[props.name] ? state.peers[props.name].consumers : null);
+const getAllConsumers = (state) => state.consumers;
+const peersKeySelector = createSelector(
+	peersSelector,
+	(peers) => Object.keys(peers)
+);
 
 export const micProducersSelector = createSelector(
 	producersSelect,
@@ -54,23 +59,25 @@ export const screenConsumerSelector = createSelector(
 
 export const spotlightsLengthSelector = createSelector(
 	spotlightsSelector,
-	(spotlights) => (spotlights ? spotlights.length : 0)
+	(spotlights) => spotlights.length
 );
 
 export const spotlightPeersSelector = createSelector(
 	spotlightsSelector,
 	peersSelector,
-	(spotlights, peers) => spotlights.map((peerName) => peers[peerName])
+	(spotlights, peers) =>
+		spotlights.reduce((result, peerName) =>
+		{
+			if (peers[peerName])
+				result.push(peers[peerName]);
+
+			return result;
+		}, [])
 );
 
 export const peersLengthSelector = createSelector(
 	peersSelector,
 	(peers) => Object.values(peers).length
-);
-
-const peersKeySelector = createSelector(
-	peersSelector,
-	(peers) => Object.keys(peers)	
 );
 
 export const passivePeersSelector = createSelector(
@@ -100,10 +107,6 @@ export const meProducersSelector = createSelector(
 		};
 	}
 );
-
-const getPeerConsumers = (state, props) =>
-	(state.peers[props.name] ? state.peers[props.name].consumers : null);
-const getAllConsumers = (state) => state.consumers;
 
 export const makePeerConsumerSelector = () =>
 {

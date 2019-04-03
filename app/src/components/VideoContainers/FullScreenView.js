@@ -161,5 +161,16 @@ const mapDispatchToProps = (dispatch) =>
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.consumers[prev.room.fullScreenConsumer] ===
+					next.consumers[next.room.fullScreenConsumer] &&
+				prev.room.toolbarsVisible === next.room.toolbarsVisible
+			);
+		}
+	}
 )(withStyles(styles)(FullScreenView));

@@ -132,81 +132,6 @@ const styles = () =>
 				fontSize      : 11,
 				color         : 'rgba(255, 255, 255, 0.55)'
 			}
-		},
-		volume :
-		{
-			position       : 'absolute',
-			top            : 0,
-			bottom         : 0,
-			right          : 2,
-			width          : 10,
-			display        : 'flex',
-			flexDirection  : 'column',
-			justifyContent : 'center',
-			alignItems     : 'center'
-		},
-		volumeBar :
-		{
-			width              : 6,
-			borderRadius       : 6,
-			background         : 'rgba(yellow, 0.65)',
-			transitionProperty : 'height background-color',
-			transitionDuration : '0.25s',
-			'&.level0'         :
-			{
-				height          : 0,
-				backgroundColor : 'rgba(255, 255, 0, 0.65)'
-			},
-			'&.level1' :
-			{
-				height          : '10%',
-				backgroundColor : 'rgba(255, 255, 0, 0.65)'
-			},
-			'&.level2' :
-			{
-				height          : '20%',
-				backgroundColor : 'rgba(255, 255, 0, 0.65)'
-			},
-			'&.level3' :
-			{
-				height          : '30%',
-				backgroundColor : 'rgba(255, 255, 0, 0.65)'
-			},
-			'&.level4' :
-			{
-				height          : '40%',
-				backgroundColor : 'rgba(255, 165, 0, 0.65)'
-			},
-			'&.level5' :
-			{
-				height          : '50%',
-				backgroundColor : 'rgba(255, 165, 0, 0.65)'
-			},
-			'&.level6' :
-			{
-				height          : '60%',
-				backgroundColor : 'rgba(255, 0, 0, 0.65)'
-			},
-			'&.level7' :
-			{
-				height          : '70%',
-				backgroundColor : 'rgba(255, 0, 0, 0.65)'
-			},
-			'&.level8' :
-			{
-				height          : '80%',
-				backgroundColor : 'rgba(0, 0, 0, 0.65)'
-			},
-			'&.level9' :
-			{
-				height          : '90%',
-				backgroundColor : 'rgba(0, 0, 0, 0.65)'
-			},
-			'&.level10' :
-			{
-				height          : '100%',
-				backgroundColor : 'rgba(0, 0, 0, 0.65)'
-			}
 		}
 	});
 
@@ -218,14 +143,9 @@ class VideoView extends React.PureComponent
 
 		this.state =
 		{
-			volume      : 0, // Integer from 0 to 10.,
 			videoWidth  : null,
 			videoHeight : null
 		};
-
-		// Latest received video track.
-		// @type {MediaStreamTrack}
-		this._audioTrack = null;
 
 		// Latest received video track.
 		// @type {MediaStreamTrack}
@@ -240,7 +160,6 @@ class VideoView extends React.PureComponent
 		const {
 			isMe,
 			peer,
-			volume,
 			showPeerInfo,
 			videoContain,
 			advancedMode,
@@ -249,6 +168,7 @@ class VideoView extends React.PureComponent
 			audioCodec,
 			videoCodec,
 			onChangeDisplayName,
+			children,
 			classes
 		} = this.props;
 
@@ -331,18 +251,16 @@ class VideoView extends React.PureComponent
 					muted={isMe}
 				/>
 
-				<div className={classes.volume}>
-					<div className={classnames(classes.volumeBar, `level${volume}`)} />
-				</div>
+				{children}
 			</div>
 		);
 	}
 
 	componentDidMount()
 	{
-		const { audioTrack, videoTrack } = this.props;
+		const { videoTrack } = this.props;
 
-		this._setTracks(audioTrack, videoTrack);
+		this._setTracks(videoTrack);
 	}
 
 	componentWillUnmount()
@@ -352,18 +270,17 @@ class VideoView extends React.PureComponent
 
 	componentWillReceiveProps(nextProps)
 	{
-		const { audioTrack, videoTrack } = nextProps;
+		const { videoTrack } = nextProps;
 
-		this._setTracks(audioTrack, videoTrack);
+		this._setTracks(videoTrack);
 
 	}
 
-	_setTracks(audioTrack, videoTrack)
+	_setTracks(videoTrack)
 	{
-		if (this._audioTrack === audioTrack && this._videoTrack === videoTrack)
+		if (this._videoTrack === videoTrack)
 			return;
 
-		this._audioTrack = audioTrack;
 		this._videoTrack = videoTrack;
 
 		clearInterval(this._videoResolutionTimer);
@@ -371,12 +288,9 @@ class VideoView extends React.PureComponent
 
 		const { video } = this.refs;
 
-		if (audioTrack || videoTrack)
+		if (videoTrack)
 		{
 			const stream = new MediaStream();
-
-			if (audioTrack)
-				stream.addTrack(audioTrack);
 
 			if (videoTrack)
 				stream.addTrack(videoTrack);
@@ -425,14 +339,13 @@ VideoView.propTypes =
 	showPeerInfo        : PropTypes.bool,
 	videoContain        : PropTypes.bool,
 	advancedMode        : PropTypes.bool,
-	audioTrack          : PropTypes.any,
-	volume              : PropTypes.number,
 	videoTrack          : PropTypes.any,
 	videoVisible        : PropTypes.bool.isRequired,
 	videoProfile        : PropTypes.string,
 	audioCodec          : PropTypes.string,
 	videoCodec          : PropTypes.string,
 	onChangeDisplayName : PropTypes.func,
+	children            : PropTypes.object,
 	classes             : PropTypes.object.isRequired
 };
 

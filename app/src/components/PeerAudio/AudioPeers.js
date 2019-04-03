@@ -38,7 +38,17 @@ const mapStateToProps = (state) =>
 	});
 
 const AudioPeersContainer = connect(
-	mapStateToProps
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.consumers === next.consumers
+			);
+		}
+	}
 )(AudioPeers);
 
 export default AudioPeersContainer;

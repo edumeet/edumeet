@@ -14,6 +14,7 @@ import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import NewWindowIcon from '@material-ui/icons/OpenInNew';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
+import Volume from './Volume';
 
 const styles = (theme) =>
 	({
@@ -125,7 +126,6 @@ const Peer = (props) =>
 		micConsumer,
 		webcamConsumer,
 		screenConsumer,
-		volume,
 		toggleConsumerFullscreen,
 		toggleConsumerWindow,
 		style,
@@ -133,9 +133,6 @@ const Peer = (props) =>
 		classes,
 		theme
 	} = props;
-
-	if (!peer)
-		return;
 
 	const micEnabled = (
 		Boolean(micConsumer) &&
@@ -289,13 +286,14 @@ const Peer = (props) =>
 							advancedMode={advancedMode}
 							peer={peer}
 							showPeerInfo
-							volume={volume}
 							videoTrack={webcamConsumer ? webcamConsumer.track : null}
 							videoVisible={videoVisible}
 							videoProfile={videoProfile}
 							audioCodec={micConsumer ? micConsumer.codec : null}
 							videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-						/>
+						>
+							<Volume name={peer.name} />
+						</VideoView>
 					</div>
 					:null
 				}
@@ -419,7 +417,6 @@ Peer.propTypes =
 	micConsumer              : appPropTypes.Consumer,
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
-	volume                   : PropTypes.number,
 	windowConsumer           : PropTypes.number,
 	activeSpeaker            : PropTypes.bool,
 	style                    : PropTypes.object,
@@ -438,7 +435,6 @@ const makeMapStateToProps = (initialState, props) =>
 		return {
 			peer           : state.peers[props.name],
 			...getPeerConsumers(state, props),
-			volume         : state.peerVolumes[props.name],
 			windowConsumer : state.room.windowConsumer,
 			activeSpeaker  : props.name === state.room.activeSpeakerName
 		};
@@ -465,5 +461,17 @@ const mapDispatchToProps = (dispatch) =>
 
 export default withRoomContext(connect(
 	makeMapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.peers === next.peers &&
+				prev.consumers === next.consumers &&
+				prev.room.activeSpeakerName === next.room.activeSpeakerName &&
+				prev.room.windowConsumer === next.room.windowConsumer
+			);
+		}
+	}
 )(withStyles(styles, { withTheme: true })(Peer)));

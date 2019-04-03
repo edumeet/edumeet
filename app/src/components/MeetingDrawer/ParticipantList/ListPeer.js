@@ -82,42 +82,6 @@ const styles = () =>
 				backgroundImage : `url(${HandIcon})`
 			}
 		},
-		volumeContainer :
-		{
-			float          : 'right',
-			display        : 'flex',
-			flexDirection  : 'row',
-			justifyContent : 'flex-start',
-			width          : '1vmin',
-			position       : 'relative',
-			backgroundSize : '75%'
-		},
-		bar :
-		{
-			flex               : '0 0 auto',
-			margin             : '0.3rem',
-			backgroundSize     : '75%',
-			backgroundRepeat   : 'no-repeat',
-			backgroundColor    : 'rgba(0, 0, 0, 1)',
-			cursor             : 'pointer',
-			transitionProperty : 'opacity, background-color',
-			width              : 3,
-			borderRadius       : 6,
-			transitionDuration : '0.25s',
-			position           : 'absolute',
-			bottom             : 0,
-			'&.level0'         : { height: 0 },
-			'&.level1'         : { height: '0.2vh' },
-			'&.level2'         : { height: '0.4vh' },
-			'&.level3'         : { height: '0.6vh' },
-			'&.level4'         : { height: '0.8vh' },
-			'&.level5'         : { height: '1.0vh' },
-			'&.level6'         : { height: '1.2vh' },
-			'&.level7'         : { height: '1.4vh' },
-			'&.level8'         : { height: '1.6vh' },
-			'&.level9'         : { height: '1.8vh' },
-			'&.level10'        : { height: '2.0vh' }
-		},
 		controls :
 		{
 			float          : 'right',
@@ -169,12 +133,9 @@ const ListPeer = (props) =>
 		peer,
 		micConsumer,
 		screenConsumer,
-		volume,
+		children,
 		classes
 	} = props;
-
-	if (!peer)
-		return;
 
 	const micEnabled = (
 		Boolean(micConsumer) &&
@@ -211,9 +172,7 @@ const ListPeer = (props) =>
 					:null
 				}
 			</div>
-			<div className={classes.volumeContainer}>
-				<div className={classnames(classes.bar, `level${volume}`)} />
-			</div>
+			{children}
 			<div className={classes.controls}>
 				{ screenConsumer ?
 					<div
@@ -271,7 +230,7 @@ ListPeer.propTypes =
 	micConsumer    : appPropTypes.Consumer,
 	webcamConsumer : appPropTypes.Consumer,
 	screenConsumer : appPropTypes.Consumer,
-	volume         : PropTypes.number,
+	children       : PropTypes.object,
 	classes        : PropTypes.object.isRequired
 };
 
@@ -282,9 +241,8 @@ const makeMapStateToProps = (initialState, props) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer   : state.peers[props.name],
-			...getPeerConsumers(state, props),
-			volume : state.peerVolumes[props.name]
+			peer : state.peers[props.name],
+			...getPeerConsumers(state, props)
 		};
 	};
 
@@ -292,5 +250,16 @@ const makeMapStateToProps = (initialState, props) =>
 };
 
 export default withRoomContext(connect(
-	makeMapStateToProps
+	makeMapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.peers === next.peers &&
+				prev.consumers === next.consumers
+			);
+		}
+	}
 )(withStyles(styles)(ListPeer)));

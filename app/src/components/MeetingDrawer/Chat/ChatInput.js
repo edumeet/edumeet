@@ -127,5 +127,18 @@ const mapStateToProps = (state) =>
 	});
 
 export default withRoomContext(
-	connect(mapStateToProps)(withStyles(styles)(ChatInput))
+	connect(
+		mapStateToProps,
+		null,
+		null,
+		{
+			areStatesEqual : (next, prev) =>
+			{
+				return (
+					prev.me.displayName === next.me.displayName &&
+					prev.me.picture === next.me.picture
+				);
+			}
+		}
+	)(withStyles(styles)(ChatInput))
 );

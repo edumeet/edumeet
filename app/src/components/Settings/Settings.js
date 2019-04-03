@@ -215,5 +215,15 @@ const mapDispatchToProps = {
 
 export default withRoomContext(connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.me === next.me &&
+				prev.room === next.room
+			);
+		}
+	}
 )(withStyles(styles)(Settings)));

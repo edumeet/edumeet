@@ -81,5 +81,17 @@ const mapDispatchToProps = (dispatch) =>
 	});
 
 export default withSnackbar(
-	connect(mapStateToProps, mapDispatchToProps)(Notifications)
+	connect(
+		mapStateToProps,
+		mapDispatchToProps,
+		null,
+		{
+			areStatesEqual : (next, prev) =>
+			{
+				return (
+					prev.notifications === next.notifications
+				);
+			}
+		}
+	)(Notifications)
 );

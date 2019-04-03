@@ -119,5 +119,16 @@ const mapDispatchToProps = {
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.toolarea.currentToolTab === next.toolarea.currentToolTab &&
+				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
+				prev.toolarea.unreadFiles === next.toolarea.unreadFiles
+			);
+		}
+	}
 )(withStyles(styles, { withTheme: true })(MeetingDrawer));

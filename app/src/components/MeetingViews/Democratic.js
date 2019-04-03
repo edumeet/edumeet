@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
+	spotlightPeersSelector,
 	peersLengthSelector,
 	videoBoxesSelector,
 	spotlightsLengthSelector
@@ -117,7 +118,7 @@ class Democratic extends React.PureComponent
 		const {
 			advancedMode,
 			peersLength,
-			spotlights,
+			spotlightsPeers,
 			spotlightsLength,
 			classes
 		} = this.props;
@@ -134,13 +135,13 @@ class Democratic extends React.PureComponent
 					advancedMode={advancedMode}
 					style={style}
 				/>
-				{ spotlights.map((peerName) =>
+				{ spotlightsPeers.map((peer) =>
 				{
 					return (
 						<Peer
-							key={peerName}
+							key={peer.name}
 							advancedMode={advancedMode}
-							name={peerName}
+							name={peer.name}
 							style={style}
 						/>
 					);
@@ -162,7 +163,7 @@ Democratic.propTypes =
 	peersLength      : PropTypes.number,
 	boxes            : PropTypes.number,
 	spotlightsLength : PropTypes.number,
-	spotlights       : PropTypes.array.isRequired,
+	spotlightsPeers  : PropTypes.array.isRequired,
 	classes          : PropTypes.object.isRequired
 };
 
@@ -171,7 +172,7 @@ const mapStateToProps = (state) =>
 	return {
 		peersLength      : peersLengthSelector(state),
 		boxes            : videoBoxesSelector(state),
-		spotlights       : state.room.spotlights,
+		spotlightsPeers  : spotlightPeersSelector(state),
 		spotlightsLength : spotlightsLengthSelector(state)
 	};
 };
@@ -184,6 +185,7 @@ export default connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.consumers === next.consumers &&
 				prev.spotlights === next.spotlights

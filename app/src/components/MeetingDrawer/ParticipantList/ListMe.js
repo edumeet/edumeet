@@ -111,5 +111,15 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(
-	mapStateToProps
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.me === next.me
+			);
+		}
+	}
 )(withStyles(styles)(ListMe));

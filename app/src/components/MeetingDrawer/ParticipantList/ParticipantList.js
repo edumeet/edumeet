@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-	passivePeersSelector
+	passivePeersSelector,
+	spotlightPeersSelector
 } from '../../Selectors';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -9,6 +10,7 @@ import { withRoomContext } from '../../../RoomContext';
 import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
+import Volume from '../../Containers/Volume';
 
 const styles = (theme) =>
 	({
@@ -75,7 +77,7 @@ class ParticipantList extends React.PureComponent
 			advancedMode,
 			passivePeers,
 			selectedPeerName,
-			spotlights,
+			spotlightPeers,
 			classes
 		} = this.props;
 
@@ -88,15 +90,17 @@ class ParticipantList extends React.PureComponent
 				<br />
 				<ul className={classes.list}>
 					<li className={classes.listheader}>Participants in Spotlight:</li>
-					{ spotlights.map((peerName) => (
+					{ spotlightPeers.map((peer) => (
 						<li
-							key={peerName}
+							key={peer.name}
 							className={classNames(classes.listItem, {
-								selected : peerName === selectedPeerName
+								selected : peer.name === selectedPeerName
 							})}
-							onClick={() => roomClient.setSelectedPeer(peerName)}
+							onClick={() => roomClient.setSelectedPeer(peer.name)}
 						>
-							<ListPeer name={peerName} advancedMode={advancedMode} />
+							<ListPeer name={peer.name} advancedMode={advancedMode}>
+								<Volume small name={peer.name} />
+							</ListPeer>
 						</li>
 					))}
 				</ul>
@@ -126,16 +130,18 @@ ParticipantList.propTypes =
 	advancedMode     : PropTypes.bool,
 	passivePeers     : PropTypes.array,
 	selectedPeerName : PropTypes.string,
-	spotlights       : PropTypes.array.isRequired,
+	spotlightPeers   : PropTypes.array,
 	classes          : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
-	({
+{
+	return {
 		passivePeers     : passivePeersSelector(state),
 		selectedPeerName : state.room.selectedPeerName,
-		spotlights       : state.room.spotlights
-	});
+		spotlightPeers   : spotlightPeersSelector(state)
+	};
+};
 
 const ParticipantListContainer = withRoomContext(connect(
 	mapStateToProps,

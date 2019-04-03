@@ -66,7 +66,17 @@ const mapDispatchToProps = (dispatch) =>
 
 const VideoWindowContainer = connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.consumers[prev.room.windowConsumer] ===
+					next.consumers[next.room.windowConsumer]
+			);
+		}
+	}
 )(VideoWindow);
 
 export default VideoWindowContainer;

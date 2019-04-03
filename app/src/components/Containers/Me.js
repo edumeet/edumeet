@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import VideoView from '../VideoContainers/VideoView';
+import Volume from './Volume';
 
 const styles = () =>
 	({
@@ -55,7 +56,6 @@ const Me = (props) =>
 		micProducer,
 		webcamProducer,
 		screenProducer,
-		volume,
 		classes
 	} = props;
 
@@ -87,8 +87,6 @@ const Me = (props) =>
 						advancedMode={advancedMode}
 						peer={me}
 						showPeerInfo
-						audioTrack={micProducer ? micProducer.track : null}
-						volume={volume}
 						videoTrack={webcamProducer ? webcamProducer.track : null}
 						videoVisible={videoVisible}
 						audioCodec={micProducer ? micProducer.codec : null}
@@ -97,7 +95,9 @@ const Me = (props) =>
 						{
 							roomClient.changeDisplayName(displayName);
 						}}
-					/>
+					>
+						<Volume name={me.name} />
+					</VideoView>
 				</div>
 			</div>
 			{ screenProducer ?
@@ -128,7 +128,6 @@ Me.propTypes =
 	micProducer    : appPropTypes.Producer,
 	webcamProducer : appPropTypes.Producer,
 	screenProducer : appPropTypes.Producer,
-	volume         : PropTypes.number,
 	style          : PropTypes.object,
 	classes        : PropTypes.object.isRequired
 };
@@ -138,12 +137,22 @@ const mapStateToProps = (state) =>
 	return {
 		me            : state.me,
 		...meProducersSelector(state),
-		volume        : state.peerVolumes[state.me.name],
 		activeSpeaker : state.me.name === state.room.activeSpeakerName
 	};
 };
 
 export default withRoomContext(connect(
 	mapStateToProps,
-	null
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.me === next.me &&
+				prev.producers === next.producers &&
+				prev.room.activeSpeakerName === next.room.activeSpeakerName
+			);
+		}
+	}
 )(withStyles(styles)(Me)));
