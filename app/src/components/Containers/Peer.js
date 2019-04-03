@@ -125,6 +125,7 @@ const Peer = (props) =>
 		micConsumer,
 		webcamConsumer,
 		screenConsumer,
+		volume,
 		toggleConsumerFullscreen,
 		toggleConsumerWindow,
 		style,
@@ -132,6 +133,9 @@ const Peer = (props) =>
 		classes,
 		theme
 	} = props;
+
+	if (!peer)
+		return;
 
 	const micEnabled = (
 		Boolean(micConsumer) &&
@@ -285,7 +289,7 @@ const Peer = (props) =>
 							advancedMode={advancedMode}
 							peer={peer}
 							showPeerInfo
-							volume={micConsumer ? micConsumer.volume : null}
+							volume={volume}
 							videoTrack={webcamConsumer ? webcamConsumer.track : null}
 							videoVisible={videoVisible}
 							videoProfile={videoProfile}
@@ -411,10 +415,11 @@ Peer.propTypes =
 {
 	roomClient               : PropTypes.any.isRequired,
 	advancedMode             : PropTypes.bool,
-	peer                     : appPropTypes.Peer.isRequired,
+	peer                     : appPropTypes.Peer,
 	micConsumer              : appPropTypes.Consumer,
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
+	volume                   : PropTypes.number,
 	windowConsumer           : PropTypes.number,
 	activeSpeaker            : PropTypes.bool,
 	style                    : PropTypes.object,
@@ -424,15 +429,16 @@ Peer.propTypes =
 	theme                    : PropTypes.object.isRequired
 };
 
-const makeMapStateToProps = () =>
+const makeMapStateToProps = (initialState, props) =>
 {
 	const getPeerConsumers = makePeerConsumerSelector();
 
-	const mapStateToProps = (state, props) =>
+	const mapStateToProps = (state) =>
 	{
 		return {
 			peer           : state.peers[props.name],
 			...getPeerConsumers(state, props),
+			volume         : state.peerVolumes[props.name],
 			windowConsumer : state.room.windowConsumer,
 			activeSpeaker  : props.name === state.room.activeSpeakerName
 		};

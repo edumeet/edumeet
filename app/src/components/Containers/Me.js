@@ -55,6 +55,7 @@ const Me = (props) =>
 		micProducer,
 		webcamProducer,
 		screenProducer,
+		volume,
 		classes
 	} = props;
 
@@ -87,7 +88,7 @@ const Me = (props) =>
 						peer={me}
 						showPeerInfo
 						audioTrack={micProducer ? micProducer.track : null}
-						volume={micProducer ? micProducer.volume : null}
+						volume={volume}
 						videoTrack={webcamProducer ? webcamProducer.track : null}
 						videoVisible={videoVisible}
 						audioCodec={micProducer ? micProducer.codec : null}
@@ -121,13 +122,13 @@ const Me = (props) =>
 Me.propTypes =
 {
 	roomClient     : PropTypes.any.isRequired,
-	connected      : PropTypes.bool.isRequired,
 	advancedMode   : PropTypes.bool,
 	me             : appPropTypes.Me.isRequired,
 	activeSpeaker  : PropTypes.bool,
 	micProducer    : appPropTypes.Producer,
 	webcamProducer : appPropTypes.Producer,
 	screenProducer : appPropTypes.Producer,
+	volume         : PropTypes.number,
 	style          : PropTypes.object,
 	classes        : PropTypes.object.isRequired
 };
@@ -135,9 +136,9 @@ Me.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		connected     : state.room.state === 'connected',
 		me            : state.me,
 		...meProducersSelector(state),
+		volume        : state.peerVolumes[state.me.name],
 		activeSpeaker : state.me.name === state.room.activeSpeakerName
 	};
 };

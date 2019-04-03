@@ -433,5 +433,20 @@ const mapDispatchToProps = (dispatch) =>
 
 export default withRoomContext(connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.room === next.room &&
+				prev.me.loggedIn === next.me.loggedIn &&
+				prev.me.loginEnabled === next.me.loginEnabled &&
+				prev.me.picture === next.me.picture &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
+				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
+				prev.toolarea.unreadFiles === next.toolarea.unreadFiles
+			);
+		}
+	}
 )(withStyles(styles, { withTheme: true })(Room)));

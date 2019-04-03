@@ -169,8 +169,12 @@ const ListPeer = (props) =>
 		peer,
 		micConsumer,
 		screenConsumer,
+		volume,
 		classes
 	} = props;
+
+	if (!peer)
+		return;
 
 	const micEnabled = (
 		Boolean(micConsumer) &&
@@ -208,7 +212,7 @@ const ListPeer = (props) =>
 				}
 			</div>
 			<div className={classes.volumeContainer}>
-				<div className={classnames(classes.bar, `level${micEnabled && micConsumer ? micConsumer.volume:0}`)} />
+				<div className={classnames(classes.bar, `level${volume}`)} />
 			</div>
 			<div className={classes.controls}>
 				{ screenConsumer ?
@@ -267,18 +271,20 @@ ListPeer.propTypes =
 	micConsumer    : appPropTypes.Consumer,
 	webcamConsumer : appPropTypes.Consumer,
 	screenConsumer : appPropTypes.Consumer,
+	volume         : PropTypes.number,
 	classes        : PropTypes.object.isRequired
 };
 
-const makeMapStateToProps = () =>
+const makeMapStateToProps = (initialState, props) =>
 {
 	const getPeerConsumers = makePeerConsumerSelector();
 
-	const mapStateToProps = (state, props) =>
+	const mapStateToProps = (state) =>
 	{
 		return {
-			peer : state.peers[props.name],
-			...getPeerConsumers(state, props)
+			peer   : state.peers[props.name],
+			...getPeerConsumers(state, props),
+			volume : state.peerVolumes[props.name]
 		};
 	};
 

@@ -799,7 +799,7 @@ export default class RoomClient
 				if (volume !== this._micProducer.volume)
 				{
 					this._micProducer.volume = volume;
-					store.dispatch(stateActions.setProducerVolume(this._micProducer.id, volume));
+					store.dispatch(stateActions.setPeerVolume(this._peerName, volume));
 				}
 			});
 
@@ -1504,7 +1504,7 @@ export default class RoomClient
 				if (volume !== producer.volume)
 				{
 					producer.volume = volume;
-					store.dispatch(stateActions.setProducerVolume(producer.id, volume));
+					store.dispatch(stateActions.setPeerVolume(this._peerName, volume));
 				}
 			});
 
@@ -1937,7 +1937,7 @@ export default class RoomClient
 					if (volume !== consumer.volume)
 					{
 						consumer.volume = volume;
-						store.dispatch(stateActions.setConsumerVolume(consumer.id, volume));
+						store.dispatch(stateActions.setPeerVolume(consumer.peer.name, volume));
 					}
 				});
 			}

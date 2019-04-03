@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { meProducersSelector } from '../Selectors';
 import { withStyles } from '@material-ui/core/styles';
 import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
 import classnames from 'classnames';
@@ -8,7 +9,6 @@ import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import Fab from '@material-ui/core/Fab';
 import Tooltip from '@material-ui/core/Tooltip';
-// import Avatar from '@material-ui/core/Avatar';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideoIcon from '@material-ui/icons/Videocam';
@@ -18,8 +18,6 @@ import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 import ExtensionIcon from '@material-ui/icons/Extension';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
-// import HandOff from '../../images/icon-hand-black.svg';
-// import HandOn from '../../images/icon-hand-white.svg';
 import LeaveIcon from '@material-ui/icons/Cancel';
 
 const styles = (theme) =>
@@ -309,16 +307,24 @@ Sidebar.propTypes =
 const mapStateToProps = (state) =>
 	({
 		toolbarsVisible : state.room.toolbarsVisible,
-		micProducer     : Object.values(state.producers)
-			.find((producer) => producer.source === 'mic'),
-		webcamProducer : Object.values(state.producers)
-			.find((producer) => producer.source === 'webcam'),
-		screenProducer : Object.values(state.producers)
-			.find((producer) => producer.source === 'screen'),
-		me     : state.me,
-		locked : state.room.locked
+		...meProducersSelector(state),
+		me              : state.me,
+		locked          : state.room.locked
 	});
 
 export default withRoomContext(connect(
-	mapStateToProps
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.room.locked === next.room.locked &&
+				prev.producers === next.producers &&
+				prev.me === next.me
+			);
+		}
+	}
 )(withStyles(styles, { withTheme: true })(Sidebar)));

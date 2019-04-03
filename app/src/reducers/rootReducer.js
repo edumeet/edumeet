@@ -4,6 +4,7 @@ import me from './me';
 import producers from './producers';
 import peers from './peers';
 import consumers from './consumers';
+import peerVolumes from './peerVolumes';
 import notifications from './notifications';
 import chatmessages from './chatmessages';
 import toolarea from './toolarea';
@@ -15,6 +16,7 @@ export default combineReducers({
 	producers,
 	peers,
 	consumers,
+	peerVolumes,
 	notifications,
 	chatmessages,
 	toolarea,

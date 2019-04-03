@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-	peersSelector,
+	peersLengthSelector,
 	videoBoxesSelector,
-	spotlightsSelector,
 	spotlightsLengthSelector
 } from '../Selectors';
 import PropTypes from 'prop-types';
@@ -117,7 +116,7 @@ class Democratic extends React.PureComponent
 	{
 		const {
 			advancedMode,
-			peers,
+			peersLength,
 			spotlights,
 			spotlightsLength,
 			classes
@@ -135,27 +134,20 @@ class Democratic extends React.PureComponent
 					advancedMode={advancedMode}
 					style={style}
 				/>
-				{ Object.keys(peers).map((peerName) =>
+				{ spotlights.map((peerName) =>
 				{
-					if (spotlights.find((spotlightsElement) => spotlightsElement === peerName))
-					{
-						return (
-							<Peer
-								key={peerName}
-								advancedMode={advancedMode}
-								name={peerName}
-								style={style}
-							/>
-						);
-					}
-					else
-					{
-						return ('');
-					}
+					return (
+						<Peer
+							key={peerName}
+							advancedMode={advancedMode}
+							name={peerName}
+							style={style}
+						/>
+					);
 				})}
-				{ spotlightsLength < Object.keys(peers).length ?
+				{ spotlightsLength < peersLength ?
 					<HiddenPeers
-						hiddenPeersCount={Object.keys(peers).length - spotlightsLength}
+						hiddenPeersCount={peersLength - spotlightsLength}
 					/>
 					:null
 				}
@@ -167,7 +159,7 @@ class Democratic extends React.PureComponent
 Democratic.propTypes =
 {
 	advancedMode     : PropTypes.bool,
-	peers            : PropTypes.object.isRequired,
+	peersLength      : PropTypes.number,
 	boxes            : PropTypes.number,
 	spotlightsLength : PropTypes.number,
 	spotlights       : PropTypes.array.isRequired,
@@ -177,13 +169,25 @@ Democratic.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		peers            : peersSelector(state),
+		peersLength      : peersLengthSelector(state),
 		boxes            : videoBoxesSelector(state),
-		spotlights       : spotlightsSelector(state),
+		spotlights       : state.room.spotlights,
 		spotlightsLength : spotlightsLengthSelector(state)
 	};
 };
 
 export default connect(
-	mapStateToProps
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.producers === next.producers &&
+				prev.consumers === next.consumers &&
+				prev.spotlights === next.spotlights
+			);
+		}
+	}
 )(withStyles(styles)(Democratic));

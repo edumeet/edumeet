@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {
+	passivePeersSelector
+} from '../../Selectors';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import * as appPropTypes from '../../appPropTypes';
 import { withRoomContext } from '../../../RoomContext';
 import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
@@ -71,7 +73,7 @@ class ParticipantList extends React.PureComponent
 		const {
 			roomClient,
 			advancedMode,
-			peers,
+			passivePeers,
 			selectedPeerName,
 			spotlights,
 			classes
@@ -86,38 +88,30 @@ class ParticipantList extends React.PureComponent
 				<br />
 				<ul className={classes.list}>
 					<li className={classes.listheader}>Participants in Spotlight:</li>
-					{peers.filter((peer) =>
-					{
-						return (spotlights.find((spotlight) =>
-						{ return (spotlight === peer.name); }));
-					}).map((peer) => (
+					{ spotlights.map((peerName) => (
 						<li
-							key={peer.name}
+							key={peerName}
 							className={classNames(classes.listItem, {
-								selected : peer.name === selectedPeerName
+								selected : peerName === selectedPeerName
 							})}
-							onClick={() => roomClient.setSelectedPeer(peer.name)}
+							onClick={() => roomClient.setSelectedPeer(peerName)}
 						>
-							<ListPeer name={peer.name} advancedMode={advancedMode} />
+							<ListPeer name={peerName} advancedMode={advancedMode} />
 						</li>
 					))}
 				</ul>
 				<br />
 				<ul className={classes.list}>
 					<li className={classes.listheader}>Passive Participants:</li>
-					{peers.filter((peer) =>
-					{
-						return !(spotlights.find((spotlight) =>
-						{ return (spotlight === peer.name); }));
-					}).map((peer) => (
+					{ passivePeers.map((peerName) => (
 						<li
-							key={peer.name}
+							key={peerName}
 							className={classNames(classes.listItem, {
-								selected : peer.name === selectedPeerName
+								selected : peerName === selectedPeerName
 							})}
-							onClick={() => roomClient.setSelectedPeer(peer.name)}
+							onClick={() => roomClient.setSelectedPeer(peerName)}
 						>
-							<ListPeer name={peer.name} advancedMode={advancedMode} />
+							<ListPeer name={peerName} advancedMode={advancedMode} />
 						</li>
 					))}
 				</ul>
@@ -130,25 +124,33 @@ ParticipantList.propTypes =
 {
 	roomClient       : PropTypes.any.isRequired,
 	advancedMode     : PropTypes.bool,
-	peers            : PropTypes.arrayOf(appPropTypes.Peer).isRequired,
+	passivePeers     : PropTypes.array,
 	selectedPeerName : PropTypes.string,
 	spotlights       : PropTypes.array.isRequired,
 	classes          : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
-{
-	const peersArray = Object.values(state.peers);
-
-	return {
-		peers            : peersArray,
+	({
+		passivePeers     : passivePeersSelector(state),
 		selectedPeerName : state.room.selectedPeerName,
 		spotlights       : state.room.spotlights
-	};
-};
+	});
 
 const ParticipantListContainer = withRoomContext(connect(
-	mapStateToProps
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.peers === next.peers &&
+				prev.spotlights === next.spotlights &&
+				prev.room.selectedPeerName === next.room.selectedPeerName
+			);
+		}
+	}
 )(withStyles(styles)(ParticipantList)));
 
 export default ParticipantListContainer;

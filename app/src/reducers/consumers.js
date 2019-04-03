@@ -25,6 +25,7 @@ const consumers = (state = initialState, action) =>
 		{
 			const { consumerId, originator } = action.payload;
 			const consumer = state[consumerId];
+
 			let newConsumer;
 
 			if (originator === 'local')
@@ -35,19 +36,11 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
-		case 'SET_CONSUMER_VOLUME':
-		{
-			const { consumerId, volume } = action.payload;
-			const consumer = state[consumerId];
-			const newConsumer = { ...consumer, volume };
-
-			return { ...state, [consumerId]: newConsumer };
-		}
-
 		case 'SET_CONSUMER_RESUMED':
 		{
 			const { consumerId, originator } = action.payload;
 			const consumer = state[consumerId];
+
 			let newConsumer;
 
 			if (originator === 'local')

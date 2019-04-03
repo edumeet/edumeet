@@ -100,4 +100,17 @@ const mapStateToProps = (state) =>
 		myPicture    : state.me.picture
 	});
 
-export default connect(mapStateToProps, null)(withStyles(styles)(MessageList));
+export default connect(
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.chatmessages === next.chatmessages &&
+				prev.me.picture === next.me.picture
+			);
+		}
+	}
+)(withStyles(styles)(MessageList));
