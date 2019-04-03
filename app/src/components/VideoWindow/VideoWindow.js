@@ -4,7 +4,7 @@ import NewWindow from './NewWindow';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../appPropTypes';
 import * as stateActions from '../../actions/stateActions';
-import VideoView from '../VideoContainers/VideoView';
+import FullView from '../VideoContainers/FullView';
 
 const VideoWindow = (props) =>
 {
@@ -30,9 +30,8 @@ const VideoWindow = (props) =>
 
 	return (
 		<NewWindow onUnload={toggleConsumerWindow}>
-			<VideoView
+			<FullView
 				advancedMode={advancedMode}
-				videoContain
 				videoTrack={consumer ? consumer.track : null}
 				videoVisible={consumerVisible}
 				videoProfile={consumerProfile}
