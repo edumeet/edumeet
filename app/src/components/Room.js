@@ -315,7 +315,7 @@ class Room extends React.PureComponent
 								color='inherit'
 								noWrap
 							>
-								Multiparty meeting
+								{ window.config.title }
 							</Typography>
 							<div className={classes.grow} />
 							<div className={classes.actionButtons}>

@@ -22,6 +22,7 @@ var config =
 	background  : 'images/background.jpg',
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
+	title       : 'Multiparty meeting',
 	theme       :
 	{
 		palette :
