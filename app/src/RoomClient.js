@@ -36,6 +36,10 @@ const VIDEO_CONSTRAINS =
 
 let store;
 
+const AudioContext = window.AudioContext // Default
+	|| window.webkitAudioContext // Safari and old versions of Chrome
+	|| false;
+
 export default class RoomClient
 {
 	/**
@@ -143,8 +147,6 @@ export default class RoomClient
 		this._screenSharingProducer = null;
 
 		this._startKeyListener();
-
-		this._audioContext = null;
 
 		this.join();
 	}
