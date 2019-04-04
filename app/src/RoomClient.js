@@ -15,7 +15,8 @@ const {
 	turnServers,
 	requestTimeout,
 	transportOptions,
-	lastN
+	lastN,
+	mobileLastN
 } = window.config;
 
 const logger = new Logger('RoomClient');
@@ -24,8 +25,7 @@ let ROOM_OPTIONS =
 {
 	requestTimeout   : requestTimeout,
 	transportOptions : transportOptions,
-	turnServers      : turnServers,
-	maxSpotlights    : lastN
+	turnServers      : turnServers
 };
 
 const VIDEO_CONSTRAINS =
@@ -107,7 +107,10 @@ export default class RoomClient
 		});
 
 		// Max spotlights
-		this._maxSpotlights = ROOM_OPTIONS.maxSpotlights;
+		if (device.bowser.ios || device.bowser.mobile || device.bowser.android)
+			this._maxSpotlights = mobileLastN;
+		else
+			this._maxSpotlights = lastN;
 
 		// Manager of spotlight
 		this._spotlights = null;
