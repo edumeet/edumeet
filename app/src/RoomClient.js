@@ -999,7 +999,8 @@ export default class RoomClient
 		logger.debug('resumeAudio()');
 		try
 		{
-			await this._audioContext.resume();
+			if (AudioContext)
+				await this._audioContext.resume();
 
 			store.dispatch(
 				stateActions.setAudioSuspended({ audioSuspended: false }));
@@ -1508,12 +1509,15 @@ export default class RoomClient
 				}
 			});
 
-			this._audioContext = new AudioContext();
-
-			// We need to provoke user interaction to get permission from browser to start audio
-			if (this._audioContext.state === 'suspended')
+			if (AudioContext)
 			{
-				store.dispatch(stateActions.setAudioSuspended({ audioSuspended: true }));
+				this._audioContext = new AudioContext();
+
+				// We need to provoke user interaction to get permission from browser to start audio
+				if (this._audioContext.state === 'suspended')
+				{
+					store.dispatch(stateActions.setAudioSuspended({ audioSuspended: true }));
+				}
 			}
 		}
 		catch (error)
