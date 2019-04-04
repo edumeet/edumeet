@@ -17,11 +17,12 @@ var config =
 	{
 		tcp : true
 	},
-	lastN      : 4,
-	background : 'images/background.jpg',
+	lastN       : 4,
+	mobileLastN : 1,
+	background  : 'images/background.jpg',
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
-	theme      :
+	theme       :
 	{
 		palette :
 		{
