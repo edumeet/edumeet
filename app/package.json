@@ -14,7 +14,7 @@
 		"hark": "^1.2.3",
 		"js-cookie": "^2.2.0",
 		"marked": "^0.6.1",
-		"mediasoup-client": "^2.4.9",
+		"mediasoup-client": "^2.4.10",
 		"notistack": "^0.5.1",
 		"prop-types": "^15.7.2",
 		"random-string": "^0.2.0",
