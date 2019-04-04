@@ -797,7 +797,7 @@ export default class RoomClient
 
 				if (volume === 1)
 					volume = 0;
-
+				volume = Math.round(volume);
 				if (volume !== this._micProducer.volume)
 				{
 					this._micProducer.volume = volume;
@@ -1503,7 +1503,7 @@ export default class RoomClient
 
 				if (volume === 1)
 					volume = 0;
-
+				volume = Math.round(volume);
 				if (volume !== producer.volume)
 				{
 					producer.volume = volume;
@@ -1939,7 +1939,7 @@ export default class RoomClient
 
 					if (volume === 1)
 						volume = 0;
-
+					volume = Math.round(volume);
 					if (volume !== consumer.volume)
 					{
 						consumer.volume = volume;
