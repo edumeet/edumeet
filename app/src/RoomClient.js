@@ -551,7 +551,7 @@ export default class RoomClient
 			this.muteMic();
 	}
 
-	muteMic()
+	async muteMic()
 	{
 		logger.debug('muteMic()');
 
@@ -567,13 +567,18 @@ export default class RoomClient
 		}
 	}
 
-	unmuteMic()
+	async unmuteMic()
 	{
 		logger.debug('unmuteMic()');
 
 		try
 		{
-			this._micProducer.resume();
+			if (this._micProducer)
+				this._micProducer.resume();
+			else if (this._room.canSend('audio'))
+				await this._setMicProducer();
+			else
+				throw new Error('cannot send audio');
 		}
 		catch (error)
 		{
