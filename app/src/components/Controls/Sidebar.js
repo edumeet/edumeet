@@ -152,6 +152,7 @@ const Sidebar = (props) =>
 				<Fab
 					aria-label='Mute mic'
 					className={classes.fab}
+					disabled={!me.canSendMic || me.audioInProgress}
 					color={micState === 'on' ? 'default' : 'secondary'}
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
@@ -172,6 +173,7 @@ const Sidebar = (props) =>
 				<Fab
 					aria-label='Mute video'
 					className={classes.fab}
+					disabled={!me.canSendWebcam || me.webcamInProgress}
 					color={webcamState === 'on' ? 'default' : 'secondary'}
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>

@@ -107,7 +107,7 @@ const Settings = ({
 						name='Camera'
 						autoWidth
 						className={classes.selectEmpty}
-						disabled={webcams.length === 0}
+						disabled={webcams.length === 0 || me.webcamInProgress}
 					>
 						{ webcams.map((webcam, index) =>
 						{
@@ -138,7 +138,7 @@ const Settings = ({
 						name='Audio device'
 						autoWidth
 						className={classes.selectEmpty}
-						disabled={audioDevices.length === 0}
+						disabled={audioDevices.length === 0 || me.audioInProgress}
 					>
 						{ audioDevices.map((audio, index) =>
 						{
