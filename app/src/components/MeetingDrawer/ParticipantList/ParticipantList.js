@@ -152,7 +152,7 @@ const ParticipantListContainer = withRoomContext(connect(
 		{
 			return (
 				prev.peers === next.peers &&
-				prev.spotlights === next.spotlights &&
+				prev.room.spotlights === next.room.spotlights &&
 				prev.room.selectedPeerName === next.room.selectedPeerName
 			);
 		}
