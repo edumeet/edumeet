@@ -54,7 +54,6 @@ const styles = (theme) =>
 		viewContainer :
 		{
 			position   : 'relative',
-			flexGrow   : 1,
 			'&.webcam' :
 			{
 				order : 2
@@ -86,15 +85,16 @@ const styles = (theme) =>
 		},
 		videoInfo :
 		{
-			top            : 0,
-			bottom         : 0,
-			left           : 0,
-			right          : 0,
-			display        : 'flex',
-			flexDirection  : 'column',
-			justifyContent : 'center',
-			alignItems     : 'center',
-			'& p'          :
+			position        : 'absolute',
+			width           : '100%',
+			height          : '100%',
+			backgroundColor : 'rgba(0, 0, 0, 0.3)',
+			display         : 'flex',
+			justifyContent  : 'center',
+			alignItems      : 'center',
+			padding         : '0.4vmin',
+			zIndex          : 21,
+			'& p'           :
 			{
 				padding       : '6px 12px',
 				borderRadius  : 6,
@@ -195,22 +195,22 @@ const Peer = (props) =>
 					}, 2000);
 				}}
 			>
-				{ videoVisible && !webcamConsumer.supported ?
-					<div className={classes.videoInfo} style={style}>
-						<p>incompatible video</p>
-					</div>
-					:null
-				}
+				<div className={classnames(classes.viewContainer)} style={style}>
+					{ videoVisible && !webcamConsumer.supported ?
+						<div className={classes.videoInfo}>
+							<p>incompatible video</p>
+						</div>
+						:null
+					}
 
-				{ !videoVisible ?
-					<div className={classes.videoInfo} style={style}>
-						<p>this video is paused</p>
-					</div>
-					:null
-				}
+					{ !videoVisible ?
+						<div className={classes.videoInfo}>
+							<p>this video is paused</p>
+						</div>
+						:null
+					}
 
-				{ videoVisible && webcamConsumer.supported ?
-					<div className={classnames(classes.viewContainer)} style={style}>
+					{ videoVisible && webcamConsumer.supported ?
 						<div
 							className={classnames(classes.controls, webcamHover ? 'hover' : null)}
 							onMouseOver={() => setWebcamHover(true)}
@@ -281,22 +281,22 @@ const Peer = (props) =>
 								<FullScreenIcon />
 							</Fab>
 						</div>
+						:null
+					}
 
-						<VideoView
-							advancedMode={advancedMode}
-							peer={peer}
-							showPeerInfo
-							videoTrack={webcamConsumer ? webcamConsumer.track : null}
-							videoVisible={videoVisible}
-							videoProfile={videoProfile}
-							audioCodec={micConsumer ? micConsumer.codec : null}
-							videoCodec={webcamConsumer ? webcamConsumer.codec : null}
-						>
-							<Volume name={peer.name} />
-						</VideoView>
-					</div>
-					:null
-				}
+					<VideoView
+						advancedMode={advancedMode}
+						peer={peer}
+						showPeerInfo
+						videoTrack={webcamConsumer ? webcamConsumer.track : null}
+						videoVisible={videoVisible}
+						videoProfile={videoProfile}
+						audioCodec={micConsumer ? micConsumer.codec : null}
+						videoCodec={webcamConsumer ? webcamConsumer.codec : null}
+					>
+						<Volume name={peer.name} />
+					</VideoView>
+				</div>
 			</div>
 
 			{ screenConsumer ?

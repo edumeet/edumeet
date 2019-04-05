@@ -188,7 +188,7 @@ export default connect(
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.consumers === next.consumers &&
-				prev.spotlights === next.spotlights
+				prev.room.spotlights === next.room.spotlights
 			);
 		}
 	}

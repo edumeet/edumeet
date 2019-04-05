@@ -13,7 +13,6 @@ const styles = () =>
 	({
 		root :
 		{
-			display            : 'flex',
 			flexDirection      : 'row',
 			margin             : 6,
 			flex               : '0 0 auto',
@@ -32,8 +31,6 @@ const styles = () =>
 		viewContainer :
 		{
 			position   : 'relative',
-			width      : 'var(--me-width)',
-			height     : 'var(--me-height)',
 			'&.webcam' :
 			{
 				order : 2
