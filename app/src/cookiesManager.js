@@ -1,7 +1,10 @@
 import jsCookie from 'js-cookie';
 
 const USER_COOKIE = 'multiparty-meeting.user';
-const DEVICES_COOKIE = 'multiparty-meeting.devices';
+const VIDEO_COOKIE = 'multiparty-meeting.videoEnabled';
+
+const AUDIO_DEVICE = 'multiparty-meeting.audioDevice';
+const VIDEO_DEVICE = 'multiparty-meeting.videoDevice';
 
 export function getUser()
 {
@@ -13,22 +16,32 @@ export function setUser({ displayName })
 	jsCookie.set(USER_COOKIE, { displayName });
 }
 
-export function getDevices()
+export function getVideoEnabled()
 {
-	return jsCookie.getJSON(DEVICES_COOKIE);
+	return jsCookie.getJSON(VIDEO_COOKIE);
 }
 
-export function setDevices({ webcamEnabled })
+export function setVideoEnabled({ webcamEnabled })
 {
-	jsCookie.set(DEVICES_COOKIE, { webcamEnabled });
+	jsCookie.set(VIDEO_COOKIE, { webcamEnabled });
+}
+
+export function getAudioDevice()
+{
+	return jsCookie.getJSON(AUDIO_DEVICE);
 }
 
 export function setAudioDevice({ audioDeviceId })
 {
-	jsCookie.set(DEVICES_COOKIE, { audioDeviceId });
+	jsCookie.set(AUDIO_DEVICE, { audioDeviceId });
+}
+
+export function getVideoDevice()
+{
+	return jsCookie.getJSON(VIDEO_DEVICE);
 }
 
 export function setVideoDevice({ videoDeviceId })
 {
-	jsCookie.set(DEVICES_COOKIE, { videoDeviceId });
+	jsCookie.set(VIDEO_DEVICE, { videoDeviceId });
 }

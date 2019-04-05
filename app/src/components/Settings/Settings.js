@@ -72,14 +72,14 @@ const Settings = ({
 	let webcams;
 
 	if (me.webcamDevices)
-		webcams = Array.from(me.webcamDevices.values());
+		webcams = Object.values(me.webcamDevices);
 	else
 		webcams = [];
 
 	let audioDevices;
 
 	if (me.audioDevices)
-		audioDevices = Array.from(me.audioDevices.values());
+		audioDevices = Object.values(me.audioDevices);
 	else
 		audioDevices = [];
 
@@ -106,9 +106,8 @@ const Settings = ({
 						name='Camera'
 						autoWidth
 						className={classes.selectEmpty}
-						// disabled={!me.canChangeWebcam}
+						disabled={webcams.length === 0}
 					>
-						<MenuItem value='' />
 						{ webcams.map((webcam, index) =>
 						{
 							return (
@@ -117,7 +116,11 @@ const Settings = ({
 						})}
 					</Select>
 					<FormHelperText>
-						Select camera device
+						{ webcams.length > 0 ?
+							'Select video device'
+							:
+							'Unable to select video device'
+						}
 					</FormHelperText>
 				</FormControl>
 			</form>
@@ -134,9 +137,8 @@ const Settings = ({
 						name='Audio device'
 						autoWidth
 						className={classes.selectEmpty}
-						disabled={!me.canChangeAudioDevice}
+						disabled={audioDevices.length === 0}
 					>
-						<MenuItem value='' />
 						{ audioDevices.map((audio, index) =>
 						{
 							return (
@@ -145,7 +147,7 @@ const Settings = ({
 						})}
 					</Select>
 					<FormHelperText>
-						{ me.canChangeAudioDevice ?
+						{ audioDevices.length > 0 ?
 							'Select audio device'
 							:
 							'Unable to select audio device'
