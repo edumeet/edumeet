@@ -87,8 +87,10 @@ export default class RoomClient
 		// Alert sound
 		this._soundAlert = new Audio('/sounds/notify.mp3');
 
-		// AudioContext
-		this._audioContext= null;
+		if (AudioContext)
+		{
+			this._audioContext = new AudioContext();
+		}
 
 		// Socket.io peer connection
 		this._signalingSocket = null;
@@ -562,14 +564,32 @@ export default class RoomClient
 	{
 		logger.debug('muteMic()');
 
-		this._micProducer.pause();
+		try
+		{
+			this._micProducer.pause();
+		}
+		catch (error)
+		{
+			logger.error('muteMic() | failed: %o', error);
+
+			this.notify('An error occured while accessing your microphone.');
+		}
 	}
 
 	unmuteMic()
 	{
 		logger.debug('unmuteMic()');
 
-		this._micProducer.resume();
+		try
+		{
+			this._micProducer.resume();
+		}
+		catch (error)
+		{
+			logger.error('unmuteMic() | failed: %o', error);
+
+			this.notify('An error occured while accessing your microphone.');
+		}
 	}
 
 	// Updated consumers based on spotlights
@@ -989,8 +1009,7 @@ export default class RoomClient
 		logger.debug('resumeAudio()');
 		try
 		{
-			if (AudioContext)
-				await this._audioContext.resume();
+			await this._audioContext.resume();
 
 			store.dispatch(
 				stateActions.setAudioSuspended({ audioSuspended: false }));
@@ -998,6 +1017,8 @@ export default class RoomClient
 		}
 		catch (error)
 		{
+			store.dispatch(
+				stateActions.setAudioSuspended({ audioSuspended: true }));
 			logger.error('resumeAudioJoin() failed: %o', error);
 		}
 	}
@@ -1518,14 +1539,12 @@ export default class RoomClient
 				}
 			});
 
-			if (AudioContext)
+			if (this._audioContext)
 			{
-				this._audioContext = new AudioContext();
-
 				// We need to provoke user interaction to get permission from browser to start audio
 				if (this._audioContext.state === 'suspended')
 				{
-					store.dispatch(stateActions.setAudioSuspended({ audioSuspended: true }));
+					this.resumeAudio();
 				}
 			}
 		}
