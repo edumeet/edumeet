@@ -81,14 +81,6 @@ export const setScreenCapabilities = ({	canShareScreen, needExtension }) =>
 	};
 };
 
-export const setCanChangeAudioDevice = (flag) =>
-{
-	return {
-		type    : 'SET_CAN_CHANGE_AUDIO_DEVICE',
-		payload : flag
-	};
-};
-
 export const setAudioDevices = (devices) =>
 {
 	return {
@@ -102,6 +94,22 @@ export const setWebcamDevices = (devices) =>
 	return {
 		type    : 'SET_WEBCAM_DEVICES',
 		payload : { devices }
+	};
+};
+
+export const setSelectedAudioDevice = (deviceId) =>
+{
+	return {
+		type    : 'CHANGE_AUDIO_DEVICE',
+		payload : { deviceId }
+	};
+};
+
+export const setSelectedWebcamDevice = (deviceId) =>
+{
+	return {
+		type    : 'CHANGE_WEBCAM',
+		payload : { deviceId }
 	};
 };
 
