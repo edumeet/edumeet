@@ -9,7 +9,6 @@ import Logger from './Logger';
 import debug from 'debug';
 import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
-import * as cookiesManager from './cookiesManager';
 import * as stateActions from './actions/stateActions';
 import Room from './components/Room';
 import LoadingView from './components/LoadingView';
@@ -51,8 +50,6 @@ function run()
 	let roomId = (urlParser.pathname).substr(1)
 		? (urlParser.pathname).substr(1).toLowerCase() : urlParser.query.roomId.toLowerCase();
 	const produce = urlParser.query.produce !== 'false';
-
-	let displayName = urlParser.query.displayName;
 	const useSimulcast = urlParser.query.simulcast === 'true';
 
 	if (!roomId)
@@ -82,24 +79,6 @@ function run()
 
 	const roomUrl = roomUrlParser.toString();
 
-	// Get displayName from cookie (if not already given as param).
-	const userCookie = cookiesManager.getUser() || {};
-
-	let displayNameSet;
-
-	if (!displayName)
-		displayName = userCookie.displayName;
-
-	if (displayName)
-	{
-		displayNameSet = true;
-	}
-	else
-	{
-		displayName = 'Guest';
-		displayNameSet = false;
-	}
-
 	// Get current device.
 	const device = getDeviceInfo();
 
@@ -109,15 +88,13 @@ function run()
 	store.dispatch(
 		stateActions.setMe({
 			peerName,
-			displayName,
-			displayNameSet,
 			device,
 			loginEnabled : window.config.loginEnabled
 		})
 	);
 
 	roomClient = new RoomClient(
-		{ roomId, peerName, displayName, device, useSimulcast, produce });
+		{ roomId, peerName, device, useSimulcast, produce });
 
 	global.CLIENT = roomClient;
 

@@ -122,8 +122,8 @@ ChatInput.propTypes =
 
 const mapStateToProps = (state) =>
 	({
-		displayName : state.me.displayName,
-		picture     : state.me.picture
+		displayName : state.settings.displayName,
+		picture     : state.settings.picture
 	});
 
 export default withRoomContext(
@@ -135,8 +135,8 @@ export default withRoomContext(
 			areStatesEqual : (next, prev) =>
 			{
 				return (
-					prev.me.displayName === next.me.displayName &&
-					prev.me.picture === next.me.picture
+					prev.settings.displayName === next.settings.displayName &&
+					prev.settings.picture === next.settings.picture
 				);
 			}
 		}

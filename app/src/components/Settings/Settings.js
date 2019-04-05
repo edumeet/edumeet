@@ -63,6 +63,7 @@ const Settings = ({
 	roomClient,
 	room,
 	me,
+	settings,
 	onToggleAdvancedMode,
 	// handleChangeMode,
 	handleCloseSettings,
@@ -96,7 +97,7 @@ const Settings = ({
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
 					<Select
-						value={me.selectedWebcam || ''}
+						value={settings.selectedWebcam || ''}
 						onChange={(event) =>
 						{
 							if (event.target.value)
@@ -127,7 +128,7 @@ const Settings = ({
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
 					<Select
-						value={me.selectedAudioDevice || ''}
+						value={settings.selectedAudioDevice || ''}
 						onChange={(event) =>
 						{
 							if (event.target.value)
@@ -157,7 +158,7 @@ const Settings = ({
 			</form>
 			<FormControlLabel
 				className={classes.setting}
-				control={<Checkbox checked={room.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
+				control={<Checkbox checked={settings.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
 				label='Advanced mode'
 			/>
 			{ /* <form className={classes.setting} autoComplete='off'>
@@ -195,6 +196,7 @@ Settings.propTypes =
 	roomClient           : PropTypes.any.isRequired,
 	me                   : appPropTypes.Me.isRequired,
 	room                 : appPropTypes.Room.isRequired,
+	settings             : PropTypes.object.isRequired,
 	onToggleAdvancedMode : PropTypes.func.isRequired,
 	handleChangeMode     : PropTypes.func.isRequired,
 	handleCloseSettings  : PropTypes.func.isRequired,
@@ -204,8 +206,9 @@ Settings.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		me   : state.me,
-		room : state.room
+		me       : state.me,
+		room     : state.room,
+		settings : state.settings
 	};
 };
 
@@ -224,7 +227,8 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.me === next.me &&
-				prev.room === next.room
+				prev.room === next.room &&
+				prev.settings === next.settings
 			);
 		}
 	}

@@ -160,6 +160,7 @@ class VideoView extends React.PureComponent
 		const {
 			isMe,
 			peer,
+			displayName,
 			showPeerInfo,
 			videoContain,
 			advancedMode,
@@ -206,8 +207,8 @@ class VideoView extends React.PureComponent
 						<div className={classes.peer}>
 							{ isMe ?
 								<EditableInput
-									value={peer.displayName}
-									propName='displayName'
+									value={displayName}
+									propName='newDisplayName'
 									className={classnames(classes.displayNameEdit, 'display-name')}
 									classLoading='loading'
 									classInvalid='invalid'
@@ -217,11 +218,11 @@ class VideoView extends React.PureComponent
 										autoCorrect : false,
 										spellCheck  : false
 									}}
-									onChange={({ displayName }) => onChangeDisplayName(displayName)}
+									onChange={({ newDisplayName }) => onChangeDisplayName(newDisplayName)}
 								/>
 								:
 								<span className={classes.displayNameStatic}>
-									{peer.displayName}
+									{displayName}
 								</span>
 							}
 
@@ -336,6 +337,7 @@ VideoView.propTypes =
 	isMe : PropTypes.bool,
 	peer : PropTypes.oneOfType(
 		[ appPropTypes.Me, appPropTypes.Peer ]),
+	displayName         : PropTypes.string,
 	showPeerInfo        : PropTypes.bool,
 	videoContain        : PropTypes.bool,
 	advancedMode        : PropTypes.bool,

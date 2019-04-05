@@ -57,11 +57,11 @@ export const setSettingsOpen = ({ settingsOpen }) =>
 		payload : { settingsOpen }
 	});
 
-export const setMe = ({ peerName, displayName, displayNameSet, device, loginEnabled }) =>
+export const setMe = ({ peerName, device, loginEnabled }) =>
 {
 	return {
 		type    : 'SET_ME',
-		payload : { peerName, displayName, displayNameSet, device, loginEnabled }
+		payload : { peerName, device, loginEnabled }
 	};
 };
 
@@ -141,22 +141,6 @@ export const setDisplayMode = (mode) =>
 		type    : 'SET_DISPLAY_MODE',
 		payload : { mode }
 	});
-
-export const setAudioOnlyState = (enabled) =>
-{
-	return {
-		type    : 'SET_AUDIO_ONLY_STATE',
-		payload : { enabled }
-	};
-};
-
-export const setAudioOnlyInProgress = (flag) =>
-{
-	return {
-		type    : 'SET_AUDIO_ONLY_IN_PROGRESS',
-		payload : { flag }
-	};
-};
 
 export const setPeerVideoInProgress = (peerName, flag) =>
 {
@@ -239,14 +223,6 @@ export const setPeerRaiseHandState = (peerName, raiseHandState) =>
 	return {
 		type    : 'SET_PEER_RAISE_HAND_STATE',
 		payload : { peerName, raiseHandState }
-	};
-};
-
-export const setRestartIceInProgress = (flag) =>
-{
-	return {
-		type    : 'SET_RESTART_ICE_IN_PROGRESS',
-		payload : { flag }
 	};
 };
 

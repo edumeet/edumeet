@@ -1,8 +1,6 @@
 const initialState =
 {
 	name                  : null,
-	displayName           : null,
-	displayNameSet        : false,
 	device                : null,
 	canSendMic            : false,
 	canSendWebcam         : false,
@@ -14,14 +12,8 @@ const initialState =
 	audioInProgress       : false,
 	screenShareInProgress : false,
 	loginEnabled          : false,
-	audioOnly             : false,
-	audioOnlyInProgress   : false,
 	raiseHand             : false,
 	raiseHandInProgress   : false,
-	restartIceInProgress  : false,
-	picture               : null,
-	selectedWebcam        : null,
-	selectedAudioDevice   : null,
 	loggedIn              : false
 };
 
@@ -33,8 +25,6 @@ const me = (state = initialState, action) =>
 		{
 			const {
 				peerName,
-				displayName,
-				displayNameSet,
 				device,
 				loginEnabled
 			} = action.payload;
@@ -42,8 +32,6 @@ const me = (state = initialState, action) =>
 			return {
 				...state,
 				name : peerName,
-				displayName,
-				displayNameSet,
 				device,
 				loginEnabled
 			};
@@ -54,16 +42,6 @@ const me = (state = initialState, action) =>
 
 		case 'USER_LOGOUT':
 			return { ...state, loggedIn: false };
-
-		case 'CHANGE_WEBCAM':
-		{
-			return { ...state, selectedWebcam: action.payload.deviceId };
-		}
-
-		case 'CHANGE_AUDIO_DEVICE':
-		{
-			return { ...state, selectedAudioDevice: action.payload.deviceId };
-		}
 
 		case 'SET_MEDIA_CAPABILITIES':
 		{
@@ -114,31 +92,6 @@ const me = (state = initialState, action) =>
 			return { ...state, screenShareInProgress: flag };
 		}
 
-		case 'SET_DISPLAY_NAME':
-		{
-			let { displayName } = action.payload;
-
-			// Be ready for undefined displayName (so keep previous one).
-			if (!displayName)
-				displayName = state.displayName;
-
-			return { ...state, displayName, displayNameSet: true };
-		}
-
-		case 'SET_AUDIO_ONLY_STATE':
-		{
-			const { enabled } = action.payload;
-
-			return { ...state, audioOnly: enabled };
-		}
-
-		case 'SET_AUDIO_ONLY_IN_PROGRESS':
-		{
-			const { flag } = action.payload;
-
-			return { ...state, audioOnlyInProgress: flag };
-		}
-
 		case 'SET_MY_RAISE_HAND_STATE':
 		{
 			const { flag } = action.payload;
@@ -151,18 +104,6 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, raiseHandInProgress: flag };
-		}
-
-		case 'SET_RESTART_ICE_IN_PROGRESS':
-		{
-			const { flag } = action.payload;
-
-			return { ...state, restartIceInProgress: flag };
-		}
-
-		case 'SET_PICTURE':
-		{
-			return { ...state, picture: action.payload.picture };
 		}
 
 		default:

@@ -8,7 +8,6 @@ import hark from 'hark';
 import ScreenShare from './ScreenShare';
 import Spotlights from './Spotlights';
 import { getSignalingUrl } from './urlFactory';
-import * as cookiesManager from './cookiesManager';
 import * as requestActions from './actions/requestActions';
 import * as stateActions from './actions/stateActions';
 const {
@@ -52,11 +51,11 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ roomId, peerName, displayName, device, useSimulcast, produce })
+		{ roomId, peerName, device, useSimulcast, produce })
 	{
 		logger.debug(
-			'constructor() [roomId:"%s", peerName:"%s", displayName:"%s", device:%s]',
-			roomId, peerName, displayName, device.flag);
+			'constructor() [roomId:"%s", peerName:"%s", device:%s]',
+			roomId, peerName, device.flag);
 
 		this._signalingUrl = getSignalingUrl(peerName, roomId);
 
@@ -80,9 +79,6 @@ export default class RoomClient
 
 		// My peer name.
 		this._peerName = peerName;
-
-		// My display name
-		this._displayName = displayName;
 
 		// Alert sound
 		this._soundAlert = new Audio('/sounds/notify.mp3');
@@ -140,8 +136,6 @@ export default class RoomClient
 		this._screenSharingProducer = null;
 
 		this._startKeyListener();
-
-		this.join();
 	}
 
 	close()
@@ -309,9 +303,6 @@ export default class RoomClient
 	{
 		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
 
-		// Store in cookie.
-		cookiesManager.setUser({ displayName });
-
 		try
 		{
 			await this.sendRequest('change-display-name', { displayName });
@@ -450,7 +441,7 @@ export default class RoomClient
 
 			if (existingTorrent)
 			{
-				const { displayName, picture } = store.getState().me;
+				const { displayName, picture } = store.getState().settings;
 
 				const file = {
 					magnetUri : existingTorrent.magnetURI,
@@ -467,7 +458,7 @@ export default class RoomClient
 					'Torrent successfully created'
 				);
 
-				const { displayName, picture } = store.getState().me;
+				const { displayName, picture } = store.getState().settings;
 				const file = {
 					magnetUri : newTorrent.magnetURI,
 					displayName,
@@ -698,9 +689,6 @@ export default class RoomClient
 	{
 		logger.debug('enableWebcam()');
 
-		// Store in cookie.
-		cookiesManager.setVideoEnabled({ webcamEnabled: true });
-
 		store.dispatch(stateActions.setWebcamInProgress(true));
 
 		try
@@ -736,9 +724,6 @@ export default class RoomClient
 	async disableWebcam()
 	{
 		logger.debug('disableWebcam()');
-
-		// Store in cookie.
-		cookiesManager.setVideoEnabled({ webcamEnabled: false });
 
 		store.dispatch(stateActions.setWebcamInProgress(true));
 
@@ -820,8 +805,6 @@ export default class RoomClient
 				stateActions.setProducerTrack(this._micProducer.id, newTrack));
 
 			store.dispatch(stateActions.setSelectedAudioDevice(deviceId));
-			
-			cookiesManager.setAudioDevice({ audioDeviceId: deviceId });
 
 			await this._updateAudioDevices();
 		}
@@ -873,8 +856,6 @@ export default class RoomClient
 				stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
 
 			store.dispatch(stateActions.setSelectedWebcamDevice(deviceId));
-
-			cookiesManager.setVideoDevice({ videoDeviceId: deviceId });
 
 			await this._updateWebcams();
 		}
@@ -978,30 +959,6 @@ export default class RoomClient
 
 		store.dispatch(
 			stateActions.setMyRaiseHandStateInProgress(false));
-	}
-
-	async restartIce()
-	{
-		logger.debug('restartIce()');
-
-		store.dispatch(
-			stateActions.setRestartIceInProgress(true));
-
-		try
-		{
-			await this._room.restartIce();
-		}
-		catch (error)
-		{
-			logger.error('restartIce() failed: %o', error);
-		}
-
-		// Make it artificially longer.
-		setTimeout(() =>
-		{
-			store.dispatch(
-				stateActions.setRestartIceInProgress(false));
-		}, 500);
 	}
 
 	async resumeAudio()
@@ -1287,10 +1244,12 @@ export default class RoomClient
 
 		try
 		{
+			const { displayName } = store.getState().settings;
+
 			await this._room.join(
 				this._peerName,
 				{
-					displayName : this._displayName,
+					displayName : displayName,
 					device      : this._device
 				}
 			);
@@ -1336,14 +1295,8 @@ export default class RoomClient
 				if (this._room.canSend('audio'))
 					await this._setMicProducer();
 
-				// Add our webcam (unless the cookie says no).
 				if (this._room.canSend('video'))
-				{
-					const devicesCookie = cookiesManager.getVideoEnabled();
-
-					if (!devicesCookie || devicesCookie.webcamEnabled)
-						await this.enableWebcam();
-				}
+					await this.enableWebcam();
 			}
 
 			store.dispatch(stateActions.setRoomState('connected'));
@@ -1472,8 +1425,6 @@ export default class RoomClient
 				}));
 
 			store.dispatch(stateActions.setSelectedAudioDevice(deviceId));
-			
-			cookiesManager.setAudioDevice({ audioDeviceId: deviceId });
 
 			await this._updateAudioDevices();
 
@@ -1732,8 +1683,6 @@ export default class RoomClient
 
 			store.dispatch(stateActions.setSelectedWebcamDevice(deviceId));
 
-			cookiesManager.setVideoDevice({ videoDeviceId: deviceId });
-
 			await this._updateWebcams();
 
 			producer.on('close', (originator) =>
@@ -1856,16 +1805,10 @@ export default class RoomClient
 
 			await this._updateAudioDevices();
 
-			const devicesCookie = cookiesManager.getAudioDevice();
+			const { selectedAudioDevice } = store.getState().settings;
 
-			if (
-				devicesCookie &&
-				devicesCookie.audioDeviceId &&
-				this._audioDevices[devicesCookie.audioDeviceId]
-			)
-			{
-				return this._audioDevices[devicesCookie.audioDeviceId].deviceId;
-			}
+			if (selectedAudioDevice && this._audioDevices[selectedAudioDevice])
+				return selectedAudioDevice;
 			else
 			{
 				const audioDevices = Object.values(this._audioDevices);
@@ -1889,16 +1832,10 @@ export default class RoomClient
 
 			await this._updateWebcams();
 
-			const devicesCookie = cookiesManager.getVideoDevice();
+			const { selectedWebcam } = store.getState().settings;
 
-			if (
-				devicesCookie &&
-				devicesCookie.videoDeviceId &&
-				this._webcams[devicesCookie.videoDeviceId]
-			)
-			{
-				return this._webcams[devicesCookie.videoDeviceId].deviceId;
-			}
+			if (selectedWebcam && this._webcams[selectedWebcam])
+				return selectedWebcam;
 			else
 			{
 				const webcams = Object.values(this._webcams);

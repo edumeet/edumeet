@@ -15,7 +15,7 @@ const persistConfig =
 	key             : 'root',
 	storage         : storage,
 	stateReconciler : autoMergeLevel2,
-	whitelist       : []
+	whitelist       : [ 'settings' ]
 };
 
 const reduxMiddlewares =

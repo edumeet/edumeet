@@ -287,6 +287,7 @@ const Peer = (props) =>
 					<VideoView
 						advancedMode={advancedMode}
 						peer={peer}
+						displayName={peer.displayName}
 						showPeerInfo
 						videoTrack={webcamConsumer ? webcamConsumer.track : null}
 						videoVisible={videoVisible}

@@ -8,7 +8,6 @@ const initialState =
 	activeSpeakerName  : null,
 	torrentSupport     : false,
 	showSettings       : false,
-	advancedMode       : false,
 	fullScreenConsumer : null, // ConsumerID
 	windowConsumer     : null, // ConsumerID
 	toolbarsVisible    : true,
@@ -87,13 +86,6 @@ const room = (state = initialState, action) =>
 			const showSettings = !state.showSettings;
 
 			return { ...state, showSettings };
-		}
-
-		case 'TOGGLE_ADVANCED_MODE':
-		{
-			const advancedMode = !state.advancedMode;
-
-			return { ...state, advancedMode };
 		}
 
 		case 'TOGGLE_FULLSCREEN_CONSUMER':

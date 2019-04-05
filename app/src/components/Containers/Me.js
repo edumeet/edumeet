@@ -47,6 +47,7 @@ const Me = (props) =>
 	const {
 		roomClient,
 		me,
+		settings,
 		activeSpeaker,
 		style,
 		advancedMode,
@@ -83,6 +84,7 @@ const Me = (props) =>
 						isMe
 						advancedMode={advancedMode}
 						peer={me}
+						displayName={settings.displayName}
 						showPeerInfo
 						videoTrack={webcamProducer ? webcamProducer.track : null}
 						videoVisible={videoVisible}
@@ -121,6 +123,7 @@ Me.propTypes =
 	roomClient     : PropTypes.any.isRequired,
 	advancedMode   : PropTypes.bool,
 	me             : appPropTypes.Me.isRequired,
+	settings       : PropTypes.object,
 	activeSpeaker  : PropTypes.bool,
 	micProducer    : appPropTypes.Producer,
 	webcamProducer : appPropTypes.Producer,
@@ -134,6 +137,7 @@ const mapStateToProps = (state) =>
 	return {
 		me            : state.me,
 		...meProducersSelector(state),
+		settings      : state.settings,
 		activeSpeaker : state.me.name === state.room.activeSpeakerName
 	};
 };
@@ -148,6 +152,7 @@ export default withRoomContext(connect(
 			return (
 				prev.me === next.me &&
 				prev.producers === next.producers &&
+				prev.settings === next.settings &&
 				prev.room.activeSpeakerName === next.room.activeSpeakerName
 			);
 		}

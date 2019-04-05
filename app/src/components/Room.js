@@ -176,6 +176,10 @@ class Room extends React.PureComponent
 
 	componentDidMount()
 	{
+		const { roomClient } = this.props;
+
+		roomClient.join();
+
 		if (this.fullscreen.fullscreenEnabled)
 		{
 			this.fullscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
@@ -220,6 +224,7 @@ class Room extends React.PureComponent
 		const {
 			roomClient,
 			room,
+			advancedMode,
 			myPicture,
 			loggedIn,
 			loginEnabled,
@@ -277,9 +282,9 @@ class Room extends React.PureComponent
 						This website uses cookies to enhance the user experience.
 					</CookieConsent>
 
-					<FullScreenView advancedMode={room.advancedMode} />
+					<FullScreenView advancedMode={advancedMode} />
 
-					<VideoWindow advancedMode={room.advancedMode} />
+					<VideoWindow advancedMode={advancedMode} />
 
 					<AudioPeers />
 
@@ -377,7 +382,7 @@ class Room extends React.PureComponent
 						</Hidden>
 					</nav>
 
-					<View advancedMode={room.advancedMode} />
+					<View advancedMode={advancedMode} />
 
 					<Sidebar />
 
@@ -392,6 +397,7 @@ Room.propTypes =
 {
 	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
+	advancedMode       : PropTypes.bool.isRequired,
 	myPicture          : PropTypes.string,
 	loggedIn           : PropTypes.bool.isRequired,
 	loginEnabled       : PropTypes.bool.isRequired,
@@ -407,6 +413,7 @@ Room.propTypes =
 const mapStateToProps = (state) =>
 	({
 		room         : state.room,
+		advancedMode : state.settings.advancedMode,
 		loggedIn     : state.me.loggedIn,
 		loginEnabled : state.me.loginEnabled,
 		myPicture    : state.me.picture,
@@ -445,7 +452,8 @@ export default withRoomContext(connect(
 				prev.me.picture === next.me.picture &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
-				prev.toolarea.unreadFiles === next.toolarea.unreadFiles
+				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
+				prev.settings.advancedMode === next.settings.advancedMode
 			);
 		}
 	}

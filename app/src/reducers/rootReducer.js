@@ -9,6 +9,7 @@ import notifications from './notifications';
 import chatmessages from './chatmessages';
 import toolarea from './toolarea';
 import files from './files';
+import settings from './settings';
 
 export default combineReducers({
 	room,
@@ -20,5 +21,6 @@ export default combineReducers({
 	notifications,
 	chatmessages,
 	toolarea,
-	files
+	files,
+	settings
 });

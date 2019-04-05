@@ -75,10 +75,11 @@ const ListMe = (props) =>
 {
 	const {
 		me,
+		settings,
 		classes
 	} = props;
 
-	const picture = me.picture || EmptyAvatar;
+	const picture = settings.picture || EmptyAvatar;
 
 	return (
 		<li className={classes.root}>
@@ -86,7 +87,7 @@ const ListMe = (props) =>
 				<img alt='My avatar' className={classes.avatar} src={picture} />
 
 				<div className={classes.peerInfo}>
-					{me.displayName}
+					{settings.displayName}
 				</div>
 
 				<div className={classes.indicators}>
@@ -102,12 +103,14 @@ const ListMe = (props) =>
 
 ListMe.propTypes =
 {
-	me      : appPropTypes.Me.isRequired,
-	classes : PropTypes.object.isRequired
+	me       : appPropTypes.Me.isRequired,
+	settings : PropTypes.object.isRequired,
+	classes  : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => ({
-	me : state.me
+	me       : state.me,
+	settings : state.settings
 });
 
 export default connect(
@@ -118,7 +121,8 @@ export default connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.me === next.me
+				prev.me === next.me &&
+				prev.settings === next.settings
 			);
 		}
 	}
