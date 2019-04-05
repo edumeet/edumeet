@@ -136,6 +136,8 @@ export default class RoomClient
 		this._screenSharingProducer = null;
 
 		this._startKeyListener();
+
+		this._startDevicesListener();
 	}
 
 	close()
@@ -208,6 +210,19 @@ export default class RoomClient
 					}
 				}
 			}
+		});
+	}
+
+	_startDevicesListener()
+	{
+		navigator.mediaDevices.addEventListener('devicechange', async () =>
+		{
+			logger.debug('_startDevicesListener() | navigator.mediaDevices.ondevicechange');
+
+			await this._updateAudioDevices();
+			await this._updateWebcams();
+
+			this.notify('Your devices changed, configure your devices in the settings dialog.');
 		});
 	}
 
