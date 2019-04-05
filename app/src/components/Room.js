@@ -416,7 +416,7 @@ const mapStateToProps = (state) =>
 		advancedMode : state.settings.advancedMode,
 		loggedIn     : state.me.loggedIn,
 		loginEnabled : state.me.loginEnabled,
-		myPicture    : state.me.picture,
+		myPicture    : state.settings.picture,
 		toolAreaOpen : state.toolarea.toolAreaOpen,
 		unread       : state.toolarea.unreadMessages +
 			state.toolarea.unreadFiles
@@ -449,7 +449,7 @@ export default withRoomContext(connect(
 				prev.room === next.room &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
-				prev.me.picture === next.me.picture &&
+				prev.settings.picture === next.settings.picture &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
