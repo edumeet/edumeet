@@ -1,6 +1,6 @@
 # multiparty-meeting
 
-A WebRTC meeting service using [mediasoup](https://mediasoup.org) as its backend.
+A WebRTC meeting service using [mediasoup](https://mediasoup.org).
 
 Try it online at https://letsmeet.no. You can add /roomname to the URL for specifying a room.
 
@@ -11,7 +11,12 @@ Try it online at https://letsmeet.no. You can add /roomname to the URL for speci
 * File sharing
 * Different video layouts
 
-## Installation
+There is also a SIP gateway that can be found [here](https://github.com/havfo/multiparty-meeting-sipgw). To try it, call: roomname@letsmeet.no.
+
+## Docker
+If you want the automatic approach, you can find a docker image [here](https://hub.docker.com/r/misi/mm/).
+
+## Manual installation
 
 * Clone the project:
 
@@ -26,10 +31,10 @@ $ cd multiparty-meeting
 $ cp server/config.example.js server/config.js
 ```
 
-* Copy `app/config.example.js` to `app/config.js` :
+* Copy `app/public/config.example.js` to `app/public/config.js` :
 
 ```bash
-$ cp app/config.example.js app/config.js
+$ cp app/public/config.example.js app/public/config.js
 ```
 
 * Edit your two `config.js` with appropriate settings (listening IP/port, logging options, **valid** TLS certificate, etc).
@@ -39,16 +44,9 @@ $ cp app/config.example.js app/config.js
 ```bash
 $ cd app
 $ npm install
-$ export NODE_ENV=production
-$ gulp dist
+$ npm run build
 ```
-This will build the client application and copy everythink to `server/public` from where the server can host client code to browser requests. (no apache/NGINX needed)
-
-* Globally install `gulp-cli` NPM module (may need `sudo`):
-
-```bash
-$ npm install -g gulp-cli
-```
+This will build the client application and copy everythink to `server/public` from where the server can host client code to browser requests.
 
 * Set up the server:
 
@@ -63,7 +61,8 @@ $ npm install
 * Run the Node.js server application in a terminal:
 
 ```bash
-$ node server.js
+$ cd server
+$ npm start
 ```
 * test your service in a webRTC enabled browser: `https://yourDomainOrIPAdress:3443/roomname`
 
@@ -90,29 +89,24 @@ $ systemctl enable multiparty-meeting
 ## Ports and firewall
 
 * 3443/tcp (default https webserver and signaling - adjustable in `server/config.js`)
-* 3000/tcp (default `gulp live` port for developing with live browser reload, not needed in production enviroments - adjustable in app/gulpfile.js)
+* 4443/tcp (default `npm start` port for developing with live browser reload, not needed in production enviroments - adjustable in app/package.json)
 * 40000-49999/udp/tcp (media ports - adjustable in `server/config.js`)
-
-* If you want your service running at standard ports 80/443 you should:
-  * Configure a forwarding rule with iptables from port 443 to your configured service port (default 3443)
-
 
 ## TURN configuration
 
 * You need an addtional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `app/config.js`
 
-## Author
+## Authors
 
 * Håvar Aambø Fosstveit
 * Stefan Otto
 * Mészáros Mihály
 
 
-This is heavily based on the [work](https://github.com/versatica/mediasoup-demo) done by:
+This started as a fork of the [work](https://github.com/versatica/mediasoup-demo) done by:
 * Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
 
 
 ## License
 
 MIT
-

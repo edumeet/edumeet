@@ -4,13 +4,12 @@
 
 process.title = 'multiparty-meeting-server';
 
-const config = require('./config');
+const config = require('./config/config');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
 const express = require('express');
 const compression = require('compression');
-const url = require('url');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const Dataporten = require('passport-dataporten');
@@ -46,18 +45,18 @@ const dataporten = new Dataporten.Setup(config.oauth2);
 
 app.all('*', (req, res, next) =>
 {
-	if(req.secure)
+	if (req.secure)
 	{
 		return next();
 	}
 
-	res.redirect('https://' + req.hostname + req.url);
+	res.redirect(`https://${req.hostname}${req.url}`);
 });
 
 app.use(dataporten.passport.initialize());
 app.use(dataporten.passport.session());
 
-app.get('/login', (req, res, next) => 
+app.get('/login', (req, res, next) =>
 {
 	dataporten.passport.authenticate('dataporten', {
 		state : base64.encode(JSON.stringify({
@@ -65,11 +64,16 @@ app.get('/login', (req, res, next) =>
 			peerName : req.query.peerName,
 			code     : utils.random(10)
 		}))
-		
+
 	})(req, res, next);
 });
 
 dataporten.setupLogout(app, '/logout');
+
+app.get('/', (req, res) =>
+{
+	res.sendFile(`${__dirname}/public/chooseRoom.html`);
+});
 
 app.get(
 	'/auth-callback',
@@ -174,7 +178,6 @@ io.on('connection', (socket) =>
 		room = rooms.get(roomId);
 	}
 
-	socket.join(roomId);
 	socket.room = roomId;
 
 	room.handleConnection(peerName, socket);
