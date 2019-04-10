@@ -14,6 +14,9 @@ const initialState =
 	mode               : 'democratic',
 	selectedPeerName   : null,
 	spotlights         : [],
+	socket         				: null,
+	screenState        : false,
+	inviteShow         : false,
 	settingsOpen       : false
 };
 
@@ -136,6 +139,19 @@ const room = (state = initialState, action) =>
 			return { ...state, spotlights };
 		}
 
+		case 'SET_SOCKET':
+		{
+			const { socket } = action.payload;
+
+			return { ...state, socket };
+		}
+
+		case 'SET_INVITE_STATE':
+		{
+			const { inviteShow } = action.payload;
+
+			return { ...state, inviteShow };
+		}
 		default:
 			return state;
 	}

@@ -83,7 +83,7 @@ class ParticipantList extends React.PureComponent
 
 		return (
 			<div className={classes.root} ref={(node) => { this.node = node; }}>
-				<ul className={classes.list}>
+				{/* <ul className={classes.list}>
 					<li className={classes.listheader}>Me:</li>
 					<ListMe />
 				</ul>
@@ -104,7 +104,7 @@ class ParticipantList extends React.PureComponent
 						</li>
 					))}
 				</ul>
-				<br />
+				<br /> */}
 				<ul className={classes.list}>
 					<li className={classes.listheader}>Passive Participants:</li>
 					{ passivePeers.map((peerName) => (

@@ -72,7 +72,7 @@ dataporten.setupLogout(app, '/logout');
 
 app.get('/', (req, res) =>
 {
-	res.sendFile(`${__dirname}/public/chooseRoom.html`);
+	res.sendFile(`${__dirname}/public/index.html`);
 });
 
 app.get(

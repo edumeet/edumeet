@@ -146,12 +146,12 @@ class Democratic extends React.PureComponent
 						/>
 					);
 				})}
-				{ spotlightsLength < peersLength ?
+				{/* { spotlightsLength < peersLength ?
 					<HiddenPeers
 						hiddenPeersCount={peersLength - spotlightsLength}
 					/>
 					:null
-				}
+				} */}
 			</div>
 		);
 	}

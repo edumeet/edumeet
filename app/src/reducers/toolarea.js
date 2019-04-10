@@ -1,7 +1,7 @@
 const initialState =
 {
 	toolAreaOpen   : false,
-	currentToolTab : 'chat', // chat, settings, users
+	currentToolTab : 'users', // chat, settings, users
 	unreadMessages : 0,
 	unreadFiles    : 0
 };

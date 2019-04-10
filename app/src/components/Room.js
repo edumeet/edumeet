@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -33,7 +34,8 @@ import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Settings from './Settings/Settings';
-
+import Timer from './Timer';
+import intl from 'react-intl-universal';
 const TIMEOUT = 10 * 1000;
 
 const styles = (theme) =>
@@ -72,6 +74,8 @@ const styles = (theme) =>
 		{
 			display                      : 'none',
 			marginLeft                   : 20,
+			width                        : '24px',
+			height                       : '24px',
 			[theme.breakpoints.up('sm')] :
 			{
 				display : 'block'
@@ -120,6 +124,10 @@ const styles = (theme) =>
 			{
 				display : 'block'
 			}
+		},
+		time :
+		{
+			marginLeft : '20px'
 		},
 		actionButtons :
 		{
@@ -185,8 +193,8 @@ class Room extends React.PureComponent
 			this.fullscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
 		}
 
-		window.addEventListener('mousemove', this.handleMovement);
-		window.addEventListener('touchstart', this.handleMovement);
+		// window.addEventListener('mousemove', this.handleMovement);
+		// window.addEventListener('touchstart', this.handleMovement);
 	}
 
 	componentWillUnmount()
@@ -196,8 +204,8 @@ class Room extends React.PureComponent
 			this.fullscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
 		}
 
-		window.removeEventListener('mousemove', this.handleMovement);
-		window.removeEventListener('touchstart', this.handleMovement);
+		// window.removeEventListener('mousemove', this.handleMovement);
+		// window.removeEventListener('touchstart', this.handleMovement);
 	}
 
 	handleToggleFullscreen = () =>
@@ -224,6 +232,7 @@ class Room extends React.PureComponent
 		const {
 			roomClient,
 			room,
+			me,
 			advancedMode,
 			myPicture,
 			loggedIn,
@@ -241,6 +250,10 @@ class Room extends React.PureComponent
 			filmstrip  : Filmstrip,
 			democratic : Democratic
 		}[room.mode];
+
+		const title = me.extend.title || intl.get('app_title');
+		const startTime = me.extend.startTime || new Date().getTime();
+		const memberCount = room.spotlights.length + 1;
 
 		if (room.audioSuspended)
 		{
@@ -278,11 +291,11 @@ class Room extends React.PureComponent
 		{
 			return (
 				<div className={classes.root}>
-					<CookieConsent>
+					{/* <CookieConsent>
 						This website uses cookies to enhance the user experience.
-					</CookieConsent>
+					</CookieConsent> */}
 
-					<FullScreenView advancedMode={advancedMode} />
+					{/* <FullScreenView advancedMode={advancedMode} /> */}
 
 					<VideoWindow advancedMode={advancedMode} />
 
@@ -320,11 +333,12 @@ class Room extends React.PureComponent
 								color='inherit'
 								noWrap
 							>
-								{ window.config.title }
+								{`${title} (${memberCount})`}
 							</Typography>
+							<Timer className={classes.time} startTime={startTime} />
 							<div className={classes.grow} />
 							<div className={classes.actionButtons}>
-								{ this.fullscreen.fullscreenEnabled ?
+								{/* { this.fullscreen.fullscreenEnabled ?
 									<IconButton
 										aria-label='Fullscreen'
 										color='inherit'
@@ -337,7 +351,7 @@ class Room extends React.PureComponent
 										}
 									</IconButton>
 									:null
-								}
+								} */}
 								<IconButton
 									aria-label='Settings'
 									color='inherit'
@@ -397,6 +411,7 @@ Room.propTypes =
 {
 	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
+	me                 : appPropTypes.Me.isRequired,
 	advancedMode       : PropTypes.bool.isRequired,
 	myPicture          : PropTypes.string,
 	loggedIn           : PropTypes.bool.isRequired,
@@ -413,9 +428,11 @@ Room.propTypes =
 const mapStateToProps = (state) =>
 	({
 		room         : state.room,
+		me           : state.me,
 		advancedMode : state.settings.advancedMode,
 		loggedIn     : state.me.loggedIn,
 		loginEnabled : state.me.loginEnabled,
+
 		myPicture    : state.settings.picture,
 		toolAreaOpen : state.toolarea.toolAreaOpen,
 		unread       : state.toolarea.unreadMessages +
@@ -447,6 +464,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room === next.room &&
+				prev.me === next.me &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.settings.picture === next.settings.picture &&

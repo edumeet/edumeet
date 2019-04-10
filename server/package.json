@@ -6,6 +6,9 @@
   "author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
   "license": "MIT",
   "main": "lib/index.js",
+  "scripts": {
+    "debug": "export DEBUG='*' && node server"
+  },
   "dependencies": {
     "base-64": "^0.1.0",
     "colors": "^1.1.2",

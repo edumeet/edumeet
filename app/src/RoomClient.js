@@ -6,10 +6,14 @@ import saveAs from 'file-saver';
 import Logger from './Logger';
 import hark from 'hark';
 import ScreenShare from './ScreenShare';
+import DoodExtend from './DoodExtend';
 import Spotlights from './Spotlights';
 import { getSignalingUrl } from './urlFactory';
 import * as requestActions from './actions/requestActions';
 import * as stateActions from './actions/stateActions';
+import intl from 'react-intl-universal';
+import { log } from './utils';
+
 const {
 	turnServers,
 	requestTimeout,
@@ -51,14 +55,15 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ roomId, peerName, device, useSimulcast, produce })
+		{ roomId, peerName, device, useSimulcast, produce, extend })
 	{
 		logger.debug(
 			'constructor() [roomId:"%s", peerName:"%s", device:%s]',
 			roomId, peerName, device.flag);
 
-		this._signalingUrl = getSignalingUrl(peerName, roomId);
+		this._signalingUrl = getSignalingUrl(peerName, roomId, extend);
 
+		this._extends = extend;
 		// window element to external login site
 		this._loginWindow = null;
 
@@ -132,6 +137,8 @@ export default class RoomClient
 		this._audioDevices = {};
 
 		this._screenSharing = ScreenShare.create(device);
+
+		this._doodExtend = DoodExtend.create(device);
 
 		this._screenSharingProducer = null;
 
@@ -759,6 +766,22 @@ export default class RoomClient
 		store.dispatch(stateActions.setWebcamInProgress(false));
 	}
 
+	async enableScreenRecord()
+	{
+		log('zxj::enableScreenRecord(2)', this._room.peers);
+		store.dispatch(stateActions.setRecordState(1));
+		this._doodExtend.startRecording({
+			producer : this._micProducer,
+			peers    : this._room.peers
+		});
+	}
+	async disableScreenRecord(isCancel = false)
+	{
+		log('zxj::disableScreenRecord(2)');
+		store.dispatch(stateActions.setRecordState(0));
+		this._doodExtend.stopRecording({ isCancel });
+	}
+
 	async changeAudioDevice(deviceId)
 	{
 		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
@@ -1326,7 +1349,7 @@ export default class RoomClient
 
 			this.getServerHistory();
 
-			this.notify('You have joined the room.');
+			this.notify(intl.get('tip_join_room_me')); // ('You have joined the room.');
 
 			this._spotlights.on('spotlights-updated', (spotlights) =>
 			{

@@ -61,7 +61,7 @@ const MeetingDrawer = (props) =>
 				color='default'
 				className={classes.appBar}
 			>
-				<Tabs
+				{/* <Tabs
 					className={classes.tabsHeader}
 					value={tabs.indexOf(currentToolTab)}
 					onChange={(event, value) => setToolTab(tabs[value])}
@@ -84,7 +84,8 @@ const MeetingDrawer = (props) =>
 						}
 					/>
 					<Tab label='Participants' />
-				</Tabs>
+				</Tabs> */}
+				<Tab label='Participants' />
 				<IconButton onClick={closeDrawer}>
 					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 				</IconButton>

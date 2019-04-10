@@ -255,14 +255,14 @@ class Filmstrip extends React.PureComponent
 						})}
 					</div>
 				</div>
-				<div className={classes.hiddenPeers}>
+				{/* <div className={classes.hiddenPeers}>
 					{ spotlightsLength<Object.keys(peers).length ?
 						<HiddenPeers
 							hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
 						/>
 						:null
 					}
-				</div>
+				</div> */}
 
 			</div>
 		);

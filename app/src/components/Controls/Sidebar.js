@@ -13,13 +13,16 @@ import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
+import RecordStart from '@material-ui/icons/VideoCall';
+import RecordStop from '@material-ui/icons/Stop';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
 import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 import ExtensionIcon from '@material-ui/icons/Extension';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import LeaveIcon from '@material-ui/icons/Cancel';
-
+import intl from 'react-intl-universal';
+import { log } from './../../utils';
 const styles = (theme) =>
 	({
 		root :
@@ -115,6 +118,23 @@ const Sidebar = (props) =>
 		webcamTip = 'Start video';
 	}
 
+	let recordState;
+
+	let recordTip;
+
+	log('zxj:: sidebar>>', me);
+
+	if (me.recordState === 0)
+	{
+		recordTip = intl.get('screen_record_start');
+		recordState = 'off';
+	}
+	else if (me.recordState === 1)
+	{
+		recordTip = intl.get('screen_record_stop');
+		recordState = 'on';
+	}
+
 	let screenState;
 
 	let screenTip;
@@ -187,6 +207,27 @@ const Sidebar = (props) =>
 						<VideoIcon />
 						:
 						<VideoOffIcon />
+					}
+				</Fab>
+			</Tooltip>
+			<Tooltip title={recordTip} placement={smallScreen ? 'top' : 'right'}>
+				<Fab
+					aria-label='Record screen'
+					className={classes.fab}
+					disabled={me.recordState === -1}
+					color={recordState === 'on' ? 'primary' : 'default'}
+					size={smallScreen ? 'large' : 'medium'}
+					onClick={() =>
+					{
+						recordState === 'on' ?
+							roomClient.disableScreenRecord() :
+							roomClient.enableScreenRecord();
+					}}
+				>
+					{ recordState === 'on' ?
+						<RecordStop />
+						:
+						<RecordStart />
 					}
 				</Fab>
 			</Tooltip>

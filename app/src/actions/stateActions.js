@@ -6,6 +6,68 @@ export const setRoomUrl = (url) =>
 	};
 };
 
+export const setSocket = (socket) =>
+{
+	return {
+		type    : 'SET_SOCKET',
+		payload : { socket }
+	};
+};
+
+export const setInviteState = (inviteShow) =>
+{
+	return {
+		type    : 'SET_INVITE_STATE',
+		payload : { inviteShow }
+	};
+};
+
+export const toggleScreenState = () =>
+{
+	return {
+		type : 'TOGGLE_TOOL_SCREEN'
+	};
+};
+
+export const setRecordState = (recordState) =>
+{
+	return {
+		type    : 'SET_RECORD_STATE',
+		payload : { recordState }
+	};
+};
+
+export const setScreenList = (screens) =>
+{
+	return {
+		type    : 'SET_SCREEN',
+		payload : { screens }
+	};
+};
+
+export const setMemberList = (members) =>
+{
+	return {
+		type    : 'SET_MEMBERS',
+		payload : { members }
+	};
+};
+
+export const setMemberIdList = (memberIds) =>
+{
+	return {
+		type    : 'SET_MEMBERS_ID',
+		payload : { memberIds }
+	};
+};
+
+export const toggleToolState = () =>
+{
+	return {
+		type : 'TOGGLE_TOOL_STATE'
+	};
+};
+
 export const setRoomState = (state) =>
 {
 	return {
@@ -57,11 +119,11 @@ export const setSettingsOpen = ({ settingsOpen }) =>
 		payload : { settingsOpen }
 	});
 
-export const setMe = ({ peerName, device, loginEnabled }) =>
+export const setMe = ({ peerName, device, loginEnabled, extend }) =>
 {
 	return {
 		type    : 'SET_ME',
-		payload : { peerName, device, loginEnabled }
+		payload : { peerName, device, loginEnabled, extend }
 	};
 };
 

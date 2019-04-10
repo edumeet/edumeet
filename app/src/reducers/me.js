@@ -14,7 +14,13 @@ const initialState =
 	loginEnabled          : false,
 	raiseHand             : false,
 	raiseHandInProgress   : false,
-	loggedIn              : false
+	loggedIn              : false,
+	screens               : null,
+	members               : [],
+	memberIds             : [],
+	recordState        			: 0, // 0 关闭 1打开 -1 不支持
+	extend           					: null
+
 };
 
 const me = (state = initialState, action) =>
@@ -26,14 +32,16 @@ const me = (state = initialState, action) =>
 			const {
 				peerName,
 				device,
-				loginEnabled
+				loginEnabled,
+				extend
 			} = action.payload;
 
 			return {
 				...state,
 				name : peerName,
 				device,
-				loginEnabled
+				loginEnabled,
+				extend
 			};
 		}
 
@@ -104,6 +112,32 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, raiseHandInProgress: flag };
+		}
+
+		case 'SET_RECORD_STATE':
+		{
+			return { ...state, recordState: action.payload.recordState };
+		}
+
+		case 'SET_SCREEN':
+		{
+			const { screens } = action.payload;
+
+			return { ...state, screens };
+		}
+
+		case 'SET_MEMBERS':
+		{
+			const { members } = action.payload;
+
+			return { ...state, members };
+		}
+
+		case 'SET_MEMBERS_ID':
+		{
+			const { memberIds } = action.payload;
+
+			return { ...state, memberIds };
 		}
 
 		default:

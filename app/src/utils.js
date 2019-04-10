@@ -17,3 +17,9 @@ export const idle = (callback, delay) =>
 		handle = setTimeout(callback, delay);
 	};
 };
+
+export function log(tag, ...params)
+{
+	// eslint-disable-next-line no-console
+	console.log(tag, params);
+}
