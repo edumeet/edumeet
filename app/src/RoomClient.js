@@ -95,6 +95,8 @@ export default class RoomClient
 		this._room = null;
 		this._roomId = roomId;
 
+		this._doneJoining = false;
+
 		// Our WebTorrent client
 		this._webTorrent = this._torrentSupport && new WebTorrent({
 			tracker : {
@@ -1259,7 +1261,10 @@ export default class RoomClient
 
 			this._soundNotification();
 
-			this._handlePeer(peer);
+			if (this._doneJoining)
+			{
+				this._handlePeer(peer);
+			}
 		});
 
 		try
@@ -1340,6 +1345,8 @@ export default class RoomClient
 			{
 				this._handlePeer(peer, { notify: false });
 			}
+
+			this._doneJoining = true;
 
 			this._spotlights.start();
 		}
