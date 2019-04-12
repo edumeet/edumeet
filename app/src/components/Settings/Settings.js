@@ -59,13 +59,33 @@ const styles = (theme) =>
 	label : 'Filmstrip view'
 } ]; */
 
+const resolutions = [ {
+	value : 'low',
+	label : 'Low'
+},
+{
+	value : 'medium',
+	label : 'Medium'
+},
+{
+	value : 'high',
+	label : 'High (HD)'
+},
+{
+	value : 'veryhigh',
+	label : 'Very high (FHD)'
+},
+{
+	value : 'ultra',
+	label : 'Ultra (UHD)'
+} ];
+
 const Settings = ({
 	roomClient,
 	room,
 	me,
 	settings,
 	onToggleAdvancedMode,
-	// handleChangeMode,
 	handleCloseSettings,
 	classes
 }) =>
@@ -156,32 +176,38 @@ const Settings = ({
 					</FormHelperText>
 				</FormControl>
 			</form>
+			<form className={classes.setting} autoComplete='off'>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={settings.resolution || ''}
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								roomClient.changeVideoResolution(event.target.value);
+						}}
+						name='Video resolution'
+						autoWidth
+						className={classes.selectEmpty}
+					>
+						{ resolutions.map((resolution, index) =>
+						{
+							return (
+								<MenuItem key={index} value={resolution.value}>
+									{resolution.label}
+								</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						Select your video resolution
+					</FormHelperText>
+				</FormControl>
+			</form>
 			<FormControlLabel
 				className={classes.setting}
 				control={<Checkbox checked={settings.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
 				label='Advanced mode'
 			/>
-			{ /* <form className={classes.setting} autoComplete='off'>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={room.mode || ''}
-						onChange={(event) => handleChangeMode(event.target.value)}
-						name='Room mode'
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{ modes.map((mode, index) =>
-						{
-							return (
-								<MenuItem key={index} value={mode.value}>{mode.label}</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						Select room layout
-					</FormHelperText>
-				</FormControl>
-			</form> */ }
 			<DialogActions>
 				<Button onClick={() => handleCloseSettings({ settingsOpen: false })} color='primary'>
 					Close

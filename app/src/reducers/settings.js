@@ -4,7 +4,8 @@ const initialState =
 	picture             : null,
 	selectedWebcam      : null,
 	selectedAudioDevice : null,
-	advancedMode        : false
+	advancedMode        : false,
+	resolution          : 'high' // low, medium, high, veryhigh, ultra
 };
 
 const settings = (state = initialState, action) =>
@@ -42,6 +43,13 @@ const settings = (state = initialState, action) =>
 			const advancedMode = !state.advancedMode;
 
 			return { ...state, advancedMode };
+		}
+
+		case 'SET_VIDEO_RESOLUTION':
+		{
+			const { resolution } = action.payload;
+
+			return { ...state, resolution };
 		}
 
 		default:

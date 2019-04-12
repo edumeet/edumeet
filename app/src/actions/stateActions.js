@@ -113,6 +113,14 @@ export const setSelectedWebcamDevice = (deviceId) =>
 	};
 };
 
+export const setVideoResolution = (resolution) =>
+{
+	return {
+		type    : 'SET_VIDEO_RESOLUTION',
+		payload : { resolution }
+	};
+};
+
 export const setFileSharingSupported = (supported) =>
 {
 	return {

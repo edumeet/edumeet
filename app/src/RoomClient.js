@@ -29,8 +29,31 @@ let ROOM_OPTIONS =
 
 const VIDEO_CONSTRAINS =
 {
-	width       : { ideal: 1280 },
-	aspectRatio : 1.334
+	'low' :
+	{
+		width       : { ideal: 320 },
+		aspectRatio : 1.334
+	},
+	'medium' :
+	{
+		width       : { ideal: 640 },
+		aspectRatio : 1.334
+	},
+	'high' :
+	{
+		width       : { ideal: 1280 },
+		aspectRatio : 1.334
+	},
+	'veryhigh' :
+	{
+		width       : { ideal: 1920 },
+		aspectRatio : 1.334
+	},
+	'ultra' :
+	{
+		width       : { ideal: 3840 },
+		aspectRatio : 1.334
+	}
 };
 
 let store;
@@ -839,6 +862,56 @@ export default class RoomClient
 			stateActions.setAudioInProgress(false));
 	}
 
+	async changeVideoResolution(resolution)
+	{
+		logger.debug('changeVideoResolution() [resolution: %s]', resolution);
+
+		store.dispatch(
+			stateActions.setWebcamInProgress(true));
+
+		try
+		{
+			const deviceId = await this._getWebcamDeviceId();
+
+			const device = this._webcams[deviceId];
+
+			if (!device)
+				throw new Error('no webcam devices');
+
+			logger.debug('changeVideoResolution() | calling getUserMedia()');
+
+			const stream = await navigator.mediaDevices.getUserMedia(
+				{
+					video :
+					{
+						deviceId : { exact: device.deviceId },
+						...VIDEO_CONSTRAINS[resolution]
+					}
+				});
+
+			const track = stream.getVideoTracks()[0];
+
+			const newTrack = await this._webcamProducer.replaceTrack(track);
+
+			track.stop();
+
+			store.dispatch(
+				stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+
+			store.dispatch(stateActions.setSelectedWebcamDevice(deviceId));
+			store.dispatch(stateActions.setVideoResolution(resolution));
+
+			await this._updateWebcams();
+		}
+		catch (error)
+		{
+			logger.error('changeVideoResolution() failed: %o', error);
+		}
+
+		store.dispatch(
+			stateActions.setWebcamInProgress(false));
+	}
+
 	async changeWebcam(deviceId)
 	{
 		logger.debug('changeWebcam() [deviceId: %s]', deviceId);
@@ -849,6 +922,7 @@ export default class RoomClient
 		try
 		{
 			const device = this._webcams[deviceId];
+			const resolution = store.getState().settings.resolution;
 
 			if (!device)
 				throw new Error('no webcam devices');
@@ -864,7 +938,7 @@ export default class RoomClient
 					video :
 					{
 						deviceId : { exact: device.deviceId },
-						...VIDEO_CONSTRAINS
+						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
 
@@ -1666,6 +1740,7 @@ export default class RoomClient
 			const deviceId = await this._getWebcamDeviceId();
 
 			const device = this._webcams[deviceId];
+			const resolution = store.getState().settings.resolution;
 
 			if (!device)
 				throw new Error('no webcam devices');
@@ -1681,7 +1756,7 @@ export default class RoomClient
 					video :
 					{
 						deviceId : { exact: deviceId },
-						...VIDEO_CONSTRAINS
+						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
 
