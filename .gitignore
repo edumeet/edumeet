@@ -1,9 +1,10 @@
 node_modules/
 
-/app/config.*
-!/app/config.example.js
-/server/config.*
-!/server/config.example.js
+/app/build/
+/app/public/config.js
+/app/public/images/logo.*
+/server/config/
+!/server/config/config.example.js
 /server/public/
 /server/certs/
 !/server/certs/mediasoup-demo.localhost.*

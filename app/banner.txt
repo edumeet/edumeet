@@ -1,7 +1,0 @@
-/*
- * <%= pkg.name %> v<%= pkg.version %>
- * <%= pkg.description %>
- * Copyright: 2017-<%= currentYear %> <%= pkg.author %>
- * License: <%= pkg.license %>
- */
-

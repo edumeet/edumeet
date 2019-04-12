@@ -3,7 +3,7 @@ const readline = require('readline');
 const colors = require('colors/safe');
 const repl = require('repl');
 const homer = require('./lib/homer');
-const config = require('./config');
+const config = require('./config/config');
 
 // mediasoup server.
 const mediaServer = mediasoup.Server(
