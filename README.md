@@ -25,16 +25,16 @@ $ git clone https://github.com/havfo/multiparty-meeting.git
 $ cd multiparty-meeting
 ```
 
-* Copy `server/config.example.js` to `server/config.js` :
+* Copy `server/config/config.example.js` to `server/config/config.js` :
 
 ```bash
-$ cp server/config.example.js server/config.js
+$ cp server/config/config.example.js server/config/config.js
 ```
 
-* Copy `app/public/config.example.js` to `app/public/config.js` :
+* Copy `app/public/config/config.example.js` to `app/public/config/config.js` :
 
 ```bash
-$ cp app/public/config.example.js app/public/config.js
+$ cp app/public/config/config.example.js app/public/config/config.js
 ```
 
 * Edit your two `config.js` with appropriate settings (listening IP/port, logging options, **valid** TLS certificate, etc).
