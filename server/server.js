@@ -140,10 +140,10 @@ function setupAuth(oidcIssuer)
 	passport.use('oidc', oidcStrategy);
 
 	app.use(session({
-		secret: 'keyboard cat',
+		secret: config.cookieSecret,
 		resave: true,
 		saveUninitialized: true,
-		//cookie            : { secure: true }
+		cookie: { secure: true }
 	}));
 
 	app.use(passport.initialize());

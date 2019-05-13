@@ -19,6 +19,8 @@ module.exports =
 			redirect_uri	: 'https://client.example.com/auth/callback'
 		}
 	},
+	// session cookie secret
+	cookieSecret	: 'T0P-S3cR3t_cook!e',
 	// Listening hostname for `gulp live|open`.
 	domain : 'localhost',
 	tls    :
