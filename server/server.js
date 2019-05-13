@@ -84,20 +84,11 @@ function setupAuth(oidcIssuer)
 		{ client, params, passReqToCallback, usePKCE }, 
 		(tokenset, userinfo, done) => 
 		{				
-			console.log('tokenset', tokenset);
-			console.log('access_token', tokenset.access_token);
-			console.log('id_token', tokenset.id_token);
-			console.log('claims', tokenset.claims);
-			console.log('userinfo', userinfo);
 			let user = {
 				id			: tokenset.claims.sub,
 				provider	: tokenset.claims.iss,
 				_userinfo   : userinfo,
 				_claims     : tokenset.claims,
-				//tokenset    : tokenset,
-				//idtoken     : tokenset.id_token,
-				// eslint-disable-next-line camelcase
-				//access_token : tokenset.access_token
 			};
 			
 
