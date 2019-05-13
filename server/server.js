@@ -12,9 +12,12 @@ const express = require('express');
 const compression = require('compression');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
-const Dataporten = require('passport-dataporten');
 const utils = require('./util');
 const base64 = require('base-64');
+// auth
+const passport = require('passport');
+const { Issuer, Strategy } = require('openid-client');
+const session = require('express-session')
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -37,148 +40,291 @@ const tls =
 	key  : fs.readFileSync(config.tls.key)
 };
 
-const app = express();
+let app = express();
+let httpsServer;
+let oidcClient;
+let oidcStrategy;
 
-app.use(compression());
-
-const dataporten = new Dataporten.Setup(config.oauth2);
-
-app.all('*', (req, res, next) =>
+passport.serializeUser(function(user, done)
 {
-	if (req.secure)
+	done(null, user);
+});
+
+passport.deserializeUser(function(user, done)
+{
+	done(null, user);
+});
+
+const auth=config.auth;
+
+function setupAuth(oidcIssuer)
+{
+	oidcClient = new oidcIssuer.Client(auth.clientOptions);
+	const params = 
 	{
-		return next();
-	}
+		...auth.clientOptions
+		// ... any authorization request parameters go here
+		// client_id defaults to client.client_id
+		// redirect_uri defaults to client.redirect_uris[0]
+		// response type defaults to client.response_types[0], then 'code'
+		// scope defaults to 'openid'
+	};
+	
+	// optional, defaults to false, when true req is passed as a first
+	// argument to verify fn
+	const passReqToCallback = false; 
+	
+	// optional, defaults to false, when true the code_challenge_method will be
+	// resolved from the issuer configuration, instead of true you may provide
+	// any of the supported values directly, i.e. "S256" (recommended) or "plain"
+	const usePKCE = false;
+	const client=oidcClient;
 
-	res.redirect(`https://${req.hostname}${req.url}`);
-});
-
-app.use(dataporten.passport.initialize());
-app.use(dataporten.passport.session());
-
-app.get('/login', (req, res, next) =>
-{
-	dataporten.passport.authenticate('dataporten', {
-		state : base64.encode(JSON.stringify({
-			roomId   : req.query.roomId,
-			peerName : req.query.peerName,
-			code     : utils.random(10)
-		}))
-
-	})(req, res, next);
-});
-
-dataporten.setupLogout(app, '/logout');
-
-app.get('/', (req, res) =>
-{
-	res.sendFile(`${__dirname}/public/chooseRoom.html`);
-});
-
-app.get(
-	'/auth-callback',
-	dataporten.passport.authenticate('dataporten', { failureRedirect: '/login' }),
-	(req, res) =>
-	{
-		const state = JSON.parse(base64.decode(req.query.state));
-
-		if (rooms.has(state.roomId))
-		{
-			const data =
-			{
-				peerName : state.peerName,
-				name     : req.user.data.displayName,
-				picture  : req.user.data.photos[0]
+	oidcStrategy = new Strategy(
+		{ client, params, passReqToCallback, usePKCE }, 
+		(tokenset, userinfo, done) => 
+		{				
+			console.log('tokenset', tokenset);
+			console.log('access_token', tokenset.access_token);
+			console.log('id_token', tokenset.id_token);
+			console.log('claims', tokenset.claims);
+			console.log('userinfo', userinfo);
+			let user = {
+				id			: tokenset.claims.sub,
+				provider	: tokenset.claims.iss,
+				_userinfo   : userinfo,
+				_claims     : tokenset.claims,
+				//tokenset    : tokenset,
+				//idtoken     : tokenset.id_token,
+				// eslint-disable-next-line camelcase
+				//access_token : tokenset.access_token
 			};
+			
 
-			const room = rooms.get(state.roomId);
+			if ( typeof(userinfo.picture) !== 'undefined' ){
+				if ( ! userinfo.picture.match(/^http/g) ) {
+					user.Photos = [ { value: `data:image/jpeg;base64, ${userinfo.picture}` } ];
+				} else {
+					user.Photos= [ { value: userinfo.picture } ];
+				}
+			}
+			
+			if ( typeof(userinfo.nickname) !== 'undefined' ){
+				user.displayName=userinfo.nickname;
+			}
 
-			room.authCallback(data);
+			if ( typeof(userinfo.name) !== 'undefined' ){
+				user.displayName=userinfo.name;
+			}
+			
+			if ( typeof(userinfo.email) !== 'undefined' ){
+				user.emails=[{value: userinfo.email}];
+			}
+
+			if ( typeof(userinfo.given_name) !== 'undefined' ){
+				user.name={givenName: userinfo.given_name};
+			}
+
+			if ( typeof(userinfo.family_name) !== 'undefined' ){
+				user.name={familyName: userinfo.family_name};
+			}
+
+			if ( typeof(userinfo.middle_name) !== 'undefined' ){
+				user.name={middleName: userinfo.middle_name};
+			}
+
+
+			return done(null, user);
+		}
+	);
+	passport.use('oidc', oidcStrategy);
+
+	app.use(session({
+		secret: 'keyboard cat',
+		resave: true,
+		saveUninitialized: true,
+		//cookie            : { secure: true }
+	}));
+
+	app.use(passport.initialize());
+	app.use(passport.session());
+
+	// login
+	app.get('/auth/login', (req, res, next) =>
+	{
+		passport.authenticate('oidc', {
+			state : base64.encode(JSON.stringify({
+					roomId   : req.query.roomId,
+					peerName : req.query.peerName,
+					code     : utils.random(10)
+			}))
+		})(req, res, next);
+	});
+
+	// logout
+	app.get('/auth/logout', function(req, res)
+	{
+		req.logout();
+		res.redirect('/');
+	}
+	);
+	// callback
+	app.get(
+		'/auth/callback',
+		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
+		(req, res) =>
+		{
+			const state = JSON.parse(base64.decode(req.query.state));
+
+			if (rooms.has(state.roomId))
+			{				
+				let displayName,photo
+				if (typeof(req.user) !== 'undefined'){
+					if (typeof(req.user.displayName) !== 'undefined') displayName=req.user.displayName;
+					else displayName="";
+					if (typeof(req.user.Photos[0].value) !== 'undefined') photo=req.user.Photos[0].value
+					else photo="/static/media/buddy.403cb9f6.svg";
+				}
+								 
+				const data =
+				{
+					peerName : state.peerName,
+					name     : displayName,
+					picture  : photo
+				};
+
+				const room = rooms.get(state.roomId);
+
+				room.authCallback(data);
+			}
+
+			res.send('');
+		}
+	);
+}
+
+function setupWebServer() {
+	app.use(compression());
+
+	app.all('*', (req, res, next) =>
+	{
+		if (req.secure)
+		{
+			return next();
 		}
 
-		res.send('');
-	}
-);
+		res.redirect(`https://${req.hostname}${req.url}`);
+	});
 
-// Serve all files in the public folder as static files.
-app.use(express.static('public'));
-
-app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
-
-const httpsServer = https.createServer(tls, app);
-
-httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
-{
-	logger.info('Server running on port: ', config.listeningPort);
-});
-
-const httpServer = http.createServer(app);
-
-httpServer.listen(config.listeningRedirectPort, '0.0.0.0', () =>
-{
-	logger.info('Server redirecting port: ', config.listeningRedirectPort);
-});
-
-const io = require('socket.io')(httpsServer);
-
-// Handle connections from clients.
-io.on('connection', (socket) =>
-{
-	const { roomId, peerName } = socket.handshake.query;
-
-	if (!roomId || !peerName)
+	app.get('/', (req, res) =>
 	{
-		logger.warn('connection request without roomId and/or peerName');
+		res.sendFile(`${__dirname}/public/chooseRoom.html`);
+	});
 
-		socket.disconnect(true);
+	// Serve all files in the public folder as static files.
+	app.use(express.static('public'));
 
-		return;
-	}
+	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
 
-	logger.info(
-		'connection request [roomId:"%s", peerName:"%s"]', roomId, peerName);
+	httpsServer = https.createServer(tls, app);
 
-	let room;
-
-	// If an unknown roomId, create a new Room.
-	if (!rooms.has(roomId))
+	httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 	{
-		logger.info('creating a new Room [roomId:"%s"]', roomId);
+		logger.info('Server running on port: ', config.listeningPort);
+	});
 
-		try
-		{
-			room = new Room(roomId, mediaServer, io);
+	const httpServer = http.createServer(app);
 
-			global.APP_ROOM = room;
-		}
-		catch (error)
+	httpServer.listen(config.listeningRedirectPort, '0.0.0.0', () =>
+	{
+		logger.info('Server redirecting port: ', config.listeningRedirectPort);
+	});
+};
+
+function setupSocketIO(){
+	const io = require('socket.io')(httpsServer);
+
+	// Handle connections from clients.
+	io.on('connection', (socket) =>
+	{
+		const { roomId, peerName } = socket.handshake.query;
+
+		if (!roomId || !peerName)
 		{
-			logger.error('error creating a new Room: %s', error);
+			logger.warn('connection request without roomId and/or peerName');
 
 			socket.disconnect(true);
 
 			return;
 		}
 
-		const logStatusTimer = setInterval(() =>
-		{
-			room.logStatus();
-		}, 30000);
+		logger.info(
+			'connection request [roomId:"%s", peerName:"%s"]', roomId, peerName);
 
-		rooms.set(roomId, room);
+		let room;
 
-		room.on('close', () =>
+		// If an unknown roomId, create a new Room.
+		if (!rooms.has(roomId))
 		{
-			rooms.delete(roomId);
-			clearInterval(logStatusTimer);
-		});
-	}
-	else
+			logger.info('creating a new Room [roomId:"%s"]', roomId);
+
+			try
+			{
+				room = new Room(roomId, mediaServer, io);
+
+				global.APP_ROOM = room;
+			}
+			catch (error)
+			{
+				logger.error('error creating a new Room: %s', error);
+
+				socket.disconnect(true);
+
+				return;
+			}
+
+			const logStatusTimer = setInterval(() =>
+			{
+				room.logStatus();
+			}, 30000);
+
+			rooms.set(roomId, room);
+
+			room.on('close', () =>
+			{
+				rooms.delete(roomId);
+				clearInterval(logStatusTimer);
+			});
+		}
+		else
+		{
+			room = rooms.get(roomId);
+		}
+
+		socket.room = roomId;
+
+		room.handleConnection(peerName, socket);
+	});
+}
+if ( 
+	typeof(auth) !== 'undefined' &&
+	typeof(auth.issuerURL) !== 'undefined' &&
+	typeof(auth.clientOptions) !== 'undefined'
+)
+{
+	Issuer.discover(auth.issuerURL).then((oidcIssuer) => 
 	{
-		room = rooms.get(roomId);
+		setupAuth(oidcIssuer);
+		setupWebServer();
+		setupSocketIO();
+	}).catch((err) => { 
+		logger.error(err); 
 	}
+	);
+} else
+{
+	logger.error('Auth is not configure properly!');
+	setupWebServer();
+	setupSocketIO();
+}
 
-	socket.room = roomId;
-
-	room.handleConnection(peerName, socket);
-});

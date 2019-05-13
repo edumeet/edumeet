@@ -1,11 +1,23 @@
 module.exports =
 {
 	// oAuth2 conf
-	oauth2 :
+	auth :
 	{
-		clientID  			: '',
-		clientSecret	: '',
-		callbackURL 	: 'https://mYDomainName:port/auth-callback'
+		/*
+		The issuer URL for OpenID Connect discovery 
+		The OpenID Provider Configuration Document 
+		could be discovered on: 
+		issuerURL + '/.well-known/openid-configuration'
+		*/
+		issuerURL 	: 'https://example.com'
+		clientOptions	:	
+		{
+			client_id  	: '',
+			client_secret	: '',
+			scope		: 'openid email profile'
+			// where client.example.com is your multiparty meeting server 
+			redirect_uri	: 'https://client.example.com/auth/callback'
+		}
 	},
 	// Listening hostname for `gulp live|open`.
 	domain : 'localhost',

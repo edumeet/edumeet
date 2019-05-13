@@ -253,14 +253,14 @@ export default class RoomClient
 
 	login()
 	{
-		const url = `/login?roomId=${this._room.roomId}&peerName=${this._peerName}`;
+		const url = `/auth/login?roomId=${this._room.roomId}&peerName=${this._peerName}`;
 
 		this._loginWindow = window.open(url, 'loginWindow');
 	}
 
 	logout()
 	{
-		window.location = '/logout';
+		window.location = '/auth/logout';
 	}
 
 	closeLoginWindow()
