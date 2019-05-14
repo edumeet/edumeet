@@ -173,7 +173,11 @@ function setupAuth(oidcIssuer)
 				if (typeof(req.user) !== 'undefined'){
 					if (typeof(req.user.displayName) !== 'undefined') displayName=req.user.displayName;
 					else displayName="";
-					if (typeof(req.user.Photos[0].value) !== 'undefined') photo=req.user.Photos[0].value
+					if (
+						typeof(req.user.Photos) !== 'undefined' &&
+						typeof(req.user.Photos[0]) !== 'undefined' &&
+						typeof(req.user.Photos[0].value) !== 'undefined'
+						) photo=req.user.Photos[0].value;
 					else photo="/static/media/buddy.403cb9f6.svg";
 				}
 								 
