@@ -16,7 +16,8 @@
     "mediasoup": "^2.6.11",
     "openid-client": "^2.5.0",
     "passport": "^0.4.0",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.1.1",
+    "spdy": "^4.0.0"
   },
   "devDependencies": {
     "gulp": "^4.0.0",

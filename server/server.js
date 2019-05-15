@@ -6,8 +6,8 @@ process.title = 'multiparty-meeting-server';
 
 const config = require('./config/config');
 const fs = require('fs');
-const https = require('https');
 const http = require('http');
+const spdy = require('spdy');
 const express = require('express');
 const compression = require('compression');
 const Logger = require('./lib/Logger');
@@ -221,7 +221,7 @@ function setupWebServer() {
 
 	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
 
-	httpsServer = https.createServer(tls, app);
+	httpsServer = spdy.createServer(tls, app);
 
 	httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
 	{
