@@ -1339,6 +1339,16 @@ export default class RoomClient
 			{
 				this._handlePeer(peer);
 			}
+
+			if (store.getState().settings.picture)
+			{
+				const delay = ms => new Promise(res => setTimeout(res, ms));
+				const changeProfilePictureDelayed = async (picture) => {
+					await delay(4000);
+					this.changeProfilePicture(picture);
+				};
+				changeProfilePictureDelayed(store.getState().settings.picture);
+			}
 		});
 
 		try
@@ -1423,6 +1433,11 @@ export default class RoomClient
 			this._doneJoining = true;
 
 			this._spotlights.start();
+
+			if (store.getState().settings.picture)
+			{
+				this.changeProfilePicture(store.getState().settings.picture);
+			}
 		}
 		catch (error)
 		{
