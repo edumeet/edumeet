@@ -1,6 +1,6 @@
 module.exports =
 {
-	// oAuth2 conf
+	// auth conf
 	auth :
 	{
 		/*
@@ -9,21 +9,21 @@ module.exports =
 		could be discovered on: 
 		issuerURL + '/.well-known/openid-configuration'
 		*/
-		issuerURL 	: 'https://example.com'
-		clientOptions	:	
+		issuerURL    	: 'https://example.com',
+		clientOptions	:
 		{
-			client_id  	: '',
+			client_id    	: '',
 			client_secret	: '',
-			scope		: 'openid email profile'
+			scope       		: 'openid email profile',
 			// where client.example.com is your multiparty meeting server 
-			redirect_uri	: 'https://client.example.com/auth/callback'
+			redirect_uri 	: 'https://client.example.com/auth/callback'
 		}
 	},
 	// session cookie secret
 	cookieSecret	: 'T0P-S3cR3t_cook!e',
 	// Listening hostname for `gulp live|open`.
-	domain : 'localhost',
-	tls    :
+	domain       : 'localhost',
+	tls          :
 	{
 		cert : `${__dirname}/../certs/mediasoup-demo.localhost.cert.pem`,
 		key  : `${__dirname}/../certs/mediasoup-demo.localhost.key.pem`
