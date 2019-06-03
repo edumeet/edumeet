@@ -809,6 +809,8 @@ export default class RoomClient
 			logger.debug(
 				'changeAudioDevice() | new selected webcam [device:%o]',
 				device);
+			
+			this._micProducer.track.stop();
 
 			logger.debug('changeAudioDevice() | calling getUserMedia()');
 
@@ -822,14 +824,18 @@ export default class RoomClient
 
 			const track = stream.getAudioTracks()[0];
 
-			const newTrack = await this._micProducer.replaceTrack(track);
+			await this._micProducer.replaceTrack({ track });
 
 			const harkStream = new MediaStream();
 
-			harkStream.addTrack(newTrack);
+			harkStream.addTrack(track);
+
 			if (!harkStream.getAudioTracks()[0])
 				throw new Error('changeAudioDevice(): given stream has no audio track');
-			if (this._micProducer.hark != null) this._micProducer.hark.stop();
+
+			if (this._micProducer.hark != null)
+				this._micProducer.hark.stop();
+
 			this._micProducer.hark = hark(harkStream, { play: false });
 
 			// eslint-disable-next-line no-unused-vars
@@ -855,7 +861,7 @@ export default class RoomClient
 			track.stop();
 
 			store.dispatch(
-				stateActions.setProducerTrack(this._micProducer.id, newTrack));
+				stateActions.setProducerTrack(this._micProducer.id, track));
 
 			store.dispatch(stateActions.setSelectedAudioDevice(deviceId));
 
@@ -1885,8 +1891,10 @@ export default class RoomClient
 			const harkStream = new MediaStream();
 
 			harkStream.addTrack(track);
+
 			if (!harkStream.getAudioTracks()[0])
 				throw new Error('enableMic(): given stream has no audio track');
+
 			this._micProducer.hark = hark(harkStream, { play: false });
 
 			// eslint-disable-next-line no-unused-vars
