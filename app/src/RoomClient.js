@@ -858,8 +858,6 @@ export default class RoomClient
 				}
 			});
 
-			track.stop();
-
 			store.dispatch(
 				stateActions.setProducerTrack(this._micProducer.id, track));
 
