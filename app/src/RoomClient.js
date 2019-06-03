@@ -1256,7 +1256,7 @@ export default class RoomClient
 					// resume this Consumer (which was paused for now).
 					cb(null);
 
-					if (consumer.kind === 'audio')
+					if (kind === 'audio')
 					{
 						const stream = new MediaStream();
 
@@ -1285,7 +1285,7 @@ export default class RoomClient
 							{
 								consumer.volume = volume;
 
-								store.dispatch(stateActions.setPeerVolume(consumer.peerId, volume));
+								store.dispatch(stateActions.setPeerVolume(peerId, volume));
 							}
 						});
 					}
