@@ -150,7 +150,7 @@ const makeMapStateToProps = (initialState, props) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			volume : state.peerVolumes[props.name]
+			volume : state.peerVolumes[props.id]
 		};
 	};
 

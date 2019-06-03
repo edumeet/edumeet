@@ -5,7 +5,7 @@ const consumersSelect = (state) => state.consumers;
 const spotlightsSelector = (state) => state.room.spotlights;
 const peersSelector = (state) => state.peers;
 const getPeerConsumers = (state, props) =>
-	(state.peers[props.name] ? state.peers[props.name].consumers : null);
+	(state.peers[props.id] ? state.peers[props.id].consumers : null);
 const getAllConsumers = (state) => state.consumers;
 const peersKeySelector = createSelector(
 	peersSelector,
@@ -66,10 +66,10 @@ export const spotlightPeersSelector = createSelector(
 	spotlightsSelector,
 	peersSelector,
 	(spotlights, peers) =>
-		spotlights.reduce((result, peerName) =>
+		spotlights.reduce((result, peerId) =>
 		{
-			if (peers[peerName])
-				result.push(peers[peerName]);
+			if (peers[peerId])
+				result.push(peers[peerId]);
 
 			return result;
 		}, [])
@@ -83,7 +83,7 @@ export const peersLengthSelector = createSelector(
 export const passivePeersSelector = createSelector(
 	peersKeySelector,
 	spotlightsSelector,
-	(peers, spotlights) => peers.filter((peerName) => !spotlights.includes(peerName))
+	(peers, spotlights) => peers.filter((peerId) => !spotlights.includes(peerId))
 );
 
 export const videoBoxesSelector = createSelector(

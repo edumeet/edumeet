@@ -196,13 +196,6 @@ const Peer = (props) =>
 				}}
 			>
 				<div className={classnames(classes.viewContainer)} style={style}>
-					{ videoVisible && !webcamConsumer.supported ?
-						<div className={classes.videoInfo}>
-							<p>incompatible video</p>
-						</div>
-						:null
-					}
-
 					{ !videoVisible ?
 						<div className={classes.videoInfo}>
 							<p>this video is paused</p>
@@ -210,7 +203,7 @@ const Peer = (props) =>
 						:null
 					}
 
-					{ videoVisible && webcamConsumer.supported ?
+					{ videoVisible ?
 						<div
 							className={classnames(classes.controls, webcamHover ? 'hover' : null)}
 							onMouseOver={() => setWebcamHover(true)}
@@ -240,8 +233,8 @@ const Peer = (props) =>
 								onClick={() =>
 								{
 									micEnabled ?
-										roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
-										roomClient.modifyPeerConsumer(peer.name, 'mic', false);
+										roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+										roomClient.modifyPeerConsumer(peer.id, 'mic', false);
 								}}
 							>
 								{ micEnabled ?
@@ -295,7 +288,7 @@ const Peer = (props) =>
 						audioCodec={micConsumer ? micConsumer.codec : null}
 						videoCodec={webcamConsumer ? webcamConsumer.codec : null}
 					>
-						<Volume name={peer.name} />
+						<Volume id={peer.id} />
 					</VideoView>
 				</div>
 			</div>
@@ -323,13 +316,6 @@ const Peer = (props) =>
 						}, 2000);
 					}}
 				>
-					{ screenVisible && !screenConsumer.supported ?
-						<div className={classes.videoInfo} style={style}>
-							<p>incompatible video</p>
-						</div>
-						:null
-					}
-
 					{ !screenVisible ?
 						<div className={classes.videoInfo} style={style}>
 							<p>this video is paused</p>
@@ -337,7 +323,7 @@ const Peer = (props) =>
 						:null
 					}
 
-					{ screenVisible && screenConsumer.supported ?
+					{ screenVisible ?
 						<div className={classnames(classes.viewContainer)} style={style}>
 							<div
 								className={classnames(classes.controls, screenHover ? 'hover' : null)}
@@ -418,7 +404,7 @@ Peer.propTypes =
 	micConsumer              : appPropTypes.Consumer,
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
-	windowConsumer           : PropTypes.number,
+	windowConsumer           : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
 	style                    : PropTypes.object,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
@@ -434,10 +420,10 @@ const makeMapStateToProps = (initialState, props) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer           : state.peers[props.name],
+			peer           : state.peers[props.id],
 			...getPeerConsumers(state, props),
 			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : props.name === state.room.activeSpeakerName
+			activeSpeaker  : props.id === state.room.activeSpeakerId
 		};
 	};
 
@@ -470,7 +456,7 @@ export default withRoomContext(connect(
 			return (
 				prev.peers === next.peers &&
 				prev.consumers === next.consumers &&
-				prev.room.activeSpeakerName === next.room.activeSpeakerName &&
+				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.windowConsumer === next.room.windowConsumer
 			);
 		}

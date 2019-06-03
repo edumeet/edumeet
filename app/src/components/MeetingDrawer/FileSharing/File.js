@@ -55,7 +55,7 @@ class File extends React.PureComponent
 	{
 		const {
 			roomClient,
-			torrentSupport,
+			canShareFiles,
 			file,
 			classes
 		} = this.props;
@@ -105,7 +105,7 @@ class File extends React.PureComponent
 							<Typography className={classes.text}>
 								{magnet.decode(file.magnetUri).dn}
 							</Typography>
-							{ torrentSupport ?
+							{ canShareFiles ?
 								<Button
 									variant='contained'
 									component='span'
@@ -145,17 +145,17 @@ class File extends React.PureComponent
 }
 
 File.propTypes = {
-	roomClient     : PropTypes.object.isRequired,
-	torrentSupport : PropTypes.bool.isRequired,
-	file           : PropTypes.object.isRequired,
-	classes        : PropTypes.object.isRequired
+	roomClient    : PropTypes.object.isRequired,
+	canShareFiles : PropTypes.bool.isRequired,
+	file          : PropTypes.object.isRequired,
+	classes       : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state, { magnetUri }) =>
 {
 	return {
-		file           : state.files[magnetUri],
-		torrentSupport : state.room.torrentSupport
+		file          : state.files[magnetUri],
+		canShareFiles : state.me.canShareFiles
 	};
 };
 

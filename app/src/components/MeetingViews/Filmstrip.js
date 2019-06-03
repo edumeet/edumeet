@@ -104,11 +104,11 @@ class Filmstrip extends React.PureComponent
 	// Find the name of the peer which is currently speaking. This is either
 	// the latest active speaker, or the manually selected peer, or, if no
 	// person has spoken yet, the first peer in the list of peers.
-	getActivePeerName = () =>
+	getActivePeerId = () =>
 	{
-		if (this.props.selectedPeerName)
+		if (this.props.selectedPeerId)
 		{
-			return this.props.selectedPeerName;
+			return this.props.selectedPeerId;
 		}
 
 		if (this.state.lastSpeaker)
@@ -116,23 +116,23 @@ class Filmstrip extends React.PureComponent
 			return this.state.lastSpeaker;
 		}
 
-		const peerNames = Object.keys(this.props.peers);
+		const peerIds = Object.keys(this.props.peers);
 
-		if (peerNames.length > 0)
+		if (peerIds.length > 0)
 		{
-			return peerNames[0];
+			return peerIds[0];
 		}
 	};
 
-	isSharingCamera = (peerName) => this.props.peers[peerName] &&
-		this.props.peers[peerName].consumers.some((consumer) =>
+	isSharingCamera = (peerId) => this.props.peers[peerId] &&
+		this.props.peers[peerId].consumers.some((consumer) =>
 			this.props.consumers[consumer].source === 'screen');
 
 	getRatio = () =>
 	{
 		let ratio = 4 / 3;
 
-		if (this.isSharingCamera(this.getActivePeerName()))
+		if (this.isSharingCamera(this.getActivePeerId()))
 		{
 			ratio *= 2;
 		}
@@ -202,12 +202,12 @@ class Filmstrip extends React.PureComponent
 			classes
 		} = this.props;
 
-		const activePeerName = this.getActivePeerName();
+		const activePeerId = this.getActivePeerId();
 
 		return (
 			<div className={classes.root}>
 				<div className={classes.activePeerContainer} ref={this.activePeerContainer}>
-					{ peers[activePeerName] ?
+					{ peers[activePeerId] ?
 						<div
 							className={classes.activePeer}
 							style={{
@@ -217,7 +217,7 @@ class Filmstrip extends React.PureComponent
 						>
 							<Peer
 								advancedMode={advancedMode}
-								name={activePeerName}
+								name={activePeerId}
 							/>
 						</div>
 						:null
@@ -226,23 +226,23 @@ class Filmstrip extends React.PureComponent
 
 				<div className={classes.filmStrip}>
 					<div className={classes.filmStripContent}>
-						{ Object.keys(peers).map((peerName) =>
+						{ Object.keys(peers).map((peerId) =>
 						{
-							if (spotlights.find((spotlightsElement) => spotlightsElement === peerName))
+							if (spotlights.find((spotlightsElement) => spotlightsElement === peerId))
 							{
 								return (
 									<div
-										key={peerName}
-										onClick={() => roomClient.setSelectedPeer(peerName)}
+										key={peerId}
+										onClick={() => roomClient.setSelectedPeer(peerId)}
 										className={classnames(classes.film, {
-											selected : this.props.selectedPeerName === peerName,
-											active   : this.state.lastSpeaker === peerName
+											selected : this.props.selectedPeerId === peerId,
+											active   : this.state.lastSpeaker === peerId
 										})}
 									>
 										<div className={classes.filmContent}>
 											<Peer
 												advancedMode={advancedMode}
-												name={peerName}
+												name={peerId}
 											/>
 										</div>
 									</div>
@@ -276,7 +276,7 @@ Filmstrip.propTypes = {
 	peers             : PropTypes.object.isRequired,
 	consumers         : PropTypes.object.isRequired,
 	myName            : PropTypes.string.isRequired,
-	selectedPeerName  : PropTypes.string,
+	selectedPeerId  : PropTypes.string,
 	spotlightsLength  : PropTypes.number,
 	spotlights        : PropTypes.array.isRequired,
 	classes           : PropTypes.object.isRequired
@@ -288,7 +288,7 @@ const mapStateToProps = (state) =>
 
 	return {
 		activeSpeakerName : state.room.activeSpeakerName,
-		selectedPeerName  : state.room.selectedPeerName,
+		selectedPeerId  : state.room.selectedPeerId,
 		peers             : state.peers,
 		consumers         : state.consumers,
 		myName            : state.me.name,

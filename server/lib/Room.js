@@ -4,15 +4,41 @@ const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
 const config = require('../config/config');
 
-const MAX_BITRATE = config.mediasoup.maxBitrate || 1000000;
-const MIN_BITRATE = Math.min(50000, MAX_BITRATE);
-const BITRATE_FACTOR = 0.75;
-
 const logger = new Logger('Room');
 
 class Room extends EventEmitter
 {
-	constructor(roomId, mediaServer, io)
+	/**
+	 * Factory function that creates and returns Room instance.
+	 *
+	 * @async
+	 *
+	 * @param {mediasoup.Worker} mediasoupWorker - The mediasoup Worker in which a new
+	 *   mediasoup Router must be created.
+	 * @param {String} roomId - Id of the Room instance.
+	 */
+	static async create({ mediasoupWorker, roomId })
+	{
+		logger.info('create() [roomId:%s, forceH264:%s]', roomId);
+
+		// Router media codecs.
+		let mediaCodecs = config.mediasoup.router.mediaCodecs;
+
+		// Create a mediasoup Router.
+		const mediasoupRouter = await mediasoupWorker.createRouter({ mediaCodecs });
+
+		// Create a mediasoup AudioLevelObserver.
+		const audioLevelObserver = await mediasoupRouter.createAudioLevelObserver(
+			{
+				maxEntries : 1,
+				threshold  : -80,
+				interval   : 800
+			});
+
+		return new Room({ roomId, mediasoupRouter, audioLevelObserver });
+	}
+
+	constructor({ roomId, mediasoupRouter, audioLevelObserver })
 	{
 		logger.info('constructor() [roomId:"%s"]', roomId);
 
@@ -34,30 +60,51 @@ class Room extends EventEmitter
 
 		this._lastN = [];
 
-		this._io = io;
+		// this._io = io;
 
-		this._signalingPeers = new Map();
+		this._peers = new Map();
 
-		try
+		// mediasoup Router instance.
+		// @type {mediasoup.Router}
+		this._mediasoupRouter = mediasoupRouter;
+
+		// mediasoup AudioLevelObserver.
+		// @type {mediasoup.AudioLevelObserver}
+		this._audioLevelObserver = audioLevelObserver;
+
+		// Set audioLevelObserver events.
+		this._audioLevelObserver.on('volumes', (volumes) =>
 		{
-			// mediasoup Room instance.
-			this._mediaRoom = mediaServer.Room(config.mediasoup.mediaCodecs);
-		}
-		catch (error)
+			const { producer, volume } = volumes[0];
+
+			// logger.debug(
+			//	'audioLevelObserver "volumes" event [producerId:%s, volume:%s]',
+			//	producer.id, volume);
+
+			// Notify all Peers.
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'activeSpeaker', {
+					peerId : producer.appData.peerId,
+					volume : volume
+				});
+			});
+		});
+
+		this._audioLevelObserver.on('silence', () =>
 		{
-			this.close();
+			// logger.debug('audioLevelObserver "silence" event');
 
-			throw error;
-		}
-
-		// Current max bitrate for all the participants.
-		this._maxBitrate = MAX_BITRATE;
+			// Notify all Peers.
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'activeSpeaker', { peerId : null });
+			});
+		});
 
 		// Current active speaker.
 		// @type {mediasoup.Peer}
 		this._currentActiveSpeaker = null;
-
-		this._handleMediaRoom();
 	}
 
 	get id()
@@ -71,19 +118,20 @@ class Room extends EventEmitter
 
 		this._closed = true;
 
-		// Close the signalingPeers
-		if (this._signalingPeers)
-			for (let peer of this._signalingPeers)
+		// Close the peers
+		if (this._peers)
+		{
+			this._peers.forEach((peer) =>
 			{
 				if (peer.socket)
 					peer.socket.disconnect();
-			};
+			});
+		}
 
-		this._signalingPeers.clear();
+		this._peers.clear();
 
-		// Close the mediasoup Room.
-		if (this._mediaRoom)
-			this._mediaRoom.close();
+		// Close the mediasoup Router.
+		this._mediasoupRouter.close();
 
 		// Emit 'close' event.
 		this.emit('close');
@@ -91,55 +139,52 @@ class Room extends EventEmitter
 
 	logStatus()
 	{
-		if (!this._mediaRoom)
-			return;
-
 		logger.info(
-			'logStatus() [room id:"%s", peers:%s, mediasoup peers:%s]',
+			'logStatus() [room id:"%s", peers:%s]',
 			this._roomId,
-			this._signalingPeers.length,
-			this._mediaRoom.peers.length);
+			this._peers.size
+		);
 	}
 
-	handleConnection(peerName, socket)
+	handleConnection({ peerId, consume, socket })
 	{
-		logger.info('handleConnection() [peerName:"%s"]', peerName);
+		logger.info('handleConnection() [peerId:"%s"]', peerId);
 
 		// This will allow reconnects to join despite lock
-		if (this._signalingPeers.has(peerName))
+		if (this._peers.has(peerId))
 		{
 			logger.warn(
-				'handleConnection() | there is already a peer with same peerName, ' +
-				'closing the previous one [peerName:"%s"]',
-				peerName);
+				'handleConnection() | there is already a peer with same peerId, ' +
+				'closing the previous one [peerId:"%s"]',
+				peerId);
 
-			const signalingPeer = this._signalingPeers.get(peerName);
+			const peer = this._peers.get(peerId);
 
-			signalingPeer.socket.disconnect();
-			this._signalingPeers.delete(peerName);
+			peer.socket.disconnect();
+			this._peers.delete(peerId);
 		}
 		else if (this._locked) // Don't allow connections to a locked room
 		{
-			socket.emit('room-locked');
+			notification(socket, 'roomLocked');
 			socket.disconnect(true);
 			return;
 		}
 
 		socket.join(this._roomId);
 
-		const signalingPeer = { peerName : peerName, socket : socket };
+		const peer = { id : peerId, socket : socket };
 
-		const index = this._lastN.indexOf(peerName);
+		const index = this._lastN.indexOf(peerId);
 
 		if (index === -1) // We don't have this peer, add to end
 		{
-			this._lastN.push(peerName);
+			this._lastN.push(peerId);
 		}
 
-		this._signalingPeers.set(peerName, signalingPeer);
+		this._peers.set(peerId, peer);
 
-		this._handleSignalingPeer(signalingPeer);
-		socket.emit('room-ready');
+		this._handlePeer({ peer, consume });
+		this._notification(socket, 'roomReady');
 	}
 
 	isLocked()
@@ -152,566 +197,860 @@ class Room extends EventEmitter
 		logger.debug('authCallback()');
 
 		const {
-			peerName,
-			name,
+			peerId,
+			displayName,
 			picture
 		} = data;
 
-		const signalingPeer = this._signalingPeers.get(peerName);
+		const peer = this._peers.get(peerId);
 
-		if (signalingPeer)
+		if (peer)
 		{
-			signalingPeer.socket.emit('auth',
-			{
-				name    : name,
-				picture : picture
+			this._notification(peer.socket, 'auth', {
+				displayName : displayName,
+				picture     : picture
 			});
 		}
 	}
 
-	_handleMediaRoom()
+	_handlePeer({ peer, consume })
 	{
-		logger.debug('_handleMediaRoom()');
+		logger.debug('_handlePeer() [peer:"%s"]', peer.id);
 
-		const activeSpeakerDetector = this._mediaRoom.createActiveSpeakerDetector();
+		peer.data = {};
 
-		activeSpeakerDetector.on('activespeakerchange', (activePeer) =>
+		// Not joined after a custom protoo 'join' request is later received.
+		peer.data.consume = consume;
+		peer.data.joined = false;
+		peer.data.displayName = undefined;
+		peer.data.device = undefined;
+		peer.data.rtpCapabilities = undefined;
+		peer.data.raiseHandState = false;
+
+		// Have mediasoup related maps ready even before the Peer joins since we
+		// allow creating Transports before joining.
+		peer.data.transports = new Map();
+		peer.data.producers = new Map();
+		peer.data.consumers = new Map();
+
+		peer.socket.on('request', (request, cb) =>
 		{
-			if (activePeer)
-			{
-				logger.info('new active speaker [peerName:"%s"]', activePeer.name);
+			logger.debug(
+				'Peer "request" event [method:%s, peerId:%s]',
+				request.method, peer.id);
 
-				this._currentActiveSpeaker = activePeer;
-
-				const index = this._lastN.indexOf(activePeer.name);
-
-				if (index > -1) // We have this speaker in the list, move to front
+			this._handleSocketRequest(peer, request, cb)
+				.catch((error) =>
 				{
-					this._lastN.splice(index, 1);
-					this._lastN = [activePeer.name].concat(this._lastN);
-				}
+					logger.error('request failed:%o', error);
 
-				const activeVideoProducer = activePeer.producers
-					.find((producer) => producer.kind === 'video');
-
-				for (const peer of this._mediaRoom.peers)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.kind !== 'video')
-							continue;
-
-						if (consumer.source === activeVideoProducer)
-						{
-							consumer.setPreferredProfile('high');
-						}
-						else
-						{
-							consumer.setPreferredProfile('low');
-						}
-					}
-				}
-			}
-			else
-			{
-				logger.info('no active speaker');
-
-				this._currentActiveSpeaker = null;
-
-				for (const peer of this._mediaRoom.peers)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.kind !== 'video')
-							continue;
-
-						consumer.setPreferredProfile('low');
-					}
-				}
-			}
-
-			this._io.to(this._roomId).emit('active-speaker', {
-					peerName : activePeer ? activePeer.name : null
+					cb(error);
 				});
 		});
-	}
 
-	_handleSignalingPeer(signalingPeer)
-	{
-		logger.debug('_handleSignalingPeer() [peer:"%s"]', signalingPeer.id);
-
-		signalingPeer.socket.on('mediasoup-request', (request, cb) =>
+		peer.socket.on('disconnect', () =>
 		{
-			const mediasoupRequest = request;
-
-			this._handleMediasoupClientRequest(
-				signalingPeer, mediasoupRequest, cb);
-		});
-
-		signalingPeer.socket.on('mediasoup-notification', (request, cb) =>
-		{
-			// Return no error
-			cb(null);
-
-			const mediasoupNotification = request;
-
-			this._handleMediasoupClientNotification(
-				signalingPeer, mediasoupNotification);
-		});
-
-		signalingPeer.socket.on('change-display-name', (request, cb) =>
-		{
-			// Return no error
-			cb(null);
-
-			const { displayName } = request;
-			const mediaPeer  = this._mediaRoom.getPeerByName(signalingPeer.peerName);
-			const oldDisplayName = mediaPeer.appData.displayName;
-
-			mediaPeer.appData.displayName = displayName;
-
-			signalingPeer.socket.broadcast.to(this._roomId).emit(
-				'display-name-changed',
-				{
-					peerName       : signalingPeer.peerName,
-					displayName    : displayName,
-					oldDisplayName : oldDisplayName
-				}
-			);
-		});
-
-		signalingPeer.socket.on('change-profile-picture', (request, cb) =>
-		{
-			// Return no error
-			cb(null);
-
-			signalingPeer.socket.broadcast.to(this._roomId).emit(
-				'profile-picture-changed',
-				{
-					peerName : signalingPeer.peerName,
-					picture  : request.picture
-				}
-			);
-		});
-
-		signalingPeer.socket.on('chat-message', (request, cb) =>
-		{
-			// Return no error
-			cb(null);
-
-			const { chatMessage } = request;
-
-			this._chatHistory.push(chatMessage);
-
-			// Spread to others
-			signalingPeer.socket.broadcast.to(this._roomId).emit(
-				'chat-message-receive',
-				{
-					peerName    : signalingPeer.peerName,
-					chatMessage : chatMessage
-				}
-			);
-		});
-
-		signalingPeer.socket.on('server-history', (request, cb) =>
-		{
-			// Return to sender
-			cb(
-				null,
-				{
-					chatHistory : this._chatHistory,
-					fileHistory : this._fileHistory,
-					lastN       : this._lastN
-				}
-			);
-		});
-
-		signalingPeer.socket.on('lock-room', (request, cb) =>
-		{
-			// Return no error
-			cb(null);
-
-			this._locked = true;
-
-			// Spread to others
-			signalingPeer.socket.broadcast.to(this._roomId).emit(
-				'lock-room',
-				{
-					peerName : signalingPeer.peerName
-				}
-			);
-		});
-
-		signalingPeer.socket.on('unlock-room', (request, cb) =>
-		{
-			// Return no error
-			cb(null);
-
-			this._locked = false;
-
-			// Spread to others
-			signalingPeer.socket.broadcast.to(this._roomId).emit(
-				'unlock-room',
-				{
-					peerName : signalingPeer.peerName
-				}
-			);
-		});
-
-		signalingPeer.socket.on('send-file', (request, cb) =>
-		{
-			// Return no error
-			cb(null);
-
-			const fileData = request.file;
-
-			this._fileHistory.push(fileData);
-
-			// Spread to others
-			signalingPeer.socket.broadcast.to(this._roomId).emit(
-				'file-receive',
-				{
-					peerName : signalingPeer.peerName,
-					file     : fileData
-				}
-			);
-		});
-
-		signalingPeer.socket.on('raisehand-message', (request, cb) =>
-		{
-			// Return no error
-			cb(null);
-
-			const { raiseHandState } = request;
-			const { mediaPeer } = signalingPeer;
-
-			mediaPeer.appData.raiseHandState = raiseHandState;
-			// Spread to others
-			signalingPeer.socket.broadcast.to(this._roomId).emit(
-				'raisehand-message',
-				{
-					peerName       : signalingPeer.peerName,
-					raiseHandState : raiseHandState
-				},
-			);
-		});
-
-		signalingPeer.socket.on('request-consumer-keyframe', (request, cb) =>
-		{
-			cb(null);
-
-			const { consumerId } = request;
-			const mediaPeer  = this._mediaRoom.getPeerByName(signalingPeer.peerName);
-			const consumer = mediaPeer.consumers
-				.find((_consumer) => _consumer.id === consumerId);
-			
-			if (!consumer)
-			{
-				logger.warn('consumer with id "%s" not found', consumerId);
-				
+			if (this._closed)
 				return;
+
+			logger.debug('Peer "close" event [peerId:%s]', peer.id);
+
+			// If the Peer was joined, notify all Peers.
+			if (peer.data.joined)
+			{
+				this._notification(peer.socket, 'peerClosed', { peerId: peer.id }, true);
 			}
-			
-			consumer.requestKeyFrame();
-		});
 
-		signalingPeer.socket.on('disconnect', () =>
-		{
-			logger.debug('Peer "close" event [peer:"%s"]', signalingPeer.peerName);
-
-			const mediaPeer  = this._mediaRoom.getPeerByName(signalingPeer.peerName);
-
-			if (mediaPeer && !mediaPeer.closed)
-				mediaPeer.close();
-
-			const index = this._lastN.indexOf(signalingPeer.peerName);
+			const index = this._lastN.indexOf(peer.id);
 
 			if (index > -1) // We have this peer in the list, remove
 			{
 				this._lastN.splice(index, 1);
 			}
 
-			// If this is the latest peer in the room, close the room.
-			// However wait a bit (for reconnections).
-			setTimeout(() =>
+			// Iterate and close all mediasoup Transport associated to this Peer, so all
+			// its Producers and Consumers will also be closed.
+			for (const transport of peer.data.transports.values())
 			{
-				if (this._mediaRoom && this._mediaRoom.closed)
-					return;
-
-				if (this._mediaRoom.peers.length === 0)
-				{
-					logger.info(
-						'last peer in the room left, closing the room [roomId:"%s"]',
-						this._roomId);
-
-					this.close();
-				}
-			}, 5000);
-		});
-	}
-
-	_handleMediaPeer(signalingPeer, mediaPeer)
-	{
-		mediaPeer.on('notify', (notification) =>
-		{
-			signalingPeer.socket.emit('mediasoup-notification', notification);
-		});
-
-		mediaPeer.on('newtransport', (transport) =>
-		{
-			logger.info(
-				'mediaPeer "newtransport" event [id:%s, direction:%s]',
-				transport.id, transport.direction);
-
-			// Update peers max sending  bitrate.
-			if (transport.direction === 'send')
-			{
-				this._updateMaxBitrate();
-
-				transport.on('close', () =>
-				{
-					this._updateMaxBitrate();
-				});
+				transport.close();
 			}
 
-			this._handleMediaTransport(transport);
-		});
+			this._peers.delete(peer.id);
 
-		mediaPeer.on('newproducer', (producer) =>
-		{
-			logger.info('mediaPeer "newproducer" event [id:%s]', producer.id);
-
-			this._handleMediaProducer(producer);
-		});
-
-		mediaPeer.on('newconsumer', (consumer) =>
-		{
-			logger.info('mediaPeer "newconsumer" event [id:%s]', consumer.id);
-
-			this._handleMediaConsumer(consumer);
-		});
-
-		// Also handle already existing Consumers.
-		for (const consumer of mediaPeer.consumers)
-		{
-			logger.info('mediaPeer existing "consumer" [id:%s]', consumer.id);
-
-			this._handleMediaConsumer(consumer);
-		}
-
-		// Notify about the existing active speaker.
-		if (this._currentActiveSpeaker)
-		{
-			signalingPeer.socket.emit(
-				'active-speaker',
+			// If this is the latest Peer in the room, close the room after a while.
+			if (this._peers.size === 0)
+			{
+				setTimeout(() =>
 				{
-					peerName : this._currentActiveSpeaker.name
-				});
-		}
-	}
+					if (this._closed)
+						return;
 
-	_handleMediaTransport(transport)
-	{
-		transport.on('close', (originator) =>
-		{
-			logger.info(
-				'Transport "close" event [originator:%s]', originator);
+					if (this._peers.size === 0)
+					{
+						logger.info(
+							'last Peer in the room left, closing the room [roomId:%s]',
+							this._roomId);
+
+						this.close();
+					}
+				}, 10000);
+			}
 		});
 	}
 
-	_handleMediaProducer(producer)
+	async _handleSocketRequest(peer, request, cb)
 	{
-		producer.on('close', (originator) =>
-		{
-			logger.info(
-				'Producer "close" event [originator:%s]', originator);
-		});
-
-		producer.on('pause', (originator) =>
-		{
-			logger.info(
-				'Producer "pause" event [originator:%s]', originator);
-		});
-
-		producer.on('resume', (originator) =>
-		{
-			logger.info(
-				'Producer "resume" event [originator:%s]', originator);
-		});
-	}
-
-	_handleMediaConsumer(consumer)
-	{
-		consumer.on('close', (originator) =>
-		{
-			logger.info(
-				'Consumer "close" event [originator:%s]', originator);
-		});
-
-		consumer.on('pause', (originator) =>
-		{
-			logger.info(
-				'Consumer "pause" event [originator:%s]', originator);
-		});
-
-		consumer.on('resume', (originator) =>
-		{
-			logger.info(
-				'Consumer "resume" event [originator:%s]', originator);
-		});
-
-		consumer.on('effectiveprofilechange', (profile) =>
-		{
-			logger.info(
-				'Consumer "effectiveprofilechange" event [profile:%s]', profile);
-		});
-
-		// If video, initially make it 'low' profile unless this is for the current
-		// active speaker.
-		if (consumer.kind === 'video' && consumer.peer !== this._currentActiveSpeaker)
-			consumer.setPreferredProfile('low');
-	}
-
-	_handleMediasoupClientRequest(signalingPeer, request, cb)
-	{
-		logger.debug(
-			'mediasoup-client request [method:%s, peer:"%s"]',
-			request.method, signalingPeer.peerName);
-
 		switch (request.method)
 		{
-			case 'queryRoom':
+
+			case 'getRouterRtpCapabilities':
 			{
-				this._mediaRoom.receiveRequest(request)
-					.then((response) => cb(null, response))
-					.catch((error) => cb(error.toString()));
+				cb(null, this._mediasoupRouter.rtpCapabilities);
 
 				break;
 			}
 
 			case 'join':
 			{
-				// TODO: Handle appData. Yes?
-				const { peerName } = request;
+				// Ensure the Peer is not already joined.
+				if (peer.data.joined)
+					throw new Error('Peer already joined');
 
-				if (peerName !== signalingPeer.peerName)
+				const { displayName, device, rtpCapabilities } = request.data;
+
+				// Store client data into the protoo Peer data object.
+				peer.data.displayName = displayName;
+				peer.data.device = device;
+				peer.data.rtpCapabilities = rtpCapabilities;
+
+				// Tell the new Peer about already joined Peers.
+				// And also create Consumers for existing Producers.
+
+				const peerInfos = [];
+
+				this._peers.forEach((joinedPeer) =>
 				{
-					cb('that is not your corresponding mediasoup Peer name');
-
-					break;
-				}
-				else if (signalingPeer.mediaPeer)
-				{
-					cb('already have a mediasoup Peer');
-
-					break;
-				}
-
-				this._mediaRoom.receiveRequest(request)
-					.then((response) =>
+					if (joinedPeer.data.joined)
 					{
-						cb(null, response);
+						peerInfos.push(
+							{
+								id          : joinedPeer.id,
+								displayName : joinedPeer.data.displayName,
+								device      : joinedPeer.data.device
+							});
+	
+						for (const producer of joinedPeer.data.producers.values())
+						{
+							this._createConsumer(
+								{
+									consumerPeer : peer,
+									producerPeer : joinedPeer,
+									producer
+								});
+						}
+					}
+				});
 
-						// Get the newly created mediasoup Peer.
-						const mediaPeer = this._mediaRoom.getPeerByName(peerName);
+				cb(null, { peers: peerInfos });
 
-						signalingPeer.mediaPeer = mediaPeer;
+				// Mark the new Peer as joined.
+				peer.data.joined = true;
 
-						this._handleMediaPeer(signalingPeer, mediaPeer);
-					})
-					.catch((error) =>
+				this._notification(
+					peer.socket,
+					'newPeer',
 					{
-						cb(error.toString());
+						id          : peer.id,
+						displayName : displayName,
+						device      : device
+					},
+					true
+				);
+
+				logger.debug(
+					'peer joined [peeerId: %s, displayName: %s, device: %o]',
+					peer.id, displayName, device);
+
+				break;
+			}
+
+			case 'createWebRtcTransport':
+			{
+				// NOTE: Don't require that the Peer is joined here, so the client can
+				// initiate mediasoup Transports and be ready when he later joins.
+
+				const { forceTcp, producing, consuming } = request.data;
+				const {
+					maxIncomingBitrate,
+					initialAvailableOutgoingBitrate
+				} = config.mediasoup.webRtcTransport;
+
+				const transport = await this._mediasoupRouter.createWebRtcTransport(
+					{
+						listenIps : config.mediasoup.webRtcTransport.listenIps,
+						enableUdp : !forceTcp,
+						enableTcp : true,
+						preferUdp : true,
+						initialAvailableOutgoingBitrate,
+						appData   : { producing, consuming }
 					});
+
+				// Store the WebRtcTransport into the protoo Peer data Object.
+				peer.data.transports.set(transport.id, transport);
+
+				cb(
+					null,
+					{
+						id             : transport.id,
+						iceParameters  : transport.iceParameters,
+						iceCandidates  : transport.iceCandidates,
+						dtlsParameters : transport.dtlsParameters
+					});
+
+				// If set, apply max incoming bitrate limit.
+				if (maxIncomingBitrate)
+				{
+					try { await transport.setMaxIncomingBitrate(maxIncomingBitrate); }
+					catch (error) {}
+				}
+
+				break;
+			}
+
+			case 'connectWebRtcTransport':
+			{
+				const { transportId, dtlsParameters } = request.data;
+				const transport = peer.data.transports.get(transportId);
+
+				if (!transport)
+					throw new Error(`transport with id "${transportId}" not found`);
+
+				await transport.connect({ dtlsParameters });
+
+				cb(null);
+
+				break;
+			}
+
+			case 'restartIce':
+			{
+				const { transportId } = request.data;
+				const transport = peer.data.transports.get(transportId);
+
+				if (!transport)
+					throw new Error(`transport with id "${transportId}" not found`);
+
+				const iceParameters = await transport.restartIce();
+
+				cb(null, iceParameters);
+
+				break;
+			}
+
+			case 'produce':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { transportId, kind, rtpParameters } = request.data;
+				let { appData } = request.data;
+				const transport = peer.data.transports.get(transportId);
+
+				if (!transport)
+					throw new Error(`transport with id "${transportId}" not found`);
+
+				// Add peerId into appData to later get the associated Peer during
+				// the 'loudest' event of the audioLevelObserver.
+				appData = { ...appData, peerId: peer.id };
+
+				const producer =
+					await transport.produce({ kind, rtpParameters, appData });
+
+				// Store the Producer into the protoo Peer data Object.
+				peer.data.producers.set(producer.id, producer);
+
+				// Set Producer events.
+				producer.on('score', (score) =>
+				{
+					// logger.debug(
+					// 	'producer "score" event [producerId:%s, score:%o]',
+					// 	producer.id, score);
+
+					this._notification(peer.socket, 'producerScore', { producerId: producer.id, score });
+				});
+
+				producer.on('videoorientationchange', (videoOrientation) =>
+				{
+					logger.debug(
+						'producer "videoorientationchange" event [producerId:%s, videoOrientation:%o]',
+						producer.id, videoOrientation);
+				});
+
+				cb(null, { id: producer.id });
+
+				this._peers.forEach((otherPeer) =>
+				{
+					if (otherPeer.data.joined && otherPeer !== peer)
+					{
+						this._createConsumer(
+							{
+								consumerPeer : otherPeer,
+								producerPeer : peer,
+								producer
+							});
+					}
+				});
+
+				// Add into the audioLevelObserver.
+				if (kind === 'audio')
+				{
+					this._audioLevelObserver.addProducer({ producerId: producer.id })
+						.catch(() => {});
+				}
+
+				break;
+			}
+
+			case 'closeProducer':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { producerId } = request.data;
+				const producer = peer.data.producers.get(producerId);
+
+				if (!producer)
+					throw new Error(`producer with id "${producerId}" not found`);
+
+				producer.close();
+
+				// Remove from its map.
+				peer.data.producers.delete(producer.id);
+
+				cb(null);
+
+				break;
+			}
+
+			case 'pauseProducer':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { producerId } = request.data;
+				const producer = peer.data.producers.get(producerId);
+
+				if (!producer)
+					throw new Error(`producer with id "${producerId}" not found`);
+
+				await producer.pause();
+
+				cb(null);
+
+				break;
+			}
+
+			case 'resumeProducer':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { producerId } = request.data;
+				const producer = peer.data.producers.get(producerId);
+
+				if (!producer)
+					throw new Error(`producer with id "${producerId}" not found`);
+
+				await producer.resume();
+
+				cb(null);
+
+				break;
+			}
+
+			case 'pauseConsumer':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { consumerId } = request.data;
+				const consumer = peer.data.consumers.get(consumerId);
+
+				if (!consumer)
+					throw new Error(`consumer with id "${consumerId}" not found`);
+
+				await consumer.pause();
+
+				cb(null);
+
+				break;
+			}
+
+			case 'resumeConsumer':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { consumerId } = request.data;
+				const consumer = peer.data.consumers.get(consumerId);
+
+				if (!consumer)
+					throw new Error(`consumer with id "${consumerId}" not found`);
+
+				await consumer.resume();
+
+				cb(null);
+
+				break;
+			}
+
+			case 'setConsumerPreferedLayers':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { consumerId, spatialLayer, temporalLayer } = request.data;
+				const consumer = peer.data.consumers.get(consumerId);
+
+				if (!consumer)
+					throw new Error(`consumer with id "${consumerId}" not found`);
+
+				await consumer.setPreferredLayers({ spatialLayer, temporalLayer });
+
+				cb(null);
+
+				break;
+			}
+
+			case 'requestConsumerKeyFrame':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { consumerId } = request.data;
+				const consumer = peer.data.consumers.get(consumerId);
+
+				if (!consumer)
+					throw new Error(`consumer with id "${consumerId}" not found`);
+
+				await consumer.requestKeyFrame();
+
+				cb(null);
+
+				break;
+			}
+
+			case 'getTransportStats':
+			{
+				const { transportId } = request.data;
+				const transport = peer.data.transports.get(transportId);
+
+				if (!transport)
+					throw new Error(`transport with id "${transportId}" not found`);
+
+				const stats = await transport.getStats();
+
+				cb(null, stats);
+
+				break;
+			}
+
+			case 'getProducerStats':
+			{
+				const { producerId } = request.data;
+				const producer = peer.data.producers.get(producerId);
+
+				if (!producer)
+					throw new Error(`producer with id "${producerId}" not found`);
+
+				const stats = await producer.getStats();
+
+				cb(null, stats);
+
+				break;
+			}
+
+			case 'getConsumerStats':
+			{
+				const { consumerId } = request.data;
+				const consumer = peer.data.consumers.get(consumerId);
+
+				if (!consumer)
+					throw new Error(`consumer with id "${consumerId}" not found`);
+
+				const stats = await consumer.getStats();
+
+				cb(null, stats);
+
+				break;
+			}
+
+			case 'changeDisplayName':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { displayName } = request.data;
+				const oldDisplayName = peer.data.displayName;
+
+				peer.data.displayName = displayName;
+
+				// Spread to others
+				this._notification(peer.socket, 'changeDisplayName', {
+					peerId         : peer.id,
+					displayName    : displayName,
+					oldDisplayName : oldDisplayName
+				}, true);
+
+				// Return no error
+				cb(null);
+
+				break;
+			}
+
+			case 'changeProfilePicture':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { picture } = request.data;
+
+				// Spread to others
+				this._notification(peer.socket, 'changeProfilePicture', {
+					peerId  : peer.id,
+					picture : picture
+				}, true);
+
+				// Return no error
+				cb(null);
+
+				break;
+			}
+
+			case 'chatMessage':
+			{
+				const { chatMessage } = request.data;
+	
+				this._chatHistory.push(chatMessage);
+
+				// Spread to others
+				this._notification(peer.socket, 'chatMessage', {
+					peerId      : peer.id,
+					chatMessage : chatMessage
+				}, true);
+
+				// Return no error
+				cb(null);
+
+				break;
+			}
+
+			case 'serverHistory':
+			{
+				// Return to sender
+				cb(
+					null,
+					{
+						chatHistory : this._chatHistory,
+						fileHistory : this._fileHistory,
+						lastN       : this._lastN
+					}
+				);
+
+				break;
+			}
+
+			case 'lockRoom':
+			{
+				this._locked = true;
+
+				// Spread to others
+				this._notification(peer.socket, 'lockRoom', {
+					peerId : peer.id
+				}, true);
+
+				// Return no error
+				cb(null);
+
+				break;
+			}
+
+			case 'unlockRoom':
+			{
+				this._locked = false;
+
+				// Spread to others
+				this._notification(peer.socket, 'unlockRoom', {
+					peerId : peer.id
+				}, true);
+
+				// Return no error
+				cb(null);
+
+				break;
+			}
+
+			case 'sendFile':
+			{
+				const { file } = request.data;
+	
+				this._fileHistory.push(file);
+
+				// Spread to others
+				this._notification(peer.socket, 'sendFile', {
+					file   : file
+				}, true);
+
+				// Return no error
+				cb(null);
+
+				break;
+			}
+
+			case 'raiseHand':
+			{
+				const { raiseHandState } = request.data;
+
+				peer.data.raiseHandState = raiseHandState;
+
+				// Spread to others
+				this._notification(peer.socket, 'raiseHand', {
+					peerId         : peer.id,
+					raiseHandState : raiseHandState
+				}, true);
+
+				// Return no error
+				cb(null);
 
 				break;
 			}
 
 			default:
 			{
-				const { mediaPeer } = signalingPeer;
+				logger.error('unknown request.method "%s"', request.method);
 
-				if (!mediaPeer)
-				{
-					logger.error(
-						'cannot handle mediasoup request, no mediasoup Peer [method:"%s"]',
-						request.method);
-
-					cb('no mediasoup Peer');
-				}
-
-				mediaPeer.receiveRequest(request)
-					.then((response) => cb(null, response))
-					.catch((error) => cb(error.toString()));
+				cb(500, `unknown request.method "${request.method}"`);
 			}
 		}
 	}
 
-	_handleMediasoupClientNotification(signalingPeer, notification)
+	/**
+	 * Creates a mediasoup Consumer for the given mediasoup Producer.
+	 *
+	 * @async
+	 */
+	async _createConsumer({ consumerPeer, producerPeer, producer })
 	{
-		logger.debug(
-			'mediasoup-client notification [method:%s, peer:"%s"]',
-			notification.method, signalingPeer.peerName);
+		// Optimization:
+		// - Create the server-side Consumer. If video, do it paused.
+		// - Tell its Peer about it and wait for its response.
+		// - Upon receipt of the response, resume the server-side Consumer.
+		// - If video, this will mean a single key frame requested by the
+		//   server-side Consumer (when resuming it).
 
-		// NOTE: mediasoup-client just sends notifications with target 'peer',
-		// so first of all, get the mediasoup Peer.
-		const { mediaPeer } = signalingPeer;
-
-		if (!mediaPeer)
+		// NOTE: Don't create the Consumer if the remote Peer cannot consume it.
+		if (
+			!consumerPeer.data.rtpCapabilities ||
+			!this._mediasoupRouter.canConsume(
+				{
+					producerId      : producer.id,
+					rtpCapabilities : consumerPeer.data.rtpCapabilities
+				})
+		)
 		{
-			logger.error(
-				'cannot handle mediasoup notification, no mediasoup Peer [method:"%s"]',
-				notification.method);
+			return;
+		}
+
+		// Must take the Transport the remote Peer is using for consuming.
+		const transport = Array.from(consumerPeer.data.transports.values())
+			.find((t) => t.appData.consuming);
+
+		// This should not happen.
+		if (!transport)
+		{
+			logger.warn('_createConsumer() | Transport for consuming not found');
 
 			return;
 		}
 
-		mediaPeer.receiveNotification(notification);
+		// Create the Consumer in paused mode.
+		let consumer;
+
+		try
+		{
+			consumer = await transport.consume(
+				{
+					producerId      : producer.id,
+					rtpCapabilities : consumerPeer.data.rtpCapabilities,
+					paused          : producer.kind === 'video'
+				});
+		}
+		catch (error)
+		{
+			logger.warn('_createConsumer() | transport.consume():%o', error);
+
+			return;
+		}
+
+		// Store the Consumer into the protoo consumerPeer data Object.
+		consumerPeer.data.consumers.set(consumer.id, consumer);
+
+		// Set Consumer events.
+		consumer.on('transportclose', () =>
+		{
+			// Remove from its map.
+			consumerPeer.data.consumers.delete(consumer.id);
+		});
+
+		consumer.on('producerclose', () =>
+		{
+			// Remove from its map.
+			consumerPeer.data.consumers.delete(consumer.id);
+
+			this._notification(consumerPeer.socket, 'consumerClosed', { consumerId: consumer.id });
+		});
+
+		consumer.on('producerpause', () =>
+		{
+			this._notification(consumerPeer.socket, 'consumerPaused', { consumerId: consumer.id });
+		});
+
+		consumer.on('producerresume', () =>
+		{
+			this._notification(consumerPeer.socket, 'consumerResumed', { consumerId: consumer.id });
+		});
+
+		consumer.on('score', (score) =>
+		{
+			// logger.debug(
+			// 	'consumer "score" event [consumerId:%s, score:%o]',
+			// 	consumer.id, score);
+
+			this._notification(consumerPeer.socket, 'consumerScore', { consumerId: consumer.id, score });
+		});
+
+		consumer.on('layerschange', (layers) =>
+		{
+			this._notification(
+				consumerPeer.socket,
+				'consumerLayersChanged',
+				{
+					consumerId    : consumer.id,
+					spatialLayer  : layers ? layers.spatialLayer : null,
+					temporalLayer : layers ? layers.temporalLayer : null
+				}
+			);
+		});
+
+		// Send a protoo request to the remote Peer with Consumer parameters.
+		try
+		{
+			await this._request(
+				consumerPeer.socket,
+				'newConsumer',
+				{
+					peerId         : producerPeer.id,
+					kind           : producer.kind,
+					producerId     : producer.id,
+					id             : consumer.id,
+					kind           : consumer.kind,
+					rtpParameters  : consumer.rtpParameters,
+					type           : consumer.type,
+					appData        : producer.appData,
+					producerPaused : consumer.producerPaused
+				}
+			);
+
+			// Now that we got the positive response from the remote Peer and, if
+			// video, resume the Consumer to ask for an efficient key frame.
+			if (producer.kind === 'video')
+				await consumer.resume();
+
+			this._notification(
+				consumerPeer.socket,
+				'consumerScore',
+				{
+					consumerId : consumer.id,
+					score      : consumer.score
+				}
+			);
+		}
+		catch (error)
+		{
+			logger.warn('_createConsumer() | failed:%o', error);
+		}
 	}
 
-	_updateMaxBitrate()
+	_timeoutCallback(callback)
 	{
-		if (this._mediaRoom.closed)
-			return;
+		let called = false;
 
-		const numPeers = this._mediaRoom.peers.length;
-		const previousMaxBitrate = this._maxBitrate;
-		let newMaxBitrate;
+		const interval = setTimeout(
+			() =>
+			{
+				if (called)
+					return;
+				called = true;
+				callback(new Error('Request timeout.'));
+			},
+			10000
+		);
 
-		if (numPeers <= 2)
+		return (...args) =>
 		{
-			newMaxBitrate = MAX_BITRATE;
+			if (called)
+				return;
+			called = true;
+			clearTimeout(interval);
+
+			callback(...args);
+		};
+	}
+
+	_request(socket, method, data = {})
+	{
+		return new Promise((resolve, reject) =>
+		{
+			socket.emit(
+				'request',
+				{ method, data },
+				this._timeoutCallback((err, response) =>
+				{
+					if (err)
+					{
+						reject(err);
+					}
+					else
+					{
+						resolve(response);
+					}
+				})
+			);
+		});
+	}
+
+	_notification(socket, method, data = {}, broadcast = false)
+	{
+		if (broadcast)
+		{
+			socket.broadcast.to(this._roomId).emit(
+				'notification', { method, data }
+			);
 		}
 		else
 		{
-			newMaxBitrate = Math.round(MAX_BITRATE / ((numPeers - 1) * BITRATE_FACTOR));
-
-			if (newMaxBitrate < MIN_BITRATE)
-				newMaxBitrate = MIN_BITRATE;
+			socket.emit('notification', { method, data });
 		}
-
-		this._maxBitrate = newMaxBitrate;
-
-		for (const peer of this._mediaRoom.peers)
-		{
-			for (const transport of peer.transports)
-			{
-				if (transport.direction === 'send')
-				{
-					transport.setMaxBitrate(newMaxBitrate)
-						.catch((error) =>
-						{
-							logger.error('transport.setMaxBitrate() failed: %s', String(error));
-						});
-				}
-			}
-		}
-
-		logger.info(
-			'_updateMaxBitrate() [num peers:%s, before:%skbps, now:%skbps]',
-			numPeers,
-			Math.round(previousMaxBitrate / 1000),
-			Math.round(newMaxBitrate / 1000));
 	}
 }
 

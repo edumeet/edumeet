@@ -5,14 +5,14 @@ const initialState =
 	locked             : false,
 	lockedOut          : false,
 	audioSuspended     : false,
-	activeSpeakerName  : null,
+	activeSpeakerId    : null,
 	torrentSupport     : false,
 	showSettings       : false,
 	fullScreenConsumer : null, // ConsumerID
 	windowConsumer     : null, // ConsumerID
 	toolbarsVisible    : true,
 	mode               : 'democratic',
-	selectedPeerName   : null,
+	selectedPeerId     : null,
 	spotlights         : [],
 	settingsOpen       : false
 };
@@ -35,7 +35,7 @@ const room = (state = initialState, action) =>
 			if (roomState === 'connected')
 				return { ...state, state: roomState };
 			else
-				return { ...state, state: roomState, activeSpeakerName: null };
+				return { ...state, state: roomState, activeSpeakerId: null };
 		}
 
 		case 'SET_ROOM_LOCKED':
@@ -69,9 +69,9 @@ const room = (state = initialState, action) =>
 
 		case 'SET_ROOM_ACTIVE_SPEAKER':
 		{
-			const { peerName } = action.payload;
+			const { peerId } = action.payload;
 
-			return { ...state, activeSpeakerName: peerName };
+			return { ...state, activeSpeakerId: peerId };
 		}
 
 		case 'FILE_SHARING_SUPPORTED':
@@ -119,13 +119,13 @@ const room = (state = initialState, action) =>
 
 		case 'SET_SELECTED_PEER':
 		{
-			const { selectedPeerName } = action.payload;
+			const { selectedPeerId } = action.payload;
 
 			return {
 				...state,
 
-				selectedPeerName : state.selectedPeerName === selectedPeerName ?
-					null : selectedPeerName
+				selectedPeerId : state.selectedPeerId === selectedPeerId ?
+					null : selectedPeerId
 			};
 		}
 

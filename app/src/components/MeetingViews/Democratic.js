@@ -139,9 +139,9 @@ class Democratic extends React.PureComponent
 				{
 					return (
 						<Peer
-							key={peer.name}
+							key={peer.id}
 							advancedMode={advancedMode}
-							name={peer.name}
+							id={peer.id}
 							style={style}
 						/>
 					);

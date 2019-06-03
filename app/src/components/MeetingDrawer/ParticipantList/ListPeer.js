@@ -185,8 +185,8 @@ const ListPeer = (props) =>
 						{
 							e.stopPropagation();
 							screenVisible ?
-								roomClient.modifyPeerConsumer(peer.name, 'screen', true) :
-								roomClient.modifyPeerConsumer(peer.name, 'screen', false);
+								roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
+								roomClient.modifyPeerConsumer(peer.id, 'screen', false);
 						}}
 					>
 						{ screenVisible ?
@@ -207,8 +207,8 @@ const ListPeer = (props) =>
 					{
 						e.stopPropagation();
 						micEnabled ?
-							roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
-							roomClient.modifyPeerConsumer(peer.name, 'mic', false);
+							roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+							roomClient.modifyPeerConsumer(peer.id, 'mic', false);
 					}}
 				>
 					{ micEnabled ?
@@ -241,7 +241,7 @@ const makeMapStateToProps = (initialState, props) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer : state.peers[props.name],
+			peer : state.peers[props.id],
 			...getPeerConsumers(state, props)
 		};
 	};

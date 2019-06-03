@@ -7,33 +7,33 @@ const peerVolumes = (state = initialState, action) =>
 		case 'SET_ME':
 		{
 			const {
-				peerName
+				peerId
 			} = action.payload;
 
-			return { ...state, [peerName]: 0 };
+			return { ...state, [peerId]: 0 };
 		}
 		case 'ADD_PEER':
 		{
 			const { peer } = action.payload;
 
-			return { ...state, [peer.name]: 0 };
+			return { ...state, [peer.id]: 0 };
 		}
 
 		case 'REMOVE_PEER':
 		{
-			const { peerName } = action.payload;
+			const { peerId } = action.payload;
 			const newState = { ...state };
 
-			delete newState[peerName];
+			delete newState[peerId];
 
 			return newState;
 		}
 
 		case 'SET_PEER_VOLUME':
 		{
-			const { peerName, volume } = action.payload;
+			const { peerId, volume } = action.payload;
 
-			return { ...state, [peerName]: volume };
+			return { ...state, [peerId]: volume };
 		}
 
 		default:

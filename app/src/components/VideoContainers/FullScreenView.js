@@ -102,13 +102,6 @@ const FullScreenView = (props) =>
 
 	return (
 		<div className={classes.root}>
-			{ consumerVisible && !consumer.supported ?
-				<div className={classes.incompatibleVideo}>
-					<p>incompatible video</p>
-				</div>
-				:null
-			}
-
 			<div className={classes.controls}>
 				<div
 					className={classnames(classes.button, {

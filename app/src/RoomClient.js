@@ -20,7 +20,7 @@ const {
 
 const logger = new Logger('RoomClient');
 
-let ROOM_OPTIONS =
+const ROOM_OPTIONS =
 {
 	requestTimeout   : requestTimeout,
 	transportOptions : transportOptions,
@@ -56,6 +56,13 @@ const VIDEO_CONSTRAINS =
 	}
 };
 
+const VIDEO_ENCODINGS =
+[
+	{ maxBitrate: 180000, scaleResolutionDownBy: 4 },
+	{ maxBitrate: 360000, scaleResolutionDownBy: 2 },
+	{ maxBitrate: 1500000, scaleResolutionDownBy: 1 }
+];
+
 let store;
 
 const AudioContext = window.AudioContext // Default
@@ -74,13 +81,13 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ roomId, peerName, device, useSimulcast, produce })
+		{ roomId, peerId, device, useSimulcast, produce, consume, forceTcp })
 	{
 		logger.debug(
-			'constructor() [roomId:"%s", peerName:"%s", device:%s]',
-			roomId, peerName, device.flag);
+			'constructor() [roomId: "%s", peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", consume: "%s", forceTcp: "%s"]',
+			roomId, peerId, device.flag, useSimulcast, produce, consume, forceTcp);
 
-		this._signalingUrl = getSignalingUrl(peerName, roomId);
+		this._signalingUrl = getSignalingUrl(peerId, roomId);
 
 		// window element to external login site
 		this._loginWindow = null;
@@ -90,6 +97,12 @@ export default class RoomClient
 
 		// Whether we should produce.
 		this._produce = produce;
+
+		// Whether we should consume.
+		this._consume = consume;
+
+		// Wheter we force TCP
+		this._forceTcp = forceTcp;
 
 		// Torrent support
 		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
@@ -101,7 +114,7 @@ export default class RoomClient
 		this._device = device;
 
 		// My peer name.
-		this._peerName = peerName;
+		this._peerId = peerId;
 
 		// Alert sound
 		this._soundAlert = new Audio('/sounds/notify.mp3');
@@ -114,9 +127,12 @@ export default class RoomClient
 		// Socket.io peer connection
 		this._signalingSocket = null;
 
-		// The mediasoup room instance
-		this._room = null;
+		// The room ID
 		this._roomId = roomId;
+
+		// mediasoup-client Device instance.
+		// @type {mediasoupClient.Device}
+		this._mediasoupDevice = null;
 
 		this._doneJoining = false;
 
@@ -156,6 +172,10 @@ export default class RoomClient
 
 		this._audioDevices = {};
 
+		// mediasoup Consumers.
+		// @type {Map<String, mediasoupClient.Consumer>}
+		this._consumers = new Map();
+
 		this._screenSharing = ScreenShare.create(device);
 
 		this._screenSharingProducer = null;
@@ -174,12 +194,14 @@ export default class RoomClient
 
 		logger.debug('close()');
 
-		// Leave the mediasoup Room.
-		this._room.leave();
+		this._signalingSocket.close();
 
-		// Close signaling Peer (wait a bit so mediasoup-client can send
-		// the 'leaveRoom' notification).
-		setTimeout(() => this._signalingSocket.close(), 250);
+		// Close mediasoup Transports.
+		if (this._sendTransport)
+			this._sendTransport.close();
+
+		if (this._recvTransport)
+			this._recvTransport.close();
 
 		store.dispatch(stateActions.setRoomState('closed'));
 	}
@@ -204,28 +226,61 @@ export default class RoomClient
 					case 'a': // Activate advanced mode
 					{
 						store.dispatch(stateActions.toggleAdvancedMode());
-						this.notify('Toggled advanced mode.');
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Toggled advanced mode.'
+							}));
 						break;
 					}
 
 					case '1': // Set democratic view
 					{
 						store.dispatch(stateActions.setDisplayMode('democratic'));
-						this.notify('Changed layout to democratic view.');
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Changed layout to democratic view.'
+							}));
 						break;
 					}
 
 					case '2': // Set filmstrip view
 					{
 						store.dispatch(stateActions.setDisplayMode('filmstrip'));
-						this.notify('Changed layout to filmstrip view.');
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Changed layout to filmstrip view.'
+							}));
 						break;
 					}
 
 					case 'm': // Toggle microphone
 					{
-						this.toggleMic();
-						this.notify('Muted/unmuted your microphone.');
+						if (this._micProducer)
+						{
+							if (this._micProducer.paused)
+							{
+								this._micProducer.resume();
+
+								store.dispatch(requestActions.notify(
+									{
+										text : 'Unmuted your microphone.'
+									}));
+							}
+							else
+							{
+								this._micProducer.pause();
+
+								store.dispatch(requestActions.notify(
+									{
+										text : 'Muted your microphone.'
+									}));
+							}
+						}
+						else
+						{
+							this.enableMic();
+						}
+
 						break;
 					}
 
@@ -247,13 +302,16 @@ export default class RoomClient
 			await this._updateAudioDevices();
 			await this._updateWebcams();
 
-			this.notify('Your devices changed, configure your devices in the settings dialog.');
+			store.dispatch(requestActions.notify(
+				{
+					text : 'Your devices changed, configure your devices in the settings dialog.'
+				}));
 		});
 	}
 
 	login()
 	{
-		const url = `/auth/login?roomId=${this._room.roomId}&peerName=${this._peerName}`;
+		const url = `/auth/login?roomId=${this._roomId}&peerId=${this._peerId}`;
 
 		this._loginWindow = window.open(url, 'loginWindow');
 	}
@@ -324,17 +382,21 @@ export default class RoomClient
 			}
 			else
 			{
-				this._signalingSocket.emit(method, data, this.timeoutCallback((err, response) =>
-				{
-					if (err)
+				this._signalingSocket.emit(
+					'request',
+					{ method, data },
+					this.timeoutCallback((err, response) =>
 					{
-						reject(err);
-					}
-					else
-					{
-						resolve(response);
-					}
-				}));
+						if (err)
+						{
+							reject(err);
+						}
+						else
+						{
+							resolve(response);
+						}
+					})
+				);
 			}
 		});
 	}
@@ -345,17 +407,24 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('change-display-name', { displayName });
+			await this.sendRequest('changeDisplayName', { displayName });
 
 			store.dispatch(stateActions.setDisplayName(displayName));
 
-			this.notify(`Your display name changed to ${displayName}.`);
+			store.dispatch(requestActions.notify(
+				{
+					text : `Your display name changed to ${displayName}.`
+				}));
 		}
 		catch (error)
 		{
 			logger.error('changeDisplayName() | failed: %o', error);
 
-			this.notify('An error occured while changing your display name.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'An error occured while changing your display name.'
+				}));
 
 			// We need to refresh the component for it to render the previous
 			// displayName again.
@@ -369,7 +438,7 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('change-profile-picture', { picture });
+			await this.sendRequest('changeProfilePicture', { picture });
 		}
 		catch (error)
 		{
@@ -386,13 +455,17 @@ export default class RoomClient
 			store.dispatch(
 				stateActions.addUserMessage(chatMessage.text));
 
-			await this.sendRequest('chat-message', { chatMessage });
+			await this.sendRequest('chatMessage', { chatMessage });
 		}
 		catch (error)
 		{
 			logger.error('sendChatMessage() | failed: %o', error);
 
-			this.notify('An error occured while sending chat message.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to send chat message.'
+				}));
 		}
 	}
 
@@ -402,7 +475,11 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				return this.notify('An error occurred while saving a file');
+				return store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'Unable to save file.'
+					}));
 			}
 
 			saveAs(blob, file.name);
@@ -466,15 +543,20 @@ export default class RoomClient
 
 	async shareFiles(files)
 	{
-		this.notify('Creating torrent');
+		store.dispatch(requestActions.notify(
+			{
+				text : 'Starting file share.'
+			}));
 
 		createTorrent(files, (err, torrent) =>
 		{
 			if (err)
 			{
-				return this.notify(
-					'An error occured while uploading a file'
-				);
+				return store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'Unable to upload file.'
+					}));
 			}
 
 			const existingTorrent = this._webTorrent.get(torrent);
@@ -494,9 +576,10 @@ export default class RoomClient
 
 			this._webTorrent.seed(files, (newTorrent) =>
 			{
-				this.notify(
-					'Torrent successfully created'
-				);
+				store.dispatch(requestActions.notify(
+					{
+						text : 'File successfully shared.'
+					}));
 
 				const { displayName, picture } = store.getState().settings;
 				const file = {
@@ -525,13 +608,17 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('send-file', { file });
+			await this.sendRequest('sendFile', { file });
 		}
 		catch (error)
 		{
 			logger.error('sendFile() | failed: %o', error);
 
-			this.notify('An error occurred while sharing file.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to share file.'
+				}));
 		}
 	}
 
@@ -545,7 +632,7 @@ export default class RoomClient
 				chatHistory,
 				fileHistory,
 				lastN
-			} = await this.sendRequest('server-history');
+			} = await this.sendRequest('serverHistory');
 
 			if (chatHistory.length > 0)
 			{
@@ -566,7 +653,7 @@ export default class RoomClient
 				logger.debug('Got lastN');
 
 				// Remove our self from list
-				const index = lastN.indexOf(this._peerName);
+				const index = lastN.indexOf(this._peerId);
 
 				lastN.splice(index, 1);
 
@@ -577,18 +664,12 @@ export default class RoomClient
 		{
 			logger.error('getServerHistory() | failed: %o', error);
 
-			this.notify('An error occured while getting server history.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to retrieve room history.'
+				}));
 		}
-	}
-
-	toggleMic()
-	{
-		logger.debug('toggleMic()');
-
-		if (this._micProducer.locallyPaused)
-			this.unmuteMic();
-		else
-			this.muteMic();
 	}
 
 	async muteMic()
@@ -603,7 +684,11 @@ export default class RoomClient
 		{
 			logger.error('muteMic() | failed: %o', error);
 
-			this.notify('An error occured while accessing your microphone.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to access your microphone.'
+				}));
 		}
 	}
 
@@ -616,7 +701,7 @@ export default class RoomClient
 			if (this._micProducer)
 				this._micProducer.resume();
 			else if (this._room.canSend('audio'))
-				await this._setMicProducer();
+				await this.enableMic();
 			else
 				throw new Error('cannot send audio');
 		}
@@ -624,7 +709,11 @@ export default class RoomClient
 		{
 			logger.error('unmuteMic() | failed: %o', error);
 
-			this.notify('An error occured while accessing your microphone.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'An error occured while accessing your microphone.'
+				}));
 		}
 	}
 
@@ -635,26 +724,17 @@ export default class RoomClient
 
 		try
 		{
-			for (const peer of this._room.peers)
+			for (const consumer of this._consumers.values())
 			{
-				if (spotlights.indexOf(peer.name) > -1) // Resume video for speaker
+				if (consumer.kind === 'video')
 				{
-					for (const consumer of peer.consumers)
+					if (spotlights.indexOf(consumer.appData.peerId) > -1)
 					{
-						if (consumer.kind !== 'video' || !consumer.supported)
-							continue;
-
-						await consumer.resume();
+						await this._resumeConsumer(consumer);
 					}
-				}
-				else // Pause video for everybody else
-				{
-					for (const consumer of peer.consumers)
+					else
 					{
-						if (consumer.kind !== 'video')
-							continue;
-
-						await consumer.pause('not-speaker');
+						await this._pauseConsumer(consumer);
 					}
 				}
 			}
@@ -710,78 +790,6 @@ export default class RoomClient
 			{
 				logger.error('installExtension() | failed: %o', error);
 			});
-	}
-
-	async enableScreenSharing()
-	{
-		logger.debug('enableScreenSharing()');
-
-		store.dispatch(stateActions.setScreenShareInProgress(true));
-
-		try
-		{
-			await this._setScreenShareProducer();
-		}
-		catch (error)
-		{
-			logger.error('enableScreenSharing() | failed: %o', error);
-		}
-
-		store.dispatch(stateActions.setScreenShareInProgress(false));
-	}
-
-	async enableWebcam()
-	{
-		logger.debug('enableWebcam()');
-
-		store.dispatch(stateActions.setWebcamInProgress(true));
-
-		try
-		{
-			await this._setWebcamProducer();
-		}
-		catch (error)
-		{
-			logger.error('enableWebcam() | failed: %o', error);
-		}
-
-		store.dispatch(stateActions.setWebcamInProgress(false));
-	}
-
-	async disableScreenSharing()
-	{
-		logger.debug('disableScreenSharing()');
-
-		store.dispatch(stateActions.setScreenShareInProgress(true));
-
-		try
-		{
-			await this._screenSharingProducer.close();
-		}
-		catch (error)
-		{
-			logger.error('disableScreenSharing() | failed: %o', error);
-		}
-
-		store.dispatch(stateActions.setScreenShareInProgress(false));
-	}
-
-	async disableWebcam()
-	{
-		logger.debug('disableWebcam()');
-
-		store.dispatch(stateActions.setWebcamInProgress(true));
-
-		try
-		{
-			this._webcamProducer.close();
-		}
-		catch (error)
-		{
-			logger.error('disableWebcam() | failed: %o', error);
-		}
-
-		store.dispatch(stateActions.setWebcamInProgress(false));
 	}
 
 	async changeAudioDevice(deviceId)
@@ -840,7 +848,7 @@ export default class RoomClient
 				if (volume !== this._micProducer.volume)
 				{
 					this._micProducer.volume = volume;
-					store.dispatch(stateActions.setPeerVolume(this._peerName, volume));
+					store.dispatch(stateActions.setPeerVolume(this._peerId, volume));
 				}
 			});
 
@@ -878,6 +886,8 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no webcam devices');
 
+			this._webcamProducer.track.stop();
+
 			logger.debug('changeVideoResolution() | calling getUserMedia()');
 
 			const stream = await navigator.mediaDevices.getUserMedia(
@@ -891,12 +901,10 @@ export default class RoomClient
 
 			const track = stream.getVideoTracks()[0];
 
-			const newTrack = await this._webcamProducer.replaceTrack(track);
-
-			track.stop();
+			await this._webcamProducer.replaceTrack({ track });
 
 			store.dispatch(
-				stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+				stateActions.setProducerTrack(this._webcamProducer.id, track));
 
 			store.dispatch(stateActions.setSelectedWebcamDevice(deviceId));
 			store.dispatch(stateActions.setVideoResolution(resolution));
@@ -931,6 +939,8 @@ export default class RoomClient
 				'changeWebcam() | new selected webcam [device:%o]',
 				device);
 
+			this._webcamProducer.track.stop();
+
 			logger.debug('changeWebcam() | calling getUserMedia()');
 
 			const stream = await navigator.mediaDevices.getUserMedia(
@@ -944,12 +954,10 @@ export default class RoomClient
 
 			const track = stream.getVideoTracks()[0];
 
-			const newTrack = await this._webcamProducer.replaceTrack(track);
-
-			track.stop();
+			await this._webcamProducer.replaceTrack({ track });
 
 			store.dispatch(
-				stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+				stateActions.setProducerTrack(this._webcamProducer.id, track));
 
 			store.dispatch(stateActions.setSelectedWebcamDevice(deviceId));
 
@@ -964,52 +972,48 @@ export default class RoomClient
 			stateActions.setWebcamInProgress(false));
 	}
 
-	setSelectedPeer(peerName)
+	setSelectedPeer(peerId)
 	{
-		logger.debug('setSelectedPeer() [peerName:"%s"]', peerName);
+		logger.debug('setSelectedPeer() [peerId:"%s"]', peerId);
 
-		this._spotlights.setPeerSpotlight(peerName);
+		this._spotlights.setPeerSpotlight(peerId);
 
 		store.dispatch(
-			stateActions.setSelectedPeer(peerName));
+			stateActions.setSelectedPeer(peerId));
 	}
 
 	// type: mic/webcam/screen
 	// mute: true/false
-	modifyPeerConsumer(peerName, type, mute)
+	async modifyPeerConsumer(peerId, type, mute)
 	{
 		logger.debug(
-			'modifyPeerConsumer() [peerName:"%s", type:"%s"]',
-			peerName,
+			'modifyPeerConsumer() [peerId:"%s", type:"%s"]',
+			peerId,
 			type
 		);
 
 		if (type === 'mic')
 			store.dispatch(
-				stateActions.setPeerAudioInProgress(peerName, true));
+				stateActions.setPeerAudioInProgress(peerId, true));
 		else if (type === 'webcam')
 			store.dispatch(
-				stateActions.setPeerVideoInProgress(peerName, true));
+				stateActions.setPeerVideoInProgress(peerId, true));
 		else if (type === 'screen')
 			store.dispatch(
-				stateActions.setPeerScreenInProgress(peerName, true));
+				stateActions.setPeerScreenInProgress(peerId, true));
 
 		try
 		{
-			for (const peer of this._room.peers)
+			for (const consumer of this._consumers.values())
 			{
-				if (peer.name === peerName)
+				if (consumer.appData.peerId === peerId && consumer.appData.source === type)
 				{
-					for (const consumer of peer.consumers)
+					if (mute)
 					{
-						if (consumer.appData.source !== type || !consumer.supported)
-							continue;
-
-						if (mute)
-							consumer.pause(`mute-${type}`);
-						else
-							consumer.resume();
+						await this._pauseConsumer(consumer);
 					}
+					else
+						await this._resumeConsumer(consumer);
 				}
 			}
 		}
@@ -1020,13 +1024,57 @@ export default class RoomClient
 
 		if (type === 'mic')
 			store.dispatch(
-				stateActions.setPeerAudioInProgress(peerName, false));
+				stateActions.setPeerAudioInProgress(peerId, false));
 		else if (type === 'webcam')
 			store.dispatch(
-				stateActions.setPeerVideoInProgress(peerName, false));
+				stateActions.setPeerVideoInProgress(peerId, false));
 		else if (type === 'screen')
 			store.dispatch(
-				stateActions.setPeerScreenInProgress(peerName, false));
+				stateActions.setPeerScreenInProgress(peerId, false));
+	}
+
+	async _pauseConsumer(consumer)
+	{
+		logger.debug('_pauseConsumer() [consumer: %o]', consumer);
+
+		if (consumer.paused || consumer.closed)
+			return;
+
+		try
+		{
+			await this.sendRequest('pauseConsumer', { consumerId: consumer.id });
+
+			consumer.pause();
+
+			store.dispatch(
+				stateActions.setConsumerPaused(consumer.id, 'local'));
+		}
+		catch (error)
+		{
+			logger.error('_pauseConsumer() | failed:%o', error);
+		}
+	}
+
+	async _resumeConsumer(consumer)
+	{
+		logger.debug('_resumeConsumer() [consumer: %o]', consumer);
+
+		if (!consumer.paused || consumer.closed)
+			return;
+
+		try
+		{
+			await this.sendRequest('resumeConsumer', { consumerId: consumer.id });
+
+			consumer.resume();
+
+			store.dispatch(
+				stateActions.setConsumerResumed(consumer.id, 'local'));
+		}
+		catch (error)
+		{
+			logger.error('_resumeConsumer() | failed:%o', error);
+		}
 	}
 
 	async sendRaiseHandState(state)
@@ -1038,7 +1086,7 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('raisehand-message', { raiseHandState: state });
+			await this.sendRequest('raiseHand', { raiseHandState: state });
 
 			store.dispatch(
 				stateActions.setMyRaiseHandState(state));
@@ -1047,7 +1095,11 @@ export default class RoomClient
 		{
 			logger.error('sendRaiseHandState() | failed: %o', error);
 
-			this.notify(`An error occured while ${state ? 'raising' : 'lowering'} hand.`);
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : `An error occured while ${state ? 'raising' : 'lowering'} hand.`
+				}));
 
 			// We need to refresh the component for it to render changed state
 			store.dispatch(stateActions.setMyRaiseHandState(!state));
@@ -1076,18 +1128,11 @@ export default class RoomClient
 		}
 	}
 
-	join()
+	async join()
 	{
 		this._signalingSocket = io(this._signalingUrl);
 
-		if (this._device.flag === 'firefox')
-			ROOM_OPTIONS = Object.assign({ iceTransportPolicy: 'relay' }, ROOM_OPTIONS);
-
-		// mediasoup-client Room instance.
-		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
-		this._room.roomId = this._roomId;
-
-		this._spotlights = new Spotlights(this._maxSpotlights, this._room);
+		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
 		store.dispatch(stateActions.setRoomState('connecting'));
 
@@ -1096,31 +1141,29 @@ export default class RoomClient
 			logger.debug('signaling Peer "connect" event');
 		});
 
-		this._signalingSocket.on('room-ready', () =>
-		{
-			logger.debug('signaling Peer "room-ready" event');
-
-			this._joinRoom();
-		});
-
-		this._signalingSocket.on('room-locked', () =>
-		{
-			logger.debug('signaling Peer "room-locked" event');
-
-			store.dispatch(stateActions.setRoomLockedOut());
-		});
-
 		this._signalingSocket.on('disconnect', () =>
 		{
 			logger.warn('signaling Peer "disconnect" event');
 
-			this.notify('You are disconnected.');
+			store.dispatch(requestActions.notify(
+				{
+					text : 'You are disconnected.'
+				}));
 
-			// Leave Room.
-			try { this._room.remoteClose({ cause: 'signaling disconnected' }); }
-			catch (error) {}
+			// Close mediasoup Transports.
+			if (this._sendTransport)
+			{
+				this._sendTransport.close();
+				this._sendTransport = null;
+			}
 
-			store.dispatch(stateActions.setRoomState('connecting'));
+			if (this._recvTransport)
+			{
+				this._recvTransport.close();
+				this._recvTransport = null;
+			}
+
+			store.dispatch(stateActions.setRoomState('closed'));
 		});
 
 		this._signalingSocket.on('close', () =>
@@ -1133,153 +1176,386 @@ export default class RoomClient
 			this.close();
 		});
 
-		this._signalingSocket.on('mediasoup-notification', (data) =>
+		this._signalingSocket.on('request', async (request, cb) =>
 		{
-			const notification = data;
+			logger.debug(
+				'socket "request" event [method:%s, data:%o]',
+				request.method, request.data);
 
-			this._room.receiveNotification(notification);
-		});
-
-		this._signalingSocket.on('lock-room', ({ peerName }) =>
-		{
-			store.dispatch(
-				stateActions.setRoomLocked());
-
-			const peer = this._room.getPeerByName(peerName);
-
-			if (peer)
+			switch (request.method)
 			{
-				this.notify(`${peer.appData.displayName} locked the room.`);
+				case 'newConsumer':
+				{
+					const {
+						peerId,
+						producerId,
+						id,
+						kind,
+						rtpParameters,
+						type,
+						appData,
+						producerPaused
+					} = request.data;
+
+					let codecOptions;
+
+					if (kind === 'audio')
+					{
+						codecOptions =
+						{
+							opusStereo : 1
+						};
+					}
+
+					const consumer = await this._recvTransport.consume(
+						{
+							id,
+							producerId,
+							kind,
+							rtpParameters,
+							codecOptions,
+							appData : { ...appData, peerId } // Trick.
+						});
+
+					// Store in the map.
+					this._consumers.set(consumer.id, consumer);
+
+					consumer.on('transportclose', () =>
+					{
+						this._consumers.delete(consumer.id);
+					});
+
+					const { spatialLayers, temporalLayers } =
+						mediasoupClient.parseScalabilityMode(
+							consumer.rtpParameters.encodings[0].scalabilityMode);
+
+					store.dispatch(stateActions.addConsumer(
+						{
+							id                     : consumer.id,
+							peerId                 : peerId,
+							kind                   : kind,
+							type                   : type,
+							locallyPaused          : false,
+							remotelyPaused         : producerPaused,
+							rtpParameters          : consumer.rtpParameters,
+							source                 : consumer.appData.source,
+							spatialLayers          : spatialLayers,
+							temporalLayers         : temporalLayers,
+							preferredSpatialLayer  : spatialLayers - 1,
+							preferredTemporalLayer : temporalLayers - 1,
+							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
+							track                  : consumer.track
+						},
+						peerId));
+
+					// We are ready. Answer the request so the server will
+					// resume this Consumer (which was paused for now).
+					cb(null);
+
+					if (consumer.kind === 'audio')
+					{
+						const stream = new MediaStream();
+
+						stream.addTrack(consumer.track);
+						if (!stream.getAudioTracks()[0])
+							throw new Error('request.newConsumer | given stream has no audio track');
+
+						consumer.hark = hark(stream, { play: false });
+
+						// eslint-disable-next-line no-unused-vars
+						consumer.hark.on('volume_change', (dBs, threshold) =>
+						{
+							// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+							//   Math.pow(10, dBs / 20)
+							// However it does not produce a visually useful output, so let exagerate
+							// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+							// minimize component renderings.
+							let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+							if (volume === 1)
+								volume = 0;
+
+							volume = Math.round(volume);
+
+							if (volume !== consumer.volume)
+							{
+								consumer.volume = volume;
+
+								store.dispatch(stateActions.setPeerVolume(consumer.peerId, volume));
+							}
+						});
+					}
+
+					break;
+				}
+
+				default:
+				{
+					logger.error('unknown request.method "%s"', request.method);
+
+					cb(500, `unknown request.method "${request.method}"`);
+				}
 			}
 		});
 
-		this._signalingSocket.on('unlock-room', ({ peerName }) =>
+		this._signalingSocket.on('notification', async (notification) =>
 		{
-			store.dispatch(
-				stateActions.setRoomUnLocked());
+			logger.debug(
+				'socket "notification" event [method:%s, data:%o]',
+				notification.method, notification.data);
 
-			const peer = this._room.getPeerByName(peerName);
-
-			if (peer)
+			switch (notification.method)
 			{
-				this.notify(`${peer.appData.displayName} unlocked the room.`);
-			}
-		});
+				case 'roomReady':
+				{
+					await this._joinRoom();
 
-		this._signalingSocket.on('active-speaker', ({ peerName }) =>
-		{
-			store.dispatch(
-				stateActions.setRoomActiveSpeaker(peerName));
+					break;
+				}
 
-			if (peerName && peerName !== this._peerName)
-				this._spotlights.handleActiveSpeaker(peerName);
-		});
+				case 'roomLocked':
+				{
+					store.dispatch(stateActions.setRoomLockedOut());
 
-		this._signalingSocket.on('display-name-changed', ({ peerName, displayName: name }) =>
-		{
-			// NOTE: Hack, we shouldn't do this, but this is just a demo.
-			const peer = this._room.getPeerByName(peerName);
+					break;
+				}
 
-			if (!peer)
-			{
-				logger.error('peer not found');
+				case 'lockRoom':
+				{
+					store.dispatch(
+						stateActions.setRoomLocked());
 
-				return;
-			}
+					store.dispatch(requestActions.notify(
+						{
+							text : 'Room is now locked.'
+						}));
 
-			const oldDisplayName = peer.appData.name;
+					break;
+				}
 
-			peer.appData.displayName = name;
+				case 'unlockRoom':
+				{
+					store.dispatch(
+						stateActions.setRoomUnLocked());
+					
+					store.dispatch(requestActions.notify(
+						{
+							text : 'Room is now unlocked.'
+						}));
 
-			store.dispatch(
-				stateActions.setPeerDisplayName(name, peerName));
+					break;
+				}
 
-			this.notify(`${oldDisplayName} changed their display name to ${name}.`);
-		});
+				case 'activeSpeaker':
+				{
+					const { peerId } = notification.data;
 
-		this._signalingSocket.on('profile-picture-changed', ({ peerName, picture }) =>
-		{
-			store.dispatch(stateActions.setPeerPicture(peerName, picture));
-		});
+					store.dispatch(
+						stateActions.setRoomActiveSpeaker(peerId));
+					
+					if (peerId && peerId !== this._peerId)
+						this._spotlights.handleActiveSpeaker(peerId);
 
-		// This means: server wants to change MY user information
-		this._signalingSocket.on('auth', (data) =>
-		{
-			logger.debug('got auth event from server', data);
+					break;
+				}
 
-			this.changeDisplayName(data.name);
+				case 'changeDisplayName':
+				{
+					const { peerId, displayName, oldDisplayName } = notification.data;
 
-			this.changeProfilePicture(data.picture);
-			store.dispatch(stateActions.setPicture(data.picture));
-			store.dispatch(stateActions.loggedIn());
+					store.dispatch(
+						stateActions.setPeerDisplayName(displayName, peerId));
 
-			this.notify('You are logged in.');
+					store.dispatch(requestActions.notify(
+						{
+							text : `${oldDisplayName} is now ${displayName}`
+						}));
 
-			this.closeLoginWindow();
-		});
+					break;
+				}
 
-		this._signalingSocket.on('raisehand-message', (data) =>
-		{
-			const { peerName, raiseHandState } = data;
+				case 'changeProfilePicture':
+				{
+					const { peerId, picture } = notification.data;
 
-			logger.debug('Got raiseHandState from "%s"', peerName);
+					store.dispatch(stateActions.setPeerPicture(peerId, picture));
 
-			// NOTE: Hack, we shouldn't do this, but this is just a demo.
-			const peer = this._room.getPeerByName(peerName);
+					break;
+				}
 
-			if (!peer)
-			{
-				logger.error('peer not found');
+				case 'auth':
+				{
+					const { displayName, picture } = notification.data;
 
-				return;
-			}
+					this.changeDisplayName(displayName);
 
-			this.notify(`${peer.appData.displayName} ${raiseHandState ? 'raised' : 'lowered'} their hand.`);
+					this.changeProfilePicture(picture);
+					store.dispatch(stateActions.setPicture(picture));
+					store.dispatch(stateActions.loggedIn());
 
-			store.dispatch(
-				stateActions.setPeerRaiseHandState(peerName, raiseHandState));
-		});
+					store.dispatch(requestActions.notify(
+						{
+							text : 'You are logged in.'
+						}));
 
-		this._signalingSocket.on('chat-message-receive', (data) =>
-		{
-			const { peerName, chatMessage } = data;
+					this.closeLoginWindow();
 
-			logger.debug('Got chat from "%s"', peerName);
+					break;
+				}
 
-			store.dispatch(
-				stateActions.addResponseMessage({ ...chatMessage, peerName }));
+				case 'chatMessage':
+				{
+					const { peerId, chatMessage } = notification.data;
 
-			if (!store.getState().toolarea.toolAreaOpen ||
-				(store.getState().toolarea.toolAreaOpen &&
-				store.getState().toolarea.currentToolTab !== 'chat')) // Make sound
-			{
-				this._soundNotification();
-			}
-		});
+					store.dispatch(
+						stateActions.addResponseMessage({ ...chatMessage, peerId }));
 
-		this._signalingSocket.on('file-receive', (data) =>
-		{
-			const { peerName, file } = data;
+					if (
+						!store.getState().toolarea.toolAreaOpen ||
+						(store.getState().toolarea.toolAreaOpen &&
+						store.getState().toolarea.currentToolTab !== 'chat')
+					) // Make sound
+					{
+						this._soundNotification();
+					}
 
-			// NOTE: Hack, we shouldn't do this, but this is just a demo.
-			const peer = this._room.getPeerByName(peerName);
+					break;
+				}
 
-			if (!peer)
-			{
-				logger.error('peer not found');
+				case 'sendFile':
+				{
+					const { file } = notification.data;
 
-				return;
-			}
+					store.dispatch(stateActions.addFile(file));
 
-			store.dispatch(stateActions.addFile(file));
+					store.dispatch(requestActions.notify(
+						{
+							text : 'New file available.'
+						}));
 
-			this.notify(`${peer.appData.displayName} shared a file.`);
+					if (
+						!store.getState().toolarea.toolAreaOpen ||
+						(store.getState().toolarea.toolAreaOpen &&
+						store.getState().toolarea.currentToolTab !== 'files')
+					) // Make sound
+					{
+						this._soundNotification();
+					}
 
-			if (!store.getState().toolarea.toolAreaOpen ||
-				(store.getState().toolarea.toolAreaOpen &&
-				store.getState().toolarea.currentToolTab !== 'files')) // Make sound
-			{
-				this._soundNotification();
+					break;
+				}
+
+				case 'producerScore':
+				{
+					const { producerId, score } = notification.data;
+
+					store.dispatch(
+						stateActions.setProducerScore(producerId, score));
+
+					break;
+				}
+
+				case 'newPeer':
+				{
+					const { id, displayName, device } = notification.data;
+
+					store.dispatch(
+						stateActions.addPeer({ id, displayName, device, consumers: [] }));
+
+					store.dispatch(requestActions.notify(
+						{
+							text : `${displayName} joined the room.`
+						}));
+
+					break;
+				}
+
+				case 'peerClosed':
+				{
+					const { peerId } = notification.data;
+
+					store.dispatch(
+						stateActions.removePeer(peerId));
+
+					break;
+				}
+
+				case 'consumerClosed':
+				{
+					const { consumerId } = notification.data;
+					const consumer = this._consumers.get(consumerId);
+
+					if (!consumer)
+						break;
+
+					consumer.close();
+					this._consumers.delete(consumerId);
+
+					const { peerId } = consumer.appData;
+
+					store.dispatch(
+						stateActions.removeConsumer(consumerId, peerId));
+
+					break;
+				}
+
+				case 'consumerPaused':
+				{
+					const { consumerId } = notification.data;
+					const consumer = this._consumers.get(consumerId);
+
+					if (!consumer)
+						break;
+
+					store.dispatch(
+						stateActions.setConsumerPaused(consumerId, 'remote'));
+
+					break;
+				}
+
+				case 'consumerResumed':
+				{
+					const { consumerId } = notification.data;
+					const consumer = this._consumers.get(consumerId);
+
+					if (!consumer)
+						break;
+
+					store.dispatch(
+						stateActions.setConsumerResumed(consumerId, 'remote'));
+
+					break;
+				}
+
+				case 'consumerLayersChanged':
+				{
+					const { consumerId, spatialLayer, temporalLayer } = notification.data;
+					const consumer = this._consumers.get(consumerId);
+
+					if (!consumer)
+						break;
+
+					store.dispatch(stateActions.setConsumerCurrentLayers(
+						consumerId, spatialLayer, temporalLayer));
+
+					break;
+				}
+
+				case 'consumerScore':
+				{
+					const { consumerId, score } = notification.data;
+
+					store.dispatch(
+						stateActions.setConsumerScore(consumerId, score));
+
+					break;
+				}
+
+				default:
+				{
+					logger.error(
+						'unknown notification.method "%s"', notification.method);
+				}
 			}
 		});
 	}
@@ -1288,113 +1564,152 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
-		// NOTE: We allow rejoining (room.join()) the same mediasoup Room when
-		// WebSocket re-connects, so we must clean existing event listeners. Otherwise
-		// they will be called twice after the reconnection.
-		this._room.removeAllListeners();
-
-		this._room.on('close', (originator, appData) =>
-		{
-			if (originator === 'remote')
-			{
-				logger.warn('mediasoup Peer/Room remotely closed [appData:%o]', appData);
-
-				store.dispatch(stateActions.setRoomState('closed'));
-
-				return;
-			}
-		});
-
-		this._room.on('request', (request, callback, errback) =>
-		{
-			logger.debug(
-				'sending mediasoup request [method:%s]:%o', request.method, request);
-
-			this.sendRequest('mediasoup-request', request)
-				.then(callback)
-				.catch(errback);
-		});
-
-		this._room.on('notify', (notification) =>
-		{
-			logger.debug(
-				'sending mediasoup notification [method:%s]:%o',
-				notification.method, notification);
-
-			this.sendRequest('mediasoup-notification', notification)
-				.catch((error) =>
-				{
-					logger.warn('could not send mediasoup notification:%o', error);
-				});
-		});
-
-		this._room.on('newpeer', (peer) =>
-		{
-			logger.debug(
-				'room "newpeer" event [name:"%s", peer:%o]', peer.name, peer);
-
-			this._soundNotification();
-
-			if (this._doneJoining)
-			{
-				this._handlePeer(peer);
-			}
-		});
+		const { displayName } = store.getState().settings;
 
 		try
 		{
-			const { displayName } = store.getState().settings;
+			this._mediasoupDevice = new mediasoupClient.Device();
 
-			await this._room.join(
-				this._peerName,
-				{
-					displayName : displayName,
-					device      : this._device
-				}
-			);
+			const routerRtpCapabilities =
+				await this.sendRequest('getRouterRtpCapabilities');
 
-			store.dispatch(
-				stateActions.setFileSharingSupported(this._torrentSupport));
+			await this._mediasoupDevice.load({ routerRtpCapabilities });
 
-			this._sendTransport =
-				this._room.createTransport('send', { media: 'SEND_MIC_WEBCAM' });
-
-			this._sendTransport.on('close', (originator) =>
+			if (this._produce)
 			{
-				logger.debug(
-					'Transport "close" event [originator:%s]', originator);
-			});
+				const transportInfo = await this.sendRequest(
+					'createWebRtcTransport',
+					{
+						forceTcp  : this._forceTcp,
+						producing : true,
+						consuming : false
+					});
 
-			// Create Transport for receiving.
-			this._recvTransport =
-				this._room.createTransport('recv', { media: 'RECV' });
+				const {
+					id,
+					iceParameters,
+					iceCandidates,
+					dtlsParameters
+				} = transportInfo;
 
-			this._recvTransport.on('close', (originator) =>
+				this._sendTransport = this._mediasoupDevice.createSendTransport(
+					{
+						id,
+						iceParameters,
+						iceCandidates,
+						dtlsParameters
+					});
+
+				this._sendTransport.on(
+					'connect', ({ dtlsParameters }, callback, errback) => // eslint-disable-line no-shadow
+					{
+						this.sendRequest(
+							'connectWebRtcTransport',
+							{
+								transportId : this._sendTransport.id,
+								dtlsParameters
+							})
+							.then(callback)
+							.catch(errback);
+					});
+
+				this._sendTransport.on(
+					'produce', ({ kind, rtpParameters, appData }, callback, errback) =>
+					{
+						this.sendRequest(
+							'produce',
+							{
+								transportId : this._sendTransport.id,
+								kind,
+								rtpParameters,
+								appData
+							})
+							.then(callback)
+							.catch(errback);
+					});
+			}
+
+			if (this._consume)
 			{
-				logger.debug(
-					'receiving Transport "close" event [originator:%s]', originator);
-			});
+				const transportInfo = await this.sendRequest(
+					'createWebRtcTransport',
+					{
+						forceTcp  : this._forceTcp,
+						producing : false,
+						consuming : true
+					});
+
+				const {
+					id,
+					iceParameters,
+					iceCandidates,
+					dtlsParameters
+				} = transportInfo;
+
+				this._recvTransport = this._mediasoupDevice.createRecvTransport(
+					{
+						id,
+						iceParameters,
+						iceCandidates,
+						dtlsParameters
+					});
+
+				this._recvTransport.on(
+					'connect', ({ dtlsParameters }, callback, errback) => // eslint-disable-line no-shadow
+					{
+						this.sendRequest(
+							'connectWebRtcTransport',
+							{
+								transportId : this._recvTransport.id,
+								dtlsParameters
+							})
+							.then(callback)
+							.catch(errback);
+					});
+			}
 
 			// Set our media capabilities.
 			store.dispatch(stateActions.setMediaCapabilities(
 				{
-					canSendMic    : this._room.canSend('audio'),
-					canSendWebcam : this._room.canSend('video')
-				}));
-			store.dispatch(stateActions.setScreenCapabilities(
-				{
-					canShareScreen : this._room.canSend('video') &&
+					canSendMic     : this._mediasoupDevice.canProduce('audio'),
+					canSendWebcam  : this._mediasoupDevice.canProduce('video'),
+					canShareScreen : this._mediasoupDevice.canProduce('video') &&
 						this._screenSharing.isScreenShareAvailable(),
-					needExtension : this._screenSharing.needExtension()
+					needExtension : this._screenSharing.needExtension(),
+					canShareFiles : this._torrentSupport
 				}));
+
+			const { peers } = await this.sendRequest(
+				'join',
+				{
+					displayName     : displayName,
+					device          : this._device,
+					rtpCapabilities : this._consume
+						? this._mediasoupDevice.rtpCapabilities
+						: undefined
+				});
+			
+			for (const peer of peers)
+			{
+				store.dispatch(
+					stateActions.addPeer({ ...peer, consumers: [] }));
+			}
+
+			this._spotlights.addPeers(peers);
+
+			this._spotlights.on('spotlights-updated', (spotlights) =>
+			{
+				store.dispatch(stateActions.setSpotlights(spotlights));
+				this.updateSpotlights(spotlights);
+			});
 
 			// Don't produce if explicitely requested to not to do it.
 			if (this._produce)
 			{
-				if (this._room.canSend('audio'))
-					await this._setMicProducer();
+				if (this._mediasoupDevice.canProduce('audio'))
+					await this.enableMic();
 
-				if (this._room.canSend('video'))
+				if (this._mediasoupDevice.canProduce('video'))
 					await this.enableWebcam();
 			}
 
@@ -1405,22 +1720,10 @@ export default class RoomClient
 
 			this.getServerHistory();
 
-			this.notify('You have joined the room.');
-
-			this._spotlights.on('spotlights-updated', (spotlights) =>
-			{
-				store.dispatch(stateActions.setSpotlights(spotlights));
-				this.updateSpotlights(spotlights);
-			});
-
-			const peers = this._room.peers;
-
-			for (const peer of peers)
-			{
-				this._handlePeer(peer, { notify: false });
-			}
-
-			this._doneJoining = true;
+			store.dispatch(requestActions.notify(
+				{
+					text : 'You have joined the room.'
+				}));
 
 			this._spotlights.start();
 		}
@@ -1428,7 +1731,11 @@ export default class RoomClient
 		{
 			logger.error('_joinRoom() failed:%o', error);
 
-			this.notify('An error occured while joining the room.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to join the room.'
+				}));
 
 			this.close();
 		}
@@ -1440,14 +1747,24 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('lock-room');
+			await this.sendRequest('lockRoom');
 
 			store.dispatch(
 				stateActions.setRoomLocked());
-			this.notify('You locked the room.');
+
+			store.dispatch(requestActions.notify(
+				{
+					text : 'You locked the room.'
+				}));
 		}
 		catch (error)
 		{
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to lock the room.'
+				}));
+
 			logger.error('lockRoom() | failed: %o', error);
 		}
 	}
@@ -1458,27 +1775,44 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('unlock-room');
+			await this.sendRequest('unlockRoom');
 
 			store.dispatch(
 				stateActions.setRoomUnLocked());
-			this.notify('You unlocked the room.');
+
+			store.dispatch(requestActions.notify(
+				{
+					text : 'You unlocked the room.'
+				}));
 		}
 		catch (error)
 		{
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to unlock the room.'
+				}));
+
 			logger.error('unlockRoom() | failed: %o', error);
 		}
 	}
 
-	async _setMicProducer()
+	async enableMic()
 	{
-		if (!this._room.canSend('audio'))
-			throw new Error('cannot send audio');
-
 		if (this._micProducer)
-			throw new Error('mic Producer already exists');
+			return;
 
-		let producer;
+		if (!this._mediasoupDevice.canProduce('audio'))
+		{
+			logger.error('enableMic() | cannot produce audio');
+
+			return;
+		}
+
+		let track;
+
+		store.dispatch(
+			stateActions.setAudioInProgress(true));
 
 		try
 		{
@@ -1490,10 +1824,10 @@ export default class RoomClient
 				throw new Error('no audio devices');
 			
 			logger.debug(
-				'_setMicProducer() | new selected audio device [device:%o]',
+				'enableMic() | new selected audio device [device:%o]',
 				device);
 
-			logger.debug('_setMicProducer() | calling getUserMedia()');
+			logger.debug('enableMic() | calling getUserMedia()');
 
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
@@ -1503,76 +1837,60 @@ export default class RoomClient
 				}
 			);
 
-			const track = stream.getAudioTracks()[0];
+			track = stream.getAudioTracks()[0];
 
-			producer = this._room.createProducer(track, null, { source: 'mic' });
-
-			// No need to keep original track.
-			track.stop();
-
-			// Send it.
-			await producer.send(this._sendTransport);
-
-			this._micProducer = producer;
+			this._micProducer = await this._sendTransport.produce(
+				{
+					track,
+					codecOptions :
+					{
+						opusStereo : 1,
+						opusDtx    : 1
+					},
+					appData : 
+					{ source: 'mic' }
+				});
 
 			store.dispatch(stateActions.addProducer(
 				{
-					id             : producer.id,
-					source         : 'mic',
-					locallyPaused  : producer.locallyPaused,
-					remotelyPaused : producer.remotelyPaused,
-					track          : producer.track,
-					codec          : producer.rtpParameters.codecs[0].name
+					id            : this._micProducer.id,
+					source        : 'mic',
+					paused        : this._micProducer.paused,
+					track         : this._micProducer.track,
+					rtpParameters : this._micProducer.rtpParameters,
+					codec         : this._micProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
 				}));
 
 			store.dispatch(stateActions.setSelectedAudioDevice(deviceId));
 
 			await this._updateAudioDevices();
 
-			producer.on('close', (originator) =>
+			this._micProducer.on('transportclose', () =>
 			{
-				logger.debug(
-					'mic Producer "close" event [originator:%s]', originator);
-
 				this._micProducer = null;
-				store.dispatch(stateActions.removeProducer(producer.id));
 			});
 
-			producer.on('pause', (originator) =>
+			this._micProducer.on('trackended', () =>
 			{
-				logger.debug(
-					'mic Producer "pause" event [originator:%s]', originator);
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'Microphone disconnected!'
+					}));
 
-				store.dispatch(stateActions.setProducerPaused(producer.id, originator));
-			});
-
-			producer.on('resume', (originator) =>
-			{
-				logger.debug(
-					'mic Producer "resume" event [originator:%s]', originator);
-
-				store.dispatch(stateActions.setProducerResumed(producer.id, originator));
-			});
-
-			producer.on('handled', () =>
-			{
-				logger.debug('mic Producer "handled" event');
-			});
-
-			producer.on('unhandled', () =>
-			{
-				logger.debug('mic Producer "unhandled" event');
+				this.disableMic()
+					.catch(() => {});
 			});
 
 			const harkStream = new MediaStream();
 
-			harkStream.addTrack(producer.track);
+			harkStream.addTrack(track);
 			if (!harkStream.getAudioTracks()[0])
-				throw new Error('_setMicProducer(): given stream has no audio track');
-			producer.hark = hark(harkStream, { play: false });
+				throw new Error('enableMic(): given stream has no audio track');
+			this._micProducer.hark = hark(harkStream, { play: false });
 
 			// eslint-disable-next-line no-unused-vars
-			producer.hark.on('volume_change', (dBs, threshold) =>
+			this._micProducer.hark.on('volume_change', (dBs, threshold) =>
 			{
 				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 				//   Math.pow(10, dBs / 20)
@@ -1584,10 +1902,10 @@ export default class RoomClient
 				if (volume === 1)
 					volume = 0;
 				volume = Math.round(volume);
-				if (volume !== producer.volume)
+				if (this._micProducer && volume !== this._micProducer.volume)
 				{
-					producer.volume = volume;
-					store.dispatch(stateActions.setPeerVolume(this._peerName, volume));
+					this._micProducer.volume = volume;
+					store.dispatch(stateActions.setPeerVolume(this._peerId, volume));
 				}
 			});
 
@@ -1602,22 +1920,71 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_setMicProducer() failed:%o', error);
+			logger.error('enableMic() failed:%o', error);
 
-			this.notify('An error occured while accessing your microphone.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'An error occured while accessing your microphone.'
+				}));
 
-			if (producer)
-				producer.close();
+			if (track)
+				track.stop();
 
 		}
+
+		store.dispatch(
+			stateActions.setAudioInProgress(false));
 	}
 
-	async _setScreenShareProducer()
+	async disableMic()
 	{
-		if (!this._room.canSend('video'))
-			throw new Error('cannot send screen');
+		logger.debug('disableMic()');
 
-		let producer;
+		if (!this._micProducer)
+			return;
+
+		store.dispatch(stateActions.setAudioInProgress(true));
+
+		this._micProducer.close();
+
+		store.dispatch(
+			stateActions.removeProducer(this._micProducer.id));
+
+		try
+		{
+			await this.sendRequest(
+				'closeProducer', { producerId: this._micProducer.id });
+		}
+		catch (error)
+		{
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : `Error closing server-side mic Producer: ${error}`
+				}));
+		}
+
+		this._micProducer = null;
+
+		store.dispatch(stateActions.setAudioInProgress(false));
+	}
+
+	async enableScreenSharing()
+	{
+		if (this._screenSharingProducer)
+			return;
+
+		if (!this._mediasoupDevice.canProduce('video'))
+		{
+			logger.error('enableScreenSharing() | cannot produce video');
+
+			return;
+		}
+
+		let track;
+
+		store.dispatch(stateActions.setScreenShareInProgress(true));
 
 		try
 		{
@@ -1627,7 +1994,7 @@ export default class RoomClient
 			if (!available)
 				throw new Error('screen sharing not available');
 
-			logger.debug('_setScreenShareProducer() | calling getUserMedia()');
+			logger.debug('enableScreenSharing() | calling getUserMedia()');
 
 			const stream = await this._screenSharing.start({
 				width     : 1280,
@@ -1635,105 +2002,132 @@ export default class RoomClient
 				frameRate : 3
 			});
 
-			const track = stream.getVideoTracks()[0];
+			track = stream.getVideoTracks()[0];
 
-			producer = this._room.createProducer(
-				track, { simulcast: false }, { source: 'screen' });
-
-			// No need to keep original track.
-			track.stop();
-
-			// Send it.
-			await producer.send(this._sendTransport);
-
-			this._screenSharingProducer = producer;
+			if (this._useSimulcast)
+			{
+				this._screenSharingProducer = await this._sendTransport.produce(
+					{
+						track,
+						encodings    : VIDEO_ENCODINGS,
+						codecOptions :
+						{
+							videoGoogleStartBitrate : 1000
+						},
+						appData : 
+						{
+							source : 'screen'
+						}
+					});
+			}
+			else
+			{
+				this._screenSharingProducer = await this._sendTransport.produce({
+					track,
+					appData : 
+					{
+						source : 'screen'
+					}
+				});
+			}
 
 			store.dispatch(stateActions.addProducer(
 				{
-					id             : producer.id,
-					source         : 'screen',
-					deviceLabel    : 'screen',
-					type           : 'screen',
-					locallyPaused  : producer.locallyPaused,
-					remotelyPaused : producer.remotelyPaused,
-					track          : producer.track,
-					codec          : producer.rtpParameters.codecs[0].name
+					id            : this._screenSharingProducer.id,
+					deviceLabel   : 'screen',
+					source        : 'screen',
+					paused        : this._screenSharingProducer.paused,
+					track         : this._screenSharingProducer.track,
+					rtpParameters : this._screenSharingProducer.rtpParameters,
+					codec         : this._screenSharingProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
 				}));
 
-			producer.on('close', (originator) =>
+			this._screenSharingProducer.on('transportclose', () =>
 			{
-				logger.debug(
-					'webcam Producer "close" event [originator:%s]', originator);
-
 				this._screenSharingProducer = null;
-				store.dispatch(stateActions.removeProducer(producer.id));
 			});
 
-			producer.on('trackended', (originator) =>
+			this._screenSharingProducer.on('trackended', () =>
 			{
-				logger.debug(
-					'webcam Producer "trackended" event [originator:%s]', originator);
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'Screen sharing disconnected!'
+					}));
 
-				this.disableScreenSharing();
+				this.disableScreenSharing()
+					.catch(() => {});
 			});
 
-			producer.on('pause', (originator) =>
-			{
-				logger.debug(
-					'webcam Producer "pause" event [originator:%s]', originator);
-
-				store.dispatch(stateActions.setProducerPaused(producer.id, originator));
-			});
-
-			producer.on('resume', (originator) =>
-			{
-				logger.debug(
-					'webcam Producer "resume" event [originator:%s]', originator);
-
-				store.dispatch(stateActions.setProducerResumed(producer.id, originator));
-			});
-
-			producer.on('handled', () =>
-			{
-				logger.debug('webcam Producer "handled" event');
-			});
-
-			producer.on('unhandled', () =>
-			{
-				logger.debug('webcam Producer "unhandled" event');
-			});
-
-			logger.debug('_setScreenShareProducer() succeeded');
+			logger.debug('enableScreenSharing() succeeded');
 		}
 		catch (error)
 		{
-			logger.error('_setScreenShareProducer() failed:%o', error);
+			logger.error('enableScreenSharing() failed: %o', error);
 
-			if (error.name === 'NotAllowedError') // Request to share denied by user
-			{
-				this.notify('Request to start sharing your screen was denied.');
-			}
-			else // Some other error
-			{
-				this.notify('An error occured while starting to share your screen.');
-			}
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'An error occured while accessing your camera.'
+				}));
 
-			if (producer)
-				producer.close();
-
-			throw error;
+			if (track)
+				track.stop();
 		}
+
+		store.dispatch(stateActions.setScreenShareInProgress(false));
 	}
 
-	async _setWebcamProducer()
+	async disableScreenSharing()
 	{
-		if (!this._room.canSend('video'))
-			throw new Error('cannot send video');
+		logger.debug('disableScreenSharing()');
+
+		if (!this._screenSharingProducer)
+			return;
+
+		store.dispatch(stateActions.setScreenShareInProgress(true));
+
+		this._screenSharingProducer.close();
+
+		store.dispatch(
+			stateActions.removeProducer(this._screenSharingProducer.id));
+
+		try
+		{
+			await this.sendRequest(
+				'closeProducer', { producerId: this._screenSharingProducer.id });
+		}
+		catch (error)
+		{
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : `Error closing server-side screen Producer: ${error}`
+				}));
+		}
+
+		this._screenSharingProducer = null;
+
+		store.dispatch(stateActions.setScreenShareInProgress(false));
+	}
+
+	async enableWebcam()
+	{
 
 		if (this._webcamProducer)
-			throw new Error('webcam Producer already exists');
+			return;
 
-		let producer;
+		if (!this._mediasoupDevice.canProduce('video'))
+		{
+			logger.error('enableWebcam() | cannot produce video');
+
+			return;
+		}
+
+		let track;
+
+		store.dispatch(
+			stateActions.setWebcamInProgress(true));
 
 		try
 		{
@@ -1760,66 +2154,65 @@ export default class RoomClient
 					}
 				});
 
-			const track = stream.getVideoTracks()[0];
+			track = stream.getVideoTracks()[0];
 
-			producer = this._room.createProducer(
-				track, { simulcast: this._useSimulcast }, { source: 'webcam' });
-
-			// No need to keep original track.
-			track.stop();
-
-			// Send it.
-			await producer.send(this._sendTransport);
-
-			this._webcamProducer = producer;
+			if (this._useSimulcast)
+			{
+				this._webcamProducer = await this._sendTransport.produce(
+					{
+						track,
+						encodings    : VIDEO_ENCODINGS,
+						codecOptions :
+						{
+							videoGoogleStartBitrate : 1000
+						},
+						appData : 
+						{
+							source : 'webcam'
+						}
+					});
+			}
+			else
+			{
+				this._webcamProducer = await this._sendTransport.produce({
+					track,
+					appData : 
+					{
+						source : 'webcam'
+					}
+				});
+			}
 
 			store.dispatch(stateActions.addProducer(
 				{
-					id             : producer.id,
-					source         : 'webcam',
-					locallyPaused  : producer.locallyPaused,
-					remotelyPaused : producer.remotelyPaused,
-					track          : producer.track,
-					codec          : producer.rtpParameters.codecs[0].name
+					id            : this._webcamProducer.id,
+					deviceLabel   : device.label,
+					source        : 'webcam',
+					paused        : this._webcamProducer.paused,
+					track         : this._webcamProducer.track,
+					rtpParameters : this._webcamProducer.rtpParameters,
+					codec         : this._webcamProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
 				}));
 
 			store.dispatch(stateActions.setSelectedWebcamDevice(deviceId));
 
 			await this._updateWebcams();
 
-			producer.on('close', (originator) =>
+			this._webcamProducer.on('transportclose', () =>
 			{
-				logger.debug(
-					'webcam Producer "close" event [originator:%s]', originator);
-
 				this._webcamProducer = null;
-				store.dispatch(stateActions.removeProducer(producer.id));
 			});
 
-			producer.on('pause', (originator) =>
+			this._webcamProducer.on('trackended', () =>
 			{
-				logger.debug(
-					'webcam Producer "pause" event [originator:%s]', originator);
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'Webcam disconnected!'
+					}));
 
-				store.dispatch(stateActions.setProducerPaused(producer.id, originator));
-			});
-
-			producer.on('resume', (originator) =>
-			{
-				logger.debug(
-					'webcam Producer "resume" event [originator:%s]', originator);
-
-				store.dispatch(stateActions.setProducerResumed(producer.id, originator));
-			});
-
-			producer.on('handled', () =>
-			{
-				logger.debug('webcam Producer "handled" event');
-			});
-
-			producer.on('unhandled', () =>
-			{
-				logger.debug('webcam Producer "unhandled" event');
+				this.disableWebcam()
+					.catch(() => {});
 			});
 
 			logger.debug('_setWebcamProducer() succeeded');
@@ -1828,13 +2221,51 @@ export default class RoomClient
 		{
 			logger.error('_setWebcamProducer() failed:%o', error);
 
-			this.notify('An error occured while accessing your camera.');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'An error occured while accessing your camera.'
+				}));
 
-			if (producer)
-				producer.close();
-
-			throw error;
+			if (track)
+				track.stop();
 		}
+
+		store.dispatch(
+			stateActions.setWebcamInProgress(false));
+	}
+
+	async disableWebcam()
+	{
+		logger.debug('disableWebcam()');
+
+		if (!this._webcamProducer)
+			return;
+
+		store.dispatch(stateActions.setWebcamInProgress(true));
+
+		this._webcamProducer.close();
+
+		store.dispatch(
+			stateActions.removeProducer(this._webcamProducer.id));
+
+		try
+		{
+			await this.sendRequest(
+				'closeProducer', { producerId: this._webcamProducer.id });
+		}
+		catch (error)
+		{
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : `Error closing server-side webcam Producer: ${error}`
+				}));
+		}
+
+		this._webcamProducer = null;
+
+		store.dispatch(stateActions.setWebcamInProgress(false));
 	}
 
 	async _updateAudioDevices()
@@ -1948,169 +2379,6 @@ export default class RoomClient
 		catch (error)
 		{
 			logger.error('_getWebcamDeviceId() failed:%o', error);
-		}
-	}
-
-	_handlePeer(peer, { notify = true } = {})
-	{
-		const displayName = peer.appData.displayName;
-
-		store.dispatch(stateActions.addPeer(
-			{
-				name           : peer.name,
-				displayName    : displayName,
-				device         : peer.appData.device,
-				raiseHandState : peer.appData.raiseHandState,
-				consumers      : []
-			}));
-
-		if (notify)
-		{
-			this.notify(`${displayName} joined the room.`);
-		}
-
-		for (const consumer of peer.consumers)
-		{
-			this._handleConsumer(consumer);
-		}
-
-		peer.on('close', (originator) =>
-		{
-			logger.debug(
-				'peer "close" event [name:"%s", originator:%s]',
-				peer.name, originator);
-
-			store.dispatch(stateActions.removePeer(peer.name));
-
-			if (this._room.joined)
-			{
-				this.notify(`${displayName} left the room.`);
-			}
-		});
-
-		peer.on('newconsumer', (consumer) =>
-		{
-			logger.debug(
-				'peer "newconsumer" event [name:"%s", id:%s, consumer:%o]',
-				peer.name, consumer.id, consumer);
-
-			this._handleConsumer(consumer);
-		});
-	}
-
-	_handleConsumer(consumer)
-	{
-		const codec = consumer.rtpParameters.codecs[0];
-
-		store.dispatch(stateActions.addConsumer(
-			{
-				id             : consumer.id,
-				peerName       : consumer.peer.name,
-				source         : consumer.appData.source,
-				supported      : consumer.supported,
-				locallyPaused  : consumer.locallyPaused,
-				remotelyPaused : consumer.remotelyPaused,
-				track          : null,
-				codec          : codec ? codec.name : null
-			},
-			consumer.peer.name)
-		);
-
-		consumer.on('close', (originator) =>
-		{
-			logger.debug(
-				'consumer "close" event [id:%s, originator:%s, consumer:%o]',
-				consumer.id, originator, consumer);
-
-			store.dispatch(stateActions.removeConsumer(
-				consumer.id, consumer.peer.name));
-		});
-
-		consumer.on('handled', (originator) =>
-		{
-			logger.debug(
-				'consumer "handled" event [id:%s, originator:%s, consumer:%o]',
-				consumer.id, originator, consumer);
-			if (consumer.kind === 'audio')
-			{
-				const stream = new MediaStream();
-
-				stream.addTrack(consumer.track);
-				if (!stream.getAudioTracks()[0])
-					throw new Error('consumer.on("handled" | given stream has no audio track');
-
-				consumer.hark = hark(stream, { play: false });
-
-				// eslint-disable-next-line no-unused-vars
-				consumer.hark.on('volume_change', (dBs, threshold) =>
-				{
-					// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-					//   Math.pow(10, dBs / 20)
-					// However it does not produce a visually useful output, so let exagerate
-					// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-					// minimize component renderings.
-					let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-					if (volume === 1)
-						volume = 0;
-					volume = Math.round(volume);
-					if (volume !== consumer.volume)
-					{
-						consumer.volume = volume;
-						store.dispatch(stateActions.setPeerVolume(consumer.peer.name, volume));
-					}
-				});
-			}
-		});
-
-		consumer.on('pause', (originator) =>
-		{
-			logger.debug(
-				'consumer "pause" event [id:%s, originator:%s, consumer:%o]',
-				consumer.id, originator, consumer);
-
-			store.dispatch(stateActions.setConsumerPaused(consumer.id, originator));
-		});
-
-		consumer.on('resume', (originator) =>
-		{
-			logger.debug(
-				'consumer "resume" event [id:%s, originator:%s, consumer:%o]',
-				consumer.id, originator, consumer);
-
-			store.dispatch(stateActions.setConsumerResumed(consumer.id, originator));
-		});
-
-		consumer.on('effectiveprofilechange', (profile) =>
-		{
-			logger.debug(
-				'consumer "effectiveprofilechange" event [id:%s, consumer:%o, profile:%s]',
-				consumer.id, consumer, profile);
-
-			store.dispatch(stateActions.setConsumerEffectiveProfile(consumer.id, profile));
-		});
-
-		// Receive the consumer (if we can).
-		if (consumer.supported)
-		{
-			if (consumer.kind === 'video' &&
-				!this._spotlights.peerInSpotlights(consumer.peer.name))
-			{ // Start paused
-				logger.debug(
-					'consumer paused by default');
-				consumer.pause('not-speaker');
-			}
-
-			consumer.receive(this._recvTransport)
-				.then((track) =>
-				{
-					store.dispatch(stateActions.setConsumerTrack(consumer.id, track));
-				})
-				.catch((error) =>
-				{
-					logger.error(
-						'unexpected error while receiving a new Consumer:%o', error);
-				});
 		}
 	}
 }
