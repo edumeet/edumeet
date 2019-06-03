@@ -51,11 +51,30 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
-		case 'SET_CONSUMER_EFFECTIVE_PROFILE':
+		case 'SET_CONSUMER_CURRENT_LAYERS':
 		{
-			const { consumerId, profile } = action.payload;
+			const { consumerId, spatialLayer, temporalLayer } = action.payload;
 			const consumer = state[consumerId];
-			const newConsumer = { ...consumer, profile };
+			const newConsumer =
+			{
+				...consumer,
+				currentSpatialLayer  : spatialLayer,
+				currentTemporalLayer : temporalLayer
+			};
+
+			return { ...state, [consumerId]: newConsumer };
+		}
+
+		case 'SET_CONSUMER_PREFERRED_LAYERS':
+		{
+			const { consumerId, spatialLayer, temporalLayer } = action.payload;
+			const consumer = state[consumerId];
+			const newConsumer =
+			{
+				...consumer,
+				preferredSpatialLayer  : spatialLayer,
+				preferredTemporalLayer : temporalLayer
+			};
 
 			return { ...state, [consumerId]: newConsumer };
 		}
@@ -65,6 +84,19 @@ const consumers = (state = initialState, action) =>
 			const { consumerId, track } = action.payload;
 			const consumer = state[consumerId];
 			const newConsumer = { ...consumer, track };
+
+			return { ...state, [consumerId]: newConsumer };
+		}
+
+		case 'SET_CONSUMER_SCORE':
+		{
+			const { consumerId, score } = action.payload;
+			const consumer = state[consumerId];
+
+			if (!consumer)
+				return state;
+
+			const newConsumer = { ...consumer, score };
 
 			return { ...state, [consumerId]: newConsumer };
 		}

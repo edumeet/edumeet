@@ -14,11 +14,11 @@ export const setRoomState = (state) =>
 	};
 };
 
-export const setRoomActiveSpeaker = (peerName) =>
+export const setRoomActiveSpeaker = (peerId) =>
 {
 	return {
 		type    : 'SET_ROOM_ACTIVE_SPEAKER',
-		payload : { peerName }
+		payload : { peerId }
 	};
 };
 
@@ -57,19 +57,25 @@ export const setSettingsOpen = ({ settingsOpen }) =>
 		payload : { settingsOpen }
 	});
 
-export const setMe = ({ peerName, device, loginEnabled }) =>
+export const setMe = ({ peerId, device, loginEnabled }) =>
 {
 	return {
 		type    : 'SET_ME',
-		payload : { peerName, device, loginEnabled }
+		payload : { peerId, device, loginEnabled }
 	};
 };
 
-export const setMediaCapabilities = ({ canSendMic, canSendWebcam }) =>
+export const setMediaCapabilities = ({
+	canSendMic,
+	canSendWebcam,
+	canShareScreen,
+	needExtension,
+	canShareFiles
+}) =>
 {
 	return {
 		type    : 'SET_MEDIA_CAPABILITIES',
-		payload : { canSendMic, canSendWebcam }
+		payload : { canSendMic, canSendWebcam, canShareScreen, needExtension, canShareFiles }
 	};
 };
 
@@ -150,27 +156,27 @@ export const setDisplayMode = (mode) =>
 		payload : { mode }
 	});
 
-export const setPeerVideoInProgress = (peerName, flag) =>
+export const setPeerVideoInProgress = (peerId, flag) =>
 {
 	return {
 		type    : 'SET_PEER_VIDEO_IN_PROGRESS',
-		payload : { peerName, flag }
+		payload : { peerId, flag }
 	};
 };
 
-export const setPeerAudioInProgress = (peerName, flag) =>
+export const setPeerAudioInProgress = (peerId, flag) =>
 {
 	return {
 		type    : 'SET_PEER_AUDIO_IN_PROGRESS',
-		payload : { peerName, flag }
+		payload : { peerId, flag }
 	};
 };
 
-export const setPeerScreenInProgress = (peerName, flag) =>
+export const setPeerScreenInProgress = (peerId, flag) =>
 {
 	return {
 		type    : 'SET_PEER_SCREEN_IN_PROGRESS',
-		payload : { peerName, flag }
+		payload : { peerId, flag }
 	};
 };
 
@@ -226,11 +232,11 @@ export const setMyRaiseHandStateInProgress = (flag) =>
 	};
 };
 
-export const setPeerRaiseHandState = (peerName, raiseHandState) =>
+export const setPeerRaiseHandState = (peerId, raiseHandState) =>
 {
 	return {
 		type    : 'SET_PEER_RAISE_HAND_STATE',
-		payload : { peerName, raiseHandState }
+		payload : { peerId, raiseHandState }
 	};
 };
 
@@ -274,6 +280,14 @@ export const setProducerTrack = (producerId, track) =>
 	};
 };
 
+export const setProducerScore = (producerId, score) =>
+{
+	return {
+		type    : 'SET_PRODUCER_SCORE',
+		payload : { producerId, score }
+	};
+};
+
 export const setAudioInProgress = (flag) =>
 {
 	return {
@@ -306,35 +320,35 @@ export const addPeer = (peer) =>
 	};
 };
 
-export const removePeer = (peerName) =>
+export const removePeer = (peerId) =>
 {
 	return {
 		type    : 'REMOVE_PEER',
-		payload : { peerName }
+		payload : { peerId }
 	};
 };
 
-export const setPeerDisplayName = (displayName, peerName) =>
+export const setPeerDisplayName = (displayName, peerId) =>
 {
 	return {
 		type    : 'SET_PEER_DISPLAY_NAME',
-		payload : { displayName, peerName }
+		payload : { displayName, peerId }
 	};
 };
 
-export const addConsumer = (consumer, peerName) =>
+export const addConsumer = (consumer, peerId) =>
 {
 	return {
 		type    : 'ADD_CONSUMER',
-		payload : { consumer, peerName }
+		payload : { consumer, peerId }
 	};
 };
 
-export const removeConsumer = (consumerId, peerName) =>
+export const removeConsumer = (consumerId, peerId) =>
 {
 	return {
 		type    : 'REMOVE_CONSUMER',
-		payload : { consumerId, peerName }
+		payload : { consumerId, peerId }
 	};
 };
 
@@ -354,11 +368,19 @@ export const setConsumerResumed = (consumerId, originator) =>
 	};
 };
 
-export const setConsumerEffectiveProfile = (consumerId, profile) =>
+export const setConsumerCurrentLayers = (consumerId, spatialLayer, temporalLayer) =>
 {
 	return {
-		type    : 'SET_CONSUMER_EFFECTIVE_PROFILE',
-		payload : { consumerId, profile }
+		type    : 'SET_CONSUMER_CURRENT_LAYERS',
+		payload : { consumerId, spatialLayer, temporalLayer }
+	};
+};
+
+export const setConsumerPreferredLayers = (consumerId, spatialLayer, temporalLayer) =>
+{
+	return {
+		type    : 'SET_CONSUMER_PREFERRED_LAYERS',
+		payload : { consumerId, spatialLayer, temporalLayer }
 	};
 };
 
@@ -370,11 +392,19 @@ export const setConsumerTrack = (consumerId, track) =>
 	};
 };
 
-export const setPeerVolume = (peerName, volume) =>
+export const setConsumerScore = (consumerId, score) =>
+{
+	return {
+		type    : 'SET_CONSUMER_SCORE',
+		payload : { consumerId, score }
+	};
+};
+
+export const setPeerVolume = (peerId, volume) =>
 {
 	return {
 		type    : 'SET_PEER_VOLUME',
-		payload : { peerName, volume }
+		payload : { peerId, volume }
 	};
 };
 
@@ -536,10 +566,10 @@ export const setPicture = (picture) =>
 		payload : { picture }
 	});
 
-export const setPeerPicture = (peerName, picture) =>
+export const setPeerPicture = (peerId, picture) =>
 	({
 		type    : 'SET_PEER_PICTURE',
-		payload : { peerName, picture }
+		payload : { peerId, picture }
 	});
 
 export const loggedIn = () =>
@@ -547,10 +577,10 @@ export const loggedIn = () =>
 		type : 'LOGGED_IN'
 	});
 
-export const setSelectedPeer = (selectedPeerName) =>
+export const setSelectedPeer = (selectedpeerId) =>
 	({
 		type    : 'SET_SELECTED_PEER',
-		payload : { selectedPeerName }
+		payload : { selectedpeerId }
 	});
 
 export const setSpotlights = (spotlights) =>

@@ -5,7 +5,7 @@ export const Room = PropTypes.shape(
 		url   : PropTypes.string.isRequired,
 		state : PropTypes.oneOf(
 			[ 'new', 'connecting', 'connected', 'closed' ]).isRequired,
-		activeSpeakerName : PropTypes.string
+		activeSpeakerId : PropTypes.string
 	});
 
 export const Device = PropTypes.shape(
@@ -17,7 +17,7 @@ export const Device = PropTypes.shape(
 
 export const Me = PropTypes.shape(
 	{
-		name             : PropTypes.string.isRequired,
+		id               : PropTypes.string.isRequired,
 		device           : Device.isRequired,
 		canSendMic       : PropTypes.bool.isRequired,
 		canSendWebcam    : PropTypes.bool.isRequired,
@@ -26,30 +26,28 @@ export const Me = PropTypes.shape(
 
 export const Producer = PropTypes.shape(
 	{
-		id             : PropTypes.number.isRequired,
-		source         : PropTypes.oneOf([ 'mic', 'webcam', 'screen' ]).isRequired,
-		deviceLabel    : PropTypes.string,
-		type           : PropTypes.oneOf([ 'front', 'back', 'screen' ]),
-		locallyPaused  : PropTypes.bool.isRequired,
-		remotelyPaused : PropTypes.bool.isRequired,
-		track          : PropTypes.any,
-		codec          : PropTypes.string.isRequired
+		id          : PropTypes.string.isRequired,
+		source      : PropTypes.oneOf([ 'mic', 'webcam', 'screen' ]).isRequired,
+		deviceLabel : PropTypes.string,
+		type        : PropTypes.oneOf([ 'front', 'back', 'screen' ]),
+		paused      : PropTypes.bool.isRequired,
+		track       : PropTypes.any,
+		codec       : PropTypes.string.isRequired
 	});
 
 export const Peer = PropTypes.shape(
 	{
-		name        : PropTypes.string.isRequired,
+		id          : PropTypes.string.isRequired,
 		displayName : PropTypes.string,
 		device      : Device.isRequired,
-		consumers   : PropTypes.arrayOf(PropTypes.number).isRequired
+		consumers   : PropTypes.arrayOf(PropTypes.string).isRequired
 	});
 
 export const Consumer = PropTypes.shape(
 	{
-		id             : PropTypes.number.isRequired,
-		peerName       : PropTypes.string.isRequired,
+		id             : PropTypes.string.isRequired,
+		peerId         : PropTypes.string.isRequired,
 		source         : PropTypes.oneOf([ 'mic', 'webcam', 'screen' ]).isRequired,
-		supported      : PropTypes.bool.isRequired,
 		locallyPaused  : PropTypes.bool.isRequired,
 		remotelyPaused : PropTypes.bool.isRequired,
 		profile        : PropTypes.oneOf([ 'none', 'default', 'low', 'medium', 'high' ]),
@@ -75,7 +73,7 @@ export const Message = PropTypes.shape(
 export const FileEntryProps = PropTypes.shape(
 	{
 		data : PropTypes.shape({
-			name    : PropTypes.string.isRequired,
+			id      : PropTypes.string.isRequired,
 			picture : PropTypes.string,
 			file    : PropTypes.shape({
 				magnet : PropTypes.string.isRequired

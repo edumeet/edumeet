@@ -158,8 +158,8 @@ const Sidebar = (props) =>
 					onClick={() =>
 					{
 						micState === 'on' ?
-							roomClient.muteMic() :
-							roomClient.unmuteMic();
+							roomClient.disableMic() :
+							roomClient.enableMic();
 					}}
 				>
 					{ micState === 'on' ?

@@ -3,12 +3,12 @@ import UrlParse from 'url-parse';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { getDeviceInfo } from 'mediasoup-client';
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
 import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
+import deviceInfo from './deviceInfo';
 import * as stateActions from './actions/stateActions';
 import Room from './components/Room';
 import LoadingView from './components/LoadingView';
@@ -44,13 +44,15 @@ function run()
 {
 	logger.debug('run() [environment:%s]', process.env.NODE_ENV);
 
-	const peerName = randomString({ length: 8 }).toLowerCase();
+	const peerId = randomString({ length: 8 }).toLowerCase();
 	const urlParser = new UrlParse(window.location.href, true);
 
 	let roomId = (urlParser.pathname).substr(1)
 		? (urlParser.pathname).substr(1).toLowerCase() : urlParser.query.roomId.toLowerCase();
 	const produce = urlParser.query.produce !== 'false';
+	const consume = urlParser.query.consume !== 'false';
 	const useSimulcast = urlParser.query.simulcast === 'true';
+	const forceTcp = urlParser.query.forceTcp === 'true';
 
 	if (!roomId)
 	{
@@ -80,21 +82,21 @@ function run()
 	const roomUrl = roomUrlParser.toString();
 
 	// Get current device.
-	const device = getDeviceInfo();
+	const device = deviceInfo();
 
 	store.dispatch(
 		stateActions.setRoomUrl(roomUrl));
 
 	store.dispatch(
 		stateActions.setMe({
-			peerName,
+			peerId,
 			device,
 			loginEnabled : window.config.loginEnabled
 		})
 	);
 
 	roomClient = new RoomClient(
-		{ roomId, peerName, device, useSimulcast, produce });
+		{ roomId, peerId, device, useSimulcast, produce, consume, forceTcp });
 
 	global.CLIENT = roomClient;
 

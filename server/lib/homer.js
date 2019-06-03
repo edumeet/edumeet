@@ -54,7 +54,7 @@ function handleRoom(room, stream)
 			Object.assign({}, baseEvent,
 				{
 					event           : 'room.newpeer',
-					peerName        : peer.name,
+					peerId        : peer.id,
 					rtpCapabilities : peer.rtpCapabilities
 				}),
 			stream);
@@ -67,7 +67,7 @@ function handlePeer(peer, baseEvent, stream)
 {
 	baseEvent = Object.assign({}, baseEvent,
 		{
-			peerName : peer.name
+			peerId : peer.id
 		});
 
 	peer.on('close', (originator) =>

@@ -8,13 +8,14 @@
 	"dependencies": {
 		"@material-ui/core": "^3.9.2",
 		"@material-ui/icons": "^3.0.2",
+		"bowser": "^2.4.0",
 		"create-torrent": "^3.33.0",
 		"domready": "^1.0.8",
 		"file-saver": "^2.0.1",
 		"hark": "^1.2.3",
 		"js-cookie": "^2.2.0",
 		"marked": "^0.6.1",
-		"mediasoup-client": "^2.4.10",
+		"mediasoup-client": "^3.0.6",
 		"notistack": "^0.5.1",
 		"prop-types": "^15.7.2",
 		"random-string": "^0.2.0",
@@ -169,7 +170,12 @@
 			"no-case-declarations": 2,
 			"no-catch-shadow": 2,
 			"no-class-assign": 2,
-			"no-confusing-arrow": ["error", {"allowParens": true}],
+			"no-confusing-arrow": [
+				"error",
+				{
+					"allowParens": true
+				}
+			],
 			"no-console": 2,
 			"no-const-assign": 2,
 			"no-debugger": 2,

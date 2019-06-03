@@ -1,11 +1,12 @@
 const initialState =
 {
-	name                  : null,
+	id                    : null,
 	device                : null,
 	canSendMic            : false,
 	canSendWebcam         : false,
 	canShareScreen        : false,
 	needExtension         : false,
+	canShareFiles         : false,
 	audioDevices          : null,
 	webcamDevices         : null,
 	webcamInProgress      : false,
@@ -24,14 +25,14 @@ const me = (state = initialState, action) =>
 		case 'SET_ME':
 		{
 			const {
-				peerName,
+				peerId,
 				device,
 				loginEnabled
 			} = action.payload;
 
 			return {
 				...state,
-				name : peerName,
+				id : peerId,
 				device,
 				loginEnabled
 			};
@@ -45,9 +46,22 @@ const me = (state = initialState, action) =>
 
 		case 'SET_MEDIA_CAPABILITIES':
 		{
-			const {	canSendMic, canSendWebcam } = action.payload;
+			const {
+				canSendMic,
+				canSendWebcam,
+				canShareScreen,
+				needExtension,
+				canShareFiles
+			} = action.payload;
 
-			return { ...state, canSendMic, canSendWebcam };
+			return {
+				...state,
+				canSendMic,
+				canSendWebcam,
+				canShareScreen,
+				needExtension,
+				canShareFiles
+			};
 		}
 
 		case 'SET_SCREEN_CAPABILITIES':

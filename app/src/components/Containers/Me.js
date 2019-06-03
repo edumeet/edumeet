@@ -95,7 +95,7 @@ const Me = (props) =>
 							roomClient.changeDisplayName(displayName);
 						}}
 					>
-						<Volume name={me.name} />
+						<Volume id={me.id} />
 					</VideoView>
 				</div>
 			</div>
@@ -138,7 +138,7 @@ const mapStateToProps = (state) =>
 		me            : state.me,
 		...meProducersSelector(state),
 		settings      : state.settings,
-		activeSpeaker : state.me.name === state.room.activeSpeakerName
+		activeSpeaker : state.me.id === state.room.activeSpeakerId
 	};
 };
 
@@ -153,7 +153,7 @@ export default withRoomContext(connect(
 				prev.me === next.me &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
-				prev.room.activeSpeakerName === next.room.activeSpeakerName
+				prev.room.activeSpeakerId === next.room.activeSpeakerId
 			);
 		}
 	}
