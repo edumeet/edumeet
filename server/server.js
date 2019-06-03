@@ -161,33 +161,33 @@ async function setupAuth(oidcIssuer)
 					user.Photos = [ { value: userinfo.picture } ];
 				}
 			}
-			
-			if (typeof(userinfo.nickname) !== 'undefined')
+
+			if (userinfo.nickname != null)
 			{
 				user.displayName = userinfo.nickname;
 			}
 
-			if (typeof(userinfo.name) !== 'undefined')
+			if (userinfo.name != null)
 			{
 				user.displayName = userinfo.name;
 			}
-			
-			if (typeof(userinfo.email) !== 'undefined')
+
+			if (userinfo.email != null)
 			{
 				user.emails = [ { value: userinfo.email } ];
 			}
 
-			if (typeof(userinfo.given_name) !== 'undefined')
+			if (userinfo.given_name != null)
 			{
 				user.name = { givenName: userinfo.given_name };
 			}
 
-			if (typeof(userinfo.family_name) !== 'undefined')
+			if (userinfo.family_name != null)
 			{
 				user.name = { familyName: userinfo.family_name };
 			}
 
-			if (typeof(userinfo.middle_name) !== 'undefined')
+			if (userinfo.middle_name != null)
 			{
 				user.name = { middleName: userinfo.middle_name };
 			}
@@ -240,17 +240,17 @@ async function setupAuth(oidcIssuer)
 				let displayName;
 				let photo;
 
-				if (typeof(req.user) !== 'undefined')
+				if (req.user != null)
 				{
-					if (typeof(req.user.displayName) !== 'undefined')
+					if (req.user.displayName != null)
 						displayName = req.user.displayName;
 					else
 						displayName = '';
 
 					if (
-						typeof(req.user.Photos) !== 'undefined' &&
-						typeof(req.user.Photos[0]) !== 'undefined' &&
-						typeof(req.user.Photos[0].value) !== 'undefined'
+						req.user.Photos != null &&
+						req.user.Photos[0] != null &&
+						req.user.Photos[0].value != null
 					)
 						photo = req.user.Photos[0].value;
 					else
@@ -259,9 +259,9 @@ async function setupAuth(oidcIssuer)
 
 				const data =
 				{
-					peerId   : state.peerId,
-					name     : displayName,
-					picture  : photo
+					peerId      : state.peerId,
+					displayName : displayName,
+					picture     : photo
 				};
 
 				const room = rooms.get(state.roomId);
