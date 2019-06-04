@@ -1472,10 +1472,10 @@ export default class RoomClient
 
 				case 'newPeer':
 				{
-					const { id, displayName, device } = notification.data;
+					const { id, displayName, picture, device } = notification.data;
 
 					store.dispatch(
-						stateActions.addPeer({ id, displayName, device, consumers: [] }));
+						stateActions.addPeer({ id, displayName, picture, device, consumers: [] }));
 
 					store.dispatch(requestActions.notify(
 						{
