@@ -23,8 +23,6 @@ module.exports =
 	},
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',
-	// Listening hostname for `gulp live|open`.
-	domain       : 'localhost',
 	tls          :
 	{
 		cert : `${__dirname}/../certs/mediasoup-demo.localhost.cert.pem`,
