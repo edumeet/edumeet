@@ -163,6 +163,9 @@ export default class RoomClient
 		// Local mic mediasoup Producer.
 		this._micProducer = null;
 
+		// Local mic hark
+		this._hark = null;
+
 		// Local webcam mediasoup Producer.
 		this._webcamProducer = null;
 
@@ -826,6 +829,8 @@ export default class RoomClient
 
 			await this._micProducer.replaceTrack({ track });
 
+			this._micProducer.volume = 0;
+
 			const harkStream = new MediaStream();
 
 			harkStream.addTrack(track);
@@ -833,13 +838,13 @@ export default class RoomClient
 			if (!harkStream.getAudioTracks()[0])
 				throw new Error('changeAudioDevice(): given stream has no audio track');
 
-			if (this._micProducer.hark != null)
-				this._micProducer.hark.stop();
+			if (this._hark != null)
+				this._hark.stop();
 
-			this._micProducer.hark = hark(harkStream, { play: false });
+			this._hark = hark(harkStream, { play: false });
 
 			// eslint-disable-next-line no-unused-vars
-			this._micProducer.hark.on('volume_change', (dBs, threshold) =>
+			this._hark.on('volume_change', (dBs, threshold) =>
 			{
 				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 				//   Math.pow(10, dBs / 20)
@@ -850,10 +855,13 @@ export default class RoomClient
 
 				if (volume === 1)
 					volume = 0;
+
 				volume = Math.round(volume);
-				if (volume !== this._micProducer.volume)
+
+				if (this._micProducer && volume !== this._micProducer.volume)
 				{
 					this._micProducer.volume = volume;
+
 					store.dispatch(stateActions.setPeerVolume(this._peerId, volume));
 				}
 			});
@@ -1258,9 +1266,12 @@ export default class RoomClient
 
 					if (kind === 'audio')
 					{
+						consumer.volume = 0;
+
 						const stream = new MediaStream();
 
 						stream.addTrack(consumer.track);
+
 						if (!stream.getAudioTracks()[0])
 							throw new Error('request.newConsumer | given stream has no audio track');
 
@@ -1281,7 +1292,7 @@ export default class RoomClient
 
 							volume = Math.round(volume);
 
-							if (volume !== consumer.volume)
+							if (consumer && volume !== consumer.volume)
 							{
 								consumer.volume = volume;
 
@@ -1493,6 +1504,10 @@ export default class RoomClient
 						break;
 
 					consumer.close();
+
+					if (consumer.hark != null)
+						consumer.hark.stop();
+
 					this._consumers.delete(consumerId);
 
 					const { peerId } = consumer.appData;
@@ -1886,6 +1901,8 @@ export default class RoomClient
 					.catch(() => {});
 			});
 
+			this._micProducer.volume = 0;
+
 			const harkStream = new MediaStream();
 
 			harkStream.addTrack(track);
@@ -1893,10 +1910,13 @@ export default class RoomClient
 			if (!harkStream.getAudioTracks()[0])
 				throw new Error('enableMic(): given stream has no audio track');
 
-			this._micProducer.hark = hark(harkStream, { play: false });
+			if (this._hark != null)
+				this._hark.stop();
+
+			this._hark = hark(harkStream, { play: false });
 
 			// eslint-disable-next-line no-unused-vars
-			this._micProducer.hark.on('volume_change', (dBs, threshold) =>
+			this._hark.on('volume_change', (dBs, threshold) =>
 			{
 				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 				//   Math.pow(10, dBs / 20)
@@ -1907,10 +1927,13 @@ export default class RoomClient
 
 				if (volume === 1)
 					volume = 0;
+
 				volume = Math.round(volume);
+
 				if (this._micProducer && volume !== this._micProducer.volume)
 				{
 					this._micProducer.volume = volume;
+
 					store.dispatch(stateActions.setPeerVolume(this._peerId, volume));
 				}
 			});
