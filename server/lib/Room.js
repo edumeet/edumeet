@@ -316,10 +316,16 @@ class Room extends EventEmitter
 				if (peer.data.joined)
 					throw new Error('Peer already joined');
 
-				const { displayName, device, rtpCapabilities } = request.data;
+				const {
+					displayName,
+					picture,
+					device,
+					rtpCapabilities
+				} = request.data;
 
 				// Store client data into the protoo Peer data object.
 				peer.data.displayName = displayName;
+				peer.data.picture = picture;
 				peer.data.device = device;
 				peer.data.rtpCapabilities = rtpCapabilities;
 
@@ -336,6 +342,7 @@ class Room extends EventEmitter
 							{
 								id          : joinedPeer.id,
 								displayName : joinedPeer.data.displayName,
+								picture     : joinedPeer.data.picture,
 								device      : joinedPeer.data.device
 							});
 	
@@ -362,14 +369,15 @@ class Room extends EventEmitter
 					{
 						id          : peer.id,
 						displayName : displayName,
+						picture     : picture,
 						device      : device
 					},
 					true
 				);
 
 				logger.debug(
-					'peer joined [peeerId: %s, displayName: %s, device: %o]',
-					peer.id, displayName, device);
+					'peer joined [peeerId: %s, displayName: %s, picture: %s, device: %o]',
+					peer.id, displayName, picture, device);
 
 				break;
 			}

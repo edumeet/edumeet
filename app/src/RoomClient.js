@@ -1583,7 +1583,10 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
-		const { displayName } = store.getState().settings;
+		const {
+			displayName,
+			picture
+		} = store.getState().settings;
 
 		try
 		{
@@ -1702,6 +1705,7 @@ export default class RoomClient
 				'join',
 				{
 					displayName     : displayName,
+					picture         : picture,
 					device          : this._device,
 					rtpCapabilities : this._consume
 						? this._mediasoupDevice.rtpCapabilities
