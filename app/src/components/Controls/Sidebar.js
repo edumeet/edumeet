@@ -119,12 +119,7 @@ const Sidebar = (props) =>
 
 	let screenTip;
 
-	if (me.needExtension)
-	{
-		screenState = 'need-extension';
-		screenTip = 'Install screen sharing extension';
-	}
-	else if (!me.canShareScreen)
+	if (!me.canShareScreen)
 	{
 		screenState = 'unsupported';
 		screenTip = 'Screen sharing not supported';

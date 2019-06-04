@@ -748,53 +748,6 @@ export default class RoomClient
 		}
 	}
 
-	installExtension()
-	{
-		logger.debug('installExtension()');
-
-		return new Promise((resolve, reject) =>
-		{
-			window.addEventListener('message', _onExtensionMessage, false);
-			// eslint-disable-next-line
-			chrome.webstore.install(null, _successfulInstall, _failedInstall);
-			function _onExtensionMessage({ data })
-			{
-				if (data.type === 'ScreenShareInjected')
-				{
-					logger.debug('installExtension() | installation succeeded');
-
-					return resolve();
-				}
-			}
-
-			function _failedInstall(reason)
-			{
-				window.removeEventListener('message', _onExtensionMessage);
-
-				return reject(
-					new Error('Failed to install extension: %s', reason));
-			}
-
-			function _successfulInstall()
-			{
-				logger.debug('installExtension() | installation accepted');
-			}
-		})
-			.then(() =>
-			{
-				// This should be handled better
-				store.dispatch(stateActions.setScreenCapabilities(
-					{
-						canShareScreen : this._room.canSend('video'),
-						needExtension  : false
-					}));
-			})
-			.catch((error) =>
-			{
-				logger.error('installExtension() | failed: %o', error);
-			});
-	}
-
 	async changeAudioDevice(deviceId)
 	{
 		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
@@ -1697,7 +1650,6 @@ export default class RoomClient
 					canSendWebcam  : this._mediasoupDevice.canProduce('video'),
 					canShareScreen : this._mediasoupDevice.canProduce('video') &&
 						this._screenSharing.isScreenShareAvailable(),
-					needExtension : this._screenSharing.needExtension(),
 					canShareFiles : this._torrentSupport
 				}));
 
@@ -2021,8 +1973,7 @@ export default class RoomClient
 
 		try
 		{
-			const available = this._screenSharing.isScreenShareAvailable() &&
-				!this._screenSharing.needExtension();
+			const available = this._screenSharing.isScreenShareAvailable();
 
 			if (!available)
 				throw new Error('screen sharing not available');

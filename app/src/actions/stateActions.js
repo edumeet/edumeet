@@ -69,21 +69,12 @@ export const setMediaCapabilities = ({
 	canSendMic,
 	canSendWebcam,
 	canShareScreen,
-	needExtension,
 	canShareFiles
 }) =>
 {
 	return {
 		type    : 'SET_MEDIA_CAPABILITIES',
-		payload : { canSendMic, canSendWebcam, canShareScreen, needExtension, canShareFiles }
-	};
-};
-
-export const setScreenCapabilities = ({	canShareScreen, needExtension }) =>
-{
-	return {
-		type    : 'SET_SCREEN_CAPABILITIES',
-		payload : { canShareScreen, needExtension }
+		payload : { canSendMic, canSendWebcam, canShareScreen, canShareFiles }
 	};
 };
 
