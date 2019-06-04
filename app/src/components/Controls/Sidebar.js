@@ -206,11 +206,6 @@ const Sidebar = (props) =>
 								roomClient.enableScreenSharing();
 								break;
 							}
-							case 'need-extension':
-							{
-								roomClient.installExtension();
-								break;
-							}
 							default:
 							{
 								break;
