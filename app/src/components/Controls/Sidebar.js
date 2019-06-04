@@ -15,7 +15,6 @@ import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
 import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
-import ExtensionIcon from '@material-ui/icons/Extension';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import LeaveIcon from '@material-ui/icons/Cancel';
@@ -219,10 +218,6 @@ const Sidebar = (props) =>
 					}
 					{ screenState === 'off' ?
 						<ScreenIcon/>
-						:null
-					}
-					{ screenState === 'need-extension' ?
-						<ExtensionIcon/>
 						:null
 					}
 				</Fab>
