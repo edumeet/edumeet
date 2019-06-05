@@ -1,5 +1,4 @@
 import domready from 'domready';
-import UrlParse from 'url-parse';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
@@ -45,41 +44,30 @@ function run()
 	logger.debug('run() [environment:%s]', process.env.NODE_ENV);
 
 	const peerId = randomString({ length: 8 }).toLowerCase();
-	const urlParser = new UrlParse(window.location.href, true);
+	const urlParser = new URL(window.location);
+	const parameters = urlParser.searchParams;
 
-	let roomId = (urlParser.pathname).substr(1)
-		? (urlParser.pathname).substr(1).toLowerCase() : urlParser.query.roomId.toLowerCase();
-	const produce = urlParser.query.produce !== 'false';
-	const consume = urlParser.query.consume !== 'false';
-	const useSimulcast = urlParser.query.simulcast === 'true';
-	const forceTcp = urlParser.query.forceTcp === 'true';
+	let roomId = (urlParser.pathname).substr(1);
 
 	if (!roomId)
+		roomId = parameters.get('roomId');
+
+	if (roomId)
+		roomId = roomId.toLowerCase();
+	else
 	{
 		roomId = randomString({ length: 8 }).toLowerCase();
 
-		urlParser.query.roomId = roomId;
+		parameters.set('roomId', roomId);
 		window.history.pushState('', '', urlParser.toString());
 	}
 
-	// Get the effective/shareable Room URL.
-	const roomUrlParser = new UrlParse(window.location.href, true);
+	const produce = parameters.get('produce') !== 'false';
+	const consume = parameters.get('consume') !== 'false';
+	const useSimulcast = parameters.get('simulcast') === 'true';
+	const forceTcp = parameters.get('forceTcp') === 'true';
 
-	for (const key of Object.keys(roomUrlParser.query))
-	{
-		// Don't keep some custom params.
-		switch (key)
-		{
-			case 'roomId':
-			case 'simulcast':
-				break;
-			default:
-				delete roomUrlParser.query[key];
-		}
-	}
-	delete roomUrlParser.hash;
-
-	const roomUrl = roomUrlParser.toString();
+	const roomUrl = window.location.href.split('?')[0];
 
 	// Get current device.
 	const device = deviceInfo();

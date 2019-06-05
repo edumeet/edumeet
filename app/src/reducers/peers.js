@@ -1,5 +1,3 @@
-import omit from 'lodash/omit';
-
 const peer = (state = {}, action) =>
 {
 	switch (action.type) 
@@ -58,7 +56,12 @@ const peers = (state = {}, action) =>
 
 		case 'REMOVE_PEER':
 		{
-			return omit(state, [ action.payload.peerId ]);
+			const { peerId } = action.payload;
+			const newState = { ...state };
+
+			delete newState[peerId];
+
+			return newState;
 		}
 
 		case 'SET_PEER_DISPLAY_NAME':
