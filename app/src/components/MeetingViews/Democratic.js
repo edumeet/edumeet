@@ -7,12 +7,10 @@ import {
 	spotlightsLengthSelector
 } from '../Selectors';
 import PropTypes from 'prop-types';
-import debounce from 'lodash/debounce';
 import { withStyles } from '@material-ui/core/styles';
 import Peer from '../Containers/Peer';
 import Me from '../Containers/Me';
 import HiddenPeers from '../Containers/HiddenPeers';
-import ResizeObserver from 'resize-observer-polyfill';
 
 const RATIO = 1.334;
 const PADDING_V = 50;
@@ -43,16 +41,17 @@ class Democratic extends React.PureComponent
 	{
 		super(props);
 
-		this.state = {
-			peerWidth  : 400,
-			peerHeight : 300
-		};
+		this.state = {};
+
+		this.resizeTimeout = null;
 
 		this.peersRef = React.createRef();
 	}
 
-	updateDimensions = debounce(() =>
+	updateDimensions = () =>
 	{
+		console.log('updateDimensions');
+
 		if (!this.peersRef.current)
 		{
 			return;
@@ -93,14 +92,21 @@ class Democratic extends React.PureComponent
 				peerHeight : 0.9 * y
 			});
 		}
-	}, 200);
+	};
 
 	componentDidMount()
 	{
-		window.addEventListener('resize', this.updateDimensions);
-		const observer = new ResizeObserver(this.updateDimensions);
+		// window.resize event listener
+		window.addEventListener('resize', () =>
+		{
+			// clear the timeout
+			clearTimeout(this.resizeTimeout);
 
-		observer.observe(this.peersRef.current);
+			// start timing for event "completion"
+			this.resizeTimeout = setTimeout(() => this.updateDimensions(), 250);
+		});
+
+		this.updateDimensions();
 	}
 
 	componentWillUnmount()
@@ -108,9 +114,10 @@ class Democratic extends React.PureComponent
 		window.removeEventListener('resize', this.updateDimensions);
 	}
 
-	componentDidUpdate()
+	componentDidUpdate(prevProps)
 	{
-		this.updateDimensions();
+		if (prevProps !== this.props)
+			this.updateDimensions();
 	}
 
 	render()
@@ -125,14 +132,15 @@ class Democratic extends React.PureComponent
 
 		const style =
 		{
-			'width'  : this.state.peerWidth,
-			'height' : this.state.peerHeight
+			'width'  : this.state.peerWidth ? this.state.peerWidth : 0,
+			'height' : this.state.peerHeight ? this.state.peerHeight : 0
 		};
 
 		return (
 			<div className={classes.root} ref={this.peersRef}>
 				<Me
 					advancedMode={advancedMode}
+					spacing={6}
 					style={style}
 				/>
 				{ spotlightsPeers.map((peer) =>
@@ -142,6 +150,7 @@ class Democratic extends React.PureComponent
 							key={peer.id}
 							advancedMode={advancedMode}
 							id={peer.id}
+							spacing={6}
 							style={style}
 						/>
 					);

@@ -568,10 +568,10 @@ export const loggedIn = () =>
 		type : 'LOGGED_IN'
 	});
 
-export const setSelectedPeer = (selectedpeerId) =>
+export const setSelectedPeer = (selectedPeerId) =>
 	({
 		type    : 'SET_SELECTED_PEER',
-		payload : { selectedpeerId }
+		payload : { selectedPeerId }
 	});
 
 export const setSpotlights = (spotlights) =>

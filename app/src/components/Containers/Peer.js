@@ -21,7 +21,6 @@ const styles = (theme) =>
 		root :
 		{
 			flex               : '0 0 auto',
-			margin             : 6,
 			boxShadow          : 'var(--peer-shadow)',
 			border             : 'var(--peer-border)',
 			touchAction        : 'none',
@@ -128,6 +127,7 @@ const Peer = (props) =>
 		screenConsumer,
 		toggleConsumerFullscreen,
 		toggleConsumerWindow,
+		spacing,
 		style,
 		windowConsumer,
 		classes,
@@ -164,6 +164,11 @@ const Peer = (props) =>
 
 	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
+	const spacingStyle =
+	{
+		'margin' : spacing
+	};
+
 	return (
 		<React.Fragment>
 			<div
@@ -194,6 +199,7 @@ const Peer = (props) =>
 						setHover(false);
 					}, 2000);
 				}}
+				style={spacingStyle}
 			>
 				<div className={classnames(classes.viewContainer)} style={style}>
 					{ !videoVisible ?
@@ -406,6 +412,7 @@ Peer.propTypes =
 	screenConsumer           : appPropTypes.Consumer,
 	windowConsumer           : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
+	spacing                  : PropTypes.number,
 	style                    : PropTypes.object,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,

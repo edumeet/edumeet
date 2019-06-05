@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import * as appPropTypes from '../../appPropTypes';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';

@@ -14,7 +14,6 @@ const styles = () =>
 		root :
 		{
 			flexDirection      : 'row',
-			margin             : 6,
 			flex               : '0 0 auto',
 			boxShadow          : 'var(--peer-shadow)',
 			border             : 'var(--peer-border)',
@@ -49,6 +48,7 @@ const Me = (props) =>
 		me,
 		settings,
 		activeSpeaker,
+		spacing,
 		style,
 		advancedMode,
 		micProducer,
@@ -69,6 +69,11 @@ const Me = (props) =>
 		!screenProducer.remotelyPaused
 	);
 
+	const spacingStyle =
+	{
+		'margin' : spacing
+	};
+
 	return (
 		<React.Fragment>
 			<div
@@ -78,6 +83,7 @@ const Me = (props) =>
 						activeSpeaker ? 'active-speaker' : null
 					)
 				}
+				style={spacingStyle}
 			>
 				<div className={classnames(classes.viewContainer, 'webcam')} style={style}>
 					<VideoView
@@ -128,6 +134,7 @@ Me.propTypes =
 	micProducer    : appPropTypes.Producer,
 	webcamProducer : appPropTypes.Producer,
 	screenProducer : appPropTypes.Producer,
+	spacing        : PropTypes.number,
 	style          : PropTypes.object,
 	classes        : PropTypes.object.isRequired
 };
