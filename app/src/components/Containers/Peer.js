@@ -73,7 +73,7 @@ const styles = (theme) =>
 			justifyContent  : 'center',
 			alignItems      : 'flex-end',
 			padding         : '0.4vmin',
-			zIndex          : 20,
+			zIndex          : 21,
 			opacity         : 0,
 			transition      : 'opacity 0.3s',
 			touchAction     : 'none',
@@ -92,7 +92,7 @@ const styles = (theme) =>
 			justifyContent  : 'center',
 			alignItems      : 'center',
 			padding         : '0.4vmin',
-			zIndex          : 21,
+			zIndex          : 20,
 			'& p'           :
 			{
 				padding       : '6px 12px',
@@ -209,79 +209,77 @@ const Peer = (props) =>
 						:null
 					}
 
-					{ videoVisible ?
-						<div
-							className={classnames(classes.controls, webcamHover ? 'hover' : null)}
-							onMouseOver={() => setWebcamHover(true)}
-							onMouseOut={() => setWebcamHover(false)}
-							onTouchStart={() =>
+					<div
+						className={classnames(classes.controls, webcamHover ? 'hover' : null)}
+						onMouseOver={() => setWebcamHover(true)}
+						onMouseOut={() => setWebcamHover(false)}
+						onTouchStart={() =>
+						{
+							if (touchWebcamTimeout)
+								clearTimeout(touchWebcamTimeout);
+		
+							setWebcamHover(true);
+						}}
+						onTouchEnd={() =>
+						{
+							if (touchWebcamTimeout)
+								clearTimeout(touchWebcamTimeout);
+		
+							touchWebcamTimeout = setTimeout(() =>
 							{
-								if (touchWebcamTimeout)
-									clearTimeout(touchWebcamTimeout);
-			
-								setWebcamHover(true);
-							}}
-							onTouchEnd={() =>
+								setWebcamHover(false);
+							}, 2000);
+						}}
+					>
+						<Fab
+							aria-label='Mute mic'
+							className={classes.fab}
+							disabled={!micConsumer}
+							color={micEnabled ? 'default' : 'secondary'}
+							onClick={() =>
 							{
-								if (touchWebcamTimeout)
-									clearTimeout(touchWebcamTimeout);
-			
-								touchWebcamTimeout = setTimeout(() =>
-								{
-									setWebcamHover(false);
-								}, 2000);
+								micEnabled ?
+									roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+									roomClient.modifyPeerConsumer(peer.id, 'mic', false);
 							}}
 						>
-							<Fab
-								aria-label='Mute mic'
-								className={classes.fab}
-								color={micEnabled ? 'default' : 'secondary'}
-								onClick={() =>
-								{
-									micEnabled ?
-										roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-										roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-								}}
-							>
-								{ micEnabled ?
-									<MicIcon />
-									:
-									<MicOffIcon />
-								}
-							</Fab>
-
-							{ !smallScreen ?
-								<Fab
-									aria-label='New window'
-									className={classes.fab}
-									disabled={
-										!videoVisible ||
-										(windowConsumer === webcamConsumer.id)
-									}
-									onClick={() =>
-									{
-										toggleConsumerWindow(webcamConsumer);
-									}}
-								>
-									<NewWindowIcon />
-								</Fab>
-								:null
+							{ micEnabled ?
+								<MicIcon />
+								:
+								<MicOffIcon />
 							}
+						</Fab>
 
+						{ !smallScreen ?
 							<Fab
-								aria-label='Fullscreen'
+								aria-label='New window'
 								className={classes.fab}
-								disabled={!videoVisible}
+								disabled={
+									!videoVisible ||
+									(windowConsumer === webcamConsumer.id)
+								}
 								onClick={() =>
 								{
-									toggleConsumerFullscreen(webcamConsumer);
+									toggleConsumerWindow(webcamConsumer);
 								}}
 							>
-								<FullScreenIcon />
+								<NewWindowIcon />
 							</Fab>
-						</div>
-						:null
-					}
+							:null
+						}
+
+						<Fab
+							aria-label='Fullscreen'
+							className={classes.fab}
+							disabled={!videoVisible}
+							onClick={() =>
+							{
+								toggleConsumerFullscreen(webcamConsumer);
+							}}
+						>
+							<FullScreenIcon />
+						</Fab>
+					</div>
 
 					<VideoView
 						advancedMode={advancedMode}
