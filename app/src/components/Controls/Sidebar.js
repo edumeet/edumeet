@@ -143,84 +143,90 @@ const Sidebar = (props) =>
 			}
 		>
 			<Tooltip title={micTip} placement={smallScreen ? 'top' : 'right'}>
-				<Fab
-					aria-label='Mute mic'
-					className={classes.fab}
-					disabled={!me.canSendMic || me.audioInProgress}
-					color={micState === 'on' ? 'default' : 'secondary'}
-					size={smallScreen ? 'large' : 'medium'}
-					onClick={() =>
-					{
-						micState === 'on' ?
-							roomClient.disableMic() :
-							roomClient.enableMic();
-					}}
-				>
-					{ micState === 'on' ?
-						<MicIcon />
-						:
-						<MicOffIcon />
-					}
-				</Fab>
+				<div>
+					<Fab
+						aria-label='Mute mic'
+						className={classes.fab}
+						disabled={!me.canSendMic || me.audioInProgress}
+						color={micState === 'on' ? 'default' : 'secondary'}
+						size={smallScreen ? 'large' : 'medium'}
+						onClick={() =>
+						{
+							micState === 'on' ?
+								roomClient.disableMic() :
+								roomClient.enableMic();
+						}}
+					>
+						{ micState === 'on' ?
+							<MicIcon />
+							:
+							<MicOffIcon />
+						}
+					</Fab>
+				</div>
 			</Tooltip>
 			<Tooltip title={webcamTip} placement={smallScreen ? 'top' : 'right'}>
-				<Fab
-					aria-label='Mute video'
-					className={classes.fab}
-					disabled={!me.canSendWebcam || me.webcamInProgress}
-					color={webcamState === 'on' ? 'default' : 'secondary'}
-					size={smallScreen ? 'large' : 'medium'}
-					onClick={() =>
-					{
-						webcamState === 'on' ?
-							roomClient.disableWebcam() :
-							roomClient.enableWebcam();
-					}}
-				>
-					{ webcamState === 'on' ?
-						<VideoIcon />
-						:
-						<VideoOffIcon />
-					}
-				</Fab>
+				<div>
+					<Fab
+						aria-label='Mute video'
+						className={classes.fab}
+						disabled={!me.canSendWebcam || me.webcamInProgress}
+						color={webcamState === 'on' ? 'default' : 'secondary'}
+						size={smallScreen ? 'large' : 'medium'}
+						onClick={() =>
+						{
+							webcamState === 'on' ?
+								roomClient.disableWebcam() :
+								roomClient.enableWebcam();
+						}}
+					>
+						{ webcamState === 'on' ?
+							<VideoIcon />
+							:
+							<VideoOffIcon />
+						}
+					</Fab>
+				</div>
 			</Tooltip>
 			<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'right'}>
-				<Fab
-					aria-label='Share screen'
-					className={classes.fab}
-					disabled={!me.canShareScreen || me.screenShareInProgress}
-					color={screenState === 'on' ? 'primary' : 'default'}
-					size={smallScreen ? 'large' : 'medium'}
-					onClick={() =>
-					{
-						switch (screenState)
+				<div>
+					<Fab
+						aria-label='Share screen'
+						className={classes.fab}
+						disabled={!me.canShareScreen || me.screenShareInProgress}
+						color={screenState === 'on' ? 'primary' : 'default'}
+						size={smallScreen ? 'large' : 'medium'}
+						onClick={() =>
 						{
-							case 'on':
+							switch (screenState)
 							{
-								roomClient.disableScreenSharing();
-								break;
+								case 'on':
+								{
+									roomClient.disableScreenSharing();
+									break;
+								}
+								case 'off':
+								{
+									roomClient.enableScreenSharing();
+									break;
+								}
+								default:
+								{
+									break;
+								}
 							}
-							case 'off':
-							{
-								roomClient.enableScreenSharing();
-								break;
-							}
-							default:
-							{
-								break;
-							}
+						}}
+					>
+						{ screenState === 'on' || screenState === 'unsupported' ?
+							<ScreenOffIcon/>
+							:null
 						}
-					}}
-				>
-					{ screenState === 'on' || screenState === 'unsupported' ?
-						<ScreenOffIcon/>
-						:null
-					}
-					{ screenState === 'off' ?
-						<ScreenIcon/>
-						:null
-					}
-				</Fab>
+						{ screenState === 'off' ?
+							<ScreenIcon/>
+							:null
+						}
+					</Fab>
+				</div>
 			</Tooltip>
 
 			<Tooltip
