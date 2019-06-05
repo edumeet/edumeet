@@ -50,8 +50,6 @@ class Democratic extends React.PureComponent
 
 	updateDimensions = () =>
 	{
-		console.log('updateDimensions');
-
 		if (!this.peersRef.current)
 		{
 			return;
