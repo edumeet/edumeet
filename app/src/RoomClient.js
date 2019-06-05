@@ -566,15 +566,7 @@ export default class RoomClient
 
 			if (existingTorrent)
 			{
-				const { displayName, picture } = store.getState().settings;
-
-				const file = {
-					magnetUri : existingTorrent.magnetURI,
-					displayName,
-					picture
-				};
-
-				return this._sendFile(file);
+				return this._sendFile(existingTorrent.magnetURI);
 			}
 
 			this._webTorrent.seed(files, (newTorrent) =>
@@ -584,34 +576,24 @@ export default class RoomClient
 						text : 'File successfully shared.'
 					}));
 
-				const { displayName, picture } = store.getState().settings;
-				const file = {
-					magnetUri : newTorrent.magnetURI,
-					displayName,
-					picture
-				};
-
 				store.dispatch(stateActions.addFile(
-					{
-						magnetUri   : file.magnetUri,
-						displayName : displayName,
-						picture     : picture,
-						me          : true
-					}));
+					this._peerId,
+					newTorrent.magnetURI
+				));
 
-				this._sendFile(file);
+				this._sendFile(newTorrent.magnetURI);
 			});
 		});
 	}
 
 	// { file, name, picture }
-	async _sendFile(file)
+	async _sendFile(magnetUri)
 	{
-		logger.debug('sendFile() [file: %o]', file);
+		logger.debug('sendFile() [magnetUri: %o]', magnetUri);
 
 		try
 		{
-			await this.sendRequest('sendFile', { file });
+			await this.sendRequest('sendFile', { magnetUri });
 		}
 		catch (error)
 		{
@@ -1392,9 +1374,9 @@ export default class RoomClient
 
 				case 'sendFile':
 				{
-					const { file } = notification.data;
+					const { peerId, magnetUri } = notification.data;
 
-					store.dispatch(stateActions.addFile(file));
+					store.dispatch(stateActions.addFile(peerId, magnetUri));
 
 					store.dispatch(requestActions.notify(
 						{

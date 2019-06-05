@@ -503,11 +503,11 @@ export const dropMessages = () =>
 	};
 };
 
-export const addFile = (file) =>
+export const addFile = (peerId, magnetUri) =>
 {
 	return {
 		type    : 'ADD_FILE',
-		payload : { file }
+		payload : { peerId, magnetUri }
 	};
 };
 

@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import * as appPropTypes from '../../appPropTypes';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import magnet from 'magnet-uri';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 
 const styles = (theme) =>
 	({
@@ -55,15 +55,18 @@ class File extends React.PureComponent
 	{
 		const {
 			roomClient,
+			displayName,
+			picture,
 			canShareFiles,
+			magnetUri,
 			file,
 			classes
 		} = this.props;
 
 		return (
 			<div className={classes.root}>
-				<img alt='Peer avatar' className={classes.avatar} src={file.picture || EmptyAvatar} />
-	
+				<img alt='Avatar' className={classes.avatar} src={picture} />
+
 				<div className={classes.fileContent}>
 					{ file.files ?
 						<Fragment>
@@ -93,17 +96,13 @@ class File extends React.PureComponent
 						:null
 					}
 					<Typography className={classes.text}>
-						{ file.me ?
-							'You shared a file'
-							:
-							`${file.displayName} shared a file`
-						}
+						{ `${displayName} shared a file` }
 					</Typography>
 
 					{ !file.active && !file.files ?
 						<div className={classes.fileInfo}>
 							<Typography className={classes.text}>
-								{magnet.decode(file.magnetUri).dn}
+								{ magnet.decode(magnetUri).dn }
 							</Typography>
 							{ canShareFiles ?
 								<Button
@@ -112,7 +111,7 @@ class File extends React.PureComponent
 									className={classes.button}
 									onClick={() =>
 									{
-										roomClient.handleDownload(file.magnetUri);
+										roomClient.handleDownload(magnetUri);
 									}}
 								>
 									Download
@@ -146,6 +145,9 @@ class File extends React.PureComponent
 
 File.propTypes = {
 	roomClient    : PropTypes.object.isRequired,
+	magnetUri     : PropTypes.string.isRequired,
+	displayName   : PropTypes.string.isRequired,
+	picture       : PropTypes.string,
 	canShareFiles : PropTypes.bool.isRequired,
 	file          : PropTypes.object.isRequired,
 	classes       : PropTypes.object.isRequired
@@ -160,5 +162,16 @@ const mapStateToProps = (state, { magnetUri }) =>
 };
 
 export default withRoomContext(connect(
-	mapStateToProps
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.files === next.files &&
+				prev.me.canShareFiles === next.me.canShareFiles
+			);
+		}
+	}
 )(withStyles(styles)(File)));

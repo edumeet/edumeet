@@ -435,7 +435,7 @@ class Room extends EventEmitter
 
 				await transport.connect({ dtlsParameters });
 
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -537,7 +537,7 @@ class Room extends EventEmitter
 				// Remove from its map.
 				peer.data.producers.delete(producer.id);
 
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -556,7 +556,7 @@ class Room extends EventEmitter
 
 				await producer.pause();
 
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -575,7 +575,7 @@ class Room extends EventEmitter
 
 				await producer.resume();
 
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -594,7 +594,7 @@ class Room extends EventEmitter
 
 				await consumer.pause();
 
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -613,7 +613,7 @@ class Room extends EventEmitter
 
 				await consumer.resume();
 
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -632,7 +632,7 @@ class Room extends EventEmitter
 
 				await consumer.setPreferredLayers({ spatialLayer, temporalLayer });
 
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -651,7 +651,7 @@ class Room extends EventEmitter
 
 				await consumer.requestKeyFrame();
 
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -720,7 +720,7 @@ class Room extends EventEmitter
 				}, true);
 
 				// Return no error
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -740,7 +740,7 @@ class Room extends EventEmitter
 				}, true);
 
 				// Return no error
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -758,7 +758,7 @@ class Room extends EventEmitter
 				}, true);
 
 				// Return no error
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -788,7 +788,7 @@ class Room extends EventEmitter
 				}, true);
 
 				// Return no error
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -803,24 +803,25 @@ class Room extends EventEmitter
 				}, true);
 
 				// Return no error
-				cb(null);
+				cb();
 
 				break;
 			}
 
 			case 'sendFile':
 			{
-				const { file } = request.data;
+				const { magnetUri } = request.data;
 	
-				this._fileHistory.push(file);
+				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
 
 				// Spread to others
 				this._notification(peer.socket, 'sendFile', {
-					file   : file
+					peerId    : peer.id,
+					magnetUri : magnetUri
 				}, true);
 
 				// Return no error
-				cb(null);
+				cb();
 
 				break;
 			}
@@ -838,7 +839,7 @@ class Room extends EventEmitter
 				}, true);
 
 				// Return no error
-				cb(null);
+				cb();
 
 				break;
 			}
