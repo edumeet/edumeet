@@ -53,6 +53,8 @@ const styles = (theme) =>
 		viewContainer :
 		{
 			position   : 'relative',
+			width      : '100%',
+			height     : '100%',
 			'&.webcam' :
 			{
 				order : 2
@@ -164,9 +166,10 @@ const Peer = (props) =>
 
 	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-	const spacingStyle =
+	const rootStyle =
 	{
-		'margin' : spacing
+		'margin' : spacing,
+		...style
 	};
 
 	return (
@@ -199,9 +202,9 @@ const Peer = (props) =>
 						setHover(false);
 					}, 2000);
 				}}
-				style={spacingStyle}
+				style={rootStyle}
 			>
-				<div className={classnames(classes.viewContainer)} style={style}>
+				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible ?
 						<div className={classes.videoInfo}>
 							<p>this video is paused</p>
@@ -319,16 +322,17 @@ const Peer = (props) =>
 							setHover(false);
 						}, 2000);
 					}}
+					style={rootStyle}
 				>
 					{ !screenVisible ?
-						<div className={classes.videoInfo} style={style}>
+						<div className={classes.videoInfo}>
 							<p>this video is paused</p>
 						</div>
 						:null
 					}
 
 					{ screenVisible ?
-						<div className={classnames(classes.viewContainer)} style={style}>
+						<div className={classnames(classes.viewContainer)}>
 							<div
 								className={classnames(classes.controls, screenHover ? 'hover' : null)}
 								onMouseOver={() => setScreenHover(true)}

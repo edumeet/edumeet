@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import {
-	spotlightsLengthSelector
+	spotlightsLengthSelector,
+	videoBoxesSelector
 } from '../Selectors';
 import { withRoomContext } from '../../RoomContext';
 import Me from '../Containers/Me';
@@ -60,6 +61,8 @@ class Filmstrip extends React.PureComponent
 		this.resizeTimeout = null;
 
 		this.activePeerContainer = React.createRef();
+
+		this.filmStripContainer = React.createRef();
 	}
 
 	state = {
@@ -102,31 +105,53 @@ class Filmstrip extends React.PureComponent
 
 	updateDimensions = () =>
 	{
-		const container = this.activePeerContainer.current;
+		const newState = {};
 
-		if (container)
+		const speaker = this.activePeerContainer.current;
+
+		if (speaker)
 		{
-			let width = (container.clientWidth - 100);
+			let speakerWidth = (speaker.clientWidth - 100);
 
-			let height = (width / 4) * 3;
-
+			let speakerHeight = (speakerWidth / 4) * 3;
+	
 			if (this.isSharingCamera(this.getActivePeerId()))
 			{
-				width /= 2;
-				height = (width / 4) * 3;
+				speakerWidth /= 2;
+				speakerHeight = (speakerWidth / 4) * 3;
 			}
-
-			if (height > (container.clientHeight - 60))
+	
+			if (speakerHeight > (speaker.clientHeight - 60))
 			{
-				height = (container.clientHeight - 60);
-				width = (height / 3) * 4;
+				speakerHeight = (speaker.clientHeight - 60);
+				speakerWidth = (speakerHeight / 3) * 4;
 			}
 
-			this.setState({
-				width,
-				height
-			});
+			newState.speakerWidth = speakerWidth;
+			newState.speakerHeight = speakerHeight;
 		}
+
+		const filmStrip = this.filmStripContainer.current;
+
+		if (filmStrip)
+		{
+			let filmStripHeight = filmStrip.clientHeight - 10;
+
+			let filmStripWidth = (filmStripHeight / 3) * 4;
+	
+			if (filmStripWidth * this.props.boxes > (filmStrip.clientWidth - 50))
+			{
+				filmStripWidth = (filmStrip.clientWidth - 50) / this.props.boxes;
+				filmStripHeight = (filmStripWidth / 4) * 3;
+			}
+
+			newState.filmStripWidth = filmStripWidth;
+			newState.filmStripHeight = filmStripHeight;
+		}
+
+		this.setState({
+			...newState
+		});
 	};
 
 	componentDidMount()
@@ -190,14 +215,14 @@ class Filmstrip extends React.PureComponent
 
 		const speakerStyle =
 		{
-			width  : this.state.width,
-			height : this.state.height
+			width  : this.state.speakerWidth,
+			height : this.state.speakerHeight
 		};
 
 		const peerStyle =
 		{
-			'width'  : '24vmin',
-			'height' : '18vmin'
+			width  : this.state.filmStripWidth,
+			height : this.state.filmStripHeight
 		};
 
 		return (
@@ -213,7 +238,7 @@ class Filmstrip extends React.PureComponent
 					}
 				</div>
 
-				<div className={classes.filmStrip}>
+				<div className={classes.filmStrip} ref={this.filmStripContainer}>
 					<Grid container justify='center' spacing={0}>
 						<Grid item>
 							<div
@@ -258,14 +283,13 @@ class Filmstrip extends React.PureComponent
 						})}
 					</Grid>
 				</div>
-				<div className={classes.hiddenPeers}>
-					{ spotlightsLength<Object.keys(peers).length ?
-						<HiddenPeers
-							hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
-						/>
-						:null
-					}
-				</div>
+
+				{ spotlightsLength<Object.keys(peers).length ?
+					<HiddenPeers
+						hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
+					/>
+					:null
+				}
 			</div>
 		);
 	}
@@ -281,6 +305,7 @@ Filmstrip.propTypes = {
 	selectedPeerId   : PropTypes.string,
 	spotlightsLength : PropTypes.number,
 	spotlights       : PropTypes.array.isRequired,
+	boxes            : PropTypes.number,
 	classes          : PropTypes.object.isRequired
 };
 
@@ -293,7 +318,8 @@ const mapStateToProps = (state) =>
 		consumers        : state.consumers,
 		myId             : state.me.id,
 		spotlights       : state.room.spotlights,
-		spotlightsLength : spotlightsLengthSelector(state)
+		spotlightsLength : spotlightsLengthSelector(state),
+		boxes            : videoBoxesSelector(state),
 	};
 };
 

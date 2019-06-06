@@ -51,13 +51,13 @@ const styles = (theme) =>
 		}
 	});
 
-/* const modes = [ {
+const modes = [ {
 	value : 'democratic',
 	label : 'Democratic view'
 }, {
 	value : 'filmstrip',
 	label : 'Filmstrip view'
-} ]; */
+} ];
 
 const resolutions = [ {
 	value : 'low',
@@ -87,6 +87,7 @@ const Settings = ({
 	settings,
 	onToggleAdvancedMode,
 	handleCloseSettings,
+	handleChangeMode,
 	classes
 }) =>
 {
@@ -203,6 +204,33 @@ const Settings = ({
 					</FormHelperText>
 				</FormControl>
 			</form>
+			<form className={classes.setting} autoComplete='off'>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={room.mode || ''}
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								handleChangeMode(event.target.value);
+						}}
+						name='Room layout'
+						autoWidth
+						className={classes.selectEmpty}
+					>
+						{ modes.map((mode, index) =>
+						{
+							return (
+								<MenuItem key={index} value={mode.value}>
+									{mode.label}
+								</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						Select room layout
+					</FormHelperText>
+				</FormControl>
+			</form>
 			<FormControlLabel
 				className={classes.setting}
 				control={<Checkbox checked={settings.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
@@ -241,7 +269,7 @@ const mapStateToProps = (state) =>
 const mapDispatchToProps = {
 	onToggleAdvancedMode : stateActions.toggleAdvancedMode,
 	handleChangeMode     : stateActions.setDisplayMode,
-	handleCloseSettings  : stateActions.setSettingsOpen
+	handleCloseSettings  : stateActions.setSettingsOpen,
 };
 
 export default withRoomContext(connect(
