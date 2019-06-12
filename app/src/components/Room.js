@@ -15,7 +15,6 @@ import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Hidden from '@material-ui/core/Hidden';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Avatar from '@material-ui/core/Avatar';
@@ -33,6 +32,7 @@ import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Settings from './Settings/Settings';
+import JoinDialog from './JoinDialog';
 
 const TIMEOUT = 10 * 1000;
 
@@ -176,10 +176,6 @@ class Room extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { roomClient } = this.props;
-
-		roomClient.join();
-
 		if (this.fullscreen.fullscreenEnabled)
 		{
 			this.fullscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
@@ -242,29 +238,7 @@ class Room extends React.PureComponent
 			democratic : Democratic
 		}[room.mode];
 
-		if (room.audioSuspended)
-		{
-			return (
-				<div className={classes.root}>
-					<Paper className={classes.message}>
-						<Typography variant='h2'>
-							This webpage required sound and video to play, please click to allow.
-						</Typography>
-						<Button
-							variant='contained'
-							onClick={() =>
-							{
-								roomClient.notify('Joining.');
-								roomClient.resumeAudio();
-							}}
-						>
-							Allow
-						</Button>
-					</Paper>
-				</div>
-			);
-		}
-		else if (room.lockedOut)
+		if (room.lockedOut)
 		{
 			return (
 				<div className={classes.root}>
@@ -273,6 +247,10 @@ class Room extends React.PureComponent
 					</Paper>
 				</div>
 			);
+		}
+		else if (!room.joined)
+		{
+			return (<JoinDialog />);
 		}
 		else
 		{

@@ -568,6 +568,11 @@ export const loggedIn = () =>
 		type : 'LOGGED_IN'
 	});
 
+export const toggleJoined = () =>
+	({
+		type : 'TOGGLE_JOINED'
+	});
+
 export const setSelectedPeer = (selectedPeerId) =>
 	({
 		type    : 'SET_SELECTED_PEER',

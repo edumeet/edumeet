@@ -14,7 +14,8 @@ const initialState =
 	mode               : 'democratic',
 	selectedPeerId     : null,
 	spotlights         : [],
-	settingsOpen       : false
+	settingsOpen       : false,
+	joined             : false
 };
 
 const room = (state = initialState, action) =>
@@ -86,6 +87,13 @@ const room = (state = initialState, action) =>
 			const showSettings = !state.showSettings;
 
 			return { ...state, showSettings };
+		}
+
+		case 'TOGGLE_JOINED':
+		{
+			const joined = !state.joined;
+
+			return { ...state, joined };
 		}
 
 		case 'TOGGLE_FULLSCREEN_CONSUMER':

@@ -65,10 +65,6 @@ const VIDEO_ENCODINGS =
 
 let store;
 
-const AudioContext = window.AudioContext // Default
-	|| window.webkitAudioContext // Safari and old versions of Chrome
-	|| false;
-
 export default class RoomClient
 {
 	/**
@@ -118,11 +114,6 @@ export default class RoomClient
 
 		// Alert sound
 		this._soundAlert = new Audio('/sounds/notify.mp3');
-
-		if (AudioContext)
-		{
-			this._audioContext = new AudioContext();
-		}
 
 		// Socket.io peer connection
 		this._signalingSocket = null;
@@ -1056,31 +1047,13 @@ export default class RoomClient
 			stateActions.setMyRaiseHandStateInProgress(false));
 	}
 
-	async resumeAudio()
-	{
-		logger.debug('resumeAudio()');
-		try
-		{
-			await this._audioContext.resume();
-
-			store.dispatch(
-				stateActions.setAudioSuspended({ audioSuspended: false }));
-
-		}
-		catch (error)
-		{
-			store.dispatch(
-				stateActions.setAudioSuspended({ audioSuspended: true }));
-			logger.error('resumeAudioJoin() failed: %o', error);
-		}
-	}
-
-	async join()
+	async join({ joinVideo })
 	{
 		this._signalingSocket = io(this._signalingUrl);
 
 		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
+		store.dispatch(stateActions.toggleJoined());
 		store.dispatch(stateActions.setRoomState('connecting'));
 
 		this._signalingSocket.on('connect', () =>
@@ -1258,7 +1231,7 @@ export default class RoomClient
 			{
 				case 'roomReady':
 				{
-					await this._joinRoom();
+					await this._joinRoom({ joinVideo });
 
 					break;
 				}
@@ -1514,7 +1487,7 @@ export default class RoomClient
 		});
 	}
 
-	async _joinRoom()
+	async _joinRoom({ joinVideo })
 	{
 		logger.debug('_joinRoom()');
 
@@ -1666,7 +1639,7 @@ export default class RoomClient
 				if (this._mediasoupDevice.canProduce('audio'))
 					await this.enableMic();
 
-				if (this._mediasoupDevice.canProduce('video'))
+				if (joinVideo && this._mediasoupDevice.canProduce('video'))
 					await this.enableWebcam();
 			}
 
@@ -1875,15 +1848,6 @@ export default class RoomClient
 					store.dispatch(stateActions.setPeerVolume(this._peerId, volume));
 				}
 			});
-
-			if (this._audioContext)
-			{
-				// We need to provoke user interaction to get permission from browser to start audio
-				if (this._audioContext.state === 'suspended')
-				{
-					this.resumeAudio();
-				}
-			}
 		}
 		catch (error)
 		{
