@@ -652,9 +652,15 @@ export default class RoomClient
 	{
 		logger.debug('muteMic()');
 
+		this._micProducer.pause();
+
 		try
 		{
-			this._micProducer.pause();
+			await this.sendRequest(
+				'pauseProducer', { producerId: this._micProducer.id });
+
+			store.dispatch(
+				stateActions.setProducerPaused(this._micProducer.id));
 		}
 		catch (error)
 		{
@@ -672,24 +678,32 @@ export default class RoomClient
 	{
 		logger.debug('unmuteMic()');
 
-		try
+		if (!this._micProducer)
 		{
-			if (this._micProducer)
-				this._micProducer.resume();
-			else if (this._room.canSend('audio'))
-				await this.enableMic();
-			else
-				throw new Error('cannot send audio');
+			this.enableMic();
 		}
-		catch (error)
+		else
 		{
-			logger.error('unmuteMic() | failed: %o', error);
+			this._micProducer.resume();
 
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : 'An error occured while accessing your microphone.'
-				}));
+			try
+			{
+				await this.sendRequest(
+					'resumeProducer', { producerId: this._micProducer.id });
+	
+				store.dispatch(
+					stateActions.setProducerResumed(this._micProducer.id));
+			}
+			catch (error)
+			{
+				logger.error('unmuteMic() | failed: %o', error);
+	
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'An error occured while accessing your microphone.'
+					}));
+			}
 		}
 	}
 
