@@ -1637,10 +1637,10 @@ export default class RoomClient
 			if (this._produce)
 			{
 				if (this._mediasoupDevice.canProduce('audio'))
-					await this.enableMic();
+					this.enableMic();
 
 				if (joinVideo && this._mediasoupDevice.canProduce('video'))
-					await this.enableWebcam();
+					this.enableWebcam();
 			}
 
 			store.dispatch(stateActions.setRoomState('connected'));
