@@ -78,10 +78,15 @@ const Sidebar = (props) =>
 
 	let micTip;
 
-	if (!me.canSendMic || !micProducer)
+	if (!me.canSendMic)
 	{
 		micState = 'unsupported';
 		micTip = 'Audio unsupported';
+	}
+	else if (!micProducer)
+	{
+		micState = 'off';
+		micTip = 'Activate audio';
 	}
 	else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
 	{
@@ -90,7 +95,7 @@ const Sidebar = (props) =>
 	}
 	else
 	{
-		micState = 'off';
+		micState = 'muted';
 		micTip = 'Unmute audio';
 	}
 
@@ -152,9 +157,12 @@ const Sidebar = (props) =>
 						size={smallScreen ? 'large' : 'medium'}
 						onClick={() =>
 						{
-							micState === 'on' ?
-								roomClient.disableMic() :
+							if (micState === 'off')
 								roomClient.enableMic();
+							else if (micState === 'on')
+								roomClient.muteMic();
+							else
+								roomClient.unmuteMic();
 						}}
 					>
 						{ micState === 'on' ?
