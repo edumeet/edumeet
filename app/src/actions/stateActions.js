@@ -43,14 +43,6 @@ export const setRoomLockedOut = () =>
 	};
 };
 
-export const setAudioSuspended = ({ audioSuspended }) =>
-{
-	return {
-		type    : 'SET_AUDIO_SUSPENDED',
-		payload : { audioSuspended }
-	};
-};
-
 export const setSettingsOpen = ({ settingsOpen }) =>
 	({
 		type    : 'SET_SETTINGS_OPEN',
