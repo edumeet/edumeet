@@ -65,10 +65,6 @@ const VIDEO_ENCODINGS =
 
 let store;
 
-const AudioContext = window.AudioContext // Default
-	|| window.webkitAudioContext // Safari and old versions of Chrome
-	|| false;
-
 export default class RoomClient
 {
 	/**
@@ -118,11 +114,6 @@ export default class RoomClient
 
 		// Alert sound
 		this._soundAlert = new Audio('/sounds/notify.mp3');
-
-		if (AudioContext)
-		{
-			this._audioContext = new AudioContext();
-		}
 
 		// Socket.io peer connection
 		this._signalingSocket = null;
@@ -661,9 +652,15 @@ export default class RoomClient
 	{
 		logger.debug('muteMic()');
 
+		this._micProducer.pause();
+
 		try
 		{
-			this._micProducer.pause();
+			await this.sendRequest(
+				'pauseProducer', { producerId: this._micProducer.id });
+
+			store.dispatch(
+				stateActions.setProducerPaused(this._micProducer.id));
 		}
 		catch (error)
 		{
@@ -681,24 +678,32 @@ export default class RoomClient
 	{
 		logger.debug('unmuteMic()');
 
-		try
+		if (!this._micProducer)
 		{
-			if (this._micProducer)
-				this._micProducer.resume();
-			else if (this._room.canSend('audio'))
-				await this.enableMic();
-			else
-				throw new Error('cannot send audio');
+			this.enableMic();
 		}
-		catch (error)
+		else
 		{
-			logger.error('unmuteMic() | failed: %o', error);
+			this._micProducer.resume();
 
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : 'An error occured while accessing your microphone.'
-				}));
+			try
+			{
+				await this.sendRequest(
+					'resumeProducer', { producerId: this._micProducer.id });
+	
+				store.dispatch(
+					stateActions.setProducerResumed(this._micProducer.id));
+			}
+			catch (error)
+			{
+				logger.error('unmuteMic() | failed: %o', error);
+	
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'An error occured while accessing your microphone.'
+					}));
+			}
 		}
 	}
 
@@ -1056,31 +1061,13 @@ export default class RoomClient
 			stateActions.setMyRaiseHandStateInProgress(false));
 	}
 
-	async resumeAudio()
-	{
-		logger.debug('resumeAudio()');
-		try
-		{
-			await this._audioContext.resume();
-
-			store.dispatch(
-				stateActions.setAudioSuspended({ audioSuspended: false }));
-
-		}
-		catch (error)
-		{
-			store.dispatch(
-				stateActions.setAudioSuspended({ audioSuspended: true }));
-			logger.error('resumeAudioJoin() failed: %o', error);
-		}
-	}
-
-	async join()
+	async join({ joinVideo })
 	{
 		this._signalingSocket = io(this._signalingUrl);
 
 		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
+		store.dispatch(stateActions.toggleJoined());
 		store.dispatch(stateActions.setRoomState('connecting'));
 
 		this._signalingSocket.on('connect', () =>
@@ -1258,7 +1245,7 @@ export default class RoomClient
 			{
 				case 'roomReady':
 				{
-					await this._joinRoom();
+					await this._joinRoom({ joinVideo });
 
 					break;
 				}
@@ -1514,7 +1501,7 @@ export default class RoomClient
 		});
 	}
 
-	async _joinRoom()
+	async _joinRoom({ joinVideo })
 	{
 		logger.debug('_joinRoom()');
 
@@ -1664,10 +1651,10 @@ export default class RoomClient
 			if (this._produce)
 			{
 				if (this._mediasoupDevice.canProduce('audio'))
-					await this.enableMic();
+					this.enableMic();
 
-				if (this._mediasoupDevice.canProduce('video'))
-					await this.enableWebcam();
+				if (joinVideo && this._mediasoupDevice.canProduce('video'))
+					this.enableWebcam();
 			}
 
 			store.dispatch(stateActions.setRoomState('connected'));
@@ -1875,15 +1862,6 @@ export default class RoomClient
 					store.dispatch(stateActions.setPeerVolume(this._peerId, volume));
 				}
 			});
-
-			if (this._audioContext)
-			{
-				// We need to provoke user interaction to get permission from browser to start audio
-				if (this._audioContext.state === 'suspended')
-				{
-					this.resumeAudio();
-				}
-			}
 		}
 		catch (error)
 		{

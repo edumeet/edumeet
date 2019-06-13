@@ -4,7 +4,6 @@ const initialState =
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
 	lockedOut          : false,
-	audioSuspended     : false,
 	activeSpeakerId    : null,
 	torrentSupport     : false,
 	showSettings       : false,
@@ -14,7 +13,8 @@ const initialState =
 	mode               : 'democratic',
 	selectedPeerId     : null,
 	spotlights         : [],
-	settingsOpen       : false
+	settingsOpen       : false,
+	joined             : false
 };
 
 const room = (state = initialState, action) =>
@@ -53,13 +53,6 @@ const room = (state = initialState, action) =>
 			return { ...state, lockedOut: true };
 		}
 
-		case 'SET_AUDIO_SUSPENDED':
-		{
-			const { audioSuspended } = action.payload;
-
-			return { ...state, audioSuspended };
-		}
-
 		case 'SET_SETTINGS_OPEN':
 		{
 			const { settingsOpen } = action.payload;
@@ -86,6 +79,13 @@ const room = (state = initialState, action) =>
 			const showSettings = !state.showSettings;
 
 			return { ...state, showSettings };
+		}
+
+		case 'TOGGLE_JOINED':
+		{
+			const joined = !state.joined;
+
+			return { ...state, joined };
 		}
 
 		case 'TOGGLE_FULLSCREEN_CONSUMER':

@@ -43,14 +43,6 @@ export const setRoomLockedOut = () =>
 	};
 };
 
-export const setAudioSuspended = ({ audioSuspended }) =>
-{
-	return {
-		type    : 'SET_AUDIO_SUSPENDED',
-		payload : { audioSuspended }
-	};
-};
-
 export const setSettingsOpen = ({ settingsOpen }) =>
 	({
 		type    : 'SET_SETTINGS_OPEN',
@@ -566,6 +558,11 @@ export const setPeerPicture = (peerId, picture) =>
 export const loggedIn = () =>
 	({
 		type : 'LOGGED_IN'
+	});
+
+export const toggleJoined = () =>
+	({
+		type : 'TOGGLE_JOINED'
 	});
 
 export const setSelectedPeer = (selectedPeerId) =>
