@@ -250,7 +250,11 @@ class Room extends React.PureComponent
 		}
 		else if (!room.joined)
 		{
-			return (<JoinDialog />);
+			return (
+				<div className={classes.root}>
+					<JoinDialog />
+				</div>
+			);
 		}
 		else
 		{
