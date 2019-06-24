@@ -27,10 +27,12 @@ import Filmstrip from './MeetingViews/Filmstrip';
 import AudioPeers from './PeerAudio/AudioPeers';
 import FullScreenView from './VideoContainers/FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
-import Sidebar from './Controls/Sidebar';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
+import LockIcon from '@material-ui/icons/Lock';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
+import LeaveIcon from '@material-ui/icons/Cancel';
 import Settings from './Settings/Settings';
 import JoinDialog from './JoinDialog';
 
@@ -306,6 +308,34 @@ class Room extends React.PureComponent
 							</Typography>
 							<div className={classes.grow} />
 							<div className={classes.actionButtons}>
+								<IconButton
+									aria-label='Leave meeting'
+									color='secondary'
+									onClick={() => roomClient.close()}
+								>
+									<LeaveIcon />
+								</IconButton>
+								<IconButton
+									aria-label='Lock room'
+									color='inherit'
+									onClick={() =>
+									{
+										if (room.locked)
+										{
+											roomClient.unlockRoom();
+										}
+										else
+										{
+											roomClient.lockRoom();
+										}
+									}}
+								>
+									{ room.locked ?
+										<LockIcon />
+										:
+										<LockOpenIcon />
+									}
+								</IconButton>
 								{ this.fullscreen.fullscreenEnabled ?
 									<IconButton
 										aria-label='Fullscreen'
@@ -365,8 +395,6 @@ class Room extends React.PureComponent
 					</nav>
 
 					<View advancedMode={advancedMode} />
-
-					<Sidebar />
 
 					<Settings />
 				</div>

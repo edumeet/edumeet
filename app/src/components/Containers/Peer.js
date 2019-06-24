@@ -31,11 +31,11 @@ const styles = (theme) =>
 			backgroundRepeat   : 'no-repeat',
 			'&.webcam'         :
 			{
-				order : 2
+				order : 4
 			},
 			'&.screen' :
 			{
-				order : 1
+				order : 3
 			},
 			'&.hover' :
 			{
@@ -52,17 +52,9 @@ const styles = (theme) =>
 		},
 		viewContainer :
 		{
-			position   : 'relative',
-			width      : '100%',
-			height     : '100%',
-			'&.webcam' :
-			{
-				order : 2
-			},
-			'&.screen' :
-			{
-				order : 1
-			}
+			position : 'relative',
+			width    : '100%',
+			height   : '100%'
 		},
 		controls :
 		{
