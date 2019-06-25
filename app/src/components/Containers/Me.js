@@ -49,7 +49,8 @@ const styles = (theme) =>
 		},
 		fab :
 		{
-			margin : theme.spacing(1)
+			margin        : theme.spacing(1),
+			pointerEvents : 'auto'
 		},
 		viewContainer :
 		{
@@ -72,6 +73,7 @@ const styles = (theme) =>
 			opacity         : 0,
 			transition      : 'opacity 0.3s',
 			touchAction     : 'none',
+			pointerEvents   : 'none',
 			'&.hover'       :
 			{
 				opacity : 1
@@ -93,14 +95,8 @@ const styles = (theme) =>
 const Me = (props) =>
 {
 	const [ hover, setHover ] = useState(false);
-	const [ webcamHover, setWebcamHover ] = useState(false);
-	const [ screenHover, setScreenHover ] = useState(false);
 
 	let touchTimeout = null;
-
-	let touchWebcamTimeout = null;
-
-	let touchScreenTimeout = null;
 
 	const {
 		roomClient,
@@ -236,24 +232,24 @@ const Me = (props) =>
 			>
 				<div className={classnames(classes.viewContainer)} style={style}>
 					<div
-						className={classnames(classes.controls, webcamHover ? 'hover' : null)}
-						onMouseOver={() => setWebcamHover(true)}
-						onMouseOut={() => setWebcamHover(false)}
+						className={classnames(classes.controls, hover ? 'hover' : null)}
+						onMouseOver={() => setHover(true)}
+						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
 						{
-							if (touchWebcamTimeout)
-								clearTimeout(touchWebcamTimeout);
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
 
-							setWebcamHover(true);
+							setHover(true);
 						}}
 						onTouchEnd={() =>
 						{
-							if (touchWebcamTimeout)
-								clearTimeout(touchWebcamTimeout);
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
 
-							touchWebcamTimeout = setTimeout(() =>
+							touchTimeout = setTimeout(() =>
 							{
-								setWebcamHover(false);
+								setHover(false);
 							}, 2000);
 						}}
 					>
@@ -394,25 +390,25 @@ const Me = (props) =>
 				>
 					<div className={classnames(classes.viewContainer)} style={style}>
 						<div
-							className={classnames(classes.controls, screenHover ? 'hover' : null)}
-							onMouseOver={() => setScreenHover(true)}
-							onMouseOut={() => setScreenHover(false)}
+							className={classnames(classes.controls, hover ? 'hover' : null)}
+							onMouseOver={() => setHover(true)}
+							onMouseOut={() => setHover(false)}
 							onTouchStart={() =>
 							{
-								if (touchScreenTimeout)
-									clearTimeout(touchScreenTimeout);
+								if (touchTimeout)
+									clearTimeout(touchTimeout);
 			
-								setScreenHover(true);
+								setHover(true);
 							}}
 							onTouchEnd={() =>
 							{
 
-								if (touchScreenTimeout)
-									clearTimeout(touchScreenTimeout);
+								if (touchTimeout)
+									clearTimeout(touchTimeout);
 			
-								touchScreenTimeout = setTimeout(() =>
+								touchTimeout = setTimeout(() =>
 								{
-									setScreenHover(false);
+									setHover(false);
 								}, 2000);
 							}}
 						>
@@ -421,6 +417,7 @@ const Me = (props) =>
 						
 						<VideoView
 							isMe
+							isScreen
 							advancedMode={advancedMode}
 							videoContain
 							videoTrack={screenProducer ? screenProducer.track : null}

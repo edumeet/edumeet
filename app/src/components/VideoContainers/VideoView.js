@@ -27,7 +27,7 @@ const styles = (theme) =>
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
 			backgroundColor    : 'var(--peer-video-bg-color)',
-			'&.is-me'          :
+			'&.isMe'           :
 			{
 				transform : 'scaleX(-1)'
 			},
@@ -142,6 +142,7 @@ class VideoView extends React.PureComponent
 	{
 		const {
 			isMe,
+			isScreen,
 			peer,
 			displayName,
 			showPeerInfo,
@@ -229,7 +230,7 @@ class VideoView extends React.PureComponent
 					ref='video'
 					className={classnames(classes.video, {
 						hidden  : !videoVisible,
-						'is-me' : isMe,
+						'isMe' : isMe && !isScreen,
 						loading : videoProfile === 'none',
 						contain : videoContain
 					})}
@@ -320,8 +321,9 @@ class VideoView extends React.PureComponent
 
 VideoView.propTypes =
 {
-	isMe : PropTypes.bool,
-	peer : PropTypes.oneOfType(
+	isMe     : PropTypes.bool,
+	isScreen : PropTypes.bool,
+	peer     : PropTypes.oneOfType(
 		[ appPropTypes.Me, appPropTypes.Peer ]),
 	displayName         : PropTypes.string,
 	showPeerInfo        : PropTypes.bool,
