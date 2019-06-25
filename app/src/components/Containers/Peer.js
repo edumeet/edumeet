@@ -66,7 +66,7 @@ const styles = (theme) =>
 			flexDirection   : 'column',
 			justifyContent  : 'center',
 			alignItems      : 'flex-end',
-			padding         : '0.4vmin',
+			padding         : theme.spacing(1),
 			zIndex          : 21,
 			opacity         : 0,
 			transition      : 'opacity 0.3s',
@@ -85,7 +85,7 @@ const styles = (theme) =>
 			display         : 'flex',
 			justifyContent  : 'center',
 			alignItems      : 'center',
-			padding         : '0.4vmin',
+			padding         : theme.spacing(1),
 			zIndex          : 20,
 			'& p'           :
 			{

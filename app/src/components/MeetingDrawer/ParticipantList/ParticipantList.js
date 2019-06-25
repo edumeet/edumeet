@@ -18,7 +18,7 @@ const styles = (theme) =>
 		{
 			width     : '100%',
 			overflowY : 'auto',
-			padding   : 6
+			padding   : theme.spacing(1)
 		},
 		list :
 		{
@@ -29,12 +29,12 @@ const styles = (theme) =>
 		},
 		listheader :
 		{
-			padding    : '0.5rem',
+			padding    : theme.spacing(1),
 			fontWeight : 'bolder'
 		},
 		listItem :
 		{
-			padding      : '0.5rem',
+			padding      : theme.spacing(1),
 			width        : '100%',
 			overflow     : 'hidden',
 			cursor       : 'pointer',

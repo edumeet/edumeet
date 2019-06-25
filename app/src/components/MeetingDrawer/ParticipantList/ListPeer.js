@@ -13,11 +13,11 @@ import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 import HandIcon from '../../../images/icon-hand-white.svg';
 
-const styles = () =>
+const styles = (theme) =>
 	({
 		root :
 		{
-			padding  : '0.5rem',
+			padding  : theme.spacing(1),
 			width    : '100%',
 			overflow : 'hidden',
 			cursor   : 'auto',
@@ -37,7 +37,7 @@ const styles = () =>
 			fontSize    : '1rem',
 			border      : 'none',
 			display     : 'flex',
-			paddingLeft : '0.5rem',
+			paddingLeft : theme.spacing(1),
 			flexGrow    : 1,
 			alignItems  : 'center'
 		},

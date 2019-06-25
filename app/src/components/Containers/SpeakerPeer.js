@@ -8,7 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import VideoView from '../VideoContainers/VideoView';
 import Volume from './Volume';
 
-const styles = () =>
+const styles = (theme) =>
 	({
 		root :
 		{
@@ -51,7 +51,7 @@ const styles = () =>
 			display         : 'flex',
 			justifyContent  : 'center',
 			alignItems      : 'center',
-			padding         : '0.4vmin',
+			padding         : theme.spacing(1),
 			zIndex          : 21,
 			'& p'           :
 			{

@@ -67,7 +67,7 @@ const styles = (theme) =>
 			flexDirection   : 'column',
 			justifyContent  : 'center',
 			alignItems      : 'flex-end',
-			padding         : '0.4vmin',
+			padding         : theme.spacing(1),
 			zIndex          : 21,
 			opacity         : 0,
 			transition      : 'opacity 0.3s',
@@ -83,7 +83,7 @@ const styles = (theme) =>
 				top       : '50%',
 				left      : '50%',
 				transform : 'translate(-50%, -50%)',
-				color     : 'rgba(255, 255, 255, 1)',
+				color     : 'rgba(255, 255, 255, 0.5)',
 				fontSize  : '7em',
 				margin    : 0
 			}
