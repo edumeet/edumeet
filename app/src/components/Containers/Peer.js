@@ -102,14 +102,8 @@ const styles = (theme) =>
 const Peer = (props) =>
 {
 	const [ hover, setHover ] = useState(false);
-	const [ webcamHover, setWebcamHover ] = useState(false);
-	const [ screenHover, setScreenHover ] = useState(false);
 
 	let touchTimeout = null;
-
-	let touchWebcamTimeout = null;
-
-	let touchScreenTimeout = null;
 
 	const {
 		roomClient,
@@ -206,24 +200,24 @@ const Peer = (props) =>
 					}
 
 					<div
-						className={classnames(classes.controls, webcamHover ? 'hover' : null)}
-						onMouseOver={() => setWebcamHover(true)}
-						onMouseOut={() => setWebcamHover(false)}
+						className={classnames(classes.controls, hover ? 'hover' : null)}
+						onMouseOver={() => setHover(true)}
+						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
 						{
-							if (touchWebcamTimeout)
-								clearTimeout(touchWebcamTimeout);
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
 		
-							setWebcamHover(true);
+							setHover(true);
 						}}
 						onTouchEnd={() =>
 						{
-							if (touchWebcamTimeout)
-								clearTimeout(touchWebcamTimeout);
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
 		
-							touchWebcamTimeout = setTimeout(() =>
+							touchTimeout = setTimeout(() =>
 							{
-								setWebcamHover(false);
+								setHover(false);
 							}, 2000);
 						}}
 					>
@@ -330,25 +324,25 @@ const Peer = (props) =>
 					{ screenVisible ?
 						<div className={classnames(classes.viewContainer)}>
 							<div
-								className={classnames(classes.controls, screenHover ? 'hover' : null)}
-								onMouseOver={() => setScreenHover(true)}
-								onMouseOut={() => setScreenHover(false)}
+								className={classnames(classes.controls, hover ? 'hover' : null)}
+								onMouseOver={() => setHover(true)}
+								onMouseOut={() => setHover(false)}
 								onTouchStart={() =>
 								{
-									if (touchScreenTimeout)
-										clearTimeout(touchScreenTimeout);
+									if (touchTimeout)
+										clearTimeout(touchTimeout);
 				
-									setScreenHover(true);
+									setHover(true);
 								}}
 								onTouchEnd={() =>
 								{
 
-									if (touchScreenTimeout)
-										clearTimeout(touchScreenTimeout);
+									if (touchTimeout)
+										clearTimeout(touchTimeout);
 				
-									touchScreenTimeout = setTimeout(() =>
+									touchTimeout = setTimeout(() =>
 									{
-										setScreenHover(false);
+										setHover(false);
 									}, 2000);
 								}}
 							>
