@@ -60,7 +60,7 @@ const styles = (theme) =>
 			left           : '50%',
 			transform      : 'translateX(-50%) translateY(-50%)',
 			width          : '30vw',
-			padding        : theme.spacing.unit * 2,
+			padding        : theme.spacing(2),
 			flexDirection  : 'column',
 			justifyContent : 'center',
 			alignItems     : 'center'
@@ -129,7 +129,7 @@ const styles = (theme) =>
 		},
 		actionButton :
 		{
-			margin  : theme.spacing.unit,
+			margin  : theme.spacing(1),
 			padding : 0
 		},
 		meContainer :

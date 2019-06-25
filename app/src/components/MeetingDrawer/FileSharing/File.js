@@ -14,11 +14,11 @@ const styles = (theme) =>
 			display              : 'flex',
 			alignItems           : 'center',
 			width                : '100%',
-			padding              : theme.spacing.unit,
+			padding              : theme.spacing(1),
 			boxShadow            : '0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12)',
 			'&:not(:last-child)' :
 			{
-				marginBottom : theme.spacing.unit
+				marginBottom : theme.spacing(1)
 			}
 		},
 		avatar :
@@ -29,7 +29,7 @@ const styles = (theme) =>
 		text :
 		{
 			margin  : 0,
-			padding : theme.spacing.unit
+			padding : theme.spacing(1)
 		},
 		fileContent :
 		{
@@ -40,7 +40,7 @@ const styles = (theme) =>
 		{
 			display    : 'flex',
 			alignItems : 'center',
-			padding    : theme.spacing.unit
+			padding    : theme.spacing(1)
 		},
 		button :
 		{

@@ -43,7 +43,7 @@ const styles = (theme) =>
 		},
 		setting :
 		{
-			padding : theme.spacing.unit * 2
+			padding : theme.spacing(2)
 		},
 		formControl :
 		{

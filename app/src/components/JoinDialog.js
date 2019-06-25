@@ -15,7 +15,7 @@ const styles = (theme) =>
 		dialogPaper :
 		{
 			width                          : '20vw',
-			padding                        : theme.spacing.unit * 2,
+			padding                        : theme.spacing(2),
 			[theme.breakpoints.down('lg')] :
 			{
 				width : '30vw'

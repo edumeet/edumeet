@@ -23,7 +23,7 @@ const styles = (theme) =>
 		list :
 		{
 			listStyleType   : 'none',
-			padding         : theme.spacing.unit,
+			padding         : theme.spacing(1),
 			boxShadow       : '0 2px 5px 2px rgba(0, 0, 0, 0.2)',
 			backgroundColor : 'rgba(255, 255, 255, 1)'
 		},
