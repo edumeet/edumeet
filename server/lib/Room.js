@@ -165,7 +165,7 @@ class Room extends EventEmitter
 		}
 		else if (this._locked) // Don't allow connections to a locked room
 		{
-			notification(socket, 'roomLocked');
+			this._notification(socket, 'roomLocked');
 			socket.disconnect(true);
 			return;
 		}
