@@ -201,7 +201,7 @@ class VideoView extends React.PureComponent
 										shouldBlockWhileLoading
 										editProps={{
 											maxLength   : 30,
-											autoCorrect : false,
+											autoCorrect : 'off',
 											spellCheck  : false
 										}}
 										onChange={({ newDisplayName }) => onChangeDisplayName(newDisplayName)}
