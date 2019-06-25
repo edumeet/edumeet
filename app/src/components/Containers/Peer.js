@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import * as stateActions from '../../actions/stateActions';
 import VideoView from '../VideoContainers/VideoView';
 import Fab from '@material-ui/core/Fab';
@@ -123,6 +123,7 @@ const Peer = (props) =>
 		toggleConsumerWindow,
 		spacing,
 		style,
+		smallButtons,
 		windowConsumer,
 		classes,
 		theme
@@ -231,6 +232,7 @@ const Peer = (props) =>
 							className={classes.fab}
 							disabled={!micConsumer}
 							color={micEnabled ? 'default' : 'secondary'}
+							size={smallButtons ? 'small' : 'large'}
 							onClick={() =>
 							{
 								micEnabled ?
@@ -253,6 +255,7 @@ const Peer = (props) =>
 									!videoVisible ||
 									(windowConsumer === webcamConsumer.id)
 								}
+								size={smallButtons ? 'small' : 'large'}
 								onClick={() =>
 								{
 									toggleConsumerWindow(webcamConsumer);
@@ -267,6 +270,7 @@ const Peer = (props) =>
 							aria-label='Fullscreen'
 							className={classes.fab}
 							disabled={!videoVisible}
+							size={smallButtons ? 'small' : 'large'}
 							onClick={() =>
 							{
 								toggleConsumerFullscreen(webcamConsumer);
@@ -356,6 +360,7 @@ const Peer = (props) =>
 											!screenVisible ||
 											(windowConsumer === screenConsumer.id)
 										}
+										size={smallButtons ? 'small' : 'large'}
 										onClick={() =>
 										{
 											toggleConsumerWindow(screenConsumer);
@@ -370,6 +375,7 @@ const Peer = (props) =>
 									aria-label='Fullscreen'
 									className={classes.fab}
 									disabled={!screenVisible}
+									size={smallButtons ? 'small' : 'large'}
 									onClick={() =>
 									{
 										toggleConsumerFullscreen(screenConsumer);
@@ -408,6 +414,7 @@ Peer.propTypes =
 	activeSpeaker            : PropTypes.bool,
 	spacing                  : PropTypes.number,
 	style                    : PropTypes.object,
+	smallButtons             : PropTypes.bool,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
 	classes                  : PropTypes.object.isRequired,

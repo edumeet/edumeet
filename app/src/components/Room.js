@@ -32,7 +32,7 @@ import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
-import LeaveIcon from '@material-ui/icons/Cancel';
+import Button from '@material-ui/core/Button';
 import Settings from './Settings/Settings';
 import JoinDialog from './JoinDialog';
 
@@ -126,6 +126,11 @@ const styles = (theme) =>
 		actionButtons :
 		{
 			display : 'flex'
+		},
+		actionButton :
+		{
+			margin  : theme.spacing.unit,
+			padding : 0
 		},
 		meContainer :
 		{
@@ -309,14 +314,8 @@ class Room extends React.PureComponent
 							<div className={classes.grow} />
 							<div className={classes.actionButtons}>
 								<IconButton
-									aria-label='Leave meeting'
-									color='secondary'
-									onClick={() => roomClient.close()}
-								>
-									<LeaveIcon />
-								</IconButton>
-								<IconButton
 									aria-label='Lock room'
+									className={classes.actionButton}
 									color='inherit'
 									onClick={() =>
 									{
@@ -339,6 +338,7 @@ class Room extends React.PureComponent
 								{ this.fullscreen.fullscreenEnabled ?
 									<IconButton
 										aria-label='Fullscreen'
+										className={classes.actionButton}
 										color='inherit'
 										onClick={this.handleToggleFullscreen}
 									>
@@ -352,6 +352,7 @@ class Room extends React.PureComponent
 								}
 								<IconButton
 									aria-label='Settings'
+									className={classes.actionButton}
 									color='inherit'
 									onClick={() => setSettingsOpen(!room.settingsOpen)}
 								>
@@ -360,6 +361,7 @@ class Room extends React.PureComponent
 								{ loginEnabled ?
 									<IconButton
 										aria-label='Account'
+										className={classes.actionButton}
 										color='inherit'
 										onClick={() => 
 										{
@@ -374,6 +376,15 @@ class Room extends React.PureComponent
 									</IconButton>
 									:null
 								}
+								<Button
+									aria-label='Leave meeting'
+									className={classes.actionButton}
+									variant='contained'
+									color='secondary'
+									onClick={() => roomClient.close()}
+								>
+									Leave
+								</Button>
 							</div>
 						</Toolbar>
 					</AppBar>

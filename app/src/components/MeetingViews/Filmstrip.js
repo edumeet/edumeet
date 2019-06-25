@@ -249,6 +249,7 @@ class Filmstrip extends React.PureComponent
 								<Me
 									advancedMode={advancedMode}
 									style={peerStyle}
+									smallButtons
 								/>
 							</div>
 						</Grid>
@@ -271,6 +272,7 @@ class Filmstrip extends React.PureComponent
 												advancedMode={advancedMode}
 												id={peerId}
 												style={peerStyle}
+												smallButtons
 											/>
 										</div>
 									</Grid>

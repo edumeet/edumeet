@@ -6,8 +6,8 @@
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
 	"license": "MIT",
 	"dependencies": {
-		"@material-ui/core": "^3.9.2",
-		"@material-ui/icons": "^3.0.2",
+		"@material-ui/core": "^4.1.2",
+		"@material-ui/icons": "^4.2.1",
 		"bowser": "^2.4.0",
 		"create-torrent": "^3.33.0",
 		"domready": "^1.0.8",

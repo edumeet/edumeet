@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { meProducersSelector } from '../Selectors';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
@@ -109,6 +109,7 @@ const Me = (props) =>
 		activeSpeaker,
 		spacing,
 		style,
+		smallButtons,
 		advancedMode,
 		micProducer,
 		webcamProducer,
@@ -264,6 +265,7 @@ const Me = (props) =>
 									className={classes.fab}
 									disabled={!me.canSendMic || me.audioInProgress}
 									color={micState === 'on' ? 'default' : 'secondary'}
+									size={smallButtons ? 'small' : 'large'}
 									onClick={() =>
 									{
 										if (micState === 'off')
@@ -289,6 +291,7 @@ const Me = (props) =>
 									className={classes.fab}
 									disabled={!me.canSendWebcam || me.webcamInProgress}
 									color={webcamState === 'on' ? 'default' : 'secondary'}
+									size={smallButtons ? 'small' : 'large'}
 									onClick={() =>
 									{
 										webcamState === 'on' ?
@@ -311,6 +314,7 @@ const Me = (props) =>
 									className={classes.fab}
 									disabled={!me.canShareScreen || me.screenShareInProgress}
 									color={screenState === 'on' ? 'primary' : 'default'}
+									size={smallButtons ? 'small' : 'large'}
 									onClick={() =>
 									{
 										switch (screenState)
@@ -443,6 +447,7 @@ Me.propTypes =
 	screenProducer : appPropTypes.Producer,
 	spacing        : PropTypes.number,
 	style          : PropTypes.object,
+	smallButtons   : PropTypes.bool,
 	classes        : PropTypes.object.isRequired,
 	theme          : PropTypes.object.isRequired
 };
