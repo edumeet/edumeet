@@ -15,7 +15,6 @@ import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Hidden from '@material-ui/core/Hidden';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Avatar from '@material-ui/core/Avatar';
@@ -28,11 +27,14 @@ import Filmstrip from './MeetingViews/Filmstrip';
 import AudioPeers from './PeerAudio/AudioPeers';
 import FullScreenView from './VideoContainers/FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
-import Sidebar from './Controls/Sidebar';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
+import LockIcon from '@material-ui/icons/Lock';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
+import Button from '@material-ui/core/Button';
 import Settings from './Settings/Settings';
+import JoinDialog from './JoinDialog';
 
 const TIMEOUT = 10 * 1000;
 
@@ -58,7 +60,7 @@ const styles = (theme) =>
 			left           : '50%',
 			transform      : 'translateX(-50%) translateY(-50%)',
 			width          : '30vw',
-			padding        : theme.spacing.unit * 2,
+			padding        : theme.spacing(2),
 			flexDirection  : 'column',
 			justifyContent : 'center',
 			alignItems     : 'center'
@@ -125,6 +127,11 @@ const styles = (theme) =>
 		{
 			display : 'flex'
 		},
+		actionButton :
+		{
+			margin  : theme.spacing(1),
+			padding : 0
+		},
 		meContainer :
 		{
 			position           : 'fixed',
@@ -176,10 +183,6 @@ class Room extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { roomClient } = this.props;
-
-		roomClient.join();
-
 		if (this.fullscreen.fullscreenEnabled)
 		{
 			this.fullscreen.addEventListener('fullscreenchange', this.handleFullscreenChange);
@@ -242,35 +245,21 @@ class Room extends React.PureComponent
 			democratic : Democratic
 		}[room.mode];
 
-		if (room.audioSuspended)
-		{
-			return (
-				<div className={classes.root}>
-					<Paper className={classes.message}>
-						<Typography variant='h2'>
-							This webpage required sound and video to play, please click to allow.
-						</Typography>
-						<Button
-							variant='contained'
-							onClick={() =>
-							{
-								roomClient.notify('Joining.');
-								roomClient.resumeAudio();
-							}}
-						>
-							Allow
-						</Button>
-					</Paper>
-				</div>
-			);
-		}
-		else if (room.lockedOut)
+		if (room.lockedOut)
 		{
 			return (
 				<div className={classes.root}>
 					<Paper className={classes.message}>
 						<Typography variant='h2'>This room is locked at the moment, try again later.</Typography>
 					</Paper>
+				</div>
+			);
+		}
+		else if (!room.joined)
+		{
+			return (
+				<div className={classes.root}>
+					<JoinDialog />
 				</div>
 			);
 		}
@@ -324,9 +313,32 @@ class Room extends React.PureComponent
 							</Typography>
 							<div className={classes.grow} />
 							<div className={classes.actionButtons}>
+								<IconButton
+									aria-label='Lock room'
+									className={classes.actionButton}
+									color='inherit'
+									onClick={() =>
+									{
+										if (room.locked)
+										{
+											roomClient.unlockRoom();
+										}
+										else
+										{
+											roomClient.lockRoom();
+										}
+									}}
+								>
+									{ room.locked ?
+										<LockIcon />
+										:
+										<LockOpenIcon />
+									}
+								</IconButton>
 								{ this.fullscreen.fullscreenEnabled ?
 									<IconButton
 										aria-label='Fullscreen'
+										className={classes.actionButton}
 										color='inherit'
 										onClick={this.handleToggleFullscreen}
 									>
@@ -340,6 +352,7 @@ class Room extends React.PureComponent
 								}
 								<IconButton
 									aria-label='Settings'
+									className={classes.actionButton}
 									color='inherit'
 									onClick={() => setSettingsOpen(!room.settingsOpen)}
 								>
@@ -348,6 +361,7 @@ class Room extends React.PureComponent
 								{ loginEnabled ?
 									<IconButton
 										aria-label='Account'
+										className={classes.actionButton}
 										color='inherit'
 										onClick={() => 
 										{
@@ -362,6 +376,15 @@ class Room extends React.PureComponent
 									</IconButton>
 									:null
 								}
+								<Button
+									aria-label='Leave meeting'
+									className={classes.actionButton}
+									variant='contained'
+									color='secondary'
+									onClick={() => roomClient.close()}
+								>
+									Leave
+								</Button>
 							</div>
 						</Toolbar>
 					</AppBar>
@@ -383,8 +406,6 @@ class Room extends React.PureComponent
 					</nav>
 
 					<View advancedMode={advancedMode} />
-
-					<Sidebar />
 
 					<Settings />
 				</div>

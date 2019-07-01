@@ -4,17 +4,17 @@ const files = (state = {}, action) =>
 	{
 		case 'ADD_FILE':
 		{
-			const { file } = action.payload;
+			const { peerId, magnetUri } = action.payload;
 
 			const newFile = {
-				active   : false,
-				progress : 0,
-				files    : null,
-				me       : false,
-				...file
+				active    : false,
+				progress  : 0,
+				files     : null,
+				peerId    : peerId,
+				magnetUri : magnetUri
 			};
 
-			return { ...state, [file.magnetUri]: newFile };
+			return { ...state, [magnetUri]: newFile };
 		}
 
 		case 'ADD_FILE_HISTORY':
@@ -30,7 +30,6 @@ const files = (state = {}, action) =>
 					active   : false,
 					progress : 0,
 					files    : null,
-					me       : false,
 					...file
 				};
 

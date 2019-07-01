@@ -22,7 +22,7 @@ const styles = (theme) =>
 		},
 		button :
 		{
-			margin : theme.spacing.unit
+			margin : theme.spacing(1)
 		}
 	});
 
@@ -46,11 +46,11 @@ class FileSharing extends React.PureComponent
 	render()
 	{
 		const {
-			torrentSupport,
+			canShareFiles,
 			classes
 		} = this.props;
 
-		const buttonDescription = torrentSupport ?
+		const buttonDescription = canShareFiles ?
 			'Share file' : 'File sharing not supported';
 
 		return (
@@ -67,7 +67,7 @@ class FileSharing extends React.PureComponent
 						variant='contained'
 						component='span'
 						className={classes.button}
-						disabled={!torrentSupport}
+						disabled={!canShareFiles}
 					>
 						{buttonDescription}
 					</Button>
@@ -80,17 +80,17 @@ class FileSharing extends React.PureComponent
 }
 
 FileSharing.propTypes = {
-	roomClient     : PropTypes.any.isRequired,
-	torrentSupport : PropTypes.bool.isRequired,
-	tabOpen        : PropTypes.bool.isRequired,
-	classes        : PropTypes.object.isRequired
+	roomClient    : PropTypes.any.isRequired,
+	canShareFiles : PropTypes.bool.isRequired,
+	tabOpen       : PropTypes.bool.isRequired,
+	classes       : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		torrentSupport : state.room.torrentSupport,
-		tabOpen        : state.toolarea.currentToolTab === 'files'
+		canShareFiles : state.me.canShareFiles,
+		tabOpen       : state.toolarea.currentToolTab === 'files'
 	};
 };
 

@@ -1,89 +1,54 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ResizeObserver from 'resize-observer-polyfill';
 import { connect } from 'react-redux';
-import debounce from 'lodash/debounce';
 import { withStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
+import {
+	spotlightsLengthSelector,
+	videoBoxesSelector
+} from '../Selectors';
 import { withRoomContext } from '../../RoomContext';
+import Me from '../Containers/Me';
 import Peer from '../Containers/Peer';
+import SpeakerPeer from '../Containers/SpeakerPeer';
 import HiddenPeers from '../Containers/HiddenPeers';
+import Grid from '@material-ui/core/Grid';
 
 const styles = () =>
 	({
 		root :
 		{
-			display       : 'flex',
-			flexDirection : 'column',
-			alignItems    : 'center',
-			height        : '100%',
-			width         : '100%'
+			height              : '100%',
+			width               : '100%',
+			display             : 'grid',
+			gridTemplateColumns : '1fr',
+			gridTemplateRows    : '1.6fr minmax(0, 0.4fr)'
 		},
-		activePeerContainer :
+		speaker :
 		{
-			width          : '100%',
-			height         : '80vh',
+			gridArea       : '1 / 1 / 2 / 2',
 			display        : 'flex',
 			justifyContent : 'center',
-			alignItems     : 'center'
-		},
-		activePeer :
-		{
-			width     : '100%',
-			border    : '5px solid rgba(255, 255, 255, 0.15)',
-			boxShadow : '0px 5px 12px 2px rgba(17, 17, 17, 0.5)',
-			marginTop : 60
+			alignItems     : 'center',
+			paddingTop     : 40
 		},
 		filmStrip :
 		{
-			display    : 'flex',
-			background : 'rgba(0, 0, 0 , 0.5)',
-			width      : '100%',
-			overflowX  : 'auto',
-			height     : '20vh',
-			alignItems : 'center'
+			gridArea : '2 / 1 / 3 / 2'
 		},
-		filmStripContent :
+		filmItem :
 		{
-			margin     : '0 auto',
-			display    : 'flex',
-			height     : '100%',
-			alignItems : 'center'
-		},
-		film :
-		{
-			height      : '18vh',
-			flexShrink  : 0,
-			paddingLeft : '1vh',
-			'& .active' :
-			{
-				borderColor : 'var(--active-speaker-border-color)'
-			},
+			display      : 'flex',
+			marginLeft   : '6px',
+			border       : 'var(--peer-border)',
 			'&.selected' :
 			{
 				borderColor : 'var(--selected-peer-border-color)'
 			},
-			'&:last-child' :
+			'&.active' :
 			{
-				paddingRight : '1vh'
+				opacity : '0.6'
 			}
-		},
-		filmContent :
-		{
-			height      : '100%',
-			width       : '100%',
-			border      : '1px solid rgba(255,255,255,0.15)',
-			maxWidth    : 'calc(18vh * (4 / 3))',
-			cursor      : 'pointer',
-			'& .screen' :
-			{
-				maxWidth : 'calc(18vh * (2 * 4 / 3))',
-				border   : 0
-			}
-		},
-		hiddenPeers :
-		{
-
 		}
 	});
 
@@ -93,80 +58,114 @@ class Filmstrip extends React.PureComponent
 	{
 		super(props);
 
+		this.resizeTimeout = null;
+
 		this.activePeerContainer = React.createRef();
+
+		this.filmStripContainer = React.createRef();
 	}
 
 	state = {
-		lastSpeaker : null,
-		width       : 400
+		lastSpeaker : null
 	};
 
 	// Find the name of the peer which is currently speaking. This is either
 	// the latest active speaker, or the manually selected peer, or, if no
 	// person has spoken yet, the first peer in the list of peers.
-	getActivePeerName = () =>
+	getActivePeerId = () =>
 	{
-		if (this.props.selectedPeerName)
+		const {
+			selectedPeerId,
+			peers
+		} = this.props;
+
+		const { lastSpeaker } = this.state;
+
+		if (selectedPeerId && peers[selectedPeerId])
 		{
-			return this.props.selectedPeerName;
+			return this.props.selectedPeerId;
 		}
 
-		if (this.state.lastSpeaker)
+		if (lastSpeaker && peers[lastSpeaker])
 		{
 			return this.state.lastSpeaker;
 		}
 
-		const peerNames = Object.keys(this.props.peers);
+		const peerIds = Object.keys(peers);
 
-		if (peerNames.length > 0)
+		if (peerIds.length > 0)
 		{
-			return peerNames[0];
+			return peerIds[0];
 		}
 	};
 
-	isSharingCamera = (peerName) => this.props.peers[peerName] &&
-		this.props.peers[peerName].consumers.some((consumer) =>
+	isSharingCamera = (peerId) => this.props.peers[peerId] &&
+		this.props.peers[peerId].consumers.some((consumer) =>
 			this.props.consumers[consumer].source === 'screen');
 
-	getRatio = () =>
+	updateDimensions = () =>
 	{
-		let ratio = 4 / 3;
+		const newState = {};
 
-		if (this.isSharingCamera(this.getActivePeerName()))
+		const speaker = this.activePeerContainer.current;
+
+		if (speaker)
 		{
-			ratio *= 2;
-		}
+			let speakerWidth = (speaker.clientWidth - 100);
 
-		return ratio;
-	};
-
-	updateDimensions = debounce(() =>
-	{
-		const container = this.activePeerContainer.current;
-
-		if (container)
-		{
-			const ratio = this.getRatio();
-
-			let width = container.clientWidth;
-
-			if (width / ratio > (container.clientHeight - 100))
+			let speakerHeight = (speakerWidth / 4) * 3;
+	
+			if (this.isSharingCamera(this.getActivePeerId()))
 			{
-				width = (container.clientHeight - 100) * ratio;
+				speakerWidth /= 2;
+				speakerHeight = (speakerWidth / 4) * 3;
+			}
+	
+			if (speakerHeight > (speaker.clientHeight - 60))
+			{
+				speakerHeight = (speaker.clientHeight - 60);
+				speakerWidth = (speakerHeight / 3) * 4;
 			}
 
-			this.setState({
-				width
-			});
+			newState.speakerWidth = speakerWidth;
+			newState.speakerHeight = speakerHeight;
 		}
-	}, 200);
+
+		const filmStrip = this.filmStripContainer.current;
+
+		if (filmStrip)
+		{
+			let filmStripHeight = filmStrip.clientHeight - 10;
+
+			let filmStripWidth = (filmStripHeight / 3) * 4;
+	
+			if (filmStripWidth * this.props.boxes > (filmStrip.clientWidth - 50))
+			{
+				filmStripWidth = (filmStrip.clientWidth - 50) / this.props.boxes;
+				filmStripHeight = (filmStripWidth / 4) * 3;
+			}
+
+			newState.filmStripWidth = filmStripWidth;
+			newState.filmStripHeight = filmStripHeight;
+		}
+
+		this.setState({
+			...newState
+		});
+	};
 
 	componentDidMount()
 	{
-		window.addEventListener('resize', this.updateDimensions);
-		const observer = new ResizeObserver(this.updateDimensions);
+		// window.resize event listener
+		window.addEventListener('resize', () =>
+		{
+			// clear the timeout
+			clearTimeout(this.resizeTimeout);
 
-		observer.observe(this.activePeerContainer.current);
+			// start timing for event "completion"
+			this.resizeTimeout = setTimeout(() => this.updateDimensions(), 250);
+		});
+
 		this.updateDimensions();
 	}
 
@@ -175,19 +174,28 @@ class Filmstrip extends React.PureComponent
 		window.removeEventListener('resize', this.updateDimensions);
 	}
 
+	componentWillUpdate(nextProps)
+	{
+		if (nextProps !== this.props)
+		{
+			if (
+				nextProps.activeSpeakerId != null &&
+				nextProps.activeSpeakerId !== this.props.myId
+			)
+			{
+				// eslint-disable-next-line react/no-did-update-set-state
+				this.setState({
+					lastSpeaker : nextProps.activeSpeakerId
+				});
+			}
+		}
+	}
+
 	componentDidUpdate(prevProps)
 	{
 		if (prevProps !== this.props)
 		{
 			this.updateDimensions();
-
-			if (this.props.activeSpeakerName !== this.props.myName)
-			{
-				// eslint-disable-next-line react/no-did-update-set-state
-				this.setState({
-					lastSpeaker : this.props.activeSpeakerName
-				});
-			}
 		}
 	}
 
@@ -196,56 +204,78 @@ class Filmstrip extends React.PureComponent
 		const {
 			roomClient,
 			peers,
+			myId,
 			advancedMode,
 			spotlights,
 			spotlightsLength,
 			classes
 		} = this.props;
 
-		const activePeerName = this.getActivePeerName();
+		const activePeerId = this.getActivePeerId();
+
+		const speakerStyle =
+		{
+			width  : this.state.speakerWidth,
+			height : this.state.speakerHeight
+		};
+
+		const peerStyle =
+		{
+			width  : this.state.filmStripWidth,
+			height : this.state.filmStripHeight
+		};
 
 		return (
 			<div className={classes.root}>
-				<div className={classes.activePeerContainer} ref={this.activePeerContainer}>
-					{ peers[activePeerName] ?
-						<div
-							className={classes.activePeer}
-							style={{
-								width  : this.state.width,
-								height : this.state.width / this.getRatio()
-							}}
-						>
-							<Peer
-								advancedMode={advancedMode}
-								name={activePeerName}
-							/>
-						</div>
+				<div className={classes.speaker} ref={this.activePeerContainer}>
+					{ peers[activePeerId] ?
+						<SpeakerPeer
+							advancedMode={advancedMode}
+							id={activePeerId}
+							style={speakerStyle}
+						/>
 						:null
 					}
 				</div>
 
-				<div className={classes.filmStrip}>
-					<div className={classes.filmStripContent}>
-						{ Object.keys(peers).map((peerName) =>
+				<div className={classes.filmStrip} ref={this.filmStripContainer}>
+					<Grid container justify='center' spacing={0}>
+						<Grid item>
+							<div
+								className={classnames(classes.filmItem, {
+									active : myId === activePeerId
+								})}
+							>
+								<Me
+									advancedMode={advancedMode}
+									style={peerStyle}
+									smallButtons
+								/>
+							</div>
+						</Grid>
+
+						{ Object.keys(peers).map((peerId) =>
 						{
-							if (spotlights.find((spotlightsElement) => spotlightsElement === peerName))
+							if (spotlights.find((spotlightsElement) => spotlightsElement === peerId))
 							{
 								return (
-									<div
-										key={peerName}
-										onClick={() => roomClient.setSelectedPeer(peerName)}
-										className={classnames(classes.film, {
-											selected : this.props.selectedPeerName === peerName,
-											active   : this.state.lastSpeaker === peerName
-										})}
-									>
-										<div className={classes.filmContent}>
+									<Grid key={peerId} item>
+										<div
+											key={peerId}
+											onClick={() => roomClient.setSelectedPeer(peerId)}
+											className={classnames(classes.filmItem, {
+												selected : this.props.selectedPeerId === peerId,
+												active   : peerId === activePeerId
+											})}
+										>
 											<Peer
 												advancedMode={advancedMode}
-												name={peerName}
+												id={peerId}
+												style={peerStyle}
+												smallButtons
 											/>
 										</div>
-									</div>
+									</Grid>
 								);
 							}
 							else
@@ -253,51 +283,63 @@ class Filmstrip extends React.PureComponent
 								return ('');
 							}
 						})}
-					</div>
-				</div>
-				<div className={classes.hiddenPeers}>
-					{ spotlightsLength<Object.keys(peers).length ?
-						<HiddenPeers
-							hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
-						/>
-						:null
-					}
+					</Grid>
 				</div>
 
+				{ spotlightsLength<Object.keys(peers).length ?
+					<HiddenPeers
+						hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
+					/>
+					:null
+				}
 			</div>
 		);
 	}
 }
 
 Filmstrip.propTypes = {
-	roomClient        : PropTypes.any.isRequired,
-	activeSpeakerName : PropTypes.string,
-	advancedMode      : PropTypes.bool,
-	peers             : PropTypes.object.isRequired,
-	consumers         : PropTypes.object.isRequired,
-	myName            : PropTypes.string.isRequired,
-	selectedPeerName  : PropTypes.string,
-	spotlightsLength  : PropTypes.number,
-	spotlights        : PropTypes.array.isRequired,
-	classes           : PropTypes.object.isRequired
+	roomClient       : PropTypes.any.isRequired,
+	activeSpeakerId  : PropTypes.string,
+	advancedMode     : PropTypes.bool,
+	peers            : PropTypes.object.isRequired,
+	consumers        : PropTypes.object.isRequired,
+	myId             : PropTypes.string.isRequired,
+	selectedPeerId   : PropTypes.string,
+	spotlightsLength : PropTypes.number,
+	spotlights       : PropTypes.array.isRequired,
+	boxes            : PropTypes.number,
+	classes          : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
-	const spotlightsLength = state.room.spotlights ? state.room.spotlights.length : 0;
-
 	return {
-		activeSpeakerName : state.room.activeSpeakerName,
-		selectedPeerName  : state.room.selectedPeerName,
-		peers             : state.peers,
-		consumers         : state.consumers,
-		myName            : state.me.name,
-		spotlights        : state.room.spotlights,
-		spotlightsLength
+		activeSpeakerId  : state.room.activeSpeakerId,
+		selectedPeerId   : state.room.selectedPeerId,
+		peers            : state.peers,
+		consumers        : state.consumers,
+		myId             : state.me.id,
+		spotlights       : state.room.spotlights,
+		spotlightsLength : spotlightsLengthSelector(state),
+		boxes            : videoBoxesSelector(state),
 	};
 };
 
 export default withRoomContext(connect(
 	mapStateToProps,
-	undefined
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
+				prev.room.selectedPeerId === next.room.selectedPeerId &&
+				prev.peers === next.peers &&
+				prev.consumers === next.consumers &&
+				prev.room.spotlights === next.room.spotlights &&
+				prev.me.id === next.me.id
+			);
+		}
+	}
 )(withStyles(styles)(Filmstrip)));

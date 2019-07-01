@@ -1,5 +1,3 @@
-import omit from 'lodash/omit';
-
 const peer = (state = {}, action) =>
 {
 	switch (action.type) 
@@ -53,12 +51,17 @@ const peers = (state = {}, action) =>
 	{
 		case 'ADD_PEER':
 		{
-			return { ...state, [action.payload.peer.name]: peer(undefined, action) };
+			return { ...state, [action.payload.peer.id]: peer(undefined, action) };
 		}
 
 		case 'REMOVE_PEER':
 		{
-			return omit(state, [ action.payload.peerName ]);
+			const { peerId } = action.payload;
+			const newState = { ...state };
+
+			delete newState[peerId];
+
+			return newState;
 		}
 
 		case 'SET_PEER_DISPLAY_NAME':
@@ -69,25 +72,25 @@ const peers = (state = {}, action) =>
 		case 'SET_PEER_PICTURE':
 		case 'ADD_CONSUMER':
 		{
-			const oldPeer = state[action.payload.peerName];
+			const oldPeer = state[action.payload.peerId];
 
 			if (!oldPeer) 
 			{
 				throw new Error('no Peer found');
 			}
 
-			return { ...state, [oldPeer.name]: peer(oldPeer, action) };
+			return { ...state, [oldPeer.id]: peer(oldPeer, action) };
 		}
 		
 		case 'REMOVE_CONSUMER':
 		{
-			const oldPeer = state[action.payload.peerName];
+			const oldPeer = state[action.payload.peerId];
 
 			// NOTE: This means that the Peer was closed before, so it's ok.
 			if (!oldPeer)
 				return state;
 
-			return { ...state, [oldPeer.name]: peer(oldPeer, action) };
+			return { ...state, [oldPeer.id]: peer(oldPeer, action) };
 		}
 
 		default:

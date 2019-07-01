@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import * as appPropTypes from '../appPropTypes';
 import EditableInput from '../Controls/EditableInput';
 
-const styles = () =>
+const styles = (theme) =>
 	({
 		root :
 		{
@@ -27,7 +27,7 @@ const styles = () =>
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
 			backgroundColor    : 'var(--peer-video-bg-color)',
-			'&.is-me'          :
+			'&.isMe'           :
 			{
 				transform : 'scaleX(-1)'
 			},
@@ -48,54 +48,42 @@ const styles = () =>
 		},
 		info :
 		{
+			width          : '100%',
+			height         : '100%',
+			padding        : theme.spacing(1),
 			position       : 'absolute',
 			zIndex         : 10,
-			top            : '0.6vmin',
-			left           : '0.6vmin',
-			bottom         : 0,
-			right          : 0,
 			display        : 'flex',
 			flexDirection  : 'column',
 			justifyContent : 'space-between'
 		},
 		media :
 		{
-			flex          : '0 0 auto',
-			display       : 'flex',
-			flexDirection : 'row'
+			display            : 'flex',
+			transitionProperty : 'opacity',
+			transitionDuration : '.15s',
+			'&.hidden'         :
+			{
+				opacity            : 0,
+				transitionDuration : '0s'
+			}
 		},
 		box :
 		{
-			padding         : '0.4vmin',
+			padding         : theme.spacing(0.5),
 			borderRadius    : 2,
 			backgroundColor : 'rgba(0, 0, 0, 0.25)',
 			'& p'           :
 			{
-				userSelect    : 'none',
-				pointerEvents : 'none',
-				margin        : 0,
-				color         : 'rgba(255, 255, 255, 0.7)',
-				fontSize      : 10,
-
-				'&:last-child' :
-				{
-					marginBottom : 0
-				}
+				userSelect : 'none',
+				margin     : 0,
+				color      : 'rgba(255, 255, 255, 0.7)',
+				fontSize   : '0.8em'
 			}
 		},
 		peer :
 		{
-			flex            : '0 0 auto',
-			display         : 'flex',
-			flexDirection   : 'column',
-			justifyContent  : 'flex-end',
-			position        : 'absolute',
-			bottom          : '0.6vmin',
-			left            : 0,
-			borderRadius    : 2,
-			backgroundColor : 'rgba(0, 0, 0, 0.25)',
-			padding         : '0.5vmin',
-			alignItems      : 'flex-start'
+			display : 'flex'
 		},
 		displayNameEdit :
 		{
@@ -120,12 +108,7 @@ const styles = () =>
 		},
 		deviceInfo :
 		{
-			marginTop      : '0.4vmin',
-			display        : 'flex',
-			flexDirection  : 'row',
-			justifyContent : 'flex-start',
-			alignItems     : 'flex-end',
-			'& span'       :
+			'& span' :
 			{
 				userSelect    : 'none',
 				pointerEvents : 'none',
@@ -159,6 +142,7 @@ class VideoView extends React.PureComponent
 	{
 		const {
 			isMe,
+			isScreen,
 			peer,
 			displayName,
 			showPeerInfo,
@@ -181,59 +165,62 @@ class VideoView extends React.PureComponent
 		return (
 			<div className={classes.root}>
 				<div className={classes.info}>
-					{ advancedMode ?
-						<div className={classes.media}>
-							<div className={classes.box}>
-								{ audioCodec ?
-									<p>{audioCodec}</p>
-									:null
-								}
+					<div className={classnames(classes.media, 
+						{
+							hidden : !advancedMode
+						})}
+					>
+						<div className={classes.box}>
+							{ audioCodec ?
+								<p>{audioCodec}</p>
+								:null
+							}
 
-								{ videoCodec ?
-									<p>{videoCodec} {videoProfile}</p>
-									:null
-								}
+							{ videoCodec ?
+								<p>{videoCodec} {videoProfile}</p>
+								:null
+							}
 
-								{ (videoVisible && videoWidth !== null) ?
-									<p>{videoWidth}x{videoHeight}</p>
-									:null
-								}
-							</div>
+							{ (videoVisible && videoWidth !== null) ?
+								<p>{videoWidth}x{videoHeight}</p>
+								:null
+							}
 						</div>
-						:null
-					}
+					</div>
 
 					{ showPeerInfo ?
 						<div className={classes.peer}>
-							{ isMe ?
-								<EditableInput
-									value={displayName}
-									propName='newDisplayName'
-									className={classnames(classes.displayNameEdit, 'display-name')}
-									classLoading='loading'
-									classInvalid='invalid'
-									shouldBlockWhileLoading
-									editProps={{
-										maxLength   : 30,
-										autoCorrect : false,
-										spellCheck  : false
-									}}
-									onChange={({ newDisplayName }) => onChangeDisplayName(newDisplayName)}
-								/>
-								:
-								<span className={classes.displayNameStatic}>
-									{displayName}
-								</span>
-							}
-
-							{ advancedMode ?
-								<div className={classes.deviceInfo}>
-									<span>
-										{peer.device.name} {Math.floor(peer.device.version) || null}
+							<div className={classes.box}>
+								{ isMe ?
+									<EditableInput
+										value={displayName}
+										propName='newDisplayName'
+										className={classes.displayNameEdit}
+										classLoading='loading'
+										classInvalid='invalid'
+										shouldBlockWhileLoading
+										editProps={{
+											maxLength   : 30,
+											autoCorrect : 'off',
+											spellCheck  : false
+										}}
+										onChange={({ newDisplayName }) => onChangeDisplayName(newDisplayName)}
+									/>
+									:
+									<span className={classes.displayNameStatic}>
+										{displayName}
 									</span>
-								</div>
-								:null
-							}
+								}
+
+								{ advancedMode ?
+									<div className={classes.deviceInfo}>
+										<span>
+											{peer.device.name} {Math.floor(peer.device.version) || null}
+										</span>
+									</div>
+									:null
+								}
+							</div>
 						</div>
 						:null
 					}
@@ -243,7 +230,7 @@ class VideoView extends React.PureComponent
 					ref='video'
 					className={classnames(classes.video, {
 						hidden  : !videoVisible,
-						'is-me' : isMe,
+						'isMe' : isMe && !isScreen,
 						loading : videoProfile === 'none',
 						contain : videoContain
 					})}
@@ -334,8 +321,9 @@ class VideoView extends React.PureComponent
 
 VideoView.propTypes =
 {
-	isMe : PropTypes.bool,
-	peer : PropTypes.oneOfType(
+	isMe     : PropTypes.bool,
+	isScreen : PropTypes.bool,
+	peer     : PropTypes.oneOfType(
 		[ appPropTypes.Me, appPropTypes.Peer ]),
 	displayName         : PropTypes.string,
 	showPeerInfo        : PropTypes.bool,

@@ -6,7 +6,7 @@ import FullScreen from '../FullScreen';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 
-const styles = () =>
+const styles = (theme) =>
 	({
 		root :
 		{
@@ -27,7 +27,7 @@ const styles = () =>
 			flexDirection  : 'row',
 			justifyContent : 'flex-start',
 			alignItems     : 'center',
-			padding        : '0.4vmin'
+			padding        : theme.spacing(1)
 		},
 		button :
 		{

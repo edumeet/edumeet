@@ -6,7 +6,6 @@ import { withStyles } from '@material-ui/core/styles';
 import magnet from 'magnet-uri';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 
 const styles = (theme) =>
 	({
@@ -15,11 +14,11 @@ const styles = (theme) =>
 			display              : 'flex',
 			alignItems           : 'center',
 			width                : '100%',
-			padding              : theme.spacing.unit,
+			padding              : theme.spacing(1),
 			boxShadow            : '0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12)',
 			'&:not(:last-child)' :
 			{
-				marginBottom : theme.spacing.unit
+				marginBottom : theme.spacing(1)
 			}
 		},
 		avatar :
@@ -30,7 +29,7 @@ const styles = (theme) =>
 		text :
 		{
 			margin  : 0,
-			padding : theme.spacing.unit
+			padding : theme.spacing(1)
 		},
 		fileContent :
 		{
@@ -41,7 +40,7 @@ const styles = (theme) =>
 		{
 			display    : 'flex',
 			alignItems : 'center',
-			padding    : theme.spacing.unit
+			padding    : theme.spacing(1)
 		},
 		button :
 		{
@@ -55,15 +54,18 @@ class File extends React.PureComponent
 	{
 		const {
 			roomClient,
-			torrentSupport,
+			displayName,
+			picture,
+			canShareFiles,
+			magnetUri,
 			file,
 			classes
 		} = this.props;
 
 		return (
 			<div className={classes.root}>
-				<img alt='Peer avatar' className={classes.avatar} src={file.picture || EmptyAvatar} />
-	
+				<img alt='Avatar' className={classes.avatar} src={picture} />
+
 				<div className={classes.fileContent}>
 					{ file.files ?
 						<Fragment>
@@ -93,26 +95,22 @@ class File extends React.PureComponent
 						:null
 					}
 					<Typography className={classes.text}>
-						{ file.me ?
-							'You shared a file'
-							:
-							`${file.displayName} shared a file`
-						}
+						{ `${displayName} shared a file` }
 					</Typography>
 
 					{ !file.active && !file.files ?
 						<div className={classes.fileInfo}>
 							<Typography className={classes.text}>
-								{magnet.decode(file.magnetUri).dn}
+								{ magnet.decode(magnetUri).dn }
 							</Typography>
-							{ torrentSupport ?
+							{ canShareFiles ?
 								<Button
 									variant='contained'
 									component='span'
 									className={classes.button}
 									onClick={() =>
 									{
-										roomClient.handleDownload(file.magnetUri);
+										roomClient.handleDownload(magnetUri);
 									}}
 								>
 									Download
@@ -145,20 +143,34 @@ class File extends React.PureComponent
 }
 
 File.propTypes = {
-	roomClient     : PropTypes.object.isRequired,
-	torrentSupport : PropTypes.bool.isRequired,
-	file           : PropTypes.object.isRequired,
-	classes        : PropTypes.object.isRequired
+	roomClient    : PropTypes.object.isRequired,
+	magnetUri     : PropTypes.string.isRequired,
+	displayName   : PropTypes.string.isRequired,
+	picture       : PropTypes.string,
+	canShareFiles : PropTypes.bool.isRequired,
+	file          : PropTypes.object.isRequired,
+	classes       : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state, { magnetUri }) =>
 {
 	return {
-		file           : state.files[magnetUri],
-		torrentSupport : state.room.torrentSupport
+		file          : state.files[magnetUri],
+		canShareFiles : state.me.canShareFiles
 	};
 };
 
 export default withRoomContext(connect(
-	mapStateToProps
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.files === next.files &&
+				prev.me.canShareFiles === next.me.canShareFiles
+			);
+		}
+	}
 )(withStyles(styles)(File)));

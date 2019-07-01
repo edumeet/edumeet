@@ -13,11 +13,11 @@ import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 import HandIcon from '../../../images/icon-hand-white.svg';
 
-const styles = () =>
+const styles = (theme) =>
 	({
 		root :
 		{
-			padding  : '0.5rem',
+			padding  : theme.spacing(1),
 			width    : '100%',
 			overflow : 'hidden',
 			cursor   : 'auto',
@@ -37,7 +37,7 @@ const styles = () =>
 			fontSize    : '1rem',
 			border      : 'none',
 			display     : 'flex',
-			paddingLeft : '0.5rem',
+			paddingLeft : theme.spacing(1),
 			flexGrow    : 1,
 			alignItems  : 'center'
 		},
@@ -185,8 +185,8 @@ const ListPeer = (props) =>
 						{
 							e.stopPropagation();
 							screenVisible ?
-								roomClient.modifyPeerConsumer(peer.name, 'screen', true) :
-								roomClient.modifyPeerConsumer(peer.name, 'screen', false);
+								roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
+								roomClient.modifyPeerConsumer(peer.id, 'screen', false);
 						}}
 					>
 						{ screenVisible ?
@@ -207,8 +207,8 @@ const ListPeer = (props) =>
 					{
 						e.stopPropagation();
 						micEnabled ?
-							roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
-							roomClient.modifyPeerConsumer(peer.name, 'mic', false);
+							roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+							roomClient.modifyPeerConsumer(peer.id, 'mic', false);
 					}}
 				>
 					{ micEnabled ?
@@ -241,7 +241,7 @@ const makeMapStateToProps = (initialState, props) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer : state.peers[props.name],
+			peer : state.peers[props.id],
 			...getPeerConsumers(state, props)
 		};
 	};

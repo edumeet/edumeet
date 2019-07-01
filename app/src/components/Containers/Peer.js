@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import * as stateActions from '../../actions/stateActions';
 import VideoView from '../VideoContainers/VideoView';
 import Fab from '@material-ui/core/Fab';
@@ -21,7 +21,6 @@ const styles = (theme) =>
 		root :
 		{
 			flex               : '0 0 auto',
-			margin             : 6,
 			boxShadow          : 'var(--peer-shadow)',
 			border             : 'var(--peer-border)',
 			touchAction        : 'none',
@@ -32,11 +31,11 @@ const styles = (theme) =>
 			backgroundRepeat   : 'no-repeat',
 			'&.webcam'         :
 			{
-				order : 2
+				order : 4
 			},
 			'&.screen' :
 			{
-				order : 1
+				order : 3
 			},
 			'&.hover' :
 			{
@@ -49,19 +48,13 @@ const styles = (theme) =>
 		},
 		fab :
 		{
-			margin : theme.spacing.unit
+			margin : theme.spacing(1)
 		},
 		viewContainer :
 		{
-			position   : 'relative',
-			'&.webcam' :
-			{
-				order : 2
-			},
-			'&.screen' :
-			{
-				order : 1
-			}
+			position : 'relative',
+			width    : '100%',
+			height   : '100%'
 		},
 		controls :
 		{
@@ -73,8 +66,8 @@ const styles = (theme) =>
 			flexDirection   : 'column',
 			justifyContent  : 'center',
 			alignItems      : 'flex-end',
-			padding         : '0.4vmin',
-			zIndex          : 20,
+			padding         : theme.spacing(1),
+			zIndex          : 21,
 			opacity         : 0,
 			transition      : 'opacity 0.3s',
 			touchAction     : 'none',
@@ -92,8 +85,8 @@ const styles = (theme) =>
 			display         : 'flex',
 			justifyContent  : 'center',
 			alignItems      : 'center',
-			padding         : '0.4vmin',
-			zIndex          : 21,
+			padding         : theme.spacing(1),
+			zIndex          : 20,
 			'& p'           :
 			{
 				padding       : '6px 12px',
@@ -109,14 +102,8 @@ const styles = (theme) =>
 const Peer = (props) =>
 {
 	const [ hover, setHover ] = useState(false);
-	const [ webcamHover, setWebcamHover ] = useState(false);
-	const [ screenHover, setScreenHover ] = useState(false);
 
 	let touchTimeout = null;
-
-	let touchWebcamTimeout = null;
-
-	let touchScreenTimeout = null;
 
 	const {
 		roomClient,
@@ -128,7 +115,9 @@ const Peer = (props) =>
 		screenConsumer,
 		toggleConsumerFullscreen,
 		toggleConsumerWindow,
+		spacing,
 		style,
+		smallButtons,
 		windowConsumer,
 		classes,
 		theme
@@ -164,6 +153,12 @@ const Peer = (props) =>
 
 	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
+	const rootStyle =
+	{
+		'margin' : spacing,
+		...style
+	};
+
 	return (
 		<React.Fragment>
 			<div
@@ -194,15 +189,9 @@ const Peer = (props) =>
 						setHover(false);
 					}, 2000);
 				}}
+				style={rootStyle}
 			>
-				<div className={classnames(classes.viewContainer)} style={style}>
-					{ videoVisible && !webcamConsumer.supported ?
-						<div className={classes.videoInfo}>
-							<p>incompatible video</p>
-						</div>
-						:null
-					}
-
+				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible ?
 						<div className={classes.videoInfo}>
 							<p>this video is paused</p>
@@ -210,79 +199,80 @@ const Peer = (props) =>
 						:null
 					}
 
-					{ videoVisible && webcamConsumer.supported ?
-						<div
-							className={classnames(classes.controls, webcamHover ? 'hover' : null)}
-							onMouseOver={() => setWebcamHover(true)}
-							onMouseOut={() => setWebcamHover(false)}
-							onTouchStart={() =>
+					<div
+						className={classnames(classes.controls, hover ? 'hover' : null)}
+						onMouseOver={() => setHover(true)}
+						onMouseOut={() => setHover(false)}
+						onTouchStart={() =>
+						{
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
+		
+							setHover(true);
+						}}
+						onTouchEnd={() =>
+						{
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
+		
+							touchTimeout = setTimeout(() =>
 							{
-								if (touchWebcamTimeout)
-									clearTimeout(touchWebcamTimeout);
-			
-								setWebcamHover(true);
-							}}
-							onTouchEnd={() =>
+								setHover(false);
+							}, 2000);
+						}}
+					>
+						<Fab
+							aria-label='Mute mic'
+							className={classes.fab}
+							disabled={!micConsumer}
+							color={micEnabled ? 'default' : 'secondary'}
+							size={smallButtons ? 'small' : 'large'}
+							onClick={() =>
 							{
-								if (touchWebcamTimeout)
-									clearTimeout(touchWebcamTimeout);
-			
-								touchWebcamTimeout = setTimeout(() =>
-								{
-									setWebcamHover(false);
-								}, 2000);
+								micEnabled ?
+									roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+									roomClient.modifyPeerConsumer(peer.id, 'mic', false);
 							}}
 						>
-							<Fab
-								aria-label='Mute mic'
-								className={classes.fab}
-								color={micEnabled ? 'default' : 'secondary'}
-								onClick={() =>
-								{
-									micEnabled ?
-										roomClient.modifyPeerConsumer(peer.name, 'mic', true) :
-										roomClient.modifyPeerConsumer(peer.name, 'mic', false);
-								}}
-							>
-								{ micEnabled ?
-									<MicIcon />
-									:
-									<MicOffIcon />
-								}
-							</Fab>
-
-							{ !smallScreen ?
-								<Fab
-									aria-label='New window'
-									className={classes.fab}
-									disabled={
-										!videoVisible ||
-										(windowConsumer === webcamConsumer.id)
-									}
-									onClick={() =>
-									{
-										toggleConsumerWindow(webcamConsumer);
-									}}
-								>
-									<NewWindowIcon />
-								</Fab>
-								:null
+							{ micEnabled ?
+								<MicIcon />
+								:
+								<MicOffIcon />
 							}
+						</Fab>
 
+						{ !smallScreen ?
 							<Fab
-								aria-label='Fullscreen'
+								aria-label='New window'
 								className={classes.fab}
-								disabled={!videoVisible}
+								disabled={
+									!videoVisible ||
+									(windowConsumer === webcamConsumer.id)
+								}
+								size={smallButtons ? 'small' : 'large'}
 								onClick={() =>
 								{
-									toggleConsumerFullscreen(webcamConsumer);
+									toggleConsumerWindow(webcamConsumer);
 								}}
 							>
-								<FullScreenIcon />
+								<NewWindowIcon />
 							</Fab>
-						</div>
-						:null
-					}
+							:null
+						}
+
+						<Fab
+							aria-label='Fullscreen'
+							className={classes.fab}
+							disabled={!videoVisible}
+							size={smallButtons ? 'small' : 'large'}
+							onClick={() =>
+							{
+								toggleConsumerFullscreen(webcamConsumer);
+							}}
+						>
+							<FullScreenIcon />
+						</Fab>
+					</div>
 
 					<VideoView
 						advancedMode={advancedMode}
@@ -295,7 +285,7 @@ const Peer = (props) =>
 						audioCodec={micConsumer ? micConsumer.codec : null}
 						videoCodec={webcamConsumer ? webcamConsumer.codec : null}
 					>
-						<Volume name={peer.name} />
+						<Volume id={peer.id} />
 					</VideoView>
 				</div>
 			</div>
@@ -322,43 +312,37 @@ const Peer = (props) =>
 							setHover(false);
 						}, 2000);
 					}}
+					style={rootStyle}
 				>
-					{ screenVisible && !screenConsumer.supported ?
-						<div className={classes.videoInfo} style={style}>
-							<p>incompatible video</p>
-						</div>
-						:null
-					}
-
 					{ !screenVisible ?
-						<div className={classes.videoInfo} style={style}>
+						<div className={classes.videoInfo}>
 							<p>this video is paused</p>
 						</div>
 						:null
 					}
 
-					{ screenVisible && screenConsumer.supported ?
-						<div className={classnames(classes.viewContainer)} style={style}>
+					{ screenVisible ?
+						<div className={classnames(classes.viewContainer)}>
 							<div
-								className={classnames(classes.controls, screenHover ? 'hover' : null)}
-								onMouseOver={() => setScreenHover(true)}
-								onMouseOut={() => setScreenHover(false)}
+								className={classnames(classes.controls, hover ? 'hover' : null)}
+								onMouseOver={() => setHover(true)}
+								onMouseOut={() => setHover(false)}
 								onTouchStart={() =>
 								{
-									if (touchScreenTimeout)
-										clearTimeout(touchScreenTimeout);
+									if (touchTimeout)
+										clearTimeout(touchTimeout);
 				
-									setScreenHover(true);
+									setHover(true);
 								}}
 								onTouchEnd={() =>
 								{
 
-									if (touchScreenTimeout)
-										clearTimeout(touchScreenTimeout);
+									if (touchTimeout)
+										clearTimeout(touchTimeout);
 				
-									touchScreenTimeout = setTimeout(() =>
+									touchTimeout = setTimeout(() =>
 									{
-										setScreenHover(false);
+										setHover(false);
 									}, 2000);
 								}}
 							>
@@ -370,6 +354,7 @@ const Peer = (props) =>
 											!screenVisible ||
 											(windowConsumer === screenConsumer.id)
 										}
+										size={smallButtons ? 'small' : 'large'}
 										onClick={() =>
 										{
 											toggleConsumerWindow(screenConsumer);
@@ -384,6 +369,7 @@ const Peer = (props) =>
 									aria-label='Fullscreen'
 									className={classes.fab}
 									disabled={!screenVisible}
+									size={smallButtons ? 'small' : 'large'}
 									onClick={() =>
 									{
 										toggleConsumerFullscreen(screenConsumer);
@@ -418,9 +404,11 @@ Peer.propTypes =
 	micConsumer              : appPropTypes.Consumer,
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
-	windowConsumer           : PropTypes.number,
+	windowConsumer           : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
+	spacing                  : PropTypes.number,
 	style                    : PropTypes.object,
+	smallButtons             : PropTypes.bool,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
 	classes                  : PropTypes.object.isRequired,
@@ -434,10 +422,10 @@ const makeMapStateToProps = (initialState, props) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer           : state.peers[props.name],
+			peer           : state.peers[props.id],
 			...getPeerConsumers(state, props),
 			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : props.name === state.room.activeSpeakerName
+			activeSpeaker  : props.id === state.room.activeSpeakerId
 		};
 	};
 
@@ -470,7 +458,7 @@ export default withRoomContext(connect(
 			return (
 				prev.peers === next.peers &&
 				prev.consumers === next.consumers &&
-				prev.room.activeSpeakerName === next.room.activeSpeakerName &&
+				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.windowConsumer === next.room.windowConsumer
 			);
 		}

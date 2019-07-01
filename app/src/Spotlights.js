@@ -5,11 +5,11 @@ const logger = new Logger('Spotlight');
 
 export default class Spotlights extends EventEmitter
 {
-	constructor(maxSpotlights, room)
+	constructor(maxSpotlights, signalingSocket)
 	{
 		super();
 
-		this._room = room;
+		this._signalingSocket = signalingSocket;
 		this._maxSpotlights = maxSpotlights;
 		this._peerList = [];
 		this._selectedSpotlights = [];
@@ -19,24 +19,25 @@ export default class Spotlights extends EventEmitter
 
 	start()
 	{
-		const peers = this._room.peers;
-
-		for (const peer of peers)
-		{
-			this._handlePeer(peer);
-		}
-
-		this._handleRoom();
+		this._handleSignaling();
 
 		this._started = true;
 		this._spotlightsUpdated();
 	}
 
-	peerInSpotlights(peerName)
+	addPeers(peers)
+	{
+		for (const peer of peers)
+		{
+			this._newPeer(peer.id);
+		}
+	}
+
+	peerInSpotlights(peerId)
 	{
 		if (this._started)
 		{
-			return this._currentSpotlights.indexOf(peerName) !== -1;
+			return this._currentSpotlights.indexOf(peerId) !== -1;
 		}
 		else
 		{
@@ -44,11 +45,11 @@ export default class Spotlights extends EventEmitter
 		}
 	}
 
-	setPeerSpotlight(peerName)
+	setPeerSpotlight(peerId)
 	{
-		logger.debug('setPeerSpotlight() [peerName:"%s"]', peerName);
+		logger.debug('setPeerSpotlight() [peerId:"%s"]', peerId);
 
-		const index = this._selectedSpotlights.indexOf(peerName);
+		const index = this._selectedSpotlights.indexOf(peerId);
 		
 		if (index !== -1)
 		{
@@ -56,13 +57,13 @@ export default class Spotlights extends EventEmitter
 		}
 		else
 		{
-			this._selectedSpotlights = [ peerName ];
+			this._selectedSpotlights = [ peerId ];
 		}
 
 		/*
 		if (index === -1) // We don't have this peer in the list, adding
 		{
-			this._selectedSpotlights.push(peerName);
+			this._selectedSpotlights.push(peerId);
 		}
 		else // We have this peer, remove
 		{
@@ -74,14 +75,63 @@ export default class Spotlights extends EventEmitter
 			this._spotlightsUpdated();
 	}
 
-	_handleRoom()
+	_handleSignaling()
 	{
-		this._room.on('newpeer', (peer) =>
+		this._signalingSocket.on('notification', (notification) =>
 		{
-			logger.debug(
-				'room "newpeer" event [name:"%s", peer:%o]', peer.name, peer);
-			this._handlePeer(peer);
+			if (notification.method === 'newPeer')
+			{
+				const { id } = notification.data;
+
+				this._newPeer(id);
+			}
+
+			if (notification.method === 'peerClosed')
+			{
+				const { peerId } = notification.data;
+
+				this._closePeer(peerId);
+			}
 		});
+	}
+
+	_newPeer(id)
+	{
+		logger.debug(
+			'room "newpeer" event [id: "%s"]', id);
+		
+		if (this._peerList.indexOf(id) === -1) // We don't have this peer in the list
+		{
+			logger.debug('_handlePeer() | adding peer [peerId: "%s"]', id);
+
+			this._peerList.push(id);
+
+			if (this._started)
+				this._spotlightsUpdated();
+		}
+	}
+
+	_closePeer(id)
+	{
+		logger.debug(
+			'room "peerClosed" event [peerId:%o]', id);
+
+		let index = this._peerList.indexOf(id);
+
+		if (index !== -1) // We have this peer in the list, remove
+		{
+			this._peerList.splice(index, 1);
+		}
+
+		index = this._selectedSpotlights.indexOf(id);
+
+		if (index !== -1) // We have this peer in the list, remove
+		{
+			this._selectedSpotlights.splice(index, 1);
+		}
+
+		if (this._started)
+			this._spotlightsUpdated();
 	}
 
 	addSpeakerList(speakerList)
@@ -92,49 +142,16 @@ export default class Spotlights extends EventEmitter
 			this._spotlightsUpdated();
 	}
 
-	_handlePeer(peer)
+	handleActiveSpeaker(peerId)
 	{
-		logger.debug('_handlePeer() [peerName:"%s"]', peer.name);
+		logger.debug('handleActiveSpeaker() [peerId:"%s"]', peerId);
 
-		if (this._peerList.indexOf(peer.name) === -1) // We don't have this peer in the list
-		{
-			peer.on('close', () =>
-			{
-				let index = this._peerList.indexOf(peer.name);
-
-				if (index !== -1) // We have this peer in the list, remove
-				{
-					this._peerList.splice(index, 1);
-				}
-
-				index = this._selectedSpotlights.indexOf(peer.name);
-
-				if (index !== -1) // We have this peer in the list, remove
-				{
-					this._selectedSpotlights.splice(index, 1);
-				}
-
-				this._spotlightsUpdated();
-			});
-
-			logger.debug('_handlePeer() | adding peer [peerName:"%s"]', peer.name);
-
-			this._peerList.push(peer.name);
-
-			this._spotlightsUpdated();
-		}
-	}
-
-	handleActiveSpeaker(peerName)
-	{
-		logger.debug('handleActiveSpeaker() [peerName:"%s"]', peerName);
-
-		const index = this._peerList.indexOf(peerName);
+		const index = this._peerList.indexOf(peerId);
 
 		if (index > -1)
 		{
 			this._peerList.splice(index, 1);
-			this._peerList = [ peerName ].concat(this._peerList);
+			this._peerList = [ peerId ].concat(this._peerList);
 
 			this._spotlightsUpdated();
 		}

@@ -8,7 +8,7 @@ import * as stateActions from '../../actions/stateActions';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import VideoView from './VideoView';
 
-const styles = () =>
+const styles = (theme) =>
 	({
 		root :
 		{
@@ -29,7 +29,7 @@ const styles = () =>
 			flexDirection  : 'row',
 			justifyContent : 'flex-start',
 			alignItems     : 'center',
-			padding        : '0.4vmin'
+			padding        : theme.spacing(1)
 		},
 		button :
 		{
@@ -102,13 +102,6 @@ const FullScreenView = (props) =>
 
 	return (
 		<div className={classes.root}>
-			{ consumerVisible && !consumer.supported ?
-				<div className={classes.incompatibleVideo}>
-					<p>incompatible video</p>
-				</div>
-				:null
-			}
-
 			<div className={classes.controls}>
 				<div
 					className={classnames(classes.button, {

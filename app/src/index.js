@@ -1,14 +1,13 @@
 import domready from 'domready';
-import UrlParse from 'url-parse';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { getDeviceInfo } from 'mediasoup-client';
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
 import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
+import deviceInfo from './deviceInfo';
 import * as stateActions from './actions/stateActions';
 import Room from './components/Room';
 import LoadingView from './components/LoadingView';
@@ -44,57 +43,48 @@ function run()
 {
 	logger.debug('run() [environment:%s]', process.env.NODE_ENV);
 
-	const peerName = randomString({ length: 8 }).toLowerCase();
-	const urlParser = new UrlParse(window.location.href, true);
+	const peerId = randomString({ length: 8 }).toLowerCase();
+	const urlParser = new URL(window.location);
+	const parameters = urlParser.searchParams;
 
-	let roomId = (urlParser.pathname).substr(1)
-		? (urlParser.pathname).substr(1).toLowerCase() : urlParser.query.roomId.toLowerCase();
-	const produce = urlParser.query.produce !== 'false';
-	const useSimulcast = urlParser.query.simulcast === 'true';
+	let roomId = (urlParser.pathname).substr(1);
 
 	if (!roomId)
+		roomId = parameters.get('roomId');
+
+	if (roomId)
+		roomId = roomId.toLowerCase();
+	else
 	{
 		roomId = randomString({ length: 8 }).toLowerCase();
 
-		urlParser.query.roomId = roomId;
+		parameters.set('roomId', roomId);
 		window.history.pushState('', '', urlParser.toString());
 	}
 
-	// Get the effective/shareable Room URL.
-	const roomUrlParser = new UrlParse(window.location.href, true);
+	const produce = parameters.get('produce') !== 'false';
+	const consume = parameters.get('consume') !== 'false';
+	const useSimulcast = parameters.get('simulcast') === 'true';
+	const forceTcp = parameters.get('forceTcp') === 'true';
 
-	for (const key of Object.keys(roomUrlParser.query))
-	{
-		// Don't keep some custom params.
-		switch (key)
-		{
-			case 'roomId':
-			case 'simulcast':
-				break;
-			default:
-				delete roomUrlParser.query[key];
-		}
-	}
-	delete roomUrlParser.hash;
-
-	const roomUrl = roomUrlParser.toString();
+	const roomUrl = window.location.href.split('?')[0];
 
 	// Get current device.
-	const device = getDeviceInfo();
+	const device = deviceInfo();
 
 	store.dispatch(
 		stateActions.setRoomUrl(roomUrl));
 
 	store.dispatch(
 		stateActions.setMe({
-			peerName,
+			peerId,
 			device,
 			loginEnabled : window.config.loginEnabled
 		})
 	);
 
 	roomClient = new RoomClient(
-		{ roomId, peerName, device, useSimulcast, produce });
+		{ roomId, peerId, device, useSimulcast, produce, consume, forceTcp });
 
 	global.CLIENT = roomClient;
 

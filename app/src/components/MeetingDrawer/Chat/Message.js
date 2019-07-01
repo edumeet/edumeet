@@ -21,8 +21,8 @@ const styles = (theme) =>
 		root :
 		{
 			display      : 'flex',
-			marginBottom : theme.spacing.unit,
-			padding      : theme.spacing.unit,
+			marginBottom : theme.spacing(1),
+			padding      : theme.spacing(1),
 			flexShrink   : 0
 		},
 		selfMessage :
@@ -42,7 +42,7 @@ const styles = (theme) =>
 		},
 		content :
 		{
-			marginLeft : theme.spacing.unit
+			marginLeft : theme.spacing(1)
 		},
 		avatar :
 		{

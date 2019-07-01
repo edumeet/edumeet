@@ -4,17 +4,17 @@ const initialState =
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
 	lockedOut          : false,
-	audioSuspended     : false,
-	activeSpeakerName  : null,
+	activeSpeakerId    : null,
 	torrentSupport     : false,
 	showSettings       : false,
 	fullScreenConsumer : null, // ConsumerID
 	windowConsumer     : null, // ConsumerID
 	toolbarsVisible    : true,
 	mode               : 'democratic',
-	selectedPeerName   : null,
+	selectedPeerId     : null,
 	spotlights         : [],
-	settingsOpen       : false
+	settingsOpen       : false,
+	joined             : false
 };
 
 const room = (state = initialState, action) =>
@@ -35,7 +35,7 @@ const room = (state = initialState, action) =>
 			if (roomState === 'connected')
 				return { ...state, state: roomState };
 			else
-				return { ...state, state: roomState, activeSpeakerName: null };
+				return { ...state, state: roomState, activeSpeakerId: null };
 		}
 
 		case 'SET_ROOM_LOCKED':
@@ -53,13 +53,6 @@ const room = (state = initialState, action) =>
 			return { ...state, lockedOut: true };
 		}
 
-		case 'SET_AUDIO_SUSPENDED':
-		{
-			const { audioSuspended } = action.payload;
-
-			return { ...state, audioSuspended };
-		}
-
 		case 'SET_SETTINGS_OPEN':
 		{
 			const { settingsOpen } = action.payload;
@@ -69,9 +62,9 @@ const room = (state = initialState, action) =>
 
 		case 'SET_ROOM_ACTIVE_SPEAKER':
 		{
-			const { peerName } = action.payload;
+			const { peerId } = action.payload;
 
-			return { ...state, activeSpeakerName: peerName };
+			return { ...state, activeSpeakerId: peerId };
 		}
 
 		case 'FILE_SHARING_SUPPORTED':
@@ -86,6 +79,13 @@ const room = (state = initialState, action) =>
 			const showSettings = !state.showSettings;
 
 			return { ...state, showSettings };
+		}
+
+		case 'TOGGLE_JOINED':
+		{
+			const joined = !state.joined;
+
+			return { ...state, joined };
 		}
 
 		case 'TOGGLE_FULLSCREEN_CONSUMER':
@@ -119,13 +119,13 @@ const room = (state = initialState, action) =>
 
 		case 'SET_SELECTED_PEER':
 		{
-			const { selectedPeerName } = action.payload;
+			const { selectedPeerId } = action.payload;
 
 			return {
 				...state,
 
-				selectedPeerName : state.selectedPeerName === selectedPeerName ?
-					null : selectedPeerName
+				selectedPeerId : state.selectedPeerId === selectedPeerId ?
+					null : selectedPeerId
 			};
 		}
 

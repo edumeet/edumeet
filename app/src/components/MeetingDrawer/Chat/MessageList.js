@@ -14,7 +14,7 @@ const styles = (theme) =>
 			flexDirection : 'column',
 			alignItems    : 'center',
 			overflowY     : 'auto',
-			padding       : theme.spacing.unit
+			padding       : theme.spacing(1)
 		}
 	});
 

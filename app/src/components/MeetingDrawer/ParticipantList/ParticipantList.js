@@ -18,23 +18,23 @@ const styles = (theme) =>
 		{
 			width     : '100%',
 			overflowY : 'auto',
-			padding   : 6
+			padding   : theme.spacing(1)
 		},
 		list :
 		{
 			listStyleType   : 'none',
-			padding         : theme.spacing.unit,
+			padding         : theme.spacing(1),
 			boxShadow       : '0 2px 5px 2px rgba(0, 0, 0, 0.2)',
 			backgroundColor : 'rgba(255, 255, 255, 1)'
 		},
 		listheader :
 		{
-			padding    : '0.5rem',
+			padding    : theme.spacing(1),
 			fontWeight : 'bolder'
 		},
 		listItem :
 		{
-			padding      : '0.5rem',
+			padding      : theme.spacing(1),
 			width        : '100%',
 			overflow     : 'hidden',
 			cursor       : 'pointer',
@@ -76,7 +76,7 @@ class ParticipantList extends React.PureComponent
 			roomClient,
 			advancedMode,
 			passivePeers,
-			selectedPeerName,
+			selectedPeerId,
 			spotlightPeers,
 			classes
 		} = this.props;
@@ -92,14 +92,14 @@ class ParticipantList extends React.PureComponent
 					<li className={classes.listheader}>Participants in Spotlight:</li>
 					{ spotlightPeers.map((peer) => (
 						<li
-							key={peer.name}
+							key={peer.id}
 							className={classNames(classes.listItem, {
-								selected : peer.name === selectedPeerName
+								selected : peer.id === selectedPeerId
 							})}
-							onClick={() => roomClient.setSelectedPeer(peer.name)}
+							onClick={() => roomClient.setSelectedPeer(peer.id)}
 						>
-							<ListPeer name={peer.name} advancedMode={advancedMode}>
-								<Volume small name={peer.name} />
+							<ListPeer id={peer.id} advancedMode={advancedMode}>
+								<Volume small id={peer.id} />
 							</ListPeer>
 						</li>
 					))}
@@ -107,15 +107,15 @@ class ParticipantList extends React.PureComponent
 				<br />
 				<ul className={classes.list}>
 					<li className={classes.listheader}>Passive Participants:</li>
-					{ passivePeers.map((peerName) => (
+					{ passivePeers.map((peerId) => (
 						<li
-							key={peerName}
+							key={peerId}
 							className={classNames(classes.listItem, {
-								selected : peerName === selectedPeerName
+								selected : peerId === selectedPeerId
 							})}
-							onClick={() => roomClient.setSelectedPeer(peerName)}
+							onClick={() => roomClient.setSelectedPeer(peerId)}
 						>
-							<ListPeer name={peerName} advancedMode={advancedMode} />
+							<ListPeer id={peerId} advancedMode={advancedMode} />
 						</li>
 					))}
 				</ul>
@@ -126,20 +126,20 @@ class ParticipantList extends React.PureComponent
 
 ParticipantList.propTypes =
 {
-	roomClient       : PropTypes.any.isRequired,
-	advancedMode     : PropTypes.bool,
-	passivePeers     : PropTypes.array,
-	selectedPeerName : PropTypes.string,
-	spotlightPeers   : PropTypes.array,
-	classes          : PropTypes.object.isRequired
+	roomClient     : PropTypes.any.isRequired,
+	advancedMode   : PropTypes.bool,
+	passivePeers   : PropTypes.array,
+	selectedPeerId : PropTypes.string,
+	spotlightPeers : PropTypes.array,
+	classes        : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		passivePeers     : passivePeersSelector(state),
-		selectedPeerName : state.room.selectedPeerName,
-		spotlightPeers   : spotlightPeersSelector(state)
+		passivePeers   : passivePeersSelector(state),
+		selectedPeerId : state.room.selectedPeerId,
+		spotlightPeers : spotlightPeersSelector(state)
 	};
 };
 
@@ -153,7 +153,7 @@ const ParticipantListContainer = withRoomContext(connect(
 			return (
 				prev.peers === next.peers &&
 				prev.room.spotlights === next.room.spotlights &&
-				prev.room.selectedPeerName === next.room.selectedPeerName
+				prev.room.selectedPeerId === next.room.selectedPeerId
 			);
 		}
 	}
