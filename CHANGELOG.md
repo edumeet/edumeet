@@ -1,12 +1,13 @@
 # Changelog
 
-### 2.1
+### 3.0
 * Updated to mediasoup v3
 * Replace lib "passport-datporten" with "openid-client" (a general OIDC certified client)
   - OpenID Connect discovery
   - Auth code flow
 * Add spdy http2 support.
   - Notice it does not supports node 11.x
+* Updated to Material UI v4
 
  ### 2.0
 * Material UI

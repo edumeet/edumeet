@@ -9,6 +9,7 @@ Try it online at https://letsmeet.no. You can add /roomname to the URL for speci
 * Chat
 * Screen sharing
 * File sharing
+* Different layouts
 
 There is also a SIP gateway that can be found [here](https://github.com/havfo/multiparty-meeting-sipgw). To try it, call: roomname@letsmeet.no.
 
