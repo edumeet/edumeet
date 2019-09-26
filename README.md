@@ -37,7 +37,7 @@ $ cp server/config/config.example.js server/config/config.js
 $ cp app/public/config/config.example.js app/public/config/config.js
 ```
 
-* Edit your two `config.js` with appropriate settings (listening IP/port, logging options, **valid** TLS certificate, etc).
+* Edit your two `config.js` with appropriate settings (listening IP/port, logging options, **valid** TLS certificate, don't forget ip setting in last section in server config: (webRtcTransport), etc).
 
 * Set up the browser app:
 
