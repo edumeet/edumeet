@@ -84,6 +84,7 @@ module.exports =
 		{
 			listenIps :
 			[
+				// change ip to your servers IP address!
 				{ ip: '1.2.3.4', announcedIp: null }
 			],
 			maxIncomingBitrate              : 1500000,
