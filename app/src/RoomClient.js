@@ -1283,6 +1283,46 @@ export default class RoomClient
 					break;
 				}
 
+				case 'parkedPeer':
+				{
+					const { peerId } = notification.data;
+
+					store.dispatch(
+						stateActions.addLobbyPeer(peerId));
+
+					store.dispatch(requestActions.notify(
+						{
+							text : 'New participant entered the lobby.'
+						}));
+
+					break;
+				}
+
+				case 'promotedPeer':
+				{
+					const { peerId } = notification.data;
+
+					store.dispatch(
+						stateActions.removeLobbyPeer(peerId));
+
+					break;
+				}
+
+				case 'parkedPeerDisplayName':
+				{
+					const { peerId, displayName } = notification.data;
+
+					store.dispatch(
+						stateActions.setLobbyPeerDisplayName(displayName, peerId));
+
+					store.dispatch(requestActions.notify(
+						{
+							text : `Participant in lobby changed name to ${displayName}.`
+						}));
+
+					break;
+				}
+
 				case 'activeSpeaker':
 				{
 					const { peerId } = notification.data;

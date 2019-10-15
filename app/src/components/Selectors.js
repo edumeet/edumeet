@@ -4,12 +4,18 @@ const producersSelect = (state) => state.producers;
 const consumersSelect = (state) => state.consumers;
 const spotlightsSelector = (state) => state.room.spotlights;
 const peersSelector = (state) => state.peers;
+const lobbyPeersSelector = (state) => state.lobbyPeers;
 const getPeerConsumers = (state, props) =>
 	(state.peers[props.id] ? state.peers[props.id].consumers : null);
 const getAllConsumers = (state) => state.consumers;
 const peersKeySelector = createSelector(
 	peersSelector,
 	(peers) => Object.keys(peers)
+);
+
+export const lobbyPeersKeySelector = createSelector(
+	lobbyPeersSelector,
+	(lobbyPeers) => Object.keys(lobbyPeers)
 );
 
 export const micProducersSelector = createSelector(

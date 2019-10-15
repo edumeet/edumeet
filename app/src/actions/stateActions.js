@@ -391,11 +391,11 @@ export const setPeerVolume = (peerId, volume) =>
 	};
 };
 
-export const addLobbyPeer = (lobbyPeer) =>
+export const addLobbyPeer = (peerId) =>
 {
 	return {
 		type    : 'ADD_LOBBY_PEER',
-		payload : { lobbyPeer }
+		payload : { peerId }
 	};
 };
 

@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
+const Lobby = require('./Lobby');
 const config = require('../config/config');
 
 const logger = new Logger('Room');
@@ -53,6 +54,15 @@ class Room extends EventEmitter
 
 		// Locked flag.
 		this._locked = false;
+
+		this._lobby = new Lobby();
+
+		this._lobby.on('promotePeer', (peer) =>
+		{
+			logger.info('promotePeer() [peer:"%o"]', peer);
+
+			this._peerJoining({ ...peer });
+		});
 
 		this._chatHistory = [];
 
@@ -118,6 +128,8 @@ class Room extends EventEmitter
 
 		this._closed = true;
 
+		this._lobby.close();
+
 		// Close the peers
 		if (this._peers)
 		{
@@ -165,11 +177,21 @@ class Room extends EventEmitter
 		}
 		else if (this._locked) // Don't allow connections to a locked room
 		{
-			this._notification(socket, 'roomLocked');
-			socket.disconnect(true);
+			this._lobby.parkPeer({ peerId, consume, socket });
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'parkedPeer', { peerId });
+			});
+
 			return;
 		}
 
+		this._peerJoining({ peerId, consume, socket });
+	}
+
+	_peerJoining({ peerId, consume, socket })
+	{
 		socket.join(this._roomId);
 
 		const peer = { id : peerId, socket : socket };
@@ -801,6 +823,28 @@ class Room extends EventEmitter
 				this._notification(peer.socket, 'unlockRoom', {
 					peerId : peer.id
 				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'promotePeer':
+			{
+				const { peerId } = request.data;
+
+				this._lobby.promotePeer(peerId);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'promoteAllPeers':
+			{
+				this._lobby.promoteAllPeers();
 
 				// Return no error
 				cb();

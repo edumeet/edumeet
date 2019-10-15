@@ -3,7 +3,7 @@ const lobbyPeer = (state = {}, action) =>
 	switch (action.type) 
 	{
 		case 'ADD_LOBBY_PEER':
-			return action.payload.lobbyPeer;
+			return { peerId: action.payload.peerId };
 
 		case 'SET_LOBBY_PEER_DISPLAY_NAME':
 			return { ...state, displayName: action.payload.displayName };
@@ -19,7 +19,7 @@ const lobbyPeers = (state = {}, action) =>
 	{
 		case 'ADD_LOBBY_PEER':
 		{
-			return { ...state, [action.payload.lobbyPeer.id]: lobbyPeer(undefined, action) };
+			return { ...state, [action.payload.peerId]: lobbyPeer(undefined, action) };
 		}
 
 		case 'REMOVE_LOBBY_PEER':

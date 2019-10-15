@@ -2,13 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
 	passivePeersSelector,
-	spotlightPeersSelector
+	spotlightPeersSelector,
+	lobbyPeersKeySelector
 } from '../../Selectors';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
 import PropTypes from 'prop-types';
 import ListPeer from './ListPeer';
+import ListLobbyPeer from './ListLobbyPeer';
 import ListMe from './ListMe';
 import Volume from '../../Containers/Volume';
 
@@ -78,6 +80,7 @@ class ParticipantList extends React.PureComponent
 			passivePeers,
 			selectedPeerId,
 			spotlightPeers,
+			lobbyPeers,
 			classes
 		} = this.props;
 
@@ -88,6 +91,22 @@ class ParticipantList extends React.PureComponent
 					<ListMe />
 				</ul>
 				<br />
+
+				{ lobbyPeers ?
+					<ul className={classes.list}>
+						<li className={classes.listheader}>Participants in Spotlight:</li>
+						{ lobbyPeers.map((peerId) => (
+							<li
+								key={peerId}
+								className={classes.listItem}
+							>
+								<ListLobbyPeer id={peerId} advancedMode={advancedMode} />
+							</li>
+						))}
+					</ul>
+					:null
+				}
+
 				<ul className={classes.list}>
 					<li className={classes.listheader}>Participants in Spotlight:</li>
 					{ spotlightPeers.map((peer) => (
@@ -131,6 +150,7 @@ ParticipantList.propTypes =
 	passivePeers   : PropTypes.array,
 	selectedPeerId : PropTypes.string,
 	spotlightPeers : PropTypes.array,
+	lobbyPeers     : PropTypes.array,
 	classes        : PropTypes.object.isRequired
 };
 
@@ -139,7 +159,8 @@ const mapStateToProps = (state) =>
 	return {
 		passivePeers   : passivePeersSelector(state),
 		selectedPeerId : state.room.selectedPeerId,
-		spotlightPeers : spotlightPeersSelector(state)
+		spotlightPeers : spotlightPeersSelector(state),
+		lobbyPeers     : lobbyPeersKeySelector(state)
 	};
 };
 
@@ -153,7 +174,8 @@ const ParticipantListContainer = withRoomContext(connect(
 			return (
 				prev.peers === next.peers &&
 				prev.room.spotlights === next.room.spotlights &&
-				prev.room.selectedPeerId === next.room.selectedPeerId
+				prev.room.selectedPeerId === next.room.selectedPeerId &&
+				prev.lobbyPeers === next.lobbyPeers
 			);
 		}
 	}
