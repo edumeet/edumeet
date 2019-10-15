@@ -391,6 +391,30 @@ export const setPeerVolume = (peerId, volume) =>
 	};
 };
 
+export const addLobbyPeer = (lobbyPeer) =>
+{
+	return {
+		type    : 'ADD_LOBBY_PEER',
+		payload : { lobbyPeer }
+	};
+};
+
+export const removeLobbyPeer = (peerId) =>
+{
+	return {
+		type    : 'REMOVE_LOBBY_PEER',
+		payload : { peerId }
+	};
+};
+
+export const setLobbyPeerDisplayName = (displayName, peerId) =>
+{
+	return {
+		type    : 'SET_LOBBY_PEER_DISPLAY_NAME',
+		payload : { displayName, peerId }
+	};
+};
+
 export const addNotification = (notification) =>
 {
 	return {
