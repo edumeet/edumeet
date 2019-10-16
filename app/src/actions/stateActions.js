@@ -415,6 +415,14 @@ export const setLobbyPeerDisplayName = (displayName, peerId) =>
 	};
 };
 
+export const setLobbyPeerPromotionInProgress = (peerId, flag) =>
+{
+	return {
+		type    : 'SET_LOBBY_PEER_PROMOTION_IN_PROGRESS',
+		payload : { peerId, flag }
+	};
+};
+
 export const addNotification = (notification) =>
 {
 	return {

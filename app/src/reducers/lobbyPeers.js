@@ -3,10 +3,13 @@ const lobbyPeer = (state = {}, action) =>
 	switch (action.type) 
 	{
 		case 'ADD_LOBBY_PEER':
-			return { peerId: action.payload.peerId };
+			return { id: action.payload.peerId };
 
 		case 'SET_LOBBY_PEER_DISPLAY_NAME':
 			return { ...state, displayName: action.payload.displayName };
+
+		case 'SET_LOBBY_PEER_PROMOTION_IN_PROGRESS':
+			return { ...state, promotionInProgress: action.payload.flag };
 
 		default:
 			return state;
@@ -33,12 +36,14 @@ const lobbyPeers = (state = {}, action) =>
 		}
 
 		case 'SET_LOBBY_PEER_DISPLAY_NAME':
+		case 'SET_LOBBY_PEER_PROMOTION_IN_PROGRESS':
 		{
 			const oldLobbyPeer = state[action.payload.peerId];
 
 			if (!oldLobbyPeer) 
 			{
-				throw new Error('no Peer found');
+				// Tried to update non-existant lobbyPeer. Has probably been promoted, or left.
+				return state;
 			}
 
 			return { ...state, [oldLobbyPeer.id]: lobbyPeer(oldLobbyPeer, action) };

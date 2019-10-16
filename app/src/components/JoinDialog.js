@@ -1,11 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
+import * as stateActions from '../actions/stateActions';
 import PropTypes from 'prop-types';
 import Dialog from '@material-ui/core/Dialog';
 import Typography from '@material-ui/core/Typography';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 const styles = (theme) =>
 	({
@@ -41,6 +44,8 @@ const styles = (theme) =>
 
 const JoinDialog = ({
 	roomClient,
+	displayName,
+	changeDisplayName,
 	classes
 }) =>
 {
@@ -76,6 +81,19 @@ const JoinDialog = ({
 				>
 					Audio and Video
 				</Button>
+				<TextField
+					id='displayname'
+					label='Name'
+					className={classes.textField}
+					value={displayName}
+					onChange={(event) =>
+					{
+						const { value } = event.target;
+
+						changeDisplayName(value);
+					}}
+					margin='normal'
+				/>
 			</DialogActions>
 		</Dialog>
 	);
@@ -83,8 +101,39 @@ const JoinDialog = ({
 
 JoinDialog.propTypes =
 {
-	roomClient : PropTypes.any.isRequired,
-	classes    : PropTypes.object.isRequired
+	roomClient        : PropTypes.any.isRequired,
+	displayName       : PropTypes.string.isRequired,
+	changeDisplayName : PropTypes.func.isRequired,
+	classes           : PropTypes.object.isRequired
 };
 
-export default withRoomContext(withStyles(styles)(JoinDialog));
+const mapStateToProps = (state) =>
+{
+	return {
+		displayName : state.settings.displayName
+	};
+};
+
+const mapDispatchToProps = (dispatch) =>
+{
+	return {
+		changeDisplayName : (displayName) =>
+		{
+			dispatch(stateActions.setDisplayName(displayName));
+		}
+	};
+};
+
+export default withRoomContext(connect(
+	mapStateToProps,
+	mapDispatchToProps,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.settings.displayName === next.settings.displayName
+			);
+		}
+	}
+)(withStyles(styles)(JoinDialog)));

@@ -61,7 +61,36 @@ class Room extends EventEmitter
 		{
 			logger.info('promotePeer() [peer:"%o"]', peer);
 
+			const { peerId } = peer;
+
 			this._peerJoining({ ...peer });
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'promotedPeer', { peerId });
+			});
+		});
+
+		this._lobby.on('lobbyPeerDisplayNameChanged', (peer) =>
+		{
+			const { peerId, displayName } = peer;
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'lobbyPeerDisplayNameChanged', { peerId, displayName });
+			});
+		});
+
+		this._lobby.on('peerClosed', (peer) =>
+		{
+			logger.info('peerClosed() [peer:"%o"]', peer);
+
+			const { peerId } = peer;
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'lobbyPeerClosed', { peerId });
+			});
 		});
 
 		this._chatHistory = [];

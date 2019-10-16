@@ -934,6 +934,26 @@ export default class RoomClient
 			stateActions.setSelectedPeer(peerId));
 	}
 
+	async promoteLobbyPeer(peerId)
+	{
+		logger.debug('promoteLobbyPeer() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			stateActions.setLobbyPeerPromotionInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('promotePeer', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('promoteLobbyPeer() failed: %o', error);
+		}
+
+		store.dispatch(
+			stateActions.setLobbyPeerPromotionInProgress(peerId, false));
+	}
+
 	// type: mic/webcam/screen
 	// mute: true/false
 	async modifyPeerConsumer(peerId, type, mute)
@@ -1243,6 +1263,14 @@ export default class RoomClient
 
 			switch (notification.method)
 			{
+				case 'enteredLobby':
+				{
+					const { displayName } = store.getState().settings;
+
+					await this.sendRequest('changeDisplayName', { displayName });
+					break;
+				}
+
 				case 'roomReady':
 				{
 					await this._joinRoom({ joinVideo });
@@ -1298,6 +1326,21 @@ export default class RoomClient
 					break;
 				}
 
+				case 'lobbyPeerClosed':
+				{
+					const { peerId } = notification.data;
+
+					store.dispatch(
+						stateActions.removeLobbyPeer(peerId));
+
+					store.dispatch(requestActions.notify(
+						{
+							text : 'Participant in lobby left.'
+						}));
+
+					break;
+				}
+
 				case 'promotedPeer':
 				{
 					const { peerId } = notification.data;
@@ -1308,7 +1351,7 @@ export default class RoomClient
 					break;
 				}
 
-				case 'parkedPeerDisplayName':
+				case 'lobbyPeerDisplayNameChanged':
 				{
 					const { peerId, displayName } = notification.data;
 
