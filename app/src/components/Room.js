@@ -150,6 +150,38 @@ const styles = (theme) =>
 		}
 	});
 
+const PulsingBadge = withStyles((theme) =>
+	({
+		badge :
+		{
+			backgroundColor : theme.palette.secondary.main,
+			// boxShadow       : `0 0 0 2px ${theme.palette.secondary.main}`,
+			'&::after'      :
+			{
+				position     : 'absolute',
+				width        : '100%',
+				height       : '100%',
+				borderRadius : '50%',
+				animation    : '$ripple 1.2s infinite ease-in-out',
+				border       : `3px solid ${theme.palette.secondary.main}`,
+				content      : '""'
+			}
+		},
+		'@keyframes ripple' :
+		{
+			'0%' :
+			{
+				transform : 'scale(.8)',
+				opacity   : 1
+			},
+			'100%' :
+			{
+				transform : 'scale(2.4)',
+				opacity   : 0
+			}
+		}
+	}))(Badge);
+
 class Room extends React.PureComponent
 {
 	constructor(props)
@@ -286,7 +318,7 @@ class Room extends React.PureComponent
 						className={room.toolbarsVisible ? classes.show : classes.hide}
 					>
 						<Toolbar>
-							<Badge
+							<PulsingBadge
 								color='secondary'
 								badgeContent={unread}
 							>
@@ -298,7 +330,7 @@ class Room extends React.PureComponent
 								>
 									<MenuIcon />
 								</IconButton>
-							</Badge>
+							</PulsingBadge>
 							{ window.config.logo ?
 								<img alt='Logo' className={classes.logo} src={window.config.logo} />
 								:null

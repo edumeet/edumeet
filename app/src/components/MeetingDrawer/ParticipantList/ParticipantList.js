@@ -90,8 +90,6 @@ class ParticipantList extends React.PureComponent
 					<li className={classes.listheader}>Me:</li>
 					<ListMe />
 				</ul>
-				<br />
-
 				{ lobbyPeers.length > 0 ?
 					<ul className={classes.list}>
 						<li className={classes.listheader}>Participants in Lobby:</li>
@@ -106,8 +104,6 @@ class ParticipantList extends React.PureComponent
 					</ul>
 					:null
 				}
-
-				<br />
 				<ul className={classes.list}>
 					<li className={classes.listheader}>Participants in Spotlight:</li>
 					{ spotlightPeers.map((peer) => (
@@ -124,7 +120,6 @@ class ParticipantList extends React.PureComponent
 						</li>
 					))}
 				</ul>
-				<br />
 				<ul className={classes.list}>
 					<li className={classes.listheader}>Passive Participants:</li>
 					{ passivePeers.map((peerId) => (
