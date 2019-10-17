@@ -16,7 +16,7 @@ class Lobby extends EventEmitter
 		// Closed flag.
 		this._closed = false;
 
-		this._peers = new Map();
+		this._peers = {};
 	}
 
 	close()
@@ -25,49 +25,42 @@ class Lobby extends EventEmitter
 
 		this._closed = true;
 
-		// Close the peers
-		if (this._peers)
+		Object.values(this._peers).forEach((peer) =>
 		{
-			this._peers.forEach((peer) =>
-			{
-				if (peer.socket)
-					peer.socket.disconnect();
-			});
-		}
+			if (peer.socket)
+				peer.socket.disconnect();
+		});
 
-		this._peers.clear();
+		this._peers = {};
 	}
 
 	peerList()
 	{
 		logger.info('peerList()');
 
-		return this._peers;
+		return Object.values(this._peers).map((peer) => ({ peerId: peer.peerId, displayName: peer.displayName }));
 	}
 
 	promoteAllPeers()
 	{
 		logger.info('promoteAllPeers()');
 
-		if (this._peers)
+		Object.values(this._peers).forEach((peer) =>
 		{
-			this._peers.forEach((peer) =>
-			{
-				if (peer.socket)
-					this.promotePeer(peer.peerId);
-			});
-		}
+			if (peer.socket)
+				this.promotePeer(peer.peerId);
+		});
 	}
 
 	promotePeer(peerId)
 	{
 		logger.info('promotePeer() [peerId: %s]', peerId);
 
-		const peer = this._peers.get(peerId);
+		const peer = this._peers[peerId];
 
 		this.emit('promotePeer', peer);
 
-		this._peers.delete(peerId);
+		delete this._peers[peerId];
 	}
 
 	parkPeer({ peerId, consume, socket })
@@ -78,7 +71,7 @@ class Lobby extends EventEmitter
 
 		socket.emit('notification', { method: 'enteredLobby', data: {} });
 
-		this._peers.set(peerId, peer);
+		this._peers[peerId] = peer;
 
 		socket.on('request', (request, cb) =>
 		{
@@ -104,7 +97,7 @@ class Lobby extends EventEmitter
 
 			this.emit('peerClosed', peer);
 
-			this._peers.delete(peer.peerId);
+			delete this._peers[peer.peerId];
 		});
 	}
 

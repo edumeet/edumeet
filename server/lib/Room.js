@@ -65,7 +65,7 @@ class Room extends EventEmitter
 
 			this._peerJoining({ ...peer });
 
-			this._peers.forEach((peer) =>
+			Object.values(this._peers).forEach((peer) =>
 			{
 				this._notification(peer.socket, 'promotedPeer', { peerId });
 			});
@@ -75,7 +75,7 @@ class Room extends EventEmitter
 		{
 			const { peerId, displayName } = peer;
 
-			this._peers.forEach((peer) =>
+			Object.values(this._peers).forEach((peer) =>
 			{
 				this._notification(peer.socket, 'lobbyPeerDisplayNameChanged', { peerId, displayName });
 			});
@@ -87,7 +87,7 @@ class Room extends EventEmitter
 
 			const { peerId } = peer;
 
-			this._peers.forEach((peer) =>
+			Object.values(this._peers).forEach((peer) =>
 			{
 				this._notification(peer.socket, 'lobbyPeerClosed', { peerId });
 			});
@@ -99,9 +99,7 @@ class Room extends EventEmitter
 
 		this._lastN = [];
 
-		// this._io = io;
-
-		this._peers = new Map();
+		this._peers = {};
 
 		// mediasoup Router instance.
 		// @type {mediasoup.Router}
@@ -121,7 +119,7 @@ class Room extends EventEmitter
 			//	producer.id, volume);
 
 			// Notify all Peers.
-			this._peers.forEach((peer) =>
+			Object.values(this._peers).forEach((peer) =>
 			{
 				this._notification(peer.socket, 'activeSpeaker', {
 					peerId : producer.appData.peerId,
@@ -135,7 +133,7 @@ class Room extends EventEmitter
 			// logger.debug('audioLevelObserver "silence" event');
 
 			// Notify all Peers.
-			this._peers.forEach((peer) =>
+			Object.values(this._peers).forEach((peer) =>
 			{
 				this._notification(peer.socket, 'activeSpeaker', { peerId : null });
 			});
@@ -162,7 +160,7 @@ class Room extends EventEmitter
 		// Close the peers
 		if (this._peers)
 		{
-			this._peers.forEach((peer) =>
+			Object.values(this._peers).forEach((peer) =>
 			{
 				if (peer.socket)
 					peer.socket.disconnect();
@@ -192,23 +190,23 @@ class Room extends EventEmitter
 		logger.info('handleConnection() [peerId:"%s"]', peerId);
 
 		// This will allow reconnects to join despite lock
-		if (this._peers.has(peerId))
+		if (this._peers[peerId])
 		{
 			logger.warn(
 				'handleConnection() | there is already a peer with same peerId, ' +
 				'closing the previous one [peerId:"%s"]',
 				peerId);
 
-			const peer = this._peers.get(peerId);
+			const peer = this._peers[peerId];
 
 			peer.socket.disconnect();
-			this._peers.delete(peerId);
+			delete this._peers[peerId];
 		}
 		else if (this._locked) // Don't allow connections to a locked room
 		{
 			this._lobby.parkPeer({ peerId, consume, socket });
 
-			this._peers.forEach((peer) =>
+			Object.values(this._peers).forEach((peer) =>
 			{
 				this._notification(peer.socket, 'parkedPeer', { peerId });
 			});
@@ -232,7 +230,7 @@ class Room extends EventEmitter
 			this._lastN.push(peerId);
 		}
 
-		this._peers.set(peerId, peer);
+		this._peers[peerId] = peer;
 
 		this._handlePeer({ peer, consume });
 		this._notification(socket, 'roomReady');
@@ -253,7 +251,7 @@ class Room extends EventEmitter
 			picture
 		} = data;
 
-		const peer = this._peers.get(peerId);
+		const peer = this._peers[peerId];
 
 		if (peer)
 		{
@@ -326,7 +324,7 @@ class Room extends EventEmitter
 				transport.close();
 			}
 
-			this._peers.delete(peer.id);
+			delete this._peers[peer.id];
 
 			// If this is the latest Peer in the room, close the room after a while.
 			if (this._peers.size === 0)
@@ -385,7 +383,7 @@ class Room extends EventEmitter
 
 				const peerInfos = [];
 
-				this._peers.forEach((joinedPeer) =>
+				Object.values(this._peers).forEach((joinedPeer) =>
 				{
 					if (joinedPeer.data.joined)
 					{
@@ -548,7 +546,7 @@ class Room extends EventEmitter
 
 				cb(null, { id: producer.id });
 
-				this._peers.forEach((otherPeer) =>
+				Object.values(this._peers).forEach((otherPeer) =>
 				{
 					if (otherPeer.data.joined && otherPeer !== peer)
 					{
@@ -817,12 +815,15 @@ class Room extends EventEmitter
 			case 'serverHistory':
 			{
 				// Return to sender
+				const lobbyPeers = this._lobby.peerList();
 				cb(
 					null,
 					{
 						chatHistory : this._chatHistory,
 						fileHistory : this._fileHistory,
-						lastN       : this._lastN
+						lastN       : this._lastN,
+						locked      : this._locked,
+						lobbyPeers  : lobbyPeers
 					}
 				);
 

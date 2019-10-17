@@ -607,7 +607,9 @@ export default class RoomClient
 			const {
 				chatHistory,
 				fileHistory,
-				lastN
+				lastN,
+				locked,
+				lobbyPeers
 			} = await this.sendRequest('serverHistory');
 
 			if (chatHistory.length > 0)
@@ -634,6 +636,23 @@ export default class RoomClient
 				lastN.splice(index, 1);
 
 				this._spotlights.addSpeakerList(lastN);
+			}
+
+			locked ? 
+				store.dispatch(stateActions.setRoomLocked()) :
+				store.dispatch(stateActions.setRoomUnLocked());
+
+			if (lobbyPeers.length > 0)
+			{
+				logger.debug('Got lobby peers');
+
+				lobbyPeers.forEach((peer) =>
+				{
+					store.dispatch(
+						stateActions.addLobbyPeer(peer.peerId));
+					store.dispatch(
+						stateActions.setLobbyPeerDisplayName(peer.displayName));
+				});
 			}
 		}
 		catch (error)
