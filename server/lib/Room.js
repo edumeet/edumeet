@@ -260,6 +260,10 @@ class Room extends EventEmitter
 				picture     : picture
 			});
 		}
+		else if (this._lobby.hasPeer(peerId))
+		{
+			this._lobby.authCallback(data, this._locked);
+		}
 	}
 
 	_handlePeer({ peer, consume })

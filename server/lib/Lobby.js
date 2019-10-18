@@ -34,11 +34,42 @@ class Lobby extends EventEmitter
 		this._peers = {};
 	}
 
+	authCallback(data, roomLocked)
+	{
+		logger.debug('authCallback() | [data:"%o", roomLocked:"%s"]', data, roomLocked);
+
+		const {
+			peerId,
+			displayName,
+			picture
+		} = data;
+
+		const peer = this._peers[peerId];
+
+		if (peer)
+		{
+			this._notification(peer.socket, 'auth', {
+				displayName : displayName,
+				picture     : picture
+			});
+
+			if (!roomLocked)
+			{
+				this.promotePeer(peerId);
+			}
+		}
+	}
+
 	peerList()
 	{
 		logger.info('peerList()');
 
 		return Object.values(this._peers).map((peer) => ({ peerId: peer.peerId, displayName: peer.displayName }));
+	}
+
+	hasPeer(peerId)
+	{
+		return Boolean(this._peers[peerId]);
 	}
 
 	promoteAllPeers()
@@ -58,9 +89,12 @@ class Lobby extends EventEmitter
 
 		const peer = this._peers[peerId];
 
-		this.emit('promotePeer', peer);
+		if (peer)
+		{
+			this.emit('promotePeer', peer);
 
-		delete this._peers[peerId];
+			delete this._peers[peerId];
+		}
 	}
 
 	parkPeer({ peerId, consume, socket })
@@ -117,6 +151,20 @@ class Lobby extends EventEmitter
 
 				break;
 			}
+		}
+	}
+
+	_notification(socket, method, data = {}, broadcast = false)
+	{
+		if (broadcast)
+		{
+			socket.broadcast.to(this._roomId).emit(
+				'notification', { method, data }
+			);
+		}
+		else
+		{
+			socket.emit('notification', { method, data });
 		}
 	}
 }

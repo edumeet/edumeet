@@ -20,6 +20,12 @@ const base64 = require('base-64');
 const passport = require('passport');
 const { Issuer, Strategy } = require('openid-client');
 const session = require('express-session');
+const passportSocketIo = require('passport.socketio');
+const cookieParser = require('cookie-parser');
+// Session storage
+const redis = require('redis');
+const RedisStore = require('connect-redis')(session);
+const redisClient = redis.createClient();
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -48,6 +54,8 @@ const tls =
 	cert : fs.readFileSync(config.tls.cert),
 	key  : fs.readFileSync(config.tls.key)
 };
+
+const sessionStore = new RedisStore({ client: redisClient });
 
 const app = express();
 let httpsServer;
@@ -202,6 +210,7 @@ async function setupAuth(oidcIssuer)
 		secret            : config.cookieSecret,
 		resave            : true,
 		saveUninitialized : true,
+		store             : sessionStore,
 		cookie            : { secure: true }
 	}));
 
@@ -213,9 +222,8 @@ async function setupAuth(oidcIssuer)
 	{
 		passport.authenticate('oidc', {
 			state : base64.encode(JSON.stringify({
-				roomId : req.query.roomId,
-				peerId : req.query.peerId,
-				code   : utils.random(10)
+				id   : req.query.id,
+				code : utils.random(10)
 			}))
 		})(req, res, next);
 	});
@@ -235,39 +243,37 @@ async function setupAuth(oidcIssuer)
 		{
 			const state = JSON.parse(base64.decode(req.query.state));
 
-			if (rooms.has(state.roomId))
+			let displayName;
+			let photo;
+
+			if (req.user != null)
 			{
-				let displayName;
-				let photo;
+				if (req.user.displayName != null)
+					displayName = req.user.displayName;
+				else
+					displayName = '';
 
-				if (req.user != null)
+				if (
+					req.user.Photos != null &&
+					req.user.Photos[0] != null &&
+					req.user.Photos[0].value != null
+				)
+					photo = req.user.Photos[0].value;
+				else
+					photo = '/static/media/buddy.403cb9f6.svg';
+			}
+
+			// const room = rooms.get(state.roomId);
+
+			io.sockets.socket(state.id).emit('notification',
+			{
+				method: 'auth',
+				data :
 				{
-					if (req.user.displayName != null)
-						displayName = req.user.displayName;
-					else
-						displayName = '';
-
-					if (
-						req.user.Photos != null &&
-						req.user.Photos[0] != null &&
-						req.user.Photos[0].value != null
-					)
-						photo = req.user.Photos[0].value;
-					else
-						photo = '/static/media/buddy.403cb9f6.svg';
-				}
-
-				const data =
-				{
-					peerId      : state.peerId,
 					displayName : displayName,
 					picture     : photo
-				};
-
-				const room = rooms.get(state.roomId);
-
-				room.authCallback(data);
-			}
+				}
+			});
 
 			res.send('');
 		}
@@ -321,6 +327,13 @@ async function runHttpsServer()
 async function runWebSocketServer()
 {
 	const io = require('socket.io')(httpsServer);
+
+	io.use(passportSocketIo.authorize({
+		secret       : config.cookieSecret,
+		passport     : passport,
+		cookieParser : cookieParser,
+		store        : sessionStore,
+	}));
 
 	// Handle connections from clients.
 	io.on('connection', (socket) =>
