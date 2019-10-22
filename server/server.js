@@ -19,19 +19,19 @@ const base64 = require('base-64');
 // auth
 const passport = require('passport');
 const { Issuer, Strategy } = require('openid-client');
-const session = require('express-session');
-const passportSocketIo = require('passport.socketio');
-const cookieParser = require('cookie-parser');
-// Session storage
-const redis = require('redis');
-const RedisStore = require('connect-redis')(session);
-const redisClient = redis.createClient();
+const session = require('express-session')({
+	secret            : config.cookieSecret,
+	resave            : true,
+	saveUninitialized : true,
+	cookie            : { secure: true }
+});
+const sharedSession = require('express-socket.io-session');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
 console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
 console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
-/* eslint-enable no-console */
+/* eslint-enable nopassportSocketIo-console */
 
 const logger = new Logger();
 
@@ -55,9 +55,10 @@ const tls =
 	key  : fs.readFileSync(config.tls.key)
 };
 
-const sessionStore = new RedisStore({ client: redisClient });
-
 const app = express();
+
+app.use(session);
+
 let httpsServer;
 let oidcClient;
 let oidcStrategy;
@@ -76,13 +77,13 @@ const auth = config.auth;
 
 async function run()
 {
-	if ( 
+	if (
 		typeof(auth) !== 'undefined' &&
 		typeof(auth.issuerURL) !== 'undefined' &&
 		typeof(auth.clientOptions) !== 'undefined'
 	)
 	{
-		Issuer.discover(auth.issuerURL).then( async (oidcIssuer) => 
+		Issuer.discover(auth.issuerURL).then(async (oidcIssuer) => 
 		{
 			// Setup authentication
 			await setupAuth(oidcIssuer);
@@ -96,10 +97,10 @@ async function run()
 			// Run WebSocketServer.
 			await runWebSocketServer();
 		})
-			.catch((err) =>
-			{ 
-				logger.error(err); 
-			});
+		.catch((err) =>
+		{
+			logger.error(err);
+		});
 	}
 	else
 	{
@@ -206,18 +207,10 @@ async function setupAuth(oidcIssuer)
 
 	passport.use('oidc', oidcStrategy);
 
-	app.use(session({
-		secret            : config.cookieSecret,
-		resave            : true,
-		saveUninitialized : true,
-		store             : sessionStore,
-		cookie            : { secure: true }
-	}));
-
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	// login
+	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
 		passport.authenticate('oidc', {
@@ -328,12 +321,11 @@ async function runWebSocketServer()
 {
 	const io = require('socket.io')(httpsServer);
 
-	io.use(passportSocketIo.authorize({
-		secret       : config.cookieSecret,
-		passport     : passport,
-		cookieParser : cookieParser,
-		store        : sessionStore,
-	}));
+	io.use(
+		sharedSession(session, {
+			autoSave: true
+		})
+	);
 
 	// Handle connections from clients.
 	io.on('connection', (socket) =>
