@@ -305,7 +305,7 @@ export default class RoomClient
 
 	login()
 	{
-		const url = `/auth/login?id=${this._signalingSocket.io.engine.id}`;
+		const url = `/auth/login?id=${this._signalingSocket.io.engine.id}&roomId=${this._roomId}&peerId=${this._peerId}`;
 
 		this._loginWindow = window.open(url, 'loginWindow');
 	}

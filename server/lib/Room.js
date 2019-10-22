@@ -179,9 +179,9 @@ class Room extends EventEmitter
 	logStatus()
 	{
 		logger.info(
-			'logStatus() [room id:"%s", peers:%s]',
+			'logStatus() [room id:"%s", peers:%o]',
 			this._roomId,
-			this._peers.size
+			this._peers
 		);
 	}
 
@@ -241,28 +241,16 @@ class Room extends EventEmitter
 		return this._locked;
 	}
 
-	authCallback(data)
+	peerAuthenticated(peerid)
 	{
-		logger.debug('authCallback()');
+		logger.debug('peerAuthenticated() | [peerId:"%s"]', peerId);
 
-		const {
-			peerId,
-			displayName,
-			picture
-		} = data;
-
-		const peer = this._peers[peerId];
-
-		if (peer)
+		if (!this._locked)
 		{
-			this._notification(peer.socket, 'auth', {
-				displayName : displayName,
-				picture     : picture
-			});
-		}
-		else if (this._lobby.hasPeer(peerId))
-		{
-			this._lobby.authCallback(data, this._locked);
+			if (!Boolean(this._peers[peerid]))
+			{
+				this._lobby.promotePeer(peerId);
+			}
 		}
 	}
 

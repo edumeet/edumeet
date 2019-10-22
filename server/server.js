@@ -215,8 +215,10 @@ async function setupAuth(oidcIssuer)
 	{
 		passport.authenticate('oidc', {
 			state : base64.encode(JSON.stringify({
-				id   : req.query.id,
-				code : utils.random(10)
+				id     : req.query.id,
+				roomId : req.query.roomId,
+				peerId : req.query.peerId,
+				code   : utils.random(10)
 			}))
 		})(req, res, next);
 	});
@@ -256,7 +258,9 @@ async function setupAuth(oidcIssuer)
 					photo = '/static/media/buddy.403cb9f6.svg';
 			}
 
-			// const room = rooms.get(state.roomId);
+			const room = rooms.get(state.roomId);
+
+			room.peerAuthenticated(state.peerId);
 
 			io.sockets.socket(state.id).emit('notification',
 			{
@@ -315,7 +319,7 @@ async function runHttpsServer()
 }
 
 /**
- * Create a protoo WebSocketServer to allow WebSocket connections from browsers.
+ * Create a WebSocketServer to allow WebSocket connections from browsers.
  */
 async function runWebSocketServer()
 {

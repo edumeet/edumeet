@@ -34,32 +34,6 @@ class Lobby extends EventEmitter
 		this._peers = {};
 	}
 
-	authCallback(data, roomLocked)
-	{
-		logger.debug('authCallback() | [data:"%o", roomLocked:"%s"]', data, roomLocked);
-
-		const {
-			peerId,
-			displayName,
-			picture
-		} = data;
-
-		const peer = this._peers[peerId];
-
-		if (peer)
-		{
-			this._notification(peer.socket, 'auth', {
-				displayName : displayName,
-				picture     : picture
-			});
-
-			if (!roomLocked)
-			{
-				this.promotePeer(peerId);
-			}
-		}
-	}
-
 	peerList()
 	{
 		logger.info('peerList()');
