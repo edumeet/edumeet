@@ -7,12 +7,15 @@ const fs = require('fs');
 const http = require('http');
 const spdy = require('spdy');
 const express = require('express');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const base64 = require('base-64');
+const helmet = require('helmet');
 // auth
 const passport = require('passport');
 const { Issuer, Strategy } = require('openid-client');
@@ -49,19 +52,23 @@ const tls =
 
 const app = express();
 
+app.use(helmet.hsts());
+
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 const session = expressSession({
 	secret            : config.cookieSecret,
 	resave            : true,
 	saveUninitialized : true,
-	cookie            : { secure: true }
+	cookie            : {
+		secure   : true,
+		httpOnly : true
+	}
 });
 
 app.use(session);
-
-let httpsServer;
-let io;
-let oidcClient;
-let oidcStrategy;
 
 passport.serializeUser((user, done) =>
 {
@@ -72,6 +79,11 @@ passport.deserializeUser((user, done) =>
 {
 	done(null, user);
 });
+
+let httpsServer;
+let io;
+let oidcClient;
+let oidcStrategy;
 
 const auth = config.auth;
 
@@ -261,15 +273,20 @@ async function setupAuth(oidcIssuer)
 
 			room.peerAuthenticated(state.peerId);
 
-			io.sockets.socket(state.id).emit('notification',
-				{
-					method : 'auth',
-					data   :
+			const socket = io.sockets.socket(state.id);
+
+			if (socket)
+			{
+				socket.emit('notification',
 					{
-						displayName : displayName,
-						picture     : photo
-					}
-				});
+						method : 'auth',
+						data   :
+						{
+							displayName : displayName,
+							picture     : photo
+						}
+					});
+			}
 
 			res.send('');
 		}
@@ -334,6 +351,8 @@ async function runWebSocketServer()
 	io.on('connection', (socket) =>
 	{
 		const { roomId, peerId } = socket.handshake.query;
+
+		logger.info('socket.io "connection" | [session:"%o"]', socket.handshake.session);
 
 		if (!roomId || !peerId)
 		{
