@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
@@ -58,6 +58,28 @@ const JoinDialog = ({
 	classes
 }) =>
 {
+	const [ localDisplayName, setLocalDisplayName ] = useState(displayName);
+
+	const handleKeyDown = (event) =>
+	{
+		const { key } = event;
+
+		switch (key)
+		{
+			case 'Enter':
+			case 'Escape':
+			{
+				if (localDisplayName !== '') // Don't allow empty displayName
+					changeDisplayName(localDisplayName);
+				else
+					setLocalDisplayName(displayName);
+				break;
+			}
+			default:
+				break;
+		}
+	};
+
 	return (
 		<div className={classes.root}>
 			<Dialog
@@ -69,21 +91,30 @@ const JoinDialog = ({
 				{ window.config.logo &&
 					<img alt='Logo' className={classes.logo} src={window.config.logo} />
 				}
-				<Typography variant='subtitle1'>
+				<Typography variant='h2' align='center'>
+					Welcome
+				</Typography>
+				<Typography variant='h6'>
 					You are about to join a meeting.
-					Set your name that others will see,
-					and chose how you want to join?
+					Set the name that others will see,
+					and choose how you want to join?
 				</Typography>
 				<TextField
 					id='displayname'
-					label='Name'
+					label='Your name'
 					className={classes.textField}
-					value={displayName}
+					value={localDisplayName}
 					onChange={(event) =>
 					{
 						const { value } = event.target;
 
-						changeDisplayName(value);
+						setLocalDisplayName(value);
+					}}
+					onKeyDown={handleKeyDown}
+					onBlur={() =>
+					{
+						if (localDisplayName !== displayName)
+							changeDisplayName(localDisplayName);
 					}}
 					margin='normal'
 				/>
@@ -94,6 +125,17 @@ const JoinDialog = ({
 							roomClient.join({ joinVideo: false });
 						}}
 						variant='contained'
+						color='secondary'
+					>
+						Sign in
+					</Button>
+					<Button
+						onClick={() =>
+						{
+							roomClient.join({ joinVideo: false });
+						}}
+						variant='contained'
+						color='secondary'
 					>
 						Audio only
 					</Button>
@@ -103,6 +145,7 @@ const JoinDialog = ({
 							roomClient.join({ joinVideo: true });
 						}}
 						variant='contained'
+						color='secondary'
 					>
 						Audio and Video
 					</Button>

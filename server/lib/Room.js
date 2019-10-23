@@ -1,5 +1,3 @@
-'use strict';
-
 const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
@@ -23,7 +21,7 @@ class Room extends EventEmitter
 		logger.info('create() [roomId:%s, forceH264:%s]', roomId);
 
 		// Router media codecs.
-		let mediaCodecs = config.mediasoup.router.mediaCodecs;
+		const mediaCodecs = config.mediasoup.router.mediaCodecs;
 
 		// Create a mediasoup Router.
 		const mediasoupRouter = await mediasoupWorker.createRouter({ mediaCodecs });
@@ -58,18 +56,19 @@ class Room extends EventEmitter
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;
 
-		// access code to the room, applicable if ( _locked == true and _joinByAccessCode == true )
+		// access code to the room,
+		// applicable if ( _locked == true and _joinByAccessCode == true )
 		this._accessCode = '';
 
 		this._lobby = new Lobby();
 
-		this._lobby.on('promotePeer', (peer) =>
+		this._lobby.on('promotePeer', (promotedPeer) =>
 		{
-			logger.info('promotePeer() [peer:"%o"]', peer);
+			logger.info('promotePeer() [promotedPeer:"%o"]', promotedPeer);
 
-			const { peerId } = peer;
+			const { peerId } = promotedPeer;
 
-			this._peerJoining({ ...peer });
+			this._peerJoining({ ...promotedPeer });
 
 			Object.values(this._peers).forEach((peer) =>
 			{
@@ -77,9 +76,9 @@ class Room extends EventEmitter
 			});
 		});
 
-		this._lobby.on('lobbyPeerDisplayNameChanged', (peer) =>
+		this._lobby.on('lobbyPeerDisplayNameChanged', (changedPeer) =>
 		{
-			const { peerId, displayName } = peer;
+			const { peerId, displayName } = changedPeer;
 
 			Object.values(this._peers).forEach((peer) =>
 			{
@@ -87,11 +86,11 @@ class Room extends EventEmitter
 			});
 		});
 
-		this._lobby.on('peerClosed', (peer) =>
+		this._lobby.on('peerClosed', (closedPeer) =>
 		{
-			logger.info('peerClosed() [peer:"%o"]', peer);
+			logger.info('peerClosed() [closedPeer:"%o"]', closedPeer);
 
-			const { peerId } = peer;
+			const { peerId } = closedPeer;
 
 			Object.values(this._peers).forEach((peer) =>
 			{
@@ -141,7 +140,7 @@ class Room extends EventEmitter
 			// Notify all Peers.
 			Object.values(this._peers).forEach((peer) =>
 			{
-				this._notification(peer.socket, 'activeSpeaker', { peerId : null });
+				this._notification(peer.socket, 'activeSpeaker', { peerId: null });
 			});
 		});
 
@@ -223,7 +222,7 @@ class Room extends EventEmitter
 	{
 		socket.join(this._roomId);
 
-		const peer = { id : peerId, socket : socket };
+		const peer = { id: peerId, socket: socket };
 
 		const index = this._lastN.indexOf(peerId);
 
@@ -243,13 +242,13 @@ class Room extends EventEmitter
 		return this._locked;
 	}
 
-	peerAuthenticated(peerid)
+	peerAuthenticated(peerId)
 	{
 		logger.debug('peerAuthenticated() | [peerId:"%s"]', peerId);
 
 		if (!this._locked)
 		{
-			if (!Boolean(this._peers[peerid]))
+			if (!this._peers[peerId])
 			{
 				this._lobby.promotePeer(peerId);
 			}
@@ -810,15 +809,16 @@ class Room extends EventEmitter
 			{
 				// Return to sender
 				const lobbyPeers = this._lobby.peerList();
+
 				cb(
 					null,
 					{
-						chatHistory : this._chatHistory,
-						fileHistory : this._fileHistory,
-						lastN       : this._lastN,
-						locked      : this._locked,
-						lobbyPeers  : lobbyPeers,
-						accessCode  : this._accessCode
+						chatHistory  : this._chatHistory,
+						fileHistory  : this._fileHistory,
+						lastNHistory : this._lastN,
+						locked       : this._locked,
+						lobbyPeers   : lobbyPeers,
+						accessCode   : this._accessCode
 					}
 				);
 
@@ -867,7 +867,7 @@ class Room extends EventEmitter
 					peerId     : peer.id,
 					accessCode : accessCode
 				}, true);
-				//}
+				// }
 
 				// Return no error
 				cb();
@@ -883,7 +883,7 @@ class Room extends EventEmitter
 
 				// Spread to others
 				this._notification(peer.socket, 'setJoinByAccessCode', {
-					peerId     : peer.id,
+					peerId           : peer.id,
 					joinByAccessCode : joinByAccessCode
 				}, true);
 
@@ -892,7 +892,6 @@ class Room extends EventEmitter
 
 				break;
 			}
-	
 
 			case 'promotePeer':
 			{
@@ -1080,7 +1079,6 @@ class Room extends EventEmitter
 					kind           : producer.kind,
 					producerId     : producer.id,
 					id             : consumer.id,
-					kind           : consumer.kind,
 					rtpParameters  : consumer.rtpParameters,
 					type           : consumer.type,
 					appData        : producer.appData,

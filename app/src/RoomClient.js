@@ -610,61 +610,44 @@ export default class RoomClient
 			const {
 				chatHistory,
 				fileHistory,
-				lastN,
+				lastNHistory,
 				locked,
 				lobbyPeers,
 				accessCode
 			} = await this.sendRequest('serverHistory');
 
-			if (chatHistory.length > 0)
-			{
-				logger.debug('Got chat history');
-				store.dispatch(
-					stateActions.addChatHistory(chatHistory));
-			}
+			(chatHistory.length > 0) && store.dispatch(
+				stateActions.addChatHistory(chatHistory));
 
-			if (fileHistory.length > 0)
-			{
-				logger.debug('Got files history');
+			(fileHistory.length > 0) && store.dispatch(
+				stateActions.addFileHistory(fileHistory));
 
-				store.dispatch(stateActions.addFileHistory(fileHistory));
-			}
-
-			if (lastN.length > 0)
+			if (lastNHistory.length > 0)
 			{
-				logger.debug('Got lastN');
+				logger.debug('Got lastNHistory');
 
 				// Remove our self from list
-				const index = lastN.indexOf(this._peerId);
+				const index = lastNHistory.indexOf(this._peerId);
 
-				lastN.splice(index, 1);
+				lastNHistory.splice(index, 1);
 
-				this._spotlights.addSpeakerList(lastN);
+				this._spotlights.addSpeakerList(lastNHistory);
 			}
 
 			locked ? 
 				store.dispatch(stateActions.setRoomLocked()) :
 				store.dispatch(stateActions.setRoomUnLocked());
 
-			if (lobbyPeers.length > 0)
+			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
 			{
-				logger.debug('Got lobby peers');
+				store.dispatch(
+					stateActions.addLobbyPeer(peer.peerId));
+				store.dispatch(
+					stateActions.setLobbyPeerDisplayName(peer.displayName));
+			});
 
-				lobbyPeers.forEach((peer) =>
-				{
-					store.dispatch(
-						stateActions.addLobbyPeer(peer.peerId));
-					store.dispatch(
-						stateActions.setLobbyPeerDisplayName(peer.displayName));
-				});
-			}
-
-			if (accessCode != null)
-			{
-				logger.debug('Got accessCode');
-
-				store.dispatch(stateActions.setAccessCode(accessCode))
-			}
+			(accessCode != null) && store.dispatch(
+				stateActions.setAccessCode(accessCode));
 		}
 		catch (error)
 		{

@@ -29,7 +29,8 @@ export default class PeerAudio extends React.PureComponent
 		this._setTrack(audioTrack);
 	}
 
-	componentWillReceiveProps(nextProps)
+	// eslint-disable-next-line camelcase
+	UNSAFE_componentWillReceiveProps(nextProps)
 	{
 		const { audioTrack } = nextProps;
 
