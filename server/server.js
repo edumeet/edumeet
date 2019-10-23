@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 process.title = 'multiparty-meeting-server';
 
 const config = require('./config/config');
@@ -14,7 +12,6 @@ const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
-const utils = require('./util');
 const base64 = require('base-64');
 // auth
 const passport = require('passport');
@@ -26,7 +23,7 @@ const sharedSession = require('express-socket.io-session');
 console.log('- process.env.DEBUG:', process.env.DEBUG);
 console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
 console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
-/* eslint-enable nopassportSocketIo-console */
+/* eslint-enable no-console */
 
 const logger = new Logger();
 
@@ -57,11 +54,12 @@ const session = expressSession({
 	resave            : true,
 	saveUninitialized : true,
 	cookie            : { secure: true }
-})
+});
 
 app.use(session);
 
 let httpsServer;
+let io;
 let oidcClient;
 let oidcStrategy;
 
@@ -99,10 +97,10 @@ async function run()
 			// Run WebSocketServer.
 			await runWebSocketServer();
 		})
-		.catch((err) =>
-		{
-			logger.error(err);
-		});
+			.catch((err) =>
+			{
+				logger.error(err);
+			});
 	}
 	else
 	{
@@ -228,8 +226,7 @@ async function setupAuth(oidcIssuer)
 			state : base64.encode(JSON.stringify({
 				id     : req.query.id,
 				roomId : req.query.roomId,
-				peerId : req.query.peerId,
-				code   : utils.random(10)
+				peerId : req.query.peerId
 			}))
 		})(req, res, next);
 	});
@@ -274,14 +271,14 @@ async function setupAuth(oidcIssuer)
 			room.peerAuthenticated(state.peerId);
 
 			io.sockets.socket(state.id).emit('notification',
-			{
-				method: 'auth',
-				data :
 				{
-					displayName : displayName,
-					picture     : photo
-				}
-			});
+					method : 'auth',
+					data   :
+					{
+						displayName : displayName,
+						picture     : photo
+					}
+				});
 
 			res.send('');
 		}
@@ -334,11 +331,11 @@ async function runHttpsServer()
  */
 async function runWebSocketServer()
 {
-	const io = require('socket.io')(httpsServer);
+	io = require('socket.io')(httpsServer);
 
 	io.use(
 		sharedSession(session, {
-			autoSave: true
+			autoSave : true
 		})
 	);
 
@@ -365,14 +362,14 @@ async function runWebSocketServer()
 
 			room.handleConnection({ peerId, socket });
 		})
-		.catch((error) =>
-		{
-			logger.error('room creation or room joining failed:%o', error);
+			.catch((error) =>
+			{
+				logger.error('room creation or room joining failed:%o', error);
 
-			socket.disconnect(true);
+				socket.disconnect(true);
 
-			return;
-		});
+				return;
+			});
 	});
 }
 

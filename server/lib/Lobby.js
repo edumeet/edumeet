@@ -1,5 +1,3 @@
-'use strict';
-
 const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
 
@@ -46,7 +44,11 @@ class Lobby extends EventEmitter
 	{
 		logger.info('peerList()');
 
-		return Object.values(this._peers).map((peer) => ({ peerId: peer.peerId, displayName: peer.displayName }));
+		return Object.values(this._peers).map((peer) =>
+			({
+				peerId      : peer.peerId,
+				displayName : peer.displayName 
+			}));
 	}
 
 	hasPeer(peerId)

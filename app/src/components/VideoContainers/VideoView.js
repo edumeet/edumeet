@@ -221,7 +221,7 @@ class VideoView extends React.PureComponent
 					ref='video'
 					className={classnames(classes.video, {
 						hidden  : !videoVisible,
-						'isMe' : isMe && !isScreen,
+						'isMe'  : isMe && !isScreen,
 						loading : videoProfile === 'none',
 						contain : videoContain
 					})}
@@ -247,7 +247,8 @@ class VideoView extends React.PureComponent
 		clearInterval(this._videoResolutionTimer);
 	}
 
-	componentWillReceiveProps(nextProps)
+	// eslint-disable-next-line camelcase
+	UNSAFE_componentWillReceiveProps(nextProps)
 	{
 		const { videoTrack } = nextProps;
 
