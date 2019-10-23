@@ -19,12 +19,7 @@ const base64 = require('base-64');
 // auth
 const passport = require('passport');
 const { Issuer, Strategy } = require('openid-client');
-const session = require('express-session')({
-	secret            : config.cookieSecret,
-	resave            : true,
-	saveUninitialized : true,
-	cookie            : { secure: true }
-});
+const expressSession = require('express-session');
 const sharedSession = require('express-socket.io-session');
 
 /* eslint-disable no-console */
@@ -56,6 +51,13 @@ const tls =
 };
 
 const app = express();
+
+const session = expressSession({
+	secret            : config.cookieSecret,
+	resave            : true,
+	saveUninitialized : true,
+	cookie            : { secure: true }
+})
 
 app.use(session);
 

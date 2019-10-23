@@ -13,7 +13,6 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Hidden from '@material-ui/core/Hidden';
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -34,7 +33,6 @@ import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import Button from '@material-ui/core/Button';
 import Settings from './Settings/Settings';
-import JoinDialog from './JoinDialog';
 
 const TIMEOUT = 10 * 1000;
 
@@ -277,172 +275,139 @@ class Room extends React.PureComponent
 			democratic : Democratic
 		}[room.mode];
 
-		if (room.lockedOut)
-		{
-			return (
-				<div className={classes.root}>
-					<Paper className={classes.message}>
-						<Typography variant='h2'>This room is locked at the moment, try again later.</Typography>
-					</Paper>
-				</div>
-			);
-		}
-		else if (!room.joined)
-		{
-			return (
-				<div className={classes.root}>
-					<JoinDialog />
-				</div>
-			);
-		}
-		else
-		{
-			return (
-				<div className={classes.root}>
-					<CookieConsent>
-						This website uses cookies to enhance the user experience.
-					</CookieConsent>
+		return (
+			<div className={classes.root}>
+				<CookieConsent>
+					This website uses cookies to enhance the user experience.
+				</CookieConsent>
 
-					<FullScreenView advancedMode={advancedMode} />
+				<FullScreenView advancedMode={advancedMode} />
 
-					<VideoWindow advancedMode={advancedMode} />
+				<VideoWindow advancedMode={advancedMode} />
 
-					<AudioPeers />
+				<AudioPeers />
 
-					<Notifications />
+				<Notifications />
 
-					<CssBaseline />
+				<CssBaseline />
 
-					<AppBar
-						position='fixed'
-						className={room.toolbarsVisible ? classes.show : classes.hide}
-					>
-						<Toolbar>
-							<PulsingBadge
-								color='secondary'
-								badgeContent={unread}
-							>
-								<IconButton
-									color='inherit'
-									aria-label='Open drawer'
-									onClick={() => toggleToolArea()}
-									className={classes.menuButton}
-								>
-									<MenuIcon />
-								</IconButton>
-							</PulsingBadge>
-							{ window.config.logo ?
-								<img alt='Logo' className={classes.logo} src={window.config.logo} />
-								:null
-							}
-							<Typography
-								className={classes.title}
-								variant='h6'
+				<AppBar
+					position='fixed'
+					className={room.toolbarsVisible ? classes.show : classes.hide}
+				>
+					<Toolbar>
+						<PulsingBadge
+							color='secondary'
+							badgeContent={unread}
+						>
+							<IconButton
 								color='inherit'
-								noWrap
+								aria-label='Open drawer'
+								onClick={() => toggleToolArea()}
+								className={classes.menuButton}
 							>
-								{ window.config.title }
-							</Typography>
-							<div className={classes.grow} />
-							<div className={classes.actionButtons}>
-								<IconButton
-									aria-label='Lock room'
-									className={classes.actionButton}
-									color='inherit'
-									onClick={() =>
-									{
-										if (room.locked)
-										{
-											roomClient.unlockRoom();
-										}
-										else
-										{
-											roomClient.lockRoom();
-										}
-									}}
-								>
-									{ room.locked ?
-										<LockIcon />
-										:
-										<LockOpenIcon />
-									}
-								</IconButton>
-								{ this.fullscreen.fullscreenEnabled ?
-									<IconButton
-										aria-label='Fullscreen'
-										className={classes.actionButton}
-										color='inherit'
-										onClick={this.handleToggleFullscreen}
-									>
-										{ this.state.fullscreen ?
-											<FullScreenExitIcon />
-											:
-											<FullScreenIcon />
-										}
-									</IconButton>
-									:null
-								}
-								<IconButton
-									aria-label='Settings'
-									className={classes.actionButton}
-									color='inherit'
-									onClick={() => setSettingsOpen(!room.settingsOpen)}
-								>
-									<SettingsIcon />
-								</IconButton>
-								{ loginEnabled ?
-									<IconButton
-										aria-label='Account'
-										className={classes.actionButton}
-										color='inherit'
-										onClick={() => 
-										{
-											loggedIn ? roomClient.logout() : roomClient.login();
-										}}
-									>
-										{ myPicture ?
-											<Avatar src={myPicture} />
-											:
-											<AccountCircle />
-										}
-									</IconButton>
-									:null
-								}
-								<Button
-									aria-label='Leave meeting'
-									className={classes.actionButton}
-									variant='contained'
-									color='secondary'
-									onClick={() => roomClient.close()}
-								>
-									Leave
-								</Button>
-							</div>
-						</Toolbar>
-					</AppBar>
-					<nav>
-						<Hidden implementation='css'>
-							<SwipeableDrawer
-								variant='temporary'
-								anchor={theme.direction === 'rtl' ? 'right' : 'left'}
-								open={toolAreaOpen}
-								onClose={() => toggleToolArea()}
-								onOpen={() => toggleToolArea()}
-								classes={{
-									paper : classes.drawerPaper
+								<MenuIcon />
+							</IconButton>
+						</PulsingBadge>
+						{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+						<Typography
+							className={classes.title}
+							variant='h6'
+							color='inherit'
+							noWrap
+						>
+							{ window.config.title }
+						</Typography>
+						<div className={classes.grow} />
+						<div className={classes.actionButtons}>
+							<IconButton
+								aria-label='Lock room'
+								className={classes.actionButton}
+								color='inherit'
+								onClick={() =>
+								{
+									room.locked ? roomClient.unlockRoom() : roomClient.lockRoom();
 								}}
 							>
-								<MeetingDrawer closeDrawer={toggleToolArea} />
-							</SwipeableDrawer>
-						</Hidden>
-					</nav>
+								{ room.locked ?
+									<LockIcon />
+									:
+									<LockOpenIcon />
+								}
+							</IconButton>
+							{ this.fullscreen.fullscreenEnabled &&
+								<IconButton
+									aria-label='Fullscreen'
+									className={classes.actionButton}
+									color='inherit'
+									onClick={this.handleToggleFullscreen}
+								>
+									{ this.state.fullscreen ?
+										<FullScreenExitIcon />
+										:
+										<FullScreenIcon />
+									}
+								</IconButton>
+							}
+							<IconButton
+								aria-label='Settings'
+								className={classes.actionButton}
+								color='inherit'
+								onClick={() => setSettingsOpen(!room.settingsOpen)}
+							>
+								<SettingsIcon />
+							</IconButton>
+							{ loginEnabled &&
+								<IconButton
+									aria-label='Account'
+									className={classes.actionButton}
+									color='inherit'
+									onClick={() => 
+									{
+										loggedIn ? roomClient.logout() : roomClient.login();
+									}}
+								>
+									{ myPicture ?
+										<Avatar src={myPicture} />
+										:
+										<AccountCircle />
+									}
+								</IconButton>
+							}
+							<Button
+								aria-label='Leave meeting'
+								className={classes.actionButton}
+								variant='contained'
+								color='secondary'
+								onClick={() => roomClient.close()}
+							>
+								Leave
+							</Button>
+						</div>
+					</Toolbar>
+				</AppBar>
+				<nav>
+					<Hidden implementation='css'>
+						<SwipeableDrawer
+							variant='temporary'
+							anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+							open={toolAreaOpen}
+							onClose={() => toggleToolArea()}
+							onOpen={() => toggleToolArea()}
+							classes={{
+								paper : classes.drawerPaper
+							}}
+						>
+							<MeetingDrawer closeDrawer={toggleToolArea} />
+						</SwipeableDrawer>
+					</Hidden>
+				</nav>
 
-					<View advancedMode={advancedMode} />
+				<View advancedMode={advancedMode} />
 
-					<Settings />
-				</div>
-			);
-		}
+				<Settings />
+			</div>
+		);
 	}
 }
 
