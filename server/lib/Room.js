@@ -102,11 +102,11 @@ class Room extends EventEmitter
 		// rooms selfdestruction sequence  
 		this._lobby.on('lobbyEmpty', () =>
 		{
-			if ( this.checkEmpty() )
+			if (this.checkEmpty())
 			{
 				this.selfDestructCountdown();
 			}
-		})
+		});
 
 		this._chatHistory = [];
 
@@ -166,7 +166,8 @@ class Room extends EventEmitter
 
 	selfDestructCountdown()
 	{
-		logger.debug('selfDestructCountdown() started')
+		logger.debug('selfDestructCountdown() started');
+
 		setTimeout(() =>
 		{
 			if (this._closed)
@@ -179,7 +180,8 @@ class Room extends EventEmitter
 					this._roomId);
 				this.close();
 			}
-			else logger.debug('selfDestructCountdown() aborted; room is not empty!')
+			else
+				logger.debug('selfDestructCountdown() aborted; room is not empty!');
 		}, 10000);
 	}
 
@@ -218,8 +220,10 @@ class Room extends EventEmitter
 	// checks both room and lobby
 	checkEmpty()
 	{
-		if (( Object.keys(this._peers).length == 0) && (this._lobby.checkEmpty())) return true
-		else return false;
+		if ((Object.keys(this._peers).length == 0) && (this._lobby.checkEmpty()))
+			return true;
+		else
+			return false;
 	}
 
 	handleConnection({ peerId, consume, socket })
@@ -355,7 +359,8 @@ class Room extends EventEmitter
 
 			delete this._peers[peer.id];
 
-			// If this is the latest Peer in the room and lobby is empty, close the room after a while.
+			// If this is the last Peer in the room and
+			// lobby is empty, close the room after a while.
 			if (this.checkEmpty())
 			{
 				this.selfDestructCountdown();
