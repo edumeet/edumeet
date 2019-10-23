@@ -4,12 +4,8 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
 import * as stateActions from '../actions/stateActions';
 import PropTypes from 'prop-types';
-import Dialog from '@material-ui/core/Dialog';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import DialogActions from '@material-ui/core/DialogActions';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 
 const styles = (theme) =>
 	({
@@ -53,9 +49,6 @@ const styles = (theme) =>
 	});
 
 const Lobby = ({
-	roomClient,
-	displayName,
-	changeDisplayName,
 	classes
 }) =>
 {
@@ -70,10 +63,7 @@ const Lobby = ({
 
 Lobby.propTypes =
 {
-	roomClient        : PropTypes.any.isRequired,
-	displayName       : PropTypes.string.isRequired,
-	changeDisplayName : PropTypes.func.isRequired,
-	classes           : PropTypes.object.isRequired
+	classes : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>

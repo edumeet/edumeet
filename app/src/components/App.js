@@ -29,7 +29,7 @@ const App = (props) =>
 			<Room />
 		);
 	}
-}
+};
 
 App.propTypes =
 {
