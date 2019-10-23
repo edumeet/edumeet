@@ -16,14 +16,13 @@ import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
+// import Checkbox from '@material-ui/core/Checkbox';
+// import InputLabel from '@material-ui/core/InputLabel';
+// import OutlinedInput from '@material-ui/core/OutlinedInput';
 import Switch from '@material-ui/core/Switch';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListLobbyPeer from './ListLobbyPeer';
-
 
 const styles = (theme) =>
 	({
@@ -52,7 +51,7 @@ const styles = (theme) =>
 		},
 		lock :
 		{
-			padding : theme.spacing.unit * 2
+			padding : theme.spacing(2)
 		}
 	});
 
@@ -60,7 +59,7 @@ const LockDialog = ({
 	roomClient,
 	room,
 	handleCloseLockDialog,
-	handleAccessCode,
+	// handleAccessCode,
 	lobbyPeers,
 	classes
 }) =>
@@ -123,21 +122,25 @@ const LockDialog = ({
 					</FormGroup>
 				</FormControl>
 
-				{ lobbyPeers.length > 0 ?
-					<List subheader={
-						<ListSubheader component="div">
-						  Participants in Lobby
-						</ListSubheader>
-					}>
-					{ 
-						lobbyPeers.map((peerId) => { return (<ListLobbyPeer id={peerId} />); })
+				{ (lobbyPeers.length > 0) &&
+					<List 
+						dense={true} 
+						subheader={
+							<ListSubheader component='div'>
+								Participants in Lobby
+							</ListSubheader>
 					}
+					>
+						{
+							lobbyPeers.map((peerId) =>
+							{
+								return (<ListLobbyPeer key={peerId} id={peerId} />);
+							})
+						}
 					</List>
-					: null
 				} 
 			</form>
 			<DialogActions>
-				
 				<Button onClick={() => handleCloseLockDialog({ lockDialogOpen: false })} color='primary'>
 					Close
 				</Button>

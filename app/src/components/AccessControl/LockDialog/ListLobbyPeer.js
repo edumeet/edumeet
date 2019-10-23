@@ -69,6 +69,10 @@ const styles = (theme) =>
 			{
 				backgroundColor : 'var(--media-control-botton-on)'
 			}
+		},
+		ListItem :
+		{
+			alignItems: 'center'
 		}
 	});
 
@@ -84,13 +88,14 @@ const ListLobbyPeer = (props) =>
 
 	return (
 		<ListItem 
+			className={classnames(classes.ListItem)}
 			key={peer.peerId}
 			button
-			alignItems="flex-start"
+			alignItems='flex-start'
 		>
 			<ListItemAvatar>
 				<Avatar alt='Peer avatar' src={picture} />
-			</ListItemAvatar>			
+			</ListItemAvatar>
 			<ListItemText
 				primary={peer.displayName}
 			/>
@@ -99,10 +104,10 @@ const ListLobbyPeer = (props) =>
 					disabled : peer.promotionInProgress
 				})}
 				onClick={(e) =>
-					{
-						e.stopPropagation();
-						roomClient.promoteLobbyPeer(peer.id);
-					}}
+				{
+					e.stopPropagation();
+					roomClient.promoteLobbyPeer(peer.id);
+				}}
 			>
 				<PromoteIcon />
 			</ListItemIcon>
