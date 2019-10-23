@@ -6,6 +6,7 @@ import * as stateActions from '../actions/stateActions';
 import PropTypes from 'prop-types';
 import Dialog from '@material-ui/core/Dialog';
 import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -51,7 +52,7 @@ const styles = (theme) =>
 		}
 	});
 
-const JoinDialog = ({
+const Lobby = ({
 	roomClient,
 	displayName,
 	changeDisplayName,
@@ -60,56 +61,14 @@ const JoinDialog = ({
 {
 	return (
 		<div className={classes.root}>
-			<Dialog
-				open
-				classes={{
-					paper : classes.dialogPaper
-				}}
-			>
-				{ window.config.logo ?
-					<img alt='Logo' className={classes.logo} src={window.config.logo} />
-					:null
-				}
-				<Typography variant='subtitle1'>You are about to join a meeting, how would you like to join?</Typography>
-				<DialogActions>
-					<Button
-						onClick={() =>
-						{
-							roomClient.join({ joinVideo: false });
-						}}
-						variant='contained'
-					>
-						Audio only
-					</Button>
-					<Button
-						onClick={() =>
-						{
-							roomClient.join({ joinVideo: true });
-						}}
-						variant='contained'
-					>
-						Audio and Video
-					</Button>
-					<TextField
-						id='displayname'
-						label='Name'
-						className={classes.textField}
-						value={displayName}
-						onChange={(event) =>
-						{
-							const { value } = event.target;
-
-							changeDisplayName(value);
-						}}
-						margin='normal'
-					/>
-				</DialogActions>
-			</Dialog>
+			<Paper className={classes.message}>
+				<Typography variant='h2'>This room is locked at the moment, try again later.</Typography>
+			</Paper>
 		</div>
 	);
 };
 
-JoinDialog.propTypes =
+Lobby.propTypes =
 {
 	roomClient        : PropTypes.any.isRequired,
 	displayName       : PropTypes.string.isRequired,
@@ -146,4 +105,4 @@ export default withRoomContext(connect(
 			);
 		}
 	}
-)(withStyles(styles)(JoinDialog)));
+)(withStyles(styles)(Lobby)));

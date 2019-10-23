@@ -9,7 +9,7 @@ import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as stateActions from './actions/stateActions';
-import Room from './components/Room';
+import App from './components/App';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
@@ -95,7 +95,7 @@ function run()
 				<PersistGate loading={<LoadingView />} persistor={persistor}>
 					<RoomContext.Provider value={roomClient}>
 						<SnackbarProvider>
-							<Room />
+							<App />
 						</SnackbarProvider>
 					</RoomContext.Provider>
 				</PersistGate>
