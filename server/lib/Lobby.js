@@ -34,6 +34,14 @@ class Lobby extends EventEmitter
 		this._peers = {};
 	}
 
+	checkEmpty()
+	{
+		logger.info('checkEmpty()');
+		if (Object.keys(this._peers).length == 0)
+			return true
+		else return false;
+	}
+
 	peerList()
 	{
 		logger.info('peerList()');
@@ -75,6 +83,8 @@ class Lobby extends EventEmitter
 	{
 		logger.info('parkPeer()');
 
+		if ( this._closed ) return;
+
 		const peer = { peerId, socket, consume };
 
 		socket.emit('notification', { method: 'enteredLobby', data: {} });
@@ -86,7 +96,8 @@ class Lobby extends EventEmitter
 			logger.debug(
 				'Peer "request" event [method:%s, peerId:%s]',
 				request.method, peer.peerId);
-
+			
+			if (this._closed) return;
 			this._handleSocketRequest(peer, request, cb)
 				.catch((error) =>
 				{
@@ -98,19 +109,22 @@ class Lobby extends EventEmitter
 
 		socket.on('disconnect', () =>
 		{
-			if (this._closed)
-				return;
-
 			logger.debug('Peer "close" event [peerId:%s]', peer.peerId);
+
+			if (this._closed) return;
 
 			this.emit('peerClosed', peer);
 
 			delete this._peers[peer.peerId];
+
+			if ( this.checkEmpty() ) this.emit('lobbyEmpty');
 		});
 	}
 
 	async _handleSocketRequest(peer, request, cb)
 	{
+		logger.debug('_handleSocketRequest [peer:%o], [request:%o]', peer, request);
+		if (this._closed) return;
 		switch (request.method)
 		{
 			case 'changeDisplayName':

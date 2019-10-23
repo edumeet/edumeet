@@ -126,6 +126,15 @@ async function run()
 			room.logStatus();
 		}
 	}, 120000);
+
+	// check for deserted rooms
+	setInterval(() =>
+	{
+		for (const room of rooms.values())
+		{
+			room.checkEmpty();
+		}
+	}, 10000);
 }
 
 async function setupAuth(oidcIssuer)

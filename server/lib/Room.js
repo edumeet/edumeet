@@ -99,6 +99,16 @@ class Room extends EventEmitter
 			});
 		});
 
+		// If nobody left in lobby we should check if room is empty too and initiating
+		// rooms selfdestruction sequence  
+		this._lobby.on('lobbyEmpty', () =>
+		{
+			if ( this.checkEmpty() )
+			{
+				this.selfDestructCountdown();
+			}
+		})
+
 		this._chatHistory = [];
 
 		this._fileHistory = [];
@@ -155,6 +165,25 @@ class Room extends EventEmitter
 		return this._roomId;
 	}
 
+	selfDestructCountdown()
+	{
+		logger.debug('selfDestructCountdown() started')
+		setTimeout(() =>
+		{
+			if (this._closed)
+				return;
+
+			if (this.checkEmpty() && this._lobby.checkEmpty())
+			{
+				logger.info(
+					'Room deserted for some time, closing the room [roomId:%s]',
+					this._roomId);
+				this.close();
+			}
+			else logger.debug('selfDestructCountdown() aborted; room is not empty!')
+		}, 10000);
+	}
+
 	close()
 	{
 		logger.debug('close()');
@@ -185,6 +214,13 @@ class Room extends EventEmitter
 			this._roomId,
 			this._peers
 		);
+	}
+
+	// checks both room and lobby
+	checkEmpty()
+	{
+		if (( Object.keys(this._peers).length == 0) && (this._lobby.checkEmpty())) return true
+		else return false;
 	}
 
 	handleConnection({ peerId, consume, socket })
@@ -296,7 +332,7 @@ class Room extends EventEmitter
 			if (this._closed)
 				return;
 
-			logger.debug('Peer "close" event [peerId:%s]', peer.id);
+			logger.debug('Peer "disconnect" event [peerId:%s]', peer.id);
 
 			// If the Peer was joined, notify all Peers.
 			if (peer.data.joined)
@@ -320,23 +356,10 @@ class Room extends EventEmitter
 
 			delete this._peers[peer.id];
 
-			// If this is the latest Peer in the room, close the room after a while.
-			if (Object.keys(this._peers).length == 0)
+			// If this is the latest Peer in the room and lobby is empty, close the room after a while.
+			if (this.checkEmpty())
 			{
-				setTimeout(() =>
-				{
-					if (this._closed)
-						return;
-
-					if (Object.keys(this._peers).length == 0)
-					{
-						logger.info(
-							'last Peer in the room left, closing the room [roomId:%s]',
-							this._roomId);
-
-						this.close();
-					}
-				}, 10000);
+				this.selfDestructCountdown();
 			}
 		});
 	}
