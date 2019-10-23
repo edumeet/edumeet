@@ -163,17 +163,13 @@ class Room extends EventEmitter
 
 		this._lobby.close();
 
-		// Close the peers
-		if (this._peers)
+		Object.values(this._peers).forEach((peer) =>
 		{
-			Object.values(this._peers).forEach((peer) =>
-			{
-				if (peer.socket)
-					peer.socket.disconnect();
-			});
-		}
+			if (peer.socket)
+				peer.socket.disconnect();
+		});
 
-		this._peers.clear();
+		this._peers = {};
 
 		// Close the mediasoup Router.
 		this._mediasoupRouter.close();
@@ -325,14 +321,14 @@ class Room extends EventEmitter
 			delete this._peers[peer.id];
 
 			// If this is the latest Peer in the room, close the room after a while.
-			if (this._peers.size === 0)
+			if (Object.keys(this._peers).length == 0)
 			{
 				setTimeout(() =>
 				{
 					if (this._closed)
 						return;
 
-					if (this._peers.size === 0)
+					if (Object.keys(this._peers).length == 0)
 					{
 						logger.info(
 							'last Peer in the room left, closing the room [roomId:%s]',
