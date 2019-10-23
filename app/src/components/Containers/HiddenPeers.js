@@ -96,7 +96,7 @@ class HiddenPeers extends React.PureComponent
 				onClick={() => openUsersTab()}
 			>
 				<p>+{hiddenPeersCount} <br /> participant
-					{(hiddenPeersCount === 1) ? null : 's'}
+					{(hiddenPeersCount > 1) && 's'}
 				</p>
 			</div>
 		);

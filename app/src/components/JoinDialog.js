@@ -66,11 +66,27 @@ const JoinDialog = ({
 					paper : classes.dialogPaper
 				}}
 			>
-				{ window.config.logo ?
+				{ window.config.logo &&
 					<img alt='Logo' className={classes.logo} src={window.config.logo} />
-					:null
 				}
-				<Typography variant='subtitle1'>You are about to join a meeting, how would you like to join?</Typography>
+				<Typography variant='subtitle1'>
+					You are about to join a meeting.
+					Set your name that others will see,
+					and chose how you want to join?
+				</Typography>
+				<TextField
+					id='displayname'
+					label='Name'
+					className={classes.textField}
+					value={displayName}
+					onChange={(event) =>
+					{
+						const { value } = event.target;
+
+						changeDisplayName(value);
+					}}
+					margin='normal'
+				/>
 				<DialogActions>
 					<Button
 						onClick={() =>
@@ -90,19 +106,6 @@ const JoinDialog = ({
 					>
 						Audio and Video
 					</Button>
-					<TextField
-						id='displayname'
-						label='Name'
-						className={classes.textField}
-						value={displayName}
-						onChange={(event) =>
-						{
-							const { value } = event.target;
-
-							changeDisplayName(value);
-						}}
-						margin='normal'
-					/>
 				</DialogActions>
 			</Dialog>
 		</div>

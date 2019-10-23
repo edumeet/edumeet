@@ -228,13 +228,12 @@ class Filmstrip extends React.PureComponent
 		return (
 			<div className={classes.root}>
 				<div className={classes.speaker} ref={this.activePeerContainer}>
-					{ peers[activePeerId] ?
+					{ peers[activePeerId] &&
 						<SpeakerPeer
 							advancedMode={advancedMode}
 							id={activePeerId}
 							style={speakerStyle}
 						/>
-						:null
 					}
 				</div>
 
@@ -286,11 +285,10 @@ class Filmstrip extends React.PureComponent
 					</Grid>
 				</div>
 
-				{ spotlightsLength<Object.keys(peers).length ?
+				{ spotlightsLength<Object.keys(peers).length &&
 					<HiddenPeers
 						hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
 					/>
-					:null
 				}
 			</div>
 		);

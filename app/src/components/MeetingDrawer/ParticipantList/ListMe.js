@@ -91,9 +91,8 @@ const ListMe = (props) =>
 				</div>
 
 				<div className={classes.indicators}>
-					{ me.raisedHand ?
+					{ me.raisedHand &&
 						<div className={classnames(classes.icon, 'raise-hand')} />
-						:null
 					}
 				</div>
 			</div>

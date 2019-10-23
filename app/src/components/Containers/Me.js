@@ -332,13 +332,11 @@ const Me = (props) =>
 										}
 									}}
 								>
-									{ screenState === 'on' || screenState === 'unsupported' ?
+									{ (screenState === 'on' || screenState === 'unsupported') &&
 										<ScreenOffIcon/>
-										:null
 									}
-									{ screenState === 'off' ?
+									{ screenState === 'off' &&
 										<ScreenIcon/>
-										:null
 									}
 								</Fab>
 							</div>
@@ -351,10 +349,10 @@ const Me = (props) =>
 						peer={me}
 						displayName={settings.displayName}
 						showPeerInfo
-						videoTrack={webcamProducer ? webcamProducer.track : null}
+						videoTrack={webcamProducer && webcamProducer.track}
 						videoVisible={videoVisible}
-						audioCodec={micProducer ? micProducer.codec : null}
-						videoCodec={webcamProducer ? webcamProducer.codec : null}
+						audioCodec={micProducer && micProducer.codec}
+						videoCodec={webcamProducer && webcamProducer.codec}
 						onChangeDisplayName={(displayName) =>
 						{
 							roomClient.changeDisplayName(displayName);
@@ -364,9 +362,9 @@ const Me = (props) =>
 					</VideoView>
 				</div>
 			</div>
-			{ screenProducer ?
+			{ screenProducer &&
 				<div
-					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
+					className={classnames(classes.root, 'screen', hover && 'hover')}
 					onMouseOver={() => setHover(true)}
 					onMouseOut={() => setHover(false)}
 					onTouchStart={() =>
@@ -390,7 +388,7 @@ const Me = (props) =>
 				>
 					<div className={classnames(classes.viewContainer)} style={style}>
 						<div
-							className={classnames(classes.controls, hover ? 'hover' : null)}
+							className={classnames(classes.controls, hover && 'hover')}
 							onMouseOver={() => setHover(true)}
 							onMouseOut={() => setHover(false)}
 							onTouchStart={() =>
@@ -420,13 +418,12 @@ const Me = (props) =>
 							isScreen
 							advancedMode={advancedMode}
 							videoContain
-							videoTrack={screenProducer ? screenProducer.track : null}
+							videoTrack={screenProducer && screenProducer.track}
 							videoVisible={screenVisible}
-							videoCodec={screenProducer ? screenProducer.codec : null}
+							videoCodec={screenProducer && screenProducer.codec}
 						/>
 					</div>
 				</div>
-				:null
 			}
 		</React.Fragment>
 	);
