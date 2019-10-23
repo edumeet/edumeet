@@ -4,6 +4,11 @@ import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withRoomContext } from '../../../RoomContext';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from '@material-ui/core/Avatar';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 import PromoteIcon from '@material-ui/icons/OpenInBrowser';
 
@@ -78,27 +83,30 @@ const ListLobbyPeer = (props) =>
 	const picture = peer.picture || EmptyAvatar;
 
 	return (
-		<div className={classes.root}>
-			<img alt='Peer avatar' className={classes.avatar} src={picture} />
-
-			<div className={classes.peerInfo}>
-				{peer.displayName}
-			</div>
-			<div className={classes.controls}>
-				<div
-					className={classnames(classes.button, 'promote', {
-						disabled : peer.promotionInProgress
-					})}
-					onClick={(e) =>
+		<ListItem 
+			key={peer.peerId}
+			button
+			alignItems="flex-start"
+		>
+			<ListItemAvatar>
+				<Avatar alt='Peer avatar' src={picture} />
+			</ListItemAvatar>			
+			<ListItemText
+				primary={peer.displayName}
+			/>
+			<ListItemIcon
+				className={classnames(classes.button, 'promote', {
+					disabled : peer.promotionInProgress
+				})}
+				onClick={(e) =>
 					{
 						e.stopPropagation();
 						roomClient.promoteLobbyPeer(peer.id);
 					}}
-				>
-					<PromoteIcon />
-				</div>
-			</div>
-		</div>
+			>
+				<PromoteIcon />
+			</ListItemIcon>
+		</ListItem>
 	);
 };
 

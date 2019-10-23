@@ -62,6 +62,7 @@ function run()
 		window.history.pushState('', '', urlParser.toString());
 	}
 
+	const accessCode = parameters.get('code');
 	const produce = parameters.get('produce') !== 'false';
 	const consume = parameters.get('consume') !== 'false';
 	const useSimulcast = parameters.get('simulcast') === 'true';
@@ -84,7 +85,7 @@ function run()
 	);
 
 	roomClient = new RoomClient(
-		{ roomId, peerId, device, useSimulcast, produce, consume, forceTcp });
+		{ roomId, peerId, accessCode, device, useSimulcast, produce, consume, forceTcp });
 
 	global.CLIENT = roomClient;
 

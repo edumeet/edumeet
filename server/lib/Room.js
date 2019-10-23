@@ -55,6 +55,12 @@ class Room extends EventEmitter
 		// Locked flag.
 		this._locked = false;
 
+		// if true: accessCode is a possibility to open the room
+		this._joinByAccesCode = true;
+
+		// access code to the room, applicable if ( _locked == true and _joinByAccessCode == true )
+		this._accessCode = '';
+
 		this._lobby = new Lobby();
 
 		this._lobby.on('promotePeer', (peer) =>
@@ -815,7 +821,8 @@ class Room extends EventEmitter
 						fileHistory : this._fileHistory,
 						lastN       : this._lastN,
 						locked      : this._locked,
-						lobbyPeers  : lobbyPeers
+						lobbyPeers  : lobbyPeers,
+						accessCode  : this._accessCode
 					}
 				);
 
@@ -851,6 +858,45 @@ class Room extends EventEmitter
 
 				break;
 			}
+
+			case 'setAccessCode':
+			{
+				const { accessCode } = request.data;
+	
+				this._accessCode = accessCode;
+
+				// Spread to others
+				// if (request.public) {
+				this._notification(peer.socket, 'setAccessCode', {
+					peerId     : peer.id,
+					accessCode : accessCode
+				}, true);
+				//}
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'setJoinByAccessCode':
+			{
+				const { joinByAccessCode } = request.data;
+	
+				this._joinByAccessCode = joinByAccessCode;
+
+				// Spread to others
+				this._notification(peer.socket, 'setJoinByAccessCode', {
+					peerId     : peer.id,
+					joinByAccessCode : joinByAccessCode
+				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+	
 
 			case 'promotePeer':
 			{

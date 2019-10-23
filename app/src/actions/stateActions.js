@@ -43,12 +43,35 @@ export const setRoomLockedOut = () =>
 	};
 };
 
+export const setAccessCode = (accessCode) =>
+{
+	return {
+		type    : 'SET_ACCESS_CODE',
+		payload : { accessCode }
+	};
+};
+
+export const setJoinByAccessCode = (joinByAccessCode) =>
+{
+	return {
+		type    : 'SET_JOIN_BY_ACCESS_CODE',
+		payload : { joinByAccessCode }
+	};
+};
+
+
 export const setSettingsOpen = ({ settingsOpen }) =>
 	({
 		type    : 'SET_SETTINGS_OPEN',
 		payload : { settingsOpen }
 	});
 
+export const setLockDialogOpen = ({ lockDialogOpen }) =>
+	({
+		type    : 'SET_LOCK_DIALOG_OPEN',
+		payload : { lockDialogOpen }
+	});
+		
 export const setMe = ({ peerId, device, loginEnabled }) =>
 {
 	return {
@@ -175,6 +198,13 @@ export const toggleSettings = () =>
 {
 	return {
 		type : 'TOGGLE_SETTINGS'
+	};
+};
+
+export const toggleLockDialog = () =>
+{
+	return {
+		type : 'TOGGLE_LOCK_DIALOG'
 	};
 };
 

@@ -4,6 +4,8 @@ const initialState =
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
 	lockedOut          : false,
+	accessCode         : '', // access code to the room if locked and joinByAccessCode == true
+	joinByAccessCode   : true, // if true: accessCode is a possibility to open the room
 	activeSpeakerId    : null,
 	torrentSupport     : false,
 	showSettings       : false,
@@ -14,6 +16,7 @@ const initialState =
 	selectedPeerId     : null,
 	spotlights         : [],
 	settingsOpen       : false,
+	lockDialogOpen     : false,
 	joined             : false
 };
 
@@ -53,6 +56,27 @@ const room = (state = initialState, action) =>
 			return { ...state, lockedOut: true };
 		}
 
+		case 'SET_ACCESS_CODE':
+		{
+			const { accessCode } = action.payload;
+
+			return { ...state, accessCode };
+		}
+
+		case 'SET_JOIN_BY_ACCESS_CODE':
+		{
+			const { joinByAccessCode } = action.payload;
+
+			return { ...state, joinByAccessCode };
+		}
+
+		case 'SET_LOCK_DIALOG_OPEN':
+		{
+			const { lockDialogOpen } = action.payload;
+
+			return { ...state, lockDialogOpen };
+		}
+	
 		case 'SET_SETTINGS_OPEN':
 		{
 			const { settingsOpen } = action.payload;

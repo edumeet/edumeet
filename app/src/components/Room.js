@@ -35,6 +35,7 @@ import LockOpenIcon from '@material-ui/icons/LockOpen';
 import Button from '@material-ui/core/Button';
 import Settings from './Settings/Settings';
 import JoinDialog from './JoinDialog';
+import LockDialog from './AccessControl/LockDialog/LockDialog';
 
 const TIMEOUT = 10 * 1000;
 
@@ -264,6 +265,7 @@ class Room extends React.PureComponent
 			loggedIn,
 			loginEnabled,
 			setSettingsOpen,
+			setLockDialogOpen,
 			toolAreaOpen,
 			toggleToolArea,
 			unread,
@@ -345,28 +347,6 @@ class Room extends React.PureComponent
 							</Typography>
 							<div className={classes.grow} />
 							<div className={classes.actionButtons}>
-								<IconButton
-									aria-label='Lock room'
-									className={classes.actionButton}
-									color='inherit'
-									onClick={() =>
-									{
-										if (room.locked)
-										{
-											roomClient.unlockRoom();
-										}
-										else
-										{
-											roomClient.lockRoom();
-										}
-									}}
-								>
-									{ room.locked ?
-										<LockIcon />
-										:
-										<LockOpenIcon />
-									}
-								</IconButton>
 								{ this.fullscreen.fullscreenEnabled ?
 									<IconButton
 										aria-label='Fullscreen'
@@ -389,6 +369,13 @@ class Room extends React.PureComponent
 									onClick={() => setSettingsOpen(!room.settingsOpen)}
 								>
 									<SettingsIcon />
+								</IconButton>
+								<IconButton
+									aria-label='Lock'
+									color='inherit'
+									onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
+								>
+									{ room.locked ? <LockIcon /> : <LockOpenIcon /> }
 								</IconButton>
 								{ loginEnabled ?
 									<IconButton
@@ -439,6 +426,8 @@ class Room extends React.PureComponent
 
 					<View advancedMode={advancedMode} />
 
+					<LockDialog />
+
 					<Settings />
 				</div>
 			);
@@ -457,6 +446,7 @@ Room.propTypes =
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
 	setSettingsOpen    : PropTypes.func.isRequired,
+	setLockDialogOpen  : PropTypes.func.isRequired,
 	toggleToolArea     : PropTypes.func.isRequired,
 	unread             : PropTypes.number.isRequired,
 	classes            : PropTypes.object.isRequired,
@@ -484,6 +474,10 @@ const mapDispatchToProps = (dispatch) =>
 		setSettingsOpen : (settingsOpen) =>
 		{
 			dispatch(stateActions.setSettingsOpen({ settingsOpen }));
+		},
+		setLockDialogOpen : (lockDialogOpen) =>
+		{
+			dispatch(stateActions.setLockDialogOpen({ lockDialogOpen }));
 		},
 		toggleToolArea : () =>
 		{

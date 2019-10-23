@@ -77,7 +77,7 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ roomId, peerId, device, useSimulcast, produce, consume, forceTcp })
+		{ roomId, peerId, accessCode, device, useSimulcast, produce, consume, forceTcp })
 	{
 		logger.debug(
 			'constructor() [roomId: "%s", peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", consume: "%s", forceTcp: "%s"]',
@@ -111,6 +111,9 @@ export default class RoomClient
 
 		// My peer name.
 		this._peerId = peerId;
+
+		// Access code
+		this._accessCode = accessCode;
 
 		// Alert sound
 		this._soundAlert = new Audio('/sounds/notify.mp3');
@@ -609,7 +612,8 @@ export default class RoomClient
 				fileHistory,
 				lastN,
 				locked,
-				lobbyPeers
+				lobbyPeers,
+				accessCode
 			} = await this.sendRequest('serverHistory');
 
 			if (chatHistory.length > 0)
@@ -653,6 +657,13 @@ export default class RoomClient
 					store.dispatch(
 						stateActions.setLobbyPeerDisplayName(peer.displayName));
 				});
+			}
+
+			if (accessCode != null)
+			{
+				logger.debug('Got accessCode');
+
+				store.dispatch(stateActions.setAccessCode(accessCode))
 			}
 		}
 		catch (error)
@@ -1385,6 +1396,46 @@ export default class RoomClient
 					break;
 				}
 
+				case 'setAccessCode':
+				{
+					const { accessCode } = notification.data;
+
+					store.dispatch(
+						stateActions.setAccessCode(accessCode));
+					
+					store.dispatch(requestActions.notify(
+						{
+							text : 'Access code for room updated'
+						}));
+
+					break;
+				}
+
+				case 'setJoinByAccessCode':
+				{
+					const { joinByAccessCode } = notification.data;
+					
+					store.dispatch(
+						stateActions.setJoinByAccessCode(joinByAccessCode));
+					
+					if (joinByAccessCode) 
+					{
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Access code for room is now activated'
+							}));
+					}
+					else 
+					{
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Access code for room is now deactivated'
+							}));
+					}
+
+					break;
+				}
+
 				case 'activeSpeaker':
 				{
 					const { peerId } = notification.data;
@@ -1840,6 +1891,60 @@ export default class RoomClient
 				}));
 
 			logger.error('unlockRoom() | failed: %o', error);
+		}
+	}
+
+	async setAccessCode(code)
+	{
+		logger.debug('setAccessCode()');
+
+		try
+		{
+			await this.sendRequest('setAccessCode', { accessCode: code });
+
+			store.dispatch(
+				stateActions.setAccessCode(code));
+
+			store.dispatch(requestActions.notify(
+				{
+					text : 'Access code saved.'
+				}));
+		}
+		catch (error)
+		{
+			logger.error('setAccessCode() | failed: %o', error);
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to set access code.'
+				}));
+		}
+	}
+
+	async setJoinByAccessCode(value)
+	{
+		logger.debug('setJoinByAccessCode()');
+
+		try
+		{
+			await this.sendRequest('setJoinByAccessCode', { joinByAccessCode: value });
+
+			store.dispatch(
+				stateActions.setJoinByAccessCode(value));
+
+			store.dispatch(requestActions.notify(
+				{
+					text : `You switched Join by access-code to ${value}`
+				}));
+		}
+		catch (error)
+		{
+			logger.error('setAccessCode() | failed: %o', error);
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to set join by access code.'
+				}));
 		}
 	}
 
