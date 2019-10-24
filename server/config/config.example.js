@@ -33,6 +33,12 @@ module.exports =
 	// Any http request is redirected to https.
 	// Listening port for http server. 
 	listeningRedirectPort : 80,
+	// If this is set to true, only signed-in users will be able
+	// to join a room directly. Non-signed-in users (guests) will
+	// always be put in the lobby regardless of room lock status.
+	// If false, there is no difference between guests and signed-in
+	// users when joining.
+	requireSignInToAccess : true,
 	// Mediasoup settings
 	mediasoup             :
 	{

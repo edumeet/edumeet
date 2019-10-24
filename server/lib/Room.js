@@ -244,18 +244,28 @@ class Room extends EventEmitter
 			delete this._peers[peerId];
 		}
 		else if (this._locked) // Don't allow connections to a locked room
+			this._parkPeer({ peerId, consume, socket })
+		else if (config.requireSignInToAccess) // Only allow signed in users directly into room
 		{
-			this._lobby.parkPeer({ peerId, consume, socket });
+			const { passport } = socket.handshake.session;
 
-			Object.values(this._peers).forEach((peer) =>
-			{
-				this._notification(peer.socket, 'parkedPeer', { peerId });
-			});
-
-			return;
+			if (passport && passport.user)
+				this._peerJoining({ peerId, consume, socket });
+			else
+				this._parkPeer({ peerId, consume, socket })
 		}
+		else
+			this._peerJoining({ peerId, consume, socket });
+	}
 
-		this._peerJoining({ peerId, consume, socket });
+	_parkPeer({ peerId, consume, socket })
+	{
+		this._lobby.parkPeer({ peerId, consume, socket });
+
+		Object.values(this._peers).forEach((peer) =>
+		{
+			this._notification(peer.socket, 'parkedPeer', { peerId });
+		});
 	}
 
 	_peerJoining({ peerId, consume, socket })
