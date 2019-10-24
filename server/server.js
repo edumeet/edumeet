@@ -16,6 +16,7 @@ const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const base64 = require('base-64');
 const helmet = require('helmet');
+const httpHelper = require('./httpHelper');
 // auth
 const passport = require('passport');
 const { Issuer, Strategy } = require('openid-client');
@@ -297,7 +298,10 @@ async function setupAuth(oidcIssuer)
 					});
 			}
 
-			res.sendFile(`${__dirname}/public/authCallback.html`);
+			res.send(httpHelper({
+				displayName : displayName,
+				picture     : photo
+			}));
 		}
 	);
 }
