@@ -280,7 +280,7 @@ async function setupAuth(oidcIssuer)
 
 			const room = rooms.get(state.roomId);
 
-			room.peerAuthenticated(state.peerId);
+			room && room.peerAuthenticated(state.peerId);
 
 			res.send(httpHelper({
 				success     : true,
