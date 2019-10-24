@@ -24,11 +24,7 @@ const settings = (state = initialState, action) =>
 
 		case 'SET_DISPLAY_NAME':
 		{
-			let { displayName } = action.payload;
-
-			// Be ready for undefined displayName (so keep previous one).
-			if (!displayName)
-				displayName = state.displayName;
+			const { displayName } = action.payload;
 
 			return { ...state, displayName };
 		}

@@ -418,6 +418,9 @@ export default class RoomClient
 	{
 		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
 
+		if (!displayName)
+			displayName = 'Guest';
+		
 		try
 		{
 			await this.sendRequest('changeDisplayName', { displayName });

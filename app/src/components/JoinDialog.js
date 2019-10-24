@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
@@ -158,7 +158,7 @@ JoinDialog.propTypes =
 {
 	roomClient        : PropTypes.any.isRequired,
 	displayName       : PropTypes.string.isRequired,
-	loginEnabled      : PropTypes.string.isRequired,
+	loginEnabled      : PropTypes.bool.isRequired,
 	changeDisplayName : PropTypes.func.isRequired,
 	classes           : PropTypes.object.isRequired
 };
