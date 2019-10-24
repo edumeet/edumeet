@@ -11,7 +11,7 @@ const App = (props) =>
 		room
 	} = props;
 
-	if (room.lockedOut)
+	if (room.inLobby)
 	{
 		return (
 			<Lobby />

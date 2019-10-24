@@ -164,7 +164,6 @@ const mapStateToProps = (state) =>
 	return {
 		room       : state.room,
 		lobbyPeers : lobbyPeersKeySelector(state)
-
 	};
 };
 

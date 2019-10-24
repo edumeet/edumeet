@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
 import * as stateActions from '../actions/stateActions';
 import PropTypes from 'prop-types';
+import Dialog from '@material-ui/core/Dialog';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
+import DialogActions from '@material-ui/core/DialogActions';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 const styles = (theme) =>
 	({
@@ -49,27 +52,104 @@ const styles = (theme) =>
 	});
 
 const Lobby = ({
+	roomClient,
+	url,
+	displayName,
+	loginEnabled,
+	changeDisplayName,
 	classes
 }) =>
 {
+	const handleKeyDown = (event) =>
+	{
+		const { key } = event;
+
+		switch (key)
+		{
+			case 'Enter':
+			case 'Escape':
+			{
+				if (displayName === '')
+					changeDisplayName('Guest');
+				break;
+			}
+			default:
+				break;
+		}
+	};
+
 	return (
 		<div className={classes.root}>
-			<Paper className={classes.message}>
-				<Typography variant='h2'>This room is locked at the moment, try again later.</Typography>
-			</Paper>
+			<Dialog
+				open
+				classes={{
+					paper : classes.dialogPaper
+				}}
+			>
+				{ window.config.logo &&
+					<img alt='Logo' className={classes.logo} src={window.config.logo} />
+				}
+				<Typography variant='h2' align='center'>
+					Virtual lobby
+				</Typography>
+				<Typography variant='h6'>
+					You are currently in the virtual lobby of: {url}
+					Please wait for someone to let you in.
+				</Typography>
+				<TextField
+					id='displayname'
+					label='Your name'
+					className={classes.textField}
+					value={displayName}
+					onChange={(event) =>
+					{
+						const { value } = event.target;
+
+						changeDisplayName(value);
+					}}
+					onKeyDown={handleKeyDown}
+					onBlur={() =>
+					{
+						if (displayName === '')
+							changeDisplayName('Guest');
+					}}
+					margin='normal'
+				/>
+				<DialogActions>
+					{ loginEnabled &&
+						<Button
+							onClick={() =>
+							{
+								roomClient.login();
+							}}
+							variant='contained'
+							color='secondary'
+						>
+							Sign in
+						</Button>
+					}
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 };
 
 Lobby.propTypes =
 {
-	classes : PropTypes.object.isRequired
+	roomClient        : PropTypes.any.isRequired,
+	url               : PropTypes.string.isRequired,
+	displayName       : PropTypes.string.isRequired,
+	loginEnabled      : PropTypes.string.isRequired,
+	changeDisplayName : PropTypes.func.isRequired,
+	classes           : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		displayName : state.settings.displayName
+		url          : state.room.url,
+		displayName  : state.settings.displayName,
+		loginEnabled : state.me.loginEnabled
 	};
 };
 
@@ -91,7 +171,9 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.settings.displayName === next.settings.displayName
+				prev.room.url === next.room.url &&
+				prev.settings.displayName === next.settings.displayName &&
+				prev.me.loginEnabled === next.me.loginEnabled
 			);
 		}
 	}

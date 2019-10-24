@@ -59,8 +59,6 @@ const JoinDialog = ({
 	classes
 }) =>
 {
-	const [ localDisplayName, setLocalDisplayName ] = useState(displayName);
-
 	const handleKeyDown = (event) =>
 	{
 		const { key } = event;
@@ -70,10 +68,8 @@ const JoinDialog = ({
 			case 'Enter':
 			case 'Escape':
 			{
-				if (localDisplayName !== '') // Don't allow empty displayName
-					changeDisplayName(localDisplayName);
-				else
-					setLocalDisplayName(displayName);
+				if (displayName === '')
+					changeDisplayName('Guest');
 				break;
 			}
 			default:
@@ -104,18 +100,18 @@ const JoinDialog = ({
 					id='displayname'
 					label='Your name'
 					className={classes.textField}
-					value={localDisplayName}
+					value={displayName}
 					onChange={(event) =>
 					{
 						const { value } = event.target;
 
-						setLocalDisplayName(value);
+						changeDisplayName(value);
 					}}
 					onKeyDown={handleKeyDown}
 					onBlur={() =>
 					{
-						if (localDisplayName !== displayName)
-							changeDisplayName(localDisplayName);
+						if (displayName === '')
+							changeDisplayName('Guest');
 					}}
 					margin='normal'
 				/>
@@ -193,7 +189,8 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.settings.displayName === next.settings.displayName
+				prev.settings.displayName === next.settings.displayName &&
+				prev.me.loginEnabled === next.me.loginEnabled
 			);
 		}
 	}

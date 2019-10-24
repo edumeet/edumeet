@@ -3,7 +3,7 @@ const initialState =
 	url                : null,
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
-	lockedOut          : false,
+	enteredLobby       : false,
 	accessCode         : '', // access code to the room if locked and joinByAccessCode == true
 	joinByAccessCode   : true, // if true: accessCode is a possibility to open the room
 	activeSpeakerId    : null,
@@ -51,9 +51,11 @@ const room = (state = initialState, action) =>
 			return { ...state, locked: false };
 		}
 
-		case 'SET_ROOM_LOCKED_OUT':
+		case 'SET_IN_LOBBY':
 		{
-			return { ...state, lockedOut: true };
+			const { inLobby } = action.payload;
+
+			return { ...state, inLobby };
 		}
 
 		case 'SET_ACCESS_CODE':

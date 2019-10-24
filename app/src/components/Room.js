@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import {
+	lobbyPeersKeySelector
+} from './Selectors';
 import * as appPropTypes from './appPropTypes';
 import { withRoomContext } from '../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
@@ -29,8 +32,7 @@ import VideoWindow from './VideoWindow/VideoWindow';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
-import LockIcon from '@material-ui/icons/Lock';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
+import SecurityIcon from '@material-ui/icons/Security';
 import LockDialog from './AccessControl/LockDialog/LockDialog';
 import Button from '@material-ui/core/Button';
 import Settings from './Settings/Settings';
@@ -258,6 +260,7 @@ class Room extends React.PureComponent
 		const {
 			roomClient,
 			room,
+			lobbyPeers,
 			advancedMode,
 			myPicture,
 			loggedIn,
@@ -327,7 +330,12 @@ class Room extends React.PureComponent
 								color='inherit'
 								onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
 							>
-								{ room.locked ? <LockIcon /> : <LockOpenIcon /> }
+								<PulsingBadge
+									color='secondary'
+									badgeContent={lobbyPeers.length}
+								>
+									<SecurityIcon />
+								</PulsingBadge>
 							</IconButton>						
 							{ this.fullscreen.fullscreenEnabled &&
 								<IconButton
@@ -411,6 +419,7 @@ Room.propTypes =
 {
 	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
+	lobbyPeers         : PropTypes.array,
 	advancedMode       : PropTypes.bool.isRequired,
 	myPicture          : PropTypes.string,
 	loggedIn           : PropTypes.bool.isRequired,
@@ -428,6 +437,7 @@ Room.propTypes =
 const mapStateToProps = (state) =>
 	({
 		room         : state.room,
+		lobbyPeers   : lobbyPeersKeySelector(state),
 		advancedMode : state.settings.advancedMode,
 		loggedIn     : state.me.loggedIn,
 		loginEnabled : state.me.loginEnabled,
@@ -466,6 +476,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room === next.room &&
+				prev.lobbyPeers === next.lobbyPeers &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.settings.picture === next.settings.picture &&

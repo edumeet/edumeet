@@ -1116,7 +1116,6 @@ export default class RoomClient
 
 		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
-		store.dispatch(stateActions.toggleJoined());
 		store.dispatch(stateActions.setRoomState('connecting'));
 
 		this._signalingSocket.on('connect', () =>
@@ -1294,6 +1293,8 @@ export default class RoomClient
 			{
 				case 'enteredLobby':
 				{
+					store.dispatch(stateActions.setInLobby(true));
+
 					const { displayName } = store.getState().settings;
 
 					await this.sendRequest('changeDisplayName', { displayName });
@@ -1302,14 +1303,10 @@ export default class RoomClient
 
 				case 'roomReady':
 				{
+					store.dispatch(stateActions.toggleJoined());
+					store.dispatch(stateActions.setInLobby(false));
+
 					await this._joinRoom({ joinVideo });
-
-					break;
-				}
-
-				case 'roomLocked':
-				{
-					store.dispatch(stateActions.setRoomLockedOut());
 
 					break;
 				}

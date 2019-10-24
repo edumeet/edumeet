@@ -19,7 +19,7 @@ import * as serviceWorker from './serviceWorker';
 
 import './index.css';
 
-if (process.env.NODE_ENV !== 'production')
+if (process.env.REACT_APP_DEBUG === '*')
 {
 	debug.enable('* -engine* -socket* -RIE* *WARN* *ERROR*');
 }

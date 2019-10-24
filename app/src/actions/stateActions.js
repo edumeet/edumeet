@@ -36,10 +36,11 @@ export const setRoomUnLocked = () =>
 	};
 };
 
-export const setRoomLockedOut = () =>
+export const setInLobby = (inLobby) =>
 {
 	return {
-		type : 'SET_ROOM_LOCKED_OUT'
+		type    : 'SET_IN_LOBBY',
+		payload : { inLobby }
 	};
 };
 
