@@ -308,7 +308,7 @@ export default class RoomClient
 
 	login()
 	{
-		const url = `/auth/login?id=${this._signalingSocket.io.engine.id}&roomId=${this._roomId}&peerId=${this._peerId}`;
+		const url = `/auth/login?roomId=${this._roomId}&peerId=${this._peerId}`;
 
 		this._loginWindow = window.open(url, 'loginWindow');
 	}
@@ -318,14 +318,22 @@ export default class RoomClient
 		window.location = '/auth/logout';
 	}
 
-	closeLoginWindow()
-	{
-		this._loginWindow.close();
-	}
-
 	receiveFromChildWindow(data)
 	{
 		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);
+
+		const { displayName, picture } = data;
+
+		this.changeDisplayName(displayName);
+		this.changeProfilePicture(picture);
+
+		store.dispatch(stateActions.setPicture(picture));
+		store.dispatch(stateActions.loggedIn());
+
+		store.dispatch(requestActions.notify(
+			{
+				text : 'You are logged in.'
+			}));
 	}
 
 	_soundNotification()
@@ -1457,26 +1465,6 @@ export default class RoomClient
 					const { peerId, picture } = notification.data;
 
 					store.dispatch(stateActions.setPeerPicture(peerId, picture));
-
-					break;
-				}
-
-				case 'auth':
-				{
-					const { displayName, picture } = notification.data;
-
-					this.changeDisplayName(displayName);
-
-					this.changeProfilePicture(picture);
-					store.dispatch(stateActions.setPicture(picture));
-					store.dispatch(stateActions.loggedIn());
-
-					store.dispatch(requestActions.notify(
-						{
-							text : 'You are logged in.'
-						}));
-
-					this.closeLoginWindow();
 
 					break;
 				}

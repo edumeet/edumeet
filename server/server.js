@@ -237,7 +237,6 @@ async function setupAuth(oidcIssuer)
 	{
 		passport.authenticate('oidc', {
 			state : base64.encode(JSON.stringify({
-				id     : req.query.id,
 				roomId : req.query.roomId,
 				peerId : req.query.peerId
 			}))
@@ -282,21 +281,6 @@ async function setupAuth(oidcIssuer)
 			const room = rooms.get(state.roomId);
 
 			room.peerAuthenticated(state.peerId);
-
-			const socket = io.sockets.sockets[state.id];
-
-			if (socket)
-			{
-				socket.emit('notification',
-					{
-						method : 'auth',
-						data   :
-						{
-							displayName : displayName,
-							picture     : photo
-						}
-					});
-			}
 
 			res.send(httpHelper({
 				success     : true,
