@@ -323,6 +323,11 @@ export default class RoomClient
 		this._loginWindow.close();
 	}
 
+	receiveFromChildWindow(data)
+	{
+		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);
+	}
+
 	_soundNotification()
 	{
 		const alertPromise = this._soundAlert.play();

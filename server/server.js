@@ -282,7 +282,7 @@ async function setupAuth(oidcIssuer)
 
 			room.peerAuthenticated(state.peerId);
 
-			const socket = io.sockets.socket(state.id);
+			const socket = io.sockets.sockets[state.id];
 
 			if (socket)
 			{
@@ -297,7 +297,7 @@ async function setupAuth(oidcIssuer)
 					});
 			}
 
-			res.send('');
+			res.sendFile(`${__dirname}/public/authCallback.html`);
 		}
 	);
 }

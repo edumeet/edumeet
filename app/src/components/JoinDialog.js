@@ -54,6 +54,7 @@ const styles = (theme) =>
 const JoinDialog = ({
 	roomClient,
 	displayName,
+	loginEnabled,
 	changeDisplayName,
 	classes
 }) =>
@@ -119,16 +120,18 @@ const JoinDialog = ({
 					margin='normal'
 				/>
 				<DialogActions>
-					<Button
-						onClick={() =>
-						{
-							roomClient.join({ joinVideo: false });
-						}}
-						variant='contained'
-						color='secondary'
-					>
-						Sign in
-					</Button>
+					{ loginEnabled &&
+						<Button
+							onClick={() =>
+							{
+								roomClient.login();
+							}}
+							variant='contained'
+							color='secondary'
+						>
+							Sign in
+						</Button>
+					}
 					<Button
 						onClick={() =>
 						{
@@ -159,6 +162,7 @@ JoinDialog.propTypes =
 {
 	roomClient        : PropTypes.any.isRequired,
 	displayName       : PropTypes.string.isRequired,
+	loginEnabled      : PropTypes.string.isRequired,
 	changeDisplayName : PropTypes.func.isRequired,
 	classes           : PropTypes.object.isRequired
 };
@@ -166,7 +170,8 @@ JoinDialog.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		displayName : state.settings.displayName
+		displayName  : state.settings.displayName,
+		loginEnabled : state.me.loginEnabled
 	};
 };
 

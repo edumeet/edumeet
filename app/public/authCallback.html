@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'>
+		<title>Multiparty Meeting</title>
+	</head>
+	<body>
+		<script type='text/javascript'>
+			window.opener.receiveFromChildWindow('Data from child window!');
+
+			window.close();
+		</script>
+	</body>
+</html>
