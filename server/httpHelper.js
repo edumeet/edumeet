@@ -1,4 +1,4 @@
-export default (data) =>
+function httpHelper(data)
 {
 	const html = `<!DOCTYPE html>
 	<html>
@@ -18,4 +18,6 @@ export default (data) =>
 	</html>`;
 
 	return html;
-};
+}
+
+module.exports = httpHelper;

@@ -299,6 +299,7 @@ async function setupAuth(oidcIssuer)
 			}
 
 			res.send(httpHelper({
+				success     : true,
 				displayName : displayName,
 				picture     : photo
 			}));
