@@ -2,6 +2,7 @@ const initialState =
 {
 	id                    : null,
 	device                : null,
+	picture               : null,
 	canSendMic            : false,
 	canSendWebcam         : false,
 	canShareScreen        : false,
@@ -42,6 +43,9 @@ const me = (state = initialState, action) =>
 
 		case 'USER_LOGOUT':
 			return { ...state, loggedIn: false };
+
+		case 'SET_PICTURE':
+			return { ...state, picture: action.payload.picture };
 
 		case 'SET_MEDIA_CAPABILITIES':
 		{

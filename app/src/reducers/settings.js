@@ -1,7 +1,6 @@
 const initialState =
 {
 	displayName         : 'Guest',
-	picture             : null,
 	selectedWebcam      : null,
 	selectedAudioDevice : null,
 	advancedMode        : false,
@@ -27,11 +26,6 @@ const settings = (state = initialState, action) =>
 			const { displayName } = action.payload;
 
 			return { ...state, displayName };
-		}
-
-		case 'SET_PICTURE':
-		{
-			return { ...state, picture: action.payload.picture };
 		}
 
 		case 'TOGGLE_ADVANCED_MODE':
