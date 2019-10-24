@@ -8,7 +8,7 @@ function httpHelper(data)
 		</head>
 		<body>
 			<script type='text/javascript'>
-				let data = ${data};
+				let data = ${JSON.stringify(data)};
 	
 				window.opener.CLIENT.receiveFromChildWindow(data);
 	
