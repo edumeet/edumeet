@@ -185,15 +185,15 @@ async function setupAuth(oidcIssuer)
 				_claims   : tokenset.claims
 			};
 
-			if (typeof(userinfo.picture) !== 'undefined')
+			if (userinfo.picture != null)
 			{
 				if (!userinfo.picture.match(/^http/g))
 				{
-					user.Photos = [ { value: `data:image/jpeg;base64, ${userinfo.picture}` } ];
+					user.picture = `data:image/jpeg;base64, ${userinfo.picture}`;
 				}
 				else
 				{
-					user.Photos = [ { value: userinfo.picture } ];
+					user.picture = userinfo.picture;
 				}
 			}
 
@@ -209,22 +209,22 @@ async function setupAuth(oidcIssuer)
 
 			if (userinfo.email != null)
 			{
-				user.emails = [ { value: userinfo.email } ];
+				user.email = userinfo.email;
 			}
 
 			if (userinfo.given_name != null)
 			{
-				user.name = { givenName: userinfo.given_name };
+				user.name.givenName = userinfo.given_name;
 			}
 
 			if (userinfo.family_name != null)
 			{
-				user.name = { familyName: userinfo.family_name };
+				user.name.familyName = userinfo.family_name;
 			}
 
 			if (userinfo.middle_name != null)
 			{
-				user.name = { middleName: userinfo.middle_name };
+				user.name.middleName = userinfo.middle_name;
 			}
 
 			return done(null, user);
@@ -262,7 +262,7 @@ async function setupAuth(oidcIssuer)
 			const state = JSON.parse(base64.decode(req.query.state));
 
 			let displayName;
-			let photo;
+			let picture;
 
 			if (req.user != null)
 			{
@@ -271,14 +271,10 @@ async function setupAuth(oidcIssuer)
 				else
 					displayName = '';
 
-				if (
-					req.user.Photos != null &&
-					req.user.Photos[0] != null &&
-					req.user.Photos[0].value != null
-				)
-					photo = req.user.Photos[0].value;
+				if (req.user.picture != null)
+					picture = req.user.picture;
 				else
-					photo = '/static/media/buddy.403cb9f6.svg';
+					picture = '/static/media/buddy.403cb9f6.svg';
 			}
 
 			const peer = peers.get(state.id);
@@ -286,9 +282,8 @@ async function setupAuth(oidcIssuer)
 			peer && (peer.authenticated = true);
 
 			res.send(httpHelper({
-				success     : true,
-				displayName : displayName,
-				picture     : photo
+				displayName,
+				picture
 			}));
 		}
 	);
