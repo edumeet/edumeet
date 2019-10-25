@@ -36,6 +36,8 @@ class Peer extends EventEmitter
 
 		this._consumers = new Map();
 
+		this._checkAuthentication();
+
 		this._handlePeer();
 	}
 
@@ -60,15 +62,9 @@ class Peer extends EventEmitter
 
 	_handlePeer()
 	{
-		this.authenticated =
-			this.socket.handshake.session.passport &&
-			this.socket.handshake.session.passport.user;
-
 		this.socket.use((packet, next) =>
 		{
-			this.authenticated =
-				this.socket.handshake.session.passport &&
-				this.socket.handshake.session.passport.user;
+			this._checkAuthentication();
 
 			return next();
 		});
@@ -82,6 +78,13 @@ class Peer extends EventEmitter
 
 			this.close();
 		});
+	}
+
+	_checkAuthentication()
+	{
+		this.authenticated =
+			Boolean(this.socket.handshake.session.passport) &&
+			Boolean(this.socket.handshake.session.passport.user);
 	}
 
 	get id()
