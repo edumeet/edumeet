@@ -263,10 +263,7 @@ class Room extends EventEmitter
 	// checks both room and lobby
 	checkEmpty()
 	{
-		if ((this._peers.size == 0) && (this._lobby.checkEmpty()))
-			return true;
-		else
-			return false;
+		return (this._peers.size == 0) && (this._lobby.checkEmpty());
 	}
 
 	_parkPeer(parkPeer)

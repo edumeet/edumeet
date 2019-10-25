@@ -12,17 +12,23 @@ class Peer extends EventEmitter
 
 		this._id = id;
 
+		this._authId = null;
+
 		this._socket = socket;
 
 		this._closed = false;
 
 		this._joined = false;
 
+		this._inLobby = false;
+
 		this._authenticated = false;
 
 		this._displayName = false;
 
 		this._picture = null;
+
+		this._email = null;
 
 		this._device = null;
 
@@ -71,20 +77,10 @@ class Peer extends EventEmitter
 
 		this.socket.on('request', (request, cb) =>
 		{
-			logger.debug(
-				'Peer "request" event [method:"%s", peer:"%s"]',
-				request.method, this.id);
-			
 			if (this._closed)
 				return;
 
-			this._handleSocketRequest(request, cb)
-				.catch((error) =>
-				{
-					logger.error('request failed [error:"%o"]', error);
-
-					cb(error);
-				});
+			this._handleSocketRequest(request, cb).catch(cb);
 		});
 
 		this.socket.on('disconnect', () =>
@@ -100,12 +96,6 @@ class Peer extends EventEmitter
 
 	async _handleSocketRequest(request, cb)
 	{
-		logger.debug(
-			'_handleSocketRequest [peer:"%s"], [request:"%s"]',
-			this.id,
-			request.method
-		);
-
 		if (this._closed)
 			return;
 
@@ -121,14 +111,45 @@ class Peer extends EventEmitter
 
 				break;
 			}
+
+			case 'changeProfilePicture':
+			{
+				const { picture } = request.data;
+
+				this.picture = picture;
+
+				cb();
+
+				break;
+			}
 		}
 	}
 
 	_checkAuthentication()
 	{
-		this.authenticated =
+		if (
 			Boolean(this.socket.handshake.session.passport) &&
-			Boolean(this.socket.handshake.session.passport.user);
+			Boolean(this.socket.handshake.session.passport.user)
+		)
+		{
+			const {
+				id,
+				displayName,
+				picture,
+				email
+			} = this.socket.handshake.session.passport.user;
+
+			id && (this.authId = id);
+			displayName && (this.displayName = displayName);
+			picture && (this.picture = picture);
+			email && (this.email = email);
+
+			this.authenticated = true;
+		}
+		else
+		{
+			this.authenticated = false;
+		}
 	}
 
 	get id()
@@ -139,6 +160,16 @@ class Peer extends EventEmitter
 	set id(id)
 	{
 		this._id = id;
+	}
+
+	get authId()
+	{
+		return this._authId;
+	}
+
+	set authId(authId)
+	{
+		this._authId = authId;
 	}
 
 	get socket()
@@ -164,6 +195,16 @@ class Peer extends EventEmitter
 	set joined(joined)
 	{
 		this._joined = joined;
+	}
+
+	get inLobby()
+	{
+		return this._inLobby;
+	}
+
+	set inLobby(inLobby)
+	{
+		this._inLobby = inLobby;
 	}
 
 	get authenticated()
@@ -215,6 +256,16 @@ class Peer extends EventEmitter
 
 			this.emit('pictureChanged', { oldPicture });
 		}
+	}
+
+	get email()
+	{
+		return this._email;
+	}
+
+	set email(email)
+	{
+		this._email = email;
 	}
 
 	get device()

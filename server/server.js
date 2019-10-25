@@ -20,8 +20,11 @@ const helmet = require('helmet');
 const httpHelper = require('./httpHelper');
 // auth
 const passport = require('passport');
+const redis = require('redis');
+const client = redis.createClient();
 const { Issuer, Strategy } = require('openid-client');
 const expressSession = require('express-session');
+const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
 
 /* eslint-disable no-console */
@@ -67,6 +70,7 @@ const session = expressSession({
 	secret            : config.cookieSecret,
 	resave            : true,
 	saveUninitialized : true,
+	store             : new RedisStore({ client }),
 	cookie            : {
 		secure   : true,
 		httpOnly : true
@@ -165,16 +169,15 @@ async function setupAuth(oidcIssuer)
 	
 	// optional, defaults to false, when true req is passed as a first
 	// argument to verify fn
-	const passReqToCallback = false; 
+	const passReqToCallback = false;
 	
 	// optional, defaults to false, when true the code_challenge_method will be
 	// resolved from the issuer configuration, instead of true you may provide
 	// any of the supported values directly, i.e. "S256" (recommended) or "plain"
 	const usePKCE = false;
-	const client = oidcClient;
 
 	oidcStrategy = new Strategy(
-		{ client, params, passReqToCallback, usePKCE },
+		{ oidcClient, params, passReqToCallback, usePKCE },
 		(tokenset, userinfo, done) =>
 		{
 			const user =
