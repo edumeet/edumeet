@@ -14,7 +14,7 @@ class Lobby extends EventEmitter
 		// Closed flag.
 		this._closed = false;
 
-		this._peers = {};
+		this._peers = new Map();
 	}
 
 	close()
@@ -23,110 +23,126 @@ class Lobby extends EventEmitter
 
 		this._closed = true;
 
-		Object.values(this._peers).forEach((peer) =>
+		this._peers.forEach((peer) =>
 		{
-			if (peer.socket)
-				peer.socket.disconnect();
+			if (!peer.closed)
+				peer.close();
 		});
 
-		this._peers = {};
+		this._peers.clear();
 	}
 
 	checkEmpty()
 	{
 		logger.info('checkEmpty()');
-		if (Object.keys(this._peers).length == 0)
-			return true
-		else return false;
+		
+		return this._peers.size === 0;
 	}
 
 	peerList()
 	{
 		logger.info('peerList()');
 
-		return Object.values(this._peers).map((peer) =>
+		return Array.from(this._peers.values()).map((peer) =>
 			({
-				peerId      : peer.peerId,
+				peerId      : peer.id,
 				displayName : peer.displayName 
 			}));
 	}
 
 	hasPeer(peerId)
 	{
-		return Boolean(this._peers[peerId]);
+		return this._peers.has(peerId);
 	}
 
 	promoteAllPeers()
 	{
 		logger.info('promoteAllPeers()');
 
-		Object.values(this._peers).forEach((peer) =>
+		this._peers.forEach((peer) =>
 		{
 			if (peer.socket)
-				this.promotePeer(peer.peerId);
+				this.promotePeer(peer.id);
 		});
 	}
 
 	promotePeer(peerId)
 	{
-		logger.info('promotePeer() [peerId: %s]', peerId);
+		logger.info('promotePeer() [peer:"%s"]', peerId);
 
-		const peer = this._peers[peerId];
+		const peer = this._peers.get(peerId);
 
 		if (peer)
 		{
 			this.emit('promotePeer', peer);
 
-			delete this._peers[peerId];
+			this._peers.delete(peerId);
 		}
 	}
 
-	parkPeer({ peerId, consume, socket })
+	parkPeer(peer)
 	{
-		logger.info('parkPeer()');
+		logger.info('parkPeer() [peer:"%s"]', peer.id);
 
-		if ( this._closed ) return;
+		if (this._closed)
+			return;
 
-		const peer = { peerId, socket, consume };
+		peer.socket.emit('notification', { method: 'enteredLobby', data: {} });
 
-		socket.emit('notification', { method: 'enteredLobby', data: {} });
+		this._peers.set(peer.id, peer);
 
-		this._peers[peerId] = peer;
+		peer.on('authenticationChange', () =>
+		{
+			logger.info('parkPeer() | authenticationChange [peer:"%s"]', peer.id);
 
-		socket.on('request', (request, cb) =>
+			peer.authenticated && this.emit('peerAuthenticated', peer);
+		});
+
+		peer.socket.on('request', (request, cb) =>
 		{
 			logger.debug(
-				'Peer "request" event [method:%s, peerId:%s]',
-				request.method, peer.peerId);
+				'Peer "request" event [method:"%s", peer:"%s"]',
+				request.method, peer.id);
 			
-			if (this._closed) return;
+			if (this._closed)
+				return;
+
 			this._handleSocketRequest(peer, request, cb)
 				.catch((error) =>
 				{
-					logger.error('request failed:%o', error);
+					logger.error('request failed [error:"%o"]', error);
 
 					cb(error);
 				});
 		});
 
-		socket.on('disconnect', () =>
+		peer.socket.on('disconnect', () =>
 		{
-			logger.debug('Peer "close" event [peerId:%s]', peer.peerId);
+			logger.debug('Peer "close" event [peer:"%s"]', peer.id);
 
-			if (this._closed) return;
+			if (this._closed)
+				return;
 
 			this.emit('peerClosed', peer);
 
-			delete this._peers[peer.peerId];
+			this._peers.delete(peer.id);
 
-			if ( this.checkEmpty() ) this.emit('lobbyEmpty');
+			if (this.checkEmpty())
+				this.emit('lobbyEmpty');
 		});
 	}
 
 	async _handleSocketRequest(peer, request, cb)
 	{
-		logger.debug('_handleSocketRequest [peer:%o], [request:%o]', peer, request);
-		if (this._closed) return;
+		logger.debug(
+			'_handleSocketRequest [peer:"%s"], [request:"%s"]',
+			peer.id,
+			request.method
+		);
+
+		if (this._closed)
+			return;
+
 		switch (request.method)
 		{
 			case 'changeDisplayName':

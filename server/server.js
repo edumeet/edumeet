@@ -14,6 +14,7 @@ const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
+const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
 const httpHelper = require('./httpHelper');
@@ -43,6 +44,9 @@ let nextMediasoupWorkerIdx = 0;
 
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
+
+// Map of Peer instances indexed by peerId.
+const peers = new Map();
 
 // TLS server configuration.
 const tls =
@@ -237,8 +241,7 @@ async function setupAuth(oidcIssuer)
 	{
 		passport.authenticate('oidc', {
 			state : base64.encode(JSON.stringify({
-				roomId : req.query.roomId,
-				peerId : req.query.peerId
+				id : req.query.id
 			}))
 		})(req, res, next);
 	});
@@ -278,9 +281,9 @@ async function setupAuth(oidcIssuer)
 					photo = '/static/media/buddy.403cb9f6.svg';
 			}
 
-			const room = rooms.get(state.roomId);
+			const peer = peers.get(state.id);
 
-			room && room.peerAuthenticated(state.peerId);
+			peer && (peer.authenticated = true);
 
 			res.send(httpHelper({
 				success     : true,
@@ -350,8 +353,6 @@ async function runWebSocketServer()
 	{
 		const { roomId, peerId } = socket.handshake.query;
 
-		logger.info('socket.io "connection" | [session:"%o"]', socket.handshake.session);
-
 		if (!roomId || !peerId)
 		{
 			logger.warn('connection request without roomId and/or peerId');
@@ -367,12 +368,17 @@ async function runWebSocketServer()
 		queue.push(async () =>
 		{
 			const room = await getOrCreateRoom({ roomId });
+			const peer = new Peer({ id: peerId, socket });
 
-			room.handleConnection({ peerId, socket });
+			peers.set(peerId, peer);
+
+			peer.on('close', () => peers.delete(peerId));
+
+			room.handlePeer(peer);
 		})
 			.catch((error) =>
 			{
-				logger.error('room creation or room joining failed:%o', error);
+				logger.error('room creation or room joining failed [error:"%o"]', error);
 
 				socket.disconnect(true);
 
@@ -435,7 +441,7 @@ async function getOrCreateRoom({ roomId })
 	// If the Room does not exist create a new one.
 	if (!room)
 	{
-		logger.info('creating a new Room [roomId:%s]', roomId);
+		logger.info('creating a new Room [roomId:"%s"]', roomId);
 
 		const mediasoupWorker = getMediasoupWorker();
 

@@ -77,11 +77,11 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ roomId, peerId, accessCode, device, useSimulcast, produce, consume, forceTcp })
+		{ roomId, peerId, accessCode, device, useSimulcast, produce, forceTcp })
 	{
 		logger.debug(
-			'constructor() [roomId: "%s", peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", consume: "%s", forceTcp: "%s"]',
-			roomId, peerId, device.flag, useSimulcast, produce, consume, forceTcp);
+			'constructor() [roomId: "%s", peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s"]',
+			roomId, peerId, device.flag, useSimulcast, produce, forceTcp);
 
 		this._signalingUrl = getSignalingUrl(peerId, roomId);
 
@@ -93,9 +93,6 @@ export default class RoomClient
 
 		// Whether we should produce.
 		this._produce = produce;
-
-		// Whether we should consume.
-		this._consume = consume;
 
 		// Wheter we force TCP
 		this._forceTcp = forceTcp;
@@ -308,7 +305,7 @@ export default class RoomClient
 
 	login()
 	{
-		const url = `/auth/login?roomId=${this._roomId}&peerId=${this._peerId}`;
+		const url = `/auth/login?id=${this._peerId}`;
 
 		this._loginWindow = window.open(url, 'loginWindow');
 	}
@@ -1705,44 +1702,41 @@ export default class RoomClient
 					});
 			}
 
-			if (this._consume)
-			{
-				const transportInfo = await this.sendRequest(
-					'createWebRtcTransport',
-					{
-						forceTcp  : this._forceTcp,
-						producing : false,
-						consuming : true
-					});
+			const transportInfo = await this.sendRequest(
+				'createWebRtcTransport',
+				{
+					forceTcp  : this._forceTcp,
+					producing : false,
+					consuming : true
+				});
 
-				const {
+			const {
+				id,
+				iceParameters,
+				iceCandidates,
+				dtlsParameters
+			} = transportInfo;
+
+			this._recvTransport = this._mediasoupDevice.createRecvTransport(
+				{
 					id,
 					iceParameters,
 					iceCandidates,
 					dtlsParameters
-				} = transportInfo;
+				});
 
-				this._recvTransport = this._mediasoupDevice.createRecvTransport(
-					{
-						id,
-						iceParameters,
-						iceCandidates,
-						dtlsParameters
-					});
-
-				this._recvTransport.on(
-					'connect', ({ dtlsParameters }, callback, errback) => // eslint-disable-line no-shadow
-					{
-						this.sendRequest(
-							'connectWebRtcTransport',
-							{
-								transportId : this._recvTransport.id,
-								dtlsParameters
-							})
-							.then(callback)
-							.catch(errback);
-					});
-			}
+			this._recvTransport.on(
+				'connect', ({ dtlsParameters }, callback, errback) => // eslint-disable-line no-shadow
+				{
+					this.sendRequest(
+						'connectWebRtcTransport',
+						{
+							transportId : this._recvTransport.id,
+							dtlsParameters
+						})
+						.then(callback)
+						.catch(errback);
+				});
 
 			// Set our media capabilities.
 			store.dispatch(stateActions.setMediaCapabilities(
@@ -1760,11 +1754,11 @@ export default class RoomClient
 					displayName     : displayName,
 					picture         : picture,
 					device          : this._device,
-					rtpCapabilities : this._consume
-						? this._mediasoupDevice.rtpCapabilities
-						: undefined
+					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
-			
+
+			logger.debug('_joinRoom() joined, got peers [peers:"%o"]', peers);
+
 			for (const peer of peers)
 			{
 				store.dispatch(
