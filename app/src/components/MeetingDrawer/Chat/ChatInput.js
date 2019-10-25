@@ -123,7 +123,7 @@ ChatInput.propTypes =
 const mapStateToProps = (state) =>
 	({
 		displayName : state.settings.displayName,
-		picture     : state.settings.picture
+		picture     : state.me.picture
 	});
 
 export default withRoomContext(
@@ -136,7 +136,7 @@ export default withRoomContext(
 			{
 				return (
 					prev.settings.displayName === next.settings.displayName &&
-					prev.settings.picture === next.settings.picture
+					prev.me.picture === next.me.picture
 				);
 			}
 		}

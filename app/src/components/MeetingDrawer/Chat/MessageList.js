@@ -97,7 +97,7 @@ MessageList.propTypes =
 const mapStateToProps = (state) =>
 	({
 		chatmessages : state.chatmessages,
-		myPicture    : state.settings.picture
+		myPicture    : state.me.picture
 	});
 
 export default connect(
@@ -109,7 +109,7 @@ export default connect(
 		{
 			return (
 				prev.chatmessages === next.chatmessages &&
-				prev.settings.picture === next.settings.picture
+				prev.me.picture === next.me.picture
 			);
 		}
 	}

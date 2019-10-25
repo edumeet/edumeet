@@ -79,7 +79,7 @@ const ListMe = (props) =>
 		classes
 	} = props;
 
-	const picture = settings.picture || EmptyAvatar;
+	const picture = me.picture || EmptyAvatar;
 
 	return (
 		<li className={classes.root}>

@@ -45,7 +45,6 @@ class FileList extends React.PureComponent
 		const {
 			files,
 			me,
-			picture,
 			peers,
 			classes
 		} = this.props;
@@ -61,7 +60,7 @@ class FileList extends React.PureComponent
 					if (me.id === file.peerId)
 					{
 						displayName = 'You';
-						filePicture = picture;
+						filePicture = me.picture;
 					}
 					else if (peers[file.peerId])
 					{
@@ -91,7 +90,6 @@ FileList.propTypes =
 {
 	files   : PropTypes.object.isRequired,
 	me      : appPropTypes.Me.isRequired,
-	picture : PropTypes.string,
 	peers   : PropTypes.object.isRequired,
 	classes : PropTypes.object.isRequired
 };
@@ -99,10 +97,9 @@ FileList.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		files   : state.files,
-		me      : state.me,
-		picture : state.settings.picture,
-		peers   : state.peers
+		files : state.files,
+		me    : state.me,
+		peers : state.peers
 	};
 };
 
@@ -116,7 +113,6 @@ export default connect(
 			return (
 				prev.files === next.files &&
 				prev.me === next.me &&
-				prev.settings.picture === next.settings.picture &&
 				prev.peers === next.peers
 			);
 		}
