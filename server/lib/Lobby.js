@@ -87,36 +87,28 @@ class Lobby extends EventEmitter
 		if (this._closed)
 			return;
 
-		peer.socket.emit('notification', { method: 'enteredLobby', data: {} });
+		this._notification(peer.socket, 'enteredLobby');
 
 		this._peers.set(peer.id, peer);
 
-		peer.on('authenticationChange', () =>
+		peer.on('authenticationChanged', () =>
 		{
 			logger.info('parkPeer() | authenticationChange [peer:"%s"]', peer.id);
 
 			peer.authenticated && this.emit('peerAuthenticated', peer);
 		});
 
-		peer.socket.on('request', (request, cb) =>
+		peer.on('displayNameChanged', () =>
 		{
-			logger.debug(
-				'Peer "request" event [method:"%s", peer:"%s"]',
-				request.method, peer.id);
-			
-			if (this._closed)
-				return;
-
-			this._handleSocketRequest(peer, request, cb)
-				.catch((error) =>
-				{
-					logger.error('request failed [error:"%o"]', error);
-
-					cb(error);
-				});
+			this.emit('displayNameChanged', peer);
 		});
 
-		peer.socket.on('disconnect', () =>
+		peer.on('pictureChanged', () =>
+		{
+			this.emit('pictureChanged', peer);
+		});
+
+		peer.on('close', () =>
 		{
 			logger.debug('Peer "close" event [peer:"%s"]', peer.id);
 
@@ -130,34 +122,6 @@ class Lobby extends EventEmitter
 			if (this.checkEmpty())
 				this.emit('lobbyEmpty');
 		});
-	}
-
-	async _handleSocketRequest(peer, request, cb)
-	{
-		logger.debug(
-			'_handleSocketRequest [peer:"%s"], [request:"%s"]',
-			peer.id,
-			request.method
-		);
-
-		if (this._closed)
-			return;
-
-		switch (request.method)
-		{
-			case 'changeDisplayName':
-			{
-				const { displayName } = request.data;
-
-				peer.displayName = displayName;
-
-				this.emit('lobbyPeerDisplayNameChanged', peer);
-
-				cb();
-
-				break;
-			}
-		}
 	}
 
 	_notification(socket, method, data = {}, broadcast = false)

@@ -150,7 +150,12 @@ class Room extends EventEmitter
 			});
 		});
 
-		this._lobby.on('lobbyPeerDisplayNameChanged', (changedPeer) =>
+		this._lobby.on('peerAuthenticated', (peer) =>
+		{
+			!this._locked && this._lobby.promotePeer(peer.id);
+		});
+
+		this._lobby.on('displayNameChanged', (changedPeer) =>
 		{
 			const { id, displayName } = changedPeer;
 
@@ -160,9 +165,14 @@ class Room extends EventEmitter
 			});
 		});
 
-		this._lobby.on('peerAuthenticated', (peer) =>
+		this._lobby.on('pictureChanged', (changedPeer) =>
 		{
-			!this._locked && this._lobby.promotePeer(peer.id);
+			const { id, picture } = changedPeer;
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'lobbyPeerPictureChanged', { peerId: id, picture });
+			});
 		});
 
 		this._lobby.on('peerClosed', (closedPeer) =>
@@ -303,6 +313,31 @@ class Room extends EventEmitter
 
 					cb(error);
 				});
+		});
+
+		peer.on('displayNameChanged', ({ oldDisplayName }) =>
+		{
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'changeDisplayName', {
+				peerId         : peer.id,
+				displayName    : peer.displayName,
+				oldDisplayName : oldDisplayName
+			}, true);
+		});
+
+		peer.on('pictureChanged', () =>
+		{
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'changeProfilePicture', {
+				peerId  : peer.id,
+				picture : peer.picture
+			}, true);
 		});
 
 		peer.on('close', () =>
@@ -722,50 +757,6 @@ class Room extends EventEmitter
 				const stats = await consumer.getStats();
 
 				cb(null, stats);
-
-				break;
-			}
-
-			case 'changeDisplayName':
-			{
-				// Ensure the Peer is joined.
-				if (!peer.joined)
-					throw new Error('Peer not yet joined');
-
-				const { displayName } = request.data;
-				const oldDisplayName = peer.displayName;
-
-				peer.displayName = displayName;
-
-				// Spread to others
-				this._notification(peer.socket, 'changeDisplayName', {
-					peerId         : peer.id,
-					displayName    : displayName,
-					oldDisplayName : oldDisplayName
-				}, true);
-
-				// Return no error
-				cb();
-
-				break;
-			}
-
-			case 'changeProfilePicture':
-			{
-				// Ensure the Peer is joined.
-				if (!peer.joined)
-					throw new Error('Peer not yet joined');
-
-				const { picture } = request.data;
-
-				// Spread to others
-				this._notification(peer.socket, 'changeProfilePicture', {
-					peerId  : peer.id,
-					picture : picture
-				}, true);
-
-				// Return no error
-				cb();
 
 				break;
 			}

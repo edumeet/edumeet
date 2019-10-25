@@ -69,6 +69,24 @@ class Peer extends EventEmitter
 			return next();
 		});
 
+		this.socket.on('request', (request, cb) =>
+		{
+			logger.debug(
+				'Peer "request" event [method:"%s", peer:"%s"]',
+				request.method, this.id);
+			
+			if (this._closed)
+				return;
+
+			this._handleSocketRequest(request, cb)
+				.catch((error) =>
+				{
+					logger.error('request failed [error:"%o"]', error);
+
+					cb(error);
+				});
+		});
+
 		this.socket.on('disconnect', () =>
 		{
 			if (this.closed)
@@ -78,6 +96,32 @@ class Peer extends EventEmitter
 
 			this.close();
 		});
+	}
+
+	async _handleSocketRequest(request, cb)
+	{
+		logger.debug(
+			'_handleSocketRequest [peer:"%s"], [request:"%s"]',
+			this.id,
+			request.method
+		);
+
+		if (this._closed)
+			return;
+
+		switch (request.method)
+		{
+			case 'changeDisplayName':
+			{
+				const { displayName } = request.data;
+
+				this.displayName = displayName;
+
+				cb();
+
+				break;
+			}
+		}
 	}
 
 	_checkAuthentication()
@@ -131,8 +175,11 @@ class Peer extends EventEmitter
 	{
 		if (authenticated !== this._authenticated)
 		{
+			const oldAuthenticated = this._authenticated;
+
 			this._authenticated = authenticated;
-			this.emit('authenticationChange');
+
+			this.emit('authenticationChanged', { oldAuthenticated });
 		}
 	}
 
@@ -143,7 +190,14 @@ class Peer extends EventEmitter
 
 	set displayName(displayName)
 	{
-		this._displayName = displayName;
+		if (displayName !== this._displayName)
+		{
+			const oldDisplayName = this._displayName;
+
+			this._displayName = displayName;
+
+			this.emit('displayNameChanged', { oldDisplayName });
+		}
 	}
 
 	get picture()
@@ -153,7 +207,14 @@ class Peer extends EventEmitter
 
 	set picture(picture)
 	{
-		this._picture = picture;
+		if (picture !== this._picture)
+		{
+			const oldPicture = this._picture;
+
+			this._picture = picture;
+
+			this.emit('pictureChanged', { oldPicture });
+		}
 	}
 
 	get device()
