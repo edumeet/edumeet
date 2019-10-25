@@ -321,7 +321,7 @@ export default class RoomClient
 
 		const { displayName, picture } = data;
 
-		if (store.getState().room.joined)
+		if (store.getState().room.joined || store.getState().room.inLobby)
 		{
 			this.changeDisplayName(displayName);
 			this.changeProfilePicture(picture);

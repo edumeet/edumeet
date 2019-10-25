@@ -131,8 +131,6 @@ class Peer extends EventEmitter
 	{
 		if (authenticated !== this._authenticated)
 		{
-			logger.info('authenticated() | authenticationChange [peer:"%s", authenticated:"%s"]', this.id, authenticated);
-
 			this._authenticated = authenticated;
 			this.emit('authenticationChange');
 		}

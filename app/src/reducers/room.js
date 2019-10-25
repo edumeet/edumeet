@@ -3,7 +3,7 @@ const initialState =
 	url                : null,
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
-	enteredLobby       : false,
+	inLobby            : false,
 	accessCode         : '', // access code to the room if locked and joinByAccessCode == true
 	joinByAccessCode   : true, // if true: accessCode is a possibility to open the room
 	activeSpeakerId    : null,
