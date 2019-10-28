@@ -98,14 +98,22 @@ class Lobby extends EventEmitter
 			peer.authenticated && this.emit('peerAuthenticated', peer);
 		});
 
-		peer.on('displayNameChanged', () =>
+		peer.socket.on('request', (request, cb) =>
 		{
-			this.emit('displayNameChanged', peer);
-		});
+			logger.debug(
+				'Peer "request" event [method:"%s", peer:"%s"]',
+				request.method, peer.id);
+			
+			if (this._closed)
+				return;
 
-		peer.on('pictureChanged', () =>
-		{
-			this.emit('pictureChanged', peer);
+			this._handleSocketRequest(peer, request, cb)
+				.catch((error) =>
+				{
+					logger.error('request failed [error:"%o"]', error);
+
+					cb(error);
+				});
 		});
 
 		peer.on('close', () =>
@@ -122,6 +130,34 @@ class Lobby extends EventEmitter
 			if (this.checkEmpty())
 				this.emit('lobbyEmpty');
 		});
+	}
+
+	async _handleSocketRequest(peer, request, cb)
+	{
+		logger.debug(
+			'_handleSocketRequest [peer:"%s"], [request:"%s"]',
+			peer.id,
+			request.method
+		);
+
+		if (this._closed)
+			return;
+
+		switch (request.method)
+		{
+			case 'changeDisplayName':
+			{
+				const { displayName } = request.data;
+
+				peer.displayName = displayName;
+
+				this.emit('changeDisplayName', peer);
+
+				cb();
+
+				break;
+			}
+		}
 	}
 
 	_notification(socket, method, data = {}, broadcast = false)

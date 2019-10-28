@@ -75,14 +75,6 @@ class Peer extends EventEmitter
 			return next();
 		});
 
-		this.socket.on('request', (request, cb) =>
-		{
-			if (this._closed)
-				return;
-
-			this._handleSocketRequest(request, cb).catch(cb);
-		});
-
 		this.socket.on('disconnect', () =>
 		{
 			if (this.closed)
@@ -92,37 +84,6 @@ class Peer extends EventEmitter
 
 			this.close();
 		});
-	}
-
-	async _handleSocketRequest(request, cb)
-	{
-		if (this._closed)
-			return;
-
-		switch (request.method)
-		{
-			case 'changeDisplayName':
-			{
-				const { displayName } = request.data;
-
-				this.displayName = displayName;
-
-				cb();
-
-				break;
-			}
-
-			case 'changeProfilePicture':
-			{
-				const { picture } = request.data;
-
-				this.picture = picture;
-
-				cb();
-
-				break;
-			}
-		}
 	}
 
 	_checkAuthentication()
@@ -231,14 +192,7 @@ class Peer extends EventEmitter
 
 	set displayName(displayName)
 	{
-		if (displayName !== this._displayName)
-		{
-			const oldDisplayName = this._displayName;
-
-			this._displayName = displayName;
-
-			this.emit('displayNameChanged', { oldDisplayName });
-		}
+		this._displayName = displayName;
 	}
 
 	get picture()
@@ -248,14 +202,7 @@ class Peer extends EventEmitter
 
 	set picture(picture)
 	{
-		if (picture !== this._picture)
-		{
-			const oldPicture = this._picture;
-
-			this._picture = picture;
-
-			this.emit('pictureChanged', { oldPicture });
-		}
+		this._picture = picture;
 	}
 
 	get email()

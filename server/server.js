@@ -68,6 +68,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const session = expressSession({
 	secret            : config.cookieSecret,
+	name              : config.cookieName,
 	resave            : true,
 	saveUninitialized : true,
 	store             : new RedisStore({ client }),

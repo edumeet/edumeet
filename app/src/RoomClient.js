@@ -440,17 +440,17 @@ export default class RoomClient
 		}
 	}
 
-	async changeProfilePicture(picture)
+	async changePicture(picture)
 	{
-		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
+		logger.debug('changePicture() [picture: "%s"]', picture);
 
 		try
 		{
-			await this.sendRequest('changeProfilePicture', { picture });
+			await this.sendRequest('changePicture', { picture });
 		}
 		catch (error)
 		{
-			logger.error('shareProfilePicure() | failed: %o', error);
+			logger.error('changePicture() | failed: %o', error);
 		}
 	}
 
@@ -1284,344 +1284,358 @@ export default class RoomClient
 				'socket "notification" event [method:%s, data:%o]',
 				notification.method, notification.data);
 
-			switch (notification.method)
+			try
 			{
-				case 'enteredLobby':
+				switch (notification.method)
 				{
-					store.dispatch(stateActions.setInLobby(true));
-
-					const { displayName } = store.getState().settings;
-
-					await this.sendRequest('changeDisplayName', { displayName });
-					break;
-				}
-
-				case 'roomReady':
-				{
-					store.dispatch(stateActions.toggleJoined());
-					store.dispatch(stateActions.setInLobby(false));
-
-					await this._joinRoom({ joinVideo });
-
-					break;
-				}
-
-				case 'lockRoom':
-				{
-					store.dispatch(
-						stateActions.setRoomLocked());
-
-					store.dispatch(requestActions.notify(
-						{
-							text : 'Room is now locked.'
-						}));
-
-					break;
-				}
-
-				case 'unlockRoom':
-				{
-					store.dispatch(
-						stateActions.setRoomUnLocked());
-					
-					store.dispatch(requestActions.notify(
-						{
-							text : 'Room is now unlocked.'
-						}));
-
-					break;
-				}
-
-				case 'parkedPeer':
-				{
-					const { peerId } = notification.data;
-
-					store.dispatch(
-						stateActions.addLobbyPeer(peerId));
-
-					store.dispatch(requestActions.notify(
-						{
-							text : 'New participant entered the lobby.'
-						}));
-
-					break;
-				}
-
-				case 'lobbyPeerClosed':
-				{
-					const { peerId } = notification.data;
-
-					store.dispatch(
-						stateActions.removeLobbyPeer(peerId));
-
-					store.dispatch(requestActions.notify(
-						{
-							text : 'Participant in lobby left.'
-						}));
-
-					break;
-				}
-
-				case 'promotedPeer':
-				{
-					const { peerId } = notification.data;
-
-					store.dispatch(
-						stateActions.removeLobbyPeer(peerId));
-
-					break;
-				}
-
-				case 'lobbyPeerDisplayNameChanged':
-				{
-					const { peerId, displayName } = notification.data;
-
-					store.dispatch(
-						stateActions.setLobbyPeerDisplayName(displayName, peerId));
-
-					store.dispatch(requestActions.notify(
-						{
-							text : `Participant in lobby changed name to ${displayName}.`
-						}));
-
-					break;
-				}
-
-				case 'setAccessCode':
-				{
-					const { accessCode } = notification.data;
-
-					store.dispatch(
-						stateActions.setAccessCode(accessCode));
-					
-					store.dispatch(requestActions.notify(
-						{
-							text : 'Access code for room updated'
-						}));
-
-					break;
-				}
-
-				case 'setJoinByAccessCode':
-				{
-					const { joinByAccessCode } = notification.data;
-					
-					store.dispatch(
-						stateActions.setJoinByAccessCode(joinByAccessCode));
-					
-					if (joinByAccessCode) 
+					case 'enteredLobby':
 					{
+						store.dispatch(stateActions.setInLobby(true));
+	
+						const { displayName } = store.getState().settings;
+	
+						await this.sendRequest('changeDisplayName', { displayName });
+						break;
+					}
+	
+					case 'roomReady':
+					{
+						store.dispatch(stateActions.toggleJoined());
+						store.dispatch(stateActions.setInLobby(false));
+	
+						await this._joinRoom({ joinVideo });
+	
+						break;
+					}
+	
+					case 'lockRoom':
+					{
+						store.dispatch(
+							stateActions.setRoomLocked());
+	
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Access code for room is now activated'
+								text : 'Room is now locked.'
 							}));
+	
+						break;
 					}
-					else 
+	
+					case 'unlockRoom':
 					{
+						store.dispatch(
+							stateActions.setRoomUnLocked());
+						
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Access code for room is now deactivated'
+								text : 'Room is now unlocked.'
 							}));
+	
+						break;
 					}
-
-					break;
-				}
-
-				case 'activeSpeaker':
-				{
-					const { peerId } = notification.data;
-
-					store.dispatch(
-						stateActions.setRoomActiveSpeaker(peerId));
-					
-					if (peerId && peerId !== this._peerId)
-						this._spotlights.handleActiveSpeaker(peerId);
-
-					break;
-				}
-
-				case 'changeDisplayName':
-				{
-					const { peerId, displayName, oldDisplayName } = notification.data;
-
-					store.dispatch(
-						stateActions.setPeerDisplayName(displayName, peerId));
-
-					store.dispatch(requestActions.notify(
-						{
-							text : `${oldDisplayName} is now ${displayName}`
-						}));
-
-					break;
-				}
-
-				case 'changeProfilePicture':
-				{
-					const { peerId, picture } = notification.data;
-
-					store.dispatch(stateActions.setPeerPicture(peerId, picture));
-
-					break;
-				}
-
-				case 'chatMessage':
-				{
-					const { peerId, chatMessage } = notification.data;
-
-					store.dispatch(
-						stateActions.addResponseMessage({ ...chatMessage, peerId }));
-
-					if (
-						!store.getState().toolarea.toolAreaOpen ||
-						(store.getState().toolarea.toolAreaOpen &&
-						store.getState().toolarea.currentToolTab !== 'chat')
-					) // Make sound
+	
+					case 'parkedPeer':
 					{
-						this._soundNotification();
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.addLobbyPeer(peerId));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : 'New participant entered the lobby.'
+							}));
+	
+						break;
 					}
-
-					break;
-				}
-
-				case 'sendFile':
-				{
-					const { peerId, magnetUri } = notification.data;
-
-					store.dispatch(stateActions.addFile(peerId, magnetUri));
-
-					store.dispatch(requestActions.notify(
-						{
-							text : 'New file available.'
-						}));
-
-					if (
-						!store.getState().toolarea.toolAreaOpen ||
-						(store.getState().toolarea.toolAreaOpen &&
-						store.getState().toolarea.currentToolTab !== 'files')
-					) // Make sound
+	
+					case 'lobby:peerClosed':
 					{
-						this._soundNotification();
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.removeLobbyPeer(peerId));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Participant in lobby left.'
+							}));
+	
+						break;
 					}
-
-					break;
-				}
-
-				case 'producerScore':
-				{
-					const { producerId, score } = notification.data;
-
-					store.dispatch(
-						stateActions.setProducerScore(producerId, score));
-
-					break;
-				}
-
-				case 'newPeer':
-				{
-					const { id, displayName, picture, device } = notification.data;
-
-					store.dispatch(
-						stateActions.addPeer({ id, displayName, picture, device, consumers: [] }));
-
-					store.dispatch(requestActions.notify(
+	
+					case 'lobby:promotedPeer':
+					{
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.removeLobbyPeer(peerId));
+	
+						break;
+					}
+	
+					case 'lobby:changeDisplayName':
+					{
+						const { peerId, displayName } = notification.data;
+	
+						store.dispatch(
+							stateActions.setLobbyPeerDisplayName(displayName, peerId));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : `Participant in lobby changed name to ${displayName}.`
+							}));
+	
+						break;
+					}
+	
+					case 'setAccessCode':
+					{
+						const { accessCode } = notification.data;
+	
+						store.dispatch(
+							stateActions.setAccessCode(accessCode));
+						
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Access code for room updated'
+							}));
+	
+						break;
+					}
+	
+					case 'setJoinByAccessCode':
+					{
+						const { joinByAccessCode } = notification.data;
+						
+						store.dispatch(
+							stateActions.setJoinByAccessCode(joinByAccessCode));
+						
+						if (joinByAccessCode) 
 						{
-							text : `${displayName} joined the room.`
-						}));
-
-					break;
-				}
-
-				case 'peerClosed':
-				{
-					const { peerId } = notification.data;
-
-					store.dispatch(
-						stateActions.removePeer(peerId));
-
-					break;
-				}
-
-				case 'consumerClosed':
-				{
-					const { consumerId } = notification.data;
-					const consumer = this._consumers.get(consumerId);
-
-					if (!consumer)
+							store.dispatch(requestActions.notify(
+								{
+									text : 'Access code for room is now activated'
+								}));
+						}
+						else 
+						{
+							store.dispatch(requestActions.notify(
+								{
+									text : 'Access code for room is now deactivated'
+								}));
+						}
+	
 						break;
-
-					consumer.close();
-
-					if (consumer.hark != null)
-						consumer.hark.stop();
-
-					this._consumers.delete(consumerId);
-
-					const { peerId } = consumer.appData;
-
-					store.dispatch(
-						stateActions.removeConsumer(consumerId, peerId));
-
-					break;
-				}
-
-				case 'consumerPaused':
-				{
-					const { consumerId } = notification.data;
-					const consumer = this._consumers.get(consumerId);
-
-					if (!consumer)
+					}
+	
+					case 'activeSpeaker':
+					{
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.setRoomActiveSpeaker(peerId));
+						
+						if (peerId && peerId !== this._peerId)
+							this._spotlights.handleActiveSpeaker(peerId);
+	
 						break;
-
-					store.dispatch(
-						stateActions.setConsumerPaused(consumerId, 'remote'));
-
-					break;
-				}
-
-				case 'consumerResumed':
-				{
-					const { consumerId } = notification.data;
-					const consumer = this._consumers.get(consumerId);
-
-					if (!consumer)
+					}
+	
+					case 'changeDisplayName':
+					{
+						const { peerId, displayName, oldDisplayName } = notification.data;
+	
+						store.dispatch(
+							stateActions.setPeerDisplayName(displayName, peerId));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : `${oldDisplayName} is now ${displayName}`
+							}));
+	
 						break;
-
-					store.dispatch(
-						stateActions.setConsumerResumed(consumerId, 'remote'));
-
-					break;
-				}
-
-				case 'consumerLayersChanged':
-				{
-					const { consumerId, spatialLayer, temporalLayer } = notification.data;
-					const consumer = this._consumers.get(consumerId);
-
-					if (!consumer)
+					}
+	
+					case 'changePicture':
+					{
+						const { peerId, picture } = notification.data;
+	
+						store.dispatch(stateActions.setPeerPicture(peerId, picture));
+	
 						break;
-
-					store.dispatch(stateActions.setConsumerCurrentLayers(
-						consumerId, spatialLayer, temporalLayer));
-
-					break;
-				}
-
-				case 'consumerScore':
-				{
-					const { consumerId, score } = notification.data;
-
-					store.dispatch(
-						stateActions.setConsumerScore(consumerId, score));
-
-					break;
-				}
-
-				default:
-				{
-					logger.error(
-						'unknown notification.method "%s"', notification.method);
+					}
+	
+					case 'chatMessage':
+					{
+						const { peerId, chatMessage } = notification.data;
+	
+						store.dispatch(
+							stateActions.addResponseMessage({ ...chatMessage, peerId }));
+	
+						if (
+							!store.getState().toolarea.toolAreaOpen ||
+							(store.getState().toolarea.toolAreaOpen &&
+							store.getState().toolarea.currentToolTab !== 'chat')
+						) // Make sound
+						{
+							this._soundNotification();
+						}
+	
+						break;
+					}
+	
+					case 'sendFile':
+					{
+						const { peerId, magnetUri } = notification.data;
+	
+						store.dispatch(stateActions.addFile(peerId, magnetUri));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : 'New file available.'
+							}));
+	
+						if (
+							!store.getState().toolarea.toolAreaOpen ||
+							(store.getState().toolarea.toolAreaOpen &&
+							store.getState().toolarea.currentToolTab !== 'files')
+						) // Make sound
+						{
+							this._soundNotification();
+						}
+	
+						break;
+					}
+	
+					case 'producerScore':
+					{
+						const { producerId, score } = notification.data;
+	
+						store.dispatch(
+							stateActions.setProducerScore(producerId, score));
+	
+						break;
+					}
+	
+					case 'newPeer':
+					{
+						const { id, displayName, picture, device } = notification.data;
+	
+						store.dispatch(
+							stateActions.addPeer({ id, displayName, picture, device, consumers: [] }));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : `${displayName} joined the room.`
+							}));
+	
+						break;
+					}
+	
+					case 'peerClosed':
+					{
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.removePeer(peerId));
+	
+						break;
+					}
+	
+					case 'consumerClosed':
+					{
+						const { consumerId } = notification.data;
+						const consumer = this._consumers.get(consumerId);
+	
+						if (!consumer)
+							break;
+	
+						consumer.close();
+	
+						if (consumer.hark != null)
+							consumer.hark.stop();
+	
+						this._consumers.delete(consumerId);
+	
+						const { peerId } = consumer.appData;
+	
+						store.dispatch(
+							stateActions.removeConsumer(consumerId, peerId));
+	
+						break;
+					}
+	
+					case 'consumerPaused':
+					{
+						const { consumerId } = notification.data;
+						const consumer = this._consumers.get(consumerId);
+	
+						if (!consumer)
+							break;
+	
+						store.dispatch(
+							stateActions.setConsumerPaused(consumerId, 'remote'));
+	
+						break;
+					}
+	
+					case 'consumerResumed':
+					{
+						const { consumerId } = notification.data;
+						const consumer = this._consumers.get(consumerId);
+	
+						if (!consumer)
+							break;
+	
+						store.dispatch(
+							stateActions.setConsumerResumed(consumerId, 'remote'));
+	
+						break;
+					}
+	
+					case 'consumerLayersChanged':
+					{
+						const { consumerId, spatialLayer, temporalLayer } = notification.data;
+						const consumer = this._consumers.get(consumerId);
+	
+						if (!consumer)
+							break;
+	
+						store.dispatch(stateActions.setConsumerCurrentLayers(
+							consumerId, spatialLayer, temporalLayer));
+	
+						break;
+					}
+	
+					case 'consumerScore':
+					{
+						const { consumerId, score } = notification.data;
+	
+						store.dispatch(
+							stateActions.setConsumerScore(consumerId, score));
+	
+						break;
+					}
+	
+					default:
+					{
+						logger.error(
+							'unknown notification.method "%s"', notification.method);
+					}
 				}
 			}
+			catch (error)
+			{
+				logger.error('error on socket "notification" event failed:"%o"', error);
+
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'Error on server request.'
+					}));
+			}
+
 		});
 	}
 

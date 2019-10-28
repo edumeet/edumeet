@@ -123,7 +123,7 @@ class Room extends EventEmitter
 		}
 		else if (
 			this._locked ||
-			(config.requireSignInToAccess && !peer.authenticated)
+			(Boolean(config.requireSignInToAccess) && !peer.authenticated)
 		)
 		{
 			this._parkPeer(peer);
@@ -146,7 +146,7 @@ class Room extends EventEmitter
 
 			this._peers.forEach((peer) =>
 			{
-				this._notification(peer.socket, 'promotedPeer', { peerId: id });
+				this._notification(peer.socket, 'lobby:promotedPeer', { peerId: id });
 			});
 		});
 
@@ -155,23 +155,23 @@ class Room extends EventEmitter
 			!this._locked && this._lobby.promotePeer(peer.id);
 		});
 
-		this._lobby.on('displayNameChanged', (changedPeer) =>
+		this._lobby.on('changeDisplayName', (changedPeer) =>
 		{
 			const { id, displayName } = changedPeer;
 
 			this._peers.forEach((peer) =>
 			{
-				this._notification(peer.socket, 'lobbyPeerDisplayNameChanged', { peerId: id, displayName });
+				this._notification(peer.socket, 'lobby:changeDisplayName', { peerId: id, displayName });
 			});
 		});
 
-		this._lobby.on('pictureChanged', (changedPeer) =>
+		this._lobby.on('changePicture', (changedPeer) =>
 		{
 			const { id, picture } = changedPeer;
 
 			this._peers.forEach((peer) =>
 			{
-				this._notification(peer.socket, 'lobbyPeerPictureChanged', { peerId: id, picture });
+				this._notification(peer.socket, 'lobby:changePicture', { peerId: id, picture });
 			});
 		});
 
@@ -183,7 +183,7 @@ class Room extends EventEmitter
 
 			this._peers.forEach((peer) =>
 			{
-				this._notification(peer.socket, 'lobbyPeerClosed', { peerId: id });
+				this._notification(peer.socket, 'lobby:peerClosed', { peerId: id });
 			});
 		});
 
@@ -310,31 +310,6 @@ class Room extends EventEmitter
 
 					cb(error);
 				});
-		});
-
-		peer.on('displayNameChanged', ({ oldDisplayName }) =>
-		{
-			if (!peer.joined)
-				return;
-
-			// Spread to others
-			this._notification(peer.socket, 'changeDisplayName', {
-				peerId         : peer.id,
-				displayName    : peer.displayName,
-				oldDisplayName : oldDisplayName
-			}, true);
-		});
-
-		peer.on('pictureChanged', () =>
-		{
-			if (!peer.joined)
-				return;
-
-			// Spread to others
-			this._notification(peer.socket, 'changeProfilePicture', {
-				peerId  : peer.id,
-				picture : peer.picture
-			}, true);
 		});
 
 		peer.on('close', () =>
@@ -754,6 +729,52 @@ class Room extends EventEmitter
 				const stats = await consumer.getStats();
 
 				cb(null, stats);
+
+				break;
+			}
+
+			case 'changeDisplayName':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { displayName } = request.data;
+				const oldDisplayName = peer.data.displayName;
+
+				peer.displayName = displayName;
+
+				// Spread to others
+				this._notification(peer.socket, 'changeDisplayName', {
+					peerId         : peer.id,
+					displayName    : displayName,
+					oldDisplayName : oldDisplayName
+				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'changePicture':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.data.joined)
+					throw new Error('Peer not yet joined');
+
+				const { picture } = request.data;
+
+				peer.picture = picture;
+
+				// Spread to others
+				this._notification(peer.socket, 'changePicture', {
+					peerId  : peer.id,
+					picture : picture
+				}, true);
+
+				// Return no error
+				cb();
 
 				break;
 			}

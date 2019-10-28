@@ -70,7 +70,9 @@ const Lobby = ({
 			case 'Escape':
 			{
 				if (displayName === '')
-					changeDisplayName('Guest');
+					roomClient.changeDisplayName('Guest');
+				else
+					roomClient.changeDisplayName(displayName);
 				break;
 			}
 			default:
@@ -111,7 +113,9 @@ const Lobby = ({
 					onBlur={() =>
 					{
 						if (displayName === '')
-							changeDisplayName('Guest');
+							roomClient.changeDisplayName('Guest');
+						else
+							roomClient.changeDisplayName(displayName);
 					}}
 					margin='normal'
 				/>
