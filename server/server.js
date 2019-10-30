@@ -177,8 +177,10 @@ async function setupAuth(oidcIssuer)
 	// any of the supported values directly, i.e. "S256" (recommended) or "plain"
 	const usePKCE = false;
 
+	const cClient = oidcClient;
+
 	oidcStrategy = new Strategy(
-		{ oidcClient, params, passReqToCallback, usePKCE },
+		{ cClient, params, passReqToCallback, usePKCE },
 		(tokenset, userinfo, done) =>
 		{
 			const user =
