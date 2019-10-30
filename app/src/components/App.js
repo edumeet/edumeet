@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Room from './Room';
 import JoinDialog from './JoinDialog';
-import Lobby from './Lobby';
 
 const App = (props) =>
 {
@@ -11,13 +10,7 @@ const App = (props) =>
 		room
 	} = props;
 
-	if (room.inLobby)
-	{
-		return (
-			<Lobby />
-		);
-	}
-	else if (!room.joined)
+	if (!room.joined)
 	{
 		return (
 			<JoinDialog />
