@@ -343,7 +343,7 @@ class Room extends EventEmitter
 		peer.on('displayNameChanged', ({ oldDisplayName }) =>
 		{
 			// Ensure the Peer is joined.
-			if (!peer.data.joined)
+			if (!peer.joined)
 				throw new Error('Peer not yet joined');
 
 			// Spread to others
@@ -357,7 +357,7 @@ class Room extends EventEmitter
 		peer.on('pictureChanged', () =>
 		{
 			// Ensure the Peer is joined.
-			if (!peer.data.joined)
+			if (!peer.joined)
 				throw new Error('Peer not yet joined');
 
 			// Spread to others
@@ -787,7 +787,7 @@ class Room extends EventEmitter
 			case 'changePicture':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { picture } = request.data;
