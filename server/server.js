@@ -177,10 +177,8 @@ async function setupAuth(oidcIssuer)
 	// any of the supported values directly, i.e. "S256" (recommended) or "plain"
 	const usePKCE = false;
 
-	const client = oidcClient;
-
 	oidcStrategy = new Strategy(
-		{ client, params, passReqToCallback, usePKCE },
+		{ client: oidcClient, params, passReqToCallback, usePKCE },
 		(tokenset, userinfo, done) =>
 		{
 			const user =
@@ -286,6 +284,8 @@ async function setupAuth(oidcIssuer)
 			const peer = peers.get(state.id);
 
 			peer && (peer.authenticated = true);
+			peer && (peer.displayName = displayName);
+			peer && (peer.picture = picture);
 
 			res.send(httpHelper({
 				displayName,

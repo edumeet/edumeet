@@ -339,6 +339,33 @@ class Room extends EventEmitter
 				this.selfDestructCountdown();
 			}
 		});
+
+		peer.on('displayNameChanged', ({ oldDisplayName }) =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.data.joined)
+				throw new Error('Peer not yet joined');
+
+			// Spread to others
+			this._notification(peer.socket, 'changeDisplayName', {
+				peerId         : peer.id,
+				displayName    : peer.displayName,
+				oldDisplayName : oldDisplayName
+			}, true);
+		});
+
+		peer.on('pictureChanged', () =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.data.joined)
+				throw new Error('Peer not yet joined');
+
+			// Spread to others
+			this._notification(peer.socket, 'changePicture', {
+				peerId  : peer.id,
+				picture : peer.picture
+			}, true);
+		});
 	}
 
 	async _handleSocketRequest(peer, request, cb)

@@ -192,7 +192,14 @@ class Peer extends EventEmitter
 
 	set displayName(displayName)
 	{
-		this._displayName = displayName;
+		if (displayName !== this._displayName)
+		{
+			const oldDisplayName = this._displayName;
+
+			this._displayName = displayName;
+			
+			this.emit('displayNameChanged', { oldDisplayName });
+		}
 	}
 
 	get picture()
@@ -202,7 +209,14 @@ class Peer extends EventEmitter
 
 	set picture(picture)
 	{
-		this._picture = picture;
+		if (picture !== this._picture)
+		{
+			const oldPicture = this._picture;
+
+			this._picture = picture;
+			
+			this.emit('pictureChanged', { oldPicture });
+		}
 	}
 
 	get email()
