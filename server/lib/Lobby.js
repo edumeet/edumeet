@@ -1,5 +1,7 @@
 const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
+const config = require('../config/config');
+
 
 const logger = new Logger('Lobby');
 
@@ -88,6 +90,9 @@ class Lobby extends EventEmitter
 			return;
 
 		this._notification(peer.socket, 'enteredLobby');
+
+		if (config.requireSignInToAccess && !peer.authenticated && !super.isLocked) 
+			this._notification(peer.socket, 'signInRequired');
 
 		this._peers.set(peer.id, peer);
 

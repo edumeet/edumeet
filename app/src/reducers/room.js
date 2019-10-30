@@ -5,6 +5,7 @@ const initialState =
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
 	inLobby            : false,
+	signInRequired     : false,
 	accessCode         : '', // access code to the room if locked and joinByAccessCode == true
 	joinByAccessCode   : true, // if true: accessCode is a possibility to open the room
 	activeSpeakerId    : null,
@@ -64,6 +65,13 @@ const room = (state = initialState, action) =>
 			const { inLobby } = action.payload;
 
 			return { ...state, inLobby };
+		}
+
+		case 'SET_SIGN_IN_REQUIRED':
+		{
+			const { signInRequired } = action.payload;
+
+			return { ...state, signInRequired };
 		}
 
 		case 'SET_ACCESS_CODE':

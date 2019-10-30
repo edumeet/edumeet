@@ -53,6 +53,14 @@ export const setInLobby = (inLobby) =>
 	};
 };
 
+export const setSignInRequired = (signInRequired) =>
+{
+	return {
+		type    : 'SET_SIGN_IN_REQUIRED',
+		payload : { signInRequired }
+	};
+};
+
 export const setAccessCode = (accessCode) =>
 {
 	return {

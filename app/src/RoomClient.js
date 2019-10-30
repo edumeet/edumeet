@@ -1314,7 +1314,14 @@ export default class RoomClient
 						await this.sendRequest('changeDisplayName', { displayName });
 						break;
 					}
+
+					case 'signInRequired':
+					{
+						store.dispatch(stateActions.setSignInRequired(true));
 	
+						break;
+					}
+						
 					case 'roomReady':
 					{
 						store.dispatch(stateActions.toggleJoined());

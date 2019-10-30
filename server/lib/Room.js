@@ -83,6 +83,11 @@ class Room extends EventEmitter
 		this._handleAudioLevelObserver();
 	}
 
+	isLocked()
+	{
+		return this._locked;
+	}
+
 	close()
 	{
 		logger.debug('close()');

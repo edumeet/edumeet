@@ -198,7 +198,16 @@ const JoinDialog = ({
 					: 
 					<Typography variant='h6'>
 						<div className={classes.green}> Ok, you are ready</div> 
-						The room is looked - hang on until somebody lets you in ...
+						{ room.signInRequired ?
+							<div>
+								The room is empty! 
+								You can Log In to start the meeting or wait until the host joins.
+							</div>
+							:
+							<div>
+								The room is locked - hang on until somebody lets you in ...
+							</div>
+						}
 					</Typography>
 				}
 
@@ -252,6 +261,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room.inLobby === next.room.inLobby &&
+				prev.room.signInRequired === next.room.signInRequired &&
 				prev.settings.displayName === next.settings.displayName &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.loggedIn === next.me.loggedIn &&
