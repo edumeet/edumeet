@@ -344,7 +344,7 @@ class Room extends EventEmitter
 		{
 			// Ensure the Peer is joined.
 			if (!peer.joined)
-				throw new Error('Peer not yet joined');
+				return;
 
 			// Spread to others
 			this._notification(peer.socket, 'changeDisplayName', {
@@ -358,7 +358,7 @@ class Room extends EventEmitter
 		{
 			// Ensure the Peer is joined.
 			if (!peer.joined)
-				throw new Error('Peer not yet joined');
+				return;
 
 			// Spread to others
 			this._notification(peer.socket, 'changePicture', {
