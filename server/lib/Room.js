@@ -736,11 +736,11 @@ class Room extends EventEmitter
 			case 'changeDisplayName':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { displayName } = request.data;
-				const oldDisplayName = peer.data.displayName;
+				const oldDisplayName = peer.displayName;
 
 				peer.displayName = displayName;
 
