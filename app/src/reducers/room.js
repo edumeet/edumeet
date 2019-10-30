@@ -1,6 +1,7 @@
 const initialState =
 {
 	url                : null,
+	name               : '',
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
 	inLobby            : false,
@@ -29,6 +30,13 @@ const room = (state = initialState, action) =>
 			const { url } = action.payload;
 
 			return { ...state, url };
+		}
+
+		case 'SET_ROOM_NAME':
+		{
+			const { name } = action.payload;
+
+			return { ...state, name };
 		}
 
 		case 'SET_ROOM_STATE':

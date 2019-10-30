@@ -6,6 +6,15 @@ export const setRoomUrl = (url) =>
 	};
 };
 
+export const setRoomName = (name) =>
+{
+	return {
+		type    : 'SET_ROOM_NAME',
+		payload : { name }
+	};
+};
+
+
 export const setRoomState = (state) =>
 {
 	return {

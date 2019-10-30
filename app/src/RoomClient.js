@@ -120,6 +120,7 @@ export default class RoomClient
 
 		// The room ID
 		this._roomId = roomId;
+		store.dispatch(stateActions.setRoomName(roomId));
 
 		// mediasoup-client Device instance.
 		// @type {mediasoupClient.Device}
@@ -757,6 +758,22 @@ export default class RoomClient
 		{
 			logger.error('updateSpotlights() failed: %o', error);
 		}
+	}
+
+	async getAudioTrack()
+	{
+		await navigator.mediaDevices.getUserMedia(
+			{
+				audio : true, video : false 
+			});
+	}
+
+	async getVideoTrack()
+	{
+		await navigator.mediaDevices.getUserMedia(
+			{
+				audio : false, video : true 
+			});
 	}
 
 	async changeAudioDevice(deviceId)
@@ -2467,7 +2484,7 @@ export default class RoomClient
 
 		try
 		{
-			logger.debug('_getAudioDeviceId() | calling _updateWebcams()');
+			logger.debug('_getAudioDeviceId() | calling _updateAudioDeviceId()');
 
 			await this._updateAudioDevices();
 
