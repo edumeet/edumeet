@@ -658,8 +658,6 @@ export default class RoomClient
 					stateActions.addLobbyPeer(peer.peerId));
 				store.dispatch(
 					stateActions.setLobbyPeerDisplayName(peer.displayName));
-				store.dispatch(
-						stateActions.setLobbyPeerPicture(peer.picture));
 			});
 
 			(accessCode != null) && store.dispatch(
@@ -1417,21 +1415,6 @@ export default class RoomClient
 						break;
 					}
 	
-					case 'lobby:changePicture':
-					{
-						const { peerId, picture } = notification.data;
-	
-						store.dispatch(
-							stateActions.setLobbyPeerPicture(picture, peerId));
-	
-						store.dispatch(requestActions.notify(
-							{
-								text : `Participant in lobby changed picture.`
-							}));
-	
-						break;
-					}
-
 					case 'setAccessCode':
 					{
 						const { accessCode } = notification.data;
