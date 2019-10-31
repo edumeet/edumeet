@@ -126,16 +126,15 @@ class Room extends EventEmitter
 
 			return;
 		}
-		else if (
-			this._locked ||
-			(Boolean(config.requireSignInToAccess) && !peer.authenticated)
-		)
+		else if ( this._locked )
 		{
 			this._parkPeer(peer);
-
-			if (!this._locked)
-				this._notification(peer.socket, 'signInRequired');
-
+			return;
+		}
+		else if ( Boolean(config.requireSignInToAccess) && this.checkEmpty()) 
+		{       
+			this._parkPeer(peer);
+			this._notification(peer.socket, 'signInRequired');
 			return;
 		}
 
@@ -875,6 +874,7 @@ class Room extends EventEmitter
 				this._notification(peer.socket, 'unlockRoom', {
 					peerId : peer.id
 				}, true);
+				this._lobby.promoteAllPeers();
 
 				// Return no error
 				cb();
