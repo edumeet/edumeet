@@ -461,6 +461,14 @@ export const setLobbyPeerDisplayName = (displayName, peerId) =>
 	};
 };
 
+export const setLobbyPeerPicture = (picture, peerId) =>
+{
+	return {
+		type    : 'SET_LOBBY_PEER_PICTURE',
+		payload : { picture, peerId }
+	};
+};
+
 export const setLobbyPeerPromotionInProgress = (peerId, flag) =>
 {
 	return {

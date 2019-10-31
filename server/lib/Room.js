@@ -133,6 +133,9 @@ class Room extends EventEmitter
 		{
 			this._parkPeer(peer);
 
+			if (!this._locked)
+				this._notification(peer.socket, 'signInRequired');
+
 			return;
 		}
 

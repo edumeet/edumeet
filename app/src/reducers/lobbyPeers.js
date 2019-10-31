@@ -7,7 +7,10 @@ const lobbyPeer = (state = {}, action) =>
 
 		case 'SET_LOBBY_PEER_DISPLAY_NAME':
 			return { ...state, displayName: action.payload.displayName };
-
+		
+		case 'SET_LOBBY_PEER_PICTURE':
+			return { ...state, picture: action.payload.picture };
+	
 		case 'SET_LOBBY_PEER_PROMOTION_IN_PROGRESS':
 			return { ...state, promotionInProgress: action.payload.flag };
 

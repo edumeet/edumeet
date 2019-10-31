@@ -91,9 +91,6 @@ class Lobby extends EventEmitter
 
 		this._notification(peer.socket, 'enteredLobby');
 
-		if (config.requireSignInToAccess && !peer.authenticated && !super.isLocked()) 
-			this._notification(peer.socket, 'signInRequired');
-
 		this._peers.set(peer.id, peer);
 
 		peer.on('authenticationChanged', () =>
