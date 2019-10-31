@@ -91,7 +91,7 @@ class Lobby extends EventEmitter
 
 		this._notification(peer.socket, 'enteredLobby');
 
-		if (config.requireSignInToAccess && !peer.authenticated && !super.isLocked) 
+		if (config.requireSignInToAccess && !peer.authenticated && !super.isLocked()) 
 			this._notification(peer.socket, 'signInRequired');
 
 		this._peers.set(peer.id, peer);
@@ -157,6 +157,18 @@ class Lobby extends EventEmitter
 				peer.displayName = displayName;
 
 				this.emit('changeDisplayName', peer);
+
+				cb();
+
+				break;
+			}			
+			case 'changePicture':
+			{
+				const { picture } = request.data;
+
+				peer.picture = picture;
+
+				this.emit('changePicture', peer);
 
 				cb();
 

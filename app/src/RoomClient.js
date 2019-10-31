@@ -330,6 +330,8 @@ export default class RoomClient
 			{
 				text : 'You are logged in.'
 			}));
+		this.changeDisplayName(displayName);
+		this.changePicture(picture);
 	}
 
 	_soundNotification()

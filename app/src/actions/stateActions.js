@@ -14,7 +14,6 @@ export const setRoomName = (name) =>
 	};
 };
 
-
 export const setRoomState = (state) =>
 {
 	return {
@@ -76,7 +75,6 @@ export const setJoinByAccessCode = (joinByAccessCode) =>
 		payload : { joinByAccessCode }
 	};
 };
-
 
 export const setSettingsOpen = ({ settingsOpen }) =>
 	({
