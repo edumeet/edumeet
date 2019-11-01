@@ -6,6 +6,7 @@ const config = require('./config/config');
 const fs = require('fs');
 const http = require('http');
 const spdy = require('spdy');
+const { constants } = require('crypto');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -54,8 +55,21 @@ const peers = new Map();
 // TLS server configuration.
 const tls =
 {
-	cert : fs.readFileSync(config.tls.cert),
-	key  : fs.readFileSync(config.tls.key)
+	cert          : fs.readFileSync(config.tls.cert),
+	key           : fs.readFileSync(config.tls.key),
+	secureOptions : 'tlsv12',
+	ciphers       :
+	[
+		'ECDHE-ECDSA-AES128-GCM-SHA256',
+		'ECDHE-RSA-AES128-GCM-SHA256',
+		'ECDHE-ECDSA-AES256-GCM-SHA384',
+		'ECDHE-RSA-AES256-GCM-SHA384',
+		'ECDHE-ECDSA-CHACHA20-POLY1305',
+		'ECDHE-RSA-CHACHA20-POLY1305',
+		'DHE-RSA-AES128-GCM-SHA256',
+		'DHE-RSA-AES256-GCM-SHA384'
+	].join(':'),
+	honorCipherOrder : true
 };
 
 const app = express();
