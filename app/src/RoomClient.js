@@ -330,7 +330,8 @@ export default class RoomClient
 			{
 				text : 'You are logged in.'
 			}));
-		if ( store.getState().room.state !== 'new' ) // no socket yet
+
+		if (store.getState().room.state !== 'new') // no socket yet
 		{
 			this.changeDisplayName(displayName);
 			this.changePicture(picture);
@@ -1142,39 +1143,57 @@ export default class RoomClient
 			logger.debug('signaling Peer "connect" event');
 		});
 
-		this._signalingSocket.on('disconnect', () =>
+		this._signalingSocket.on('disconnect', (reason) =>
 		{
-			logger.warn('signaling Peer "disconnect" event');
+			logger.warn('signaling Peer "disconnect" event [reason:"%s"]', reason);
+
+			if (this._closed)
+				return;
+
+			if (reason === 'io server disconnect')
+			{
+				store.dispatch(requestActions.notify(
+					{
+						text : 'You are disconnected.'
+					}));
+	
+				store.dispatch(stateActions.setRoomState('closed'));
+
+				this.close();
+			}
+
+			store.dispatch(requestActions.notify(
+				{
+					text : 'You are disconnected, attempting to reconnect.'
+				}));
+
+			store.dispatch(stateActions.setRoomState('connecting'));
+		});
+
+		this._signalingSocket.on('reconnect_failed', () =>
+		{
+			logger.warn('signaling Peer "reconnect_failed" event');
 
 			store.dispatch(requestActions.notify(
 				{
 					text : 'You are disconnected.'
 				}));
 
-			// Close mediasoup Transports.
-			if (this._sendTransport)
-			{
-				this._sendTransport.close();
-				this._sendTransport = null;
-			}
-
-			if (this._recvTransport)
-			{
-				this._recvTransport.close();
-				this._recvTransport = null;
-			}
-
 			store.dispatch(stateActions.setRoomState('closed'));
-		});
-
-		this._signalingSocket.on('close', () =>
-		{
-			if (this._closed)
-				return;
-
-			logger.warn('signaling Peer "close" event');
 
 			this.close();
+		});
+
+		this._signalingSocket.on('reconnect', (attemptNumber) =>
+		{
+			logger.debug('signaling Peer "reconnect" event [attempts:"%s"]', attemptNumber);
+
+			store.dispatch(requestActions.notify(
+				{
+					text : 'You are reconnected.'
+				}));
+
+			store.dispatch(stateActions.setRoomState('connected'));
 		});
 
 		this._signalingSocket.on('request', async (request, cb) =>
@@ -1320,7 +1339,7 @@ export default class RoomClient
 						const { picture } = store.getState().me;
 	
 						await this.sendRequest('changeDisplayName', { displayName });
-						await this.sendRequest('changePicture', { picture })
+						await this.sendRequest('changePicture', { picture });
 						break;
 					}
 
@@ -1431,7 +1450,7 @@ export default class RoomClient
 	
 						store.dispatch(requestActions.notify(
 							{
-								text : `Participant in lobby changed picture.`
+								text : 'Participant in lobby changed picture.'
 							}));
 	
 						break;
