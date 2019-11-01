@@ -1,19 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
 import * as stateActions from '../actions/stateActions';
 import PropTypes from 'prop-types';
 import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
-import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 import CookieConsent from 'react-cookie-consent';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
 
 const styles = (theme) =>
 	({
@@ -29,54 +32,134 @@ const styles = (theme) =>
 			backgroundSize       : 'cover',
 			backgroundRepeat     : 'no-repeat'
 		},
+		dialogTitle :
+		{
+		},
 		dialogPaper :
 		{
-			width                          : '20vw',
+			width                          : '30vw',
 			padding                        : theme.spacing(2),
 			[theme.breakpoints.down('lg')] :
 			{
-				width : '30vw'
+				width : '40vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width : '40vw'
+				width : '50vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width : '60vw'
+				width : '70vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width : '80vw'
+				width : '90vw'
 			}
-		},
-		title :
-		{
-			position   : 'relative',
-			alignItems : 'center',
-			display    : 'flex',
-			marginLeft : 0
-		},
-		actionButtons :
-		{
-			right    : 0,
-			position : 'absolute'
 		},
 		logo :
 		{
-			display : 'block'
+			display       : 'block',
+			paddingBottom : '1vh'
+		},
+		loginButton :
+		{
+			position : 'absolute',
+			right    : theme.spacing(2),
+			top      : theme.spacing(2),
+			padding  : 0
+		},
+		largeIcon :
+		{
+			fontSize : '2em'
+		},
+		largeAvatar :
+		{
+			width  : 50,
+			height : 50
 		},
 		green :
 		{
-			color : 'rgba(0,255,0,1)'
+			color : 'rgba(0, 153, 0, 1)'
 		}
 	});
+
+const DialogTitle = withStyles(styles)((props) =>
+{
+	const [ open, setOpen ] = useState(false);
+
+	useEffect(() =>
+	{
+		const openTimer = setTimeout(() => setOpen(true), 1000);
+		const closeTimer = setTimeout(() => setOpen(false), 4000);
+
+		return () =>
+		{
+			clearTimeout(openTimer);
+			clearTimeout(closeTimer);
+		};
+	}, []);
+
+	const { children, classes, myPicture, onLogin, ...other } = props;
+
+	const handleTooltipClose = () =>
+	{
+		setOpen(false);
+	};
+
+	const handleTooltipOpen = () =>
+	{
+		setOpen(true);
+	};
+
+	return (
+		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
+			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+			<Typography variant='h5'>{children}</Typography>
+			{ window.config.loginEnabled &&
+				<Tooltip
+					onClose={handleTooltipClose}
+					onOpen={handleTooltipOpen}
+					open={open}
+					title='Click to log in'
+					placement='left'
+				>
+					<IconButton
+						aria-label='Account'
+						className={classes.loginButton}
+						color='inherit'
+						onClick={onLogin}
+					>
+						{ myPicture ?
+							<Avatar src={myPicture} className={classes.largeAvatar} />
+							:
+							<AccountCircle className={classes.largeIcon} />
+						}
+					</IconButton>
+				</Tooltip>
+			}
+		</MuiDialogTitle>
+	);
+});
+
+const DialogContent = withStyles((theme) => ({
+	root :
+	{
+		padding : theme.spacing(2)
+	}
+}))(MuiDialogContent);
+
+const DialogActions = withStyles((theme) => ({
+	root :
+	{
+		margin  : 0,
+		padding : theme.spacing(1)
+	}
+}))(MuiDialogActions);
 
 const JoinDialog = ({
 	roomClient,
 	room,
 	displayName,
-	loginEnabled,
 	loggedIn,
 	myPicture,
 	changeDisplayName,
@@ -109,68 +192,53 @@ const JoinDialog = ({
 					paper : classes.dialogPaper
 				}}
 			>
-				<DialogTitle disableTypography className={classes.title}> 
-					{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
-					<div className={classes.title}>
-						<Typography variant='h4'>
-							{ window.config.title } 
-						</Typography>
-					</div>
-					<div className={classes.grow} />
-					<div className={classes.actionButtons}>
-						{ loginEnabled &&
-							<IconButton
-								aria-label='Account'
-								className={classes.actionButton}
-								color='inherit'
-								onClick={() => 
-								{
-									loggedIn ? roomClient.logout() : roomClient.login();
-								}}
-							>
-								{ myPicture ?
-									<Avatar src={myPicture} />
-									:
-									<AccountCircle />
-								}
-							</IconButton>
-						}
-					</div>
+				<DialogTitle
+					myPicture={myPicture}
+					onLogin={() => 
+					{
+						loggedIn ? roomClient.logout() : roomClient.login();
+					}}
+				>
+					{ window.config.title }
+					<hr />
 				</DialogTitle>
-				{ window.config.logo &&
-					<img alt='Logo' className={classes.logo} src={window.config.logo} />
-				}
-				<Typography variant='h6'>
-					You are about to join a meeting.
-				</Typography>
-				<Typography variant='h5'>
-					<center> Room ID: { room.name } </center>
-				</Typography>
-				<Typography variant='h6'>
-					Set your name for participation,
-					and choose how you want to join:
-				</Typography>
+				<DialogContent>
+					<DialogContentText gutterBottom>
+						You are about to join a meeting.
+					</DialogContentText>
 
-				<TextField
-					id='displayname'
-					label='Your name'
-					className={classes.textField}
-					value={displayName}
-					onChange={(event) =>
-					{
-						const { value } = event.target;
+					<DialogContentText variant='h6' gutterBottom align='center'>
+						Room ID: { room.name }
+					</DialogContentText>
 
-						changeDisplayName(value);
-					}}
-					onKeyDown={handleKeyDown}
-					onBlur={() =>
-					{
-						if (displayName === '')
-							changeDisplayName('Guest');
-						if (room.inLobby) roomClient.changeDisplayName(displayName);
-					}}
-					margin='normal'
-				/>
+					<DialogContentText gutterBottom>
+						Set your name for participation,
+						and choose how you want to join:
+					</DialogContentText>
+
+					<TextField
+						id='displayname'
+						label='Your name'
+						value={displayName}
+						variant='outlined'
+						margin='normal'
+						onChange={(event) =>
+						{
+							const { value } = event.target;
+
+							changeDisplayName(value);
+						}}
+						onKeyDown={handleKeyDown}
+						onBlur={() =>
+						{
+							if (displayName === '')
+								changeDisplayName('Guest');
+							if (room.inLobby) roomClient.changeDisplayName(displayName);
+						}}
+						fullWidth
+					/>
+
+				</DialogContent>
 
 				{ !room.inLobby ?
 					<DialogActions>
@@ -196,19 +264,26 @@ const JoinDialog = ({
 						</Button>
 					</DialogActions>
 					: 
-					<Typography variant='h6'>
-						<div className={classes.green}> Ok, you are ready</div> 
+					<DialogContent>
+						<DialogContentText
+							className={classes.green}
+							gutterBottom
+							variant='h6'
+							align='center'
+						>
+							Ok, you are ready
+						</DialogContentText>
 						{ room.signInRequired ?
-							<div>
+							<DialogContentText gutterBottom>
 								The room is empty! 
 								You can Log In to start the meeting or wait until the host joins.
-							</div>
+							</DialogContentText>
 							:
-							<div>
+							<DialogContentText gutterBottom>
 								The room is locked - hang on until somebody lets you in ...
-							</div>
+							</DialogContentText>
 						}
-					</Typography>
+					</DialogContent>
 				}
 
 				<CookieConsent>
