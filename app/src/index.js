@@ -9,7 +9,7 @@ import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as stateActions from './actions/stateActions';
-import Room from './components/Room';
+import App from './components/App';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
@@ -19,7 +19,7 @@ import * as serviceWorker from './serviceWorker';
 
 import './index.css';
 
-if (process.env.NODE_ENV !== 'production')
+if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
 	debug.enable('* -engine* -socket* -RIE* *WARN* *ERROR*');
 }
@@ -62,8 +62,8 @@ function run()
 		window.history.pushState('', '', urlParser.toString());
 	}
 
+	const accessCode = parameters.get('code');
 	const produce = parameters.get('produce') !== 'false';
-	const consume = parameters.get('consume') !== 'false';
 	const useSimulcast = parameters.get('simulcast') === 'true';
 	const forceTcp = parameters.get('forceTcp') === 'true';
 
@@ -84,7 +84,7 @@ function run()
 	);
 
 	roomClient = new RoomClient(
-		{ roomId, peerId, device, useSimulcast, produce, consume, forceTcp });
+		{ roomId, peerId, accessCode, device, useSimulcast, produce, forceTcp });
 
 	global.CLIENT = roomClient;
 
@@ -94,7 +94,7 @@ function run()
 				<PersistGate loading={<LoadingView />} persistor={persistor}>
 					<RoomContext.Provider value={roomClient}>
 						<SnackbarProvider>
-							<Room />
+							<App />
 						</SnackbarProvider>
 					</RoomContext.Provider>
 				</PersistGate>

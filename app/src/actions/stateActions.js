@@ -6,6 +6,14 @@ export const setRoomUrl = (url) =>
 	};
 };
 
+export const setRoomName = (name) =>
+{
+	return {
+		type    : 'SET_ROOM_NAME',
+		payload : { name }
+	};
+};
+
 export const setRoomState = (state) =>
 {
 	return {
@@ -36,10 +44,35 @@ export const setRoomUnLocked = () =>
 	};
 };
 
-export const setRoomLockedOut = () =>
+export const setInLobby = (inLobby) =>
 {
 	return {
-		type : 'SET_ROOM_LOCKED_OUT'
+		type    : 'SET_IN_LOBBY',
+		payload : { inLobby }
+	};
+};
+
+export const setSignInRequired = (signInRequired) =>
+{
+	return {
+		type    : 'SET_SIGN_IN_REQUIRED',
+		payload : { signInRequired }
+	};
+};
+
+export const setAccessCode = (accessCode) =>
+{
+	return {
+		type    : 'SET_ACCESS_CODE',
+		payload : { accessCode }
+	};
+};
+
+export const setJoinByAccessCode = (joinByAccessCode) =>
+{
+	return {
+		type    : 'SET_JOIN_BY_ACCESS_CODE',
+		payload : { joinByAccessCode }
 	};
 };
 
@@ -49,6 +82,12 @@ export const setSettingsOpen = ({ settingsOpen }) =>
 		payload : { settingsOpen }
 	});
 
+export const setLockDialogOpen = ({ lockDialogOpen }) =>
+	({
+		type    : 'SET_LOCK_DIALOG_OPEN',
+		payload : { lockDialogOpen }
+	});
+		
 export const setMe = ({ peerId, device, loginEnabled }) =>
 {
 	return {
@@ -126,6 +165,14 @@ export const setDisplayName = (displayName) =>
 	};
 };
 
+export const setDisplayNameInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_DISPLAY_NAME_IN_PROGRESS',
+		payload : { flag }
+	};
+};
+
 export const toggleAdvancedMode = () =>
 {
 	return {
@@ -175,6 +222,13 @@ export const toggleSettings = () =>
 {
 	return {
 		type : 'TOGGLE_SETTINGS'
+	};
+};
+
+export const toggleLockDialog = () =>
+{
+	return {
+		type : 'TOGGLE_LOCK_DIALOG'
 	};
 };
 
@@ -391,6 +445,46 @@ export const setPeerVolume = (peerId, volume) =>
 	};
 };
 
+export const addLobbyPeer = (peerId) =>
+{
+	return {
+		type    : 'ADD_LOBBY_PEER',
+		payload : { peerId }
+	};
+};
+
+export const removeLobbyPeer = (peerId) =>
+{
+	return {
+		type    : 'REMOVE_LOBBY_PEER',
+		payload : { peerId }
+	};
+};
+
+export const setLobbyPeerDisplayName = (displayName, peerId) =>
+{
+	return {
+		type    : 'SET_LOBBY_PEER_DISPLAY_NAME',
+		payload : { displayName, peerId }
+	};
+};
+
+export const setLobbyPeerPicture = (picture, peerId) =>
+{
+	return {
+		type    : 'SET_LOBBY_PEER_PICTURE',
+		payload : { picture, peerId }
+	};
+};
+
+export const setLobbyPeerPromotionInProgress = (peerId, flag) =>
+{
+	return {
+		type    : 'SET_LOBBY_PEER_PROMOTION_IN_PROGRESS',
+		payload : { peerId, flag }
+	};
+};
+
 export const addNotification = (notification) =>
 {
 	return {
@@ -555,9 +649,10 @@ export const setPeerPicture = (peerId, picture) =>
 		payload : { peerId, picture }
 	});
 
-export const loggedIn = () =>
+export const loggedIn = (flag) =>
 	({
-		type : 'LOGGED_IN'
+		type    : 'LOGGED_IN',
+		payload : { flag }
 	});
 
 export const toggleJoined = () =>

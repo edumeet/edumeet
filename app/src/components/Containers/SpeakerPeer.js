@@ -117,11 +117,10 @@ const SpeakerPeer = (props) =>
 				style={spacingStyle}
 			>
 				<div className={classnames(classes.viewContainer)} style={style}>
-					{ !videoVisible ?
+					{ !videoVisible &&
 						<div className={classes.videoInfo}>
 							<p>this video is paused</p>
 						</div>
-						:null
 					}
 
 					<VideoView
@@ -140,18 +139,17 @@ const SpeakerPeer = (props) =>
 				</div>
 			</div>
 
-			{ screenConsumer ?
+			{ screenConsumer &&
 				<div
 					className={classnames(classes.root, 'screen')}
 				>
-					{ !screenVisible ?
+					{ !screenVisible &&
 						<div className={classes.videoInfo} style={style}>
 							<p>this video is paused</p>
 						</div>
-						:null
 					}
 
-					{ screenVisible ?
+					{ screenVisible &&
 						<div className={classnames(classes.viewContainer)} style={style}>
 							<VideoView
 								advancedMode={advancedMode}
@@ -162,10 +160,8 @@ const SpeakerPeer = (props) =>
 								videoCodec={screenConsumer ? screenConsumer.codec : null}
 							/>
 						</div>
-						:null
 					}
 				</div>
-				:null
 			}
 		</React.Fragment>
 	);

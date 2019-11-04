@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 process.title = 'multiparty-meeting-server';
 
 const config = require('./config/config');
@@ -9,17 +7,28 @@ const fs = require('fs');
 const http = require('http');
 const spdy = require('spdy');
 const express = require('express');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
-const utils = require('./util');
+const Peer = require('./lib/Peer');
 const base64 = require('base-64');
+const helmet = require('helmet');
+const {
+	loginHelper,
+	logoutHelper
+} = require('./httpHelper');
 // auth
 const passport = require('passport');
+const redis = require('redis');
+const client = redis.createClient();
 const { Issuer, Strategy } = require('openid-client');
-const session = require('express-session');
+const expressSession = require('express-session');
+const RedisStore = require('connect-redis')(expressSession);
+const sharedSession = require('express-socket.io-session');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -42,17 +51,51 @@ let nextMediasoupWorkerIdx = 0;
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
 
+// Map of Peer instances indexed by peerId.
+const peers = new Map();
+
 // TLS server configuration.
 const tls =
 {
-	cert : fs.readFileSync(config.tls.cert),
-	key  : fs.readFileSync(config.tls.key)
+	cert          : fs.readFileSync(config.tls.cert),
+	key           : fs.readFileSync(config.tls.key),
+	secureOptions : 'tlsv12',
+	ciphers       :
+	[
+		'ECDHE-ECDSA-AES128-GCM-SHA256',
+		'ECDHE-RSA-AES128-GCM-SHA256',
+		'ECDHE-ECDSA-AES256-GCM-SHA384',
+		'ECDHE-RSA-AES256-GCM-SHA384',
+		'ECDHE-ECDSA-CHACHA20-POLY1305',
+		'ECDHE-RSA-CHACHA20-POLY1305',
+		'DHE-RSA-AES128-GCM-SHA256',
+		'DHE-RSA-AES256-GCM-SHA384'
+	].join(':'),
+	honorCipherOrder : true
 };
 
 const app = express();
-let httpsServer;
-let oidcClient;
-let oidcStrategy;
+
+app.use(helmet.hsts());
+
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+const session = expressSession({
+	secret            : config.cookieSecret,
+	name              : config.cookieName,
+	resave            : true,
+	saveUninitialized : true,
+	store             : new RedisStore({ client }),
+	cookie            : {
+		secure   : true,
+		httpOnly : true,
+		maxAge   : 60 * 60 * 1000 // Expire after 1 hour since last request from user
+	}
+});
+
+app.use(session);
 
 passport.serializeUser((user, done) =>
 {
@@ -64,17 +107,22 @@ passport.deserializeUser((user, done) =>
 	done(null, user);
 });
 
+let httpsServer;
+let io;
+let oidcClient;
+let oidcStrategy;
+
 const auth = config.auth;
 
 async function run()
 {
-	if ( 
+	if (
 		typeof(auth) !== 'undefined' &&
 		typeof(auth.issuerURL) !== 'undefined' &&
 		typeof(auth.clientOptions) !== 'undefined'
 	)
 	{
-		Issuer.discover(auth.issuerURL).then( async (oidcIssuer) => 
+		Issuer.discover(auth.issuerURL).then(async (oidcIssuer) => 
 		{
 			// Setup authentication
 			await setupAuth(oidcIssuer);
@@ -89,8 +137,8 @@ async function run()
 			await runWebSocketServer();
 		})
 			.catch((err) =>
-			{ 
-				logger.error(err); 
+			{
+				logger.error(err);
 			});
 	}
 	else
@@ -115,6 +163,15 @@ async function run()
 			room.logStatus();
 		}
 	}, 120000);
+
+	// check for deserted rooms
+	setInterval(() =>
+	{
+		for (const room of rooms.values())
+		{
+			room.checkEmpty();
+		}
+	}, 10000);
 }
 
 async function setupAuth(oidcIssuer)
@@ -130,16 +187,15 @@ async function setupAuth(oidcIssuer)
 	
 	// optional, defaults to false, when true req is passed as a first
 	// argument to verify fn
-	const passReqToCallback = false; 
+	const passReqToCallback = false;
 	
 	// optional, defaults to false, when true the code_challenge_method will be
 	// resolved from the issuer configuration, instead of true you may provide
 	// any of the supported values directly, i.e. "S256" (recommended) or "plain"
 	const usePKCE = false;
-	const client = oidcClient;
 
 	oidcStrategy = new Strategy(
-		{ client, params, passReqToCallback, usePKCE },
+		{ client: oidcClient, params, passReqToCallback, usePKCE },
 		(tokenset, userinfo, done) =>
 		{
 			const user =
@@ -150,15 +206,15 @@ async function setupAuth(oidcIssuer)
 				_claims   : tokenset.claims
 			};
 
-			if (typeof(userinfo.picture) !== 'undefined')
+			if (userinfo.picture != null)
 			{
 				if (!userinfo.picture.match(/^http/g))
 				{
-					user.Photos = [ { value: `data:image/jpeg;base64, ${userinfo.picture}` } ];
+					user.picture = `data:image/jpeg;base64, ${userinfo.picture}`;
 				}
 				else
 				{
-					user.Photos = [ { value: userinfo.picture } ];
+					user.picture = userinfo.picture;
 				}
 			}
 
@@ -174,22 +230,22 @@ async function setupAuth(oidcIssuer)
 
 			if (userinfo.email != null)
 			{
-				user.emails = [ { value: userinfo.email } ];
+				user.email = userinfo.email;
 			}
 
 			if (userinfo.given_name != null)
 			{
-				user.name = { givenName: userinfo.given_name };
+				user.name.givenName = userinfo.given_name;
 			}
 
 			if (userinfo.family_name != null)
 			{
-				user.name = { familyName: userinfo.family_name };
+				user.name.familyName = userinfo.family_name;
 			}
 
 			if (userinfo.middle_name != null)
 			{
-				user.name = { middleName: userinfo.middle_name };
+				user.name.middleName = userinfo.middle_name;
 			}
 
 			return done(null, user);
@@ -198,24 +254,15 @@ async function setupAuth(oidcIssuer)
 
 	passport.use('oidc', oidcStrategy);
 
-	app.use(session({
-		secret            : config.cookieSecret,
-		resave            : true,
-		saveUninitialized : true,
-		cookie            : { secure: true }
-	}));
-
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	// login
+	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
 		passport.authenticate('oidc', {
 			state : base64.encode(JSON.stringify({
-				roomId : req.query.roomId,
-				peerId : req.query.peerId,
-				code   : utils.random(10)
+				id : req.query.id
 			}))
 		})(req, res, next);
 	});
@@ -224,7 +271,7 @@ async function setupAuth(oidcIssuer)
 	app.get('/auth/logout', (req, res) =>
 	{
 		req.logout();
-		res.redirect('/');
+		res.send(logoutHelper());
 	});
 
 	// callback
@@ -235,41 +282,32 @@ async function setupAuth(oidcIssuer)
 		{
 			const state = JSON.parse(base64.decode(req.query.state));
 
-			if (rooms.has(state.roomId))
+			let displayName;
+			let picture;
+
+			if (req.user != null)
 			{
-				let displayName;
-				let photo;
+				if (req.user.displayName != null)
+					displayName = req.user.displayName;
+				else
+					displayName = '';
 
-				if (req.user != null)
-				{
-					if (req.user.displayName != null)
-						displayName = req.user.displayName;
-					else
-						displayName = '';
-
-					if (
-						req.user.Photos != null &&
-						req.user.Photos[0] != null &&
-						req.user.Photos[0].value != null
-					)
-						photo = req.user.Photos[0].value;
-					else
-						photo = '/static/media/buddy.403cb9f6.svg';
-				}
-
-				const data =
-				{
-					peerId      : state.peerId,
-					displayName : displayName,
-					picture     : photo
-				};
-
-				const room = rooms.get(state.roomId);
-
-				room.authCallback(data);
+				if (req.user.picture != null)
+					picture = req.user.picture;
+				else
+					picture = '/static/media/buddy.403cb9f6.svg';
 			}
 
-			res.send('');
+			const peer = peers.get(state.id);
+
+			peer && (peer.authenticated = true);
+			peer && (peer.displayName = displayName);
+			peer && (peer.picture = picture);
+
+			res.send(loginHelper({
+				displayName,
+				picture
+			}));
 		}
 	);
 }
@@ -316,11 +354,17 @@ async function runHttpsServer()
 }
 
 /**
- * Create a protoo WebSocketServer to allow WebSocket connections from browsers.
+ * Create a WebSocketServer to allow WebSocket connections from browsers.
  */
 async function runWebSocketServer()
 {
-	const io = require('socket.io')(httpsServer);
+	io = require('socket.io')(httpsServer);
+
+	io.use(
+		sharedSession(session, {
+			autoSave : true
+		})
+	);
 
 	// Handle connections from clients.
 	io.on('connection', (socket) =>
@@ -342,17 +386,22 @@ async function runWebSocketServer()
 		queue.push(async () =>
 		{
 			const room = await getOrCreateRoom({ roomId });
+			const peer = new Peer({ id: peerId, socket });
 
-			room.handleConnection({ peerId, socket });
+			peers.set(peerId, peer);
+
+			peer.on('close', () => peers.delete(peerId));
+
+			room.handlePeer(peer);
 		})
-		.catch((error) =>
-		{
-			logger.error('room creation or room joining failed:%o', error);
+			.catch((error) =>
+			{
+				logger.error('room creation or room joining failed [error:"%o"]', error);
 
-			socket.disconnect(true);
+				socket.disconnect(true);
 
-			return;
-		});
+				return;
+			});
 	});
 }
 
@@ -410,7 +459,7 @@ async function getOrCreateRoom({ roomId })
 	// If the Room does not exist create a new one.
 	if (!room)
 	{
-		logger.info('creating a new Room [roomId:%s]', roomId);
+		logger.info('creating a new Room [roomId:"%s"]', roomId);
 
 		const mediasoupWorker = getMediasoupWorker();
 

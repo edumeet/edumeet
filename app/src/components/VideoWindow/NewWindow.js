@@ -130,7 +130,7 @@ class NewWindow extends React.PureComponent
 		return ReactDOM.createPortal([
 			<div key='newwindow' className={classes.root}>
 				<div className={classes.controls}>
-					{this.fullscreen.fullscreenEnabled && (
+					{ this.fullscreen.fullscreenEnabled &&
 						<div
 							className={classes.button}
 							onClick={this.handleToggleFullscreen}
@@ -144,9 +144,9 @@ class NewWindow extends React.PureComponent
 								<FullScreenIcon className={classes.icon} />
 							}
 						</div>
-					)}
+					}
 				</div>
-				{this.props.children}
+				{ this.props.children }
 			</div>
 		], this.container);
 	}

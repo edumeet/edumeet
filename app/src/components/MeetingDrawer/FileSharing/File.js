@@ -67,7 +67,7 @@ class File extends React.PureComponent
 				<img alt='Avatar' className={classes.avatar} src={picture} />
 
 				<div className={classes.fileContent}>
-					{ file.files ?
+					{ file.files &&
 						<Fragment>
 							<Typography className={classes.text}>
 								File finished downloading
@@ -92,13 +92,12 @@ class File extends React.PureComponent
 								</div>
 							))}
 						</Fragment>
-						:null
 					}
 					<Typography className={classes.text}>
 						{ `${displayName} shared a file` }
 					</Typography>
 
-					{ !file.active && !file.files ?
+					{ (!file.active && !file.files) &&
 						<div className={classes.fileInfo}>
 							<Typography className={classes.text}>
 								{ magnet.decode(magnetUri).dn }
@@ -121,20 +120,17 @@ class File extends React.PureComponent
 								</Typography>
 							}
 						</div>
-						:null
 					}
 
-					{ file.timeout ?
+					{ file.timeout &&
 						<Typography className={classes.text}>
 							If this process takes a long time, there might not be anyone seeding
 							this torrent. Try asking someone to reupload the file that you want.
 						</Typography>
-						:null
 					}
 
-					{ file.active ?
+					{ file.active &&
 						<progress value={file.progress} />
-						:null
 					}
 				</div>
 			</div>

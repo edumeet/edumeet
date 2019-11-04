@@ -1,15 +1,30 @@
-import io from 'socket.io-client';
-import * as mediasoupClient from 'mediasoup-client';
-import WebTorrent from 'webtorrent';
-import createTorrent from 'create-torrent';
-import saveAs from 'file-saver';
+// import io from 'socket.io-client';
+// import * as mediasoupClient from 'mediasoup-client';
+// import WebTorrent from 'webtorrent';
+// import createTorrent from 'create-torrent';
+// import saveAs from 'file-saver';
 import Logger from './Logger';
 import hark from 'hark';
-import ScreenShare from './ScreenShare';
-import Spotlights from './Spotlights';
+// import ScreenShare from './ScreenShare';
+// import Spotlights from './Spotlights';
 import { getSignalingUrl } from './urlFactory';
 import * as requestActions from './actions/requestActions';
 import * as stateActions from './actions/stateActions';
+
+let WebTorrent;
+
+let createTorrent;
+
+let saveAs;
+
+let mediasoupClient;
+
+let io;
+
+let ScreenShare;
+
+let Spotlights;
+
 const {
 	turnServers,
 	requestTimeout,
@@ -77,16 +92,13 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ roomId, peerId, device, useSimulcast, produce, consume, forceTcp })
+		{ roomId, peerId, accessCode, device, useSimulcast, produce, forceTcp })
 	{
 		logger.debug(
-			'constructor() [roomId: "%s", peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", consume: "%s", forceTcp: "%s"]',
-			roomId, peerId, device.flag, useSimulcast, produce, consume, forceTcp);
+			'constructor() [roomId: "%s", peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s"]',
+			roomId, peerId, device.flag, useSimulcast, produce, forceTcp);
 
 		this._signalingUrl = getSignalingUrl(peerId, roomId);
-
-		// window element to external login site
-		this._loginWindow = null;
 
 		// Closed flag.
 		this._closed = false;
@@ -94,14 +106,11 @@ export default class RoomClient
 		// Whether we should produce.
 		this._produce = produce;
 
-		// Whether we should consume.
-		this._consume = consume;
-
 		// Wheter we force TCP
 		this._forceTcp = forceTcp;
 
 		// Torrent support
-		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
+		this._torrentSupport = null;
 
 		// Whether simulcast should be used.
 		this._useSimulcast = useSimulcast;
@@ -112,6 +121,9 @@ export default class RoomClient
 		// My peer name.
 		this._peerId = peerId;
 
+		// Access code
+		this._accessCode = accessCode;
+
 		// Alert sound
 		this._soundAlert = new Audio('/sounds/notify.mp3');
 
@@ -120,21 +132,14 @@ export default class RoomClient
 
 		// The room ID
 		this._roomId = roomId;
+		store.dispatch(stateActions.setRoomName(roomId));
 
 		// mediasoup-client Device instance.
 		// @type {mediasoupClient.Device}
 		this._mediasoupDevice = null;
 
-		this._doneJoining = false;
-
 		// Our WebTorrent client
-		this._webTorrent = this._torrentSupport && new WebTorrent({
-			tracker : {
-				rtcConfig : {
-					iceServers : ROOM_OPTIONS.turnServers
-				}
-			}
-		});
+		this._webTorrent = null;
 
 		// Max spotlights
 		if (device.bowser.ios || device.bowser.mobile || device.bowser.android)
@@ -170,7 +175,7 @@ export default class RoomClient
 		// @type {Map<String, mediasoupClient.Consumer>}
 		this._consumers = new Map();
 
-		this._screenSharing = ScreenShare.create(device);
+		this._screenSharing = null;
 
 		this._screenSharingProducer = null;
 
@@ -198,6 +203,8 @@ export default class RoomClient
 			this._recvTransport.close();
 
 		store.dispatch(stateActions.setRoomState('closed'));
+
+		window.location = '/';
 	}
 
 	_startKeyListener()
@@ -305,19 +312,51 @@ export default class RoomClient
 
 	login()
 	{
-		const url = `/auth/login?roomId=${this._roomId}&peerId=${this._peerId}`;
+		const url = `/auth/login?id=${this._peerId}`;
 
-		this._loginWindow = window.open(url, 'loginWindow');
+		window.open(url, 'loginWindow');
 	}
 
 	logout()
 	{
-		window.location = '/auth/logout';
+		window.open('/auth/logout', 'logoutWindow');
 	}
 
-	closeLoginWindow()
+	receiveLoginChildWindow(data)
 	{
-		this._loginWindow.close();
+		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);
+
+		const { displayName, picture } = data;
+
+		if (store.getState().room.state === 'connected')
+		{
+			this.changeDisplayName(displayName);
+			this.changePicture(picture);
+		}
+		else
+		{
+			store.dispatch(stateActions.setDisplayName(displayName));
+			store.dispatch(stateActions.setPicture(picture));
+		}
+
+		store.dispatch(stateActions.loggedIn(true));
+
+		store.dispatch(requestActions.notify(
+			{
+				text : 'You are logged in.'
+			}));
+	}
+
+	receiveLogoutChildWindow()
+	{
+		logger.debug('receiveLogoutChildWindow()');
+
+		store.dispatch(stateActions.loggedIn(false));
+
+		store.dispatch(requestActions.notify(
+			{
+				text : 'You are logged out.'
+			}));
 	}
 
 	_soundNotification()
@@ -399,6 +438,12 @@ export default class RoomClient
 	{
 		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
 
+		if (!displayName)
+			displayName = 'Guest';
+
+		store.dispatch(
+			stateActions.setDisplayNameInProgress(true));
+		
 		try
 		{
 			await this.sendRequest('changeDisplayName', { displayName });
@@ -419,24 +464,23 @@ export default class RoomClient
 					type : 'error',
 					text : 'An error occured while changing your display name.'
 				}));
-
-			// We need to refresh the component for it to render the previous
-			// displayName again.
-			store.dispatch(stateActions.setDisplayName());
 		}
+
+		store.dispatch(
+			stateActions.setDisplayNameInProgress(false));
 	}
 
-	async changeProfilePicture(picture)
+	async changePicture(picture)
 	{
-		logger.debug('changeProfilePicture() [picture: "%s"]', picture);
+		logger.debug('changePicture() [picture: "%s"]', picture);
 
 		try
 		{
-			await this.sendRequest('changeProfilePicture', { picture });
+			await this.sendRequest('changePicture', { picture });
 		}
 		catch (error)
 		{
-			logger.error('shareProfilePicure() | failed: %o', error);
+			logger.error('changePicture() | failed: %o', error);
 		}
 	}
 
@@ -607,34 +651,46 @@ export default class RoomClient
 			const {
 				chatHistory,
 				fileHistory,
-				lastN
+				lastNHistory,
+				locked,
+				lobbyPeers,
+				accessCode
 			} = await this.sendRequest('serverHistory');
 
-			if (chatHistory.length > 0)
-			{
-				logger.debug('Got chat history');
-				store.dispatch(
-					stateActions.addChatHistory(chatHistory));
-			}
+			(chatHistory.length > 0) && store.dispatch(
+				stateActions.addChatHistory(chatHistory));
 
-			if (fileHistory.length > 0)
-			{
-				logger.debug('Got files history');
+			(fileHistory.length > 0) && store.dispatch(
+				stateActions.addFileHistory(fileHistory));
 
-				store.dispatch(stateActions.addFileHistory(fileHistory));
-			}
-
-			if (lastN.length > 0)
+			if (lastNHistory.length > 0)
 			{
-				logger.debug('Got lastN');
+				logger.debug('Got lastNHistory');
 
 				// Remove our self from list
-				const index = lastN.indexOf(this._peerId);
+				const index = lastNHistory.indexOf(this._peerId);
 
-				lastN.splice(index, 1);
+				lastNHistory.splice(index, 1);
 
-				this._spotlights.addSpeakerList(lastN);
+				this._spotlights.addSpeakerList(lastNHistory);
 			}
+
+			locked ? 
+				store.dispatch(stateActions.setRoomLocked()) :
+				store.dispatch(stateActions.setRoomUnLocked());
+
+			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
+			{
+				store.dispatch(
+					stateActions.addLobbyPeer(peer.peerId));
+				store.dispatch(
+					stateActions.setLobbyPeerDisplayName(peer.displayName));
+				store.dispatch(
+					stateActions.setLobbyPeerPicture(peer.picture));
+			});
+
+			(accessCode != null) && store.dispatch(
+				stateActions.setAccessCode(accessCode));
 		}
 		catch (error)
 		{
@@ -733,6 +789,22 @@ export default class RoomClient
 		{
 			logger.error('updateSpotlights() failed: %o', error);
 		}
+	}
+
+	async getAudioTrack()
+	{
+		await navigator.mediaDevices.getUserMedia(
+			{
+				audio : true, video : false 
+			});
+	}
+
+	async getVideoTrack()
+	{
+		await navigator.mediaDevices.getUserMedia(
+			{
+				audio : false, video : true 
+			});
 	}
 
 	async changeAudioDevice(deviceId)
@@ -934,6 +1006,26 @@ export default class RoomClient
 			stateActions.setSelectedPeer(peerId));
 	}
 
+	async promoteLobbyPeer(peerId)
+	{
+		logger.debug('promoteLobbyPeer() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			stateActions.setLobbyPeerPromotionInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('promotePeer', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('promoteLobbyPeer() failed: %o', error);
+		}
+
+		store.dispatch(
+			stateActions.setLobbyPeerPromotionInProgress(peerId, false));
+	}
+
 	// type: mic/webcam/screen
 	// mute: true/false
 	async modifyPeerConsumer(peerId, type, mute)
@@ -1061,13 +1153,78 @@ export default class RoomClient
 			stateActions.setMyRaiseHandStateInProgress(false));
 	}
 
+	async _loadDynamicImports()
+	{
+		({ default: WebTorrent } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "webtorrent" */
+			'webtorrent'
+		));
+
+		({ default: createTorrent } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "create-torrent" */
+			'create-torrent'
+		));
+
+		({ default: saveAs } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "file-saver" */
+			'file-saver'
+		));
+
+		({ default: ScreenShare } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "screensharing" */
+			'./ScreenShare'
+		));
+
+		({ default: Spotlights } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "spotlights" */
+			'./Spotlights'
+		));
+
+		mediasoupClient = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "mediasoup" */
+			'mediasoup-client'
+		);
+
+		({ default: io } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "socket.io" */
+			'socket.io-client'
+		));
+	}
+
 	async join({ joinVideo })
 	{
+		await this._loadDynamicImports();
+
+		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
+
+		this._webTorrent = this._torrentSupport && new WebTorrent({
+			tracker : {
+				rtcConfig : {
+					iceServers : ROOM_OPTIONS.turnServers
+				}
+			}
+		});
+
+		this._screenSharing = ScreenShare.create(this._device);
+
 		this._signalingSocket = io(this._signalingUrl);
 
 		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
-		store.dispatch(stateActions.toggleJoined());
 		store.dispatch(stateActions.setRoomState('connecting'));
 
 		this._signalingSocket.on('connect', () =>
@@ -1075,39 +1232,53 @@ export default class RoomClient
 			logger.debug('signaling Peer "connect" event');
 		});
 
-		this._signalingSocket.on('disconnect', () =>
+		this._signalingSocket.on('disconnect', (reason) =>
 		{
-			logger.warn('signaling Peer "disconnect" event');
+			logger.warn('signaling Peer "disconnect" event [reason:"%s"]', reason);
+
+			if (this._closed)
+				return;
+
+			if (reason === 'io server disconnect')
+			{
+				store.dispatch(requestActions.notify(
+					{
+						text : 'You are disconnected.'
+					}));
+
+				this.close();
+			}
+
+			store.dispatch(requestActions.notify(
+				{
+					text : 'You are disconnected, attempting to reconnect.'
+				}));
+
+			store.dispatch(stateActions.setRoomState('connecting'));
+		});
+
+		this._signalingSocket.on('reconnect_failed', () =>
+		{
+			logger.warn('signaling Peer "reconnect_failed" event');
 
 			store.dispatch(requestActions.notify(
 				{
 					text : 'You are disconnected.'
 				}));
 
-			// Close mediasoup Transports.
-			if (this._sendTransport)
-			{
-				this._sendTransport.close();
-				this._sendTransport = null;
-			}
-
-			if (this._recvTransport)
-			{
-				this._recvTransport.close();
-				this._recvTransport = null;
-			}
-
-			store.dispatch(stateActions.setRoomState('closed'));
+			this.close();
 		});
 
-		this._signalingSocket.on('close', () =>
+		this._signalingSocket.on('reconnect', (attemptNumber) =>
 		{
-			if (this._closed)
-				return;
+			logger.debug('signaling Peer "reconnect" event [attempts:"%s"]', attemptNumber);
 
-			logger.warn('signaling Peer "close" event');
+			store.dispatch(requestActions.notify(
+				{
+					text : 'You are reconnected.'
+				}));
 
-			this.close();
+			store.dispatch(stateActions.setRoomState('connected'));
 		});
 
 		this._signalingSocket.on('request', async (request, cb) =>
@@ -1241,263 +1412,388 @@ export default class RoomClient
 				'socket "notification" event [method:%s, data:%o]',
 				notification.method, notification.data);
 
-			switch (notification.method)
+			try
 			{
-				case 'roomReady':
+				switch (notification.method)
 				{
-					await this._joinRoom({ joinVideo });
-
-					break;
-				}
-
-				case 'roomLocked':
-				{
-					store.dispatch(stateActions.setRoomLockedOut());
-
-					break;
-				}
-
-				case 'lockRoom':
-				{
-					store.dispatch(
-						stateActions.setRoomLocked());
-
-					store.dispatch(requestActions.notify(
-						{
-							text : 'Room is now locked.'
-						}));
-
-					break;
-				}
-
-				case 'unlockRoom':
-				{
-					store.dispatch(
-						stateActions.setRoomUnLocked());
-					
-					store.dispatch(requestActions.notify(
-						{
-							text : 'Room is now unlocked.'
-						}));
-
-					break;
-				}
-
-				case 'activeSpeaker':
-				{
-					const { peerId } = notification.data;
-
-					store.dispatch(
-						stateActions.setRoomActiveSpeaker(peerId));
-					
-					if (peerId && peerId !== this._peerId)
-						this._spotlights.handleActiveSpeaker(peerId);
-
-					break;
-				}
-
-				case 'changeDisplayName':
-				{
-					const { peerId, displayName, oldDisplayName } = notification.data;
-
-					store.dispatch(
-						stateActions.setPeerDisplayName(displayName, peerId));
-
-					store.dispatch(requestActions.notify(
-						{
-							text : `${oldDisplayName} is now ${displayName}`
-						}));
-
-					break;
-				}
-
-				case 'changeProfilePicture':
-				{
-					const { peerId, picture } = notification.data;
-
-					store.dispatch(stateActions.setPeerPicture(peerId, picture));
-
-					break;
-				}
-
-				case 'auth':
-				{
-					const { displayName, picture } = notification.data;
-
-					this.changeDisplayName(displayName);
-
-					this.changeProfilePicture(picture);
-					store.dispatch(stateActions.setPicture(picture));
-					store.dispatch(stateActions.loggedIn());
-
-					store.dispatch(requestActions.notify(
-						{
-							text : 'You are logged in.'
-						}));
-
-					this.closeLoginWindow();
-
-					break;
-				}
-
-				case 'chatMessage':
-				{
-					const { peerId, chatMessage } = notification.data;
-
-					store.dispatch(
-						stateActions.addResponseMessage({ ...chatMessage, peerId }));
-
-					if (
-						!store.getState().toolarea.toolAreaOpen ||
-						(store.getState().toolarea.toolAreaOpen &&
-						store.getState().toolarea.currentToolTab !== 'chat')
-					) // Make sound
+					case 'enteredLobby':
 					{
-						this._soundNotification();
+						store.dispatch(stateActions.setInLobby(true));
+	
+						const { displayName } = store.getState().settings;
+						const { picture } = store.getState().me;
+	
+						await this.sendRequest('changeDisplayName', { displayName });
+						await this.sendRequest('changePicture', { picture });
+						break;
 					}
 
-					break;
-				}
-
-				case 'sendFile':
-				{
-					const { peerId, magnetUri } = notification.data;
-
-					store.dispatch(stateActions.addFile(peerId, magnetUri));
-
-					store.dispatch(requestActions.notify(
-						{
-							text : 'New file available.'
-						}));
-
-					if (
-						!store.getState().toolarea.toolAreaOpen ||
-						(store.getState().toolarea.toolAreaOpen &&
-						store.getState().toolarea.currentToolTab !== 'files')
-					) // Make sound
+					case 'signInRequired':
 					{
-						this._soundNotification();
+						store.dispatch(stateActions.setSignInRequired(true));
+	
+						break;
+					}
+						
+					case 'roomReady':
+					{
+						store.dispatch(stateActions.toggleJoined());
+						store.dispatch(stateActions.setInLobby(false));
+	
+						await this._joinRoom({ joinVideo });
+	
+						break;
+					}
+	
+					case 'lockRoom':
+					{
+						store.dispatch(
+							stateActions.setRoomLocked());
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Room is now locked.'
+							}));
+	
+						break;
+					}
+	
+					case 'unlockRoom':
+					{
+						store.dispatch(
+							stateActions.setRoomUnLocked());
+						
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Room is now unlocked.'
+							}));
+	
+						break;
+					}
+	
+					case 'parkedPeer':
+					{
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.addLobbyPeer(peerId));
+						store.dispatch(
+							stateActions.setToolbarsVisible(true));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : 'New participant entered the lobby.'
+							}));
+	
+						break;
+					}
+	
+					case 'lobby:peerClosed':
+					{
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.removeLobbyPeer(peerId));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Participant in lobby left.'
+							}));
+	
+						break;
+					}
+	
+					case 'lobby:promotedPeer':
+					{
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.removeLobbyPeer(peerId));
+	
+						break;
+					}
+	
+					case 'lobby:changeDisplayName':
+					{
+						const { peerId, displayName } = notification.data;
+	
+						store.dispatch(
+							stateActions.setLobbyPeerDisplayName(displayName, peerId));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : `Participant in lobby changed name to ${displayName}.`
+							}));
+	
+						break;
+					}
+					
+					case 'lobby:changePicture':
+					{
+						const { peerId, picture } = notification.data;
+	
+						store.dispatch(
+							stateActions.setLobbyPeerPicture(picture, peerId));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Participant in lobby changed picture.'
+							}));
+	
+						break;
 					}
 
-					break;
-				}
-
-				case 'producerScore':
-				{
-					const { producerId, score } = notification.data;
-
-					store.dispatch(
-						stateActions.setProducerScore(producerId, score));
-
-					break;
-				}
-
-				case 'newPeer':
-				{
-					const { id, displayName, picture, device } = notification.data;
-
-					store.dispatch(
-						stateActions.addPeer({ id, displayName, picture, device, consumers: [] }));
-
-					store.dispatch(requestActions.notify(
+					case 'setAccessCode':
+					{
+						const { accessCode } = notification.data;
+	
+						store.dispatch(
+							stateActions.setAccessCode(accessCode));
+						
+						store.dispatch(requestActions.notify(
+							{
+								text : 'Access code for room updated'
+							}));
+	
+						break;
+					}
+	
+					case 'setJoinByAccessCode':
+					{
+						const { joinByAccessCode } = notification.data;
+						
+						store.dispatch(
+							stateActions.setJoinByAccessCode(joinByAccessCode));
+						
+						if (joinByAccessCode) 
 						{
-							text : `${displayName} joined the room.`
-						}));
-
-					break;
-				}
-
-				case 'peerClosed':
-				{
-					const { peerId } = notification.data;
-
-					store.dispatch(
-						stateActions.removePeer(peerId));
-
-					break;
-				}
-
-				case 'consumerClosed':
-				{
-					const { consumerId } = notification.data;
-					const consumer = this._consumers.get(consumerId);
-
-					if (!consumer)
+							store.dispatch(requestActions.notify(
+								{
+									text : 'Access code for room is now activated'
+								}));
+						}
+						else 
+						{
+							store.dispatch(requestActions.notify(
+								{
+									text : 'Access code for room is now deactivated'
+								}));
+						}
+	
 						break;
-
-					consumer.close();
-
-					if (consumer.hark != null)
-						consumer.hark.stop();
-
-					this._consumers.delete(consumerId);
-
-					const { peerId } = consumer.appData;
-
-					store.dispatch(
-						stateActions.removeConsumer(consumerId, peerId));
-
-					break;
-				}
-
-				case 'consumerPaused':
-				{
-					const { consumerId } = notification.data;
-					const consumer = this._consumers.get(consumerId);
-
-					if (!consumer)
+					}
+	
+					case 'activeSpeaker':
+					{
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.setRoomActiveSpeaker(peerId));
+						
+						if (peerId && peerId !== this._peerId)
+							this._spotlights.handleActiveSpeaker(peerId);
+	
 						break;
-
-					store.dispatch(
-						stateActions.setConsumerPaused(consumerId, 'remote'));
-
-					break;
-				}
-
-				case 'consumerResumed':
-				{
-					const { consumerId } = notification.data;
-					const consumer = this._consumers.get(consumerId);
-
-					if (!consumer)
+					}
+	
+					case 'changeDisplayName':
+					{
+						const { peerId, displayName, oldDisplayName } = notification.data;
+	
+						store.dispatch(
+							stateActions.setPeerDisplayName(displayName, peerId));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : `${oldDisplayName} is now ${displayName}`
+							}));
+	
 						break;
-
-					store.dispatch(
-						stateActions.setConsumerResumed(consumerId, 'remote'));
-
-					break;
-				}
-
-				case 'consumerLayersChanged':
-				{
-					const { consumerId, spatialLayer, temporalLayer } = notification.data;
-					const consumer = this._consumers.get(consumerId);
-
-					if (!consumer)
+					}
+	
+					case 'changePicture':
+					{
+						const { peerId, picture } = notification.data;
+	
+						store.dispatch(stateActions.setPeerPicture(peerId, picture));
+	
 						break;
-
-					store.dispatch(stateActions.setConsumerCurrentLayers(
-						consumerId, spatialLayer, temporalLayer));
-
-					break;
-				}
-
-				case 'consumerScore':
-				{
-					const { consumerId, score } = notification.data;
-
-					store.dispatch(
-						stateActions.setConsumerScore(consumerId, score));
-
-					break;
-				}
-
-				default:
-				{
-					logger.error(
-						'unknown notification.method "%s"', notification.method);
+					}
+	
+					case 'chatMessage':
+					{
+						const { peerId, chatMessage } = notification.data;
+	
+						store.dispatch(
+							stateActions.addResponseMessage({ ...chatMessage, peerId }));
+	
+						if (
+							!store.getState().toolarea.toolAreaOpen ||
+							(store.getState().toolarea.toolAreaOpen &&
+							store.getState().toolarea.currentToolTab !== 'chat')
+						) // Make sound
+						{
+							store.dispatch(
+								stateActions.setToolbarsVisible(true));
+							this._soundNotification();
+						}
+	
+						break;
+					}
+	
+					case 'sendFile':
+					{
+						const { peerId, magnetUri } = notification.data;
+	
+						store.dispatch(stateActions.addFile(peerId, magnetUri));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : 'New file available.'
+							}));
+	
+						if (
+							!store.getState().toolarea.toolAreaOpen ||
+							(store.getState().toolarea.toolAreaOpen &&
+							store.getState().toolarea.currentToolTab !== 'files')
+						) // Make sound
+						{
+							store.dispatch(
+								stateActions.setToolbarsVisible(true));
+							this._soundNotification();
+						}
+	
+						break;
+					}
+	
+					case 'producerScore':
+					{
+						const { producerId, score } = notification.data;
+	
+						store.dispatch(
+							stateActions.setProducerScore(producerId, score));
+	
+						break;
+					}
+	
+					case 'newPeer':
+					{
+						const { id, displayName, picture, device } = notification.data;
+	
+						store.dispatch(
+							stateActions.addPeer({ id, displayName, picture, device, consumers: [] }));
+	
+						store.dispatch(requestActions.notify(
+							{
+								text : `${displayName} joined the room.`
+							}));
+	
+						break;
+					}
+	
+					case 'peerClosed':
+					{
+						const { peerId } = notification.data;
+	
+						store.dispatch(
+							stateActions.removePeer(peerId));
+	
+						break;
+					}
+	
+					case 'consumerClosed':
+					{
+						const { consumerId } = notification.data;
+						const consumer = this._consumers.get(consumerId);
+	
+						if (!consumer)
+							break;
+	
+						consumer.close();
+	
+						if (consumer.hark != null)
+							consumer.hark.stop();
+	
+						this._consumers.delete(consumerId);
+	
+						const { peerId } = consumer.appData;
+	
+						store.dispatch(
+							stateActions.removeConsumer(consumerId, peerId));
+	
+						break;
+					}
+	
+					case 'consumerPaused':
+					{
+						const { consumerId } = notification.data;
+						const consumer = this._consumers.get(consumerId);
+	
+						if (!consumer)
+							break;
+	
+						store.dispatch(
+							stateActions.setConsumerPaused(consumerId, 'remote'));
+	
+						break;
+					}
+	
+					case 'consumerResumed':
+					{
+						const { consumerId } = notification.data;
+						const consumer = this._consumers.get(consumerId);
+	
+						if (!consumer)
+							break;
+	
+						store.dispatch(
+							stateActions.setConsumerResumed(consumerId, 'remote'));
+	
+						break;
+					}
+	
+					case 'consumerLayersChanged':
+					{
+						const { consumerId, spatialLayer, temporalLayer } = notification.data;
+						const consumer = this._consumers.get(consumerId);
+	
+						if (!consumer)
+							break;
+	
+						store.dispatch(stateActions.setConsumerCurrentLayers(
+							consumerId, spatialLayer, temporalLayer));
+	
+						break;
+					}
+	
+					case 'consumerScore':
+					{
+						const { consumerId, score } = notification.data;
+	
+						store.dispatch(
+							stateActions.setConsumerScore(consumerId, score));
+	
+						break;
+					}
+	
+					default:
+					{
+						logger.error(
+							'unknown notification.method "%s"', notification.method);
+					}
 				}
 			}
+			catch (error)
+			{
+				logger.error('error on socket "notification" event failed:"%o"', error);
+
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : 'Error on server request.'
+					}));
+			}
+
 		});
 	}
 
@@ -1573,44 +1869,41 @@ export default class RoomClient
 					});
 			}
 
-			if (this._consume)
-			{
-				const transportInfo = await this.sendRequest(
-					'createWebRtcTransport',
-					{
-						forceTcp  : this._forceTcp,
-						producing : false,
-						consuming : true
-					});
+			const transportInfo = await this.sendRequest(
+				'createWebRtcTransport',
+				{
+					forceTcp  : this._forceTcp,
+					producing : false,
+					consuming : true
+				});
 
-				const {
+			const {
+				id,
+				iceParameters,
+				iceCandidates,
+				dtlsParameters
+			} = transportInfo;
+
+			this._recvTransport = this._mediasoupDevice.createRecvTransport(
+				{
 					id,
 					iceParameters,
 					iceCandidates,
 					dtlsParameters
-				} = transportInfo;
+				});
 
-				this._recvTransport = this._mediasoupDevice.createRecvTransport(
-					{
-						id,
-						iceParameters,
-						iceCandidates,
-						dtlsParameters
-					});
-
-				this._recvTransport.on(
-					'connect', ({ dtlsParameters }, callback, errback) => // eslint-disable-line no-shadow
-					{
-						this.sendRequest(
-							'connectWebRtcTransport',
-							{
-								transportId : this._recvTransport.id,
-								dtlsParameters
-							})
-							.then(callback)
-							.catch(errback);
-					});
-			}
+			this._recvTransport.on(
+				'connect', ({ dtlsParameters }, callback, errback) => // eslint-disable-line no-shadow
+				{
+					this.sendRequest(
+						'connectWebRtcTransport',
+						{
+							transportId : this._recvTransport.id,
+							dtlsParameters
+						})
+						.then(callback)
+						.catch(errback);
+				});
 
 			// Set our media capabilities.
 			store.dispatch(stateActions.setMediaCapabilities(
@@ -1628,11 +1921,11 @@ export default class RoomClient
 					displayName     : displayName,
 					picture         : picture,
 					device          : this._device,
-					rtpCapabilities : this._consume
-						? this._mediasoupDevice.rtpCapabilities
-						: undefined
+					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
-			
+
+			logger.debug('_joinRoom() joined, got peers [peers:"%o"]', peers);
+
 			for (const peer of peers)
 			{
 				store.dispatch(
@@ -1738,6 +2031,60 @@ export default class RoomClient
 				}));
 
 			logger.error('unlockRoom() | failed: %o', error);
+		}
+	}
+
+	async setAccessCode(code)
+	{
+		logger.debug('setAccessCode()');
+
+		try
+		{
+			await this.sendRequest('setAccessCode', { accessCode: code });
+
+			store.dispatch(
+				stateActions.setAccessCode(code));
+
+			store.dispatch(requestActions.notify(
+				{
+					text : 'Access code saved.'
+				}));
+		}
+		catch (error)
+		{
+			logger.error('setAccessCode() | failed: %o', error);
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to set access code.'
+				}));
+		}
+	}
+
+	async setJoinByAccessCode(value)
+	{
+		logger.debug('setJoinByAccessCode()');
+
+		try
+		{
+			await this.sendRequest('setJoinByAccessCode', { joinByAccessCode: value });
+
+			store.dispatch(
+				stateActions.setJoinByAccessCode(value));
+
+			store.dispatch(requestActions.notify(
+				{
+					text : `You switched Join by access-code to ${value}`
+				}));
+		}
+		catch (error)
+		{
+			logger.error('setAccessCode() | failed: %o', error);
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : 'Unable to set join by access code.'
+				}));
 		}
 	}
 
@@ -2278,7 +2625,7 @@ export default class RoomClient
 
 		try
 		{
-			logger.debug('_getAudioDeviceId() | calling _updateWebcams()');
+			logger.debug('_getAudioDeviceId() | calling _updateAudioDeviceId()');
 
 			await this._updateAudioDevices();
 

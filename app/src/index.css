@@ -18,6 +18,11 @@ html
 	font-family: 'Roboto';
 	font-weight: 300;
 	margin : 0;
+	box-sizing: border-box;
+}
+
+*, *:before, *:after {
+	box-sizing: inherit;
 }
 
 body

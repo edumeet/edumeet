@@ -166,8 +166,8 @@ const Peer = (props) =>
 					classnames(
 						classes.root,
 						'webcam',
-						hover ? 'hover' : null,
-						activeSpeaker ? 'active-speaker' : null
+						hover && 'hover',
+						activeSpeaker && 'active-speaker'
 					)
 				}
 				onMouseOver={() => setHover(true)}
@@ -192,15 +192,14 @@ const Peer = (props) =>
 				style={rootStyle}
 			>
 				<div className={classnames(classes.viewContainer)}>
-					{ !videoVisible ?
+					{ !videoVisible &&
 						<div className={classes.videoInfo}>
 							<p>this video is paused</p>
 						</div>
-						:null
 					}
 
 					<div
-						className={classnames(classes.controls, hover ? 'hover' : null)}
+						className={classnames(classes.controls, hover && 'hover')}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -241,7 +240,7 @@ const Peer = (props) =>
 							}
 						</Fab>
 
-						{ !smallScreen ?
+						{ !smallScreen &&
 							<Fab
 								aria-label='New window'
 								className={classes.fab}
@@ -257,7 +256,6 @@ const Peer = (props) =>
 							>
 								<NewWindowIcon />
 							</Fab>
-							:null
 						}
 
 						<Fab
@@ -279,20 +277,20 @@ const Peer = (props) =>
 						peer={peer}
 						displayName={peer.displayName}
 						showPeerInfo
-						videoTrack={webcamConsumer ? webcamConsumer.track : null}
+						videoTrack={webcamConsumer && webcamConsumer.track}
 						videoVisible={videoVisible}
 						videoProfile={videoProfile}
-						audioCodec={micConsumer ? micConsumer.codec : null}
-						videoCodec={webcamConsumer ? webcamConsumer.codec : null}
+						audioCodec={micConsumer && micConsumer.codec}
+						videoCodec={webcamConsumer && webcamConsumer.codec}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
 				</div>
 			</div>
 
-			{ screenConsumer ?
+			{ screenConsumer &&
 				<div
-					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
+					className={classnames(classes.root, 'screen', hover && 'hover')}
 					onMouseOver={() => setHover(true)}
 					onMouseOut={() => setHover(false)}
 					onTouchStart={() =>
@@ -314,17 +312,16 @@ const Peer = (props) =>
 					}}
 					style={rootStyle}
 				>
-					{ !screenVisible ?
+					{ !screenVisible &&
 						<div className={classes.videoInfo}>
 							<p>this video is paused</p>
 						</div>
-						:null
 					}
 
-					{ screenVisible ?
+					{ screenVisible &&
 						<div className={classnames(classes.viewContainer)}>
 							<div
-								className={classnames(classes.controls, hover ? 'hover' : null)}
+								className={classnames(classes.controls, hover && 'hover')}
 								onMouseOver={() => setHover(true)}
 								onMouseOut={() => setHover(false)}
 								onTouchStart={() =>
@@ -346,7 +343,7 @@ const Peer = (props) =>
 									}, 2000);
 								}}
 							>
-								{ !smallScreen ?
+								{ !smallScreen &&
 									<Fab
 										aria-label='New window'
 										className={classes.fab}
@@ -362,7 +359,6 @@ const Peer = (props) =>
 									>
 										<NewWindowIcon />
 									</Fab>
-									:null
 								}
 
 								<Fab
@@ -381,16 +377,14 @@ const Peer = (props) =>
 							<VideoView
 								advancedMode={advancedMode}
 								videoContain
-								videoTrack={screenConsumer ? screenConsumer.track : null}
+								videoTrack={screenConsumer && screenConsumer.track}
 								videoVisible={screenVisible}
 								videoProfile={screenProfile}
-								videoCodec={screenConsumer ? screenConsumer.codec : null}
+								videoCodec={screenConsumer && screenConsumer.codec}
 							/>
 						</div>
-						:null
 					}
 				</div>
-				:null
 			}
 		</React.Fragment>
 	);

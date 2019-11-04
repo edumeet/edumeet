@@ -159,7 +159,7 @@ const ListPeer = (props) =>
 				{peer.displayName}
 			</div>
 			<div className={classes.indicators}>
-				{ peer.raiseHandState ?
+				{ peer.raiseHandState &&
 					<div className={
 						classnames(
 							classes.icon, 'raise-hand', {
@@ -169,12 +169,11 @@ const ListPeer = (props) =>
 						)
 					}
 					/>
-					:null
 				}
 			</div>
 			{children}
 			<div className={classes.controls}>
-				{ screenConsumer ?
+				{ screenConsumer &&
 					<div
 						className={classnames(classes.button, 'screen', {
 							on       : screenVisible,
@@ -195,7 +194,6 @@ const ListPeer = (props) =>
 							<ScreenOffIcon />
 						}
 					</div>
-					:null
 				}
 				<div
 					className={classnames(classes.button, 'mic', {

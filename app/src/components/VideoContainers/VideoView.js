@@ -171,24 +171,17 @@ class VideoView extends React.PureComponent
 						})}
 					>
 						<div className={classes.box}>
-							{ audioCodec ?
-								<p>{audioCodec}</p>
-								:null
-							}
+							{ audioCodec && <p>{audioCodec}</p> }
 
-							{ videoCodec ?
-								<p>{videoCodec} {videoProfile}</p>
-								:null
-							}
+							{ videoCodec && <p>{videoCodec} {videoProfile}</p> }
 
-							{ (videoVisible && videoWidth !== null) ?
+							{ (videoVisible && videoWidth !== null) &&
 								<p>{videoWidth}x{videoHeight}</p>
-								:null
 							}
 						</div>
 					</div>
 
-					{ showPeerInfo ?
+					{ showPeerInfo &&
 						<div className={classes.peer}>
 							<div className={classes.box}>
 								{ isMe ?
@@ -212,17 +205,15 @@ class VideoView extends React.PureComponent
 									</span>
 								}
 
-								{ advancedMode ?
+								{ advancedMode &&
 									<div className={classes.deviceInfo}>
 										<span>
 											{peer.device.name} {Math.floor(peer.device.version) || null}
 										</span>
 									</div>
-									:null
 								}
 							</div>
 						</div>
-						:null
 					}
 				</div>
 
@@ -230,7 +221,7 @@ class VideoView extends React.PureComponent
 					ref='video'
 					className={classnames(classes.video, {
 						hidden  : !videoVisible,
-						'isMe' : isMe && !isScreen,
+						'isMe'  : isMe && !isScreen,
 						loading : videoProfile === 'none',
 						contain : videoContain
 					})}
@@ -256,7 +247,8 @@ class VideoView extends React.PureComponent
 		clearInterval(this._videoResolutionTimer);
 	}
 
-	componentWillReceiveProps(nextProps)
+	// eslint-disable-next-line camelcase
+	UNSAFE_componentWillReceiveProps(nextProps)
 	{
 		const { videoTrack } = nextProps;
 

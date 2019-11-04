@@ -1,9 +1,13 @@
 const initialState =
 {
 	url                : null,
+	name               : '',
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
-	lockedOut          : false,
+	inLobby            : false,
+	signInRequired     : false,
+	accessCode         : '', // access code to the room if locked and joinByAccessCode == true
+	joinByAccessCode   : true, // if true: accessCode is a possibility to open the room
 	activeSpeakerId    : null,
 	torrentSupport     : false,
 	showSettings       : false,
@@ -14,6 +18,7 @@ const initialState =
 	selectedPeerId     : null,
 	spotlights         : [],
 	settingsOpen       : false,
+	lockDialogOpen     : false,
 	joined             : false
 };
 
@@ -26,6 +31,13 @@ const room = (state = initialState, action) =>
 			const { url } = action.payload;
 
 			return { ...state, url };
+		}
+
+		case 'SET_ROOM_NAME':
+		{
+			const { name } = action.payload;
+
+			return { ...state, name };
 		}
 
 		case 'SET_ROOM_STATE':
@@ -48,11 +60,41 @@ const room = (state = initialState, action) =>
 			return { ...state, locked: false };
 		}
 
-		case 'SET_ROOM_LOCKED_OUT':
+		case 'SET_IN_LOBBY':
 		{
-			return { ...state, lockedOut: true };
+			const { inLobby } = action.payload;
+
+			return { ...state, inLobby };
 		}
 
+		case 'SET_SIGN_IN_REQUIRED':
+		{
+			const { signInRequired } = action.payload;
+
+			return { ...state, signInRequired };
+		}
+
+		case 'SET_ACCESS_CODE':
+		{
+			const { accessCode } = action.payload;
+
+			return { ...state, accessCode };
+		}
+
+		case 'SET_JOIN_BY_ACCESS_CODE':
+		{
+			const { joinByAccessCode } = action.payload;
+
+			return { ...state, joinByAccessCode };
+		}
+
+		case 'SET_LOCK_DIALOG_OPEN':
+		{
+			const { lockDialogOpen } = action.payload;
+
+			return { ...state, lockDialogOpen };
+		}
+	
 		case 'SET_SETTINGS_OPEN':
 		{
 			const { settingsOpen } = action.payload;

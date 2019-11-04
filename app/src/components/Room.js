@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import {
+	lobbyPeersKeySelector
+} from './Selectors';
 import * as appPropTypes from './appPropTypes';
 import { withRoomContext } from '../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
@@ -13,7 +16,6 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Hidden from '@material-ui/core/Hidden';
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -30,11 +32,13 @@ import VideoWindow from './VideoWindow/VideoWindow';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
+import SecurityIcon from '@material-ui/icons/Security';
+import LockDialog from './AccessControl/LockDialog/LockDialog';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import Button from '@material-ui/core/Button';
 import Settings from './Settings/Settings';
-import JoinDialog from './JoinDialog';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const TIMEOUT = 10 * 1000;
 
@@ -150,6 +154,38 @@ const styles = (theme) =>
 		}
 	});
 
+const PulsingBadge = withStyles((theme) =>
+	({
+		badge :
+		{
+			backgroundColor : theme.palette.secondary.main,
+			// boxShadow       : `0 0 0 2px ${theme.palette.secondary.main}`,
+			'&::after'      :
+			{
+				position     : 'absolute',
+				width        : '100%',
+				height       : '100%',
+				borderRadius : '50%',
+				animation    : '$ripple 1.2s infinite ease-in-out',
+				border       : `3px solid ${theme.palette.secondary.main}`,
+				content      : '""'
+			}
+		},
+		'@keyframes ripple' :
+		{
+			'0%' :
+			{
+				transform : 'scale(.8)',
+				opacity   : 1
+			},
+			'100%' :
+			{
+				transform : 'scale(2.4)',
+				opacity   : 0
+			}
+		}
+	}))(Badge);
+
 class Room extends React.PureComponent
 {
 	constructor(props)
@@ -227,11 +263,13 @@ class Room extends React.PureComponent
 		const {
 			roomClient,
 			room,
+			lobbyPeers,
 			advancedMode,
 			myPicture,
 			loggedIn,
 			loginEnabled,
 			setSettingsOpen,
+			setLockDialogOpen,
 			toolAreaOpen,
 			toggleToolArea,
 			unread,
@@ -245,74 +283,52 @@ class Room extends React.PureComponent
 			democratic : Democratic
 		}[room.mode];
 
-		if (room.lockedOut)
-		{
-			return (
-				<div className={classes.root}>
-					<Paper className={classes.message}>
-						<Typography variant='h2'>This room is locked at the moment, try again later.</Typography>
-					</Paper>
-				</div>
-			);
-		}
-		else if (!room.joined)
-		{
-			return (
-				<div className={classes.root}>
-					<JoinDialog />
-				</div>
-			);
-		}
-		else
-		{
-			return (
-				<div className={classes.root}>
-					<CookieConsent>
-						This website uses cookies to enhance the user experience.
-					</CookieConsent>
+		return (
+			<div className={classes.root}>
+				<CookieConsent>
+					This website uses cookies to enhance the user experience.
+				</CookieConsent>
 
-					<FullScreenView advancedMode={advancedMode} />
+				<FullScreenView advancedMode={advancedMode} />
 
-					<VideoWindow advancedMode={advancedMode} />
+				<VideoWindow advancedMode={advancedMode} />
 
-					<AudioPeers />
+				<AudioPeers />
 
-					<Notifications />
+				<Notifications />
 
-					<CssBaseline />
+				<CssBaseline />
 
-					<AppBar
-						position='fixed'
-						className={room.toolbarsVisible ? classes.show : classes.hide}
-					>
-						<Toolbar>
-							<Badge
-								color='secondary'
-								badgeContent={unread}
-							>
-								<IconButton
-									color='inherit'
-									aria-label='Open drawer'
-									onClick={() => toggleToolArea()}
-									className={classes.menuButton}
-								>
-									<MenuIcon />
-								</IconButton>
-							</Badge>
-							{ window.config.logo ?
-								<img alt='Logo' className={classes.logo} src={window.config.logo} />
-								:null
-							}
-							<Typography
-								className={classes.title}
-								variant='h6'
+				<AppBar
+					position='fixed'
+					className={room.toolbarsVisible ? classes.show : classes.hide}
+				>
+					<Toolbar>
+						<PulsingBadge
+							color='secondary'
+							badgeContent={unread}
+						>
+							<IconButton
 								color='inherit'
-								noWrap
+								aria-label='Open drawer'
+								onClick={() => toggleToolArea()}
+								className={classes.menuButton}
 							>
-								{ window.config.title }
-							</Typography>
-							<div className={classes.grow} />
-							<div className={classes.actionButtons}>
+								<MenuIcon />
+							</IconButton>
+						</PulsingBadge>
+						{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+						<Typography
+							className={classes.title}
+							variant='h6'
+							color='inherit'
+							noWrap
+						>
+							{ window.config.title }
+						</Typography>
+						<div className={classes.grow} />
+						<div className={classes.actionButtons}>
+							<Tooltip title={`${room.locked ? 'Unlock' : 'Lock'} room`}>
 								<IconButton
 									aria-label='Lock room'
 									className={classes.actionButton}
@@ -335,7 +351,25 @@ class Room extends React.PureComponent
 										<LockOpenIcon />
 									}
 								</IconButton>
-								{ this.fullscreen.fullscreenEnabled ?
+							</Tooltip>
+							{ lobbyPeers.length > 0 &&
+								<Tooltip title='Show lobby'>
+									<IconButton
+										aria-label='Lobby'
+										color='inherit'
+										onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
+									>
+										<PulsingBadge
+											color='secondary'
+											badgeContent={lobbyPeers.length}
+										>
+											<SecurityIcon />
+										</PulsingBadge>
+									</IconButton>
+								</Tooltip>
+							}
+							{ this.fullscreen.fullscreenEnabled &&
+								<Tooltip title={`${this.state.fullscreen ? 'Leave' : 'Enter'} fullscreen`}>
 									<IconButton
 										aria-label='Fullscreen'
 										className={classes.actionButton}
@@ -348,8 +382,9 @@ class Room extends React.PureComponent
 											<FullScreenIcon />
 										}
 									</IconButton>
-									:null
-								}
+								</Tooltip>
+							}
+							<Tooltip title='Show settings'>
 								<IconButton
 									aria-label='Settings'
 									className={classes.actionButton}
@@ -358,7 +393,9 @@ class Room extends React.PureComponent
 								>
 									<SettingsIcon />
 								</IconButton>
-								{ loginEnabled ?
+							</Tooltip>
+							{ loginEnabled &&
+								<Tooltip title={`Log ${loggedIn ? 'out' : 'in'}`}>
 									<IconButton
 										aria-label='Account'
 										className={classes.actionButton}
@@ -374,43 +411,44 @@ class Room extends React.PureComponent
 											<AccountCircle />
 										}
 									</IconButton>
-									:null
-								}
-								<Button
-									aria-label='Leave meeting'
-									className={classes.actionButton}
-									variant='contained'
-									color='secondary'
-									onClick={() => roomClient.close()}
-								>
-									Leave
-								</Button>
-							</div>
-						</Toolbar>
-					</AppBar>
-					<nav>
-						<Hidden implementation='css'>
-							<SwipeableDrawer
-								variant='temporary'
-								anchor={theme.direction === 'rtl' ? 'right' : 'left'}
-								open={toolAreaOpen}
-								onClose={() => toggleToolArea()}
-								onOpen={() => toggleToolArea()}
-								classes={{
-									paper : classes.drawerPaper
-								}}
+								</Tooltip>
+							}
+							<Button
+								aria-label='Leave meeting'
+								className={classes.actionButton}
+								variant='contained'
+								color='secondary'
+								onClick={() => roomClient.close()}
 							>
-								<MeetingDrawer closeDrawer={toggleToolArea} />
-							</SwipeableDrawer>
-						</Hidden>
-					</nav>
+								Leave
+							</Button>
+						</div>
+					</Toolbar>
+				</AppBar>
+				<nav>
+					<Hidden implementation='css'>
+						<SwipeableDrawer
+							variant='temporary'
+							anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+							open={toolAreaOpen}
+							onClose={() => toggleToolArea()}
+							onOpen={() => toggleToolArea()}
+							classes={{
+								paper : classes.drawerPaper
+							}}
+						>
+							<MeetingDrawer closeDrawer={toggleToolArea} />
+						</SwipeableDrawer>
+					</Hidden>
+				</nav>
 
-					<View advancedMode={advancedMode} />
+				<View advancedMode={advancedMode} />
 
-					<Settings />
-				</div>
-			);
-		}
+				<LockDialog />
+
+				<Settings />
+			</div>
+		);
 	}
 }
 
@@ -418,6 +456,7 @@ Room.propTypes =
 {
 	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
+	lobbyPeers         : PropTypes.array,
 	advancedMode       : PropTypes.bool.isRequired,
 	myPicture          : PropTypes.string,
 	loggedIn           : PropTypes.bool.isRequired,
@@ -425,6 +464,7 @@ Room.propTypes =
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
 	setSettingsOpen    : PropTypes.func.isRequired,
+	setLockDialogOpen  : PropTypes.func.isRequired,
 	toggleToolArea     : PropTypes.func.isRequired,
 	unread             : PropTypes.number.isRequired,
 	classes            : PropTypes.object.isRequired,
@@ -434,10 +474,11 @@ Room.propTypes =
 const mapStateToProps = (state) =>
 	({
 		room         : state.room,
+		lobbyPeers   : lobbyPeersKeySelector(state),
 		advancedMode : state.settings.advancedMode,
 		loggedIn     : state.me.loggedIn,
 		loginEnabled : state.me.loginEnabled,
-		myPicture    : state.settings.picture,
+		myPicture    : state.me.picture,
 		toolAreaOpen : state.toolarea.toolAreaOpen,
 		unread       : state.toolarea.unreadMessages +
 			state.toolarea.unreadFiles
@@ -452,6 +493,10 @@ const mapDispatchToProps = (dispatch) =>
 		setSettingsOpen : (settingsOpen) =>
 		{
 			dispatch(stateActions.setSettingsOpen({ settingsOpen }));
+		},
+		setLockDialogOpen : (lockDialogOpen) =>
+		{
+			dispatch(stateActions.setLockDialogOpen({ lockDialogOpen }));
 		},
 		toggleToolArea : () =>
 		{
@@ -468,9 +513,10 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room === next.room &&
+				prev.lobbyPeers === next.lobbyPeers &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
-				prev.settings.picture === next.settings.picture &&
+				prev.me.picture === next.me.picture &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
