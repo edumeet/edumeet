@@ -34,8 +34,11 @@ import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
 import SecurityIcon from '@material-ui/icons/Security';
 import LockDialog from './AccessControl/LockDialog/LockDialog';
+import LockIcon from '@material-ui/icons/Lock';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 import Button from '@material-ui/core/Button';
 import Settings from './Settings/Settings';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const TIMEOUT = 10 * 1000;
 
@@ -366,43 +369,49 @@ class Room extends React.PureComponent
 								</Tooltip>
 							}
 							{ this.fullscreen.fullscreenEnabled &&
-								<IconButton
-									aria-label='Fullscreen'
-									className={classes.actionButton}
-									color='inherit'
-									onClick={this.handleToggleFullscreen}
-								>
-									{ this.state.fullscreen ?
-										<FullScreenExitIcon />
-										:
-										<FullScreenIcon />
-									}
-								</IconButton>
+								<Tooltip title={`${this.state.fullscreen ? 'Leave' : 'Enter'} fullscreen`}>
+									<IconButton
+										aria-label='Fullscreen'
+										className={classes.actionButton}
+										color='inherit'
+										onClick={this.handleToggleFullscreen}
+									>
+										{ this.state.fullscreen ?
+											<FullScreenExitIcon />
+											:
+											<FullScreenIcon />
+										}
+									</IconButton>
+								</Tooltip>
 							}
-							<IconButton
-								aria-label='Settings'
-								className={classes.actionButton}
-								color='inherit'
-								onClick={() => setSettingsOpen(!room.settingsOpen)}
-							>
-								<SettingsIcon />
-							</IconButton>
-							{ loginEnabled &&
+							<Tooltip title='Show settings'>
 								<IconButton
-									aria-label='Account'
+									aria-label='Settings'
 									className={classes.actionButton}
 									color='inherit'
-									onClick={() => 
-									{
-										loggedIn ? roomClient.logout() : roomClient.login();
-									}}
+									onClick={() => setSettingsOpen(!room.settingsOpen)}
 								>
-									{ myPicture ?
-										<Avatar src={myPicture} />
-										:
-										<AccountCircle />
-									}
+									<SettingsIcon />
 								</IconButton>
+							</Tooltip>
+							{ loginEnabled &&
+								<Tooltip title={`Log ${loggedIn ? 'out' : 'in'}`}>
+									<IconButton
+										aria-label='Account'
+										className={classes.actionButton}
+										color='inherit'
+										onClick={() => 
+										{
+											loggedIn ? roomClient.logout() : roomClient.login();
+										}}
+									>
+										{ myPicture ?
+											<Avatar src={myPicture} />
+											:
+											<AccountCircle />
+										}
+									</IconButton>
+								</Tooltip>
 							}
 							<Button
 								aria-label='Leave meeting'
