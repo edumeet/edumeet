@@ -440,6 +440,9 @@ export default class RoomClient
 
 		if (!displayName)
 			displayName = 'Guest';
+
+		store.dispatch(
+			stateActions.setDisplayNameInProgress(true));
 		
 		try
 		{
@@ -461,11 +464,10 @@ export default class RoomClient
 					type : 'error',
 					text : 'An error occured while changing your display name.'
 				}));
-
-			// We need to refresh the component for it to render the previous
-			// displayName again.
-			store.dispatch(stateActions.setDisplayName());
 		}
+
+		store.dispatch(
+			stateActions.setDisplayNameInProgress(false));
 	}
 
 	async changePicture(picture)
@@ -1243,8 +1245,6 @@ export default class RoomClient
 					{
 						text : 'You are disconnected.'
 					}));
-	
-				store.dispatch(stateActions.setRoomState('closed'));
 
 				this.close();
 			}
@@ -1265,8 +1265,6 @@ export default class RoomClient
 				{
 					text : 'You are disconnected.'
 				}));
-
-			store.dispatch(stateActions.setRoomState('closed'));
 
 			this.close();
 		});
@@ -1479,6 +1477,8 @@ export default class RoomClient
 	
 						store.dispatch(
 							stateActions.addLobbyPeer(peerId));
+						store.dispatch(
+							stateActions.setToolbarsVisible(true));
 	
 						store.dispatch(requestActions.notify(
 							{
@@ -1633,6 +1633,8 @@ export default class RoomClient
 							store.getState().toolarea.currentToolTab !== 'chat')
 						) // Make sound
 						{
+							store.dispatch(
+								stateActions.setToolbarsVisible(true));
 							this._soundNotification();
 						}
 	
@@ -1656,6 +1658,8 @@ export default class RoomClient
 							store.getState().toolarea.currentToolTab !== 'files')
 						) // Make sound
 						{
+							store.dispatch(
+								stateActions.setToolbarsVisible(true));
 							this._soundNotification();
 						}
 	
