@@ -11,15 +11,17 @@ import PropTypes from 'prop-types';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import Button from '@material-ui/core/Button';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+// import FormLabel from '@material-ui/core/FormLabel';
+// import FormControl from '@material-ui/core/FormControl';
+// import FormGroup from '@material-ui/core/FormGroup';
+// import FormControlLabel from '@material-ui/core/FormControlLabel';
 // import Checkbox from '@material-ui/core/Checkbox';
 // import InputLabel from '@material-ui/core/InputLabel';
 // import OutlinedInput from '@material-ui/core/OutlinedInput';
-import Switch from '@material-ui/core/Switch';
+// import Switch from '@material-ui/core/Switch';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListLobbyPeer from './ListLobbyPeer';
@@ -56,7 +58,7 @@ const styles = (theme) =>
 	});
 
 const LockDialog = ({
-	roomClient,
+	// roomClient,
 	room,
 	handleCloseLockDialog,
 	// handleAccessCode,
@@ -73,73 +75,78 @@ const LockDialog = ({
 				paper : classes.dialogPaper
 			}}
 		>
-			<DialogTitle id='form-dialog-title'>Room access control</DialogTitle>
-			<form className={classes.lock} autoComplete='off'>
-				<FormControl component='fieldset' className={classes.formControl}>
-					<FormLabel component='legend'>Room lock</FormLabel>
-					<FormGroup>
-						<FormControlLabel
-							control={
-								<Switch checked={room.locked} onChange={() => 
-								{
-									if (room.locked)
-									{
-										roomClient.unlockRoom();
-									}
-									else
-									{
-										roomClient.lockRoom();
-									}
-								}}
-								/>}
-							label='Lock'
-						/>
-						{/* TODO: access code
-						<FormControlLabel disabled={ room.locked ? false : true } 
-							control={
-								<Checkbox checked={room.joinByAccessCode} 
-									onChange={
-										(event) => roomClient.setJoinByAccessCode(event.target.checked)
-									}
-								/>}
-							label='Join by Access code'
-						/>
-						<InputLabel htmlFor='access-code-input' />
-						<OutlinedInput 
-							disabled={ room.locked ? false : true }
-							id='acces-code-input'
-							label='Access code'
-							labelWidth={0}
-							variant='outlined'
-							value={room.accessCode}
-							onChange={(event) => handleAccessCode(event.target.value)}
-						>
-						</OutlinedInput>
-						<Button onClick={() => roomClient.setAccessCode(room.accessCode)} color='primary'>
-								save
-						</Button>
-						*/}
-					</FormGroup>
-				</FormControl>
-
-				{ (lobbyPeers.length > 0) &&
-					<List 
-						dense={true} 
-						subheader={
-							<ListSubheader component='div'>
-								Participants in Lobby
-							</ListSubheader>
-					}
-					>
-						{
-							lobbyPeers.map((peerId) =>
+			<DialogTitle id='form-dialog-title'>Lobby administration</DialogTitle>
+			{/*
+			<FormControl component='fieldset' className={classes.formControl}>
+				<FormLabel component='legend'>Room lock</FormLabel>
+				<FormGroup>
+					<FormControlLabel
+						control={
+							<Switch checked={room.locked} onChange={() => 
 							{
-								return (<ListLobbyPeer key={peerId} id={peerId} />);
-							})
-						}
-					</List>
-				} 
-			</form>
+								if (room.locked)
+								{
+									roomClient.unlockRoom();
+								}
+								else
+								{
+									roomClient.lockRoom();
+								}
+							}}
+							/>}
+						label='Lock'
+					/>
+						TODO: access code
+					<FormControlLabel disabled={ room.locked ? false : true } 
+						control={
+							<Checkbox checked={room.joinByAccessCode} 
+								onChange={
+									(event) => roomClient.setJoinByAccessCode(event.target.checked)
+								}
+							/>}
+						label='Join by Access code'
+					/>
+					<InputLabel htmlFor='access-code-input' />
+					<OutlinedInput 
+						disabled={ room.locked ? false : true }
+						id='acces-code-input'
+						label='Access code'
+						labelWidth={0}
+						variant='outlined'
+						value={room.accessCode}
+						onChange={(event) => handleAccessCode(event.target.value)}
+					>
+					</OutlinedInput>
+					<Button onClick={() => roomClient.setAccessCode(room.accessCode)} color='primary'>
+							save
+					</Button>
+					
+				</FormGroup>
+			</FormControl>
+			*/}
+			{ lobbyPeers.length > 0 ?
+				<List 
+					dense
+					subheader={
+						<ListSubheader component='div'>
+							Participants in Lobby
+						</ListSubheader>
+					}
+				>
+					{
+						lobbyPeers.map((peerId) =>
+						{
+							return (<ListLobbyPeer key={peerId} id={peerId} />);
+						})
+					}
+				</List>
+				:
+				<DialogContent>
+					<DialogContentText gutterBottom>
+						There are currently no one in the lobby.
+					</DialogContentText>
+				</DialogContent>
+			}
 			<DialogActions>
 				<Button onClick={() => handleCloseLockDialog({ lockDialogOpen: false })} color='primary'>
 					Close
@@ -151,7 +158,7 @@ const LockDialog = ({
 
 LockDialog.propTypes =
 {
-	roomClient            : PropTypes.any.isRequired,
+	// roomClient            : PropTypes.any.isRequired,
 	room                  : appPropTypes.Room.isRequired,
 	handleCloseLockDialog : PropTypes.func.isRequired,
 	handleAccessCode      : PropTypes.func.isRequired,

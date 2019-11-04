@@ -325,18 +325,46 @@ class Room extends React.PureComponent
 						</Typography>
 						<div className={classes.grow} />
 						<div className={classes.actionButtons}>
-							<IconButton
-								aria-label='Lock'
-								color='inherit'
-								onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
-							>
-								<PulsingBadge
-									color='secondary'
-									badgeContent={lobbyPeers.length}
+							<Tooltip title={`${room.locked ? 'Unlock' : 'Lock'} room`}>
+								<IconButton
+									aria-label='Lock room'
+									className={classes.actionButton}
+									color='inherit'
+									onClick={() =>
+									{
+										if (room.locked)
+										{
+											roomClient.unlockRoom();
+										}
+										else
+										{
+											roomClient.lockRoom();
+										}
+									}}
 								>
-									<SecurityIcon />
-								</PulsingBadge>
-							</IconButton>						
+									{ room.locked ?
+										<LockIcon />
+										:
+										<LockOpenIcon />
+									}
+								</IconButton>
+							</Tooltip>
+							{ lobbyPeers.length > 0 &&
+								<Tooltip title='Show lobby'>
+									<IconButton
+										aria-label='Lobby'
+										color='inherit'
+										onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
+									>
+										<PulsingBadge
+											color='secondary'
+											badgeContent={lobbyPeers.length}
+										>
+											<SecurityIcon />
+										</PulsingBadge>
+									</IconButton>
+								</Tooltip>
+							}
 							{ this.fullscreen.fullscreenEnabled &&
 								<IconButton
 									aria-label='Fullscreen'
