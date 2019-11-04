@@ -208,6 +208,8 @@ export default class RoomClient
 			this._recvTransport.close();
 
 		store.dispatch(stateActions.setRoomState('closed'));
+
+		window.location = '/';
 	}
 
 	_startKeyListener()
