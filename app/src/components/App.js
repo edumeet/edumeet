@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Room from './Room';
 import JoinDialog from './JoinDialog';
+import LoadingView from './LoadingView';
+import { ReactLazyPreload } from './ReactLazyPreload';
+
+const Room = ReactLazyPreload(() => import(/* webpackChunkName: "room" */ './Room'));
 
 const App = (props) =>
 {
 	const {
 		room
 	} = props;
+
+	useEffect(() =>
+	{
+		Room.preload();
+
+		return;
+	}, []);
 
 	if (!room.joined)
 	{
@@ -19,7 +29,9 @@ const App = (props) =>
 	else
 	{
 		return (
-			<Room />
+			<Suspense fallback={<LoadingView />}>
+				<Room />
+			</Suspense>
 		);
 	}
 };

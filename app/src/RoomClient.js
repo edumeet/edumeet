@@ -1,15 +1,30 @@
-import io from 'socket.io-client';
-import * as mediasoupClient from 'mediasoup-client';
-import WebTorrent from 'webtorrent';
-import createTorrent from 'create-torrent';
-import saveAs from 'file-saver';
+// import io from 'socket.io-client';
+// import * as mediasoupClient from 'mediasoup-client';
+// import WebTorrent from 'webtorrent';
+// import createTorrent from 'create-torrent';
+// import saveAs from 'file-saver';
 import Logger from './Logger';
 import hark from 'hark';
-import ScreenShare from './ScreenShare';
-import Spotlights from './Spotlights';
+// import ScreenShare from './ScreenShare';
+// import Spotlights from './Spotlights';
 import { getSignalingUrl } from './urlFactory';
 import * as requestActions from './actions/requestActions';
 import * as stateActions from './actions/stateActions';
+
+let WebTorrent;
+
+let createTorrent;
+
+let saveAs;
+
+let mediasoupClient;
+
+let io;
+
+let ScreenShare;
+
+let Spotlights;
+
 const {
 	turnServers,
 	requestTimeout,
@@ -98,7 +113,7 @@ export default class RoomClient
 		this._forceTcp = forceTcp;
 
 		// Torrent support
-		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
+		this._torrentSupport = null;
 
 		// Whether simulcast should be used.
 		this._useSimulcast = useSimulcast;
@@ -171,7 +186,7 @@ export default class RoomClient
 		// @type {Map<String, mediasoupClient.Consumer>}
 		this._consumers = new Map();
 
-		this._screenSharing = ScreenShare.create(device);
+		this._screenSharing = null;
 
 		this._screenSharingProducer = null;
 
@@ -1130,8 +1145,66 @@ export default class RoomClient
 			stateActions.setMyRaiseHandStateInProgress(false));
 	}
 
+	async _loadDynamicImports()
+	{
+		({ default: WebTorrent } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "webtorrent" */
+			'webtorrent'
+		));
+
+		({ default: createTorrent } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "create-torrent" */
+			'create-torrent'
+		));
+
+		({ default: saveAs } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "file-saver" */
+			'file-saver'
+		));
+
+		({ default: ScreenShare } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "screensharing" */
+			'./ScreenShare'
+		));
+
+		({ default: Spotlights } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "spotlights" */
+			'./Spotlights'
+		));
+
+		mediasoupClient = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "mediasoup" */
+			'mediasoup-client'
+		);
+
+		({ default: io } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "socket.io" */
+			'socket.io-client'
+		));
+	}
+
 	async join({ joinVideo })
 	{
+		await this._loadDynamicImports();
+
+		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
+
+		this._screenSharing = ScreenShare.create(this._device);
+
 		this._signalingSocket = io(this._signalingUrl);
 
 		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
