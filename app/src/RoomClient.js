@@ -144,13 +144,7 @@ export default class RoomClient
 		this._doneJoining = false;
 
 		// Our WebTorrent client
-		this._webTorrent = this._torrentSupport && new WebTorrent({
-			tracker : {
-				rtcConfig : {
-					iceServers : ROOM_OPTIONS.turnServers
-				}
-			}
-		});
+		this._webTorrent = null;
 
 		// Max spotlights
 		if (device.bowser.ios || device.bowser.mobile || device.bowser.android)
@@ -1202,6 +1196,14 @@ export default class RoomClient
 		await this._loadDynamicImports();
 
 		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
+
+		this._webTorrent = this._torrentSupport && new WebTorrent({
+			tracker : {
+				rtcConfig : {
+					iceServers : ROOM_OPTIONS.turnServers
+				}
+			}
+		});
 
 		this._screenSharing = ScreenShare.create(this._device);
 
