@@ -73,7 +73,7 @@ const styles = (theme) =>
 		},
 		ListItem :
 		{
-			alignItems: 'center'
+			alignItems : 'center'
 		}
 	});
 
