@@ -11,6 +11,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 import PromoteIcon from '@material-ui/icons/OpenInBrowser';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = (theme) =>
 	({
@@ -99,18 +100,20 @@ const ListLobbyPeer = (props) =>
 			<ListItemText
 				primary={peer.displayName}
 			/>
-			<ListItemIcon
-				className={classnames(classes.button, 'promote', {
-					disabled : peer.promotionInProgress
-				})}
-				onClick={(e) =>
-				{
-					e.stopPropagation();
-					roomClient.promoteLobbyPeer(peer.id);
-				}}
-			>
-				<PromoteIcon />
-			</ListItemIcon>
+			<Tooltip title='Click to let them in'>
+				<ListItemIcon
+					className={classnames(classes.button, 'promote', {
+						disabled : peer.promotionInProgress
+					})}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+						roomClient.promoteLobbyPeer(peer.id);
+					}}
+				>
+					<PromoteIcon />
+				</ListItemIcon>
+			</Tooltip>
 		</ListItem>
 	);
 };
