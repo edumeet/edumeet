@@ -100,9 +100,6 @@ export default class RoomClient
 
 		this._signalingUrl = getSignalingUrl(peerId, roomId);
 
-		// window element to external login site
-		this._loginWindow = null;
-
 		// Closed flag.
 		this._closed = false;
 
@@ -140,8 +137,6 @@ export default class RoomClient
 		// mediasoup-client Device instance.
 		// @type {mediasoupClient.Device}
 		this._mediasoupDevice = null;
-
-		this._doneJoining = false;
 
 		// Our WebTorrent client
 		this._webTorrent = null;
