@@ -160,6 +160,7 @@ const JoinDialog = ({
 	roomClient,
 	room,
 	displayName,
+	displayNameInProgress,
 	loggedIn,
 	myPicture,
 	changeDisplayName,
@@ -177,6 +178,8 @@ const JoinDialog = ({
 			{
 				if (displayName === '')
 					changeDisplayName('Guest');
+				if (room.inLobby)
+					roomClient.changeDisplayName(displayName);
 				break;
 			}
 			default:
@@ -222,6 +225,7 @@ const JoinDialog = ({
 						value={displayName}
 						variant='outlined'
 						margin='normal'
+						disabled={displayNameInProgress}
 						onChange={(event) =>
 						{
 							const { value } = event.target;
@@ -233,7 +237,8 @@ const JoinDialog = ({
 						{
 							if (displayName === '')
 								changeDisplayName('Guest');
-							if (room.inLobby) roomClient.changeDisplayName(displayName);
+							if (room.inLobby)
+								roomClient.changeDisplayName(displayName);
 						}}
 						fullWidth
 					/>
@@ -296,24 +301,26 @@ const JoinDialog = ({
 
 JoinDialog.propTypes =
 {
-	roomClient        : PropTypes.any.isRequired,
-	room              : PropTypes.object.isRequired,
-	displayName       : PropTypes.string.isRequired,
-	loginEnabled      : PropTypes.bool.isRequired,
-	loggedIn          : PropTypes.bool.isRequired,
-	myPicture         : PropTypes.string,
-	changeDisplayName : PropTypes.func.isRequired,
-	classes           : PropTypes.object.isRequired
+	roomClient            : PropTypes.any.isRequired,
+	room                  : PropTypes.object.isRequired,
+	displayName           : PropTypes.string.isRequired,
+	displayNameInProgress : PropTypes.bool.isRequired,
+	loginEnabled          : PropTypes.bool.isRequired,
+	loggedIn              : PropTypes.bool.isRequired,
+	myPicture             : PropTypes.string,
+	changeDisplayName     : PropTypes.func.isRequired,
+	classes               : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		room         : state.room,
-		displayName  : state.settings.displayName,
-		loginEnabled : state.me.loginEnabled,
-		loggedIn     : state.me.loggedIn,
-		myPicture    : state.me.picture
+		room                  : state.room,
+		displayName           : state.settings.displayName,
+		displayNameInProgress : state.me.displayNameInProgress,
+		loginEnabled          : state.me.loginEnabled,
+		loggedIn              : state.me.loggedIn,
+		myPicture             : state.me.picture
 	};
 };
 
@@ -338,6 +345,7 @@ export default withRoomContext(connect(
 				prev.room.inLobby === next.room.inLobby &&
 				prev.room.signInRequired === next.room.signInRequired &&
 				prev.settings.displayName === next.settings.displayName &&
+				prev.me.displayNameInProgress === next.me.displayNameInProgress &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.picture === next.me.picture
