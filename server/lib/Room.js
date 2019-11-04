@@ -126,19 +126,36 @@ class Room extends EventEmitter
 
 			return;
 		}
-		else if ( this._locked )
+		else if (this._locked)
 		{
 			this._parkPeer(peer);
-			return;
 		}
-		else if ( Boolean(config.requireSignInToAccess) && this.checkEmpty()) 
-		{       
-			this._parkPeer(peer);
-			this._notification(peer.socket, 'signInRequired');
-			return;
+		else
+		{
+			peer.authenticated ?
+				this._peerJoining(peer) :
+				this._handleGuest(peer);
 		}
+	}
 
-		this._peerJoining(peer);
+	_handleGuest(peer)
+	{
+		if (config.requireSignInToAccess)
+		{
+			if (config.activateOnHostJoin && !this.checkEmpty())
+			{
+				this._peerJoining(peer);
+			}
+			else
+			{
+				this._parkPeer(peer);
+				this._notification(peer.socket, 'signInRequired');
+			}
+		}
+		else
+		{
+			this._peerJoining(peer);
+		}
 	}
 
 	_handleLobby()
@@ -255,7 +272,7 @@ class Room extends EventEmitter
 			if (this._closed)
 				return;
 
-			if (this.checkEmpty())
+			if (this.checkEmpty() && this._lobby.checkEmpty())
 			{
 				logger.info(
 					'Room deserted for some time, closing the room [roomId:"%s"]',
@@ -270,7 +287,7 @@ class Room extends EventEmitter
 	// checks both room and lobby
 	checkEmpty()
 	{
-		return (this._peers.size == 0) && (this._lobby.checkEmpty());
+		return this._peers.size === 0;
 	}
 
 	_parkPeer(parkPeer)
@@ -341,7 +358,7 @@ class Room extends EventEmitter
 
 			// If this is the last Peer in the room and
 			// lobby is empty, close the room after a while.
-			if (this.checkEmpty())
+			if (this.checkEmpty() && this._lobby.checkEmpty())
 			{
 				this.selfDestructCountdown();
 			}
