@@ -317,34 +317,49 @@ export default class RoomClient
 	{
 		const url = `/auth/login?id=${this._peerId}`;
 
-		this._loginWindow = window.open(url, 'loginWindow');
+		window.open(url, 'loginWindow');
 	}
 
 	logout()
 	{
-		window.location = '/auth/logout';
+		window.open('/auth/logout', 'logoutWindow');
 	}
 
-	receiveFromChildWindow(data)
+	receiveLoginChildWindow(data)
 	{
 		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);
 
 		const { displayName, picture } = data;
 
-		store.dispatch(stateActions.setDisplayName(displayName));
-		store.dispatch(stateActions.setPicture(picture));
-		store.dispatch(stateActions.loggedIn());
+		if (store.getState().room.state === 'connected')
+		{
+			this.changeDisplayName(displayName);
+			this.changePicture(picture);
+		}
+		else
+		{
+			store.dispatch(stateActions.setDisplayName(displayName));
+			store.dispatch(stateActions.setPicture(picture));
+		}
+
+		store.dispatch(stateActions.loggedIn(true));
 
 		store.dispatch(requestActions.notify(
 			{
 				text : 'You are logged in.'
 			}));
+	}
 
-		if (store.getState().room.state !== 'new') // no socket yet
-		{
-			this.changeDisplayName(displayName);
-			this.changePicture(picture);
-		}
+	receiveLogoutChildWindow()
+	{
+		logger.debug('receiveLogoutChildWindow()');
+
+		store.dispatch(stateActions.loggedIn(false));
+
+		store.dispatch(requestActions.notify(
+			{
+				text : 'You are logged out.'
+			}));
 	}
 
 	_soundNotification()

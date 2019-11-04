@@ -165,6 +165,14 @@ export const setDisplayName = (displayName) =>
 	};
 };
 
+export const setDisplayNameInProgress = (flag) =>
+{
+	return {
+		type    : 'SET_DISPLAY_NAME_IN_PROGRESS',
+		payload : { flag }
+	};
+};
+
 export const toggleAdvancedMode = () =>
 {
 	return {
@@ -641,9 +649,10 @@ export const setPeerPicture = (peerId, picture) =>
 		payload : { peerId, picture }
 	});
 
-export const loggedIn = () =>
+export const loggedIn = (flag) =>
 	({
-		type : 'LOGGED_IN'
+		type    : 'LOGGED_IN',
+		payload : { flag }
 	});
 
 export const toggleJoined = () =>

@@ -12,6 +12,7 @@ const initialState =
 	webcamInProgress      : false,
 	audioInProgress       : false,
 	screenShareInProgress : false,
+	displayNameInProgress : false,
 	loginEnabled          : false,
 	raiseHand             : false,
 	raiseHandInProgress   : false,
@@ -39,7 +40,11 @@ const me = (state = initialState, action) =>
 		}
 
 		case 'LOGGED_IN':
-			return { ...state, loggedIn: true };
+		{
+			const { flag } = action.payload;
+
+			return { ...state, loggedIn: flag };
+		}
 
 		case 'USER_LOGOUT':
 			return { ...state, loggedIn: false };
@@ -112,6 +117,13 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, raiseHandInProgress: flag };
+		}
+
+		case 'SET_DISPLAY_NAME_IN_PROGRESS':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, displayNameInProgress: flag };
 		}
 
 		default:

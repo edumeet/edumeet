@@ -6,7 +6,6 @@ const config = require('./config/config');
 const fs = require('fs');
 const http = require('http');
 const spdy = require('spdy');
-const { constants } = require('crypto');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -18,7 +17,10 @@ const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
-const httpHelper = require('./httpHelper');
+const {
+	loginHelper,
+	logoutHelper
+} = require('./httpHelper');
 // auth
 const passport = require('passport');
 const redis = require('redis');
@@ -88,7 +90,8 @@ const session = expressSession({
 	store             : new RedisStore({ client }),
 	cookie            : {
 		secure   : true,
-		httpOnly : true
+		httpOnly : true,
+		maxAge   : 60 * 60 * 1000 // Expire after 1 hour since last request from user
 	}
 });
 
@@ -268,7 +271,7 @@ async function setupAuth(oidcIssuer)
 	app.get('/auth/logout', (req, res) =>
 	{
 		req.logout();
-		res.redirect('/');
+		res.send(logoutHelper());
 	});
 
 	// callback
@@ -301,7 +304,7 @@ async function setupAuth(oidcIssuer)
 			peer && (peer.displayName = displayName);
 			peer && (peer.picture = picture);
 
-			res.send(httpHelper({
+			res.send(loginHelper({
 				displayName,
 				picture
 			}));
