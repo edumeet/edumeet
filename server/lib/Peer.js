@@ -106,12 +106,10 @@ class Peer extends EventEmitter
 			email && (this.email = email);
 
 			this.authenticated = true;
-			this.emit('authenticationChanged');
 		}
 		else
 		{
 			this.authenticated = false;
-			this.emit('authenticationChanged');
 		}
 	}
 
