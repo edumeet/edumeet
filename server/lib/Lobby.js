@@ -1,7 +1,5 @@
 const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
-const config = require('../config/config');
-
 
 const logger = new Logger('Lobby');
 
@@ -76,8 +74,15 @@ class Lobby extends EventEmitter
 
 		if (peer)
 		{
-			this.emit('promotePeer', peer);
+			peer.socket.removeListener('request', peer.socketRequestHandler);
+			peer.removeListener('authenticationChanged', peer.authenticationHandler);
+			peer.removeListener('close', peer.closeHandler);
 
+			peer.socketRequestHandler = null;
+			peer.authenticationHandler = null;
+			peer.closeHandler = null;
+
+			this.emit('promotePeer', peer);
 			this._peers.delete(peerId);
 		}
 	}
@@ -89,18 +94,7 @@ class Lobby extends EventEmitter
 		if (this._closed)
 			return;
 
-		this._notification(peer.socket, 'enteredLobby');
-
-		this._peers.set(peer.id, peer);
-
-		peer.on('authenticationChanged', () =>
-		{
-			logger.info('parkPeer() | authenticationChange [peer:"%s"]', peer.id);
-
-			peer.authenticated && this.emit('peerAuthenticated', peer);
-		});
-
-		peer.socket.on('request', (request, cb) =>
+		peer.socketRequestHandler = (request, cb) =>
 		{
 			logger.debug(
 				'Peer "request" event [method:"%s", peer:"%s"]',
@@ -116,9 +110,16 @@ class Lobby extends EventEmitter
 
 					cb(error);
 				});
-		});
+		};
 
-		peer.on('close', () =>
+		peer.authenticationHandler = () =>
+		{
+			logger.info('parkPeer() | authenticationChange [peer:"%s"]', peer.id);
+
+			peer.authenticated && this.emit('peerAuthenticated', peer);
+		};
+
+		peer.closeHandler = () =>
 		{
 			logger.debug('Peer "close" event [peer:"%s"]', peer.id);
 
@@ -131,7 +132,17 @@ class Lobby extends EventEmitter
 
 			if (this.checkEmpty())
 				this.emit('lobbyEmpty');
-		});
+		};
+
+		this._notification(peer.socket, 'enteredLobby');
+
+		this._peers.set(peer.id, peer);
+
+		peer.on('authenticationChanged', peer.authenticationHandler);
+
+		peer.socket.on('request', peer.socketRequestHandler);
+
+		peer.on('close', peer.closeHandler);
 	}
 
 	async _handleSocketRequest(peer, request, cb)
