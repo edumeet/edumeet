@@ -300,9 +300,9 @@ async function setupAuth(oidcIssuer)
 
 			const peer = peers.get(state.id);
 
-			peer && (peer.authenticated = true);
 			peer && (peer.displayName = displayName);
 			peer && (peer.picture = picture);
+			peer && (peer.authenticated = true);
 
 			res.send(loginHelper({
 				displayName,
