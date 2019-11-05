@@ -46,9 +46,6 @@ const me = (state = initialState, action) =>
 			return { ...state, loggedIn: flag };
 		}
 
-		case 'USER_LOGOUT':
-			return { ...state, loggedIn: false };
-
 		case 'SET_PICTURE':
 			return { ...state, picture: action.payload.picture };
 
