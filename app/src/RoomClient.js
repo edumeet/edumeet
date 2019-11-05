@@ -1,12 +1,5 @@
-// import io from 'socket.io-client';
-// import * as mediasoupClient from 'mediasoup-client';
-// import WebTorrent from 'webtorrent';
-// import createTorrent from 'create-torrent';
-// import saveAs from 'file-saver';
 import Logger from './Logger';
 import hark from 'hark';
-// import ScreenShare from './ScreenShare';
-// import Spotlights from './Spotlights';
 import { getSignalingUrl } from './urlFactory';
 import * as requestActions from './actions/requestActions';
 import * as meActions from './actions/meActions';
