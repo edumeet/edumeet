@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import * as stateActions from '../../actions/stateActions';
+import * as toolareaActions from '../../actions/toolareaActions';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -114,7 +114,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-	setToolTab : stateActions.setToolTab
+	setToolTab : toolareaActions.setToolTab
 };
 
 export default connect(

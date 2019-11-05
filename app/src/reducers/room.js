@@ -116,13 +116,6 @@ const room = (state = initialState, action) =>
 			return { ...state, torrentSupport: supported };
 		}
 
-		case 'TOGGLE_SETTINGS':
-		{
-			const showSettings = !state.showSettings;
-
-			return { ...state, showSettings };
-		}
-
 		case 'TOGGLE_JOINED':
 		{
 			const joined = !state.joined;

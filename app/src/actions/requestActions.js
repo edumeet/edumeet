@@ -1,5 +1,5 @@
 import randomString from 'random-string';
-import * as stateActions from './stateActions';
+import * as notificationActions from './notificationActions';
 
 // This returns a redux-thunk action (a function).
 export const notify = ({ type = 'info', text, timeout }) =>
@@ -30,11 +30,11 @@ export const notify = ({ type = 'info', text, timeout }) =>
 
 	return (dispatch) =>
 	{
-		dispatch(stateActions.addNotification(notification));
+		dispatch(notificationActions.addNotification(notification));
 
 		setTimeout(() =>
 		{
-			dispatch(stateActions.removeNotification(notification.id));
+			dispatch(notificationActions.removeNotification(notification.id));
 		}, timeout);
 	};
 };

@@ -7,7 +7,7 @@ import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import * as stateActions from '../../actions/stateActions';
+import * as roomActions from '../../actions/roomActions';
 import VideoView from '../VideoContainers/VideoView';
 import Fab from '@material-ui/core/Fab';
 import MicIcon from '@material-ui/icons/Mic';
@@ -432,12 +432,12 @@ const mapDispatchToProps = (dispatch) =>
 		toggleConsumerFullscreen : (consumer) =>
 		{
 			if (consumer)
-				dispatch(stateActions.toggleConsumerFullscreen(consumer.id));
+				dispatch(roomActions.toggleConsumerFullscreen(consumer.id));
 		},
 		toggleConsumerWindow : (consumer) =>
 		{
 			if (consumer)
-				dispatch(stateActions.toggleConsumerWindow(consumer.id));
+				dispatch(roomActions.toggleConsumerWindow(consumer.id));
 		}
 	};
 };

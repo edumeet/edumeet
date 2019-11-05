@@ -7,7 +7,8 @@ import {
 import * as appPropTypes from './appPropTypes';
 import { withRoomContext } from '../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import * as stateActions from '../actions/stateActions';
+import * as roomActions from '../actions/roomActions';
+import * as toolareaActions from '../actions/toolareaActions';
 import { idle } from '../utils';
 import FullScreen from './FullScreen';
 import CookieConsent from 'react-cookie-consent';
@@ -488,19 +489,19 @@ const mapDispatchToProps = (dispatch) =>
 	({
 		setToolbarsVisible : (visible) =>
 		{
-			dispatch(stateActions.setToolbarsVisible(visible));
+			dispatch(roomActions.setToolbarsVisible(visible));
 		},
 		setSettingsOpen : (settingsOpen) =>
 		{
-			dispatch(stateActions.setSettingsOpen({ settingsOpen }));
+			dispatch(roomActions.setSettingsOpen({ settingsOpen }));
 		},
 		setLockDialogOpen : (lockDialogOpen) =>
 		{
-			dispatch(stateActions.setLockDialogOpen({ lockDialogOpen }));
+			dispatch(roomActions.setLockDialogOpen({ lockDialogOpen }));
 		},
 		toggleToolArea : () =>
 		{
-			dispatch(stateActions.toggleToolArea());
+			dispatch(toolareaActions.toggleToolArea());
 		}
 	});
 

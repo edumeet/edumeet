@@ -6,7 +6,7 @@ import {
 import * as appPropTypes from '../../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
-import * as stateActions from '../../../actions/stateActions';
+import * as roomActions from '../../../actions/roomActions';
 import PropTypes from 'prop-types';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -175,8 +175,8 @@ const mapStateToProps = (state) =>
 };
 
 const mapDispatchToProps = {
-	handleCloseLockDialog : stateActions.setLockDialogOpen,
-	handleAccessCode      : stateActions.setAccessCode
+	handleCloseLockDialog : roomActions.setLockDialogOpen,
+	handleAccessCode      : roomActions.setAccessCode
 };
 
 export default withRoomContext(connect(

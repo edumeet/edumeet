@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import * as appPropTypes from '../appPropTypes';
-import * as stateActions from '../../actions/stateActions';
+import * as roomActions from '../../actions/roomActions';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import VideoView from './VideoView';
 
@@ -148,7 +148,7 @@ const mapDispatchToProps = (dispatch) =>
 		toggleConsumerFullscreen : (consumer) =>
 		{
 			if (consumer)
-				dispatch(stateActions.toggleConsumerFullscreen(consumer.id));
+				dispatch(roomActions.toggleConsumerFullscreen(consumer.id));
 		}
 	});
 

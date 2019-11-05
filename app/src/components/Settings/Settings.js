@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import * as appPropTypes from '../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../RoomContext';
-import * as stateActions from '../../actions/stateActions';
+import * as roomActions from '../../actions/roomActions';
+import * as settingsActions from '../../actions/settingsActions';
 import PropTypes from 'prop-types';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -267,9 +268,9 @@ const mapStateToProps = (state) =>
 };
 
 const mapDispatchToProps = {
-	onToggleAdvancedMode : stateActions.toggleAdvancedMode,
-	handleChangeMode     : stateActions.setDisplayMode,
-	handleCloseSettings  : stateActions.setSettingsOpen,
+	onToggleAdvancedMode : settingsActions.toggleAdvancedMode,
+	handleChangeMode     : roomActions.setDisplayMode,
+	handleCloseSettings  : roomActions.setSettingsOpen
 };
 
 export default withRoomContext(connect(

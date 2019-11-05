@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import * as stateActions from '../../actions/stateActions';
+import * as toolareaActions from '../../actions/toolareaActions';
 import BuddyImage from '../../images/buddy.svg';
 
 const styles = () =>
@@ -115,8 +115,8 @@ const mapDispatchToProps = (dispatch) =>
 	return {
 		openUsersTab : () =>
 		{
-			dispatch(stateActions.openToolArea());
-			dispatch(stateActions.setToolTab('users'));
+			dispatch(toolareaActions.openToolArea());
+			dispatch(toolareaActions.setToolTab('users'));
 		}
 	};
 };

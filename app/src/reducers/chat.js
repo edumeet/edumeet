@@ -3,7 +3,7 @@ import
 	createNewMessage
 } from './helper';
 
-const chatmessages = (state = [], action) =>
+const chat = (state = [], action) =>
 {
 	switch (action.type)
 	{
@@ -30,14 +30,9 @@ const chatmessages = (state = [], action) =>
 			return [ ...state, ...chatHistory ];
 		}
 
-		case 'DROP_MESSAGES':
-		{
-			return [];
-		}
-
 		default:
 			return state;
 	}
 };
 
-export default chatmessages;
+export default chat;

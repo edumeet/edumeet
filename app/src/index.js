@@ -8,7 +8,8 @@ import debug from 'debug';
 import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
-import * as stateActions from './actions/stateActions';
+import * as roomActions from './actions/roomActions';
+import * as meActions from './actions/meActions';
 import App from './components/App';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
@@ -73,10 +74,10 @@ function run()
 	const device = deviceInfo();
 
 	store.dispatch(
-		stateActions.setRoomUrl(roomUrl));
+		roomActions.setRoomUrl(roomUrl));
 
 	store.dispatch(
-		stateActions.setMe({
+		meActions.setMe({
 			peerId,
 			device,
 			loginEnabled : window.config.loginEnabled

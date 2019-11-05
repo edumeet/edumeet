@@ -7,7 +7,7 @@ import lobbyPeers from './lobbyPeers';
 import consumers from './consumers';
 import peerVolumes from './peerVolumes';
 import notifications from './notifications';
-import chatmessages from './chatmessages';
+import chat from './chat';
 import toolarea from './toolarea';
 import files from './files';
 import settings from './settings';
@@ -21,7 +21,7 @@ export default combineReducers({
 	consumers,
 	peerVolumes,
 	notifications,
-	chatmessages,
+	chat,
 	toolarea,
 	files,
 	settings

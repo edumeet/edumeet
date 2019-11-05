@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
-import * as stateActions from '../actions/stateActions';
+import * as settingsActions from '../actions/settingsActions';
 import PropTypes from 'prop-types';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText';
@@ -329,7 +329,7 @@ const mapDispatchToProps = (dispatch) =>
 	return {
 		changeDisplayName : (displayName) =>
 		{
-			dispatch(stateActions.setDisplayName(displayName));
+			dispatch(settingsActions.setDisplayName(displayName));
 		}
 	};
 };

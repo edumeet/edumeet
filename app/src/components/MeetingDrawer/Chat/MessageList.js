@@ -33,7 +33,7 @@ class MessageList extends React.Component
 
 	shouldComponentUpdate(nextProps)
 	{
-		if (nextProps.chatmessages.length !== this.props.chatmessages.length)
+		if (nextProps.chat.length !== this.props.chat.length)
 			return true;
 
 		return false;
@@ -55,7 +55,7 @@ class MessageList extends React.Component
 	render()
 	{
 		const {
-			chatmessages,
+			chat,
 			myPicture,
 			classes
 		} = this.props;
@@ -63,7 +63,7 @@ class MessageList extends React.Component
 		return (
 			<div className={classes.root} ref={(node) => { this.node = node; }}>
 				{
-					chatmessages.map((message, index) =>
+					chat.map((message, index) =>
 					{
 						const messageTime = new Date(message.time);
 
@@ -89,15 +89,15 @@ class MessageList extends React.Component
 
 MessageList.propTypes =
 {
-	chatmessages : PropTypes.array,
+	chat : PropTypes.array,
 	myPicture    : PropTypes.string,
 	classes      : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
-		chatmessages : state.chatmessages,
-		myPicture    : state.me.picture
+		chat      : state.chat,
+		myPicture : state.me.picture
 	});
 
 export default connect(
@@ -108,7 +108,7 @@ export default connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.chatmessages === next.chatmessages &&
+				prev.chat === next.chat &&
 				prev.me.picture === next.me.picture
 			);
 		}
