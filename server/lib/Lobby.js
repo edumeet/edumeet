@@ -116,7 +116,12 @@ class Lobby extends EventEmitter
 		{
 			logger.info('parkPeer() | authenticationChange [peer:"%s"]', peer.id);
 
-			peer.authenticated && this.emit('peerAuthenticated', peer);
+			if (peer.authenticated)
+			{
+				this.emit('changeDisplayName', peer);
+				this.emit('changePicture', peer);
+				this.emit('peerAuthenticated', peer);
+			}
 		};
 
 		peer.closeHandler = () =>
