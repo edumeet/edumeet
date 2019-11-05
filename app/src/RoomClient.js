@@ -13,8 +13,6 @@ import * as stateActions from './actions/stateActions';
 
 let WebTorrent;
 
-let createTorrent;
-
 let saveAs;
 
 let mediasoupClient;
@@ -586,17 +584,8 @@ export default class RoomClient
 				text : 'Starting file share.'
 			}));
 
-		createTorrent(files, (err, torrent) =>
+		this._webTorrent.seed(files, (torrent) =>
 		{
-			if (err)
-			{
-				return store.dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : 'Unable to upload file.'
-					}));
-			}
-
 			const existingTorrent = this._webTorrent.get(torrent);
 
 			if (existingTorrent)
@@ -604,20 +593,17 @@ export default class RoomClient
 				return this._sendFile(existingTorrent.magnetURI);
 			}
 
-			this._webTorrent.seed(files, (newTorrent) =>
-			{
-				store.dispatch(requestActions.notify(
-					{
-						text : 'File successfully shared.'
-					}));
+			store.dispatch(requestActions.notify(
+				{
+					text : 'File successfully shared.'
+				}));
 
-				store.dispatch(stateActions.addFile(
-					this._peerId,
-					newTorrent.magnetURI
-				));
+			store.dispatch(stateActions.addFile(
+				this._peerId,
+				torrent.magnetURI
+			));
 
-				this._sendFile(newTorrent.magnetURI);
-			});
+			this._sendFile(torrent.magnetURI);
 		});
 	}
 
@@ -1162,13 +1148,6 @@ export default class RoomClient
 			'webtorrent'
 		));
 
-		({ default: createTorrent } = await import(
-
-			/* webpackPrefetch: true */
-			/* webpackChunkName: "create-torrent" */
-			'create-torrent'
-		));
-
 		({ default: saveAs } = await import(
 
 			/* webpackPrefetch: true */
@@ -1217,6 +1196,17 @@ export default class RoomClient
 					iceServers : ROOM_OPTIONS.turnServers
 				}
 			}
+		});
+
+		this._webTorrent.on('error', (error) =>
+		{
+			logger.error('Filesharing [error:"%o"]', error);
+
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : `An error occured with file sharing`
+				}));
 		});
 
 		this._screenSharing = ScreenShare.create(this._device);
