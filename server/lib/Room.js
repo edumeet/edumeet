@@ -891,6 +891,7 @@ class Room extends EventEmitter
 				this._notification(peer.socket, 'unlockRoom', {
 					peerId : peer.id
 				}, true);
+
 				this._lobby.promoteAllPeers();
 
 				// Return no error
