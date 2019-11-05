@@ -266,28 +266,33 @@ export default class RoomClient
 					{
 						if (this._micProducer)
 						{
-							if (this._micProducer.paused)
+							if (!this._micProducer.paused)
 							{
-								this._micProducer.resume();
-
-								store.dispatch(requestActions.notify(
-									{
-										text : 'Unmuted your microphone.'
-									}));
-							}
-							else
-							{
-								this._micProducer.pause();
+								this.muteMic();
 
 								store.dispatch(requestActions.notify(
 									{
 										text : 'Muted your microphone.'
 									}));
 							}
+							else
+							{
+								this.unmuteMic();
+
+								store.dispatch(requestActions.notify(
+									{
+										text : 'Unmuted your microphone.'
+									}));
+							}
 						}
 						else
 						{
 							this.enableMic();
+
+							store.dispatch(requestActions.notify(
+								{
+									text : 'Enabled your microphone.'
+								}));
 						}
 
 						break;
