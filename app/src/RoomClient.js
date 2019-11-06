@@ -492,9 +492,8 @@ export default class RoomClient
 					text : intl.formatMessage({
 						id             : 'room.changedDisplayName',
 						defaultMessage : 'Your display name changed to {displayName}',
-						values         : {
-							displayName
-						}
+					}, {
+						displayName
 					})
 				}));
 		}
@@ -1596,9 +1595,8 @@ export default class RoomClient
 								text : intl.formatMessage({
 									id             : 'room.lobbyPeerChangedDisplayName',
 									defaultMessage : 'Participant in lobby changed name to {displayName}',
-									values         : {
-										displayName
-									}
+								}, {
+									displayName
 								})
 							}));
 
@@ -1697,10 +1695,9 @@ export default class RoomClient
 								text : intl.formatMessage({
 									id             : 'room.peerChangedDisplayName',
 									defaultMessage : '{oldDisplayName} is now {displayName}',
-									values         : {
-										oldDisplayName,
-										displayName
-									}
+								}, {
+									oldDisplayName,
+									displayName
 								})
 							}));
 	
@@ -1787,9 +1784,8 @@ export default class RoomClient
 								text : intl.formatMessage({
 									id             : 'room.newPeer',
 									defaultMessage : '{displayName} joined the room',
-									values         : {
-										displayName
-									}
+								}, {
+									displayName
 								})
 							}));
 	
