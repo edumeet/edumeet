@@ -9,6 +9,7 @@ import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../actions/roomActions';
 import * as toolareaActions from '../../actions/toolareaActions';
+import { useIntl, FormattedMessage } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -109,6 +110,8 @@ const PulsingBadge = withStyles((theme) =>
 
 const TopBar = (props) =>
 {
+	const intl = useIntl();
+
 	const {
 		roomClient,
 		room,
@@ -126,6 +129,39 @@ const TopBar = (props) =>
 		classes
 	} = props;
 
+	const lockTooltip = room.locked ?
+		intl.formatMessage({
+			id             : 'tooltip.unLockRoom',
+			defaultMessage : 'Unlock room'
+		})
+		:
+		intl.formatMessage({
+			id             : 'tooltip.lockRoom',
+			defaultMessage : 'Lock room'
+		});
+
+	const fullscreenTooltip = fullscreen ?
+		intl.formatMessage({
+			id             : 'tooltip.leaveFullscreen',
+			defaultMessage : 'Leave fullscreen'
+		})
+		:
+		intl.formatMessage({
+			id             : 'tooltip.enterFullscreen',
+			defaultMessage : 'Enter fullscreen'
+		});
+
+	const loginTooltip = loggedIn ?
+		intl.formatMessage({
+			id             : 'tooltip.logout',
+			defaultMessage : 'Log out'
+		})
+		:
+		intl.formatMessage({
+			id             : 'tooltip.login',
+			defaultMessage : 'Log in'
+		});
+
 	return (
 		<AppBar
 			position='fixed'
@@ -138,7 +174,10 @@ const TopBar = (props) =>
 				>
 					<IconButton
 						color='inherit'
-						aria-label='Open drawer'
+						aria-label={intl.formatMessage({
+							id             : 'label.openDrawer',
+							defaultMessage : 'Open drawer'
+						})}
 						onClick={() => toggleToolArea()}
 						className={classes.menuButton}
 					>
@@ -156,9 +195,12 @@ const TopBar = (props) =>
 				</Typography>
 				<div className={classes.grow} />
 				<div className={classes.actionButtons}>
-					<Tooltip title={`${room.locked ? 'Unlock' : 'Lock'} room`}>
+					<Tooltip title={lockTooltip}>
 						<IconButton
-							aria-label='Lock room'
+							aria-label={intl.formatMessage({
+								id             : 'tooltip.lockRoom',
+								defaultMessage : 'Lock room'
+							})}
 							className={classes.actionButton}
 							color='inherit'
 							onClick={() =>
@@ -181,9 +223,17 @@ const TopBar = (props) =>
 						</IconButton>
 					</Tooltip>
 					{ lobbyPeers.length > 0 &&
-						<Tooltip title='Show lobby'>
+						<Tooltip 
+							title={intl.formatMessage({
+								id             : 'tooltip.lobby',
+								defaultMessage : 'Show lobby'
+							})}
+						>
 							<IconButton
-								aria-label='Lobby'
+								aria-label={intl.formatMessage({
+									id             : 'tooltip.lobby',
+									defaultMessage : 'Show lobby'
+								})}
 								color='inherit'
 								onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
 							>
@@ -197,9 +247,12 @@ const TopBar = (props) =>
 						</Tooltip>
 					}
 					{ fullscreenEnabled &&
-						<Tooltip title={`${fullscreen ? 'Leave' : 'Enter'} fullscreen`}>
+						<Tooltip title={fullscreenTooltip}>
 							<IconButton
-								aria-label='Fullscreen'
+								aria-label={intl.formatMessage({
+									id             : 'tooltip.enterFullscreen',
+									defaultMessage : 'Enter fullscreen'
+								})}
 								className={classes.actionButton}
 								color='inherit'
 								onClick={onFullscreen}
@@ -212,9 +265,17 @@ const TopBar = (props) =>
 							</IconButton>
 						</Tooltip>
 					}
-					<Tooltip title='Show settings'>
+					<Tooltip
+						title={intl.formatMessage({
+							id             : 'tooltip.settings',
+							defaultMessage : 'Show settings'
+						})}
+					>
 						<IconButton
-							aria-label='Settings'
+							aria-label={intl.formatMessage({
+								id             : 'tooltip.settings',
+								defaultMessage : 'Show settings'
+							})}
 							className={classes.actionButton}
 							color='inherit'
 							onClick={() => setSettingsOpen(!room.settingsOpen)}
@@ -223,9 +284,12 @@ const TopBar = (props) =>
 						</IconButton>
 					</Tooltip>
 					{ loginEnabled &&
-						<Tooltip title={`Log ${loggedIn ? 'out' : 'in'}`}>
+						<Tooltip title={loginTooltip}>
 							<IconButton
-								aria-label='Account'
+								aria-label={intl.formatMessage({
+									id             : 'tooltip.login',
+									defaultMessage : 'Log in'
+								})}
 								className={classes.actionButton}
 								color='inherit'
 								onClick={() => 
@@ -242,13 +306,19 @@ const TopBar = (props) =>
 						</Tooltip>
 					}
 					<Button
-						aria-label='Leave meeting'
+						aria-label={intl.formatMessage({
+							id             : 'label.leave',
+							defaultMessage : 'Leave'
+						})}
 						className={classes.actionButton}
 						variant='contained'
 						color='secondary'
 						onClick={() => roomClient.close()}
 					>
-						Leave
+						<FormattedMessage
+							id='label.leave'
+							defaultMessage='Leave'
+						/>
 					</Button>
 				</div>
 			</Toolbar>

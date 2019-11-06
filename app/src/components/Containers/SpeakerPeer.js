@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
 import Volume from './Volume';
 
@@ -119,7 +120,12 @@ const SpeakerPeer = (props) =>
 				<div className={classnames(classes.viewContainer)} style={style}>
 					{ !videoVisible &&
 						<div className={classes.videoInfo}>
-							<p>this video is paused</p>
+							<p>
+								<FormattedMessage
+									id='room.videoPaused'
+									defaultMessage='This video is paused'
+								/>
+							</p>
 						</div>
 					}
 
@@ -145,7 +151,12 @@ const SpeakerPeer = (props) =>
 				>
 					{ !screenVisible &&
 						<div className={classes.videoInfo} style={style}>
-							<p>this video is paused</p>
+							<p>
+								<FormattedMessage
+									id='room.videoPaused'
+									defaultMessage='This video is paused'
+								/>
+							</p>
 						</div>
 					}
 

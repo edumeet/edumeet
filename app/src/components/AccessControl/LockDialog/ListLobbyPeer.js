@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withRoomContext } from '../../../RoomContext';
+import { useIntl } from 'react-intl';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -85,6 +86,8 @@ const ListLobbyPeer = (props) =>
 		classes
 	} = props;
 
+	const intl = useIntl();
+
 	const picture = peer.picture || EmptyAvatar;
 
 	return (
@@ -100,7 +103,12 @@ const ListLobbyPeer = (props) =>
 			<ListItemText
 				primary={peer.displayName}
 			/>
-			<Tooltip title='Click to let them in'>
+			<Tooltip
+				title={intl.formatMessage({
+					id             : 'tooltip.admitFromLobby',
+					defaultMessage : 'Click to let them in'
+				})}
+			>
 				<ListItemIcon
 					className={classnames(classes.button, 'promote', {
 						disabled : peer.promotionInProgress

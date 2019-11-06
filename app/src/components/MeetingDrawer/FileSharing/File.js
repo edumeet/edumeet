@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedMessage } from 'react-intl';
 import magnet from 'magnet-uri';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -70,7 +71,10 @@ class File extends React.PureComponent
 					{ file.files &&
 						<Fragment>
 							<Typography className={classes.text}>
-								File finished downloading
+								<FormattedMessage
+									id='filesharing.finished'
+									defaultMessage='File finished downloading'
+								/>
 							</Typography>
 
 							{ file.files.map((sharedFile, i) => (
@@ -87,14 +91,23 @@ class File extends React.PureComponent
 											roomClient.saveFile(sharedFile);
 										}}
 									>
-										Save
+										<FormattedMessage
+											id='filesharing.save'
+											defaultMessage='Save'
+										/>
 									</Button>
 								</div>
 							))}
 						</Fragment>
 					}
 					<Typography className={classes.text}>
-						{ `${displayName} shared a file` }
+						<FormattedMessage
+							id='filesharing.sharedFile'
+							defaultMessage='{displayName} shared a file'
+							values={{
+								displayName
+							}}
+						/>
 					</Typography>
 
 					{ (!file.active && !file.files) &&
@@ -112,11 +125,17 @@ class File extends React.PureComponent
 										roomClient.handleDownload(magnetUri);
 									}}
 								>
-									Download
+									<FormattedMessage
+										id='filesharing.download'
+										defaultMessage='Download'
+									/>
 								</Button>
 								:
 								<Typography className={classes.text}>
-									Your browser does not support downloading files using WebTorrent.
+									<FormattedMessage
+										id='label.fileSharingUnsupported'
+										defaultMessage='File sharing not supported'
+									/>
 								</Typography>
 							}
 						</div>
@@ -124,8 +143,14 @@ class File extends React.PureComponent
 
 					{ file.timeout &&
 						<Typography className={classes.text}>
-							If this process takes a long time, there might not be anyone seeding
-							this torrent. Try asking someone to reupload the file that you want.
+							<FormattedMessage
+								id='filesharing.missingSeeds'
+								defaultMessage={
+									`If this process takes a long time, there might not 
+									be anyone seeding this torrent. Try asking someone to 
+									reupload the file that you want.`
+								}
+							/>
 						</Typography>
 					}
 

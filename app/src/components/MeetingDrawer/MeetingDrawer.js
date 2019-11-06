@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../actions/toolareaActions';
+import { useIntl } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -44,6 +45,8 @@ const styles = (theme) =>
 
 const MeetingDrawer = (props) =>
 {
+	const intl = useIntl();
+
 	const {
 		currentToolTab,
 		unreadMessages,
@@ -72,18 +75,29 @@ const MeetingDrawer = (props) =>
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={unreadMessages}>
-								Chat
+								{intl.formatMessage({
+									id             : 'label.chat',
+									defaultMessage : 'Chat'
+								})}
 							</Badge>
 						}
 					/>
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={unreadFiles}>
-								File sharing
+								{intl.formatMessage({
+									id             : 'label.filesharing',
+									defaultMessage : 'File sharing'
+								})}
 							</Badge>
 						}
 					/>
-					<Tab label='Participants' />
+					<Tab
+						label={intl.formatMessage({
+							id             : 'label.participants',
+							defaultMessage : 'Participants'
+						})}
+					/>
 				</Tabs>
 				<IconButton onClick={closeDrawer}>
 					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}

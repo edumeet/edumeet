@@ -8,7 +8,9 @@ import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import * as roomActions from '../../actions/roomActions';
+import { useIntl, FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
+import Tooltip from '@material-ui/core/Tooltip';
 import Fab from '@material-ui/core/Fab';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
@@ -103,6 +105,8 @@ const Peer = (props) =>
 {
 	const [ hover, setHover ] = useState(false);
 
+	const intl = useIntl();
+
 	let touchTimeout = null;
 
 	const {
@@ -194,7 +198,12 @@ const Peer = (props) =>
 				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible &&
 						<div className={classes.videoInfo}>
-							<p>this video is paused</p>
+							<p>
+								<FormattedMessage
+									id='room.videoPaused'
+									defaultMessage='This video is paused'
+								/>
+							</p>
 						</div>
 					}
 
@@ -220,56 +229,95 @@ const Peer = (props) =>
 							}, 2000);
 						}}
 					>
-						<Fab
-							aria-label='Mute mic'
-							className={classes.fab}
-							disabled={!micConsumer}
-							color={micEnabled ? 'default' : 'secondary'}
-							size={smallButtons ? 'small' : 'large'}
-							onClick={() =>
-							{
-								micEnabled ?
-									roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-									roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-							}}
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'device.muteAudio',
+								defaultMessage : 'Mute audio'
+							})}
+							placement={smallScreen ? 'top' : 'left'}
 						>
-							{ micEnabled ?
-								<MicIcon />
-								:
-								<MicOffIcon />
-							}
-						</Fab>
+							<div>
+								<Fab
+									aria-label={intl.formatMessage({
+										id             : 'device.muteAudio',
+										defaultMessage : 'Mute audio'
+									})}
+									className={classes.fab}
+									disabled={!micConsumer}
+									color={micEnabled ? 'default' : 'secondary'}
+									size={smallButtons ? 'small' : 'large'}
+									onClick={() =>
+									{
+										micEnabled ?
+											roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+											roomClient.modifyPeerConsumer(peer.id, 'mic', false);
+									}}
+								>
+									{ micEnabled ?
+										<MicIcon />
+										:
+										<MicOffIcon />
+									}
+								</Fab>
+							</div>
+						</Tooltip>
 
 						{ !smallScreen &&
-							<Fab
-								aria-label='New window'
-								className={classes.fab}
-								disabled={
-									!videoVisible ||
-									(windowConsumer === webcamConsumer.id)
-								}
-								size={smallButtons ? 'small' : 'large'}
-								onClick={() =>
-								{
-									toggleConsumerWindow(webcamConsumer);
-								}}
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'label.newWindow',
+									defaultMessage : 'New window'
+								})}
+								placement={smallScreen ? 'top' : 'left'}
 							>
-								<NewWindowIcon />
-							</Fab>
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.newWindow',
+											defaultMessage : 'New window'
+										})}
+										className={classes.fab}
+										disabled={
+											!videoVisible ||
+											(windowConsumer === webcamConsumer.id)
+										}
+										size={smallButtons ? 'small' : 'large'}
+										onClick={() =>
+										{
+											toggleConsumerWindow(webcamConsumer);
+										}}
+									>
+										<NewWindowIcon />
+									</Fab>
+								</div>
+							</Tooltip>
 						}
 
-						<Fab
-							aria-label='Fullscreen'
-							className={classes.fab}
-							disabled={!videoVisible}
-							size={smallButtons ? 'small' : 'large'}
-							onClick={() =>
-							{
-								toggleConsumerFullscreen(webcamConsumer);
-							}}
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'label.fullscreen',
+								defaultMessage : 'Fullscreen'
+							})}
+							placement={smallScreen ? 'top' : 'left'}
 						>
-							<FullScreenIcon />
-						</Fab>
+							<div>
+								<Fab
+									aria-label={intl.formatMessage({
+										id             : 'label.fullscreen',
+										defaultMessage : 'Fullscreen'
+									})}
+									className={classes.fab}
+									disabled={!videoVisible}
+									size={smallButtons ? 'small' : 'large'}
+									onClick={() =>
+									{
+										toggleConsumerFullscreen(webcamConsumer);
+									}}
+								>
+									<FullScreenIcon />
+								</Fab>
+							</div>
+						</Tooltip>
 					</div>
 
 					<VideoView
@@ -314,7 +362,12 @@ const Peer = (props) =>
 				>
 					{ !screenVisible &&
 						<div className={classes.videoInfo}>
-							<p>this video is paused</p>
+							<p>
+								<FormattedMessage
+									id='room.videoPaused'
+									defaultMessage='This video is paused'
+								/>
+							</p>
 						</div>
 					}
 
@@ -344,35 +397,61 @@ const Peer = (props) =>
 								}}
 							>
 								{ !smallScreen &&
-									<Fab
-										aria-label='New window'
-										className={classes.fab}
-										disabled={
-											!screenVisible ||
-											(windowConsumer === screenConsumer.id)
-										}
-										size={smallButtons ? 'small' : 'large'}
-										onClick={() =>
-										{
-											toggleConsumerWindow(screenConsumer);
-										}}
+									<Tooltip
+										title={intl.formatMessage({
+											id             : 'label.newWindow',
+											defaultMessage : 'New window'
+										})}
+										placement={smallScreen ? 'top' : 'left'}
 									>
-										<NewWindowIcon />
-									</Fab>
+										<div>
+											<Fab
+												aria-label={intl.formatMessage({
+													id             : 'label.newWindow',
+													defaultMessage : 'New window'
+												})}
+												className={classes.fab}
+												disabled={
+													!screenVisible ||
+													(windowConsumer === screenConsumer.id)
+												}
+												size={smallButtons ? 'small' : 'large'}
+												onClick={() =>
+												{
+													toggleConsumerWindow(screenConsumer);
+												}}
+											>
+												<NewWindowIcon />
+											</Fab>
+										</div>
+									</Tooltip>
 								}
 
-								<Fab
-									aria-label='Fullscreen'
-									className={classes.fab}
-									disabled={!screenVisible}
-									size={smallButtons ? 'small' : 'large'}
-									onClick={() =>
-									{
-										toggleConsumerFullscreen(screenConsumer);
-									}}
+								<Tooltip
+									title={intl.formatMessage({
+										id             : 'label.fullscreen',
+										defaultMessage : 'Fullscreen'
+									})}
+									placement={smallScreen ? 'top' : 'left'}
 								>
-									<FullScreenIcon />
-								</Fab>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'label.fullscreen',
+												defaultMessage : 'Fullscreen'
+											})}
+											className={classes.fab}
+											disabled={!screenVisible}
+											size={smallButtons ? 'small' : 'large'}
+											onClick={() =>
+											{
+												toggleConsumerFullscreen(screenConsumer);
+											}}
+										>
+											<FullScreenIcon />
+										</Fab>
+									</div>
+								</Tooltip>
 							</div>
 							<VideoView
 								advancedMode={advancedMode}

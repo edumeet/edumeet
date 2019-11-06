@@ -92,7 +92,7 @@ Message.propTypes =
 	self    : PropTypes.bool,
 	picture : PropTypes.string,
 	text    : PropTypes.string,
-	time    : PropTypes.string,
+	time    : PropTypes.object,
 	name    : PropTypes.string,
 	classes : PropTypes.object.isRequired
 };

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedMessage } from 'react-intl';
 import * as toolareaActions from '../../actions/toolareaActions';
 import BuddyImage from '../../images/buddy.svg';
 
@@ -95,8 +96,19 @@ class HiddenPeers extends React.PureComponent
 				className={classnames(classes.root, this.state.className)}
 				onClick={() => openUsersTab()}
 			>
-				<p>+{hiddenPeersCount} <br /> participant
-					{(hiddenPeersCount > 1) && 's'}
+				<p>
+					+{hiddenPeersCount} <br />
+					<FormattedMessage
+						id='room.hiddenPeers'
+						defaultMessage={
+							`{hiddenPeersCount, plural,
+							one {participant}
+							other {participants}}`
+						}
+						values={{
+							hiddenPeersCount
+						}}
+					/>
 				</p>
 			</div>
 		);

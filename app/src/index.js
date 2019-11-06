@@ -2,6 +2,7 @@ import domready from 'domready';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
+import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
@@ -18,7 +19,25 @@ import { persistor, store } from './store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 
+import messagesEnglish from './translations/en';
+import messagesNorwegian from './translations/nb';
+
 import './index.css';
+
+const cache = createIntlCache();
+
+const messages =
+{
+	'en' : messagesEnglish,
+	'nb' : messagesNorwegian
+};
+
+const locale = navigator.language.split(/[-_]/)[0]; // language without region code
+
+const intl = createIntl({
+	locale,
+	messages : messages[locale]
+}, cache);
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
@@ -29,7 +48,7 @@ const logger = new Logger();
 
 let roomClient;
 
-RoomClient.init({ store });
+RoomClient.init({ store, intl });
 
 const theme = createMuiTheme(window.config.theme);
 
@@ -92,13 +111,15 @@ function run()
 	render(
 		<Provider store={store}>
 			<MuiThemeProvider theme={theme}>
-				<PersistGate loading={<LoadingView />} persistor={persistor}>
-					<RoomContext.Provider value={roomClient}>
-						<SnackbarProvider>
-							<App />
-						</SnackbarProvider>
-					</RoomContext.Provider>
-				</PersistGate>
+				<RawIntlProvider value={intl}>
+					<PersistGate loading={<LoadingView />} persistor={persistor}>
+						<RoomContext.Provider value={roomClient}>
+							<SnackbarProvider>
+								<App />
+							</SnackbarProvider>
+						</RoomContext.Provider>
+					</PersistGate>
+				</RawIntlProvider>
 			</MuiThemeProvider>
 		</Provider>,
 		document.getElementById('multiparty-meeting')

@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedTime } from 'react-intl';
 import Message from './Message';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 
@@ -49,7 +50,7 @@ class MessageList extends React.Component
 
 	getTimeString(time)
 	{
-		return `${(time.getHours() < 10 ? '0' : '')}${time.getHours()}:${(time.getMinutes() < 10 ? '0' : '')}${time.getMinutes()}`;
+		return (<FormattedTime value={new Date(time)} />);
 	}
 
 	render()
@@ -65,8 +66,6 @@ class MessageList extends React.Component
 				{
 					chat.map((message, index) =>
 					{
-						const messageTime = new Date(message.time);
-
 						const picture = (message.sender === 'response' ?
 							message.picture : myPicture) || EmptyAvatar;
 
@@ -76,7 +75,7 @@ class MessageList extends React.Component
 								self={message.sender === 'client'}
 								picture={picture}
 								text={message.text}
-								time={this.getTimeString(messageTime)}
+								time={this.getTimeString(message.time)}
 								name={message.name}
 							/>
 						);
@@ -89,9 +88,9 @@ class MessageList extends React.Component
 
 MessageList.propTypes =
 {
-	chat : PropTypes.array,
-	myPicture    : PropTypes.string,
-	classes      : PropTypes.object.isRequired
+	chat      : PropTypes.array,
+	myPicture : PropTypes.string,
+	classes   : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>

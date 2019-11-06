@@ -7,6 +7,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
+import { useIntl, FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
 import Volume from './Volume';
 import Fab from '@material-ui/core/Fab';
@@ -96,6 +97,8 @@ const Me = (props) =>
 {
 	const [ hover, setHover ] = useState(false);
 
+	const intl = useIntl();
+
 	let touchTimeout = null;
 
 	const {
@@ -133,22 +136,34 @@ const Me = (props) =>
 	if (!me.canSendMic)
 	{
 		micState = 'unsupported';
-		micTip = 'Audio unsupported';
+		micTip = intl.formatMessage({
+			id             : 'device.audioUnsupported',
+			defaultMessage : 'Audio unsupported'
+		});
 	}
 	else if (!micProducer)
 	{
 		micState = 'off';
-		micTip = 'Activate audio';
+		micTip = intl.formatMessage({
+			id             : 'device.activateAudio',
+			defaultMessage : 'Activate audio'
+		});
 	}
 	else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
 	{
 		micState = 'on';
-		micTip = 'Mute audio';
+		micTip = intl.formatMessage({
+			id             : 'device.muteAudio',
+			defaultMessage : 'Mute audio'
+		});
 	}
 	else
 	{
 		micState = 'muted';
-		micTip = 'Unmute audio';
+		micTip = intl.formatMessage({
+			id             : 'device.unMuteAudio',
+			defaultMessage : 'Unmute audio'
+		});
 	}
 
 	let webcamState;
@@ -158,17 +173,26 @@ const Me = (props) =>
 	if (!me.canSendWebcam)
 	{
 		webcamState = 'unsupported';
-		webcamTip = 'Video unsupported';
+		webcamTip = intl.formatMessage({
+			id             : 'device.videoUnsupported',
+			defaultMessage : 'Video unsupported'
+		});
 	}
 	else if (webcamProducer)
 	{
 		webcamState = 'on';
-		webcamTip = 'Stop video';
+		webcamTip = intl.formatMessage({
+			id             : 'device.stopVideo',
+			defaultMessage : 'Stop video'
+		});
 	}
 	else
 	{
 		webcamState = 'off';
-		webcamTip = 'Start video';
+		webcamTip = intl.formatMessage({
+			id             : 'device.startVideo',
+			defaultMessage : 'Start video'
+		});
 	}
 
 	let screenState;
@@ -178,17 +202,26 @@ const Me = (props) =>
 	if (!me.canShareScreen)
 	{
 		screenState = 'unsupported';
-		screenTip = 'Screen sharing not supported';
+		screenTip = intl.formatMessage({
+			id             : 'device.screenSharingUnsupported',
+			defaultMessage : 'Screen sharing not supported'
+		});
 	}
 	else if (screenProducer)
 	{
 		screenState = 'on';
-		screenTip = 'Stop screen sharing';
+		screenTip = intl.formatMessage({
+			id             : 'device.stopScreenSharing',
+			defaultMessage : 'Stop screen sharing'
+		});
 	}
 	else
 	{
 		screenState = 'off';
-		screenTip = 'Start screen sharing';
+		screenTip = intl.formatMessage({
+			id             : 'device.startScreenSharing',
+			defaultMessage : 'Start screen sharing'
+		});
 	}
 
 	const spacingStyle =
@@ -253,11 +286,19 @@ const Me = (props) =>
 							}, 2000);
 						}}
 					>
-						<p>ME</p>
-						<Tooltip title={micTip} placement={smallScreen ? 'top' : 'right'}>
+						<p>
+							<FormattedMessage
+								id='room.me'
+								defaultMessage='ME'
+							/>
+						</p>
+						<Tooltip title={micTip} placement={smallScreen ? 'top' : 'left'}>
 							<div>
 								<Fab
-									aria-label='Mute mic'
+									aria-label={intl.formatMessage({
+										id             : 'device.muteAudio',
+										defaultMessage : 'Mute audio'
+									})}
 									className={classes.fab}
 									disabled={!me.canSendMic || me.audioInProgress}
 									color={micState === 'on' ? 'default' : 'secondary'}
@@ -280,10 +321,13 @@ const Me = (props) =>
 								</Fab>
 							</div>
 						</Tooltip>
-						<Tooltip title={webcamTip} placement={smallScreen ? 'top' : 'right'}>
+						<Tooltip title={webcamTip} placement={smallScreen ? 'top' : 'left'}>
 							<div>
 								<Fab
-									aria-label='Mute video'
+									aria-label={intl.formatMessage({
+										id             : 'device.startVideo',
+										defaultMessage : 'Start video'
+									})}
 									className={classes.fab}
 									disabled={!me.canSendWebcam || me.webcamInProgress}
 									color={webcamState === 'on' ? 'default' : 'secondary'}
@@ -303,10 +347,13 @@ const Me = (props) =>
 								</Fab>
 							</div>
 						</Tooltip>
-						<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'right'}>
+						<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'left'}>
 							<div>
 								<Fab
-									aria-label='Share screen'
+									aria-label={intl.formatMessage({
+										id             : 'device.startScreenSharing',
+										defaultMessage : 'Start screen sharing'
+									})}
 									className={classes.fab}
 									disabled={!me.canShareScreen || me.screenShareInProgress}
 									color={screenState === 'on' ? 'primary' : 'default'}
@@ -410,7 +457,12 @@ const Me = (props) =>
 								}, 2000);
 							}}
 						>
-							<p>ME</p>
+							<p>
+								<FormattedMessage
+									id='room.me'
+									defaultMessage='ME'
+								/>
+							</p>
 						</div>
 						
 						<VideoView

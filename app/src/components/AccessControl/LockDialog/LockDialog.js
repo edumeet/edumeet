@@ -8,6 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
 import * as roomActions from '../../../actions/roomActions';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -75,7 +76,12 @@ const LockDialog = ({
 				paper : classes.dialogPaper
 			}}
 		>
-			<DialogTitle id='form-dialog-title'>Lobby administration</DialogTitle>
+			<DialogTitle id='form-dialog-title'>
+				<FormattedMessage
+					id='room.lobbyAdministration'
+					defaultMessage='Lobby administration'
+				/>
+			</DialogTitle>
 			{/*
 			<FormControl component='fieldset' className={classes.formControl}>
 				<FormLabel component='legend'>Room lock</FormLabel>
@@ -129,7 +135,10 @@ const LockDialog = ({
 					dense
 					subheader={
 						<ListSubheader component='div'>
-							Participants in Lobby
+							<FormattedMessage
+								id='room.peersInLobby'
+								defaultMessage='Participants in Lobby'
+							/>
 						</ListSubheader>
 					}
 				>
@@ -143,13 +152,19 @@ const LockDialog = ({
 				:
 				<DialogContent>
 					<DialogContentText gutterBottom>
-						There are currently no one in the lobby.
+						<FormattedMessage
+							id='room.lobbyEmpty'
+							defaultMessage='There are currently no one in the lobby'
+						/>
 					</DialogContentText>
 				</DialogContent>
 			}
 			<DialogActions>
 				<Button onClick={() => handleCloseLockDialog({ lockDialogOpen: false })} color='primary'>
-					Close
+					<FormattedMessage
+						id='label.close'
+						defaultMessage='Close'
+					/>
 				</Button>
 			</DialogActions>
 		</Dialog>

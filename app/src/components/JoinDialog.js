@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
 import * as settingsActions from '../actions/settingsActions';
 import PropTypes from 'prop-types';
+import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import IconButton from '@material-ui/core/IconButton';
@@ -87,6 +88,8 @@ const DialogTitle = withStyles(styles)((props) =>
 {
 	const [ open, setOpen ] = useState(false);
 
+	const intl = useIntl();
+
 	useEffect(() =>
 	{
 		const openTimer = setTimeout(() => setOpen(true), 1000);
@@ -120,7 +123,10 @@ const DialogTitle = withStyles(styles)((props) =>
 					onClose={handleTooltipClose}
 					onOpen={handleTooltipOpen}
 					open={open}
-					title='Click to log in'
+					title={intl.formatMessage({
+						id             : 'tooltip.login',
+						defaultMessage : 'Click to log in'
+					})}
 					placement='left'
 				>
 					<IconButton
@@ -167,6 +173,8 @@ const JoinDialog = ({
 	classes
 }) =>
 {
+	const intl = useIntl();
+
 	const handleKeyDown = (event) =>
 	{
 		const { key } = event;
@@ -207,21 +215,38 @@ const JoinDialog = ({
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText gutterBottom>
-						You are about to join a meeting.
+						<FormattedMessage
+							id='room.aboutToJoin'
+							defaultMessage='You are about to join a meeting'
+						/>
 					</DialogContentText>
 
 					<DialogContentText variant='h6' gutterBottom align='center'>
-						Room ID: { room.name }
+						<FormattedMessage
+							id='room.roomId'
+							defaultMessage='Room ID: {roomName}'
+							values={{
+								roomName : room.name
+							}}
+						/>
 					</DialogContentText>
 
 					<DialogContentText gutterBottom>
-						Set your name for participation,
-						and choose how you want to join:
+						<FormattedMessage
+							id='room.setYourName'
+							defaultMessage={
+								`Set your name for participation, 
+								and choose how you want to join:`
+							}
+						/>
 					</DialogContentText>
 
 					<TextField
 						id='displayname'
-						label='Your name'
+						label={intl.formatMessage({
+							id             : 'label.yourName',
+							defaultMessage : 'Your name'
+						})}
 						value={displayName}
 						variant='outlined'
 						margin='normal'
@@ -255,7 +280,10 @@ const JoinDialog = ({
 							variant='contained'
 							color='secondary'
 						>
-							Audio only
+							<FormattedMessage
+								id='room.audioOnly'
+								defaultMessage='Audio only'
+							/>
 						</Button>
 						<Button
 							onClick={() =>
@@ -265,7 +293,10 @@ const JoinDialog = ({
 							variant='contained'
 							color='secondary'
 						>
-							Audio and Video
+							<FormattedMessage
+								id='room.audioVideo'
+								defaultMessage='Audio and Video'
+							/>
 						</Button>
 					</DialogActions>
 					: 
@@ -276,23 +307,37 @@ const JoinDialog = ({
 							variant='h6'
 							align='center'
 						>
-							Ok, you are ready
+							<FormattedMessage
+								id='room.youAreReady'
+								defaultMessage='Ok, you are ready'
+							/>
 						</DialogContentText>
 						{ room.signInRequired ?
 							<DialogContentText gutterBottom>
-								The room is empty! 
-								You can Log In to start the meeting or wait until the host joins.
+								<FormattedMessage
+									id='room.emptyRequireLogin'
+									defaultMessage={
+										`The room is empty! You can Log In to start 
+										the meeting or wait until the host joins`
+									}
+								/>
 							</DialogContentText>
 							:
 							<DialogContentText gutterBottom>
-								The room is locked - hang on until somebody lets you in ...
+								<FormattedMessage
+									id='room.locketWait'
+									defaultMessage='The room is locked - hang on until somebody lets you in ...'
+								/>
 							</DialogContentText>
 						}
 					</DialogContent>
 				}
 
 				<CookieConsent>
-					This website uses cookies to enhance the user experience.
+					<FormattedMessage
+						id='room.cookieConsent'
+						defaultMessage='This website uses cookies to enhance the user experience'
+					/>
 				</CookieConsent>
 			</Dialog>
 		</div>

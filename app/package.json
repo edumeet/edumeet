@@ -20,6 +20,7 @@
 		"react": "^16.10.2",
 		"react-cookie-consent": "^2.5.0",
 		"react-dom": "^16.10.2",
+		"react-intl": "^3.4.0",
 		"react-redux": "^7.1.1",
 		"react-scripts": "3.2.0",
 		"redux": "^4.0.4",

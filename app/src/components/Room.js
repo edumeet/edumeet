@@ -7,6 +7,7 @@ import * as roomActions from '../actions/roomActions';
 import * as toolareaActions from '../actions/toolareaActions';
 import { idle } from '../utils';
 import FullScreen from './FullScreen';
+import { FormattedMessage } from 'react-intl';
 import CookieConsent from 'react-cookie-consent';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
@@ -152,7 +153,10 @@ class Room extends React.PureComponent
 		return (
 			<div className={classes.root}>
 				<CookieConsent>
-					This website uses cookies to enhance the user experience.
+					<FormattedMessage
+						id='room.cookieConsent'
+						defaultMessage='This website uses cookies to enhance the user experience'
+					/>
 				</CookieConsent>
 
 				<FullScreenView advancedMode={advancedMode} />
@@ -237,6 +241,7 @@ export default connect(
 		{
 			return (
 				prev.room === next.room &&
+				prev.settings.advancedMode === next.settings.advancedMode &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}

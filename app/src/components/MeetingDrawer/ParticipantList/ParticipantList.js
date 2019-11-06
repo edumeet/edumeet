@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
 import Volume from '../../Containers/Volume';
@@ -84,11 +85,21 @@ class ParticipantList extends React.PureComponent
 		return (
 			<div className={classes.root} ref={(node) => { this.node = node; }}>
 				<ul className={classes.list}>
-					<li className={classes.listheader}>Me:</li>
+					<li className={classes.listheader}>
+						<FormattedMessage
+							id='room.me'
+							defaultMessage='Me'
+						/>
+					</li>
 					<ListMe />
 				</ul>
 				<ul className={classes.list}>
-					<li className={classes.listheader}>Participants in Spotlight:</li>
+					<li className={classes.listheader}>
+						<FormattedMessage
+							id='room.spotlights'
+							defaultMessage='Participants in Spotlight'
+						/>
+					</li>
 					{ spotlightPeers.map((peer) => (
 						<li
 							key={peer.id}
@@ -104,7 +115,12 @@ class ParticipantList extends React.PureComponent
 					))}
 				</ul>
 				<ul className={classes.list}>
-					<li className={classes.listheader}>Passive Participants:</li>
+					<li className={classes.listheader}>
+						<FormattedMessage
+							id='room.passive'
+							defaultMessage='Passive Participants'
+						/>
+					</li>
 					{ passivePeers.map((peerId) => (
 						<li
 							key={peerId}

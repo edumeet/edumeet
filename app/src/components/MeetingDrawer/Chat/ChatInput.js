@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
+import { useIntl } from 'react-intl';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
@@ -28,19 +29,13 @@ const styles = (theme) =>
 		}
 	});
 
-class ChatInput extends React.PureComponent
+const ChatInput = (props) =>
 {
-	constructor(props)
-	{
-		super(props);
+	const [ message, setMessage ] = useState('');
 
-		this.state =
-		{
-			message : ''
-		};
-	}
+	const intl = useIntl();
 
-	createNewMessage = (text, sender, name, picture) =>
+	const createNewMessage = (text, sender, name, picture) =>
 		({
 			type : 'message',
 			text,
@@ -50,67 +45,67 @@ class ChatInput extends React.PureComponent
 			picture
 		});
 
-	handleChange = (e) =>
+	const handleChange = (e) =>
 	{
-		this.setState({ message: e.target.value });
-	}
+		setMessage(e.target.value);
+	};
 
-	render()
-	{
-		const {
-			roomClient,
-			displayName,
-			picture,
-			classes
-		} = this.props;
-	
-		return (
-			<Paper className={classes.root}>
-				<InputBase
-					className={classes.input}
-					placeholder='Enter chat message...'
-					value={this.state.message || ''}
-					onChange={this.handleChange}
-					onKeyPress={(ev) =>
+	const {
+		roomClient,
+		displayName,
+		picture,
+		classes
+	} = props;
+
+	return (
+		<Paper className={classes.root}>
+			<InputBase
+				className={classes.input}
+				placeholder={intl.formatMessage({
+					id             : 'label.chatInput',
+					defaultMessage : 'Enter chat message...'
+				})}
+				value={message || ''}
+				onChange={handleChange}
+				onKeyPress={(ev) =>
+				{
+					if (ev.key === 'Enter')
 					{
-						if (ev.key === 'Enter')
+						ev.preventDefault();
+
+						if (message && message !== '')
 						{
-							ev.preventDefault();
+							const sendMessage = createNewMessage(message, 'response', displayName, picture);
 
-							if (this.state.message && this.state.message !== '')
-							{
-								const message = this.createNewMessage(this.state.message, 'response', displayName, picture);
+							roomClient.sendChatMessage(sendMessage);
 
-								roomClient.sendChatMessage(message);
-
-								this.setState({ message: '' });
-							}
+							setMessage('');
 						}
-					}}
-					autoFocus
-				/>
-				<IconButton
-					color='primary'
-					className={classes.iconButton}
-					aria-label='Send'
-					onClick={() =>
+					}
+				}}
+				autoFocus
+			/>
+			<IconButton
+				color='primary'
+				className={classes.iconButton}
+				aria-label='Send'
+				onClick={() =>
+				{
+					if (message && message !== '')
 					{
-						if (this.state.message && this.state.message !== '')
-						{
-							const message = this.createNewMessage(this.state.message, 'response', displayName, picture);
+						const sendMessage = this.createNewMessage(message, 'response', displayName, picture);
 
-							roomClient.sendChatMessage(message);
+						roomClient.sendChatMessage(sendMessage);
 
-							this.setState({ message: '' });
-						}
-					}}
-				>
-					<SendIcon />
-				</IconButton>
-			</Paper>
-		);
-	}
-}
+						setMessage('');
+					}
+				}}
+			>
+				<SendIcon />
+			</IconButton>
+		</Paper>
+	);
+};
 
 ChatInput.propTypes =
 {

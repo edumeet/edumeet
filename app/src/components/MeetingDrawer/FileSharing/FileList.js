@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
+import { injectIntl } from 'react-intl';
 import File from './File';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 
@@ -46,6 +47,7 @@ class FileList extends React.PureComponent
 			files,
 			me,
 			peers,
+			intl,
 			classes
 		} = this.props;
 
@@ -59,7 +61,10 @@ class FileList extends React.PureComponent
 
 					if (me.id === file.peerId)
 					{
-						displayName = 'You';
+						displayName = intl.formatMessage({
+							id             : 'room.me',
+							defaultMessage : 'Me'
+						});
 						filePicture = me.picture;
 					}
 					else if (peers[file.peerId])
@@ -69,7 +74,10 @@ class FileList extends React.PureComponent
 					}
 					else
 					{
-						displayName = 'Unknown';
+						displayName = intl.formatMessage({
+							id             : 'label.unknown',
+							defaultMessage : 'Unknown'
+						});
 					}
 
 					return (
@@ -91,6 +99,7 @@ FileList.propTypes =
 	files   : PropTypes.object.isRequired,
 	me      : appPropTypes.Me.isRequired,
 	peers   : PropTypes.object.isRequired,
+	intl    : PropTypes.object.isRequired,
 	classes : PropTypes.object.isRequired
 };
 
@@ -117,4 +126,4 @@ export default connect(
 			);
 		}
 	}
-)(withStyles(styles)(FileList));
+)(withStyles(styles)(injectIntl(FileList)));

@@ -81,15 +81,19 @@ const VIDEO_ENCODINGS =
 
 let store;
 
+let intl;
+
 export default class RoomClient
 {
 	/**
 	 * @param  {Object} data
 	 * @param  {Object} data.store - The Redux store.
+	 * @param  {Object} data.intl - react-intl object
 	 */
 	static init(data)
 	{
 		store = data.store;
+		intl = data.intl;
 	}
 
 	constructor(
@@ -230,7 +234,10 @@ export default class RoomClient
 						store.dispatch(settingsActions.toggleAdvancedMode());
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Toggled advanced mode.'
+								text : intl.formatMessage({
+									id             : 'room.toggleAdvancedMode',
+									defaultMessage : 'Toggled advanced mode'
+								})
 							}));
 						break;
 					}
@@ -240,7 +247,10 @@ export default class RoomClient
 						store.dispatch(roomActions.setDisplayMode('democratic'));
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Changed layout to democratic view.'
+								text : intl.formatMessage({
+									id             : 'room.setDemocraticView',
+									defaultMessage : 'Changed layout to democratic view'
+								})
 							}));
 						break;
 					}
@@ -250,7 +260,10 @@ export default class RoomClient
 						store.dispatch(roomActions.setDisplayMode('filmstrip'));
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Changed layout to filmstrip view.'
+								text : intl.formatMessage({
+									id             : 'room.setFilmStripView',
+									defaultMessage : 'Changed layout to filmstrip view'
+								})
 							}));
 						break;
 					}
@@ -265,7 +278,10 @@ export default class RoomClient
 
 								store.dispatch(requestActions.notify(
 									{
-										text : 'Muted your microphone.'
+										text : intl.formatMessage({
+											id             : 'devices.microPhoneMute',
+											defaultMessage : 'Muted your microphone'
+										})
 									}));
 							}
 							else
@@ -274,7 +290,10 @@ export default class RoomClient
 
 								store.dispatch(requestActions.notify(
 									{
-										text : 'Unmuted your microphone.'
+										text : intl.formatMessage({
+											id             : 'devices.microPhoneUnMute',
+											defaultMessage : 'Unmuted your microphone'
+										})
 									}));
 							}
 						}
@@ -284,7 +303,10 @@ export default class RoomClient
 
 							store.dispatch(requestActions.notify(
 								{
-									text : 'Enabled your microphone.'
+									text : intl.formatMessage({
+										id             : 'devices.microphoneEnable',
+										defaultMessage : 'Enabled your microphone'
+									})
 								}));
 						}
 
@@ -311,7 +333,10 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : 'Your devices changed, configure your devices in the settings dialog.'
+					text : intl.formatMessage({
+						id             : 'devices.devicesChanged',
+						defaultMessage : 'Your devices changed, configure your devices in the settings dialog'
+					})
 				}));
 		});
 	}
@@ -349,7 +374,10 @@ export default class RoomClient
 
 		store.dispatch(requestActions.notify(
 			{
-				text : 'You are logged in.'
+				text : intl.formatMessage({
+					id             : 'room.loggedIn',
+					defaultMessage : 'You are logged in'
+				})
 			}));
 	}
 
@@ -361,7 +389,10 @@ export default class RoomClient
 
 		store.dispatch(requestActions.notify(
 			{
-				text : 'You are logged out.'
+				text : intl.formatMessage({
+					id             : 'room.loggedOut',
+					defaultMessage : 'You are logged out'
+				})
 			}));
 	}
 
@@ -458,7 +489,13 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : `Your display name changed to ${displayName}.`
+					text : intl.formatMessage({
+						id             : 'room.changedDisplayName',
+						defaultMessage : 'Your display name changed to {displayName}',
+						values         : {
+							displayName
+						}
+					})
 				}));
 		}
 		catch (error)
@@ -468,7 +505,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'An error occured while changing your display name.'
+					text : intl.formatMessage({
+						id             : 'room.changeDisplayNameError',
+						defaultMessage : 'An error occured while changing your display name'
+					})
 				}));
 		}
 
@@ -508,7 +548,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'Unable to send chat message.'
+					text : intl.formatMessage({
+						id             : 'room.chatError',
+						defaultMessage : 'Unable to send chat message'
+					})
 				}));
 		}
 	}
@@ -522,7 +565,10 @@ export default class RoomClient
 				return store.dispatch(requestActions.notify(
 					{
 						type : 'error',
-						text : 'Unable to save file.'
+						text : intl.formatMessage({
+							id             : 'filesharing.saveFileError',
+							defaultMessage : 'Unable to save file'
+						})
 					}));
 			}
 
@@ -589,7 +635,10 @@ export default class RoomClient
 	{
 		store.dispatch(requestActions.notify(
 			{
-				text : 'Starting file share.'
+				text : intl.formatMessage({
+					id             : 'filesharing.startingFileShare',
+					defaultMessage : 'Attempting to share file'
+				})
 			}));
 
 		this._webTorrent.seed(files, (torrent) =>
@@ -603,7 +652,10 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : 'File successfully shared.'
+					text : intl.formatMessage({
+						id             : 'filesharing.successfulFileShare',
+						defaultMessage : 'File successfully shared'
+					})
 				}));
 
 			store.dispatch(fileActions.addFile(
@@ -631,7 +683,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'Unable to share file.'
+					text : intl.formatMessage({
+						id             : 'filesharing.unableToShare',
+						defaultMessage : 'Unable to share file'
+					})
 				}));
 		}
 	}
@@ -689,12 +744,6 @@ export default class RoomClient
 		catch (error)
 		{
 			logger.error('getServerHistory() | failed: %o', error);
-
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : 'Unable to retrieve room history.'
-				}));
 		}
 	}
 
@@ -719,7 +768,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'Unable to access your microphone.'
+					text : intl.formatMessage({
+						id             : 'devices.microphoneMuteError',
+						defaultMessage : 'Unable to mute your microphone'
+					})
 				}));
 		}
 	}
@@ -751,7 +803,10 @@ export default class RoomClient
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
-						text : 'An error occured while accessing your microphone.'
+						text : intl.formatMessage({
+							id             : 'devices.microphoneUnMuteError',
+							defaultMessage : 'Unable to unmute your microphone'
+						})
 					}));
 			}
 		}
@@ -1133,12 +1188,6 @@ export default class RoomClient
 		{
 			logger.error('sendRaiseHandState() | failed: %o', error);
 
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : `An error occured while ${state ? 'raising' : 'lowering'} hand.`
-				}));
-
 			// We need to refresh the component for it to render changed state
 			store.dispatch(meActions.setMyRaiseHandState(!state));
 		}
@@ -1213,7 +1262,7 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : `An error occured with file sharing`
+					text : intl.formatMessage({ id: 'filesharing.error', defaultMessage: 'There was a filesharing error' })
 				}));
 		});
 
@@ -1241,7 +1290,10 @@ export default class RoomClient
 			{
 				store.dispatch(requestActions.notify(
 					{
-						text : 'You are disconnected.'
+						text : intl.formatMessage({
+							id             : 'socket.disconnected',
+							defaultMessage : 'You are disconnected'
+						})
 					}));
 
 				this.close();
@@ -1249,7 +1301,10 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : 'You are disconnected, attempting to reconnect.'
+					text : intl.formatMessage({
+						id             : 'socket.reconnecting',
+						defaultMessage : 'You are disconnected, attempting to reconnect'
+					})
 				}));
 
 			store.dispatch(roomActions.setRoomState('connecting'));
@@ -1261,7 +1316,10 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : 'You are disconnected.'
+					text : intl.formatMessage({
+						id             : 'socket.disconnected',
+						defaultMessage : 'You are disconnected'
+					})
 				}));
 
 			this.close();
@@ -1273,7 +1331,10 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : 'You are reconnected.'
+					text : intl.formatMessage({
+						id             : 'socket.reconnected',
+						defaultMessage : 'You are reconnected'
+					})
 				}));
 
 			store.dispatch(roomActions.setRoomState('connected'));
@@ -1450,7 +1511,10 @@ export default class RoomClient
 	
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Room is now locked.'
+								text : intl.formatMessage({
+									id             : 'room.locked',
+									defaultMessage : 'Room is now locked'
+								})
 							}));
 	
 						break;
@@ -1463,7 +1527,10 @@ export default class RoomClient
 						
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Room is now unlocked.'
+								text : intl.formatMessage({
+									id             : 'room.unlocked',
+									defaultMessage : 'Room is now unlocked'
+								})
 							}));
 	
 						break;
@@ -1480,7 +1547,10 @@ export default class RoomClient
 	
 						store.dispatch(requestActions.notify(
 							{
-								text : 'New participant entered the lobby.'
+								text : intl.formatMessage({
+									id             : 'room.newLobbyPeer',
+									defaultMessage : 'New participant entered the lobby'
+								})
 							}));
 	
 						break;
@@ -1495,7 +1565,10 @@ export default class RoomClient
 	
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Participant in lobby left.'
+								text : intl.formatMessage({
+									id             : 'room.lobbyPeerLeft',
+									defaultMessage : 'Participant in lobby left'
+								})
 							}));
 	
 						break;
@@ -1520,7 +1593,13 @@ export default class RoomClient
 
 						store.dispatch(requestActions.notify(
 							{
-								text : `Participant in lobby changed name to ${displayName}.`
+								text : intl.formatMessage({
+									id             : 'room.lobbyPeerChangedDisplayName',
+									defaultMessage : 'Participant in lobby changed name to {displayName}',
+									values         : {
+										displayName
+									}
+								})
 							}));
 
 						break;
@@ -1535,7 +1614,10 @@ export default class RoomClient
 
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Participant in lobby changed picture.'
+								text : intl.formatMessage({
+									id             : 'room.lobbyPeerChangedPicture',
+									defaultMessage : 'Participant in lobby changed picture'
+								})
 							}));
 
 						break;
@@ -1550,7 +1632,10 @@ export default class RoomClient
 
 						store.dispatch(requestActions.notify(
 							{
-								text : 'Access code for room updated'
+								text : intl.formatMessage({
+									id             : 'room.setAccessCode',
+									defaultMessage : 'Access code for room updated'
+								})
 							}));
 
 						break;
@@ -1567,14 +1652,20 @@ export default class RoomClient
 						{
 							store.dispatch(requestActions.notify(
 								{
-									text : 'Access code for room is now activated'
+									text : intl.formatMessage({
+										id             : 'room.accessCodeOn',
+										defaultMessage : 'Access code for room is now activated'
+									})
 								}));
 						}
 						else 
 						{
 							store.dispatch(requestActions.notify(
 								{
-									text : 'Access code for room is now deactivated'
+									text : intl.formatMessage({
+										id             : 'room.accessCodeOff',
+										defaultMessage : 'Access code for room is now deactivated'
+									})
 								}));
 						}
 
@@ -1603,7 +1694,14 @@ export default class RoomClient
 	
 						store.dispatch(requestActions.notify(
 							{
-								text : `${oldDisplayName} is now ${displayName}`
+								text : intl.formatMessage({
+									id             : 'room.peerChangedDisplayName',
+									defaultMessage : '{oldDisplayName} is now {displayName}',
+									values         : {
+										oldDisplayName,
+										displayName
+									}
+								})
 							}));
 	
 						break;
@@ -1647,7 +1745,10 @@ export default class RoomClient
 	
 						store.dispatch(requestActions.notify(
 							{
-								text : 'New file available.'
+								text : intl.formatMessage({
+									id             : 'room.newFile',
+									defaultMessage : 'New file available'
+								})
 							}));
 	
 						if (
@@ -1683,7 +1784,13 @@ export default class RoomClient
 	
 						store.dispatch(requestActions.notify(
 							{
-								text : `${displayName} joined the room.`
+								text : intl.formatMessage({
+									id             : 'room.newPeer',
+									defaultMessage : '{displayName} joined the room',
+									values         : {
+										displayName
+									}
+								})
 							}));
 	
 						break;
@@ -1788,7 +1895,10 @@ export default class RoomClient
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
-						text : 'Error on server request.'
+						text : intl.formatMessage({
+							id             : 'socket.requestError',
+							defaultMessage : 'Error on server request'
+						})
 					}));
 			}
 
@@ -1957,7 +2067,10 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : 'You have joined the room.'
+					text : intl.formatMessage({
+						id             : 'room.joined',
+						defaultMessage : 'You have joined the room'
+					})
 				}));
 
 			this._spotlights.start();
@@ -1969,7 +2082,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'Unable to join the room.'
+					text : intl.formatMessage({
+						id             : 'room.cantJoin',
+						defaultMessage : 'Unable to join the room'
+					})
 				}));
 
 			this.close();
@@ -1989,7 +2105,10 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : 'You locked the room.'
+					text : intl.formatMessage({
+						id             : 'room.youLocked',
+						defaultMessage : 'You locked the room'
+					})
 				}));
 		}
 		catch (error)
@@ -1997,7 +2116,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'Unable to lock the room.'
+					text : intl.formatMessage({
+						id             : 'room.cantLock',
+						defaultMessage : 'Unable to lock the room'
+					})
 				}));
 
 			logger.error('lockRoom() | failed: %o', error);
@@ -2017,7 +2139,10 @@ export default class RoomClient
 
 			store.dispatch(requestActions.notify(
 				{
-					text : 'You unlocked the room.'
+					text : intl.formatMessage({
+						id             : 'room.youUnLocked',
+						defaultMessage : 'You unlocked the room'
+					})
 				}));
 		}
 		catch (error)
@@ -2025,7 +2150,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'Unable to unlock the room.'
+					text : intl.formatMessage({
+						id             : 'room.cantUnLock',
+						defaultMessage : 'Unable to unlock the room'
+					})
 				}));
 
 			logger.error('unlockRoom() | failed: %o', error);
@@ -2164,7 +2292,10 @@ export default class RoomClient
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
-						text : 'Microphone disconnected!'
+						text : intl.formatMessage({
+							id             : 'devices.microphoneDisconnected',
+							defaultMessage : 'Microphone disconnected'
+						})
 					}));
 
 				this.disableMic()
@@ -2215,7 +2346,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'An error occured while accessing your microphone.'
+					text : intl.formatMessage({
+						id             : 'devices.microphoneError',
+						defaultMessage : 'An error occured while accessing your microphone'
+					})
 				}));
 
 			if (track)
@@ -2248,11 +2382,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : `Error closing server-side mic Producer: ${error}`
-				}));
+			logger.error('disableMic() [error:"%o"]', error);
 		}
 
 		this._micProducer = null;
@@ -2341,7 +2471,10 @@ export default class RoomClient
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
-						text : 'Screen sharing disconnected!'
+						text : intl.formatMessage({
+							id             : 'devices.screenSharingDisconnected',
+							defaultMessage : 'Screen sharing disconnected'
+						})
 					}));
 
 				this.disableScreenSharing()
@@ -2357,7 +2490,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'An error occured while accessing your camera.'
+					text : intl.formatMessage({
+						id             : 'devices.screenSharingError',
+						defaultMessage : 'An error occured while accessing your screen'
+					})
 				}));
 
 			if (track)
@@ -2388,11 +2524,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : `Error closing server-side screen Producer: ${error}`
-				}));
+			logger.error('disableScreenSharing() [error:"%o"]', error);
 		}
 
 		this._screenSharingProducer = null;
@@ -2497,7 +2629,10 @@ export default class RoomClient
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
-						text : 'Webcam disconnected!'
+						text : intl.formatMessage({
+							id             : 'devices.cameraDisconnected',
+							defaultMessage : 'Camera disconnected'
+						})
 					}));
 
 				this.disableWebcam()
@@ -2513,7 +2648,10 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : 'An error occured while accessing your camera.'
+					text : intl.formatMessage({
+						id             : 'devices.cameraError',
+						defaultMessage : 'An error occured while accessing your camera'
+					})
 				}));
 
 			if (track)
@@ -2545,11 +2683,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : `Error closing server-side webcam Producer: ${error}`
-				}));
+			logger.error('disableWebcam() [error:"%o"]', error);
 		}
 
 		this._webcamProducer = null;
