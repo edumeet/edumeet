@@ -1,7 +1,6 @@
-'use strict';
-
 const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
+const Lobby = require('./Lobby');
 const config = require('../config/config');
 
 const logger = new Logger('Room');
@@ -19,10 +18,10 @@ class Room extends EventEmitter
 	 */
 	static async create({ mediasoupWorker, roomId })
 	{
-		logger.info('create() [roomId:%s, forceH264:%s]', roomId);
+		logger.info('create() [roomId:"%s"]', roomId);
 
 		// Router media codecs.
-		let mediaCodecs = config.mediasoup.router.mediaCodecs;
+		const mediaCodecs = config.mediasoup.router.mediaCodecs;
 
 		// Create a mediasoup Router.
 		const mediasoupRouter = await mediasoupWorker.createRouter({ mediaCodecs });
@@ -54,32 +53,181 @@ class Room extends EventEmitter
 		// Locked flag.
 		this._locked = false;
 
+		// if true: accessCode is a possibility to open the room
+		this._joinByAccesCode = true;
+
+		// access code to the room,
+		// applicable if ( _locked == true and _joinByAccessCode == true )
+		this._accessCode = '';
+
+		this._lobby = new Lobby();
+
 		this._chatHistory = [];
 
 		this._fileHistory = [];
 
 		this._lastN = [];
 
-		// this._io = io;
-
 		this._peers = new Map();
 
 		// mediasoup Router instance.
-		// @type {mediasoup.Router}
 		this._mediasoupRouter = mediasoupRouter;
 
 		// mediasoup AudioLevelObserver.
-		// @type {mediasoup.AudioLevelObserver}
 		this._audioLevelObserver = audioLevelObserver;
 
+		// Current active speaker.
+		this._currentActiveSpeaker = null;
+
+		this._handleLobby();
+		this._handleAudioLevelObserver();
+	}
+
+	isLocked()
+	{
+		return this._locked;
+	}
+
+	close()
+	{
+		logger.debug('close()');
+
+		this._closed = true;
+
+		this._lobby.close();
+
+		this._peers.forEach((peer) =>
+		{
+			if (!peer.closed)
+				peer.close();
+		});
+
+		this._peers.clear();
+
+		// Close the mediasoup Router.
+		this._mediasoupRouter.close();
+
+		// Emit 'close' event.
+		this.emit('close');
+	}
+
+	handlePeer(peer)
+	{
+		logger.info('handlePeer() [peer:"%s"]', peer.id);
+
+		// This will allow reconnects to join despite lock
+		if (this._peers.has(peer.id))
+		{
+			logger.warn(
+				'handleConnection() | there is already a peer with same peerId [peer:"%s"]',
+				peer.id);
+
+			peer.close();
+
+			return;
+		}
+		else if (this._locked)
+		{
+			this._parkPeer(peer);
+		}
+		else
+		{
+			peer.authenticated ?
+				this._peerJoining(peer) :
+				this._handleGuest(peer);
+		}
+	}
+
+	_handleGuest(peer)
+	{
+		if (config.requireSignInToAccess)
+		{
+			if (config.activateOnHostJoin && !this.checkEmpty())
+			{
+				this._peerJoining(peer);
+			}
+			else
+			{
+				this._parkPeer(peer);
+				this._notification(peer.socket, 'signInRequired');
+			}
+		}
+		else
+		{
+			this._peerJoining(peer);
+		}
+	}
+
+	_handleLobby()
+	{
+		this._lobby.on('promotePeer', (promotedPeer) =>
+		{
+			logger.info('promotePeer() [promotedPeer:"%s"]', promotedPeer.id);
+
+			const { id } = promotedPeer;
+
+			this._peerJoining(promotedPeer);
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'lobby:promotedPeer', { peerId: id });
+			});
+		});
+
+		this._lobby.on('peerAuthenticated', (peer) =>
+		{
+			!this._locked && this._lobby.promotePeer(peer.id);
+		});
+
+		this._lobby.on('changeDisplayName', (changedPeer) =>
+		{
+			const { id, displayName } = changedPeer;
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'lobby:changeDisplayName', { peerId: id, displayName });
+			});
+		});
+
+		this._lobby.on('changePicture', (changedPeer) =>
+		{
+			const { id, picture } = changedPeer;
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'lobby:changePicture', { peerId: id, picture });
+			});
+		});
+
+		this._lobby.on('peerClosed', (closedPeer) =>
+		{
+			logger.info('peerClosed() [closedPeer:"%s"]', closedPeer.id);
+
+			const { id } = closedPeer;
+
+			this._peers.forEach((peer) =>
+			{
+				this._notification(peer.socket, 'lobby:peerClosed', { peerId: id });
+			});
+		});
+
+		// If nobody left in lobby we should check if room is empty too and initiating
+		// rooms selfdestruction sequence  
+		this._lobby.on('lobbyEmpty', () =>
+		{
+			if (this.checkEmpty())
+			{
+				this.selfDestructCountdown();
+			}
+		});
+	}
+
+	_handleAudioLevelObserver()
+	{
 		// Set audioLevelObserver events.
 		this._audioLevelObserver.on('volumes', (volumes) =>
 		{
 			const { producer, volume } = volumes[0];
-
-			// logger.debug(
-			//	'audioLevelObserver "volumes" event [producerId:%s, volume:%s]',
-			//	producer.id, volume);
 
 			// Notify all Peers.
 			this._peers.forEach((peer) =>
@@ -93,18 +241,21 @@ class Room extends EventEmitter
 
 		this._audioLevelObserver.on('silence', () =>
 		{
-			// logger.debug('audioLevelObserver "silence" event');
-
 			// Notify all Peers.
 			this._peers.forEach((peer) =>
 			{
-				this._notification(peer.socket, 'activeSpeaker', { peerId : null });
+				this._notification(peer.socket, 'activeSpeaker', { peerId: null });
 			});
 		});
+	}
 
-		// Current active speaker.
-		// @type {mediasoup.Peer}
-		this._currentActiveSpeaker = null;
+	logStatus()
+	{
+		logger.info(
+			'logStatus() [room id:"%s", peers:"%s"]',
+			this._roomId,
+			this._peers.size
+		);
 	}
 
 	get id()
@@ -112,151 +263,86 @@ class Room extends EventEmitter
 		return this._roomId;
 	}
 
-	close()
+	selfDestructCountdown()
 	{
-		logger.debug('close()');
+		logger.debug('selfDestructCountdown() started');
 
-		this._closed = true;
-
-		// Close the peers
-		if (this._peers)
+		setTimeout(() =>
 		{
-			this._peers.forEach((peer) =>
+			if (this._closed)
+				return;
+
+			if (this.checkEmpty() && this._lobby.checkEmpty())
 			{
-				if (peer.socket)
-					peer.socket.disconnect();
-			});
-		}
-
-		this._peers.clear();
-
-		// Close the mediasoup Router.
-		this._mediasoupRouter.close();
-
-		// Emit 'close' event.
-		this.emit('close');
+				logger.info(
+					'Room deserted for some time, closing the room [roomId:"%s"]',
+					this._roomId);
+				this.close();
+			}
+			else
+				logger.debug('selfDestructCountdown() aborted; room is not empty!');
+		}, 10000);
 	}
 
-	logStatus()
+	// checks both room and lobby
+	checkEmpty()
 	{
-		logger.info(
-			'logStatus() [room id:"%s", peers:%s]',
-			this._roomId,
-			this._peers.size
-		);
+		return this._peers.size === 0;
 	}
 
-	handleConnection({ peerId, consume, socket })
+	_parkPeer(parkPeer)
 	{
-		logger.info('handleConnection() [peerId:"%s"]', peerId);
+		this._lobby.parkPeer(parkPeer);
 
-		// This will allow reconnects to join despite lock
-		if (this._peers.has(peerId))
+		this._peers.forEach((peer) =>
 		{
-			logger.warn(
-				'handleConnection() | there is already a peer with same peerId, ' +
-				'closing the previous one [peerId:"%s"]',
-				peerId);
+			this._notification(peer.socket, 'parkedPeer', { peerId: parkPeer.id });
+		});
+	}
 
-			const peer = this._peers.get(peerId);
+	_peerJoining(peer)
+	{
+		peer.socket.join(this._roomId);
 
-			peer.socket.disconnect();
-			this._peers.delete(peerId);
-		}
-		else if (this._locked) // Don't allow connections to a locked room
-		{
-			this._notification(socket, 'roomLocked');
-			socket.disconnect(true);
-			return;
-		}
-
-		socket.join(this._roomId);
-
-		const peer = { id : peerId, socket : socket };
-
-		const index = this._lastN.indexOf(peerId);
+		const index = this._lastN.indexOf(peer.id);
 
 		if (index === -1) // We don't have this peer, add to end
 		{
-			this._lastN.push(peerId);
+			this._lastN.push(peer.id);
 		}
 
-		this._peers.set(peerId, peer);
+		this._peers.set(peer.id, peer);
 
-		this._handlePeer({ peer, consume });
-		this._notification(socket, 'roomReady');
+		this._handlePeer(peer);
+		this._notification(peer.socket, 'roomReady');
 	}
 
-	isLocked()
-	{
-		return this._locked;
-	}
-
-	authCallback(data)
-	{
-		logger.debug('authCallback()');
-
-		const {
-			peerId,
-			displayName,
-			picture
-		} = data;
-
-		const peer = this._peers.get(peerId);
-
-		if (peer)
-		{
-			this._notification(peer.socket, 'auth', {
-				displayName : displayName,
-				picture     : picture
-			});
-		}
-	}
-
-	_handlePeer({ peer, consume })
+	_handlePeer(peer)
 	{
 		logger.debug('_handlePeer() [peer:"%s"]', peer.id);
-
-		peer.data = {};
-
-		// Not joined after a custom protoo 'join' request is later received.
-		peer.data.consume = consume;
-		peer.data.joined = false;
-		peer.data.displayName = undefined;
-		peer.data.device = undefined;
-		peer.data.rtpCapabilities = undefined;
-		peer.data.raiseHandState = false;
-
-		// Have mediasoup related maps ready even before the Peer joins since we
-		// allow creating Transports before joining.
-		peer.data.transports = new Map();
-		peer.data.producers = new Map();
-		peer.data.consumers = new Map();
 
 		peer.socket.on('request', (request, cb) =>
 		{
 			logger.debug(
-				'Peer "request" event [method:%s, peerId:%s]',
+				'Peer "request" event [method:"%s", peerId:"%s"]',
 				request.method, peer.id);
 
 			this._handleSocketRequest(peer, request, cb)
 				.catch((error) =>
 				{
-					logger.error('request failed:%o', error);
+					logger.error('"request" failed [error:"%o"]', error);
 
 					cb(error);
 				});
 		});
 
-		peer.socket.on('disconnect', () =>
+		peer.on('close', () =>
 		{
 			if (this._closed)
 				return;
 
-			logger.debug('Peer "close" event [peerId:%s]', peer.id);
-
 			// If the Peer was joined, notify all Peers.
-			if (peer.data.joined)
+			if (peer.joined)
 			{
 				this._notification(peer.socket, 'peerClosed', { peerId: peer.id }, true);
 			}
@@ -268,33 +354,41 @@ class Room extends EventEmitter
 				this._lastN.splice(index, 1);
 			}
 
-			// Iterate and close all mediasoup Transport associated to this Peer, so all
-			// its Producers and Consumers will also be closed.
-			for (const transport of peer.data.transports.values())
-			{
-				transport.close();
-			}
-
 			this._peers.delete(peer.id);
 
-			// If this is the latest Peer in the room, close the room after a while.
-			if (this._peers.size === 0)
+			// If this is the last Peer in the room and
+			// lobby is empty, close the room after a while.
+			if (this.checkEmpty() && this._lobby.checkEmpty())
 			{
-				setTimeout(() =>
-				{
-					if (this._closed)
-						return;
-
-					if (this._peers.size === 0)
-					{
-						logger.info(
-							'last Peer in the room left, closing the room [roomId:%s]',
-							this._roomId);
-
-						this.close();
-					}
-				}, 10000);
+				this.selfDestructCountdown();
 			}
+		});
+
+		peer.on('displayNameChanged', ({ oldDisplayName }) =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'changeDisplayName', {
+				peerId         : peer.id,
+				displayName    : peer.displayName,
+				oldDisplayName : oldDisplayName
+			}, true);
+		});
+
+		peer.on('pictureChanged', () =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'changePicture', {
+				peerId  : peer.id,
+				picture : peer.picture
+			}, true);
 		});
 	}
 
@@ -302,7 +396,6 @@ class Room extends EventEmitter
 	{
 		switch (request.method)
 		{
-
 			case 'getRouterRtpCapabilities':
 			{
 				cb(null, this._mediasoupRouter.rtpCapabilities);
@@ -313,21 +406,19 @@ class Room extends EventEmitter
 			case 'join':
 			{
 				// Ensure the Peer is not already joined.
-				if (peer.data.joined)
+				if (peer.joined)
 					throw new Error('Peer already joined');
 
 				const {
 					displayName,
 					picture,
-					device,
 					rtpCapabilities
 				} = request.data;
 
-				// Store client data into the protoo Peer data object.
-				peer.data.displayName = displayName;
-				peer.data.picture = picture;
-				peer.data.device = device;
-				peer.data.rtpCapabilities = rtpCapabilities;
+				// Store client data into the Peer data object.
+				peer.displayName = displayName;
+				peer.picture = picture;
+				peer.rtpCapabilities = rtpCapabilities;
 
 				// Tell the new Peer about already joined Peers.
 				// And also create Consumers for existing Producers.
@@ -336,17 +427,11 @@ class Room extends EventEmitter
 
 				this._peers.forEach((joinedPeer) =>
 				{
-					if (joinedPeer.data.joined)
+					if (joinedPeer.joined)
 					{
-						peerInfos.push(
-							{
-								id          : joinedPeer.id,
-								displayName : joinedPeer.data.displayName,
-								picture     : joinedPeer.data.picture,
-								device      : joinedPeer.data.device
-							});
+						peerInfos.push(joinedPeer.peerInfo);
 	
-						for (const producer of joinedPeer.data.producers.values())
+						joinedPeer.producers.forEach((producer) =>
 						{
 							this._createConsumer(
 								{
@@ -354,14 +439,14 @@ class Room extends EventEmitter
 									producerPeer : joinedPeer,
 									producer
 								});
-						}
+						});
 					}
 				});
 
 				cb(null, { peers: peerInfos });
 
 				// Mark the new Peer as joined.
-				peer.data.joined = true;
+				peer.joined = true;
 
 				this._notification(
 					peer.socket,
@@ -369,15 +454,14 @@ class Room extends EventEmitter
 					{
 						id          : peer.id,
 						displayName : displayName,
-						picture     : picture,
-						device      : device
+						picture     : picture
 					},
 					true
 				);
 
 				logger.debug(
-					'peer joined [peeerId: %s, displayName: %s, picture: %s, device: %o]',
-					peer.id, displayName, picture, device);
+					'peer joined [peer: "%s", displayName: "%s", picture: "%s"]',
+					peer.id, displayName, picture);
 
 				break;
 			}
@@ -403,8 +487,8 @@ class Room extends EventEmitter
 						appData   : { producing, consuming }
 					});
 
-				// Store the WebRtcTransport into the protoo Peer data Object.
-				peer.data.transports.set(transport.id, transport);
+				// Store the WebRtcTransport into the Peer data Object.
+				peer.addTransport(transport.id, transport);
 
 				cb(
 					null,
@@ -428,7 +512,7 @@ class Room extends EventEmitter
 			case 'connectWebRtcTransport':
 			{
 				const { transportId, dtlsParameters } = request.data;
-				const transport = peer.data.transports.get(transportId);
+				const transport = peer.getTransport(transportId);
 
 				if (!transport)
 					throw new Error(`transport with id "${transportId}" not found`);
@@ -443,7 +527,7 @@ class Room extends EventEmitter
 			case 'restartIce':
 			{
 				const { transportId } = request.data;
-				const transport = peer.data.transports.get(transportId);
+				const transport = peer.getTransport(transportId);
 
 				if (!transport)
 					throw new Error(`transport with id "${transportId}" not found`);
@@ -458,12 +542,12 @@ class Room extends EventEmitter
 			case 'produce':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { transportId, kind, rtpParameters } = request.data;
 				let { appData } = request.data;
-				const transport = peer.data.transports.get(transportId);
+				const transport = peer.getTransport(transportId);
 
 				if (!transport)
 					throw new Error(`transport with id "${transportId}" not found`);
@@ -475,23 +559,19 @@ class Room extends EventEmitter
 				const producer =
 					await transport.produce({ kind, rtpParameters, appData });
 
-				// Store the Producer into the protoo Peer data Object.
-				peer.data.producers.set(producer.id, producer);
+				// Store the Producer into the Peer data Object.
+				peer.addProducer(producer.id, producer);
 
 				// Set Producer events.
 				producer.on('score', (score) =>
 				{
-					// logger.debug(
-					// 	'producer "score" event [producerId:%s, score:%o]',
-					// 	producer.id, score);
-
 					this._notification(peer.socket, 'producerScore', { producerId: producer.id, score });
 				});
 
 				producer.on('videoorientationchange', (videoOrientation) =>
 				{
 					logger.debug(
-						'producer "videoorientationchange" event [producerId:%s, videoOrientation:%o]',
+						'producer "videoorientationchange" event [producerId:"%s", videoOrientation:"%o"]',
 						producer.id, videoOrientation);
 				});
 
@@ -499,7 +579,7 @@ class Room extends EventEmitter
 
 				this._peers.forEach((otherPeer) =>
 				{
-					if (otherPeer.data.joined && otherPeer !== peer)
+					if (otherPeer.joined && otherPeer !== peer)
 					{
 						this._createConsumer(
 							{
@@ -523,11 +603,11 @@ class Room extends EventEmitter
 			case 'closeProducer':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { producerId } = request.data;
-				const producer = peer.data.producers.get(producerId);
+				const producer = peer.getProducer(producerId);
 
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
@@ -535,7 +615,7 @@ class Room extends EventEmitter
 				producer.close();
 
 				// Remove from its map.
-				peer.data.producers.delete(producer.id);
+				peer.removeProducer(producer.id);
 
 				cb();
 
@@ -545,11 +625,11 @@ class Room extends EventEmitter
 			case 'pauseProducer':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { producerId } = request.data;
-				const producer = peer.data.producers.get(producerId);
+				const producer = peer.getProducer(producerId);
 
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
@@ -564,11 +644,11 @@ class Room extends EventEmitter
 			case 'resumeProducer':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { producerId } = request.data;
-				const producer = peer.data.producers.get(producerId);
+				const producer = peer.getProducer(producerId);
 
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
@@ -583,11 +663,11 @@ class Room extends EventEmitter
 			case 'pauseConsumer':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { consumerId } = request.data;
-				const consumer = peer.data.consumers.get(consumerId);
+				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
 					throw new Error(`consumer with id "${consumerId}" not found`);
@@ -602,11 +682,11 @@ class Room extends EventEmitter
 			case 'resumeConsumer':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { consumerId } = request.data;
-				const consumer = peer.data.consumers.get(consumerId);
+				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
 					throw new Error(`consumer with id "${consumerId}" not found`);
@@ -621,11 +701,11 @@ class Room extends EventEmitter
 			case 'setConsumerPreferedLayers':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { consumerId, spatialLayer, temporalLayer } = request.data;
-				const consumer = peer.data.consumers.get(consumerId);
+				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
 					throw new Error(`consumer with id "${consumerId}" not found`);
@@ -640,11 +720,11 @@ class Room extends EventEmitter
 			case 'requestConsumerKeyFrame':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { consumerId } = request.data;
-				const consumer = peer.data.consumers.get(consumerId);
+				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
 					throw new Error(`consumer with id "${consumerId}" not found`);
@@ -659,7 +739,7 @@ class Room extends EventEmitter
 			case 'getTransportStats':
 			{
 				const { transportId } = request.data;
-				const transport = peer.data.transports.get(transportId);
+				const transport = peer.getTransport(transportId);
 
 				if (!transport)
 					throw new Error(`transport with id "${transportId}" not found`);
@@ -674,7 +754,7 @@ class Room extends EventEmitter
 			case 'getProducerStats':
 			{
 				const { producerId } = request.data;
-				const producer = peer.data.producers.get(producerId);
+				const producer = peer.getProducer(producerId);
 
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
@@ -689,7 +769,7 @@ class Room extends EventEmitter
 			case 'getConsumerStats':
 			{
 				const { consumerId } = request.data;
-				const consumer = peer.data.consumers.get(consumerId);
+				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
 					throw new Error(`consumer with id "${consumerId}" not found`);
@@ -704,13 +784,13 @@ class Room extends EventEmitter
 			case 'changeDisplayName':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { displayName } = request.data;
-				const oldDisplayName = peer.data.displayName;
+				const oldDisplayName = peer.displayName;
 
-				peer.data.displayName = displayName;
+				peer.displayName = displayName;
 
 				// Spread to others
 				this._notification(peer.socket, 'changeDisplayName', {
@@ -725,16 +805,18 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'changeProfilePicture':
+			case 'changePicture':
 			{
 				// Ensure the Peer is joined.
-				if (!peer.data.joined)
+				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { picture } = request.data;
 
+				peer.picture = picture;
+
 				// Spread to others
-				this._notification(peer.socket, 'changeProfilePicture', {
+				this._notification(peer.socket, 'changePicture', {
 					peerId  : peer.id,
 					picture : picture
 				}, true);
@@ -766,12 +848,17 @@ class Room extends EventEmitter
 			case 'serverHistory':
 			{
 				// Return to sender
+				const lobbyPeers = this._lobby.peerList();
+
 				cb(
 					null,
 					{
-						chatHistory : this._chatHistory,
-						fileHistory : this._fileHistory,
-						lastN       : this._lastN
+						chatHistory  : this._chatHistory,
+						fileHistory  : this._fileHistory,
+						lastNHistory : this._lastN,
+						locked       : this._locked,
+						lobbyPeers   : lobbyPeers,
+						accessCode   : this._accessCode
 					}
 				);
 
@@ -802,6 +889,68 @@ class Room extends EventEmitter
 					peerId : peer.id
 				}, true);
 
+				this._lobby.promoteAllPeers();
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'setAccessCode':
+			{
+				const { accessCode } = request.data;
+	
+				this._accessCode = accessCode;
+
+				// Spread to others
+				// if (request.public) {
+				this._notification(peer.socket, 'setAccessCode', {
+					peerId     : peer.id,
+					accessCode : accessCode
+				}, true);
+				// }
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'setJoinByAccessCode':
+			{
+				const { joinByAccessCode } = request.data;
+	
+				this._joinByAccessCode = joinByAccessCode;
+
+				// Spread to others
+				this._notification(peer.socket, 'setJoinByAccessCode', {
+					peerId           : peer.id,
+					joinByAccessCode : joinByAccessCode
+				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'promotePeer':
+			{
+				const { peerId } = request.data;
+
+				this._lobby.promotePeer(peerId);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'promoteAllPeers':
+			{
+				this._lobby.promoteAllPeers();
+
 				// Return no error
 				cb();
 
@@ -828,14 +977,14 @@ class Room extends EventEmitter
 
 			case 'raiseHand':
 			{
-				const { raiseHandState } = request.data;
+				const { raisedHand } = request.data;
 
-				peer.data.raiseHandState = raiseHandState;
+				peer.raisedHand = raisedHand;
 
 				// Spread to others
 				this._notification(peer.socket, 'raiseHand', {
-					peerId         : peer.id,
-					raiseHandState : raiseHandState
+					peerId     : peer.id,
+					raisedHand : raisedHand
 				}, true);
 
 				// Return no error
@@ -860,6 +1009,13 @@ class Room extends EventEmitter
 	 */
 	async _createConsumer({ consumerPeer, producerPeer, producer })
 	{
+		logger.debug(
+			'_createConsumer() [consumerPeer:"%s", producerPeer:"%s", producer:"%s"]',
+			consumerPeer.id,
+			producerPeer.id,
+			producer.id
+		);
+
 		// Optimization:
 		// - Create the server-side Consumer. If video, do it paused.
 		// - Tell its Peer about it and wait for its response.
@@ -869,11 +1025,11 @@ class Room extends EventEmitter
 
 		// NOTE: Don't create the Consumer if the remote Peer cannot consume it.
 		if (
-			!consumerPeer.data.rtpCapabilities ||
+			!consumerPeer.rtpCapabilities ||
 			!this._mediasoupRouter.canConsume(
 				{
 					producerId      : producer.id,
-					rtpCapabilities : consumerPeer.data.rtpCapabilities
+					rtpCapabilities : consumerPeer.rtpCapabilities
 				})
 		)
 		{
@@ -881,8 +1037,7 @@ class Room extends EventEmitter
 		}
 
 		// Must take the Transport the remote Peer is using for consuming.
-		const transport = Array.from(consumerPeer.data.transports.values())
-			.find((t) => t.appData.consuming);
+		const transport = consumerPeer.getConsumerTransport();
 
 		// This should not happen.
 		if (!transport)
@@ -900,31 +1055,31 @@ class Room extends EventEmitter
 			consumer = await transport.consume(
 				{
 					producerId      : producer.id,
-					rtpCapabilities : consumerPeer.data.rtpCapabilities,
+					rtpCapabilities : consumerPeer.rtpCapabilities,
 					paused          : producer.kind === 'video'
 				});
 		}
 		catch (error)
 		{
-			logger.warn('_createConsumer() | transport.consume():%o', error);
+			logger.warn('_createConsumer() | [error:"%o"]', error);
 
 			return;
 		}
 
-		// Store the Consumer into the protoo consumerPeer data Object.
-		consumerPeer.data.consumers.set(consumer.id, consumer);
+		// Store the Consumer into the consumerPeer data Object.
+		consumerPeer.addConsumer(consumer.id, consumer);
 
 		// Set Consumer events.
 		consumer.on('transportclose', () =>
 		{
 			// Remove from its map.
-			consumerPeer.data.consumers.delete(consumer.id);
+			consumerPeer.removeConsumer(consumer.id);
 		});
 
 		consumer.on('producerclose', () =>
 		{
 			// Remove from its map.
-			consumerPeer.data.consumers.delete(consumer.id);
+			consumerPeer.removeConsumer(consumer.id);
 
 			this._notification(consumerPeer.socket, 'consumerClosed', { consumerId: consumer.id });
 		});
@@ -941,10 +1096,6 @@ class Room extends EventEmitter
 
 		consumer.on('score', (score) =>
 		{
-			// logger.debug(
-			// 	'consumer "score" event [consumerId:%s, score:%o]',
-			// 	consumer.id, score);
-
 			this._notification(consumerPeer.socket, 'consumerScore', { consumerId: consumer.id, score });
 		});
 
@@ -961,7 +1112,7 @@ class Room extends EventEmitter
 			);
 		});
 
-		// Send a protoo request to the remote Peer with Consumer parameters.
+		// Send a request to the remote Peer with Consumer parameters.
 		try
 		{
 			await this._request(
@@ -972,7 +1123,6 @@ class Room extends EventEmitter
 					kind           : producer.kind,
 					producerId     : producer.id,
 					id             : consumer.id,
-					kind           : consumer.kind,
 					rtpParameters  : consumer.rtpParameters,
 					type           : consumer.type,
 					appData        : producer.appData,
@@ -996,7 +1146,7 @@ class Room extends EventEmitter
 		}
 		catch (error)
 		{
-			logger.warn('_createConsumer() | failed:%o', error);
+			logger.warn('_createConsumer() | [error:"%o"]', error);
 		}
 	}
 

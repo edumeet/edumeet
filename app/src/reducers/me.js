@@ -1,7 +1,7 @@
 const initialState =
 {
 	id                    : null,
-	device                : null,
+	picture               : null,
 	canSendMic            : false,
 	canSendWebcam         : false,
 	canShareScreen        : false,
@@ -11,6 +11,7 @@ const initialState =
 	webcamInProgress      : false,
 	audioInProgress       : false,
 	screenShareInProgress : false,
+	displayNameInProgress : false,
 	loginEnabled          : false,
 	raiseHand             : false,
 	raiseHandInProgress   : false,
@@ -25,23 +26,25 @@ const me = (state = initialState, action) =>
 		{
 			const {
 				peerId,
-				device,
 				loginEnabled
 			} = action.payload;
 
 			return {
 				...state,
 				id : peerId,
-				device,
 				loginEnabled
 			};
 		}
 
 		case 'LOGGED_IN':
-			return { ...state, loggedIn: true };
+		{
+			const { flag } = action.payload;
 
-		case 'USER_LOGOUT':
-			return { ...state, loggedIn: false };
+			return { ...state, loggedIn: flag };
+		}
+
+		case 'SET_PICTURE':
+			return { ...state, picture: action.payload.picture };
 
 		case 'SET_MEDIA_CAPABILITIES':
 		{
@@ -108,6 +111,13 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, raiseHandInProgress: flag };
+		}
+
+		case 'SET_DISPLAY_NAME_IN_PROGRESS':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, displayNameInProgress: flag };
 		}
 
 		default:

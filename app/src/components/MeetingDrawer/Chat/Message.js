@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
+import DOMPurify from 'dompurify'; 
 import marked from 'marked';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -76,9 +77,11 @@ const Message = (props) =>
 					className={classes.text}
 					variant='subtitle1'
 					// eslint-disable-next-line react/no-danger
-					dangerouslySetInnerHTML={{ __html : marked.parse(
-						text,
-						{ sanitize: true, renderer: linkRenderer }
+					dangerouslySetInnerHTML={{ __html : DOMPurify.sanitize(
+						marked.parse(
+							text,
+							{ renderer: linkRenderer }
+						)
 					) }}
 				/>
 				<Typography variant='caption'>{self ? 'Me' : name} - {time}</Typography>
@@ -92,7 +95,7 @@ Message.propTypes =
 	self    : PropTypes.bool,
 	picture : PropTypes.string,
 	text    : PropTypes.string,
-	time    : PropTypes.string,
+	time    : PropTypes.object,
 	name    : PropTypes.string,
 	classes : PropTypes.object.isRequired
 };

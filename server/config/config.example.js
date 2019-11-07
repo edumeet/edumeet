@@ -3,26 +3,27 @@ const os = require('os');
 module.exports =
 {
 	// oAuth2 conf
-	auth :
+	/* auth :
 	{
-		/*
-		The issuer URL for OpenID Connect discovery 
-		The OpenID Provider Configuration Document 
-		could be discovered on: 
-		issuerURL + '/.well-known/openid-configuration'
-		*/
-		issuerURL     : 'https://example.com',
-		clientOptions :
-		{
+		
+		// The issuer URL for OpenID Connect discovery 
+		// The OpenID Provider Configuration Document 
+		// could be discovered on: 
+		// issuerURL + '/.well-known/openid-configuration'
+		
+		// issuerURL     : 'https://example.com',
+		// clientOptions :
+		// {
 			client_id     : '',
 			client_secret : '',
 			scope       		: 'openid email profile',
 			// where client.example.com is your multiparty meeting server 
 			redirect_uri  : 'https://client.example.com/auth/callback'
 		}
-	},
+	},*/
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',
+	cookieName   : 'multiparty-meeting.sid',
 	tls          :
 	{
 		cert : `${__dirname}/../certs/mediasoup-demo.localhost.cert.pem`,
@@ -33,6 +34,16 @@ module.exports =
 	// Any http request is redirected to https.
 	// Listening port for http server. 
 	listeningRedirectPort : 80,
+	// If this is set to true, only signed-in users will be able
+	// to join a room directly. Non-signed-in users (guests) will
+	// always be put in the lobby regardless of room lock status.
+	// If false, there is no difference between guests and signed-in
+	// users when joining.
+	requireSignInToAccess : true,
+	// This flag has no effect when requireSignInToAccess is false
+	// When truthy, the room will be open to all users when the first
+	// authenticated user has already joined the room.
+	activateOnHostJoin    : true,
 	// Mediasoup settings
 	mediasoup             :
 	{
@@ -84,6 +95,7 @@ module.exports =
 		{
 			listenIps :
 			[
+				// change ip to your servers IP address!
 				{ ip: '1.2.3.4', announcedIp: null }
 			],
 			maxIncomingBitrate              : 1500000,

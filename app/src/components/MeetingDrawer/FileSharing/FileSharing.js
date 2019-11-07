@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
+import { useIntl } from 'react-intl';
 import FileList from './FileList';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
@@ -26,58 +27,57 @@ const styles = (theme) =>
 		}
 	});
 
-class FileSharing extends React.PureComponent
+const FileSharing = (props) =>
 {
-	constructor(props)
-	{
-		super(props);
+	const intl = useIntl();
 
-		this._fileInput = React.createRef();
-	}
-
-	handleFileChange = async (event) =>
+	const handleFileChange = async (event) =>
 	{
 		if (event.target.files.length > 0)
 		{
-			this.props.roomClient.shareFiles(event.target.files);
+			props.roomClient.shareFiles(event.target.files);
 		}
 	};
 
-	render()
-	{
-		const {
-			canShareFiles,
-			classes
-		} = this.props;
+	const {
+		canShareFiles,
+		classes
+	} = props;
 
-		const buttonDescription = canShareFiles ?
-			'Share file' : 'File sharing not supported';
+	const buttonDescription = canShareFiles ?
+		intl.formatMessage({
+			id             : 'label.shareFile',
+			defaultMessage : 'Share file'
+		})
+		:
+		intl.formatMessage({
+			id             : 'label.fileSharingUnsupported',
+			defaultMessage : 'File sharing not supported'
+		});
 
-		return (
-			<Paper className={classes.root}>
-				<input
-					ref={this._fileInput}
-					className={classes.input}
-					type='file'
-					onChange={this.handleFileChange}
-					id='share-files-button'
-				/>
-				<label htmlFor='share-files-button'>
-					<Button
-						variant='contained'
-						component='span'
-						className={classes.button}
-						disabled={!canShareFiles}
-					>
-						{buttonDescription}
-					</Button>
-				</label>
+	return (
+		<Paper className={classes.root}>
+			<input
+				className={classes.input}
+				type='file'
+				onChange={handleFileChange}
+				id='share-files-button'
+			/>
+			<label htmlFor='share-files-button'>
+				<Button
+					variant='contained'
+					component='span'
+					className={classes.button}
+					disabled={!canShareFiles}
+				>
+					{buttonDescription}
+				</Button>
+			</label>
 
-				<FileList />
-			</Paper>
-		);
-	}
-}
+			<FileList />
+		</Paper>
+	);
+};
 
 FileSharing.propTypes = {
 	roomClient    : PropTypes.any.isRequired,

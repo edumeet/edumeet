@@ -23,7 +23,7 @@ const reduxMiddlewares =
 	thunk
 ];
 
-if (process.env.NODE_ENV !== 'production')
+if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
 	const reduxLogger = createLogger(
 		{

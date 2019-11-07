@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedTime } from 'react-intl';
 import Message from './Message';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 
@@ -33,7 +34,7 @@ class MessageList extends React.Component
 
 	shouldComponentUpdate(nextProps)
 	{
-		if (nextProps.chatmessages.length !== this.props.chatmessages.length)
+		if (nextProps.chat.length !== this.props.chat.length)
 			return true;
 
 		return false;
@@ -49,13 +50,13 @@ class MessageList extends React.Component
 
 	getTimeString(time)
 	{
-		return `${(time.getHours() < 10 ? '0' : '')}${time.getHours()}:${(time.getMinutes() < 10 ? '0' : '')}${time.getMinutes()}`;
+		return (<FormattedTime value={new Date(time)} />);
 	}
 
 	render()
 	{
 		const {
-			chatmessages,
+			chat,
 			myPicture,
 			classes
 		} = this.props;
@@ -63,10 +64,8 @@ class MessageList extends React.Component
 		return (
 			<div className={classes.root} ref={(node) => { this.node = node; }}>
 				{
-					chatmessages.map((message, index) =>
+					chat.map((message, index) =>
 					{
-						const messageTime = new Date(message.time);
-
 						const picture = (message.sender === 'response' ?
 							message.picture : myPicture) || EmptyAvatar;
 
@@ -76,7 +75,7 @@ class MessageList extends React.Component
 								self={message.sender === 'client'}
 								picture={picture}
 								text={message.text}
-								time={this.getTimeString(messageTime)}
+								time={this.getTimeString(message.time)}
 								name={message.name}
 							/>
 						);
@@ -89,15 +88,15 @@ class MessageList extends React.Component
 
 MessageList.propTypes =
 {
-	chatmessages : PropTypes.array,
-	myPicture    : PropTypes.string,
-	classes      : PropTypes.object.isRequired
+	chat      : PropTypes.array,
+	myPicture : PropTypes.string,
+	classes   : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
-		chatmessages : state.chatmessages,
-		myPicture    : state.settings.picture
+		chat      : state.chat,
+		myPicture : state.me.picture
 	});
 
 export default connect(
@@ -108,8 +107,8 @@ export default connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.chatmessages === next.chatmessages &&
-				prev.settings.picture === next.settings.picture
+				prev.chat === next.chat &&
+				prev.me.picture === next.me.picture
 			);
 		}
 	}

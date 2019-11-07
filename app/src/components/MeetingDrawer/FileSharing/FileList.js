@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
+import { injectIntl } from 'react-intl';
 import File from './File';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 
@@ -45,8 +46,8 @@ class FileList extends React.PureComponent
 		const {
 			files,
 			me,
-			picture,
 			peers,
+			intl,
 			classes
 		} = this.props;
 
@@ -60,8 +61,11 @@ class FileList extends React.PureComponent
 
 					if (me.id === file.peerId)
 					{
-						displayName = 'You';
-						filePicture = picture;
+						displayName = intl.formatMessage({
+							id             : 'room.me',
+							defaultMessage : 'Me'
+						});
+						filePicture = me.picture;
 					}
 					else if (peers[file.peerId])
 					{
@@ -70,7 +74,10 @@ class FileList extends React.PureComponent
 					}
 					else
 					{
-						displayName = 'Unknown';
+						displayName = intl.formatMessage({
+							id             : 'label.unknown',
+							defaultMessage : 'Unknown'
+						});
 					}
 
 					return (
@@ -91,18 +98,17 @@ FileList.propTypes =
 {
 	files   : PropTypes.object.isRequired,
 	me      : appPropTypes.Me.isRequired,
-	picture : PropTypes.string,
 	peers   : PropTypes.object.isRequired,
+	intl    : PropTypes.object.isRequired,
 	classes : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		files   : state.files,
-		me      : state.me,
-		picture : state.settings.picture,
-		peers   : state.peers
+		files : state.files,
+		me    : state.me,
+		peers : state.peers
 	};
 };
 
@@ -116,9 +122,8 @@ export default connect(
 			return (
 				prev.files === next.files &&
 				prev.me === next.me &&
-				prev.settings.picture === next.settings.picture &&
 				prev.peers === next.peers
 			);
 		}
 	}
-)(withStyles(styles)(FileList));
+)(withStyles(styles)(injectIntl(FileList)));

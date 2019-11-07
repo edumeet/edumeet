@@ -3,8 +3,10 @@ import { connect } from 'react-redux';
 import * as appPropTypes from '../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../RoomContext';
-import * as stateActions from '../../actions/stateActions';
+import * as roomActions from '../../actions/roomActions';
+import * as settingsActions from '../../actions/settingsActions';
 import PropTypes from 'prop-types';
+import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -51,35 +53,6 @@ const styles = (theme) =>
 		}
 	});
 
-const modes = [ {
-	value : 'democratic',
-	label : 'Democratic view'
-}, {
-	value : 'filmstrip',
-	label : 'Filmstrip view'
-} ];
-
-const resolutions = [ {
-	value : 'low',
-	label : 'Low'
-},
-{
-	value : 'medium',
-	label : 'Medium'
-},
-{
-	value : 'high',
-	label : 'High (HD)'
-},
-{
-	value : 'veryhigh',
-	label : 'Very high (FHD)'
-},
-{
-	value : 'ultra',
-	label : 'Ultra (UHD)'
-} ];
-
 const Settings = ({
 	roomClient,
 	room,
@@ -91,6 +64,58 @@ const Settings = ({
 	classes
 }) =>
 {
+	const intl = useIntl();
+
+	const modes = [ {
+		value : 'democratic',
+		label : intl.formatMessage({
+			id             : 'label.democratic',
+			defaultMessage : 'Democratic view'
+		})
+	}, {
+		value : 'filmstrip',
+		label : intl.formatMessage({
+			id             : 'label.filmstrip',
+			defaultMessage : 'Filmstrip view'
+		})
+	} ];
+	
+	const resolutions = [ {
+		value : 'low',
+		label : intl.formatMessage({
+			id             : 'label.low',
+			defaultMessage : 'Low'
+		})
+	},
+	{
+		value : 'medium',
+		label : intl.formatMessage({
+			id             : 'label.medium',
+			defaultMessage : 'Medium'
+		})
+	},
+	{
+		value : 'high',
+		label : intl.formatMessage({
+			id             : 'label.high',
+			defaultMessage : 'High (HD)'
+		})
+	},
+	{
+		value : 'veryhigh',
+		label : intl.formatMessage({
+			id             : 'label.veryHigh',
+			defaultMessage : 'Very high (FHD)'
+		})
+	},
+	{
+		value : 'ultra',
+		label : intl.formatMessage({
+			id             : 'label.ultra',
+			defaultMessage : 'Ultra (UHD)'
+		})
+	} ];
+
 	let webcams;
 
 	if (me.webcamDevices)
@@ -114,7 +139,12 @@ const Settings = ({
 				paper : classes.dialogPaper
 			}}
 		>
-			<DialogTitle id='form-dialog-title'>Settings</DialogTitle>
+			<DialogTitle id='form-dialog-title'>
+				<FormattedMessage
+					id='settings.settings'
+					defaultMessage='Settings'
+				/>
+			</DialogTitle>
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
 					<Select
@@ -125,7 +155,10 @@ const Settings = ({
 								roomClient.changeWebcam(event.target.value);
 						}}
 						displayEmpty
-						name='Camera'
+						name={intl.formatMessage({
+							id             : 'settings.camera',
+							defaultMessage : 'Camera'
+						})}
 						autoWidth
 						className={classes.selectEmpty}
 						disabled={webcams.length === 0 || me.webcamInProgress}
@@ -139,9 +172,15 @@ const Settings = ({
 					</Select>
 					<FormHelperText>
 						{ webcams.length > 0 ?
-							'Select video device'
+							intl.formatMessage({
+								id             : 'settings.selectCamera',
+								defaultMessage : 'Select video device'
+							})
 							:
-							'Unable to select video device'
+							intl.formatMessage({
+								id             : 'settings.cantSelectCamera',
+								defaultMessage : 'Unable to select video device'
+							})
 						}
 					</FormHelperText>
 				</FormControl>
@@ -156,7 +195,10 @@ const Settings = ({
 								roomClient.changeAudioDevice(event.target.value);
 						}}
 						displayEmpty
-						name='Audio device'
+						name={intl.formatMessage({
+							id             : 'settings.audio',
+							defaultMessage : 'Audio device'
+						})}
 						autoWidth
 						className={classes.selectEmpty}
 						disabled={audioDevices.length === 0 || me.audioInProgress}
@@ -170,9 +212,15 @@ const Settings = ({
 					</Select>
 					<FormHelperText>
 						{ audioDevices.length > 0 ?
-							'Select audio device'
+							intl.formatMessage({
+								id             : 'settings.selectAudio',
+								defaultMessage : 'Select audio device'
+							})
 							:
-							'Unable to select audio device'
+							intl.formatMessage({
+								id             : 'settings.cantSelectAudio',
+								defaultMessage : 'Unable to select audio device'
+							})
 						}
 					</FormHelperText>
 				</FormControl>
@@ -200,7 +248,10 @@ const Settings = ({
 						})}
 					</Select>
 					<FormHelperText>
-						Select your video resolution
+						<FormattedMessage
+							id='settings.resolution'
+							defaultMessage='Select your video resolution'
+						/>
 					</FormHelperText>
 				</FormControl>
 			</form>
@@ -213,7 +264,10 @@ const Settings = ({
 							if (event.target.value)
 								handleChangeMode(event.target.value);
 						}}
-						name='Room layout'
+						name={intl.formatMessage({
+							id             : 'settings.layout',
+							defaultMessage : 'Room layout'
+						})}
 						autoWidth
 						className={classes.selectEmpty}
 					>
@@ -227,18 +281,27 @@ const Settings = ({
 						})}
 					</Select>
 					<FormHelperText>
-						Select room layout
+						<FormattedMessage
+							id='settings.selectRoomLayout'
+							defaultMessage='Select room layout'
+						/>
 					</FormHelperText>
 				</FormControl>
 			</form>
 			<FormControlLabel
 				className={classes.setting}
 				control={<Checkbox checked={settings.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
-				label='Advanced mode'
+				label={intl.formatMessage({
+					id             : 'settings.advancedMode',
+					defaultMessage : 'Advanced mode'
+				})}
 			/>
 			<DialogActions>
 				<Button onClick={() => handleCloseSettings({ settingsOpen: false })} color='primary'>
-					Close
+					<FormattedMessage
+						id='label.close'
+						defaultMessage='Close'
+					/>
 				</Button>
 			</DialogActions>
 		</Dialog>
@@ -267,9 +330,9 @@ const mapStateToProps = (state) =>
 };
 
 const mapDispatchToProps = {
-	onToggleAdvancedMode : stateActions.toggleAdvancedMode,
-	handleChangeMode     : stateActions.setDisplayMode,
-	handleCloseSettings  : stateActions.setSettingsOpen,
+	onToggleAdvancedMode : settingsActions.toggleAdvancedMode,
+	handleChangeMode     : roomActions.setDisplayMode,
+	handleCloseSettings  : roomActions.setSettingsOpen
 };
 
 export default withRoomContext(connect(

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import NewWindow from './NewWindow';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../appPropTypes';
-import * as stateActions from '../../actions/stateActions';
+import * as roomActions from '../../actions/roomActions';
 import FullView from '../VideoContainers/FullView';
 
 const VideoWindow = (props) =>
@@ -59,7 +59,7 @@ const mapDispatchToProps = (dispatch) =>
 	return {
 		toggleConsumerWindow : () =>
 		{
-			dispatch(stateActions.toggleConsumerWindow());
+			dispatch(roomActions.toggleConsumerWindow());
 		}
 	};
 };

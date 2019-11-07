@@ -85,13 +85,6 @@ const files = (state = {}, action) =>
 			return { ...state, [magnetUri]: newFile };
 		}
 
-		case 'REMOVE_FILE':
-		{
-			const { magnetUri } = action.payload;
-
-			return state.filter((file) => file.magnetUri !== magnetUri);
-		}
-
 		default:
 			return state;
 	}

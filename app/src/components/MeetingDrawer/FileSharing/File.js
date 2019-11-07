@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedMessage } from 'react-intl';
 import magnet from 'magnet-uri';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -67,10 +68,13 @@ class File extends React.PureComponent
 				<img alt='Avatar' className={classes.avatar} src={picture} />
 
 				<div className={classes.fileContent}>
-					{ file.files ?
+					{ file.files &&
 						<Fragment>
 							<Typography className={classes.text}>
-								File finished downloading
+								<FormattedMessage
+									id='filesharing.finished'
+									defaultMessage='File finished downloading'
+								/>
 							</Typography>
 
 							{ file.files.map((sharedFile, i) => (
@@ -87,18 +91,26 @@ class File extends React.PureComponent
 											roomClient.saveFile(sharedFile);
 										}}
 									>
-										Save
+										<FormattedMessage
+											id='filesharing.save'
+											defaultMessage='Save'
+										/>
 									</Button>
 								</div>
 							))}
 						</Fragment>
-						:null
 					}
 					<Typography className={classes.text}>
-						{ `${displayName} shared a file` }
+						<FormattedMessage
+							id='filesharing.sharedFile'
+							defaultMessage='{displayName} shared a file'
+							values={{
+								displayName
+							}}
+						/>
 					</Typography>
 
-					{ !file.active && !file.files ?
+					{ (!file.active && !file.files) &&
 						<div className={classes.fileInfo}>
 							<Typography className={classes.text}>
 								{ magnet.decode(magnetUri).dn }
@@ -113,28 +125,37 @@ class File extends React.PureComponent
 										roomClient.handleDownload(magnetUri);
 									}}
 								>
-									Download
+									<FormattedMessage
+										id='filesharing.download'
+										defaultMessage='Download'
+									/>
 								</Button>
 								:
 								<Typography className={classes.text}>
-									Your browser does not support downloading files using WebTorrent.
+									<FormattedMessage
+										id='label.fileSharingUnsupported'
+										defaultMessage='File sharing not supported'
+									/>
 								</Typography>
 							}
 						</div>
-						:null
 					}
 
-					{ file.timeout ?
+					{ file.timeout &&
 						<Typography className={classes.text}>
-							If this process takes a long time, there might not be anyone seeding
-							this torrent. Try asking someone to reupload the file that you want.
+							<FormattedMessage
+								id='filesharing.missingSeeds'
+								defaultMessage={
+									`If this process takes a long time, there might not 
+									be anyone seeding this torrent. Try asking someone to 
+									reupload the file that you want.`
+								}
+							/>
 						</Typography>
-						:null
 					}
 
-					{ file.active ?
+					{ file.active &&
 						<progress value={file.progress} />
-						:null
 					}
 				</div>
 			</div>

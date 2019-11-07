@@ -79,7 +79,7 @@ const ListMe = (props) =>
 		classes
 	} = props;
 
-	const picture = settings.picture || EmptyAvatar;
+	const picture = me.picture || EmptyAvatar;
 
 	return (
 		<li className={classes.root}>
@@ -91,9 +91,8 @@ const ListMe = (props) =>
 				</div>
 
 				<div className={classes.indicators}>
-					{ me.raisedHand ?
+					{ me.raisedHand &&
 						<div className={classnames(classes.icon, 'raise-hand')} />
-						:null
 					}
 				</div>
 			</div>

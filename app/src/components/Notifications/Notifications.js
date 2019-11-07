@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withSnackbar } from 'notistack';
-import * as stateActions from '../../actions/stateActions';
+import * as notificationActions from '../../actions/notificationActions';
 
 class Notifications extends Component
 {
@@ -77,7 +77,7 @@ const mapStateToProps = (state) =>
 const mapDispatchToProps = (dispatch) =>
 	({
 		removeNotification : (notificationId) =>
-			dispatch(stateActions.removeNotification({ notificationId }))
+			dispatch(notificationActions.removeNotification({ notificationId }))
 	});
 
 export default withSnackbar(
