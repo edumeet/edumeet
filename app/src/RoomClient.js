@@ -491,7 +491,7 @@ export default class RoomClient
 				{
 					text : intl.formatMessage({
 						id             : 'room.changedDisplayName',
-						defaultMessage : 'Your display name changed to {displayName}',
+						defaultMessage : 'Your display name changed to {displayName}'
 					}, {
 						displayName
 					})
@@ -1594,7 +1594,7 @@ export default class RoomClient
 							{
 								text : intl.formatMessage({
 									id             : 'room.lobbyPeerChangedDisplayName',
-									defaultMessage : 'Participant in lobby changed name to {displayName}',
+									defaultMessage : 'Participant in lobby changed name to {displayName}'
 								}, {
 									displayName
 								})
@@ -1694,7 +1694,7 @@ export default class RoomClient
 							{
 								text : intl.formatMessage({
 									id             : 'room.peerChangedDisplayName',
-									defaultMessage : '{oldDisplayName} is now {displayName}',
+									defaultMessage : '{oldDisplayName} is now {displayName}'
 								}, {
 									oldDisplayName,
 									displayName
@@ -1783,7 +1783,7 @@ export default class RoomClient
 							{
 								text : intl.formatMessage({
 									id             : 'room.newPeer',
-									defaultMessage : '{displayName} joined the room',
+									defaultMessage : '{displayName} joined the room'
 								}, {
 									displayName
 								})
