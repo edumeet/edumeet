@@ -21,6 +21,7 @@ import * as serviceWorker from './serviceWorker';
 
 import messagesEnglish from './translations/en';
 import messagesNorwegian from './translations/nb';
+import messagesGerman from './translations/de';
 
 import './index.css';
 
@@ -29,7 +30,8 @@ const cache = createIntlCache();
 const messages =
 {
 	'en' : messagesEnglish,
-	'nb' : messagesNorwegian
+	'nb' : messagesNorwegian,
+	'de' : messagesGerman
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code
