@@ -1,5 +1,14 @@
 # Changelog
 
+### 3.1
+* Browser session storage
+* Virtual lobby for rooms
+* Allow minimum TLSv1.2 and recommended ciphers
+* Code splitting for faster load times
+* Various GUI fixes
+* Internationalization support
+* Can require sign in for access
+
 ### 3.0
 * Updated to mediasoup v3
 * Replace lib "passport-datporten" with "openid-client" (a general OIDC certified client)

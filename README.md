@@ -10,8 +10,7 @@ Try it online at https://letsmeet.no. You can add /roomname to the URL for speci
 * Screen sharing
 * File sharing
 * Different layouts
-
-There is also a SIP gateway that can be found [here](https://github.com/havfo/multiparty-meeting-sipgw). To try it, call: roomname@letsmeet.no.
+* Internationalization support
 
 ## Docker
 If you want the automatic approach, you can find a docker image [here](https://hub.docker.com/r/misi/mm/).
@@ -51,6 +50,7 @@ This will build the client application and copy everythink to `server/public` fr
 * Set up the server:
 
 ```bash
+$ sudo apt install redis
 $ cd ..
 $ cd server
 $ npm install
