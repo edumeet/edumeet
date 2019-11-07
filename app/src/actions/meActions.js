@@ -1,7 +1,7 @@
-export const setMe = ({ peerId, device, loginEnabled }) =>
+export const setMe = ({ peerId, loginEnabled }) =>
 	({
 		type    : 'SET_ME',
-		payload : { peerId, device, loginEnabled }
+		payload : { peerId, loginEnabled }
 	});
 
 export const loggedIn = (flag) =>

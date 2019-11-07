@@ -98,7 +98,6 @@ function run()
 	store.dispatch(
 		meActions.setMe({
 			peerId,
-			device,
 			loginEnabled : window.config.loginEnabled
 		})
 	);

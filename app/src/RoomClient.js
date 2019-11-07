@@ -2024,7 +2024,6 @@ export default class RoomClient
 				{
 					displayName     : displayName,
 					picture         : picture,
-					device          : this._device,
 					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
 

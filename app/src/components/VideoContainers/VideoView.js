@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import * as appPropTypes from '../appPropTypes';
 import EditableInput from '../Controls/EditableInput';
 
 const styles = (theme) =>
@@ -105,16 +104,6 @@ const styles = (theme) =>
 			{
 				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
-		},
-		deviceInfo :
-		{
-			'& span' :
-			{
-				userSelect    : 'none',
-				pointerEvents : 'none',
-				fontSize      : 11,
-				color         : 'rgba(255, 255, 255, 0.55)'
-			}
 		}
 	});
 
@@ -143,7 +132,6 @@ class VideoView extends React.PureComponent
 		const {
 			isMe,
 			isScreen,
-			peer,
 			displayName,
 			showPeerInfo,
 			videoContain,
@@ -203,14 +191,6 @@ class VideoView extends React.PureComponent
 									<span className={classes.displayNameStatic}>
 										{displayName}
 									</span>
-								}
-
-								{ advancedMode &&
-									<div className={classes.deviceInfo}>
-										<span>
-											{peer.device.name} {Math.floor(peer.device.version) || null}
-										</span>
-									</div>
 								}
 							</div>
 						</div>
@@ -315,8 +295,6 @@ VideoView.propTypes =
 {
 	isMe     : PropTypes.bool,
 	isScreen : PropTypes.bool,
-	peer     : PropTypes.oneOfType(
-		[ appPropTypes.Me, appPropTypes.Peer ]),
 	displayName         : PropTypes.string,
 	showPeerInfo        : PropTypes.bool,
 	videoContain        : PropTypes.bool,

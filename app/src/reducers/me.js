@@ -1,7 +1,6 @@
 const initialState =
 {
 	id                    : null,
-	device                : null,
 	picture               : null,
 	canSendMic            : false,
 	canSendWebcam         : false,
@@ -27,14 +26,12 @@ const me = (state = initialState, action) =>
 		{
 			const {
 				peerId,
-				device,
 				loginEnabled
 			} = action.payload;
 
 			return {
 				...state,
 				id : peerId,
-				device,
 				loginEnabled
 			};
 		}

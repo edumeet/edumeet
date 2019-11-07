@@ -8,17 +8,9 @@ export const Room = PropTypes.shape(
 		activeSpeakerId : PropTypes.string
 	});
 
-export const Device = PropTypes.shape(
-	{
-		flag    : PropTypes.string.isRequired,
-		name    : PropTypes.string.isRequired,
-		version : PropTypes.string
-	});
-
 export const Me = PropTypes.shape(
 	{
 		id               : PropTypes.string.isRequired,
-		device           : Device.isRequired,
 		canSendMic       : PropTypes.bool.isRequired,
 		canSendWebcam    : PropTypes.bool.isRequired,
 		webcamInProgress : PropTypes.bool.isRequired
@@ -39,7 +31,6 @@ export const Peer = PropTypes.shape(
 	{
 		id          : PropTypes.string.isRequired,
 		displayName : PropTypes.string,
-		device      : Device.isRequired,
 		consumers   : PropTypes.arrayOf(PropTypes.string).isRequired
 	});
 

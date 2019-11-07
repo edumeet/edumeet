@@ -412,14 +412,12 @@ class Room extends EventEmitter
 				const {
 					displayName,
 					picture,
-					device,
 					rtpCapabilities
 				} = request.data;
 
 				// Store client data into the Peer data object.
 				peer.displayName = displayName;
 				peer.picture = picture;
-				peer.device = device;
 				peer.rtpCapabilities = rtpCapabilities;
 
 				// Tell the new Peer about already joined Peers.
@@ -456,8 +454,7 @@ class Room extends EventEmitter
 					{
 						id          : peer.id,
 						displayName : displayName,
-						picture     : picture,
-						device      : device
+						picture     : picture
 					},
 					true
 				);

@@ -30,8 +30,6 @@ class Peer extends EventEmitter
 
 		this._email = null;
 
-		this._device = null;
-
 		this._rtpCapabilities = null;
 
 		this._raisedHand = false;
@@ -229,16 +227,6 @@ class Peer extends EventEmitter
 		this._email = email;
 	}
 
-	get device()
-	{
-		return this._device;
-	}
-
-	set device(device)
-	{
-		this._device = device;
-	}
-
 	get rtpCapabilities()
 	{
 		return this._rtpCapabilities;
@@ -331,8 +319,7 @@ class Peer extends EventEmitter
 		{
 			id          : this.id,
 			displayName : this.displayName,
-			picture     : this.picture,
-			device      : this.device
+			picture     : this.picture
 		};
 
 		return peerInfo;
