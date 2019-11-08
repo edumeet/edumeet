@@ -2,6 +2,8 @@
 
 A WebRTC meeting service using [mediasoup](https://mediasoup.org).
 
+![](demo.gif)
+
 Try it online at https://letsmeet.no. You can add /roomname to the URL for specifying a room.
 
 ## Features
