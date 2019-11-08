@@ -96,7 +96,10 @@ module.exports =
 			listenIps :
 			[
 				// change ip to your servers IP address!
-				{ ip: '1.2.3.4', announcedIp: null }
+				{ ip: '0.0.0.0', announcedIp: null }
+
+				// Can have multiple listening interfaces
+				// { ip: '::/0', announcedIp: null }
 			],
 			maxIncomingBitrate              : 1500000,
 			initialAvailableOutgoingBitrate : 1000000

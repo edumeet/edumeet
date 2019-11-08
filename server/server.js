@@ -340,17 +340,11 @@ async function runHttpsServer()
 
 	httpsServer = spdy.createServer(tls, app);
 
-	httpsServer.listen(config.listeningPort, '0.0.0.0', () =>
-	{
-		logger.info('Server running on port: ', config.listeningPort);
-	});
+	httpsServer.listen(config.listeningPort);
 
 	const httpServer = http.createServer(app);
 
-	httpServer.listen(config.listeningRedirectPort, '0.0.0.0', () =>
-	{
-		logger.info('Server redirecting port: ', config.listeningRedirectPort);
-	});
+	httpServer.listen(config.listeningRedirectPort);
 }
 
 /**
