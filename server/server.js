@@ -328,11 +328,6 @@ async function runHttpsServer()
 		res.redirect(`https://${req.hostname}${req.url}`);
 	});
 
-	app.get('/', (req, res) =>
-	{
-		res.sendFile(`${__dirname}/public/chooseRoom.html`);
-	});
-
 	// Serve all files in the public folder as static files.
 	app.use(express.static('public'));
 

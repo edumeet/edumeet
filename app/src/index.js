@@ -1,8 +1,9 @@
 import domready from 'domready';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
+import { Route, BrowserRouter as Router } from 'react-router-dom'
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
@@ -11,13 +12,14 @@ import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as roomActions from './actions/roomActions';
 import * as meActions from './actions/meActions';
-import App from './components/App';
+import ChooseRoom from './components/ChooseRoom';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistor, store } from './store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
+import { ReactLazyPreload } from './components/ReactLazyPreload';
 
 import messagesEnglish from './translations/en';
 import messagesNorwegian from './translations/nb';
@@ -25,6 +27,8 @@ import messagesGerman from './translations/de';
 import messagesHungarian from './translations/hu';
 
 import './index.css';
+
+const App = ReactLazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
 
 const cache = createIntlCache();
 
@@ -118,7 +122,14 @@ function run()
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
 						<RoomContext.Provider value={roomClient}>
 							<SnackbarProvider>
-								<App />
+								<Router>
+									<Suspense fallback={<LoadingView />}>
+										<React.Fragment>
+											<Route exact path='/' component={ChooseRoom} />
+											<Route path='/:id' component={App} />
+										</React.Fragment>
+									</Suspense>
+								</Router>
 							</SnackbarProvider>
 						</RoomContext.Provider>
 					</PersistGate>

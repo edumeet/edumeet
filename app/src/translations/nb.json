@@ -4,6 +4,7 @@
 	"socket.reconnected": "Du er koblet til igjen",
 	"socket.requestError": "Feil på server melding",
 
+	"room.chooseRoom": "Velg navn på møtet du vil bli med i eller starte",
 	"room.cookieConsent": "Denne siden bruker cookies for å forbedre brukeropplevelsen",
 	"room.joined": "Du ble med i møtet",
 	"room.cantJoin": "Kunne ikke bli med i møtet",
@@ -58,6 +59,8 @@
 	"tooltip.lobby": "Vis lobby",
 	"tooltip.settings": "Vis innstillinger",
 
+	"label.roomName": "Møtenavn",
+	"label.chooseRoomButton": "Fortsett",
 	"label.yourName": "Ditt navn",
 	"label.newWindow": "Flytt til separat vindu",
 	"label.fullscreen": "Fullskjerm",
