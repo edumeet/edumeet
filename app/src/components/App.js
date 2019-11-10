@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense } from 'react';
-import { useParams} from 'react-router';
+import { useParams } from 'react-router';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import JoinDialog from './JoinDialog';
@@ -14,7 +14,7 @@ const App = (props) =>
 		room
 	} = props;
 
-	let { id } = useParams();
+	const { id } = useParams();
 
 	useEffect(() =>
 	{

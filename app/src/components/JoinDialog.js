@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
+import isElectron from 'is-electron';
 import * as settingsActions from '../actions/settingsActions';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
@@ -334,12 +335,14 @@ const JoinDialog = ({
 					</DialogContent>
 				}
 
-				<CookieConsent>
-					<FormattedMessage
-						id='room.cookieConsent'
-						defaultMessage='This website uses cookies to enhance the user experience'
-					/>
-				</CookieConsent>
+				{ !isElectron() &&
+					<CookieConsent>
+						<FormattedMessage
+							id='room.cookieConsent'
+							defaultMessage='This website uses cookies to enhance the user experience'
+						/>
+					</CookieConsent>
+				}
 			</Dialog>
 		</div>
 	);

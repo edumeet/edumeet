@@ -1,9 +1,11 @@
 // eslint-disable-next-line
 var config =
 {
-	loginEnabled    : false,
-	developmentPort : 3443,
-	turnServers     : [
+	loginEnabled     : false,
+	developmentPort  : 3443,
+	productionPort   : 443,
+	multipartyServer : 'letsmeet.no',
+	turnServers      : [
 		{
 			urls : [
 				'turn:turn.example.com:443?transport=tcp'

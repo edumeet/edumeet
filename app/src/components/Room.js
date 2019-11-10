@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
+import isElectron from 'is-electron';
 import * as roomActions from '../actions/roomActions';
 import * as toolareaActions from '../actions/toolareaActions';
 import { idle } from '../utils';
@@ -152,12 +153,14 @@ class Room extends React.PureComponent
 
 		return (
 			<div className={classes.root}>
-				<CookieConsent>
-					<FormattedMessage
-						id='room.cookieConsent'
-						defaultMessage='This website uses cookies to enhance the user experience'
-					/>
-				</CookieConsent>
+				{ !isElectron() &&
+					<CookieConsent>
+						<FormattedMessage
+							id='room.cookieConsent'
+							defaultMessage='This website uses cookies to enhance the user experience'
+						/>
+					</CookieConsent>
+				}
 
 				<FullScreenView advancedMode={advancedMode} />
 

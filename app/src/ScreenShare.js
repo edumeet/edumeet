@@ -1,3 +1,70 @@
+import isElectron from 'is-electron';
+
+let electron = null;
+
+if (isElectron())
+	electron = window.require('electron');
+
+class ElectronScreenShare
+{
+	constructor()
+	{
+		this._stream = null;
+	}
+
+	start()
+	{
+		return Promise.resolve()
+			.then(() =>
+			{
+				return electron.desktopCapturer.getSources({ types: [ 'window', 'screen' ] });
+			})
+			.then((sources) =>
+			{
+				for (const source of sources)
+				{
+					// Currently only getting whole screen
+					if (source.name === 'Entire Screen')
+					{
+						return navigator.mediaDevices.getUserMedia({
+							audio : false,
+							video :
+							{
+								mandatory :
+								{
+									chromeMediaSource   : 'desktop',
+									chromeMediaSourceId : source.id
+								}
+							}
+						});
+					}
+				}
+			})
+			.then((stream) =>
+			{
+				this._stream = stream;
+
+				return stream;
+			});
+	}
+
+	stop()
+	{
+		if (this._stream instanceof MediaStream === false)
+		{
+			return;
+		}
+
+		this._stream.getTracks().forEach((track) => track.stop());
+		this._stream = null;
+	}
+
+	isScreenShareAvailable()
+	{
+		return true;
+	}
+}
+
 class DisplayMediaScreenShare
 {
 	constructor()
@@ -131,26 +198,31 @@ export default class ScreenShare
 {
 	static create(device)
 	{
-		switch (device.flag)
+		if (isElectron())
+			return new ElectronScreenShare();
+		else
 		{
-			case 'firefox':
+			switch (device.flag)
 			{
-				if (device.version < 66.0)
-					return new FirefoxScreenShare();
-				else
+				case 'firefox':
+				{
+					if (device.version < 66.0)
+						return new FirefoxScreenShare();
+					else
+						return new DisplayMediaScreenShare();
+				}
+				case 'chrome':
+				{
 					return new DisplayMediaScreenShare();
-			}
-			case 'chrome':
-			{
-				return new DisplayMediaScreenShare();
-			}
-			case 'msedge':
-			{
-				return new DisplayMediaScreenShare();
-			}
-			default:
-			{
-				return new DefaultScreenShare();
+				}
+				case 'msedge':
+				{
+					return new DisplayMediaScreenShare();
+				}
+				default:
+				{
+					return new DefaultScreenShare();
+				}
 			}
 		}
 	}

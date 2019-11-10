@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
+import isElectron from 'is-electron';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import randomString from 'random-string';
@@ -239,12 +240,14 @@ const ChooseRoom = ({
 					</Button>
 				</DialogActions>
 
-				<CookieConsent>
-					<FormattedMessage
-						id='room.cookieConsent'
-						defaultMessage='This website uses cookies to enhance the user experience'
-					/>
-				</CookieConsent>
+				{ !isElectron() &&
+					<CookieConsent>
+						<FormattedMessage
+							id='room.cookieConsent'
+							defaultMessage='This website uses cookies to enhance the user experience'
+						/>
+					</CookieConsent>
+				}
 			</Dialog>
 		</div>
 	);
