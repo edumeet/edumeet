@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
-import * as roomActions from '../actions/roomActions';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import randomString from 'random-string';
@@ -166,13 +165,14 @@ const DialogActions = withStyles((theme) => ({
 
 const ChooseRoom = ({
 	roomClient,
-	roomId,
 	loggedIn,
 	myPicture,
-	changeRoomId,
 	classes
 }) =>
 {
+	const [ roomId, setRoomId ] =
+		useState(randomString({ length: 8 }).toLowerCase());
+
 	const intl = useIntl();
 
 	return (
@@ -214,12 +214,12 @@ const ChooseRoom = ({
 						{
 							const { value } = event.target;
 
-							changeRoomId(value);
+							setRoomId(value.toLowerCase());
 						}}
 						onBlur={() =>
 						{
 							if (roomId === '')
-								changeRoomId(randomString({ length: 8 }).toLowerCase());
+								setRoomId(randomString({ length: 8 }).toLowerCase());
 						}}
 						fullWidth
 					/>
@@ -253,43 +253,29 @@ const ChooseRoom = ({
 ChooseRoom.propTypes =
 {
 	roomClient   : PropTypes.any.isRequired,
-	roomId       : PropTypes.string,
 	loginEnabled : PropTypes.bool.isRequired,
 	loggedIn     : PropTypes.bool.isRequired,
 	myPicture    : PropTypes.string,
-	changeRoomId : PropTypes.func.isRequired,
 	classes      : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		roomId       : state.room.name,
 		loginEnabled : state.me.loginEnabled,
 		loggedIn     : state.me.loggedIn,
 		myPicture    : state.me.picture
 	};
 };
 
-const mapDispatchToProps = (dispatch) =>
-{
-	return {
-		changeRoomId : (roomId) =>
-		{
-			dispatch(roomActions.setRoomName(roomId));
-		}
-	};
-};
-
 export default withRoomContext(connect(
 	mapStateToProps,
-	mapDispatchToProps,
+	null,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room.name === next.room.name &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.picture === next.me.picture

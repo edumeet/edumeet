@@ -10,7 +10,6 @@ import debug from 'debug';
 import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
-import * as roomActions from './actions/roomActions';
 import * as meActions from './actions/meActions';
 import ChooseRoom from './components/ChooseRoom';
 import LoadingView from './components/LoadingView';
@@ -77,33 +76,13 @@ function run()
 	const urlParser = new URL(window.location);
 	const parameters = urlParser.searchParams;
 
-	let roomId = (urlParser.pathname).substr(1);
-
-	if (!roomId)
-		roomId = parameters.get('roomId');
-
-	if (roomId)
-		roomId = roomId.toLowerCase();
-	else
-	{
-		roomId = randomString({ length: 8 }).toLowerCase();
-
-		parameters.set('roomId', roomId);
-		window.history.pushState('', '', urlParser.toString());
-	}
-
 	const accessCode = parameters.get('code');
 	const produce = parameters.get('produce') !== 'false';
 	const useSimulcast = parameters.get('simulcast') === 'true';
 	const forceTcp = parameters.get('forceTcp') === 'true';
 
-	const roomUrl = window.location.href.split('?')[0];
-
 	// Get current device.
 	const device = deviceInfo();
-
-	store.dispatch(
-		roomActions.setRoomUrl(roomUrl));
 
 	store.dispatch(
 		meActions.setMe({
@@ -113,7 +92,7 @@ function run()
 	);
 
 	roomClient = new RoomClient(
-		{ roomId, peerId, accessCode, device, useSimulcast, produce, forceTcp });
+		{ peerId, accessCode, device, useSimulcast, produce, forceTcp });
 
 	global.CLIENT = roomClient;
 

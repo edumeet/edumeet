@@ -1,9 +1,3 @@
-export const setRoomUrl = (url) =>
-	({
-		type    : 'SET_ROOM_URL',
-		payload : { url }
-	});
-
 export const setRoomName = (name) =>
 	({
 		type    : 'SET_ROOM_NAME',

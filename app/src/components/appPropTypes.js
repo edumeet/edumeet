@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 
 export const Room = PropTypes.shape(
 	{
-		url   : PropTypes.string.isRequired,
 		state : PropTypes.oneOf(
 			[ 'new', 'connecting', 'connected', 'closed' ]).isRequired,
 		activeSpeakerId : PropTypes.string

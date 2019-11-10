@@ -165,6 +165,7 @@ const DialogActions = withStyles((theme) => ({
 const JoinDialog = ({
 	roomClient,
 	room,
+	roomId,
 	displayName,
 	displayNameInProgress,
 	loggedIn,
@@ -226,7 +227,7 @@ const JoinDialog = ({
 							id='room.roomId'
 							defaultMessage='Room ID: {roomName}'
 							values={{
-								roomName : room.name
+								roomName : roomId
 							}}
 						/>
 					</DialogContentText>
@@ -275,7 +276,7 @@ const JoinDialog = ({
 						<Button
 							onClick={() =>
 							{
-								roomClient.join({ joinVideo: false });
+								roomClient.join({ roomId, joinVideo: false });
 							}}
 							variant='contained'
 							color='secondary'
@@ -288,7 +289,7 @@ const JoinDialog = ({
 						<Button
 							onClick={() =>
 							{
-								roomClient.join({ joinVideo: true });
+								roomClient.join({ roomId, joinVideo: true });
 							}}
 							variant='contained'
 							color='secondary'
@@ -348,6 +349,7 @@ JoinDialog.propTypes =
 {
 	roomClient            : PropTypes.any.isRequired,
 	room                  : PropTypes.object.isRequired,
+	roomId                : PropTypes.string.isRequired,
 	displayName           : PropTypes.string.isRequired,
 	displayNameInProgress : PropTypes.bool.isRequired,
 	loginEnabled          : PropTypes.bool.isRequired,

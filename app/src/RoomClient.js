@@ -97,13 +97,13 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ roomId, peerId, accessCode, device, useSimulcast, produce, forceTcp })
+		{ peerId, accessCode, device, useSimulcast, produce, forceTcp })
 	{
 		logger.debug(
-			'constructor() [roomId: "%s", peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s"]',
-			roomId, peerId, device.flag, useSimulcast, produce, forceTcp);
+			'constructor() [peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s"]',
+			peerId, device.flag, useSimulcast, produce, forceTcp);
 
-		this._signalingUrl = getSignalingUrl(peerId, roomId);
+		this._signalingUrl = null;
 
 		// Closed flag.
 		this._closed = false;
@@ -136,8 +136,7 @@ export default class RoomClient
 		this._signalingSocket = null;
 
 		// The room ID
-		this._roomId = roomId;
-		store.dispatch(roomActions.setRoomName(roomId));
+		this._roomId = null;
 
 		// mediasoup-client Device instance.
 		// @type {mediasoupClient.Device}
@@ -1240,9 +1239,15 @@ export default class RoomClient
 		));
 	}
 
-	async join({ joinVideo })
+	async join({ roomId, joinVideo })
 	{
 		await this._loadDynamicImports();
+
+		this._roomId = roomId;
+
+		store.dispatch(roomActions.setRoomName(roomId));
+
+		this._signalingUrl = getSignalingUrl(this._peerId, roomId);
 
 		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
 
