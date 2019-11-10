@@ -21,10 +21,11 @@ import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 import { ReactLazyPreload } from './components/ReactLazyPreload';
 
-import messagesEnglish from './translations/en';
+// import messagesEnglish from './translations/en';
 import messagesNorwegian from './translations/nb';
 import messagesGerman from './translations/de';
 import messagesHungarian from './translations/hu';
+import messagesPolish from './translations/pl';
 
 import './index.css';
 
@@ -34,10 +35,11 @@ const cache = createIntlCache();
 
 const messages =
 {
-	'en' : messagesEnglish,
+	// 'en' : messagesEnglish,
 	'nb' : messagesNorwegian,
 	'de' : messagesGerman,
-	'hu' : messagesHungarian
+	'hu' : messagesHungarian,
+	'pl' : messagesPolish
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code
