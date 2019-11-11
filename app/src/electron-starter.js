@@ -3,6 +3,7 @@ const electron = require('electron');
 const app = electron.app;
 
 const BrowserWindow = electron.BrowserWindow;
+const Menu = electron.Menu;
 
 const path = require('path');
 const url = require('url');
@@ -16,6 +17,8 @@ function createWindow()
 		height         : 720,
 		webPreferences : { nodeIntegration: true }
 	});
+
+	Menu.setApplicationMenu(null);
 
 	const startUrl = process.env.ELECTRON_START_URL || url.format({
 		pathname : path.join(__dirname, '/../build/index.html'),
