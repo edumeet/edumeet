@@ -2,8 +2,9 @@ import domready from 'domready';
 import React, { Suspense } from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
+import isElectron from 'is-electron';
 import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
-import { Route, HashRouter as Router } from 'react-router-dom';
+import { Route, HashRouter, BrowserRouter } from 'react-router-dom';
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
@@ -60,6 +61,13 @@ let roomClient;
 RoomClient.init({ store, intl });
 
 const theme = createMuiTheme(window.config.theme);
+
+let Router;
+
+if (isElectron())
+	Router = HashRouter;
+else
+	Router = BrowserRouter;
 
 domready(() =>
 {
