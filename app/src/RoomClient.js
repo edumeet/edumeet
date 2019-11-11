@@ -1194,6 +1194,43 @@ export default class RoomClient
 			meActions.setMyRaiseHandStateInProgress(false));
 	}
 
+	async setMaxSendingSpatialLayer(spatialLayer)
+	{
+		logger.debug('setMaxSendingSpatialLayer() [spatialLayer:%s]', spatialLayer);
+
+		try
+		{
+			if (this._webcamProducer)
+				await this._webcamProducer.setMaxSpatialLayer(spatialLayer);
+			else if (this._screenSharingProducer)
+				await this._screenSharingProducer.setMaxSpatialLayer(spatialLayer);
+		}
+		catch (error)
+		{
+			logger.error('setMaxSendingSpatialLayer() | failed:"%o"', error);
+		}
+	}
+
+	async setConsumerPreferredLayers(consumerId, spatialLayer, temporalLayer)
+	{
+		logger.debug(
+			'setConsumerPreferredLayers() [consumerId:%s, spatialLayer:%s, temporalLayer:%s]',
+			consumerId, spatialLayer, temporalLayer);
+
+		try
+		{
+			await this.sendRequest(
+				'setConsumerPreferedLayers', { consumerId, spatialLayer, temporalLayer });
+
+			store.dispatch(consumerActions.setConsumerPreferredLayers(
+				consumerId, spatialLayer, temporalLayer));
+		}
+		catch (error)
+		{
+			logger.error('setConsumerPreferredLayers() | failed:"%o"', error);
+		}
+	}
+
 	async _loadDynamicImports()
 	{
 		({ default: WebTorrent } = await import(

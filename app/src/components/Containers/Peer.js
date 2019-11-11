@@ -145,16 +145,6 @@ const Peer = (props) =>
 		!screenConsumer.remotelyPaused
 	);
 
-	let videoProfile;
-
-	if (webcamConsumer)
-		videoProfile = webcamConsumer.profile;
-
-	let screenProfile;
-
-	if (screenConsumer)
-		screenProfile = screenConsumer.profile;
-
 	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 	const rootStyle =
@@ -325,11 +315,27 @@ const Peer = (props) =>
 						peer={peer}
 						displayName={peer.displayName}
 						showPeerInfo
+						consumerSpatialLayers={webcamConsumer ? webcamConsumer.spatialLayers : null}
+						consumerTemporalLayers={webcamConsumer ? webcamConsumer.temporalLayers : null}
+						consumerCurrentSpatialLayer={
+							webcamConsumer ? webcamConsumer.currentSpatialLayer : null
+						}
+						consumerCurrentTemporalLayer={
+							webcamConsumer ? webcamConsumer.currentTemporalLayer : null
+						}
+						consumerPreferredSpatialLayer={
+							webcamConsumer ? webcamConsumer.preferredSpatialLayer : null
+						}
+						consumerPreferredTemporalLayer={
+							webcamConsumer ? webcamConsumer.preferredTemporalLayer : null
+						}
+						videoMultiLayer={webcamConsumer && webcamConsumer.type !== 'simple'}
 						videoTrack={webcamConsumer && webcamConsumer.track}
 						videoVisible={videoVisible}
-						videoProfile={videoProfile}
 						audioCodec={micConsumer && micConsumer.codec}
 						videoCodec={webcamConsumer && webcamConsumer.codec}
+						audioScore={micConsumer ? micConsumer.score : null}
+						videoScore={webcamConsumer ? webcamConsumer.score : null}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -456,9 +462,27 @@ const Peer = (props) =>
 							<VideoView
 								advancedMode={advancedMode}
 								videoContain
+								consumerSpatialLayers={
+									screenConsumer ? screenConsumer.spatialLayers : null
+								}
+								consumerTemporalLayers={
+									screenConsumer ? screenConsumer.temporalLayers : null
+								}
+								consumerCurrentSpatialLayer={
+									screenConsumer ? screenConsumer.currentSpatialLayer : null
+								}
+								consumerCurrentTemporalLayer={
+									screenConsumer ? screenConsumer.currentTemporalLayer : null
+								}
+								consumerPreferredSpatialLayer={
+									screenConsumer ? screenConsumer.preferredSpatialLayer : null
+								}
+								consumerPreferredTemporalLayer={
+									screenConsumer ? screenConsumer.preferredTemporalLayer : null
+								}
+								videoMultiLayer={screenConsumer && screenConsumer.type !== 'simple'}
 								videoTrack={screenConsumer && screenConsumer.track}
 								videoVisible={screenVisible}
-								videoProfile={screenProfile}
 								videoCodec={screenConsumer && screenConsumer.codec}
 							/>
 						</div>

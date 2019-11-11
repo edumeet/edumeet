@@ -137,7 +137,15 @@ class VideoView extends React.PureComponent
 			videoContain,
 			advancedMode,
 			videoVisible,
-			videoProfile,
+			videoMultiLayer,
+			// audioScore,
+			// videoScore,
+			// consumerSpatialLayers,
+			// consumerTemporalLayers,
+			consumerCurrentSpatialLayer,
+			consumerCurrentTemporalLayer,
+			consumerPreferredSpatialLayer,
+			consumerPreferredTemporalLayer,
 			audioCodec,
 			videoCodec,
 			onChangeDisplayName,
@@ -161,7 +169,19 @@ class VideoView extends React.PureComponent
 						<div className={classes.box}>
 							{ audioCodec && <p>{audioCodec}</p> }
 
-							{ videoCodec && <p>{videoCodec} {videoProfile}</p> }
+							{ videoCodec &&
+								<p>
+									{videoCodec}
+								</p>
+							}
+
+							{ videoMultiLayer &&
+								<p>
+									{`current spatial-temporal layers: ${consumerCurrentSpatialLayer} ${consumerCurrentTemporalLayer}`}
+									<br />
+									{`preferred spatial-temporal layers: ${consumerPreferredSpatialLayer} ${consumerPreferredTemporalLayer}`}
+								</p>
+							}
 
 							{ (videoVisible && videoWidth !== null) &&
 								<p>{videoWidth}x{videoHeight}</p>
@@ -202,7 +222,6 @@ class VideoView extends React.PureComponent
 					className={classnames(classes.video, {
 						hidden  : !videoVisible,
 						'isMe'  : isMe && !isScreen,
-						loading : videoProfile === 'none',
 						contain : videoContain
 					})}
 					autoPlay
@@ -293,20 +312,28 @@ class VideoView extends React.PureComponent
 
 VideoView.propTypes =
 {
-	isMe     : PropTypes.bool,
-	isScreen : PropTypes.bool,
-	displayName         : PropTypes.string,
-	showPeerInfo        : PropTypes.bool,
-	videoContain        : PropTypes.bool,
-	advancedMode        : PropTypes.bool,
-	videoTrack          : PropTypes.any,
-	videoVisible        : PropTypes.bool.isRequired,
-	videoProfile        : PropTypes.string,
-	audioCodec          : PropTypes.string,
-	videoCodec          : PropTypes.string,
-	onChangeDisplayName : PropTypes.func,
-	children            : PropTypes.object,
-	classes             : PropTypes.object.isRequired
+	isMe                           : PropTypes.bool,
+	isScreen                       : PropTypes.bool,
+	displayName                    : PropTypes.string,
+	showPeerInfo                   : PropTypes.bool,
+	videoContain                   : PropTypes.bool,
+	advancedMode                   : PropTypes.bool,
+	videoTrack                     : PropTypes.any,
+	videoVisible                   : PropTypes.bool.isRequired,
+	consumerSpatialLayers          : PropTypes.number,
+	consumerTemporalLayers         : PropTypes.number,
+	consumerCurrentSpatialLayer    : PropTypes.number,
+	consumerCurrentTemporalLayer   : PropTypes.number,
+	consumerPreferredSpatialLayer  : PropTypes.number,
+	consumerPreferredTemporalLayer : PropTypes.number,
+	videoMultiLayer                : PropTypes.bool,
+	audioScore                     : PropTypes.any,
+	videoScore                     : PropTypes.any,
+	audioCodec                     : PropTypes.string,
+	videoCodec                     : PropTypes.string,
+	onChangeDisplayName            : PropTypes.func,
+	children                       : PropTypes.object,
+	classes                        : PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(VideoView);
