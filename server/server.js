@@ -24,7 +24,7 @@ const {
 // auth
 const passport = require('passport');
 const redis = require('redis');
-const client = redis.createClient();
+const client = redis.createClient(config.redisOptions);
 const { Issuer, Strategy } = require('openid-client');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
