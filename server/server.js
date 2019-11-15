@@ -235,16 +235,19 @@ async function setupAuth(oidcIssuer)
 
 			if (userinfo.given_name != null)
 			{
+				user.name={};
 				user.name.givenName = userinfo.given_name;
 			}
 
 			if (userinfo.family_name != null)
 			{
+				if (user.name == null) user.name={};
 				user.name.familyName = userinfo.family_name;
 			}
 
 			if (userinfo.middle_name != null)
 			{
+				if (user.name == null) user.name={};
 				user.name.middleName = userinfo.middle_name;
 			}
 
