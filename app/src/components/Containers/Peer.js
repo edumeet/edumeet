@@ -31,15 +31,7 @@ const styles = (theme) =>
 			backgroundPosition : 'bottom',
 			backgroundSize     : 'auto 85%',
 			backgroundRepeat   : 'no-repeat',
-			'&.webcam'         :
-			{
-				order : 4
-			},
-			'&.screen' :
-			{
-				order : 3
-			},
-			'&.hover' :
+			'&.hover'          :
 			{
 				boxShadow : '0px 1px 3px rgba(0, 0, 0, 0.05) inset, 0px 0px 8px rgba(82, 168, 236, 0.9)'
 			},
@@ -53,6 +45,15 @@ const styles = (theme) =>
 			{
 				transition : 'filter 10s',
 				filter     : 'grayscale(0.75)'
+			},
+			'&.webcam' :
+			{
+				order : 4
+			},
+			'&.screen' :
+			{
+				order  : 3,
+				filter : 'grayscale(0)'
 			}
 		},
 		fab :
