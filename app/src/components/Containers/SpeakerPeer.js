@@ -190,13 +190,13 @@ SpeakerPeer.propTypes =
 	classes        : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state, props) =>
+const mapStateToProps = (state, { id }) =>
 {
 	const getPeerConsumers = makePeerConsumerSelector();
 
 	return {
-		peer : state.peers[props.id],
-		...getPeerConsumers(state, props)
+		peer : state.peers[id],
+		...getPeerConsumers(state, id)
 	};
 };
 

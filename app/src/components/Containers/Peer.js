@@ -519,17 +519,17 @@ Peer.propTypes =
 	theme                    : PropTypes.object.isRequired
 };
 
-const makeMapStateToProps = (initialState, props) =>
+const makeMapStateToProps = (initialState, { id }) =>
 {
 	const getPeerConsumers = makePeerConsumerSelector();
 
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer           : state.peers[props.id],
-			...getPeerConsumers(state, props),
+			peer           : state.peers[id],
+			...getPeerConsumers(state, id),
 			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : props.id === state.room.activeSpeakerId
+			activeSpeaker  : id === state.room.activeSpeakerId
 		};
 	};
 
