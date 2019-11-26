@@ -27,6 +27,7 @@ import messagesGerman from './translations/de';
 import messagesHungarian from './translations/hu';
 import messagesPolish from './translations/pl';
 import messagesDanish from './translations/dk';
+import messagesFrench from './translations/fr';
 
 import './index.css';
 
@@ -41,7 +42,8 @@ const messages =
 	'de' : messagesGerman,
 	'hu' : messagesHungarian,
 	'pl' : messagesPolish,
-	'dk' : messagesDanish
+	'dk' : messagesDanish,
+	'fr' : messagesFrench
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code
