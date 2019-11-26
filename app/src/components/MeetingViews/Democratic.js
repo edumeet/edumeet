@@ -91,11 +91,11 @@ class Democratic extends React.PureComponent
 				break;
 			}
 		}
-		if (Math.ceil(this.state.peerWidth) !== Math.ceil(0.9 * x))
+		if (Math.ceil(this.state.peerWidth) !== Math.ceil(0.94 * x))
 		{
 			this.setState({
-				peerWidth  : 0.95 * x,
-				peerHeight : 0.95 * y
+				peerWidth  : 0.94 * x,
+				peerHeight : 0.94 * y
 			});
 		}
 	};
@@ -160,9 +160,9 @@ class Democratic extends React.PureComponent
 				{
 					return (
 						<Peer
-							key={peer.id}
+							key={peer}
 							advancedMode={advancedMode}
-							id={peer.id}
+							id={peer}
 							spacing={6}
 							style={style}
 						/>
