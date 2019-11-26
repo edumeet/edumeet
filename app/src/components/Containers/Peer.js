@@ -51,7 +51,7 @@ const styles = (theme) =>
 			},
 			'&:not(.active-speaker)' :
 			{
-				transition : 'filter 2s',
+				transition : 'filter 10s',
 				filter     : 'grayscale(0.75)'
 			}
 		},

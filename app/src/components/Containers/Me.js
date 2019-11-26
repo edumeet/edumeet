@@ -45,7 +45,14 @@ const styles = (theme) =>
 			},
 			'&.active-speaker' :
 			{
+				transition  : 'filter .2s',
+				filter      : 'grayscale(0)',
 				borderColor : 'var(--active-speaker-border-color)'
+			},
+			'&:not(.active-speaker)' :
+			{
+				transition : 'filter 10s',
+				filter     : 'grayscale(0.75)'
 			}
 		},
 		fab :
