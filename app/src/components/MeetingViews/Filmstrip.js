@@ -319,7 +319,7 @@ const mapStateToProps = (state) =>
 		myId             : state.me.id,
 		spotlights       : state.room.spotlights,
 		spotlightsLength : spotlightsLengthSelector(state),
-		boxes            : videoBoxesSelector(state),
+		boxes            : videoBoxesSelector(state)
 	};
 };
 
