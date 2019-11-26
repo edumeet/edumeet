@@ -41,7 +41,7 @@ const styles = (theme) =>
 				filter      : 'grayscale(0)',
 				borderColor : 'var(--active-speaker-border-color)'
 			},
-			'&:not(.active-speaker)' :
+			'&:not(.active-speaker):not(.screen)' :
 			{
 				transition : 'filter 10s',
 				filter     : 'grayscale(0.75)'
@@ -52,8 +52,7 @@ const styles = (theme) =>
 			},
 			'&.screen' :
 			{
-				order  : 3,
-				filter : 'grayscale(0)'
+				order : 3
 			}
 		},
 		fab :
