@@ -30,6 +30,7 @@ import messagesDanish from './translations/dk';
 import messagesFrench from './translations/fr';
 import messagesGreek from './translations/el';
 import messagesRomanian from './translations/ro';
+import messagesPortuguese from './translations/pt';
 
 import './index.css';
 
@@ -47,7 +48,8 @@ const messages =
 	'dk' : messagesDanish,
 	'fr' : messagesFrench,
 	'el' : messagesGreek,
-	'ro' : messagesRomanian
+	'ro' : messagesRomanian,
+        'pt' : messagesPortuguese
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code
