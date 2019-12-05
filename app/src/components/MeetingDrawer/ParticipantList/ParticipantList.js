@@ -100,16 +100,16 @@ class ParticipantList extends React.PureComponent
 							defaultMessage='Participants in Spotlight'
 						/>
 					</li>
-					{ spotlightPeers.map((peer) => (
+					{ spotlightPeers.map((peerId) => (
 						<li
-							key={peer.id}
+							key={peerId}
 							className={classNames(classes.listItem, {
-								selected : peer.id === selectedPeerId
+								selected : peerId === selectedPeerId
 							})}
-							onClick={() => roomClient.setSelectedPeer(peer.id)}
+							onClick={() => roomClient.setSelectedPeer(peerId)}
 						>
-							<ListPeer id={peer.id} advancedMode={advancedMode}>
-								<Volume small id={peer.id} />
+							<ListPeer id={peerId} advancedMode={advancedMode}>
+								<Volume small id={peerId} />
 							</ListPeer>
 						</li>
 					))}
