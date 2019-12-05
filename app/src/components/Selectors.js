@@ -71,14 +71,7 @@ export const spotlightsLengthSelector = createSelector(
 export const spotlightPeersSelector = createSelector(
 	spotlightsSelector,
 	peersKeySelector,
-	(spotlights, peers) =>
-		peers.reduce((result, peerId) =>
-		{
-			if (spotlights.includes(peerId))
-				result.push(peerId);
-
-			return result;
-		}, [])
+	(spotlights, peers) => peers.filter((peerId) => spotlights.includes(peerId))
 );
 
 export const peersLengthSelector = createSelector(
