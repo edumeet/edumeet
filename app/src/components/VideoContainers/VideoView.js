@@ -226,7 +226,6 @@ class VideoView extends React.PureComponent
 					})}
 					autoPlay
 					playsInline
-					muted={isMe}
 				/>
 
 				{children}
