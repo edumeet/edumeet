@@ -59,6 +59,8 @@
 		"eslint": "^6.5.1",
 		"eslint-plugin-import": "^2.18.2",
 		"eslint-plugin-react": "^7.16.0",
-		"foreman": "^3.0.1"
+		"foreman": "^3.0.1",
+		"jest": "^24.9.0",
+		"redux-mock-store": "^1.5.3"
 	}
 }
