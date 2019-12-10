@@ -26,13 +26,22 @@ let ScreenShare;
 
 let Spotlights;
 
-const {
-	turnServers,
+let turnServers,
 	requestTimeout,
 	transportOptions,
 	lastN,
-	mobileLastN
-} = window.config;
+	mobileLastN;
+
+if (process.env.NODE_ENV !== 'test')
+{
+	({
+		turnServers,
+		requestTimeout,
+		transportOptions,
+		lastN,
+		mobileLastN
+	} = window.config);
+}
 
 const logger = new Logger('RoomClient');
 
