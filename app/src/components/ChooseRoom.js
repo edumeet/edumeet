@@ -29,7 +29,7 @@ const styles = (theme) =>
 			width                : '100%',
 			height               : '100%',
 			backgroundColor      : 'var(--background-color)',
-			backgroundImage      : `url(${window.config.background})`,
+			backgroundImage      : `url(${window.config ? window.config.background : null})`,
 			backgroundAttachment : 'fixed',
 			backgroundPosition   : 'center',
 			backgroundSize       : 'cover',
@@ -118,9 +118,9 @@ const DialogTitle = withStyles(styles)((props) =>
 
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+			{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 			<Typography variant='h5'>{children}</Typography>
-			{ window.config.loginEnabled &&
+			{ window.config && window.config.loginEnabled &&
 				<Tooltip
 					onClose={handleTooltipClose}
 					onOpen={handleTooltipOpen}
@@ -191,7 +191,7 @@ const ChooseRoom = ({
 						loggedIn ? roomClient.logout() : roomClient.login();
 					}}
 				>
-					{ window.config.title }
+					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>
