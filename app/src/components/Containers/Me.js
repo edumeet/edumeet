@@ -37,14 +37,14 @@ const styles = (theme) =>
 			},
 			'&.active-speaker' :
 			{
-				transition  : 'filter .2s',
-				filter      : 'grayscale(0)',
+				// transition  : 'filter .2s',
+				// filter      : 'grayscale(0)',
 				borderColor : 'var(--active-speaker-border-color)'
 			},
 			'&:not(.active-speaker):not(.screen)' :
 			{
-				transition : 'filter 10s',
-				filter     : 'grayscale(0.75)'
+				// transition : 'filter 10s',
+				// filter     : 'grayscale(0.75)'
 			},
 			'&.webcam' :
 			{
