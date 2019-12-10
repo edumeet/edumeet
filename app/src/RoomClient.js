@@ -106,8 +106,13 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ peerId, accessCode, device, useSimulcast, produce, forceTcp })
+		{ peerId, accessCode, device, useSimulcast, produce, forceTcp } = {})
 	{
+		if (!peerId)
+			throw new Error('Missing peerId');
+		else if (!device)
+			throw new Error('Missing device');
+
 		logger.debug(
 			'constructor() [peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s"]',
 			peerId, device.flag, useSimulcast, produce, forceTcp);
