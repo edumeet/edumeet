@@ -17,14 +17,17 @@ const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
+
 const {
 	loginHelper,
 	logoutHelper
 } = require('./httpHelper');
 // auth
 const passport = require('passport');
+const LTIStrategy = require('passport-lti');
+const imsLti = require('ims-lti');
 const redis = require('redis');
-const client = redis.createClient(config.redisOptions);
+const redisClient = redis.createClient(config.redisOptions);
 const { Issuer, Strategy } = require('openid-client');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
@@ -87,7 +90,7 @@ const session = expressSession({
 	name              : config.cookieName,
 	resave            : true,
 	saveUninitialized : true,
-	store             : new RedisStore({ client }),
+	store             : new RedisStore({ client: redisClient }),
 	cookie            : {
 		secure   : true,
 		httpOnly : true,
@@ -112,48 +115,25 @@ let io;
 let oidcClient;
 let oidcStrategy;
 
-const auth = config.auth;
-
 async function run()
 {
-	if (
-		typeof(auth) !== 'undefined' &&
-		typeof(auth.issuerURL) !== 'undefined' &&
-		typeof(auth.clientOptions) !== 'undefined'
-	)
+	if ( typeof(config.auth) === 'undefined' )
 	{
-		Issuer.discover(auth.issuerURL).then(async (oidcIssuer) => 
-		{
-			// Setup authentication
-			await setupAuth(oidcIssuer);
-
-			// Run a mediasoup Worker.
-			await runMediasoupWorkers();
-
-			// Run HTTPS server.
-			await runHttpsServer();
-
-			// Run WebSocketServer.
-			await runWebSocketServer();
-		})
-			.catch((err) =>
-			{
-				logger.error(err);
-			});
+		logger.warn('Auth is not configured properly!');
 	}
 	else
 	{
-		logger.error('Auth is not configure properly!');
-
-		// Run a mediasoup Worker.
-		await runMediasoupWorkers();
-
-		// Run HTTPS server.
-		await runHttpsServer();
-
-		// Run WebSocketServer.
-		await runWebSocketServer();
+		await setupAuth();
 	}
+
+	// Run a mediasoup Worker.
+	await runMediasoupWorkers();
+
+	// Run HTTPS server.
+	await runHttpsServer();
+
+	// Run WebSocketServer.
+	await runWebSocketServer();
 
 	// Log rooms status every 30 seconds.
 	setInterval(() =>
@@ -174,21 +154,72 @@ async function run()
 	}, 10000);
 }
 
-async function setupAuth(oidcIssuer)
+function setupLTI(ltiConfig)
 {
-	oidcClient = new oidcIssuer.Client(auth.clientOptions);
+
+	// Add redis nonce store
+	ltiConfig.nonceStore = new imsLti.Stores.RedisStore(ltiConfig.consumerKey, redisClient);
+	ltiConfig.passReqToCallback= true;
+
+	const ltiStrategy = new LTIStrategy(
+		ltiConfig,
+		function(req, lti, done)
+		{
+			// LTI launch parameters
+			if (lti)
+			{
+				const user = {};
+
+				if (lti.user_id && lti.custom_room)
+				{
+					user.id = lti.user_id;
+					user._lti = lti;
+				}
+
+				if (lti.custom_room)
+				{
+					user.room = lti.custom_room;
+				}
+				else
+				{
+					user.room = '';
+				}
+				if (lti.lis_person_name_full)
+				{
+					user.displayName=lti.lis_person_name_full;
+				}
+
+				// Perform local authentication if necessary
+				return done(null, user);
+
+			}
+			else
+			{
+				return done('LTI error');
+			}
+
+		}
+	);
+
+	passport.use('lti', ltiStrategy);
+}
+
+function setupOIDC(oidcIssuer)
+{
+
+	oidcClient = new oidcIssuer.Client(config.auth.oidc.clientOptions);
 
 	// ... any authorization request parameters go here
 	// client_id defaults to client.client_id
 	// redirect_uri defaults to client.redirect_uris[0]
 	// response type defaults to client.response_types[0], then 'code'
 	// scope defaults to 'openid'
-	const params = auth.clientOptions;
-	
+	const params = config.auth.oidc.clientOptions;
+
 	// optional, defaults to false, when true req is passed as a first
 	// argument to verify fn
 	const passReqToCallback = false;
-	
+
 	// optional, defaults to false, when true the code_challenge_method will be
 	// resolved from the issuer configuration, instead of true you may provide
 	// any of the supported values directly, i.e. "S256" (recommended) or "plain"
@@ -257,6 +288,31 @@ async function setupAuth(oidcIssuer)
 
 	passport.use('oidc', oidcStrategy);
 
+}
+
+async function setupAuth()
+{
+	// LTI
+	if (
+		typeof(config.auth.lti) !== 'undefined' &&
+		typeof(config.auth.lti.consumerKey) !== 'undefined' &&
+		typeof(config.auth.lti.consumerSecret) !== 'undefined'
+	) 	setupLTI(config.auth.lti);
+
+	// OIDC
+	if (
+		typeof(config.auth.oidc) !== 'undefined' &&
+		typeof(config.auth.oidc.issuerURL) !== 'undefined' &&
+		typeof(config.auth.oidc.clientOptions) !== 'undefined'
+	)
+	{
+		const oidcIssuer = await Issuer.discover(config.auth.oidc.issuerURL);
+
+		// Setup authentication
+		setupOIDC(oidcIssuer);
+
+	}
+
 	app.use(passport.initialize());
 	app.use(passport.session());
 
@@ -269,6 +325,15 @@ async function setupAuth(oidcIssuer)
 			}))
 		})(req, res, next);
 	});
+
+	// lti launch
+	app.post('/auth/lti',
+		passport.authenticate('lti', { failureRedirect: '/' }),
+		function(req, res)
+		{
+			res.redirect(`/${req.user.room}`);
+		}
+	);
 
 	// logout
 	app.get('/auth/logout', (req, res) =>
@@ -325,6 +390,11 @@ async function runHttpsServer()
 	{
 		if (req.secure)
 		{
+			if (req.isAuthenticated && req.user && req.user._lti)
+			{
+				logger.error(req.user._lti);
+			}
+
 			return next();
 		}
 
