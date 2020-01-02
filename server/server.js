@@ -117,7 +117,7 @@ let oidcStrategy;
 
 async function run()
 {
-	if ( typeof(config.auth) === 'undefined' )
+	if (typeof(config.auth) === 'undefined')
 	{
 		logger.warn('Auth is not configured properly!');
 	}
@@ -397,7 +397,7 @@ async function runHttpsServer()
 				req.user &&
 				req.user.displayName &&
 				!ltiURL.searchParams.get('displayName') &&
-				!is_path_already_taken(req.url)
+				!isPathAlreadyTaken(req.url)
 			)
 			{
 
@@ -427,7 +427,8 @@ async function runHttpsServer()
 	httpServer.listen(config.listeningRedirectPort);
 }
 
-function is_path_already_taken(url) {
+function isPathAlreadyTaken(url)
+{
 	const alreadyTakenPath =
 	[
 		'/config/',
@@ -438,8 +439,9 @@ function is_path_already_taken(url) {
 		'/auth/'
 	];
 
-	alreadyTakenPath.forEach((path) => {
-		if (url.toString().startsWith(path))
+	alreadyTakenPath.forEach((path) =>
+	{
+		if (url.toString.startsWith(path))
 			return true;
 	});
 
