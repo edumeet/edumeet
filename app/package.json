@@ -13,6 +13,7 @@
 		"bowser": "^2.7.0",
 		"dompurify": "^2.0.7",
 		"domready": "^1.0.8",
+		"end-of-stream": "1.4.0",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",
 		"is-electron": "^2.2.0",
@@ -27,7 +28,7 @@
 		"react-intl": "^3.4.0",
 		"react-redux": "^7.1.1",
 		"react-router-dom": "^5.1.2",
-		"react-scripts": "3.2.0",
+		"react-scripts": "^3.3.0",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
 		"redux-persist": "^6.0.0",
@@ -36,7 +37,6 @@
 		"riek": "^1.1.0",
 		"socket.io-client": "^2.3.0",
 		"source-map-explorer": "^2.1.0",
-		"end-of-stream": "1.4.0",
 		"webtorrent": "^0.107.16"
 	},
 	"scripts": {
