@@ -386,24 +386,31 @@ async function runHttpsServer()
 
 	app.use('/.well-known/acme-challenge', express.static('public/.well-known/acme-challenge'));
 
-	app.all('*', (req, res, next) =>
+	app.all('*', async (req, res, next) =>
 	{
 		if (req.secure)
 		{
-			const ltiURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
+			const ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
 
-			if (req.isAuthenticated && req.user && req.user.displayName && !ltiURL.searchParams.get('displayName'))
+			if (
+				req.isAuthenticated &&
+				req.user &&
+				req.user.displayName &&
+				!ltiURL.searchParams.get('displayName') &&
+				!is_path_already_taken(req.url)
+			)
 			{
 
-
 				ltiURL.searchParams.append('displayName', req.user.displayName);
+
 				res.redirect(ltiURL);
 			}
-
-			return next();
+			else
+				return next();
 		}
+		else
+			res.redirect(`https://${req.hostname}${req.url}`);
 
-		res.redirect(`https://${req.hostname}${req.url}`);
 	});
 
 	// Serve all files in the public folder as static files.
@@ -418,6 +425,25 @@ async function runHttpsServer()
 	const httpServer = http.createServer(app);
 
 	httpServer.listen(config.listeningRedirectPort);
+}
+
+function is_path_already_taken(url) {
+	const alreadyTakenPath =
+	[
+		'/config/',
+		'/static/',
+		'/images/',
+		'/sounds/',
+		'/favicon.',
+		'/auth/'
+	];
+
+	alreadyTakenPath.forEach((path) => {
+		if (url.toString().startsWith(path))
+			return true;
+	});
+
+	return false;
 }
 
 /**
