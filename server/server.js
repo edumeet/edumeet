@@ -390,9 +390,14 @@ async function runHttpsServer()
 	{
 		if (req.secure)
 		{
-			if (req.isAuthenticated && req.user && req.user._lti)
+			const ltiURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
+
+			if (req.isAuthenticated && req.user && req.user.displayName && !ltiURL.searchParams.get('displayName'))
 			{
-				logger.error(req.user._lti);
+
+
+				ltiURL.searchParams.append('displayName', req.user.displayName);
+				res.redirect(ltiURL);
 			}
 
 			return next();

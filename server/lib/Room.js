@@ -405,6 +405,27 @@ class Room extends EventEmitter
 
 			case 'join':
 			{
+
+				try
+				{
+					if (peer.socket.handshake.session.passport.user.displayName)
+					{
+						this._notification(
+							peer.socket,
+							'changeDisplayname',
+							{
+								peerId         : peer.id,
+								displayName    : peer.socket.handshake.session.passport.user.displayName,
+								oldDisplayName : ''
+							},
+							true
+						);
+					}
+				}
+				catch (error)
+				{
+					logger.error(error);
+				}
 				// Ensure the Peer is not already joined.
 				if (peer.joined)
 					throw new Error('Peer already joined');

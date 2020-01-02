@@ -106,7 +106,7 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ peerId, accessCode, device, useSimulcast, produce, forceTcp } = {})
+		{ peerId, accessCode, device, useSimulcast, produce, forceTcp, displayName } = {})
 	{
 		if (!peerId)
 			throw new Error('Missing peerId');
@@ -114,8 +114,8 @@ export default class RoomClient
 			throw new Error('Missing device');
 
 		logger.debug(
-			'constructor() [peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s"]',
-			peerId, device.flag, useSimulcast, produce, forceTcp);
+			'constructor() [peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s", displayName ""]',
+			peerId, device.flag, useSimulcast, produce, forceTcp, displayName);
 
 		this._signalingUrl = null;
 
@@ -127,6 +127,9 @@ export default class RoomClient
 
 		// Wheter we force TCP
 		this._forceTcp = forceTcp;
+
+		// Use displayName
+		store.dispatch(settingsActions.setDisplayName(displayName));
 
 		// Torrent support
 		this._torrentSupport = null;
@@ -493,7 +496,7 @@ export default class RoomClient
 
 		store.dispatch(
 			meActions.setDisplayNameInProgress(true));
-		
+
 		try
 		{
 			await this.sendRequest('changeDisplayName', { displayName });
@@ -811,7 +814,7 @@ export default class RoomClient
 			catch (error)
 			{
 				logger.error('unmuteMic() | failed: %o', error);
-	
+
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
@@ -1533,7 +1536,7 @@ export default class RoomClient
 					case 'enteredLobby':
 					{
 						store.dispatch(roomActions.setInLobby(true));
-	
+
 						const { displayName } = store.getState().settings;
 						const { picture } = store.getState().me;
 	
@@ -1702,7 +1705,7 @@ export default class RoomClient
 						store.dispatch(
 							roomActions.setJoinByAccessCode(joinByAccessCode));
 						
-						if (joinByAccessCode) 
+						if (joinByAccessCode)
 						{
 							store.dispatch(requestActions.notify(
 								{
@@ -1742,10 +1745,10 @@ export default class RoomClient
 					case 'changeDisplayName':
 					{
 						const { peerId, displayName, oldDisplayName } = notification.data;
-	
+
 						store.dispatch(
 							peerActions.setPeerDisplayName(displayName, peerId));
-	
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -1756,26 +1759,26 @@ export default class RoomClient
 									displayName
 								})
 							}));
-	
+
 						break;
 					}
-	
+
 					case 'changePicture':
 					{
 						const { peerId, picture } = notification.data;
-	
+
 						store.dispatch(peerActions.setPeerPicture(peerId, picture));
-	
+
 						break;
 					}
-	
+
 					case 'chatMessage':
 					{
 						const { peerId, chatMessage } = notification.data;
-	
+
 						store.dispatch(
 							chatActions.addResponseMessage({ ...chatMessage, peerId }));
-	
+
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
 							(store.getState().toolarea.toolAreaOpen &&
@@ -1786,16 +1789,16 @@ export default class RoomClient
 								roomActions.setToolbarsVisible(true));
 							this._soundNotification();
 						}
-	
+
 						break;
 					}
-	
+
 					case 'sendFile':
 					{
 						const { peerId, magnetUri } = notification.data;
-	
+
 						store.dispatch(fileActions.addFile(peerId, magnetUri));
-	
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -1803,7 +1806,7 @@ export default class RoomClient
 									defaultMessage : 'New file available'
 								})
 							}));
-	
+
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
 							(store.getState().toolarea.toolAreaOpen &&
@@ -1814,27 +1817,27 @@ export default class RoomClient
 								roomActions.setToolbarsVisible(true));
 							this._soundNotification();
 						}
-	
+
 						break;
 					}
-	
+
 					case 'producerScore':
 					{
 						const { producerId, score } = notification.data;
-	
+
 						store.dispatch(
 							producerActions.setProducerScore(producerId, score));
-	
+
 						break;
 					}
-	
+
 					case 'newPeer':
 					{
 						const { id, displayName, picture, device } = notification.data;
-	
+
 						store.dispatch(
 							peerActions.addPeer({ id, displayName, picture, device, consumers: [] }));
-	
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -1844,20 +1847,20 @@ export default class RoomClient
 									displayName
 								})
 							}));
-	
+
 						break;
 					}
-	
+
 					case 'peerClosed':
 					{
 						const { peerId } = notification.data;
-	
+
 						store.dispatch(
 							peerActions.removePeer(peerId));
-	
+
 						break;
 					}
-	
+
 					case 'consumerClosed':
 					{
 						const { consumerId } = notification.data;
@@ -1891,7 +1894,7 @@ export default class RoomClient
 	
 						store.dispatch(
 							consumerActions.setConsumerPaused(consumerId, 'remote'));
-	
+
 						break;
 					}
 	
