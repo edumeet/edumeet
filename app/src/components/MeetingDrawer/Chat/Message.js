@@ -14,7 +14,7 @@ linkRenderer.link = (href, title, text) =>
 	title = title ? title : href;
 	text = text ? text : href;
 	
-	return (`<a target='_blank' href='${ href }' title='${ title }'>${ text }</a>`);
+	return `<a target='_blank' href='${ href }' title='${ title }'>${ text }</a>`;
 };
 
 const styles = (theme) =>
@@ -81,7 +81,11 @@ const Message = (props) =>
 						marked.parse(
 							text,
 							{ renderer: linkRenderer }
-						)
+						),
+						{
+							ALLOWED_TAGS : [ 'a' ],
+							ALLOWED_ATTR : [ 'href', 'target', 'title' ]
+						}
 					) }}
 				/>
 				<Typography variant='caption'>{self ? 'Me' : name} - {time}</Typography>
