@@ -21,7 +21,7 @@ module.exports =
 			redirect_uri  : 'https://client.example.com/auth/callback'
 		}
 	},*/
-	redisOptions: {}
+	redisOptions: {},
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',
 	cookieName   : 'multiparty-meeting.sid',
