@@ -52,7 +52,7 @@ const messages =
 	'el' : messagesGreek,
 	'ro' : messagesRomanian,
 	'pt' : messagesPortuguese,
-	'cn' : messagesChinese,
+	'zh' : messagesChinese,
 	'es' : messagesSpanish
 };
 
