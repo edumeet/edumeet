@@ -160,10 +160,10 @@ export default class RoomClient
 		this._webTorrent = null;
 
 		// Max spotlights
-		if (device.bowser.ios || device.bowser.mobile || device.bowser.android)
-			this._maxSpotlights = mobileLastN;
-		else
+		if (device.bowser.getPlatformType() === 'desktop')
 			this._maxSpotlights = lastN;
+		else
+			this._maxSpotlights = mobileLastN;
 
 		// Manager of spotlight
 		this._spotlights = null;
