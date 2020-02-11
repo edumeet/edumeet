@@ -441,7 +441,7 @@ function isPathAlreadyTaken(url)
 
 	alreadyTakenPath.forEach((path) =>
 	{
-		if (url.toString.startsWith(path))
+		if (url.toString().startsWith(path) )
 			return true;
 	});
 
