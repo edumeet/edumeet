@@ -171,6 +171,7 @@ const TopBar = (props) =>
 				<PulsingBadge
 					color='secondary'
 					badgeContent={unread}
+					onClick={() => toggleToolArea()}
 				>
 					<IconButton
 						color='inherit'
@@ -178,7 +179,6 @@ const TopBar = (props) =>
 							id             : 'label.openDrawer',
 							defaultMessage : 'Open drawer'
 						})}
-						onClick={() => toggleToolArea()}
 						className={classes.menuButton}
 					>
 						<MenuIcon />
