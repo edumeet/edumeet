@@ -258,6 +258,14 @@ class Room extends EventEmitter
 		);
 	}
 
+	async dump()
+	{
+		return {
+			roomId : this._roomId,
+			peers : this._peers.size
+		};
+	}
+
 	get id()
 	{
 		return this._roomId;

@@ -32,6 +32,8 @@ const { Issuer, Strategy } = require('openid-client');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
+const interactiveServer = require('./lib/interactiveServer');
+const interactiveClient = require('./lib/interactiveClient');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -117,6 +119,13 @@ let oidcStrategy;
 
 async function run()
 {
+	// Open the interactive server.
+	await interactiveServer(rooms, peers);
+
+	// Open the interactive client.
+	if (process.env.INTERACTIVE === 'true' || process.env.INTERACTIVE === '1')
+		await interactiveClient();
+
 	if (typeof(config.auth) === 'undefined')
 	{
 		logger.warn('Auth is not configured properly!');
@@ -561,6 +570,7 @@ async function getOrCreateRoom({ roomId })
 		room = await Room.create({ mediasoupWorker, roomId });
 
 		rooms.set(roomId, room);
+
 		room.on('close', () => rooms.delete(roomId));
 	}
 
