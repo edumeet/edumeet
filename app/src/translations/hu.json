@@ -54,8 +54,8 @@
 	"tooltip.admitFromLobby": "Beenegdem az előszobából",
 	"tooltip.lockRoom": "A konferenciába való belépés letiltása",
 	"tooltip.unLockRoom": "konferenciába való belépés engedélyezése",
-	"tooltip.enterFullscreen": "Telejes képernyős mód",
-	"tooltip.leaveFullscreen": "Kilépés telejes képernyős módból",
+	"tooltip.enterFullscreen": "Teljes képernyős mód",
+	"tooltip.leaveFullscreen": "Kilépés teljes képernyős módból",
 	"tooltip.lobby": "Az előszobában várakozók listája",
 	"tooltip.settings": "Beállítások",
 
