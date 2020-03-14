@@ -129,7 +129,8 @@ export default class RoomClient
 		this._forceTcp = forceTcp;
 
 		// Use displayName
-		store.dispatch(settingsActions.setDisplayName(displayName));
+		if (displayName)
+			store.dispatch(settingsActions.setDisplayName(displayName));
 
 		// Torrent support
 		this._torrentSupport = null;
