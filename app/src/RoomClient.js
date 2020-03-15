@@ -889,8 +889,9 @@ export default class RoomClient
 			logger.debug(
 				'changeAudioDevice() | new selected webcam [device:%o]',
 				device);
-			
-			this._micProducer.track.stop();
+
+			if (this._micProducer && this._micProducer.track)
+				this._micProducer.track.stop();
 
 			logger.debug('changeAudioDevice() | calling getUserMedia()');
 
@@ -904,9 +905,11 @@ export default class RoomClient
 
 			const track = stream.getAudioTracks()[0];
 
-			await this._micProducer.replaceTrack({ track });
+			if (this._micProducer)
+				await this._micProducer.replaceTrack({ track });
 
-			this._micProducer.volume = 0;
+			if (this._micProducer)
+				this._micProducer.volume = 0;
 
 			const harkStream = new MediaStream();
 
@@ -942,9 +945,9 @@ export default class RoomClient
 					store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
 				}
 			});
-
-			store.dispatch(
-				producerActions.setProducerTrack(this._micProducer.id, track));
+			if (this._micProducer && this._micProducer.id)
+				store.dispatch(
+					producerActions.setProducerTrack(this._micProducer.id, track));
 
 			store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
 
@@ -2274,7 +2277,7 @@ export default class RoomClient
 		if (this._micProducer)
 			return;
 
-		if (!this._mediasoupDevice.canProduce('audio'))
+		if (this._mediasoupDevice && !this._mediasoupDevice.canProduce('audio'))
 		{
 			logger.error('enableMic() | cannot produce audio');
 
