@@ -112,7 +112,7 @@ passport.deserializeUser((user, done) =>
 	done(null, user);
 });
 
-let httpsServer;
+let mainListener;
 let io;
 let oidcClient;
 let oidcStrategy;
@@ -427,13 +427,22 @@ async function runHttpsServer()
 
 	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
 
-	httpsServer = spdy.createServer(tls, app);
+	if (config.httpOnly === true)
+	{
+		// http
+		mainListener = http.createServer(app);
+	} else {
+		// https
+		mainListener = spdy.createServer(tls, app);
 
-	httpsServer.listen(config.listeningPort);
+		// http
+		const redirectListener = http.createServer(app);
+		redirectListener.listen(config.listeningRedirectPort);
+	}
 
-	const httpServer = http.createServer(app);
+	// https or http
+	mainListener.listen(config.listeningPort);
 
-	httpServer.listen(config.listeningRedirectPort);
 }
 
 function isPathAlreadyTaken(url)
@@ -462,7 +471,7 @@ function isPathAlreadyTaken(url)
  */
 async function runWebSocketServer()
 {
-	io = require('socket.io')(httpsServer);
+	io = require('socket.io')(mainListener);
 
 	io.use(
 		sharedSession(session, {
