@@ -50,7 +50,7 @@ module.exports =
 	// Listens only on http, only on listeningPort
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
-	httpOnly: true,
+	httpOnly: false,
 	// If this is set to true, only signed-in users will be able
 	// to join a room directly. Non-signed-in users (guests) will
 	// always be put in the lobby regardless of room lock status.
