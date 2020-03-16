@@ -2004,7 +2004,8 @@ export default class RoomClient
 						id,
 						iceParameters,
 						iceCandidates,
-						dtlsParameters
+						dtlsParameters,
+						iceServers : ROOM_OPTIONS.turnServers
 					});
 
 				this._sendTransport.on(
