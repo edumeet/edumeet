@@ -171,6 +171,9 @@ export default class RoomClient
 		else
 			this._maxSpotlights = mobileLastN;
 
+		if (store.getState().settings.lastN !== this._maxSpotlights)
+			this._maxSpotlights = store.getState().settings.lastN;
+
 		// Manager of spotlight
 		this._spotlights = null;
 
@@ -821,6 +824,14 @@ export default class RoomClient
 					}));
 			}
 		}
+	}
+
+	changeMaxSpotlights(maxSpotlights)
+	{
+		this._spotlights.maxSpotlights = maxSpotlights;
+
+		store.dispatch(
+			settingsActions.setLastN(maxSpotlights));
 	}
 
 	// Updated consumers based on spotlights

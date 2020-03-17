@@ -26,3 +26,14 @@ export const toggleAdvancedMode = () =>
 	({
 		type : 'TOGGLE_ADVANCED_MODE'
 	});
+
+export const toggleStickyAppBar = () =>
+	({
+		type : 'TOGGLE_STICKY_APPBAR'
+	});
+
+export const setLastN = (lastN) =>
+	({
+		type    : 'SET_LAST_N',
+		payload : { lastN }
+	});

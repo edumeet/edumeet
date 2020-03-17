@@ -198,4 +198,19 @@ export default class Spotlights extends EventEmitter
 
 		return true;
 	}
+
+	get maxSpotlights()
+	{
+		return this._maxSpotlights;
+	}
+
+	set maxSpotlights(maxSpotlights)
+	{
+		const oldMaxSpotlights = this._maxSpotlights;
+
+		this._maxSpotlights = maxSpotlights;
+
+		if (oldMaxSpotlights !== this._maxSpotlights)
+			this._spotlightsUpdated();
+	}
 }

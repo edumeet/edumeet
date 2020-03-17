@@ -59,6 +59,7 @@ const Settings = ({
 	me,
 	settings,
 	onToggleAdvancedMode,
+	onToggleStickyAppBar,
 	handleCloseSettings,
 	handleChangeMode,
 	classes
@@ -296,6 +297,48 @@ const Settings = ({
 					defaultMessage : 'Advanced mode'
 				})}
 			/>
+			{ settings.advancedMode &&
+				<React.Fragment>
+					<form className={classes.setting} autoComplete='off'>
+						<FormControl className={classes.formControl}>
+							<Select
+								value={settings.lastN || ''}
+								onChange={(event) =>
+								{
+									if (event.target.value)
+										roomClient.changeMaxSpotlights(event.target.value);
+								}}
+								name='Last N'
+								autoWidth
+								className={classes.selectEmpty}
+							>
+								{ [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ].map((lastN) =>
+								{
+									return (
+										<MenuItem key={lastN} value={lastN}>
+											{lastN}
+										</MenuItem>
+									);
+								})}
+							</Select>
+							<FormHelperText>
+								<FormattedMessage
+									id='settings.lastn'
+									defaultMessage='Select the amount of speakers visible'
+								/>
+							</FormHelperText>
+						</FormControl>
+					</form>
+					<FormControlLabel
+						className={classes.setting}
+						control={<Checkbox checked={settings.stickyAppBar} onChange={onToggleStickyAppBar} value='stickyAppBar' />}
+						label={intl.formatMessage({
+							id             : 'settings.stickyAppBar',
+							defaultMessage : 'Sticky App Bar'
+						})}
+					/>
+				</React.Fragment>
+			}
 			<DialogActions>
 				<Button onClick={() => handleCloseSettings({ settingsOpen: false })} color='primary'>
 					<FormattedMessage
@@ -315,6 +358,7 @@ Settings.propTypes =
 	room                 : appPropTypes.Room.isRequired,
 	settings             : PropTypes.object.isRequired,
 	onToggleAdvancedMode : PropTypes.func.isRequired,
+	onToggleStickyAppBar : PropTypes.func.isRequired,
 	handleChangeMode     : PropTypes.func.isRequired,
 	handleCloseSettings  : PropTypes.func.isRequired,
 	classes              : PropTypes.object.isRequired
@@ -331,6 +375,7 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = {
 	onToggleAdvancedMode : settingsActions.toggleAdvancedMode,
+	onToggleStickyAppBar : settingsActions.toggleStickyAppBar,
 	handleChangeMode     : roomActions.setDisplayMode,
 	handleCloseSettings  : roomActions.setSettingsOpen
 };

@@ -197,9 +197,13 @@ class Room extends React.PureComponent
 
 				<View advancedMode={advancedMode} />
 
-				<LockDialog />
+				{ room.lockDialogOpen &&
+					<LockDialog />
+				}
 
-				<Settings />
+				{ room.settingsOpen &&
+					<Settings />
+				}
 			</div>
 		);
 	}

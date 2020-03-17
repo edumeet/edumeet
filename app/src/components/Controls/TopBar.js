@@ -116,6 +116,7 @@ const TopBar = (props) =>
 		roomClient,
 		room,
 		lobbyPeers,
+		stickyAppBar,
 		myPicture,
 		loggedIn,
 		loginEnabled,
@@ -165,7 +166,7 @@ const TopBar = (props) =>
 	return (
 		<AppBar
 			position='fixed'
-			className={room.toolbarsVisible ? classes.show : classes.hide}
+			className={room.toolbarsVisible || stickyAppBar ? classes.show : classes.hide}
 		>
 			<Toolbar>
 				<PulsingBadge
@@ -331,6 +332,7 @@ TopBar.propTypes =
 	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
 	lobbyPeers         : PropTypes.array,
+	stickyAppBar       : PropTypes.bool,
 	myPicture          : PropTypes.string,
 	loggedIn           : PropTypes.bool.isRequired,
 	loginEnabled       : PropTypes.bool.isRequired,
@@ -350,7 +352,7 @@ const mapStateToProps = (state) =>
 	({
 		room         : state.room,
 		lobbyPeers   : lobbyPeersKeySelector(state),
-		advancedMode : state.settings.advancedMode,
+		stickyAppBar : state.settings.stickyAppBar,
 		loggedIn     : state.me.loggedIn,
 		loginEnabled : state.me.loginEnabled,
 		myPicture    : state.me.picture,
@@ -388,6 +390,7 @@ export default withRoomContext(connect(
 			return (
 				prev.room === next.room &&
 				prev.lobbyPeers === next.lobbyPeers &&
+				prev.settings.stickyAppBar === next.settings.stickyAppBar &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&
