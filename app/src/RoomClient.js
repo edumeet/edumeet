@@ -290,6 +290,7 @@ export default class RoomClient
 						break;
 					}
 
+					case ' ':
 					case 'm': // Toggle microphone
 					{
 						if (this._micProducer)
