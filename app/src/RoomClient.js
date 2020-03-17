@@ -106,7 +106,7 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ peerId, accessCode, device, useSimulcast, produce, forceTcp, displayName } = {})
+		{ peerId, accessCode, device, useSimulcast, produce, forceTcp, displayName, muted } = {})
 	{
 		if (!peerId)
 			throw new Error('Missing peerId');
@@ -137,6 +137,8 @@ export default class RoomClient
 
 		// Whether simulcast should be used.
 		this._useSimulcast = useSimulcast;
+
+		this._muted = muted;
 
 		// This device
 		this._device = device;
@@ -2112,7 +2114,8 @@ export default class RoomClient
 			if (this._produce)
 			{
 				if (this._mediasoupDevice.canProduce('audio'))
-					this.enableMic();
+					if (!this._muted)
+						this.enableMic();
 
 				if (joinVideo && this._mediasoupDevice.canProduce('video'))
 					this.enableWebcam();

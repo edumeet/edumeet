@@ -105,6 +105,7 @@ function run()
 	const useSimulcast = parameters.get('simulcast') === 'true';
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
+	const muted = parameters.get('muted') === 'true';
 	
 	// Get current device.
 	const device = deviceInfo();
@@ -117,7 +118,7 @@ function run()
 	);
 
 	roomClient = new RoomClient(
-		{ peerId, accessCode, device, useSimulcast, produce, forceTcp, displayName });
+		{ peerId, accessCode, device, useSimulcast, produce, forceTcp, displayName, muted });
 
 	global.CLIENT = roomClient;
 
