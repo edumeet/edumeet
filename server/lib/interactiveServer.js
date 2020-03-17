@@ -32,9 +32,6 @@ class Interactive
 
 	openCommandConsole()
 	{
-		this.log('\n[opening Readline Command Console...]');
-		this.log('type help to print available commands');
-
 		const cmd = readline.createInterface(
 			{
 				input    : this._socket,
@@ -158,6 +155,13 @@ class Interactive
 						{
 							this.error(String(error));
 						}
+
+						break;
+					}
+
+					case 'stats':
+					{
+						this.log(`rooms:${global.rooms.size}\npeers:${global.peers.size}`);
 
 						break;
 					}
@@ -572,12 +576,22 @@ class Interactive
 
 	log(msg)
 	{
-		this._socket.write(`${colors.green(msg)}\n`);
+		try
+		{
+			this._socket.write(`${colors.green(msg)}\n`);
+		}
+		catch (error)
+		{}
 	}
 
 	error(msg)
 	{
-		this._socket.write(`${colors.red.bold('ERROR: ')}${colors.red(msg)}\n`);
+		try
+		{
+			this._socket.write(`${colors.red.bold('ERROR: ')}${colors.red(msg)}\n`);
+		}
+		catch (error)
+		{}
 	}
 }
 

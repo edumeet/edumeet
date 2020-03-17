@@ -14,6 +14,14 @@ module.exports = async function()
 	socket.pipe(process.stdout);
 
 	socket.on('connect', () => process.stdin.setRawMode(true));
+
 	socket.on('close', () => process.exit(0));
 	socket.on('exit', () => socket.end());
+
+	if (process.argv && process.argv[2] === '--stats')
+	{
+		await socket.write('stats\n');
+
+		socket.end();
+	}
 };
