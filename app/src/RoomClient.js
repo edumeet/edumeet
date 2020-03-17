@@ -661,13 +661,6 @@ export default class RoomClient
 
 		this._webTorrent.seed(files, (torrent) =>
 		{
-			const existingTorrent = this._webTorrent.get(torrent);
-
-			if (existingTorrent)
-			{
-				return this._sendFile(existingTorrent.magnetURI);
-			}
-
 			store.dispatch(requestActions.notify(
 				{
 					text : intl.formatMessage({
