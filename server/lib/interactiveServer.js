@@ -663,32 +663,37 @@ function runMediasoupObserver()
 
 module.exports = async function(rooms, peers)
 {
-	// Run the mediasoup observer API.
-	runMediasoupObserver();
-
-	// Make maps global so they can be used during the REPL terminal.
-	global.rooms = rooms;
-	global.peers = peers;
-	global.workers = workers;
-	global.routers = routers;
-	global.transports = transports;
-	global.producers = producers;
-	global.consumers = consumers;
-	global.dataProducers = dataProducers;
-	global.dataConsumers = dataConsumers;
-
-	const server = net.createServer((socket) =>
+	try
 	{
-		const interactive = new Interactive(socket);
+		// Run the mediasoup observer API.
+		runMediasoupObserver();
 
-		interactive.openCommandConsole();
-	});
+		// Make maps global so they can be used during the REPL terminal.
+		global.rooms = rooms;
+		global.peers = peers;
+		global.workers = workers;
+		global.routers = routers;
+		global.transports = transports;
+		global.producers = producers;
+		global.consumers = consumers;
+		global.dataProducers = dataProducers;
+		global.dataConsumers = dataConsumers;
 
-	await new Promise((resolve) =>
-	{
-		try { fs.unlinkSync(SOCKET_PATH); }
-		catch (error) {}
+		const server = net.createServer((socket) =>
+		{
+			const interactive = new Interactive(socket);
 
-		server.listen(SOCKET_PATH, resolve);
-	});
+			interactive.openCommandConsole();
+		});
+
+		await new Promise((resolve) =>
+		{
+			try { fs.unlinkSync(SOCKET_PATH); }
+			catch (error) {}
+
+			server.listen(SOCKET_PATH, resolve);
+		});
+	}
+	catch (error)
+	{}
 };
