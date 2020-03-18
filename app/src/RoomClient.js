@@ -2484,9 +2484,9 @@ export default class RoomClient
 			logger.debug('enableScreenSharing() | calling getUserMedia()');
 
 			const stream = await this._screenSharing.start({
-				width     : 1280,
-				height    : 720,
-				frameRate : 3
+				width     : 1920,
+				height    : 1080,
+				frameRate : 5
 			});
 
 			track = stream.getVideoTracks()[0];

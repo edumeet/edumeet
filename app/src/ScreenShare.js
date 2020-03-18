@@ -101,11 +101,24 @@ class DisplayMediaScreenShare
 		return true;
 	}
 
-	_toConstraints()
+	_toConstraints(options)
 	{
 		const constraints = {
-			video : true
+			video : {}
 		};
+
+		if (isFinite(options.width))
+		{
+			constraints.video.width = options.width;
+		}
+		if (isFinite(options.height))
+		{
+			constraints.video.height = options.height;
+		}
+		if (isFinite(options.frameRate))
+		{
+			constraints.video.frameRate = options.frameRate;
+		}
 
 		return constraints;
 	}
