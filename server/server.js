@@ -33,7 +33,6 @@ const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
 const interactiveServer = require('./lib/interactiveServer');
-const interactiveClient = require('./lib/interactiveClient');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -121,10 +120,6 @@ async function run()
 {
 	// Open the interactive server.
 	await interactiveServer(rooms, peers);
-
-	// Open the interactive client.
-	if (process.env.INTERACTIVE === 'true' || process.env.INTERACTIVE === '1')
-		await interactiveClient();
 
 	if (typeof(config.auth) === 'undefined')
 	{
