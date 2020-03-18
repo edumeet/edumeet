@@ -30,7 +30,8 @@ let turnServers,
 	requestTimeout,
 	transportOptions,
 	lastN,
-	mobileLastN;
+	mobileLastN,
+	defaultResolution;
 
 if (process.env.NODE_ENV !== 'test')
 {
@@ -39,7 +40,8 @@ if (process.env.NODE_ENV !== 'test')
 		requestTimeout,
 		transportOptions,
 		lastN,
-		mobileLastN
+		mobileLastN,
+		defaultResolution
 	} = window.config);
 }
 
@@ -164,6 +166,9 @@ export default class RoomClient
 
 		// Our WebTorrent client
 		this._webTorrent = null;
+
+		if (defaultResolution)
+			store.dispatch(settingsActions.setVideoResolution(defaultResolution));
 
 		// Max spotlights
 		if (device.bowser.getPlatformType() === 'desktop')

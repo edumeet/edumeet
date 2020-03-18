@@ -14,8 +14,17 @@ var config =
 			credential : 'example'
 		}
 	],
-	requestTimeout   : 10000,
-	transportOptions :
+	/**
+	 * If defaultResolution is set, it will override user settings when joining:
+	 * low ~ 320x240
+	 * medium ~ 640x480
+	 * high ~ 1280x720
+	 * veryhigh ~ 1920x1080
+	 * ultra ~ 3840x2560
+	 **/
+	defaultResolution : 'medium',
+	requestTimeout    : 10000,
+	transportOptions  :
 	{
 		tcp : true
 	},
