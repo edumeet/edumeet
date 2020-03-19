@@ -291,7 +291,6 @@ function setupOIDC(oidcIssuer)
 	);
 
 	passport.use('oidc', oidcStrategy);
-
 }
 
 async function setupAuth()
@@ -426,18 +425,20 @@ async function runHttpsServer()
 	{
 		// http
 		mainListener = http.createServer(app);
-	} else {
+	}
+	else
+	{
 		// https
 		mainListener = spdy.createServer(tls, app);
 
 		// http
 		const redirectListener = http.createServer(app);
+
 		redirectListener.listen(config.listeningRedirectPort);
 	}
 
 	// https or http
 	mainListener.listen(config.listeningPort);
-
 }
 
 function isPathAlreadyTaken(url)
@@ -454,7 +455,7 @@ function isPathAlreadyTaken(url)
 
 	alreadyTakenPath.forEach((path) =>
 	{
-		if (url.toString().startsWith(path) )
+		if (url.toString().startsWith(path))
 			return true;
 	});
 
