@@ -32,8 +32,7 @@ module.exports =
 		}
 	},
 	*/
-
-	redisOptions: {},
+	redisOptions : {},
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',
 	cookieName   : 'multiparty-meeting.sid',
@@ -50,7 +49,7 @@ module.exports =
 	// Listens only on http, only on listeningPort
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
-	httpOnly: false,
+	httpOnly              : false,
 	// If this is set to true, only signed-in users will be able
 	// to join a room directly. Non-signed-in users (guests) will
 	// always be put in the lobby regardless of room lock status.
@@ -92,6 +91,37 @@ module.exports =
 					mimeType  : 'audio/opus',
 					clockRate : 48000,
 					channels  : 2
+				},
+				{
+					kind       : 'video',
+					mimeType   : 'video/VP8',
+					clockRate  : 90000,
+					parameters :
+					{
+						'x-google-start-bitrate' : 1000
+					}
+				},
+				{
+					kind       : 'video',
+					mimeType   : 'video/VP9',
+					clockRate  : 90000,
+					parameters :
+					{
+						'profile-id'             : 2,
+						'x-google-start-bitrate' : 1000
+					}
+				},
+				{
+					kind       : 'video',
+					mimeType   : 'video/h264',
+					clockRate  : 90000,
+					parameters :
+					{
+						'packetization-mode'      : 1,
+						'profile-level-id'        : '4d0032',
+						'level-asymmetry-allowed' : 1,
+						'x-google-start-bitrate'  : 1000
+					}
 				},
 				{
 					kind       : 'video',
