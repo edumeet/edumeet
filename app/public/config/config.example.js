@@ -62,6 +62,17 @@ var config =
 						backgroundColor : '#518029'
 					}
 				}
+			},
+			MuiBadge :
+			{
+				colorPrimary :
+				{
+					backgroundColor : '#5F9B2D',
+					'&:hover'       :
+					{
+						backgroundColor : '#518029'
+					}
+				}
 			}
 		},
 		typography :
