@@ -118,8 +118,10 @@ module.exports =
 				// Can have multiple listening interfaces
 				// { ip: '::/0', announcedIp: null }
 			],
-			maxIncomingBitrate              : 1500000,
-			initialAvailableOutgoingBitrate : 1000000
+			initialAvailableOutgoingBitrate : 1000000,
+			minimumAvailableOutgoingBitrate : 600000,
+			// Additional options that are not part of WebRtcTransportOptions.
+			maxIncomingBitrate              : 1500000
 		}
 	}
 };
