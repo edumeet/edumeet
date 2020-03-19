@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
-	lobbyPeersKeySelector
+	lobbyPeersKeySelector,
+	peersLengthSelector
 } from '../Selectors';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
@@ -22,6 +23,7 @@ import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import SettingsIcon from '@material-ui/icons/Settings';
 import SecurityIcon from '@material-ui/icons/Security';
+import PeopleIcon from '@material-ui/icons/People';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import Button from '@material-ui/core/Button';
@@ -115,6 +117,7 @@ const TopBar = (props) =>
 	const {
 		roomClient,
 		room,
+		peersLength,
 		lobbyPeers,
 		stickyAppBar,
 		myPicture,
@@ -126,6 +129,7 @@ const TopBar = (props) =>
 		setSettingsOpen,
 		setLockDialogOpen,
 		toggleToolArea,
+		openUsersTab,
 		unread,
 		classes
 	} = props;
@@ -247,6 +251,28 @@ const TopBar = (props) =>
 							</IconButton>
 						</Tooltip>
 					}
+					<Tooltip 
+						title={intl.formatMessage({
+							id             : 'tooltip.participants',
+							defaultMessage : 'Show participants'
+						})}
+					>
+						<IconButton
+							aria-label={intl.formatMessage({
+								id             : 'tooltip.participants',
+								defaultMessage : 'Show participants'
+							})}
+							color='inherit'
+							onClick={() => openUsersTab()}
+						>
+							<Badge
+								color='primary'
+								badgeContent={peersLength + 1}
+							>
+								<PeopleIcon />
+							</Badge>
+						</IconButton>
+					</Tooltip>
 					{ fullscreenEnabled &&
 						<Tooltip title={fullscreenTooltip}>
 							<IconButton
@@ -331,6 +357,7 @@ TopBar.propTypes =
 {
 	roomClient         : PropTypes.object.isRequired,
 	room               : appPropTypes.Room.isRequired,
+	peersLength        : PropTypes.number,
 	lobbyPeers         : PropTypes.array,
 	stickyAppBar       : PropTypes.bool,
 	myPicture          : PropTypes.string,
@@ -343,6 +370,7 @@ TopBar.propTypes =
 	setSettingsOpen    : PropTypes.func.isRequired,
 	setLockDialogOpen  : PropTypes.func.isRequired,
 	toggleToolArea     : PropTypes.func.isRequired,
+	openUsersTab       : PropTypes.func.isRequired,
 	unread             : PropTypes.number.isRequired,
 	classes            : PropTypes.object.isRequired,
 	theme              : PropTypes.object.isRequired
@@ -351,6 +379,7 @@ TopBar.propTypes =
 const mapStateToProps = (state) =>
 	({
 		room         : state.room,
+		peersLength  : peersLengthSelector(state),
 		lobbyPeers   : lobbyPeersKeySelector(state),
 		stickyAppBar : state.settings.stickyAppBar,
 		loggedIn     : state.me.loggedIn,
@@ -377,6 +406,11 @@ const mapDispatchToProps = (dispatch) =>
 		toggleToolArea : () =>
 		{
 			dispatch(toolareaActions.toggleToolArea());
+		},
+		openUsersTab : () =>
+		{
+			dispatch(toolareaActions.openToolArea());
+			dispatch(toolareaActions.setToolTab('users'));
 		}
 	});
 
@@ -389,6 +423,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room === next.room &&
+				prev.peers === next.peers &&
 				prev.lobbyPeers === next.lobbyPeers &&
 				prev.settings.stickyAppBar === next.settings.stickyAppBar &&
 				prev.me.loggedIn === next.me.loggedIn &&

@@ -2,16 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
 	spotlightPeersSelector,
-	peersLengthSelector,
-	videoBoxesSelector,
-	spotlightsLengthSelector
+	videoBoxesSelector
 } from '../Selectors';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Peer from '../Containers/Peer';
 import Me from '../Containers/Me';
-import HiddenPeers from '../Containers/HiddenPeers';
 
 const RATIO = 1.334;
 const PADDING_V = 50;
@@ -130,9 +127,7 @@ class Democratic extends React.PureComponent
 	{
 		const {
 			advancedMode,
-			peersLength,
 			spotlightsPeers,
-			spotlightsLength,
 			toolbarsVisible,
 			stickyAppBar,
 			classes
@@ -169,11 +164,6 @@ class Democratic extends React.PureComponent
 						/>
 					);
 				})}
-				{ spotlightsLength < peersLength &&
-					<HiddenPeers
-						hiddenPeersCount={peersLength - spotlightsLength}
-					/>
-				}
 			</div>
 		);
 	}
@@ -182,9 +172,7 @@ class Democratic extends React.PureComponent
 Democratic.propTypes =
 {
 	advancedMode     : PropTypes.bool,
-	peersLength      : PropTypes.number,
 	boxes            : PropTypes.number,
-	spotlightsLength : PropTypes.number,
 	spotlightsPeers  : PropTypes.array.isRequired,
 	toolbarsVisible  : PropTypes.bool.isRequired,
 	stickyAppBar     : PropTypes.bool,
@@ -194,12 +182,10 @@ Democratic.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		peersLength      : peersLengthSelector(state),
-		boxes            : videoBoxesSelector(state),
-		spotlightsPeers  : spotlightPeersSelector(state),
-		spotlightsLength : spotlightsLengthSelector(state),
-		toolbarsVisible  : state.room.toolbarsVisible,
-		stickyAppBar     : state.settings.stickyAppBar
+		boxes           : videoBoxesSelector(state),
+		spotlightsPeers : spotlightPeersSelector(state),
+		toolbarsVisible : state.room.toolbarsVisible,
+		stickyAppBar    : state.settings.stickyAppBar
 	};
 };
 
