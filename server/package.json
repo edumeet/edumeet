@@ -24,7 +24,7 @@
 		"express-socket.io-session": "^1.3.5",
 		"helmet": "^3.21.2",
 		"ims-lti": "^3.0.2",
-		"mediasoup": "^3.0.12",
+		"mediasoup": "^3.5.5",
 		"openid-client": "^3.7.3",
 		"passport": "^0.4.0",
 		"passport-lti": "0.0.7",
