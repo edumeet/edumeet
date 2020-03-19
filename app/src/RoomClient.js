@@ -196,8 +196,8 @@ export default class RoomClient
 		else
 			this._maxSpotlights = mobileLastN;
 
-		if (store.getState().settings.lastN !== this._maxSpotlights)
-			this._maxSpotlights = store.getState().settings.lastN;
+		store.dispatch(
+			settingsActions.setLastN(this._maxSpotlights));
 
 		// Manager of spotlight
 		this._spotlights = null;
