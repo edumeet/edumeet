@@ -17,6 +17,11 @@ Try it online at https://letsmeet.no. You can add /roomname to the URL for speci
 ## Docker
 If you want the automatic approach, you can find a docker image [here](https://hub.docker.com/r/misi/mm/).
 
+## Ansible 
+If you want the ansible approach, you can find ansible role [here](https://github.com/misi/mm-ansible/).
+[![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
+
+
 ## Manual installation
 
 * Clone the project:
