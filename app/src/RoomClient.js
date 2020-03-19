@@ -83,11 +83,28 @@ const VIDEO_CONSTRAINS =
 	}
 };
 
-const VIDEO_ENCODINGS =
+const PC_PROPRIETARY_CONSTRAINTS =
+{
+	optional : [ { googDscp: true } ]
+};
+
+const VIDEO_SIMULCAST_ENCODINGS =
 [
-	{ maxBitrate: 180000, scaleResolutionDownBy: 4 },
-	{ maxBitrate: 360000, scaleResolutionDownBy: 2 },
-	{ maxBitrate: 1500000, scaleResolutionDownBy: 1 }
+	{ scaleResolutionDownBy: 4 },
+	{ scaleResolutionDownBy: 2 },
+	{ scaleResolutionDownBy: 1 }
+];
+
+// Used for VP9 webcam video.
+const VIDEO_KSVC_ENCODINGS =
+[
+	{ scalabilityMode: 'S3T3_KEY' }
+];
+
+// Used for VP9 desktop sharing.
+const VIDEO_SVC_ENCODINGS =
+[
+	{ scalabilityMode: 'S3T3', dtx: true }
 ];
 
 let store;
@@ -108,7 +125,7 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ peerId, accessCode, device, useSimulcast, produce, forceTcp, displayName, muted } = {})
+		{ peerId, accessCode, device, useSimulcast, useSharingSimulcast, produce, forceTcp, displayName, muted } = {})
 	{
 		if (!peerId)
 			throw new Error('Missing peerId');
@@ -139,6 +156,9 @@ export default class RoomClient
 
 		// Whether simulcast should be used.
 		this._useSimulcast = useSimulcast;
+
+		// Whether simulcast should be used for sharing
+		this._useSharingSimulcast = useSharingSimulcast;
 
 		this._muted = muted;
 
@@ -1235,7 +1255,7 @@ export default class RoomClient
 		{
 			if (this._webcamProducer)
 				await this._webcamProducer.setMaxSpatialLayer(spatialLayer);
-			else if (this._screenSharingProducer)
+			if (this._screenSharingProducer)
 				await this._screenSharingProducer.setMaxSpatialLayer(spatialLayer);
 		}
 		catch (error)
@@ -1261,6 +1281,38 @@ export default class RoomClient
 		catch (error)
 		{
 			logger.error('setConsumerPreferredLayers() | failed:"%o"', error);
+		}
+	}
+
+	async setConsumerPriority(consumerId, priority)
+	{
+		logger.debug(
+			'setConsumerPriority() [consumerId:%s, priority:%d]',
+			consumerId, priority);
+
+		try
+		{
+			await this.sendRequest('setConsumerPriority', { consumerId, priority });
+
+			store.dispatch(consumerActions.setConsumerPriority(consumerId, priority));
+		}
+		catch (error)
+		{
+			logger.error('setConsumerPriority() | failed:%o', error);
+		}
+	}
+
+	async requestConsumerKeyFrame(consumerId)
+	{
+		logger.debug('requestConsumerKeyFrame() [consumerId:%s]', consumerId);
+
+		try
+		{
+			await this.sendRequest('requestConsumerKeyFrame', { consumerId });
+		}
+		catch (error)
+		{
+			logger.error('requestConsumerKeyFrame() | failed:%o', error);
 		}
 	}
 
@@ -1481,6 +1533,7 @@ export default class RoomClient
 							temporalLayers         : temporalLayers,
 							preferredSpatialLayer  : spatialLayers - 1,
 							preferredTemporalLayer : temporalLayers - 1,
+							priority               : 1,
 							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
 							track                  : consumer.track
 						},
@@ -1849,10 +1902,10 @@ export default class RoomClient
 
 					case 'newPeer':
 					{
-						const { id, displayName, picture, device } = notification.data;
+						const { id, displayName, picture } = notification.data;
 
 						store.dispatch(
-							peerActions.addPeer({ id, displayName, picture, device, consumers: [] }));
+							peerActions.addPeer({ id, displayName, picture, consumers: [] }));
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2017,7 +2070,8 @@ export default class RoomClient
 						iceParameters,
 						iceCandidates,
 						dtlsParameters,
-						iceServers : ROOM_OPTIONS.turnServers
+						iceServers             : ROOM_OPTIONS.turnServers,
+						proprietaryConstraints : PC_PROPRIETARY_CONSTRAINTS
 					});
 
 				this._sendTransport.on(
@@ -2034,18 +2088,26 @@ export default class RoomClient
 					});
 
 				this._sendTransport.on(
-					'produce', ({ kind, rtpParameters, appData }, callback, errback) =>
+					'produce', async ({ kind, rtpParameters, appData }, callback, errback) =>
 					{
-						this.sendRequest(
-							'produce',
-							{
-								transportId : this._sendTransport.id,
-								kind,
-								rtpParameters,
-								appData
-							})
-							.then(callback)
-							.catch(errback);
+						try
+						{
+							// eslint-disable-next-line no-shadow
+							const { id } = await this.sendRequest(
+								'produce',
+								{
+									transportId : this._sendTransport.id,
+									kind,
+									rtpParameters,
+									appData
+								});
+
+							callback({ id });
+						}
+						catch (error)
+						{
+							errback(error);
+						}
 					});
 			}
 
@@ -2496,12 +2558,30 @@ export default class RoomClient
 
 			track = stream.getVideoTracks()[0];
 
-			if (this._useSimulcast)
+			if (this._useSharingSimulcast)
 			{
+				// If VP9 is the only available video codec then use SVC.
+				const firstVideoCodec = this._mediasoupDevice
+					.rtpCapabilities
+					.codecs
+					.find((c) => c.kind === 'video');
+
+				let encodings;
+
+				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+				{
+					encodings = VIDEO_SVC_ENCODINGS;
+				}
+				else
+				{
+					encodings = VIDEO_SIMULCAST_ENCODINGS
+						.map((encoding) => ({ ...encoding, dtx: true }));
+				}
+
 				this._screenSharingProducer = await this._sendTransport.produce(
 					{
 						track,
-						encodings    : VIDEO_ENCODINGS,
+						encodings,
 						codecOptions :
 						{
 							videoGoogleStartBitrate : 1000
@@ -2652,10 +2732,23 @@ export default class RoomClient
 
 			if (this._useSimulcast)
 			{
+				// If VP9 is the only available video codec then use SVC.
+				const firstVideoCodec = this._mediasoupDevice
+					.rtpCapabilities
+					.codecs
+					.find((c) => c.kind === 'video');
+
+				let encodings;
+
+				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+					encodings = VIDEO_KSVC_ENCODINGS;
+				else
+					encodings = VIDEO_SIMULCAST_ENCODINGS;
+
 				this._webcamProducer = await this._sendTransport.produce(
 					{
 						track,
-						encodings    : VIDEO_ENCODINGS,
+						encodings,
 						codecOptions :
 						{
 							videoGoogleStartBitrate : 1000

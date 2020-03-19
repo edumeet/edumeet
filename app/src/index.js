@@ -102,7 +102,8 @@ function run()
 
 	const accessCode = parameters.get('code');
 	const produce = parameters.get('produce') !== 'false';
-	const useSimulcast = parameters.get('simulcast') === 'true';
+	const useSimulcast = parameters.get('simulcast') !== 'false';
+	const useSharingSimulcast = parameters.get('sharingSimulcast') === 'true';
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
@@ -118,7 +119,17 @@ function run()
 	);
 
 	roomClient = new RoomClient(
-		{ peerId, accessCode, device, useSimulcast, produce, forceTcp, displayName, muted });
+		{
+			peerId,
+			accessCode,
+			device,
+			useSimulcast,
+			useSharingSimulcast,
+			produce,
+			forceTcp,
+			displayName,
+			muted
+		});
 
 	global.CLIENT = roomClient;
 
