@@ -110,7 +110,7 @@ const room = (state = initialState, action) =>
 
 		case 'TOGGLE_JOINED':
 		{
-			const joined = !state.joined;
+			const joined = true;
 
 			return { ...state, joined };
 		}
