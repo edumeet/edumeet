@@ -1,5 +1,9 @@
 # Changelog
 
+### Next Version
+ * Add munin plugin
+ * Add muted=true search param to disble audio by deffault
+
 ### 3.1
 * Browser session storage
 * Virtual lobby for rooms
