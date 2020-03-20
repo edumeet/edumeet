@@ -45,6 +45,10 @@ const styles = (theme) =>
 				display : 'block'
 			}
 		},
+		divider :
+		{
+			marginLeft : theme.spacing(3),
+		},
 		show :
 		{
 			opacity    : 1,
@@ -200,6 +204,65 @@ const TopBar = (props) =>
 				</Typography>
 				<div className={classes.grow} />
 				<div className={classes.actionButtons}>
+					{ fullscreenEnabled &&
+						<Tooltip title={fullscreenTooltip}>
+							<IconButton
+								aria-label={intl.formatMessage({
+									id             : 'tooltip.enterFullscreen',
+									defaultMessage : 'Enter fullscreen'
+								})}
+								className={classes.actionButton}
+								color='inherit'
+								onClick={onFullscreen}
+							>
+								{ fullscreen ?
+									<FullScreenExitIcon />
+									:
+									<FullScreenIcon />
+								}
+							</IconButton>
+						</Tooltip>
+					}
+					<Tooltip 
+						title={intl.formatMessage({
+							id             : 'tooltip.participants',
+							defaultMessage : 'Show participants'
+						})}
+					>
+						<IconButton
+							aria-label={intl.formatMessage({
+								id             : 'tooltip.participants',
+								defaultMessage : 'Show participants'
+							})}
+							color='inherit'
+							onClick={() => openUsersTab()}
+						>
+							<Badge
+								color='primary'
+								badgeContent={peersLength + 1}
+							>
+								<PeopleIcon />
+							</Badge>
+						</IconButton>
+					</Tooltip>
+					<Tooltip
+						title={intl.formatMessage({
+							id             : 'tooltip.settings',
+							defaultMessage : 'Show settings'
+						})}
+					>
+						<IconButton
+							aria-label={intl.formatMessage({
+								id             : 'tooltip.settings',
+								defaultMessage : 'Show settings'
+							})}
+							className={classes.actionButton}
+							color='inherit'
+							onClick={() => setSettingsOpen(!room.settingsOpen)}
+						>
+							<SettingsIcon />
+						</IconButton>
+					</Tooltip>
 					<Tooltip title={lockTooltip}>
 						<IconButton
 							aria-label={intl.formatMessage({
@@ -251,65 +314,6 @@ const TopBar = (props) =>
 							</IconButton>
 						</Tooltip>
 					}
-					<Tooltip 
-						title={intl.formatMessage({
-							id             : 'tooltip.participants',
-							defaultMessage : 'Show participants'
-						})}
-					>
-						<IconButton
-							aria-label={intl.formatMessage({
-								id             : 'tooltip.participants',
-								defaultMessage : 'Show participants'
-							})}
-							color='inherit'
-							onClick={() => openUsersTab()}
-						>
-							<Badge
-								color='primary'
-								badgeContent={peersLength + 1}
-							>
-								<PeopleIcon />
-							</Badge>
-						</IconButton>
-					</Tooltip>
-					{ fullscreenEnabled &&
-						<Tooltip title={fullscreenTooltip}>
-							<IconButton
-								aria-label={intl.formatMessage({
-									id             : 'tooltip.enterFullscreen',
-									defaultMessage : 'Enter fullscreen'
-								})}
-								className={classes.actionButton}
-								color='inherit'
-								onClick={onFullscreen}
-							>
-								{ fullscreen ?
-									<FullScreenExitIcon />
-									:
-									<FullScreenIcon />
-								}
-							</IconButton>
-						</Tooltip>
-					}
-					<Tooltip
-						title={intl.formatMessage({
-							id             : 'tooltip.settings',
-							defaultMessage : 'Show settings'
-						})}
-					>
-						<IconButton
-							aria-label={intl.formatMessage({
-								id             : 'tooltip.settings',
-								defaultMessage : 'Show settings'
-							})}
-							className={classes.actionButton}
-							color='inherit'
-							onClick={() => setSettingsOpen(!room.settingsOpen)}
-						>
-							<SettingsIcon />
-						</IconButton>
-					</Tooltip>
 					{ loginEnabled &&
 						<Tooltip title={loginTooltip}>
 							<IconButton
@@ -332,6 +336,7 @@ const TopBar = (props) =>
 							</IconButton>
 						</Tooltip>
 					}
+					<div className={classes.divider} />
 					<Button
 						aria-label={intl.formatMessage({
 							id             : 'label.leave',
