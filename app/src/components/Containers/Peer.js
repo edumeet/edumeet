@@ -373,127 +373,124 @@ const Peer = (props) =>
 					}}
 					style={rootStyle}
 				>
-					{ !screenVisible &&
-						<div className={classes.videoInfo}>
-							<p>
-								<FormattedMessage
-									id='room.videoPaused'
-									defaultMessage='This video is paused'
-								/>
-							</p>
-						</div>
-					}
+					<div className={classnames(classes.viewContainer)}>
+						{ !screenVisible &&
+							<div className={classes.videoInfo}>
+								<p>
+									<FormattedMessage
+										id='room.videoPaused'
+										defaultMessage='This video is paused'
+									/>
+								</p>
+							</div>
+						}
+						<div
+							className={classnames(classes.controls, hover && 'hover')}
+							onMouseOver={() => setHover(true)}
+							onMouseOut={() => setHover(false)}
+							onTouchStart={() =>
+							{
+								if (touchTimeout)
+									clearTimeout(touchTimeout);
+			
+								setHover(true);
+							}}
+							onTouchEnd={() =>
+							{
 
-					{ screenVisible &&
-						<div className={classnames(classes.viewContainer)}>
-							<div
-								className={classnames(classes.controls, hover && 'hover')}
-								onMouseOver={() => setHover(true)}
-								onMouseOut={() => setHover(false)}
-								onTouchStart={() =>
+								if (touchTimeout)
+									clearTimeout(touchTimeout);
+			
+								touchTimeout = setTimeout(() =>
 								{
-									if (touchTimeout)
-										clearTimeout(touchTimeout);
-				
-									setHover(true);
-								}}
-								onTouchEnd={() =>
-								{
-
-									if (touchTimeout)
-										clearTimeout(touchTimeout);
-				
-									touchTimeout = setTimeout(() =>
-									{
-										setHover(false);
-									}, 2000);
-								}}
-							>
-								{ !smallScreen &&
-									<Tooltip
-										title={intl.formatMessage({
-											id             : 'label.newWindow',
-											defaultMessage : 'New window'
-										})}
-										placement={smallScreen ? 'top' : 'left'}
-									>
-										<div>
-											<Fab
-												aria-label={intl.formatMessage({
-													id             : 'label.newWindow',
-													defaultMessage : 'New window'
-												})}
-												className={classes.fab}
-												disabled={
-													!screenVisible ||
-													(windowConsumer === screenConsumer.id)
-												}
-												size={smallButtons ? 'small' : 'large'}
-												onClick={() =>
-												{
-													toggleConsumerWindow(screenConsumer);
-												}}
-											>
-												<NewWindowIcon />
-											</Fab>
-										</div>
-									</Tooltip>
-								}
-
+									setHover(false);
+								}, 2000);
+							}}
+						>
+							{ !smallScreen &&
 								<Tooltip
 									title={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
+										id             : 'label.newWindow',
+										defaultMessage : 'New window'
 									})}
 									placement={smallScreen ? 'top' : 'left'}
 								>
 									<div>
 										<Fab
 											aria-label={intl.formatMessage({
-												id             : 'label.fullscreen',
-												defaultMessage : 'Fullscreen'
+												id             : 'label.newWindow',
+												defaultMessage : 'New window'
 											})}
 											className={classes.fab}
-											disabled={!screenVisible}
+											disabled={
+												!screenVisible ||
+												(windowConsumer === screenConsumer.id)
+											}
 											size={smallButtons ? 'small' : 'large'}
 											onClick={() =>
 											{
-												toggleConsumerFullscreen(screenConsumer);
+												toggleConsumerWindow(screenConsumer);
 											}}
 										>
-											<FullScreenIcon />
+											<NewWindowIcon />
 										</Fab>
 									</div>
 								</Tooltip>
-							</div>
-							<VideoView
-								advancedMode={advancedMode}
-								videoContain
-								consumerSpatialLayers={
-									screenConsumer ? screenConsumer.spatialLayers : null
-								}
-								consumerTemporalLayers={
-									screenConsumer ? screenConsumer.temporalLayers : null
-								}
-								consumerCurrentSpatialLayer={
-									screenConsumer ? screenConsumer.currentSpatialLayer : null
-								}
-								consumerCurrentTemporalLayer={
-									screenConsumer ? screenConsumer.currentTemporalLayer : null
-								}
-								consumerPreferredSpatialLayer={
-									screenConsumer ? screenConsumer.preferredSpatialLayer : null
-								}
-								consumerPreferredTemporalLayer={
-									screenConsumer ? screenConsumer.preferredTemporalLayer : null
-								}
-								videoMultiLayer={screenConsumer && screenConsumer.type !== 'simple'}
-								videoTrack={screenConsumer && screenConsumer.track}
-								videoVisible={screenVisible}
-								videoCodec={screenConsumer && screenConsumer.codec}
-							/>
+							}
+
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'label.fullscreen',
+									defaultMessage : 'Fullscreen'
+								})}
+								placement={smallScreen ? 'top' : 'left'}
+							>
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										className={classes.fab}
+										disabled={!screenVisible}
+										size={smallButtons ? 'small' : 'large'}
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(screenConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</Fab>
+								</div>
+							</Tooltip>
 						</div>
-					}
+						<VideoView
+							advancedMode={advancedMode}
+							videoContain
+							consumerSpatialLayers={
+								screenConsumer ? screenConsumer.spatialLayers : null
+							}
+							consumerTemporalLayers={
+								screenConsumer ? screenConsumer.temporalLayers : null
+							}
+							consumerCurrentSpatialLayer={
+								screenConsumer ? screenConsumer.currentSpatialLayer : null
+							}
+							consumerCurrentTemporalLayer={
+								screenConsumer ? screenConsumer.currentTemporalLayer : null
+							}
+							consumerPreferredSpatialLayer={
+								screenConsumer ? screenConsumer.preferredSpatialLayer : null
+							}
+							consumerPreferredTemporalLayer={
+								screenConsumer ? screenConsumer.preferredTemporalLayer : null
+							}
+							videoMultiLayer={screenConsumer && screenConsumer.type !== 'simple'}
+							videoTrack={screenConsumer && screenConsumer.track}
+							videoVisible={screenVisible}
+							videoCodec={screenConsumer && screenConsumer.codec}
+						/>
+					</div>
 				</div>
 			}
 		</React.Fragment>
