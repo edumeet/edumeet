@@ -241,51 +241,6 @@ function setupOIDC(oidcIssuer)
 				_claims   : tokenset.claims
 			};
 
-			if (userinfo.picture != null)
-			{
-				if (!userinfo.picture.match(/^http/g))
-				{
-					user.picture = `data:image/jpeg;base64, ${userinfo.picture}`;
-				}
-				else
-				{
-					user.picture = userinfo.picture;
-				}
-			}
-
-			if (userinfo.nickname != null)
-			{
-				user.displayName = userinfo.nickname;
-			}
-
-			if (userinfo.name != null)
-			{
-				user.displayName = userinfo.name;
-			}
-
-			if (userinfo.email != null)
-			{
-				user.email = userinfo.email;
-			}
-
-			if (userinfo.given_name != null)
-			{
-				user.name={};
-				user.name.givenName = userinfo.given_name;
-			}
-
-			if (userinfo.family_name != null)
-			{
-				if (user.name == null) user.name={};
-				user.name.familyName = userinfo.family_name;
-			}
-
-			if (userinfo.middle_name != null)
-			{
-				if (user.name == null) user.name={};
-				user.name.middleName = userinfo.middle_name;
-			}
-
 			return done(null, user);
 		}
 	);
@@ -349,7 +304,7 @@ async function setupAuth()
 	app.get(
 		'/auth/callback',
 		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
-		(req, res) =>
+		async (req, res) =>
 		{
 			const state = JSON.parse(base64.decode(req.query.state));
 
@@ -373,7 +328,11 @@ async function setupAuth()
 
 			peer && (peer.displayName = displayName);
 			peer && (peer.picture = picture);
-			peer && (peer.authenticated = true);
+
+			if (peer && typeof config.userMapping === 'function')
+			{
+				await config.userMapping({ peer, userinfo: req.user._userinfo });
+			}
 
 			res.send(loginHelper({
 				displayName,
@@ -500,6 +459,30 @@ async function runWebSocketServer()
 			peers.set(peerId, peer);
 
 			peer.on('close', () => peers.delete(peerId));
+
+			if (
+				Boolean(socket.handshake.session.passport) &&
+				Boolean(socket.handshake.session.passport.user)
+			)
+			{
+				const {
+					id,
+					displayName,
+					picture,
+					email,
+					_userinfo
+				} = socket.handshake.session.passport.user;
+		
+				peer.authId= id;
+				peer.displayName = displayName;
+				peer.picture = picture;
+				peer.email = email;
+		
+				if (typeof config.userMapping === 'function')
+				{
+					await config.userMapping({ peer, userinfo: _userinfo });
+				}
+			}
 
 			room.handlePeer(peer);
 		})

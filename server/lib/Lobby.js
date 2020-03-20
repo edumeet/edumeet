@@ -75,11 +75,15 @@ class Lobby extends EventEmitter
 		if (peer)
 		{
 			peer.socket.removeListener('request', peer.socketRequestHandler);
-			peer.removeListener('authenticationChanged', peer.authenticationHandler);
+			peer.removeListener('rolesChange', peer.roleChangeHandler);
+			peer.removeListener('displayNameChanged', peer.displayNameChangeHandler);
+			peer.removeListener('pictureChanged', peer.pictureChangeHandler);
 			peer.removeListener('close', peer.closeHandler);
 
 			peer.socketRequestHandler = null;
-			peer.authenticationHandler = null;
+			peer.roleChangeHandler = null;
+			peer.displayNameChangeHandler = null;
+			peer.pictureChangeHandler = null;
 			peer.closeHandler = null;
 
 			this.emit('promotePeer', peer);
@@ -112,16 +116,25 @@ class Lobby extends EventEmitter
 				});
 		};
 
-		peer.authenticationHandler = () =>
+		peer.roleChangeHandler = () =>
 		{
-			logger.info('parkPeer() | authenticationChange [peer:"%s"]', peer.id);
+			logger.info('parkPeer() | rolesChange [peer:"%s"]', peer.id);
 
-			if (peer.authenticated)
-			{
-				this.emit('changeDisplayName', peer);
-				this.emit('changePicture', peer);
-				this.emit('peerAuthenticated', peer);
-			}
+			this.emit('peerRolesChanged', peer);
+		};
+
+		peer.displayNameChangeHandler = () =>
+		{
+			logger.info('parkPeer() | displayNameChange [peer:"%s"]', peer.id);
+
+			this.emit('changeDisplayName', peer);
+		};
+
+		peer.pictureChangeHandler = () =>
+		{
+			logger.info('parkPeer() | pictureChange [peer:"%s"]', peer.id);
+
+			this.emit('changePicture', peer);
 		};
 
 		peer.closeHandler = () =>
@@ -143,7 +156,9 @@ class Lobby extends EventEmitter
 
 		this._peers.set(peer.id, peer);
 
-		peer.on('authenticationChanged', peer.authenticationHandler);
+		peer.on('rolesChange', peer.roleChangeHandler);
+		peer.on('displayNameChanged', peer.displayNameChangeHandler);
+		peer.on('pictureChanged', peer.pictureChangeHandler);
 
 		peer.socket.on('request', peer.socketRequestHandler);
 
@@ -169,8 +184,6 @@ class Lobby extends EventEmitter
 
 				peer.displayName = displayName;
 
-				this.emit('changeDisplayName', peer);
-
 				cb();
 
 				break;
@@ -180,8 +193,6 @@ class Lobby extends EventEmitter
 				const { picture } = request.data;
 
 				peer.picture = picture;
-
-				this.emit('changePicture', peer);
 
 				cb();
 

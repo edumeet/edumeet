@@ -1,4 +1,5 @@
 const os = require('os');
+const userRoles = require('../userRoles');
 
 module.exports =
 {
@@ -50,18 +51,95 @@ module.exports =
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
 	httpOnly              : false,
-	// If this is set to true, only signed-in users will be able
-	// to join a room directly. Non-signed-in users (guests) will
-	// always be put in the lobby regardless of room lock status.
-	// If false, there is no difference between guests and signed-in
-	// users when joining.
-	requireSignInToAccess : true,
-	// This flag has no effect when requireSignInToAccess is false
+	// This function will be called on successful login through oidc.
+	// Use this function to map your oidc userinfo to the Peer object,
+	// see examples below.
+	// Examples:
+	/*
+	// All authenicated users will be MODERATOR and AUTHENTICATED
+	userMapping : async ({ peer, userinfo }) =>
+	{
+		peer.addRole(userRoles.MODERATOR);
+		peer.addRole(userRoles.AUTHENTICATED);
+	},
+	// All authenicated users will be AUTHENTICATED,
+	// and those with the moderator role set in the userinfo
+	// will also be MODERATOR
+	userMapping : async ({ peer, userinfo }) =>
+	{
+		if (
+			Array.isArray(userinfo.meet_roles) &&
+			userinfo.meet_roles.includes('moderator')
+		)
+		{
+			peer.addRole(userRoles.MODERATOR);
+		}
+
+		if (
+			Array.isArray(userinfo.meet_roles) &&
+			userinfo.meet_roles.includes('meetingadmin')
+		)
+		{
+			peer.addRole(userRoles.ADMIN);
+		}
+
+		peer.addRole(userRoles.AUTHENTICATED);
+	},
+	// All authenicated users will be AUTHENTICATED,
+	// and those with email ending with @example.com
+	// will also be MODERATOR
+	userMapping : async ({ peer, userinfo }) =>
+	{
+		if (userinfo.email && userinfo.email.endsWith('@example.com'))
+		{
+			peer.addRole(userRoles.MODERATOR);
+		}
+
+		peer.addRole(userRoles.AUTHENTICATED);
+	},*/
+	userMapping           : async ({ peer, userinfo }) =>
+	{
+		if (userinfo.picture != null)
+		{
+			if (!userinfo.picture.match(/^http/g))
+			{
+				peer.picture = `data:image/jpeg;base64, ${userinfo.picture}`;
+			}
+			else
+			{
+				peer.picture = userinfo.picture;
+			}
+		}
+
+		if (userinfo.nickname != null)
+		{
+			peer.displayName = userinfo.nickname;
+		}
+
+		if (userinfo.name != null)
+		{
+			peer.displayName = userinfo.name;
+		}
+
+		if (userinfo.email != null)
+		{
+			peer.email = userinfo.email;
+		}
+	},
+	// Required roles for Access. All users have the role "ALL" by default.
+	// Other roles need to be added in the "userMapping" function. This
+	// is an Array of roles. userRoles.ADMIN have all priveleges and access
+	// always.
+	//
+	// Example:
+	// [ userRoles.MODERATOR, userRoles.AUTHENTICATED ]
+	// This will allow all MODERATOR and AUTHENTICATED users access.
+	requiredRolesForAccess : [ userRoles.ALL ],
 	// When truthy, the room will be open to all users when the first
-	// authenticated user has already joined the room.
-	activateOnHostJoin    : true,
+	// AUTHENTICATED or MODERATOR user joins the room.
+	activateOnHostJoin     : true,
 	// Mediasoup settings
-	mediasoup             :
+	mediasoup              :
 	{
 		numWorkers : Object.keys(os.cpus()).length,
 		// mediasoup Worker settings.

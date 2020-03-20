@@ -1,4 +1,6 @@
 const EventEmitter = require('events').EventEmitter;
+const userRoles = require('../userRoles');
+const config = require('../config/config');
 const Logger = require('./Logger');
 
 const logger = new Logger('Peer');
@@ -22,7 +24,7 @@ class Peer extends EventEmitter
 
 		this._inLobby = false;
 
-		this._authenticated = false;
+		this._roles = [ userRoles.ALL ];
 
 		this._displayName = false;
 
@@ -39,8 +41,6 @@ class Peer extends EventEmitter
 		this._producers = new Map();
 
 		this._consumers = new Map();
-
-		this._checkAuthentication();
 
 		this._handlePeer();
 	}
@@ -66,13 +66,6 @@ class Peer extends EventEmitter
 
 	_handlePeer()
 	{
-		this.socket.use((packet, next) =>
-		{
-			this._checkAuthentication();
-
-			return next();
-		});
-
 		this.socket.on('disconnect', () =>
 		{
 			if (this.closed)
@@ -82,33 +75,6 @@ class Peer extends EventEmitter
 
 			this.close();
 		});
-	}
-
-	_checkAuthentication()
-	{
-		if (
-			Boolean(this.socket.handshake.session.passport) &&
-			Boolean(this.socket.handshake.session.passport.user)
-		)
-		{
-			const {
-				id,
-				displayName,
-				picture,
-				email
-			} = this.socket.handshake.session.passport.user;
-
-			id && (this.authId = id);
-			displayName && (this.displayName = displayName);
-			picture && (this.picture = picture);
-			email && (this.email = email);
-
-			this.authenticated = true;
-		}
-		else
-		{
-			this.authenticated = false;
-		}
 	}
 
 	get id()
@@ -166,21 +132,9 @@ class Peer extends EventEmitter
 		this._inLobby = inLobby;
 	}
 
-	get authenticated()
+	get roles()
 	{
-		return this._authenticated;
-	}
-
-	set authenticated(authenticated)
-	{
-		if (authenticated !== this._authenticated)
-		{
-			const oldAuthenticated = this._authenticated;
-
-			this._authenticated = authenticated;
-
-			this.emit('authenticationChanged', { oldAuthenticated });
-		}
+		return this._roles;
 	}
 
 	get displayName()
@@ -260,6 +214,35 @@ class Peer extends EventEmitter
 	get consumers()
 	{
 		return this._consumers;
+	}
+
+	addRole(newRole)
+	{
+		if (!this._roles.includes(newRole))
+		{
+			this._roles.push(newRole);
+
+			logger.info('addRole() | [newRole:"%s]"', newRole);
+
+			this.emit('rolesChange', { newRole });
+		}
+	}
+
+	removeRole(oldRole)
+	{
+		if (this._roles.includes(oldRole))
+		{
+			this._roles = this._roles.filter((role) => role !== oldRole);
+
+			logger.info('removeRole() | [oldRole:"%s]"', oldRole);
+
+			this.emit('rolesChange', { oldRole });
+		}
+	}
+
+	hasRole(role)
+	{
+		return this._roles.includes(role);
 	}
 
 	addTransport(id, transport)

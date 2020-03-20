@@ -1,6 +1,7 @@
 const EventEmitter = require('events').EventEmitter;
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
+const userRoles = require('../userRoles');
 const config = require('../config/config');
 
 const logger = new Logger('Room');
@@ -117,9 +118,8 @@ class Room extends EventEmitter
 
 	handlePeer(peer)
 	{
-		logger.info('handlePeer() [peer:"%s"]', peer.id);
+		logger.info('handlePeer() [peer:"%s", roles:"%s"]', peer.id, peer.roles);
 
-		// This will allow reconnects to join despite lock
 		if (this._peers[peer.id])
 		{
 			logger.warn(
@@ -130,13 +130,16 @@ class Room extends EventEmitter
 
 			return;
 		}
+
+		// Always let ADMIN in, even if locked
+		if (peer.roles.includes(userRoles.ADMIN))
+			this._peerJoining(peer);
 		else if (this._locked)
-		{
 			this._parkPeer(peer);
-		}
 		else
 		{
-			peer.authenticated ?
+			// If the user has a role in config.requiredRolesForAccess, let them in
+			peer.roles.some((role) => config.requiredRolesForAccess.includes(role)) ?
 				this._peerJoining(peer) :
 				this._handleGuest(peer);
 		}
@@ -144,21 +147,12 @@ class Room extends EventEmitter
 
 	_handleGuest(peer)
 	{
-		if (config.requireSignInToAccess)
-		{
-			if (config.activateOnHostJoin && !this.checkEmpty())
-			{
-				this._peerJoining(peer);
-			}
-			else
-			{
-				this._parkPeer(peer);
-				this._notification(peer.socket, 'signInRequired');
-			}
-		}
+		if (config.activateOnHostJoin && !this.checkEmpty())
+			this._peerJoining(peer);
 		else
 		{
-			this._peerJoining(peer);
+			this._parkPeer(peer);
+			this._notification(peer.socket, 'signInRequired');
 		}
 	}
 
@@ -178,9 +172,26 @@ class Room extends EventEmitter
 			}
 		});
 
-		this._lobby.on('peerAuthenticated', (peer) =>
+		this._lobby.on('peerRolesChanged', (peer) =>
 		{
-			!this._locked && this._lobby.promotePeer(peer.id);
+			// Always let admin in, even if locked
+			if (peer.roles.includes(userRoles.ADMIN))
+			{
+				this._lobby.promotePeer(peer.id);
+
+				return;
+			}
+
+			// If the user has a role in config.requiredRolesForAccess, let them in
+			if (
+				!this._locked &&
+				peer.roles.some((role) => config.requiredRolesForAccess.includes(role))
+			)
+			{
+				this._lobby.promotePeer(peer.id);
+
+				return;
+			}
 		});
 
 		this._lobby.on('changeDisplayName', (changedPeer) =>
