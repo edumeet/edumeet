@@ -190,7 +190,7 @@ function setupLTI(ltiConfig)
 				}
 				if (lti.lis_person_name_full)
 				{
-					user.displayName=lti.lis_person_name_full;
+					user.displayName = lti.lis_person_name_full;
 				}
 
 				// Perform local authentication if necessary
