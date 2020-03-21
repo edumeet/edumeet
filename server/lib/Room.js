@@ -420,6 +420,32 @@ class Room extends EventEmitter
 				picture : peer.picture
 			}, true);
 		});
+
+		peer.on('gotRole', ({ newRole }) =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'gotRole', {
+				peerId : peer.id,
+				role   : newRole
+			}, true);
+		});
+
+		peer.on('lostRole', ({ oldRole }) =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'lostRole', {
+				peerId : peer.id,
+				role   : oldRole
+			}, true);
+		});
 	}
 
 	async _handleSocketRequest(peer, request, cb)
@@ -483,7 +509,10 @@ class Room extends EventEmitter
 					.filter((joinedPeer) => joinedPeer.id !== peer.id)
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
-				cb(null, { peers: peerInfos });
+				cb(null, {
+					roles : peer.roles,
+					peers : peerInfos
+				});
 
 				// Mark the new Peer as joined.
 				peer.joined = true;
@@ -511,7 +540,8 @@ class Room extends EventEmitter
 						{
 							id          : peer.id,
 							displayName : displayName,
-							picture     : picture
+							picture     : picture,
+							roles       : peer.roles
 						}
 					);
 				}
@@ -1072,6 +1102,69 @@ class Room extends EventEmitter
 				}, true);
 
 				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:muteAll':
+			{
+				if (
+					!peer.hasRole(userRoles.MODERATOR) &&
+					!peer.hasRole(userRoles.ADMIN)
+				)
+					throw new Error('peer does not have moderator priveleges');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:mute', {
+					peerId : peer.id
+				}, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopAllVideo':
+			{
+				if (
+					!peer.hasRole(userRoles.MODERATOR) &&
+					!peer.hasRole(userRoles.ADMIN)
+				)
+					throw new Error('peer does not have moderator priveleges');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:stopVideo', {
+					peerId : peer.id
+				}, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:kickPeer':
+			{
+				if (
+					!peer.hasRole(userRoles.MODERATOR) &&
+					!peer.hasRole(userRoles.ADMIN)
+				)
+					throw new Error('peer does not have moderator priveleges');
+
+				const { peerId } = request.data;
+
+				const kickPeer = this._peers[peerId];
+
+				if (!kickPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(
+					kickPeer.socket,
+					'moderator:kick'
+				);
+
+				kickPeer.close();
+
 				cb();
 
 				break;

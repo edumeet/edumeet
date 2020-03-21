@@ -110,3 +110,15 @@ export const toggleConsumerFullscreen = (consumerId) =>
 		type    : 'TOGGLE_FULLSCREEN_CONSUMER',
 		payload : { consumerId }
 	});
+
+export const setMuteAllInProgress = (flag) =>
+	({
+		type    : 'MUTE_ALL_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const setStopAllVideoInProgress = (flag) =>
+	({
+		type    : 'STOP_ALL_VIDEO_IN_PROGRESS',
+		payload : { flag }
+	});

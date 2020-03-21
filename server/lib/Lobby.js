@@ -75,13 +75,13 @@ class Lobby extends EventEmitter
 		if (peer)
 		{
 			peer.socket.removeListener('request', peer.socketRequestHandler);
-			peer.removeListener('rolesChange', peer.roleChangeHandler);
+			peer.removeListener('gotRole', peer.gotRoleHandler);
 			peer.removeListener('displayNameChanged', peer.displayNameChangeHandler);
 			peer.removeListener('pictureChanged', peer.pictureChangeHandler);
 			peer.removeListener('close', peer.closeHandler);
 
 			peer.socketRequestHandler = null;
-			peer.roleChangeHandler = null;
+			peer.gotRoleHandler = null;
 			peer.displayNameChangeHandler = null;
 			peer.pictureChangeHandler = null;
 			peer.closeHandler = null;
@@ -116,7 +116,7 @@ class Lobby extends EventEmitter
 				});
 		};
 
-		peer.roleChangeHandler = () =>
+		peer.gotRoleHandler = () =>
 		{
 			logger.info('parkPeer() | rolesChange [peer:"%s"]', peer.id);
 
@@ -156,7 +156,7 @@ class Lobby extends EventEmitter
 
 		this._peers.set(peer.id, peer);
 
-		peer.on('rolesChange', peer.roleChangeHandler);
+		peer.on('gotRole', peer.gotRoleHandler);
 		peer.on('displayNameChanged', peer.displayNameChangeHandler);
 		peer.on('pictureChanged', peer.pictureChangeHandler);
 

@@ -163,6 +163,12 @@ const room = (state = initialState, action) =>
 			return { ...state, spotlights };
 		}
 
+		case 'MUTE_ALL_IN_PROGRESS':
+			return { ...state, muteAllInProgress: action.payload.flag };
+
+		case 'STOP_ALL_VIDEO_IN_PROGRESS':
+			return { ...state, stopAllVideoInProgress: action.payload.flag };
+
 		default:
 			return state;
 	}

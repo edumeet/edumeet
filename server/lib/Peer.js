@@ -224,7 +224,7 @@ class Peer extends EventEmitter
 
 			logger.info('addRole() | [newRole:"%s]"', newRole);
 
-			this.emit('rolesChange', { newRole });
+			this.emit('gotRole', { newRole });
 		}
 	}
 
@@ -236,7 +236,7 @@ class Peer extends EventEmitter
 
 			logger.info('removeRole() | [oldRole:"%s]"', oldRole);
 
-			this.emit('rolesChange', { oldRole });
+			this.emit('lostRole', { oldRole });
 		}
 	}
 
@@ -302,7 +302,8 @@ class Peer extends EventEmitter
 		{
 			id          : this.id,
 			displayName : this.displayName,
-			picture     : this.picture
+			picture     : this.picture,
+			roles       : this.roles
 		};
 
 		return peerInfo;
