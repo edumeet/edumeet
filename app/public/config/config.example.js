@@ -22,7 +22,19 @@ var config =
 	 * veryhigh ~ 1920x1080
 	 * ultra ~ 3840x2560
 	 **/
-	defaultResolution : 'medium',
+	defaultResolution  : 'medium',
+	// Enable or disable simulcast for webcam video
+	simulcast          : true,
+	// Enable or disable simulcast for screen sharing video
+	simulcastSharing   : false,
+	// Simulcast encoding layers and levels
+	simulcastEncodings :
+	[
+		{ scaleResolutionDownBy: 4 },
+		{ scaleResolutionDownBy: 2 },
+		{ scaleResolutionDownBy: 1 }
+	],
+	// Socket.io request timeout
 	requestTimeout    : 10000,
 	transportOptions  :
 	{

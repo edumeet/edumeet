@@ -157,8 +157,14 @@ export default class RoomClient
 		// Whether simulcast should be used.
 		this._useSimulcast = useSimulcast;
 
+		if ('simulcast' in window.config)
+			this._useSimulcast = window.config.simulcast;
+
 		// Whether simulcast should be used for sharing
 		this._useSharingSimulcast = useSharingSimulcast;
+
+		if ('simulcastSharing' in window.config)
+			this._useSharingSimulcast = window.config.simulcastSharing;
 
 		this._muted = muted;
 
@@ -2574,8 +2580,16 @@ export default class RoomClient
 				}
 				else
 				{
-					encodings = VIDEO_SIMULCAST_ENCODINGS
-						.map((encoding) => ({ ...encoding, dtx: true }));
+					if ('simulcastEncodings' in window.config)
+					{
+						encodings = window.config.simulcastEncodings
+							.map((encoding) => ({ ...encoding, dtx: true }));
+					}
+					else
+					{
+						encodings = VIDEO_SIMULCAST_ENCODINGS
+							.map((encoding) => ({ ...encoding, dtx: true }));
+					}
 				}
 
 				this._screenSharingProducer = await this._sendTransport.produce(
@@ -2743,7 +2757,12 @@ export default class RoomClient
 				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
 					encodings = VIDEO_KSVC_ENCODINGS;
 				else
-					encodings = VIDEO_SIMULCAST_ENCODINGS;
+				{
+					if ('simulcastEncodings' in window.config)
+						encodings = window.config.simulcastEncodings;
+					else
+						encodings = VIDEO_SIMULCAST_ENCODINGS;
+				}
 
 				this._webcamProducer = await this._sendTransport.produce(
 					{
