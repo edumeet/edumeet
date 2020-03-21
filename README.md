@@ -28,7 +28,7 @@ Currently multiparty-meeting will only run on nodejs v10.*
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
-apt install npm build-essentials
+$ sudo apt install npm build-essentials redis
 ```
 
 * Clone the project:
@@ -64,7 +64,6 @@ This will build the client application and copy everythink to `server/public` fr
 * Set up the server:
 
 ```bash
-$ sudo apt install redis
 $ cd ..
 $ cd server
 $ npm install
@@ -78,7 +77,8 @@ $ npm install
 $ cd server
 $ npm start
 ```
-* test your service in a webRTC enabled browser: `https://yourDomainOrIPAdress:3443/roomname`
+* Note: Do not run the server as root. If you need to use port 80/443 make a iptables-mapping for that or use systemd configuration for that (see futher down this doc).
+* Test your service in a webRTC enabled browser: `https://yourDomainOrIPAdress:3443/roomname`
 
 ## Deploy it in a server
 
@@ -88,14 +88,14 @@ $ cp multiparty-meeting.service /etc/systemd/system/
 $ edit /etc/systemd/system/multiparty-meeting.service
 ```
 
-* reload systemd configuration and start service:
+* Reload systemd configuration and start service:
 
 ```bash
 $ systemctl daemon-reload
 $ systemctl start multiparty-meeting
 ```
 
-* if you want to start multiparty-meeting at boot time:
+* If you want to start multiparty-meeting at boot time:
 ```bash
 $ systemctl enable multiparty-meeting
 ```
