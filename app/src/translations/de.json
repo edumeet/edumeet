@@ -1,7 +1,7 @@
 {
 	"socket.disconnected": "Verbindung unterbrochen",
 	"socket.reconnecting": "Verbindung unterbrochen, versuche neu zu verbinden",
-	"socket.reconnected": "Verbindung wieder hergestellt",
+	"socket.reconnected": "Verbindung wieder herges|tellt",
 	"socket.requestError": "Fehler bei Serveranfrage",
 
 	"room.chooseRoom": "Choose the name of the room you would like to join",
@@ -20,7 +20,7 @@
 	"room.lobbyPeerChangedPicture": "Teilnehmer in Empfangsraum hat sein Avatar geändert",
 	"room.setAccessCode": "Zugangskode für den Raum geändert",
 	"room.accessCodeOn": "Zugangskode aktiviert",
-	"room.accessCodeOff": "Yugangskode deaktiviert",
+	"room.accessCodeOff": "Zugangskode deaktiviert",
 	"room.peerChangedDisplayName": "{oldDisplayName} heißt jetzt {displayName}",
 	"room.newPeer": "{displayName} hat den Raum betreten",
 	"room.newFile": "Neue Datei verfügbar",
@@ -32,7 +32,7 @@
 	"room.changedDisplayName": "Dein Name ist jetzt {displayName}",
 	"room.changeDisplayNameError": "Konnte Name nicht ändern",
 	"room.chatError": "Konnte Meldung nicht senden",
-	"room.aboutToJoin": "Du bist dabei den Raum yu betreten",
+	"room.aboutToJoin": "Du bist dabei den Raum zu betreten",
 	"room.roomId": "Raum ID: {roomName}",
 	"room.setYourName": "Gib deinen Namen an und wähle wie den Raum betreten willst",
 	"room.audioOnly": "Nur Audio",
