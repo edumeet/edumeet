@@ -241,7 +241,10 @@ const ChooseRoom = ({
 				</DialogActions>
 
 				{ !isElectron() &&
-					<CookieConsent>
+					<CookieConsent buttonText={intl.formatMessage({
+						id             : 'room.consentUnderstand',
+						defaultMessage : 'I understand'
+					})}>
 						<FormattedMessage
 							id='room.cookieConsent'
 							defaultMessage='This website uses cookies to enhance the user experience'

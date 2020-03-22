@@ -154,9 +154,16 @@ class Room extends React.PureComponent
 		return (
 			<div className={classes.root}>
 				{ !isElectron() &&
-					<CookieConsent>
+					<CookieConsent
+						buttonText={
+							<FormattedMessage
+								id = 'room.consentUnderstand'
+								defaultMessage = 'I understand'
+							/>
+						}
+					>
 						<FormattedMessage
-							id='room.cookieConsent'
+							id = 'room.cookieConsent'
 							defaultMessage='This website uses cookies to enhance the user experience'
 						/>
 					</CookieConsent>

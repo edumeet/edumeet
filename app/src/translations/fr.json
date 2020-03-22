@@ -6,6 +6,7 @@
 
 	"room.chooseRoom"	 : " Choisissez le nom de la réunion que vous souhaitez rejoindre",
 	"room.cookieConsent"	 : " Ce site utilise les cookies pour améliorer votre expérience utilisateur",
+	"room.consentUnderstand": "I understand",
 	"room.joined"	 : " Vous avez rejoint la salle",
 	"room.cantJoin"	 : " Impossible de rejoindre la salle",
 	"room.youLocked"	 : " Vous avez privatisé la salle",
