@@ -1,6 +1,5 @@
 const initialState =
 {
-	url                : null,
 	name               : '',
 	state              : 'new', // new/connecting/connected/disconnected/closed,
 	locked             : false,
@@ -26,13 +25,6 @@ const room = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
-		case 'SET_ROOM_URL':
-		{
-			const { url } = action.payload;
-
-			return { ...state, url };
-		}
-
 		case 'SET_ROOM_NAME':
 		{
 			const { name } = action.payload;

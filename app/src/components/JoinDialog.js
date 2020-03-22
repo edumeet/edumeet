@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
+import isElectron from 'is-electron';
 import * as settingsActions from '../actions/settingsActions';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
@@ -27,7 +28,7 @@ const styles = (theme) =>
 			width                : '100%',
 			height               : '100%',
 			backgroundColor      : 'var(--background-color)',
-			backgroundImage      : `url(${window.config.background})`,
+			backgroundImage      : `url(${window.config ? window.config.background : null})`,
 			backgroundAttachment : 'fixed',
 			backgroundPosition   : 'center',
 			backgroundSize       : 'cover',
@@ -116,9 +117,9 @@ const DialogTitle = withStyles(styles)((props) =>
 
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+			{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 			<Typography variant='h5'>{children}</Typography>
-			{ window.config.loginEnabled &&
+			{ window.config && window.config.loginEnabled &&
 				<Tooltip
 					onClose={handleTooltipClose}
 					onOpen={handleTooltipOpen}
@@ -165,6 +166,7 @@ const DialogActions = withStyles((theme) => ({
 const JoinDialog = ({
 	roomClient,
 	room,
+	roomId,
 	displayName,
 	displayNameInProgress,
 	loggedIn,
@@ -210,7 +212,7 @@ const JoinDialog = ({
 						loggedIn ? roomClient.logout() : roomClient.login();
 					}}
 				>
-					{ window.config.title }
+					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>
@@ -226,7 +228,7 @@ const JoinDialog = ({
 							id='room.roomId'
 							defaultMessage='Room ID: {roomName}'
 							values={{
-								roomName : room.name
+								roomName : roomId
 							}}
 						/>
 					</DialogContentText>
@@ -275,7 +277,7 @@ const JoinDialog = ({
 						<Button
 							onClick={() =>
 							{
-								roomClient.join({ joinVideo: false });
+								roomClient.join({ roomId, joinVideo: false });
 							}}
 							variant='contained'
 							color='secondary'
@@ -288,7 +290,7 @@ const JoinDialog = ({
 						<Button
 							onClick={() =>
 							{
-								roomClient.join({ joinVideo: true });
+								roomClient.join({ roomId, joinVideo: true });
 							}}
 							variant='contained'
 							color='secondary'
@@ -333,12 +335,17 @@ const JoinDialog = ({
 					</DialogContent>
 				}
 
-				<CookieConsent>
-					<FormattedMessage
-						id='room.cookieConsent'
-						defaultMessage='This website uses cookies to enhance the user experience'
-					/>
-				</CookieConsent>
+				{ !isElectron() &&
+					<CookieConsent buttonText={intl.formatMessage({
+						id             : 'room.consentUnderstand',
+						defaultMessage : 'I understand'
+					})}>
+						<FormattedMessage
+							id='room.cookieConsent'
+							defaultMessage='This website uses cookies to enhance the user experience'
+						/>
+					</CookieConsent>
+				}
 			</Dialog>
 		</div>
 	);
@@ -348,6 +355,7 @@ JoinDialog.propTypes =
 {
 	roomClient            : PropTypes.any.isRequired,
 	room                  : PropTypes.object.isRequired,
+	roomId                : PropTypes.string.isRequired,
 	displayName           : PropTypes.string.isRequired,
 	displayNameInProgress : PropTypes.bool.isRequired,
 	loginEnabled          : PropTypes.bool.isRequired,

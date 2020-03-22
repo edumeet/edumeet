@@ -4,14 +4,12 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import {
-	spotlightsLengthSelector,
 	videoBoxesSelector
 } from '../Selectors';
 import { withRoomContext } from '../../RoomContext';
 import Me from '../Containers/Me';
 import Peer from '../Containers/Peer';
 import SpeakerPeer from '../Containers/SpeakerPeer';
-import HiddenPeers from '../Containers/HiddenPeers';
 import Grid from '@material-ui/core/Grid';
 
 const styles = () =>
@@ -207,7 +205,6 @@ class Filmstrip extends React.PureComponent
 			myId,
 			advancedMode,
 			spotlights,
-			spotlightsLength,
 			classes
 		} = this.props;
 
@@ -284,12 +281,6 @@ class Filmstrip extends React.PureComponent
 						})}
 					</Grid>
 				</div>
-
-				{ spotlightsLength<Object.keys(peers).length &&
-					<HiddenPeers
-						hiddenPeersCount={Object.keys(peers).length-spotlightsLength}
-					/>
-				}
 			</div>
 		);
 	}
@@ -303,7 +294,6 @@ Filmstrip.propTypes = {
 	consumers        : PropTypes.object.isRequired,
 	myId             : PropTypes.string.isRequired,
 	selectedPeerId   : PropTypes.string,
-	spotlightsLength : PropTypes.number,
 	spotlights       : PropTypes.array.isRequired,
 	boxes            : PropTypes.number,
 	classes          : PropTypes.object.isRequired
@@ -318,8 +308,7 @@ const mapStateToProps = (state) =>
 		consumers        : state.consumers,
 		myId             : state.me.id,
 		spotlights       : state.room.spotlights,
-		spotlightsLength : spotlightsLengthSelector(state),
-		boxes            : videoBoxesSelector(state),
+		boxes            : videoBoxesSelector(state)
 	};
 };
 

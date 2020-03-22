@@ -26,3 +26,14 @@ export const toggleAdvancedMode = () =>
 	({
 		type : 'TOGGLE_ADVANCED_MODE'
 	});
+
+export const togglePermanentTopBar = () =>
+	({
+		type : 'TOGGLE_PERMANENT_TOPBAR'
+	});
+
+export const setLastN = (lastN) =>
+	({
+		type    : 'SET_LAST_N',
+		payload : { lastN }
+	});

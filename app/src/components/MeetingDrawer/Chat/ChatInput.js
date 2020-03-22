@@ -93,7 +93,7 @@ const ChatInput = (props) =>
 				{
 					if (message && message !== '')
 					{
-						const sendMessage = this.createNewMessage(message, 'response', displayName, picture);
+						const sendMessage = createNewMessage(message, 'response', displayName, picture);
 
 						roomClient.sendChatMessage(sendMessage);
 

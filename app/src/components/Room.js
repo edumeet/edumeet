@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
+import isElectron from 'is-electron';
 import * as roomActions from '../actions/roomActions';
 import * as toolareaActions from '../actions/toolareaActions';
 import { idle } from '../utils';
@@ -33,7 +34,7 @@ const styles = (theme) =>
 			width                : '100%',
 			height               : '100%',
 			backgroundColor      : 'var(--background-color)',
-			backgroundImage      : `url(${window.config.background})`,
+			backgroundImage      : `url(${window.config ? window.config.background : null})`,
 			backgroundAttachment : 'fixed',
 			backgroundPosition   : 'center',
 			backgroundSize       : 'cover',
@@ -152,12 +153,21 @@ class Room extends React.PureComponent
 
 		return (
 			<div className={classes.root}>
-				<CookieConsent>
-					<FormattedMessage
-						id='room.cookieConsent'
-						defaultMessage='This website uses cookies to enhance the user experience'
-					/>
-				</CookieConsent>
+				{ !isElectron() &&
+					<CookieConsent
+						buttonText={
+							<FormattedMessage
+								id = 'room.consentUnderstand'
+								defaultMessage = 'I understand'
+							/>
+						}
+					>
+						<FormattedMessage
+							id = 'room.cookieConsent'
+							defaultMessage='This website uses cookies to enhance the user experience'
+						/>
+					</CookieConsent>
+				}
 
 				<FullScreenView advancedMode={advancedMode} />
 
@@ -194,9 +204,13 @@ class Room extends React.PureComponent
 
 				<View advancedMode={advancedMode} />
 
-				<LockDialog />
+				{ room.lockDialogOpen &&
+					<LockDialog />
+				}
 
-				<Settings />
+				{ room.settingsOpen &&
+					<Settings />
+				}
 			</div>
 		);
 	}

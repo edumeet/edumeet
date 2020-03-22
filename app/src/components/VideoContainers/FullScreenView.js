@@ -83,6 +83,7 @@ const FullScreenView = (props) =>
 		consumer,
 		toggleConsumerFullscreen,
 		toolbarsVisible,
+		permanentTopBar,
 		classes
 	} = props;
 
@@ -105,7 +106,7 @@ const FullScreenView = (props) =>
 			<div className={classes.controls}>
 				<div
 					className={classnames(classes.button, {
-						visible : toolbarsVisible
+						visible : toolbarsVisible || permanentTopBar
 					})}
 					onClick={(e) =>
 					{
@@ -134,13 +135,15 @@ FullScreenView.propTypes =
 	consumer                 : appPropTypes.Consumer,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toolbarsVisible          : PropTypes.bool,
+	permanentTopBar             : PropTypes.bool,
 	classes                  : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
 		consumer        : state.consumers[state.room.fullScreenConsumer],
-		toolbarsVisible : state.room.toolbarsVisible
+		toolbarsVisible : state.room.toolbarsVisible,
+		permanentTopBar    : state.settings.permanentTopBar
 	});
 
 const mapDispatchToProps = (dispatch) =>
@@ -162,7 +165,8 @@ export default connect(
 			return (
 				prev.consumers[prev.room.fullScreenConsumer] ===
 					next.consumers[next.room.fullScreenConsumer] &&
-				prev.room.toolbarsVisible === next.room.toolbarsVisible
+				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.settings.permanentTopBar === next.settings.permanentTopBar
 			);
 		}
 	}

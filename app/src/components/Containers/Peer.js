@@ -31,21 +31,28 @@ const styles = (theme) =>
 			backgroundPosition : 'bottom',
 			backgroundSize     : 'auto 85%',
 			backgroundRepeat   : 'no-repeat',
-			'&.webcam'         :
+			'&.hover'          :
+			{
+				boxShadow : '0px 1px 3px rgba(0, 0, 0, 0.05) inset, 0px 0px 8px rgba(82, 168, 236, 0.9)'
+			},
+			'&.active-speaker' :
+			{
+				// transition  : 'filter .2s',
+				// filter      : 'grayscale(0)',
+				borderColor : 'var(--active-speaker-border-color)'
+			},
+			'&:not(.active-speaker):not(.screen)' :
+			{
+				// transition : 'filter 10s',
+				// filter     : 'grayscale(0.75)'
+			},
+			'&.webcam' :
 			{
 				order : 4
 			},
 			'&.screen' :
 			{
 				order : 3
-			},
-			'&.hover' :
-			{
-				boxShadow : '0px 1px 3px rgba(0, 0, 0, 0.05) inset, 0px 0px 8px rgba(82, 168, 236, 0.9)'
-			},
-			'&.active-speaker' :
-			{
-				borderColor : 'var(--active-speaker-border-color)'
 			}
 		},
 		fab :
@@ -144,16 +151,6 @@ const Peer = (props) =>
 		!screenConsumer.locallyPaused &&
 		!screenConsumer.remotelyPaused
 	);
-
-	let videoProfile;
-
-	if (webcamConsumer)
-		videoProfile = webcamConsumer.profile;
-
-	let screenProfile;
-
-	if (screenConsumer)
-		screenProfile = screenConsumer.profile;
 
 	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -325,11 +322,27 @@ const Peer = (props) =>
 						peer={peer}
 						displayName={peer.displayName}
 						showPeerInfo
+						consumerSpatialLayers={webcamConsumer ? webcamConsumer.spatialLayers : null}
+						consumerTemporalLayers={webcamConsumer ? webcamConsumer.temporalLayers : null}
+						consumerCurrentSpatialLayer={
+							webcamConsumer ? webcamConsumer.currentSpatialLayer : null
+						}
+						consumerCurrentTemporalLayer={
+							webcamConsumer ? webcamConsumer.currentTemporalLayer : null
+						}
+						consumerPreferredSpatialLayer={
+							webcamConsumer ? webcamConsumer.preferredSpatialLayer : null
+						}
+						consumerPreferredTemporalLayer={
+							webcamConsumer ? webcamConsumer.preferredTemporalLayer : null
+						}
+						videoMultiLayer={webcamConsumer && webcamConsumer.type !== 'simple'}
 						videoTrack={webcamConsumer && webcamConsumer.track}
 						videoVisible={videoVisible}
-						videoProfile={videoProfile}
 						audioCodec={micConsumer && micConsumer.codec}
 						videoCodec={webcamConsumer && webcamConsumer.codec}
+						audioScore={micConsumer ? micConsumer.score : null}
+						videoScore={webcamConsumer ? webcamConsumer.score : null}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -360,109 +373,124 @@ const Peer = (props) =>
 					}}
 					style={rootStyle}
 				>
-					{ !screenVisible &&
-						<div className={classes.videoInfo}>
-							<p>
-								<FormattedMessage
-									id='room.videoPaused'
-									defaultMessage='This video is paused'
-								/>
-							</p>
-						</div>
-					}
+					<div className={classnames(classes.viewContainer)}>
+						{ !screenVisible &&
+							<div className={classes.videoInfo}>
+								<p>
+									<FormattedMessage
+										id='room.videoPaused'
+										defaultMessage='This video is paused'
+									/>
+								</p>
+							</div>
+						}
+						<div
+							className={classnames(classes.controls, hover && 'hover')}
+							onMouseOver={() => setHover(true)}
+							onMouseOut={() => setHover(false)}
+							onTouchStart={() =>
+							{
+								if (touchTimeout)
+									clearTimeout(touchTimeout);
+			
+								setHover(true);
+							}}
+							onTouchEnd={() =>
+							{
 
-					{ screenVisible &&
-						<div className={classnames(classes.viewContainer)}>
-							<div
-								className={classnames(classes.controls, hover && 'hover')}
-								onMouseOver={() => setHover(true)}
-								onMouseOut={() => setHover(false)}
-								onTouchStart={() =>
+								if (touchTimeout)
+									clearTimeout(touchTimeout);
+			
+								touchTimeout = setTimeout(() =>
 								{
-									if (touchTimeout)
-										clearTimeout(touchTimeout);
-				
-									setHover(true);
-								}}
-								onTouchEnd={() =>
-								{
-
-									if (touchTimeout)
-										clearTimeout(touchTimeout);
-				
-									touchTimeout = setTimeout(() =>
-									{
-										setHover(false);
-									}, 2000);
-								}}
-							>
-								{ !smallScreen &&
-									<Tooltip
-										title={intl.formatMessage({
-											id             : 'label.newWindow',
-											defaultMessage : 'New window'
-										})}
-										placement={smallScreen ? 'top' : 'left'}
-									>
-										<div>
-											<Fab
-												aria-label={intl.formatMessage({
-													id             : 'label.newWindow',
-													defaultMessage : 'New window'
-												})}
-												className={classes.fab}
-												disabled={
-													!screenVisible ||
-													(windowConsumer === screenConsumer.id)
-												}
-												size={smallButtons ? 'small' : 'large'}
-												onClick={() =>
-												{
-													toggleConsumerWindow(screenConsumer);
-												}}
-											>
-												<NewWindowIcon />
-											</Fab>
-										</div>
-									</Tooltip>
-								}
-
+									setHover(false);
+								}, 2000);
+							}}
+						>
+							{ !smallScreen &&
 								<Tooltip
 									title={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
+										id             : 'label.newWindow',
+										defaultMessage : 'New window'
 									})}
 									placement={smallScreen ? 'top' : 'left'}
 								>
 									<div>
 										<Fab
 											aria-label={intl.formatMessage({
-												id             : 'label.fullscreen',
-												defaultMessage : 'Fullscreen'
+												id             : 'label.newWindow',
+												defaultMessage : 'New window'
 											})}
 											className={classes.fab}
-											disabled={!screenVisible}
+											disabled={
+												!screenVisible ||
+												(windowConsumer === screenConsumer.id)
+											}
 											size={smallButtons ? 'small' : 'large'}
 											onClick={() =>
 											{
-												toggleConsumerFullscreen(screenConsumer);
+												toggleConsumerWindow(screenConsumer);
 											}}
 										>
-											<FullScreenIcon />
+											<NewWindowIcon />
 										</Fab>
 									</div>
 								</Tooltip>
-							</div>
-							<VideoView
-								advancedMode={advancedMode}
-								videoContain
-								videoTrack={screenConsumer && screenConsumer.track}
-								videoVisible={screenVisible}
-								videoProfile={screenProfile}
-								videoCodec={screenConsumer && screenConsumer.codec}
-							/>
+							}
+
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'label.fullscreen',
+									defaultMessage : 'Fullscreen'
+								})}
+								placement={smallScreen ? 'top' : 'left'}
+							>
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										className={classes.fab}
+										disabled={!screenVisible}
+										size={smallButtons ? 'small' : 'large'}
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(screenConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</Fab>
+								</div>
+							</Tooltip>
 						</div>
-					}
+						<VideoView
+							advancedMode={advancedMode}
+							videoContain
+							consumerSpatialLayers={
+								screenConsumer ? screenConsumer.spatialLayers : null
+							}
+							consumerTemporalLayers={
+								screenConsumer ? screenConsumer.temporalLayers : null
+							}
+							consumerCurrentSpatialLayer={
+								screenConsumer ? screenConsumer.currentSpatialLayer : null
+							}
+							consumerCurrentTemporalLayer={
+								screenConsumer ? screenConsumer.currentTemporalLayer : null
+							}
+							consumerPreferredSpatialLayer={
+								screenConsumer ? screenConsumer.preferredSpatialLayer : null
+							}
+							consumerPreferredTemporalLayer={
+								screenConsumer ? screenConsumer.preferredTemporalLayer : null
+							}
+							videoMultiLayer={screenConsumer && screenConsumer.type !== 'simple'}
+							videoTrack={screenConsumer && screenConsumer.track}
+							videoVisible={screenVisible}
+							videoCodec={screenConsumer && screenConsumer.codec}
+						/>
+					</div>
 				</div>
 			}
 		</React.Fragment>
@@ -488,17 +516,17 @@ Peer.propTypes =
 	theme                    : PropTypes.object.isRequired
 };
 
-const makeMapStateToProps = (initialState, props) =>
+const makeMapStateToProps = (initialState, { id }) =>
 {
 	const getPeerConsumers = makePeerConsumerSelector();
 
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer           : state.peers[props.id],
-			...getPeerConsumers(state, props),
+			peer           : state.peers[id],
+			...getPeerConsumers(state, id),
 			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : props.id === state.room.activeSpeakerId
+			activeSpeaker  : id === state.room.activeSpeakerId
 		};
 	};
 

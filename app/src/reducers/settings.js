@@ -4,7 +4,8 @@ const initialState =
 	selectedWebcam      : null,
 	selectedAudioDevice : null,
 	advancedMode        : false,
-	resolution          : 'high' // low, medium, high, veryhigh, ultra
+	resolution          : 'medium', // low, medium, high, veryhigh, ultra
+	lastN               : 4
 };
 
 const settings = (state = initialState, action) =>
@@ -33,6 +34,20 @@ const settings = (state = initialState, action) =>
 			const advancedMode = !state.advancedMode;
 
 			return { ...state, advancedMode };
+		}
+
+		case 'SET_LAST_N':
+		{
+			const { lastN } = action.payload;
+
+			return { ...state, lastN };
+		}
+
+		case 'TOGGLE_PERMANENT_TOPBAR':
+		{
+			const permanentTopBar = !state.permanentTopBar;
+
+			return { ...state, permanentTopBar };
 		}
 
 		case 'SET_VIDEO_RESOLUTION':

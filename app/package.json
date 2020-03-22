@@ -5,16 +5,20 @@
 	"description": "multiparty meeting service",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
 	"license": "MIT",
+	"homepage": "./",
+	"main": "src/electron-starter.js",
 	"dependencies": {
 		"@material-ui/core": "^4.5.1",
 		"@material-ui/icons": "^4.5.1",
 		"bowser": "^2.7.0",
 		"dompurify": "^2.0.7",
 		"domready": "^1.0.8",
+		"end-of-stream": "1.4.0",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",
-		"marked": "^0.7.0",
-		"mediasoup-client": "^3.2.7",
+		"is-electron": "^2.2.0",
+		"marked": "^0.8.0",
+		"mediasoup-client": "^3.5.4",
 		"notistack": "^0.9.5",
 		"prop-types": "^15.7.2",
 		"random-string": "^0.2.0",
@@ -23,7 +27,8 @@
 		"react-dom": "^16.10.2",
 		"react-intl": "^3.4.0",
 		"react-redux": "^7.1.1",
-		"react-scripts": "3.2.0",
+		"react-router-dom": "^5.1.2",
+		"react-scripts": "^3.3.0",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
 		"redux-persist": "^6.0.0",
@@ -35,12 +40,13 @@
 		"webtorrent": "^0.107.16"
 	},
 	"scripts": {
-		"analyze-main": "source-map-explorer build/static/js/main.*",
-		"analyze-chunk": "source-map-explorer build/static/js/2.*",
+		"analyze": "source-map-explorer build/static/js/*",
 		"start": "HTTPS=true PORT=4443 react-scripts start",
 		"build": "react-scripts build && mkdir -p ../server/public && rm -rf ../server/public/* && cp -r build/* ../server/public/",
 		"test": "react-scripts test",
-		"eject": "react-scripts eject"
+		"eject": "react-scripts eject",
+		"electron": "electron --no-sandbox .",
+		"dev": "nf start -p 3000"
 	},
 	"browserslist": [
 		">0.2%",
@@ -49,8 +55,12 @@
 		"not op_mini all"
 	],
 	"devDependencies": {
+		"electron": "^7.1.1",
 		"eslint": "^6.5.1",
 		"eslint-plugin-import": "^2.18.2",
-		"eslint-plugin-react": "^7.16.0"
+		"eslint-plugin-react": "^7.16.0",
+		"foreman": "^3.0.1",
+		"jest": "^24.9.0",
+		"redux-mock-store": "^1.5.3"
 	}
 }

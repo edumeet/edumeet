@@ -4,7 +4,9 @@
 	"socket.reconnected": "Du er koblet til igjen",
 	"socket.requestError": "Feil på server melding",
 
+	"room.chooseRoom": "Velg navn på møtet du vil bli med i eller starte",
 	"room.cookieConsent": "Denne siden bruker cookies for å forbedre brukeropplevelsen",
+	"room.consentUnderstand": "Jeg forstår",
 	"room.joined": "Du ble med i møtet",
 	"room.cantJoin": "Kunne ikke bli med i møtet",
 	"room.youLocked": "Du låste møtet",
@@ -57,7 +59,10 @@
 	"tooltip.leaveFullscreen": "Forlat fullskjerm",
 	"tooltip.lobby": "Vis lobby",
 	"tooltip.settings": "Vis innstillinger",
+	"tooltip.participants": "Vis deltakere",
 
+	"label.roomName": "Møtenavn",
+	"label.chooseRoomButton": "Fortsett",
 	"label.yourName": "Ditt navn",
 	"label.newWindow": "Flytt til separat vindu",
 	"label.fullscreen": "Fullskjerm",
@@ -90,6 +95,8 @@
 	"settings.layout": "Møtelayout",
 	"settings.selectRoomLayout": "Velg møtelayout",
 	"settings.advancedMode": "Avansert modus",
+	"settings.permanentTopBar": "Permanent topplinje",
+	"settings.lastn": "Antall videoer synlig",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

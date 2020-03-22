@@ -34,6 +34,14 @@ export const setConsumerPreferredLayers = (consumerId, spatialLayer, temporalLay
 		payload : { consumerId, spatialLayer, temporalLayer }
 	});
 
+export const setConsumerPriority = (consumerId, priority) =>
+	{
+		return {
+			type    : 'SET_CONSUMER_PRIORITY',
+			payload : { consumerId, priority }
+		};
+	};
+
 export const setConsumerTrack = (consumerId, track) =>
 	({
 		type    : 'SET_CONSUMER_TRACK',

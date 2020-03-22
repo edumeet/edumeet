@@ -1,35 +1,61 @@
 import domready from 'domready';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
+import isElectron from 'is-electron';
 import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
+import { Route, HashRouter, BrowserRouter } from 'react-router-dom';
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
 import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
-import * as roomActions from './actions/roomActions';
 import * as meActions from './actions/meActions';
-import App from './components/App';
+import ChooseRoom from './components/ChooseRoom';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistor, store } from './store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
+import { ReactLazyPreload } from './components/ReactLazyPreload';
 
-import messagesEnglish from './translations/en';
+// import messagesEnglish from './translations/en';
 import messagesNorwegian from './translations/nb';
+import messagesGerman from './translations/de';
+import messagesHungarian from './translations/hu';
+import messagesPolish from './translations/pl';
+import messagesDanish from './translations/dk';
+import messagesFrench from './translations/fr';
+import messagesGreek from './translations/el';
+import messagesRomanian from './translations/ro';
+import messagesPortuguese from './translations/pt';
+import messagesChinese from './translations/cn';
+import messagesSpanish from './translations/es';
+import messagesCroatian from './translations/hr';
 
 import './index.css';
+
+const App = ReactLazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
 
 const cache = createIntlCache();
 
 const messages =
 {
-	'en' : messagesEnglish,
-	'nb' : messagesNorwegian
+	// 'en' : messagesEnglish,
+	'nb' : messagesNorwegian,
+	'de' : messagesGerman,
+	'hu' : messagesHungarian,
+	'pl' : messagesPolish,
+	'dk' : messagesDanish,
+	'fr' : messagesFrench,
+	'el' : messagesGreek,
+	'ro' : messagesRomanian,
+	'pt' : messagesPortuguese,
+	'zh' : messagesChinese,
+	'es' : messagesSpanish,
+	'hr' : messagesCroatian
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code
@@ -52,6 +78,13 @@ RoomClient.init({ store, intl });
 
 const theme = createMuiTheme(window.config.theme);
 
+let Router;
+
+if (isElectron())
+	Router = HashRouter;
+else
+	Router = BrowserRouter;
+
 domready(() =>
 {
 	logger.debug('DOM ready');
@@ -67,33 +100,16 @@ function run()
 	const urlParser = new URL(window.location);
 	const parameters = urlParser.searchParams;
 
-	let roomId = (urlParser.pathname).substr(1);
-
-	if (!roomId)
-		roomId = parameters.get('roomId');
-
-	if (roomId)
-		roomId = roomId.toLowerCase();
-	else
-	{
-		roomId = randomString({ length: 8 }).toLowerCase();
-
-		parameters.set('roomId', roomId);
-		window.history.pushState('', '', urlParser.toString());
-	}
-
 	const accessCode = parameters.get('code');
 	const produce = parameters.get('produce') !== 'false';
 	const useSimulcast = parameters.get('simulcast') === 'true';
+	const useSharingSimulcast = parameters.get('sharingSimulcast') === 'true';
 	const forceTcp = parameters.get('forceTcp') === 'true';
-
-	const roomUrl = window.location.href.split('?')[0];
-
+	const displayName = parameters.get('displayName');
+	const muted = parameters.get('muted') === 'true';
+	
 	// Get current device.
 	const device = deviceInfo();
-
-	store.dispatch(
-		roomActions.setRoomUrl(roomUrl));
 
 	store.dispatch(
 		meActions.setMe({
@@ -103,7 +119,17 @@ function run()
 	);
 
 	roomClient = new RoomClient(
-		{ roomId, peerId, accessCode, device, useSimulcast, produce, forceTcp });
+		{
+			peerId,
+			accessCode,
+			device,
+			useSimulcast,
+			useSharingSimulcast,
+			produce,
+			forceTcp,
+			displayName,
+			muted
+		});
 
 	global.CLIENT = roomClient;
 
@@ -114,7 +140,14 @@ function run()
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
 						<RoomContext.Provider value={roomClient}>
 							<SnackbarProvider>
-								<App />
+								<Router>
+									<Suspense fallback={<LoadingView />}>
+										<React.Fragment>
+											<Route exact path='/' component={ChooseRoom} />
+											<Route path='/:id' component={App} />
+										</React.Fragment>
+									</Suspense>
+								</Router>
 							</SnackbarProvider>
 						</RoomContext.Provider>
 					</PersistGate>

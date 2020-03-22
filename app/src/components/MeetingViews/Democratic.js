@@ -2,16 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
 	spotlightPeersSelector,
-	peersLengthSelector,
-	videoBoxesSelector,
-	spotlightsLengthSelector
+	videoBoxesSelector
 } from '../Selectors';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Peer from '../Containers/Peer';
 import Me from '../Containers/Me';
-import HiddenPeers from '../Containers/HiddenPeers';
 
 const RATIO = 1.334;
 const PADDING_V = 50;
@@ -71,7 +68,7 @@ class Democratic extends React.PureComponent
 
 		const width = this.peersRef.current.clientWidth - PADDING_H;
 		const height = this.peersRef.current.clientHeight -
-			(this.props.toolbarsVisible ? PADDING_V : PADDING_H);
+			(this.props.toolbarsVisible || this.props.permanentTopBar ? PADDING_V : PADDING_H);
 
 		let x, y, space;
 
@@ -91,11 +88,11 @@ class Democratic extends React.PureComponent
 				break;
 			}
 		}
-		if (Math.ceil(this.state.peerWidth) !== Math.ceil(0.9 * x))
+		if (Math.ceil(this.state.peerWidth) !== Math.ceil(0.94 * x))
 		{
 			this.setState({
-				peerWidth  : 0.95 * x,
-				peerHeight : 0.95 * y
+				peerWidth  : 0.94 * x,
+				peerHeight : 0.94 * y
 			});
 		}
 	};
@@ -130,10 +127,9 @@ class Democratic extends React.PureComponent
 	{
 		const {
 			advancedMode,
-			peersLength,
 			spotlightsPeers,
-			spotlightsLength,
 			toolbarsVisible,
+			permanentTopBar,
 			classes
 		} = this.props;
 
@@ -147,7 +143,7 @@ class Democratic extends React.PureComponent
 			<div
 				className={classnames(
 					classes.root,
-					toolbarsVisible ? classes.showingToolBar : classes.hiddenToolBar
+					toolbarsVisible || permanentTopBar ? classes.showingToolBar : classes.hiddenToolBar
 				)}
 				ref={this.peersRef}
 			>
@@ -160,19 +156,14 @@ class Democratic extends React.PureComponent
 				{
 					return (
 						<Peer
-							key={peer.id}
+							key={peer}
 							advancedMode={advancedMode}
-							id={peer.id}
+							id={peer}
 							spacing={6}
 							style={style}
 						/>
 					);
 				})}
-				{ spotlightsLength < peersLength &&
-					<HiddenPeers
-						hiddenPeersCount={peersLength - spotlightsLength}
-					/>
-				}
 			</div>
 		);
 	}
@@ -181,22 +172,20 @@ class Democratic extends React.PureComponent
 Democratic.propTypes =
 {
 	advancedMode     : PropTypes.bool,
-	peersLength      : PropTypes.number,
 	boxes            : PropTypes.number,
-	spotlightsLength : PropTypes.number,
 	spotlightsPeers  : PropTypes.array.isRequired,
 	toolbarsVisible  : PropTypes.bool.isRequired,
+	permanentTopBar     : PropTypes.bool,
 	classes          : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		peersLength      : peersLengthSelector(state),
-		boxes            : videoBoxesSelector(state),
-		spotlightsPeers  : spotlightPeersSelector(state),
-		spotlightsLength : spotlightsLengthSelector(state),
-		toolbarsVisible  : state.room.toolbarsVisible
+		boxes           : videoBoxesSelector(state),
+		spotlightsPeers : spotlightPeersSelector(state),
+		toolbarsVisible : state.room.toolbarsVisible,
+		permanentTopBar    : state.settings.permanentTopBar
 	};
 };
 
@@ -212,7 +201,8 @@ export default connect(
 				prev.producers === next.producers &&
 				prev.consumers === next.consumers &&
 				prev.room.spotlights === next.room.spotlights &&
-				prev.room.toolbarsVisible === next.room.toolbarsVisible
+				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.settings.permanentTopBar === next.settings.permanentTopBar
 			);
 		}
 	}

@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../../appPropTypes';
 import { withRoomContext } from '../../../RoomContext';
+import { useIntl } from 'react-intl';
+import IconButton from '@material-ui/core/IconButton';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
@@ -128,6 +130,8 @@ const styles = (theme) =>
 
 const ListPeer = (props) =>
 {
+	const intl = useIntl();
+
 	const {
 		roomClient,
 		peer,
@@ -174,47 +178,49 @@ const ListPeer = (props) =>
 			{children}
 			<div className={classes.controls}>
 				{ screenConsumer &&
-					<div
-						className={classnames(classes.button, 'screen', {
-							on       : screenVisible,
-							off      : !screenVisible,
-							disabled : peer.peerScreenInProgress
+					<IconButton
+						aria-label={intl.formatMessage({
+							id             : 'tooltip.muteScreenSharing',
+							defaultMessage : 'Mute participant share'
 						})}
+						color={ screenVisible ? 'primary' : 'secondary'}
+						disabled={ peer.peerScreenInProgress }
 						onClick={(e) =>
-						{
-							e.stopPropagation();
-							screenVisible ?
-								roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
-								roomClient.modifyPeerConsumer(peer.id, 'screen', false);
-						}}
+							{
+								e.stopPropagation();
+								screenVisible ?
+									roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
+									roomClient.modifyPeerConsumer(peer.id, 'screen', false);
+							}}
 					>
 						{ screenVisible ?
 							<ScreenIcon />
 							:
 							<ScreenOffIcon />
 						}
-					</div>
+					</IconButton>
 				}
-				<div
-					className={classnames(classes.button, 'mic', {
-						on       : micEnabled,
-						off      : !micEnabled,
-						disabled : peer.peerAudioInProgress
+				<IconButton
+					aria-label={intl.formatMessage({
+						id             : 'tooltip.muteParticipant',
+						defaultMessage : 'Mute participant'
 					})}
+					color={ micEnabled ? 'primary' : 'secondary'}
+					disabled={ peer.peerAudioInProgress }
 					onClick={(e) =>
-					{
-						e.stopPropagation();
-						micEnabled ?
-							roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-							roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-					}}
+						{
+							e.stopPropagation();
+							micEnabled ?
+								roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+								roomClient.modifyPeerConsumer(peer.id, 'mic', false);
+						}}
 				>
 					{ micEnabled ?
 						<MicIcon />
 						:
 						<MicOffIcon />
 					}
-				</div>
+				</IconButton>
 			</div>
 		</div>
 	);
@@ -232,15 +238,15 @@ ListPeer.propTypes =
 	classes        : PropTypes.object.isRequired
 };
 
-const makeMapStateToProps = (initialState, props) =>
+const makeMapStateToProps = (initialState, { id }) =>
 {
 	const getPeerConsumers = makePeerConsumerSelector();
 
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer : state.peers[props.id],
-			...getPeerConsumers(state, props)
+			peer : state.peers[id],
+			...getPeerConsumers(state, id)
 		};
 	};
 

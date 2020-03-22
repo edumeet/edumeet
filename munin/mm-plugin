@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# -*- sh -*-
+
+: << =cut
+
+=head1 NAME
+
+turn - Plugin to monitor the turn server test probe.
+
+=head1 CONFIGURATION
+
+No configuration
+
+=head1 AUTHOR
+
+Unknown author
+
+=head1 LICENSE
+
+GPLv2
+
+=head1 MAGIC MARKERS
+
+ #%# family=auto
+ #%# capabilities=autoconf
+
+=cut
+
+. "$MUNIN_LIBDIR/plugins/plugin.sh"
+
+if [ "$1" = "autoconf" ]; then
+	if [ -r /proc/sys/kernel/random/entropy_avail ]; then
+		echo yes
+		exit 0
+	else
+		echo no
+		exit 0
+	fi
+fi
+
+if [ "$1" = "config" ]; then
+	echo 'graph_title MM stats'
+	#echo 'graph_args --base 1000 -l 0'
+	echo 'graph_vlabel Actual Seesion Count'
+	echo 'graph_category other'
+	echo 'graph_info This graph shows the mm stats.'
+	echo 'rooms.label rooms'
+	echo 'rooms.info The count of rooms.'
+	echo 'peers.label peers'
+	echo 'peers.info The count of peers.'
+	exit 0
+fi
+
+ROOMS=`docker exec -t mm_mm_1 /opt/multiparty-meeting/server/connect.js --stats | grep 'rooms' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | sed -E 's/rooms:([0-9]+)/\1/g'`
+PEERS=`docker exec -t mm_mm_1 /opt/multiparty-meeting/server/connect.js --stats | grep 'peers' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | sed -E 's/peers:([0-9]+)/\1/g'`
+
+echo "rooms.value ${ROOMS}"
+echo "peers.value ${PEERS}"
+
+:
