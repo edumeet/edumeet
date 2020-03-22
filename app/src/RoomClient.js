@@ -367,6 +367,16 @@ export default class RoomClient
 						break;
 					}
 
+					case 'v': // Toggle video
+					{
+						if (this._webcamProducer)
+							this.disableWebcam();
+						else
+							this.enableWebcam();
+
+						break;
+					}
+
 					default:
 					{
 						break;
