@@ -694,23 +694,26 @@ export default class RoomClient
 				})
 			}));
 
-		this._webTorrent.seed(files, (torrent) =>
-		{
-			store.dispatch(requestActions.notify(
-				{
-					text : intl.formatMessage({
-						id             : 'filesharing.successfulFileShare',
-						defaultMessage : 'File successfully shared'
-					})
-				}));
+		this._webTorrent.seed(
+			files,
+			{ announceList: [['wss://tracker.lab.vvc.niif.hu:443']] },
+			(torrent) =>
+			{
+				store.dispatch(requestActions.notify(
+					{
+						text : intl.formatMessage({
+							id             : 'filesharing.successfulFileShare',
+							defaultMessage : 'File successfully shared'
+						})
+					}));
 
-			store.dispatch(fileActions.addFile(
-				this._peerId,
-				torrent.magnetURI
-			));
+				store.dispatch(fileActions.addFile(
+					this._peerId,
+					torrent.magnetURI
+				));
 
-			this._sendFile(torrent.magnetURI);
-		});
+				this._sendFile(torrent.magnetURI);
+			});
 	}
 
 	// { file, name, picture }
