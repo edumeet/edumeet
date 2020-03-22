@@ -570,9 +570,9 @@ async function getOrCreateRoom({ roomId })
 	{
 		logger.info('creating a new Room [roomId:"%s"]', roomId);
 
-		const mediasoupWorker = getMediasoupWorker();
+		// const mediasoupWorker = getMediasoupWorker();
 
-		room = await Room.create({ mediasoupWorker, roomId });
+		room = await Room.create({ mediasoupWorkers, roomId });
 
 		rooms.set(roomId, room);
 
