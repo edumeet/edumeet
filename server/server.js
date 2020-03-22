@@ -279,7 +279,8 @@ async function setupAuth()
 	{
 		passport.authenticate('oidc', {
 			state : base64.encode(JSON.stringify({
-				id : req.query.id
+				peerId : req.query.peerId,
+				roomId : req.query.roomId
 			}))
 		})(req, res, next);
 	});
@@ -324,14 +325,21 @@ async function setupAuth()
 					picture = '/static/media/buddy.403cb9f6.svg';
 			}
 
-			const peer = peers.get(state.id);
+			const peer = peers.get(state.peerId);
+
+			if (peer && peer.roomId !== state.roomId) // The peer is mischievous
+				throw new Error('peer authenticated with wrong room');
 
 			peer && (peer.displayName = displayName);
 			peer && (peer.picture = picture);
 
 			if (peer && typeof config.userMapping === 'function')
 			{
-				await config.userMapping({ peer, userinfo: req.user._userinfo });
+				await config.userMapping({
+					peer,
+					roomId   : state.roomId,
+					userinfo : req.user._userinfo
+				});
 			}
 
 			res.send(loginHelper({
@@ -454,7 +462,7 @@ async function runWebSocketServer()
 		queue.push(async () =>
 		{
 			const room = await getOrCreateRoom({ roomId });
-			const peer = new Peer({ id: peerId, socket });
+			const peer = new Peer({ id: peerId, roomId, socket });
 
 			peers.set(peerId, peer);
 
@@ -480,7 +488,7 @@ async function runWebSocketServer()
 		
 				if (typeof config.userMapping === 'function')
 				{
-					await config.userMapping({ peer, userinfo: _userinfo });
+					await config.userMapping({ peer, roomId, userinfo: _userinfo });
 				}
 			}
 

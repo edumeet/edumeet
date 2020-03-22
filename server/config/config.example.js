@@ -52,12 +52,13 @@ module.exports =
 	// use case: loadbalancer backend
 	httpOnly              : false,
 	// This function will be called on successful login through oidc.
-	// Use this function to map your oidc userinfo to the Peer object,
-	// see examples below.
+	// Use this function to map your oidc userinfo to the Peer object.
+	// The roomId is equal to the room name.
+	// See examples below.
 	// Examples:
 	/*
 	// All authenicated users will be MODERATOR and AUTHENTICATED
-	userMapping : async ({ peer, userinfo }) =>
+	userMapping : async ({ peer, roomId, userinfo }) =>
 	{
 		peer.addRole(userRoles.MODERATOR);
 		peer.addRole(userRoles.AUTHENTICATED);
@@ -65,7 +66,7 @@ module.exports =
 	// All authenicated users will be AUTHENTICATED,
 	// and those with the moderator role set in the userinfo
 	// will also be MODERATOR
-	userMapping : async ({ peer, userinfo }) =>
+	userMapping : async ({ peer, roomId, userinfo }) =>
 	{
 		if (
 			Array.isArray(userinfo.meet_roles) &&
@@ -88,7 +89,7 @@ module.exports =
 	// All authenicated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
-	userMapping : async ({ peer, userinfo }) =>
+	userMapping : async ({ peer, roomId, userinfo }) =>
 	{
 		if (userinfo.email && userinfo.email.endsWith('@example.com'))
 		{
@@ -96,8 +97,21 @@ module.exports =
 		}
 
 		peer.addRole(userRoles.AUTHENTICATED);
-	},*/
-	userMapping           : async ({ peer, userinfo }) =>
+	}
+	// All authenicated users will be AUTHENTICATED,
+	// and those with email ending with @example.com
+	// will also be MODERATOR
+	userMapping : async ({ peer, roomId, userinfo }) =>
+	{
+		if (userinfo.email && userinfo.email.endsWith('@example.com'))
+		{
+			peer.addRole(userRoles.MODERATOR);
+		}
+
+		peer.addRole(userRoles.AUTHENTICATED);
+	},
+	*/
+	userMapping           : async ({ peer, roomId, userinfo }) =>
 	{
 		if (userinfo.picture != null)
 		{

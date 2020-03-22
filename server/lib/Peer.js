@@ -1,18 +1,19 @@
 const EventEmitter = require('events').EventEmitter;
 const userRoles = require('../userRoles');
-const config = require('../config/config');
 const Logger = require('./Logger');
 
 const logger = new Logger('Peer');
 
 class Peer extends EventEmitter
 {
-	constructor({ id, socket })
+	constructor({ id, roomId, socket })
 	{
 		logger.info('constructor() [id:"%s", socket:"%s"]', id, socket.id);
 		super();
 
 		this._id = id;
+
+		this._roomId = roomId;
 
 		this._authId = null;
 
@@ -85,6 +86,16 @@ class Peer extends EventEmitter
 	set id(id)
 	{
 		this._id = id;
+	}
+
+	get roomId()
+	{
+		return this._roomId;
+	}
+
+	set roomId(roomId)
+	{
+		this._roomId = roomId;
 	}
 
 	get authId()

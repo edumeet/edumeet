@@ -391,7 +391,7 @@ export default class RoomClient
 
 	login()
 	{
-		const url = `/auth/login?id=${this._peerId}`;
+		const url = `/auth/login?peerId=${this._peerId}&roomId=${this._roomId}`;
 
 		window.open(url, 'loginWindow');
 	}
