@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "Efterlad fuldskærm",
 	"tooltip.lobby": "Vis lobby",
 	"tooltip.settings": "Vis indstillinger",
+	"tooltip.participants": "Vis deltagere",
 
 	"label.roomName": "Værelsesnavn",
 	"label.chooseRoomButton": "Fortsæt",
@@ -93,6 +94,8 @@
 	"settings.layout": "Møde visning",
 	"settings.selectRoomLayout": "Vælg møde visning",
 	"settings.advancedMode": "Avanceret tilstand",
+	"settings.permanentTopBar": "Permanent øverste linje",
+	"settings.lastn": "Antal synlige videoer",
 
 	"filesharing.saveFileError": "Kan ikke gemme fil",
 	"filesharing.startingFileShare": "Forsøger at dele filen",

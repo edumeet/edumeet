@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "退出全屏",
 	"tooltip.lobby": "显示大厅",
 	"tooltip.settings": "显示设置",
+	"tooltip.participants": "显示参加者",
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",
@@ -93,6 +94,8 @@
 	"settings.layout": "房间布局",
 	"settings.selectRoomLayout": "选择房间布局",
 	"settings.advancedMode": "高级模式",
+	"settings.permanentTopBar": "永久顶吧",
+	"settings.lastn": "可见视频数量",
 
 	"filesharing.saveFileError": "无法保存文件",
 	"filesharing.startingFileShare": "正在尝试共享文件",

@@ -43,11 +43,11 @@ const settings = (state = initialState, action) =>
 			return { ...state, lastN };
 		}
 
-		case 'TOGGLE_STICKY_APPBAR':
+		case 'TOGGLE_PERMANENT_TOPBAR':
 		{
-			const stickyAppBar = !state.stickyAppBar;
+			const permanentTopBar = !state.permanentTopBar;
 
-			return { ...state, stickyAppBar };
+			return { ...state, permanentTopBar };
 		}
 
 		case 'SET_VIDEO_RESOLUTION':

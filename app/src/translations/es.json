@@ -58,6 +58,7 @@
   "tooltip.leaveFullscreen": "Salir de la pantalla completa",
   "tooltip.lobby": "Mostrar sala de espera",
   "tooltip.settings": "Mostrar ajustes",
+  "tooltip.participants": "Mostrar participantes",
 
   "label.roomName": "Nombre de la sala",
   "label.chooseRoomButton": "Continuar",
@@ -93,6 +94,8 @@
   "settings.layout": "Disposición de la sala",
   "settings.selectRoomLayout": "Seleccione la disposición de la sala",
   "settings.advancedMode": "Modo avanzado",
+  "settings.permanentTopBar": "Barra superior permanente",
+  "settings.lastn": "Cantidad de videos visibles",
 
   "filesharing.saveFileError": "No ha sido posible guardar el fichero",
   "filesharing.startingFileShare": "Intentando compartir el fichero",

@@ -27,9 +27,9 @@ export const toggleAdvancedMode = () =>
 		type : 'TOGGLE_ADVANCED_MODE'
 	});
 
-export const toggleStickyAppBar = () =>
+export const togglePermanentTopBar = () =>
 	({
-		type : 'TOGGLE_STICKY_APPBAR'
+		type : 'TOGGLE_PERMANENT_TOPBAR'
 	});
 
 export const setLastN = (lastN) =>

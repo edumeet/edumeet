@@ -59,7 +59,7 @@ const Settings = ({
 	me,
 	settings,
 	onToggleAdvancedMode,
-	onToggleStickyAppBar,
+	onTogglePermanentTopBar,
 	handleCloseSettings,
 	handleChangeMode,
 	classes
@@ -324,17 +324,17 @@ const Settings = ({
 							<FormHelperText>
 								<FormattedMessage
 									id='settings.lastn'
-									defaultMessage='Select the amount of speakers visible'
+									defaultMessage='Number of visible videos'
 								/>
 							</FormHelperText>
 						</FormControl>
 					</form>
 					<FormControlLabel
 						className={classes.setting}
-						control={<Checkbox checked={settings.stickyAppBar} onChange={onToggleStickyAppBar} value='stickyAppBar' />}
+						control={<Checkbox checked={settings.permanentTopBar} onChange={onTogglePermanentTopBar} value='permanentTopBar' />}
 						label={intl.formatMessage({
-							id             : 'settings.stickyAppBar',
-							defaultMessage : 'Sticky App Bar'
+							id             : 'settings.permanentTopBar',
+							defaultMessage : 'Permanent top bar'
 						})}
 					/>
 				</React.Fragment>
@@ -358,7 +358,7 @@ Settings.propTypes =
 	room                 : appPropTypes.Room.isRequired,
 	settings             : PropTypes.object.isRequired,
 	onToggleAdvancedMode : PropTypes.func.isRequired,
-	onToggleStickyAppBar : PropTypes.func.isRequired,
+	onTogglePermanentTopBar : PropTypes.func.isRequired,
 	handleChangeMode     : PropTypes.func.isRequired,
 	handleCloseSettings  : PropTypes.func.isRequired,
 	classes              : PropTypes.object.isRequired
@@ -375,7 +375,7 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = {
 	onToggleAdvancedMode : settingsActions.toggleAdvancedMode,
-	onToggleStickyAppBar : settingsActions.toggleStickyAppBar,
+	onTogglePermanentTopBar : settingsActions.togglePermanentTopBar,
 	handleChangeMode     : roomActions.setDisplayMode,
 	handleCloseSettings  : roomActions.setSettingsOpen
 };

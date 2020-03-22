@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "Vollbild verlassen",
 	"tooltip.lobby": "Warteraum",
 	"tooltip.settings": "Einstellungen",
+	"tooltip.participants": "Teilnehmer",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -93,6 +94,8 @@
 	"settings.layout": "Raumlayout",
 	"settings.selectRoomLayout": "Wähle Raumlayout",
 	"settings.advancedMode": "Erweiterter Modus",
+	"settings.permanentTopBar": "Permanente obere Leiste",
+	"settings.lastn": "Anzahl der sichtbaren Videos",
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",

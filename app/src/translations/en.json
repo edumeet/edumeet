@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "Leave fullscreen",
 	"tooltip.lobby": "Show lobby",
 	"tooltip.settings": "Show settings",
+	"tooltip.participants": "Show participants",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -93,6 +94,8 @@
 	"settings.layout": "Room layout",
 	"settings.selectRoomLayout": "Select room layout",
 	"settings.advancedMode": "Advanced mode",
+	"settings.permanentTopBar": "Permanent top bar",
+	"settings.lastn": "Number of visible videos",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

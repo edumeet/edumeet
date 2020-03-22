@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "Wyłącz tryb pełnoekranowy",
 	"tooltip.lobby": "Pokaż poczekalnię",
 	"tooltip.settings": "Pokaż ustawienia",
+	"tooltip.participants": "Pokaż uczestników",
 
 	"label.roomName": "Nazwa konferencji",
 	"label.chooseRoomButton": "Kontynuuj",
@@ -93,6 +94,8 @@
 	"settings.layout": "Układ konferencji",
 	"settings.selectRoomLayout": "Ustawienia układu konferencji",
 	"settings.advancedMode": "Tryb zaawansowany",
+	"settings.permanentTopBar": "Stały górny pasek",
+	"settings.lastn": "Liczba widocznych filmów",
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",

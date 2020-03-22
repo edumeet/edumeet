@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "Forlat fullskjerm",
 	"tooltip.lobby": "Vis lobby",
 	"tooltip.settings": "Vis innstillinger",
+	"tooltip.participants": "Vis deltakere",
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",
@@ -93,6 +94,8 @@
 	"settings.layout": "Møtelayout",
 	"settings.selectRoomLayout": "Velg møtelayout",
 	"settings.advancedMode": "Avansert modus",
+	"settings.permanentTopBar": "Permanent topplinje",
+	"settings.lastn": "Antall videoer synlig",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "Έξοδος από την πλήρη οθόνη",
 	"tooltip.lobby": "Εμφάνιση λόμπι",
 	"tooltip.settings": "Εμφάνιση ρυθμίσεων",
+	"tooltip.participants": "Εμφάνιση συμμετεχόντων",
 
 	"label.roomName": "Όνομα δωματίου",
 	"label.chooseRoomButton": "Συνέχεια",
@@ -93,6 +94,8 @@
 	"settings.layout": "Περιβάλλον δωματίου",
 	"settings.selectRoomLayout": "Επιλογή περιβάλλοντος δωματίου",
 	"settings.advancedMode": "Προηγμένη λειτουργία",
+	"settings.permanentTopBar": "Μόνιμη μπάρα κορυφής",
+	"settings.lastn": "Αριθμός ορατών βίντεο",
 
 	"filesharing.saveFileError": "Αδυναμία αποθήκευσης του αρχείου",
 	"filesharing.startingFileShare": "Προσπάθεια διαμοιρασμού αρχείου",

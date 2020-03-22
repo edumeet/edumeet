@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "Izađi iz punog ekrana",
 	"tooltip.lobby": "Prikaži predvorje",
 	"tooltip.settings": "Prikaži postavke",
+	"tooltip.participants": "Pokažite sudionike",
 
 	"label.roomName": "Naziv sobe",
 	"label.chooseRoomButton": "Nastavi",
@@ -93,6 +94,8 @@
 	"settings.layout":  "Način prikaza",
 	"settings.selectRoomLayout":  "Odaberi način prikaza",
 	"settings.advancedMode": "Napredne mogućnosti",
+	"settings.permanentTopBar": "Stalna gornja šipka",
+	"settings.lastn": "Broj vidljivih videozapisa",
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",

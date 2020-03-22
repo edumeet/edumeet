@@ -58,6 +58,7 @@
 	"tooltip.leaveFullscreen": "Kilépés teljes képernyős módból",
 	"tooltip.lobby": "Az előszobában várakozók listája",
 	"tooltip.settings": "Beállítások",
+	"tooltip.participants": "Résztvevők",
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
@@ -93,6 +94,8 @@
 	"settings.layout": "A konferencia képkiosztása",
 	"settings.selectRoomLayout": "Válaszd ki a konferencia képkiosztását",
 	"settings.advancedMode": "Részletes információk",
+	"settings.permanentTopBar": "Állandó felső sáv",
+	"settings.lastn": "A látható videók száma",
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

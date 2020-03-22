@@ -123,7 +123,7 @@ const TopBar = (props) =>
 		room,
 		peersLength,
 		lobbyPeers,
-		stickyAppBar,
+		permanentTopBar,
 		myPicture,
 		loggedIn,
 		loginEnabled,
@@ -174,7 +174,7 @@ const TopBar = (props) =>
 	return (
 		<AppBar
 			position='fixed'
-			className={room.toolbarsVisible || stickyAppBar ? classes.show : classes.hide}
+			className={room.toolbarsVisible || permanentTopBar ? classes.show : classes.hide}
 		>
 			<Toolbar>
 				<PulsingBadge
@@ -364,7 +364,7 @@ TopBar.propTypes =
 	room               : appPropTypes.Room.isRequired,
 	peersLength        : PropTypes.number,
 	lobbyPeers         : PropTypes.array,
-	stickyAppBar       : PropTypes.bool,
+	permanentTopBar       : PropTypes.bool,
 	myPicture          : PropTypes.string,
 	loggedIn           : PropTypes.bool.isRequired,
 	loginEnabled       : PropTypes.bool.isRequired,
@@ -386,7 +386,7 @@ const mapStateToProps = (state) =>
 		room         : state.room,
 		peersLength  : peersLengthSelector(state),
 		lobbyPeers   : lobbyPeersKeySelector(state),
-		stickyAppBar : state.settings.stickyAppBar,
+		permanentTopBar : state.settings.permanentTopBar,
 		loggedIn     : state.me.loggedIn,
 		loginEnabled : state.me.loginEnabled,
 		myPicture    : state.me.picture,
@@ -430,7 +430,7 @@ export default withRoomContext(connect(
 				prev.room === next.room &&
 				prev.peers === next.peers &&
 				prev.lobbyPeers === next.lobbyPeers &&
-				prev.settings.stickyAppBar === next.settings.stickyAppBar &&
+				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&

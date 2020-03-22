@@ -68,7 +68,7 @@ class Democratic extends React.PureComponent
 
 		const width = this.peersRef.current.clientWidth - PADDING_H;
 		const height = this.peersRef.current.clientHeight -
-			(this.props.toolbarsVisible || this.props.stickyAppBar ? PADDING_V : PADDING_H);
+			(this.props.toolbarsVisible || this.props.permanentTopBar ? PADDING_V : PADDING_H);
 
 		let x, y, space;
 
@@ -129,7 +129,7 @@ class Democratic extends React.PureComponent
 			advancedMode,
 			spotlightsPeers,
 			toolbarsVisible,
-			stickyAppBar,
+			permanentTopBar,
 			classes
 		} = this.props;
 
@@ -143,7 +143,7 @@ class Democratic extends React.PureComponent
 			<div
 				className={classnames(
 					classes.root,
-					toolbarsVisible || stickyAppBar ? classes.showingToolBar : classes.hiddenToolBar
+					toolbarsVisible || permanentTopBar ? classes.showingToolBar : classes.hiddenToolBar
 				)}
 				ref={this.peersRef}
 			>
@@ -175,7 +175,7 @@ Democratic.propTypes =
 	boxes            : PropTypes.number,
 	spotlightsPeers  : PropTypes.array.isRequired,
 	toolbarsVisible  : PropTypes.bool.isRequired,
-	stickyAppBar     : PropTypes.bool,
+	permanentTopBar     : PropTypes.bool,
 	classes          : PropTypes.object.isRequired
 };
 
@@ -185,7 +185,7 @@ const mapStateToProps = (state) =>
 		boxes           : videoBoxesSelector(state),
 		spotlightsPeers : spotlightPeersSelector(state),
 		toolbarsVisible : state.room.toolbarsVisible,
-		stickyAppBar    : state.settings.stickyAppBar
+		permanentTopBar    : state.settings.permanentTopBar
 	};
 };
 
@@ -202,7 +202,7 @@ export default connect(
 				prev.consumers === next.consumers &&
 				prev.room.spotlights === next.room.spotlights &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
-				prev.settings.stickyAppBar === next.settings.stickyAppBar
+				prev.settings.permanentTopBar === next.settings.permanentTopBar
 			);
 		}
 	}

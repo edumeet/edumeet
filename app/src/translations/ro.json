@@ -57,7 +57,7 @@
 	"tooltip.enterFullscreen": "Modul ecran complet",
 	"tooltip.leaveFullscreen": "Ieșire din modul ecran complet",
 	"tooltip.lobby": "Arată holul",
-	"tooltip.settings": "Arată setăile",
+	"tooltip.settings": "Arată participanții",
 
 	"label.roomName": "Numele camerei",
 	"label.chooseRoomButton": "Continuare",
@@ -93,6 +93,8 @@
 	"settings.layout": "Aspectul camerei video",
 	"settings.selectRoomLayout": "Selectează spectul camerei video",
 	"settings.advancedMode": "Mod avansat",
+	"settings.permanentTopBar": "Bara de sus permanentă",
+	"settings.lastn": "Numărul de videoclipuri vizibile",
 
 	"filesharing.saveFileError": "Încercarea de a salva fișierul a eșuat",
 	"filesharing.startingFileShare": "Partajarea fișierului",
