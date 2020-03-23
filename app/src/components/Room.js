@@ -23,6 +23,7 @@ import VideoWindow from './VideoWindow/VideoWindow';
 import LockDialog from './AccessControl/LockDialog/LockDialog';
 import Settings from './Settings/Settings';
 import TopBar from './Controls/TopBar';
+import MobileControls from './Controls/MobileControls';
 
 const TIMEOUT = 5 * 1000;
 
@@ -140,6 +141,7 @@ class Room extends React.PureComponent
 			room,
 			advancedMode,
 			toolAreaOpen,
+			isMobile,
 			toggleToolArea,
 			classes,
 			theme
@@ -204,6 +206,10 @@ class Room extends React.PureComponent
 
 				<View advancedMode={advancedMode} />
 
+				{ isMobile &&
+					<MobileControls />
+				}
+
 				{ room.lockDialogOpen &&
 					<LockDialog />
 				}
@@ -222,6 +228,7 @@ Room.propTypes =
 	advancedMode       : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
+	isMobile           : PropTypes.bool,
 	toggleToolArea     : PropTypes.func.isRequired,
 	classes            : PropTypes.object.isRequired,
 	theme              : PropTypes.object.isRequired
@@ -231,7 +238,8 @@ const mapStateToProps = (state) =>
 	({
 		room         : state.room,
 		advancedMode : state.settings.advancedMode,
-		toolAreaOpen : state.toolarea.toolAreaOpen
+		toolAreaOpen : state.toolarea.toolAreaOpen,
+		isMobile     : state.me.isMobile
 	});
 
 const mapDispatchToProps = (dispatch) =>
@@ -256,7 +264,8 @@ export default connect(
 			return (
 				prev.room === next.room &&
 				prev.settings.advancedMode === next.settings.advancedMode &&
-				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
+				prev.me.isMobile === next.me.isMobile
 			);
 		}
 	}

@@ -200,7 +200,10 @@ export default class RoomClient
 		if (device.bowser.getPlatformType() === 'desktop')
 			this._maxSpotlights = lastN;
 		else
+		{
 			this._maxSpotlights = mobileLastN;
+			store.dispatch(meActions.setIsMobile());
+		}
 
 		store.dispatch(
 			settingsActions.setLastN(this._maxSpotlights));

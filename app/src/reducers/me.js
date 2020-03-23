@@ -2,6 +2,7 @@ const initialState =
 {
 	id                    : null,
 	picture               : null,
+	isMobile              : false,
 	canSendMic            : false,
 	canSendWebcam         : false,
 	canShareScreen        : false,
@@ -34,6 +35,11 @@ const me = (state = initialState, action) =>
 				id : peerId,
 				loginEnabled
 			};
+		}
+
+		case 'SET_IS_MOBILE':
+		{
+			return { ...state, isMobile: true };
 		}
 
 		case 'LOGGED_IN':

@@ -121,6 +121,7 @@ const Peer = (props) =>
 		advancedMode,
 		peer,
 		activeSpeaker,
+		isMobile,
 		micConsumer,
 		webcamConsumer,
 		screenConsumer,
@@ -259,7 +260,7 @@ const Peer = (props) =>
 							</div>
 						</Tooltip>
 
-						{ !smallScreen &&
+						{ !isMobile &&
 							<Tooltip
 								title={intl.formatMessage({
 									id             : 'label.newWindow',
@@ -407,7 +408,7 @@ const Peer = (props) =>
 								}, 2000);
 							}}
 						>
-							{ !smallScreen &&
+							{ !isMobile &&
 								<Tooltip
 									title={intl.formatMessage({
 										id             : 'label.newWindow',
@@ -507,6 +508,7 @@ Peer.propTypes =
 	screenConsumer           : appPropTypes.Consumer,
 	windowConsumer           : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
+	isMobile                 : PropTypes.bool,
 	spacing                  : PropTypes.number,
 	style                    : PropTypes.object,
 	smallButtons             : PropTypes.bool,
@@ -526,7 +528,8 @@ const makeMapStateToProps = (initialState, { id }) =>
 			peer           : state.peers[id],
 			...getPeerConsumers(state, id),
 			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : id === state.room.activeSpeakerId
+			activeSpeaker  : id === state.room.activeSpeakerId,
+			isMobile       : state.me.isMobile
 		};
 	};
 
@@ -560,7 +563,8 @@ export default withRoomContext(connect(
 				prev.peers === next.peers &&
 				prev.consumers === next.consumers &&
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
-				prev.room.windowConsumer === next.room.windowConsumer
+				prev.room.windowConsumer === next.room.windowConsumer &&
+				prev.me.isMobile === next.me.isMobile
 			);
 		}
 	}

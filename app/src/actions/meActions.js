@@ -4,6 +4,11 @@ export const setMe = ({ peerId, loginEnabled }) =>
 		payload : { peerId, loginEnabled }
 	});
 
+export const setIsMobile = () =>
+	({
+		type : 'SET_IS_MOBILE'
+	});
+
 export const loggedIn = (flag) =>
 	({
 		type    : 'LOGGED_IN',

@@ -299,102 +299,106 @@ const Me = (props) =>
 								defaultMessage='ME'
 							/>
 						</p>
-						<Tooltip title={micTip} placement={smallScreen ? 'top' : 'left'}>
-							<div>
-								<Fab
-									aria-label={intl.formatMessage({
-										id             : 'device.muteAudio',
-										defaultMessage : 'Mute audio'
-									})}
-									className={classes.fab}
-									disabled={!me.canSendMic || me.audioInProgress}
-									color={micState === 'on' ? 'default' : 'secondary'}
-									size={smallButtons ? 'small' : 'large'}
-									onClick={() =>
-									{
-										if (micState === 'off')
-											roomClient.enableMic();
-										else if (micState === 'on')
-											roomClient.muteMic();
-										else
-											roomClient.unmuteMic();
-									}}
-								>
-									{ micState === 'on' ?
-										<MicIcon />
-										:
-										<MicOffIcon />
-									}
-								</Fab>
-							</div>
-						</Tooltip>
-						<Tooltip title={webcamTip} placement={smallScreen ? 'top' : 'left'}>
-							<div>
-								<Fab
-									aria-label={intl.formatMessage({
-										id             : 'device.startVideo',
-										defaultMessage : 'Start video'
-									})}
-									className={classes.fab}
-									disabled={!me.canSendWebcam || me.webcamInProgress}
-									color={webcamState === 'on' ? 'default' : 'secondary'}
-									size={smallButtons ? 'small' : 'large'}
-									onClick={() =>
-									{
-										webcamState === 'on' ?
-											roomClient.disableWebcam() :
-											roomClient.enableWebcam();
-									}}
-								>
-									{ webcamState === 'on' ?
-										<VideoIcon />
-										:
-										<VideoOffIcon />
-									}
-								</Fab>
-							</div>
-						</Tooltip>
-						<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'left'}>
-							<div>
-								<Fab
-									aria-label={intl.formatMessage({
-										id             : 'device.startScreenSharing',
-										defaultMessage : 'Start screen sharing'
-									})}
-									className={classes.fab}
-									disabled={!me.canShareScreen || me.screenShareInProgress}
-									color={screenState === 'on' ? 'primary' : 'default'}
-									size={smallButtons ? 'small' : 'large'}
-									onClick={() =>
-									{
-										switch (screenState)
-										{
-											case 'on':
+						{ !me.isMobile &&
+							<React.Fragment>
+								<Tooltip title={micTip} placement={smallScreen ? 'top' : 'left'}>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.muteAudio',
+												defaultMessage : 'Mute audio'
+											})}
+											className={classes.fab}
+											disabled={!me.canSendMic || me.audioInProgress}
+											color={micState === 'on' ? 'default' : 'secondary'}
+											size={smallButtons ? 'small' : 'large'}
+											onClick={() =>
 											{
-												roomClient.disableScreenSharing();
-												break;
+												if (micState === 'off')
+													roomClient.enableMic();
+												else if (micState === 'on')
+													roomClient.muteMic();
+												else
+													roomClient.unmuteMic();
+											}}
+										>
+											{ micState === 'on' ?
+												<MicIcon />
+												:
+												<MicOffIcon />
 											}
-											case 'off':
+										</Fab>
+									</div>
+								</Tooltip>
+								<Tooltip title={webcamTip} placement={smallScreen ? 'top' : 'left'}>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.startVideo',
+												defaultMessage : 'Start video'
+											})}
+											className={classes.fab}
+											disabled={!me.canSendWebcam || me.webcamInProgress}
+											color={webcamState === 'on' ? 'default' : 'secondary'}
+											size={smallButtons ? 'small' : 'large'}
+											onClick={() =>
 											{
-												roomClient.enableScreenSharing();
-												break;
+												webcamState === 'on' ?
+													roomClient.disableWebcam() :
+													roomClient.enableWebcam();
+											}}
+										>
+											{ webcamState === 'on' ?
+												<VideoIcon />
+												:
+												<VideoOffIcon />
 											}
-											default:
+										</Fab>
+									</div>
+								</Tooltip>
+								<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'left'}>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.startScreenSharing',
+												defaultMessage : 'Start screen sharing'
+											})}
+											className={classes.fab}
+											disabled={!me.canShareScreen || me.screenShareInProgress}
+											color={screenState === 'on' ? 'primary' : 'default'}
+											size={smallButtons ? 'small' : 'large'}
+											onClick={() =>
 											{
-												break;
+												switch (screenState)
+												{
+													case 'on':
+													{
+														roomClient.disableScreenSharing();
+														break;
+													}
+													case 'off':
+													{
+														roomClient.enableScreenSharing();
+														break;
+													}
+													default:
+													{
+														break;
+													}
+												}
+											}}
+										>
+											{ (screenState === 'on' || screenState === 'unsupported') &&
+												<ScreenOffIcon/>
 											}
-										}
-									}}
-								>
-									{ (screenState === 'on' || screenState === 'unsupported') &&
-										<ScreenOffIcon/>
-									}
-									{ screenState === 'off' &&
-										<ScreenIcon/>
-									}
-								</Fab>
-							</div>
-						</Tooltip>
+											{ screenState === 'off' &&
+												<ScreenIcon/>
+											}
+										</Fab>
+									</div>
+								</Tooltip>
+							</React.Fragment>
+						}
 					</div>
 
 					<VideoView
