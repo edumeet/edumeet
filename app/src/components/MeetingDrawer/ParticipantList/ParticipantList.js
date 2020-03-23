@@ -143,7 +143,11 @@ class ParticipantList extends React.PureComponent
 							})}
 							onClick={() => roomClient.setSelectedPeer(peerId)}
 						>
-							<ListPeer id={peerId} advancedMode={advancedMode} isModerator={isModerator} />
+							<ListPeer
+								id={peerId}
+								advancedMode={advancedMode}
+								isModerator={isModerator}
+							/>
 						</li>
 					))}
 				</ul>
@@ -165,12 +169,9 @@ ParticipantList.propTypes =
 
 const mapStateToProps = (state) =>
 {
-	const isModerator =
-		state.me.roles.includes(userRoles.MODERATOR) ||
-		state.me.roles.includes(userRoles.ADMIN);
-
 	return {
-		isModerator,
+		isModerator : state.me.roles.includes(userRoles.MODERATOR) ||
+			state.me.roles.includes(userRoles.ADMIN),
 		passivePeers   : passivePeersSelector(state),
 		selectedPeerId : state.room.selectedPeerId,
 		spotlightPeers : spotlightPeersSelector(state)
