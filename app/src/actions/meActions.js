@@ -10,7 +10,7 @@ export const loggedIn = (flag) =>
 		payload : { flag }
 	});
 
-export const addRole = ({ role }) =>
+export const addRole = (role) =>
 	({
 		type    : 'ADD_ROLE',
 		payload : { role }

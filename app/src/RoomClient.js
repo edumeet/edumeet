@@ -2117,7 +2117,7 @@ export default class RoomClient
 
 						if (peerId === this._peerId)
 						{
-							store.dispatch(meActions.addRole({ role }));
+							store.dispatch(meActions.addRole(role));
 
 							store.dispatch(requestActions.notify(
 								{
@@ -2128,7 +2128,7 @@ export default class RoomClient
 								}));
 						}
 						else
-							store.dispatch(peerActions.addPeerRole({ peerId, role }));
+							store.dispatch(peerActions.addPeerRole(peerId, role));
 
 						break;
 					}
@@ -2139,7 +2139,7 @@ export default class RoomClient
 
 						if (peerId === this._peerId)
 						{
-							store.dispatch(meActions.removeRole({ role }));
+							store.dispatch(meActions.removeRole(role));
 
 							store.dispatch(requestActions.notify(
 								{
@@ -2150,7 +2150,7 @@ export default class RoomClient
 								}));
 						}
 						else
-							store.dispatch(peerActions.removePeerRole({ peerId, role }));
+							store.dispatch(peerActions.removePeerRole(peerId, role));
 
 						break;
 					}
