@@ -28,7 +28,7 @@ Currently multiparty-meeting will only run on nodejs v10.*
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
-$ sudo apt install npm build-essentials redis
+$ sudo apt install git npm build-essential redis
 ```
 
 * Clone the project:
