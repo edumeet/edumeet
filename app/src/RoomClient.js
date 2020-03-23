@@ -407,16 +407,8 @@ export default class RoomClient
 
 		const { displayName, picture } = data;
 
-		if (store.getState().room.state === 'connected')
-		{
-			this.changeDisplayName(displayName);
-			this.changePicture(picture);
-		}
-		else
-		{
-			store.dispatch(settingsActions.setDisplayName(displayName));
-			store.dispatch(meActions.setPicture(picture));
-		}
+		store.dispatch(settingsActions.setDisplayName(displayName));
+		store.dispatch(meActions.setPicture(picture));
 
 		store.dispatch(meActions.loggedIn(true));
 
