@@ -48,6 +48,9 @@ const me = (state = initialState, action) =>
 
 		case 'ADD_ROLE':
 		{
+			if (state.roles.includes(action.payload.role))
+				return state;
+
 			const roles = [ ...state.roles, action.payload.role ];
 
 			return { ...state, roles };

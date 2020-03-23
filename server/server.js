@@ -309,42 +309,28 @@ async function setupAuth()
 		{
 			const state = JSON.parse(base64.decode(req.query.state));
 
-			let displayName;
-			let picture;
+			const { peerId, roomId } = state;
 
-			if (req.user != null)
-			{
-				if (req.user.displayName != null)
-					displayName = req.user.displayName;
-				else
-					displayName = '';
+			let peer = peers.get(peerId);
 
-				if (req.user.picture != null)
-					picture = req.user.picture;
-				else
-					picture = '/static/media/buddy.403cb9f6.svg';
-			}
+			if (!peer) // User has no socket session yet, make temporary
+				peer = new Peer({ id: peerId, roomId });
 
-			const peer = peers.get(state.peerId);
-
-			if (peer && peer.roomId !== state.roomId) // The peer is mischievous
+			if (peer && peer.roomId !== roomId) // The peer is mischievous
 				throw new Error('peer authenticated with wrong room');
-
-			peer && (peer.displayName = displayName);
-			peer && (peer.picture = picture);
 
 			if (peer && typeof config.userMapping === 'function')
 			{
 				await config.userMapping({
 					peer,
-					roomId   : state.roomId,
+					roomId,
 					userinfo : req.user._userinfo
 				});
 			}
 
 			res.send(loginHelper({
-				displayName,
-				picture
+				displayName : peer.displayName,
+				picture     : peer.picture
 			}));
 		}
 	);

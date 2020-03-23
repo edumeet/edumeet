@@ -8,7 +8,7 @@ class Peer extends EventEmitter
 {
 	constructor({ id, roomId, socket })
 	{
-		logger.info('constructor() [id:"%s", socket:"%s"]', id, socket.id);
+		logger.info('constructor() [id:"%s"]', id);
 		super();
 
 		this._id = id;
@@ -59,23 +59,26 @@ class Peer extends EventEmitter
 			transport.close();
 		});
 
-		if (this._socket)
-			this._socket.disconnect(true);
+		if (this.socket)
+			this.socket.disconnect(true);
 
 		this.emit('close');
 	}
 
 	_handlePeer()
 	{
-		this.socket.on('disconnect', () =>
+		if (this.socket)
 		{
-			if (this.closed)
-				return;
-
-			logger.debug('"disconnect" event [id:%s]', this.id);
-
-			this.close();
-		});
+			this.socket.on('disconnect', () =>
+			{
+				if (this.closed)
+					return;
+	
+				logger.debug('"disconnect" event [id:%s]', this.id);
+	
+				this.close();
+			});
+		}
 	}
 
 	get id()
