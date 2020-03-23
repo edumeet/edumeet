@@ -2324,7 +2324,7 @@ export default class RoomClient
 			{
 				if (!myRoles.includes(role))
 				{
-					store.dispatch(meActions.addRole({ role }));
+					store.dispatch(meActions.addRole(role));
 
 					store.dispatch(requestActions.notify(
 						{
