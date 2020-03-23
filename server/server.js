@@ -18,6 +18,7 @@ const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
 
+const userRoles = require('./userRoles');
 const {
 	loginHelper,
 	logoutHelper
@@ -297,6 +298,19 @@ async function setupAuth()
 	// logout
 	app.get('/auth/logout', (req, res) =>
 	{
+		const { peerId } = req.session;
+
+		const peer = peers.get(peerId);
+
+		if (peer)
+		{
+			for (const role of peer.roles)
+			{
+				if (role !== userRoles.ALL)
+					peer.removeRole(role);
+			}
+		}
+
 		req.logout();
 		res.send(logoutHelper());
 	});
@@ -310,6 +324,9 @@ async function setupAuth()
 			const state = JSON.parse(base64.decode(req.query.state));
 
 			const { peerId, roomId } = state;
+
+			req.session.peerId = peerId;
+			req.session.roomId = roomId;
 
 			let peer = peers.get(peerId);
 
