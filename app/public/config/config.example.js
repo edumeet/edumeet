@@ -5,15 +5,7 @@ var config =
 	developmentPort  : 3443,
 	productionPort   : 443,
 	multipartyServer : 'letsmeet.no',
-	turnServers      : [
-		{
-			urls : [
-				'turn:turn.example.com:443?transport=tcp'
-			],
-			username   : 'example',
-			credential : 'example'
-		}
-	],
+
 	/**
 	 * If defaultResolution is set, it will override user settings when joining:
 	 * low ~ 320x240
@@ -35,8 +27,8 @@ var config =
 		{ scaleResolutionDownBy: 1 }
 	],
 	// Socket.io request timeout
-	requestTimeout    : 10000,
-	transportOptions  :
+	requestTimeout   : 10000,
+	transportOptions :
 	{
 		tcp : true
 	},

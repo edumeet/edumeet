@@ -1,4 +1,5 @@
 const EventEmitter = require('events').EventEmitter;
+const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
 const config = require('../config/config');
@@ -319,7 +320,7 @@ class Room extends EventEmitter
 		}
 	}
 
-	_peerJoining(peer)
+	async _peerJoining(peer)
 	{
 		peer.socket.join(this._roomId);
 
@@ -333,7 +334,46 @@ class Room extends EventEmitter
 		this._peers[peer.id] = peer;
 
 		this._handlePeer(peer);
-		this._notification(peer.socket, 'roomReady');
+
+		let turnServers;
+
+		if ('turnAPIURI' in config)
+		{
+			try
+			{
+				const { data } = await axios.get(
+					config.turnAPIURI,
+					{
+						params : {
+							'uri_schema'  : 'turn',
+							'transport'   : 'tcp',
+							'ip_ver'      : 'ipv4',
+							'servercount' : '2',
+							'api_key'     : config.turnAPIKey,
+							'ip'          : peer.socket.request.connection.remoteAddress
+						}
+					});
+	
+				turnServers = [ {
+					urls       : data.uris,
+					username   : data.username,
+					credential : data.password
+				} ];
+			}
+			catch (error)
+			{
+				if ('backupTurnServers' in config)
+					turnServers = config.backupTurnServers;
+	
+				logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
+			}
+		}
+		else if ('backupTurnServers' in config)
+		{
+			turnServers = config.backupTurnServers;
+		}
+
+		this._notification(peer.socket, 'roomReady', { turnServers });
 	}
 
 	_handlePeer(peer)

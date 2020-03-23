@@ -32,6 +32,19 @@ module.exports =
 		}
 	},
 	*/
+	// URI and key for requesting geoip-based TURN server closest to the client
+	turnAPIKey        : 'examplekey',
+	turnAPIURI        : 'https://example.com/api/turn',
+	// Backup turnservers if REST fails or is not configured
+	backupTurnServers : [
+		{
+			urls : [
+				'turn:turn.example.com:443?transport=tcp'
+			],
+			username   : 'example',
+			credential : 'example'
+		}
+	],
 	redisOptions : {},
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',

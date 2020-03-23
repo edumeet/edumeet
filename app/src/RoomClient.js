@@ -26,8 +26,7 @@ let ScreenShare;
 
 let Spotlights;
 
-let turnServers,
-	requestTimeout,
+let requestTimeout,
 	transportOptions,
 	lastN,
 	mobileLastN,
@@ -36,7 +35,6 @@ let turnServers,
 if (process.env.NODE_ENV !== 'test')
 {
 	({
-		turnServers,
 		requestTimeout,
 		transportOptions,
 		lastN,
@@ -50,8 +48,7 @@ const logger = new Logger('RoomClient');
 const ROOM_OPTIONS =
 {
 	requestTimeout   : requestTimeout,
-	transportOptions : transportOptions,
-	turnServers      : turnServers
+	transportOptions : transportOptions
 };
 
 const VIDEO_CONSTRAINS =
@@ -1393,27 +1390,6 @@ export default class RoomClient
 
 		this._signalingUrl = getSignalingUrl(this._peerId, roomId);
 
-		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
-
-		this._webTorrent = this._torrentSupport && new WebTorrent({
-			tracker : {
-				rtcConfig : {
-					iceServers : ROOM_OPTIONS.turnServers
-				}
-			}
-		});
-
-		this._webTorrent.on('error', (error) =>
-		{
-			logger.error('Filesharing [error:"%o"]', error);
-
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : intl.formatMessage({ id: 'filesharing.error', defaultMessage: 'There was a filesharing error' })
-				}));
-		});
-
 		this._screenSharing = ScreenShare.create(this._device);
 
 		this._signalingSocket = io(this._signalingUrl);
@@ -1645,6 +1621,10 @@ export default class RoomClient
 						
 					case 'roomReady':
 					{
+						const { turnServers } = notification.data;
+
+						this._turnServers = turnServers;
+
 						store.dispatch(roomActions.toggleJoined());
 						store.dispatch(roomActions.setInLobby(false));
 	
@@ -2062,6 +2042,27 @@ export default class RoomClient
 
 		try
 		{
+			this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
+
+			this._webTorrent = this._torrentSupport && new WebTorrent({
+				tracker : {
+					rtcConfig : {
+						iceServers : this._turnServers
+					}
+				}
+			});
+	
+			this._webTorrent.on('error', (error) =>
+			{
+				logger.error('Filesharing [error:"%o"]', error);
+	
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : intl.formatMessage({ id: 'filesharing.error', defaultMessage: 'There was a filesharing error' })
+					}));
+			});
+
 			this._mediasoupDevice = new mediasoupClient.Device();
 
 			const routerRtpCapabilities =
@@ -2092,7 +2093,7 @@ export default class RoomClient
 						iceParameters,
 						iceCandidates,
 						dtlsParameters,
-						iceServers             : ROOM_OPTIONS.turnServers,
+						iceServers             : this._turnServers,
 						proprietaryConstraints : PC_PROPRIETARY_CONSTRAINTS
 					});
 
@@ -2154,7 +2155,7 @@ export default class RoomClient
 					iceParameters,
 					iceCandidates,
 					dtlsParameters,
-					iceServers : ROOM_OPTIONS.turnServers
+					iceServers : this._turnServers
 				});
 
 			this._recvTransport.on(
