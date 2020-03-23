@@ -5,6 +5,8 @@ const config = require('../config/config');
 
 const logger = new Logger('Room');
 
+const ROUTER_SCALE_SIZE = 40;
+
 class Room extends EventEmitter
 {
 	/**
