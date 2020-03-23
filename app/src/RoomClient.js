@@ -122,7 +122,17 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ peerId, accessCode, device, useSimulcast, useSharingSimulcast, produce, forceTcp, displayName, muted } = {})
+		{
+			peerId,
+			accessCode,
+			device,
+			useSimulcast,
+			useSharingSimulcast,
+			produce,
+			forceTcp,
+			displayName,
+			muted
+		} = {})
 	{
 		if (!peerId)
 			throw new Error('Missing peerId');
@@ -706,7 +716,7 @@ export default class RoomClient
 
 		this._webTorrent.seed(
 			files,
-			{ announceList: [['wss://tracker.lab.vvc.niif.hu:443']] },
+			{ announceList: [ [ 'wss://tracker.lab.vvc.niif.hu:443' ] ] },
 			(torrent) =>
 			{
 				store.dispatch(requestActions.notify(
@@ -2595,18 +2605,15 @@ export default class RoomClient
 				{
 					encodings = VIDEO_SVC_ENCODINGS;
 				}
+				else if ('simulcastEncodings' in window.config)
+				{
+					encodings = window.config.simulcastEncodings
+						.map((encoding) => ({ ...encoding, dtx: true }));
+				}
 				else
 				{
-					if ('simulcastEncodings' in window.config)
-					{
-						encodings = window.config.simulcastEncodings
-							.map((encoding) => ({ ...encoding, dtx: true }));
-					}
-					else
-					{
-						encodings = VIDEO_SIMULCAST_ENCODINGS
-							.map((encoding) => ({ ...encoding, dtx: true }));
-					}
+					encodings = VIDEO_SIMULCAST_ENCODINGS
+						.map((encoding) => ({ ...encoding, dtx: true }));
 				}
 
 				this._screenSharingProducer = await this._sendTransport.produce(
@@ -2773,13 +2780,10 @@ export default class RoomClient
 
 				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
 					encodings = VIDEO_KSVC_ENCODINGS;
+				else if ('simulcastEncodings' in window.config)
+					encodings = window.config.simulcastEncodings;
 				else
-				{
-					if ('simulcastEncodings' in window.config)
-						encodings = window.config.simulcastEncodings;
-					else
-						encodings = VIDEO_SIMULCAST_ENCODINGS;
-				}
+					encodings = VIDEO_SIMULCAST_ENCODINGS;
 
 				this._webcamProducer = await this._sendTransport.produce(
 					{
