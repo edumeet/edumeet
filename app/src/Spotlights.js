@@ -116,19 +116,9 @@ export default class Spotlights extends EventEmitter
 		logger.debug(
 			'room "peerClosed" event [peerId:%o]', id);
 
-		let index = this._peerList.indexOf(id);
+		this._peerList = this._peerList.filter((peer) => peer !== id);
 
-		if (index !== -1) // We have this peer in the list, remove
-		{
-			this._peerList.splice(index, 1);
-		}
-
-		index = this._selectedSpotlights.indexOf(id);
-
-		if (index !== -1) // We have this peer in the list, remove
-		{
-			this._selectedSpotlights.splice(index, 1);
-		}
+		this._selectedSpotlights = this._selectedSpotlights.filter((peer) => peer !== id);
 
 		if (this._started)
 			this._spotlightsUpdated();
