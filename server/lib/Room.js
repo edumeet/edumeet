@@ -430,7 +430,7 @@ class Room extends EventEmitter
 			this._notification(peer.socket, 'gotRole', {
 				peerId : peer.id,
 				role   : newRole
-			}, true);
+			}, true, true);
 		});
 
 		peer.on('lostRole', ({ oldRole }) =>
@@ -443,7 +443,7 @@ class Room extends EventEmitter
 			this._notification(peer.socket, 'lostRole', {
 				peerId : peer.id,
 				role   : oldRole
-			}, true);
+			}, true, true);
 		});
 	}
 
@@ -1361,13 +1361,16 @@ class Room extends EventEmitter
 		});
 	}
 
-	_notification(socket, method, data = {}, broadcast = false)
+	_notification(socket, method, data = {}, broadcast = false, includeSender = false)
 	{
 		if (broadcast)
 		{
 			socket.broadcast.to(this._roomId).emit(
 				'notification', { method, data }
 			);
+
+			if (includeSender)
+				socket.emit('notification', { method, data });
 		}
 		else
 		{
