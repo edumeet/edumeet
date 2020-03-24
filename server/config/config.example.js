@@ -149,8 +149,8 @@ module.exports =
 	// [ userRoles.MODERATOR, userRoles.AUTHENTICATED ]
 	// This will allow all MODERATOR and AUTHENTICATED users access.
 	requiredRolesForAccess : [ userRoles.ALL ],
-	// When truthy, the room will be open to all users when the first
-	// AUTHENTICATED or MODERATOR user joins the room.
+	// When truthy, the room will be open to all users when as long as there
+	// are allready users in the room
 	activateOnHostJoin     : true,
 	// Mediasoup settings
 	mediasoup              :

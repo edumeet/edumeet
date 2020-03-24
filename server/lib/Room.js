@@ -54,6 +54,12 @@ class Room extends EventEmitter
 		// Locked flag.
 		this._locked = false;
 
+		// Required roles to access
+		this._requiredRoles = [ userRoles.ALL ];
+
+		if ('requiredRolesForAccess' in config)
+			this._requiredRoles = config.requiredRolesForAccess;
+
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;
 
@@ -135,7 +141,7 @@ class Room extends EventEmitter
 		else
 		{
 			// If the user has a role in config.requiredRolesForAccess, let them in
-			peer.roles.some((role) => config.requiredRolesForAccess.includes(role)) ?
+			peer.roles.some((role) => this._requiredRoles.includes(role)) ?
 				this._peerJoining(peer) :
 				this._handleGuest(peer);
 		}
@@ -181,7 +187,7 @@ class Room extends EventEmitter
 			// If the user has a role in config.requiredRolesForAccess, let them in
 			if (
 				!this._locked &&
-				peer.roles.some((role) => config.requiredRolesForAccess.includes(role))
+				peer.roles.some((role) => this._requiredRoles.includes(role))
 			)
 			{
 				this._lobby.promotePeer(peer.id);
