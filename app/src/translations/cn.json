@@ -48,9 +48,9 @@
 	"room.spotlights": "Spotlight中的参与者",
 	"room.passive": "被动参与者",
 	"room.videoPaused": "该视频已暂停",
-	"room.muteAll": "Mute all",
-	"room.stopAllVideo": "Stop all video",
-	"room.closeMeeting": "Close meeting",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
 
 	"tooltip.login": "登录",
 	"tooltip.logout": "注销",
@@ -61,7 +61,7 @@
 	"tooltip.leaveFullscreen": "退出全屏",
 	"tooltip.lobby": "显示大厅",
 	"tooltip.settings": "显示设置",
-	"tooltip.kickParticipant": "Kick out participant",
+	"tooltip.kickParticipant": null,
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",

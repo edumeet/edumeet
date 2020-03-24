@@ -48,9 +48,9 @@
 	"room.spotlights": "Aktywni uczestnicy",
 	"room.passive": "Pasywni uczestnicy",
 	"room.videoPaused": "To wideo jest wstrzymane.",
-	"room.muteAll": "Mute all",
-	"room.stopAllVideo": "Stop all video",
-	"room.closeMeeting": "Close meeting",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
 
 	"tooltip.login": "Zaloguj",
 	"tooltip.logout": "Wyloguj",
@@ -61,7 +61,7 @@
 	"tooltip.leaveFullscreen": "Wyłącz tryb pełnoekranowy",
 	"tooltip.lobby": "Pokaż poczekalnię",
 	"tooltip.settings": "Pokaż ustawienia",
-	"tooltip.kickParticipant": "Kick out participant",
+	"tooltip.kickParticipant": null,
 
 	"label.roomName": "Nazwa konferencji",
 	"label.chooseRoomButton": "Kontynuuj",

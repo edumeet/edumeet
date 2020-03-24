@@ -48,9 +48,9 @@
 	"room.spotlights": "Deltagere i fokus",
 	"room.passive": "Passive deltagere",
 	"room.videoPaused": "Denne video er sat på pause",
-	"room.muteAll": "Mute all",
-	"room.stopAllVideo": "Stop all video",
-	"room.closeMeeting": "Close meeting",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
 
 	"tooltip.login": "Log ind",
 	"tooltip.logout": "Log ud",
@@ -61,7 +61,7 @@
 	"tooltip.leaveFullscreen": "Efterlad fuldskærm",
 	"tooltip.lobby": "Vis lobby",
 	"tooltip.settings": "Vis indstillinger",
-	"tooltip.kickParticipant": "Kick out participant",
+	"tooltip.kickParticipant": null,
 
 	"label.roomName": "Værelsesnavn",
 	"label.chooseRoomButton": "Fortsæt",
@@ -106,7 +106,7 @@
 	"filesharing.finished": "Filen er færdig med at downloade",
 	"filesharing.save": "Gem",
 	"filesharing.sharedFile": "{displayName} delte en fil",
-	"filesharing.download": "Download",
+	"filesharing.download": null,
 	"filesharing.missingSeeds": "Hvis denne proces tager lang tid, er der muligvis ikke nogen, der seedede denne torrent. Prøv at bede nogen om at uploade den fil, du ønsker at hente.",
 
 	"device.devicesChanged": "Detekteret ndringer i dine enheder, konfigurer dine enheder i indstillingsdialogen",

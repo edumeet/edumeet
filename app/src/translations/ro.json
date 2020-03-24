@@ -48,9 +48,9 @@
 	"room.spotlights": "Participanți în Spotlight",
 	"room.passive": "Participanți pasivi",
 	"room.videoPaused": "Acest video este pus pe pauză",
-	"room.muteAll": "Mute all",
-	"room.stopAllVideo": "Stop all video",
-	"room.closeMeeting": "Close meeting",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
 
 	"tooltip.login": "Intră în cont",
 	"tooltip.logout": "Deconectare",
@@ -61,7 +61,7 @@
 	"tooltip.leaveFullscreen": "Ieșire din modul ecran complet",
 	"tooltip.lobby": "Arată holul",
 	"tooltip.settings": "Arată setăile",
-	"tooltip.kickParticipant": "Kick out participant",
+	"tooltip.kickParticipant": null,
 
 	"label.roomName": "Numele camerei",
 	"label.chooseRoomButton": "Continuare",

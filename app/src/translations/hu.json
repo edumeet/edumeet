@@ -4,7 +4,7 @@
 	"socket.reconnected": "Sikeres újarkapcsolódás",
 	"socket.requestError": "Sikertelen szerver lekérés",
 
-	"room.chooseRoom": "Choose the name of the room you would like to join",
+	"room.chooseRoom": null,
 	"room.cookieConsent": "Ez a weblap a felhasználói élmény fokozása miatt sütiket használ",
 	"room.joined": "Csatlakozátál a konferenciához",
 	"room.cantJoin": "Sikertelen csatlakozás a konferenciához",
@@ -48,9 +48,9 @@
 	"room.spotlights": "Látható résztvevők",
 	"room.passive": "Passzív résztvevők",
 	"room.videoPaused": "Ez a videóstream szünetel",
-	"room.muteAll": "Mute all",
-	"room.stopAllVideo": "Stop all video",
-	"room.closeMeeting": "Close meeting",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
 
 	"tooltip.login": "Belépés",
 	"tooltip.logout": "Kilépés",
@@ -61,7 +61,7 @@
 	"tooltip.leaveFullscreen": "Kilépés teljes képernyős módból",
 	"tooltip.lobby": "Az előszobában várakozók listája",
 	"tooltip.settings": "Beállítások",
-	"tooltip.kickParticipant": "Kick out participant",
+	"tooltip.kickParticipant": null,
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
