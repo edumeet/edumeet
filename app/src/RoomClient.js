@@ -1178,6 +1178,26 @@ export default class RoomClient
 			roomActions.setStopAllVideoInProgress(false));
 	}
 
+	async closeMeeting()
+	{
+		logger.debug('closeMeeting()');
+
+		store.dispatch(
+			roomActions.setCloseMeetingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:closeMeeting');
+		}
+		catch (error)
+		{
+			logger.error('closeMeeting() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setCloseMeetingInProgress(false));
+	}
+
 	// type: mic/webcam/screen
 	// mute: true/false
 	async modifyPeerConsumer(peerId, type, mute)

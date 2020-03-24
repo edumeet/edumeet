@@ -71,6 +71,23 @@ const ListModerator = (props) =>
 					defaultMessage='Stop all video'
 				/>
 			</Button>
+			<div className={classes.divider} />
+			<Button
+				aria-label={intl.formatMessage({
+					id             : 'room.closeMeeting',
+					defaultMessage : 'Close meeting'
+				})}
+				className={classes.actionButton}
+				variant='contained'
+				color='secondary'
+				disabled={room.closeMeetingInProgress}
+				onClick={() => roomClient.closeMeeting()}
+			>
+				<FormattedMessage
+					id='room.closeMeeting'
+					defaultMessage='Close meeting'
+				/>
+			</Button>
 		</div>
 	);
 };

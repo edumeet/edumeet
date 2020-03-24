@@ -122,3 +122,9 @@ export const setStopAllVideoInProgress = (flag) =>
 		type    : 'STOP_ALL_VIDEO_IN_PROGRESS',
 		payload : { flag }
 	});
+
+export const setCloseMeetingInProgress = (flag) =>
+	({
+		type    : 'CLOSE_MEETING_IN_PROGRESS',
+		payload : { flag }
+	});

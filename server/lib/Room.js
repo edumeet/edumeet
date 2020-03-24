@@ -1105,6 +1105,33 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:closeMeeting':
+			{
+				if (
+					!peer.hasRole(userRoles.MODERATOR) &&
+					!peer.hasRole(userRoles.ADMIN)
+				)
+					throw new Error('peer does not have moderator priveleges');
+
+				this._notification(
+					peer.socket,
+					'moderator:kick',
+					null,
+					true
+				);
+
+				// Close the peers.
+				for (const kickedPeer in this._peers)
+				{
+					if (peer !== kickedPeer)
+						kickedPeer.close();
+				}
+
+				cb();
+
+				break;
+			}
+
 			case 'moderator:kickPeer':
 			{
 				if (
