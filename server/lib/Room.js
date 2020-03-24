@@ -1120,14 +1120,10 @@ class Room extends EventEmitter
 					true
 				);
 
-				// Close the peers.
-				for (const kickedPeer in this._peers)
-				{
-					if (peer !== kickedPeer)
-						kickedPeer.close();
-				}
-
 				cb();
+
+				// Close the room
+				this.close();
 
 				break;
 			}
