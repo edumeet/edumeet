@@ -100,11 +100,8 @@ class Room extends EventEmitter
 		// Close the peers.
 		for (const peer in this._peers)
 		{
-			if (Object.prototype.hasOwnProperty.call(this._peers, peer))
-			{
-				if (!peer.closed)
-					peer.close();
-			}
+			if (!peer.closed)
+				peer.close();
 		}
 
 		this._peers = null;
@@ -313,7 +310,6 @@ class Room extends EventEmitter
 		}, 10000);
 	}
 
-	// checks both room and lobby
 	checkEmpty()
 	{
 		return Object.keys(this._peers).length === 0;
@@ -333,12 +329,8 @@ class Room extends EventEmitter
 	{
 		peer.socket.join(this._roomId);
 
-		const index = this._lastN.indexOf(peer.id);
-
-		if (index === -1) // We don't have this peer, add to end
-		{
-			this._lastN.push(peer.id);
-		}
+		// If we don't have this peer, add to end
+		!this._lastN.includes(peer.id) && this._lastN.push(peer.id);
 
 		this._peers[peer.id] = peer;
 
@@ -372,25 +364,17 @@ class Room extends EventEmitter
 
 			// If the Peer was joined, notify all Peers.
 			if (peer.joined)
-			{
 				this._notification(peer.socket, 'peerClosed', { peerId: peer.id }, true);
-			}
 
-			const index = this._lastN.indexOf(peer.id);
-
-			if (index > -1) // We have this peer in the list, remove
-			{
-				this._lastN.splice(index, 1);
-			}
+			// Remove from lastN
+			this._lastN = this._lastN.filter((id) => id !== peer.id);
 
 			delete this._peers[peer.id];
 
 			// If this is the last Peer in the room and
 			// lobby is empty, close the room after a while.
 			if (this.checkEmpty() && this._lobby.checkEmpty())
-			{
 				this.selfDestructCountdown();
-			}
 		});
 
 		peer.on('displayNameChanged', ({ oldDisplayName }) =>

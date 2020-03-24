@@ -14,7 +14,7 @@ class Lobby extends EventEmitter
 		// Closed flag.
 		this._closed = false;
 
-		this._peers = new Map();
+		this._peers = {};
 	}
 
 	close()
@@ -23,27 +23,28 @@ class Lobby extends EventEmitter
 
 		this._closed = true;
 
-		this._peers.forEach((peer) =>
+		// Close the peers.
+		for (const peer in this._peers)
 		{
 			if (!peer.closed)
 				peer.close();
-		});
+		}
 
-		this._peers.clear();
+		this._peers = null;
 	}
 
 	checkEmpty()
 	{
 		logger.info('checkEmpty()');
 		
-		return this._peers.size === 0;
+		return Object.keys(this._peers).length === 0;
 	}
 
 	peerList()
 	{
 		logger.info('peerList()');
 
-		return Array.from(this._peers.values()).map((peer) =>
+		return Object.values(this._peers).map((peer) =>
 			({
 				peerId      : peer.id,
 				displayName : peer.displayName 
@@ -52,25 +53,25 @@ class Lobby extends EventEmitter
 
 	hasPeer(peerId)
 	{
-		return this._peers.has(peerId);
+		return this._peers[peerId] != null;
 	}
 
 	promoteAllPeers()
 	{
 		logger.info('promoteAllPeers()');
 
-		this._peers.forEach((peer) =>
+		for (const peer in this._peers)
 		{
 			if (peer.socket)
 				this.promotePeer(peer.id);
-		});
+		}
 	}
 
 	promotePeer(peerId)
 	{
 		logger.info('promotePeer() [peer:"%s"]', peerId);
 
-		const peer = this._peers.get(peerId);
+		const peer = this._peers[peerId];
 
 		if (peer)
 		{
@@ -87,7 +88,7 @@ class Lobby extends EventEmitter
 			peer.closeHandler = null;
 
 			this.emit('promotePeer', peer);
-			this._peers.delete(peerId);
+			delete this._peers[peerId];
 		}
 	}
 
@@ -146,7 +147,7 @@ class Lobby extends EventEmitter
 
 			this.emit('peerClosed', peer);
 
-			this._peers.delete(peer.id);
+			delete this._peers[peer.id];
 
 			if (this.checkEmpty())
 				this.emit('lobbyEmpty');
@@ -154,7 +155,7 @@ class Lobby extends EventEmitter
 
 		this._notification(peer.socket, 'enteredLobby');
 
-		this._peers.set(peer.id, peer);
+		this._peers[peer.id] = peer;
 
 		peer.on('gotRole', peer.gotRoleHandler);
 		peer.on('displayNameChanged', peer.displayNameChangeHandler);
