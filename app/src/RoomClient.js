@@ -2104,6 +2104,8 @@ export default class RoomClient
 						iceCandidates,
 						dtlsParameters,
 						iceServers             : this._turnServers,
+						// TODO: Fix for issue #72
+						iceTransportPolicy : this._device.flag === 'firefox' ? 'relay' : undefined,
 						proprietaryConstraints : PC_PROPRIETARY_CONSTRAINTS
 					});
 
@@ -2165,7 +2167,9 @@ export default class RoomClient
 					iceParameters,
 					iceCandidates,
 					dtlsParameters,
-					iceServers : this._turnServers
+					iceServers : this._turnServers,
+					// TODO: Fix for issue #72
+					iceTransportPolicy : this._device.flag === 'firefox' ? 'relay' : undefined
 				});
 
 			this._recvTransport.on(
