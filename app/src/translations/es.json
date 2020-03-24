@@ -48,6 +48,9 @@
   "room.spotlights": "Participantes destacados",
   "room.passive": "Participantes pasivos",
   "room.videoPaused": "El vídeo está pausado",
+  "room.muteAll": "Mute all",
+  "room.stopAllVideo": "Stop all video",
+  "room.closeMeeting": "Close meeting",
 
   "tooltip.login": "Entrar",
   "tooltip.logout": "Salir",
@@ -58,6 +61,7 @@
   "tooltip.leaveFullscreen": "Salir de la pantalla completa",
   "tooltip.lobby": "Mostrar sala de espera",
   "tooltip.settings": "Mostrar ajustes",
+  "tooltip.kickParticipant": "Kick out participant",
 
   "label.roomName": "Nombre de la sala",
   "label.chooseRoomButton": "Continuar",

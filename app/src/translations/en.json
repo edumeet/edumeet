@@ -48,6 +48,9 @@
 	"room.spotlights": "Participants in Spotlight",
 	"room.passive": "Passive Participants",
 	"room.videoPaused": "This video is paused",
+	"room.muteAll": "Mute all",
+	"room.stopAllVideo": "Stop all video",
+	"room.closeMeeting": "Close meeting",
 
 	"tooltip.login": "Log in",
 	"tooltip.logout": "Log out",
@@ -58,6 +61,7 @@
 	"tooltip.leaveFullscreen": "Leave fullscreen",
 	"tooltip.lobby": "Show lobby",
 	"tooltip.settings": "Show settings",
+	"tooltip.kickParticipant": "Kick out participant",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",

@@ -48,6 +48,9 @@
 	"room.spotlights": "Učesnici u fokusu",
 	"room.passive": "Pasivni učesnici",
 	"room.videoPaused":  "Video pauziran",
+	"room.muteAll": "Mute all",
+	"room.stopAllVideo": "Stop all video",
+	"room.closeMeeting": "Close meeting",
 
 	"tooltip.login": "Prijava",
 	"tooltip.logout": "Odjava",
@@ -58,6 +61,7 @@
 	"tooltip.leaveFullscreen": "Izađi iz punog ekrana",
 	"tooltip.lobby": "Prikaži predvorje",
 	"tooltip.settings": "Prikaži postavke",
+	"tooltip.kickParticipant": "Kick out participant",
 
 	"label.roomName": "Naziv sobe",
 	"label.chooseRoomButton": "Nastavi",

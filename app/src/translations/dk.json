@@ -48,6 +48,9 @@
 	"room.spotlights": "Deltagere i fokus",
 	"room.passive": "Passive deltagere",
 	"room.videoPaused": "Denne video er sat på pause",
+	"room.muteAll": "Mute all",
+	"room.stopAllVideo": "Stop all video",
+	"room.closeMeeting": "Close meeting",
 
 	"tooltip.login": "Log ind",
 	"tooltip.logout": "Log ud",
@@ -58,6 +61,7 @@
 	"tooltip.leaveFullscreen": "Efterlad fuldskærm",
 	"tooltip.lobby": "Vis lobby",
 	"tooltip.settings": "Vis indstillinger",
+	"tooltip.kickParticipant": "Kick out participant",
 
 	"label.roomName": "Værelsesnavn",
 	"label.chooseRoomButton": "Fortsæt",

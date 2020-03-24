@@ -48,6 +48,9 @@
 	"room.spotlights": "Συμμετέχοντες στο Spotlight",
 	"room.passive": "Παθητικοί συμμετέχοντες",
 	"room.videoPaused": "Το βίντεο έχει σταματήσει",
+	"room.muteAll": "Mute all",
+	"room.stopAllVideo": "Stop all video",
+	"room.closeMeeting": "Close meeting",
 
 	"tooltip.login": "Σύνδεση",
 	"tooltip.logout": "Αποσύνδεση",
@@ -58,6 +61,7 @@
 	"tooltip.leaveFullscreen": "Έξοδος από την πλήρη οθόνη",
 	"tooltip.lobby": "Εμφάνιση λόμπι",
 	"tooltip.settings": "Εμφάνιση ρυθμίσεων",
+	"tooltip.kickParticipant": "Kick out participant",
 
 	"label.roomName": "Όνομα δωματίου",
 	"label.chooseRoomButton": "Συνέχεια",
