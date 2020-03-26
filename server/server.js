@@ -361,7 +361,7 @@ async function runHttpsServer()
 
 	app.all('*', async (req, res, next) =>
 	{
-		if (req.secure)
+		if (req.secure || config.httpOnly )
 		{
 			const ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
 
