@@ -1,16 +1,19 @@
 const EventEmitter = require('events').EventEmitter;
+const userRoles = require('../userRoles');
 const Logger = require('./Logger');
 
 const logger = new Logger('Peer');
 
 class Peer extends EventEmitter
 {
-	constructor({ id, socket })
+	constructor({ id, roomId, socket })
 	{
-		logger.info('constructor() [id:"%s", socket:"%s"]', id, socket.id);
+		logger.info('constructor() [id:"%s"]', id);
 		super();
 
 		this._id = id;
+
+		this._roomId = roomId;
 
 		this._authId = null;
 
@@ -22,7 +25,7 @@ class Peer extends EventEmitter
 
 		this._inLobby = false;
 
-		this._authenticated = false;
+		this._roles = [ userRoles.ALL ];
 
 		this._displayName = false;
 
@@ -40,8 +43,6 @@ class Peer extends EventEmitter
 
 		this._consumers = new Map();
 
-		this._checkAuthentication();
-
 		this._handlePeer();
 	}
 
@@ -58,56 +59,25 @@ class Peer extends EventEmitter
 			transport.close();
 		});
 
-		if (this._socket)
-			this._socket.disconnect(true);
+		if (this.socket)
+			this.socket.disconnect(true);
 
 		this.emit('close');
 	}
 
 	_handlePeer()
 	{
-		this.socket.use((packet, next) =>
+		if (this.socket)
 		{
-			this._checkAuthentication();
-
-			return next();
-		});
-
-		this.socket.on('disconnect', () =>
-		{
-			if (this.closed)
-				return;
-
-			logger.debug('"disconnect" event [id:%s]', this.id);
-
-			this.close();
-		});
-	}
-
-	_checkAuthentication()
-	{
-		if (
-			Boolean(this.socket.handshake.session.passport) &&
-			Boolean(this.socket.handshake.session.passport.user)
-		)
-		{
-			const {
-				id,
-				displayName,
-				picture,
-				email
-			} = this.socket.handshake.session.passport.user;
-
-			id && (this.authId = id);
-			displayName && (this.displayName = displayName);
-			picture && (this.picture = picture);
-			email && (this.email = email);
-
-			this.authenticated = true;
-		}
-		else
-		{
-			this.authenticated = false;
+			this.socket.on('disconnect', () =>
+			{
+				if (this.closed)
+					return;
+	
+				logger.debug('"disconnect" event [id:%s]', this.id);
+	
+				this.close();
+			});
 		}
 	}
 
@@ -119,6 +89,16 @@ class Peer extends EventEmitter
 	set id(id)
 	{
 		this._id = id;
+	}
+
+	get roomId()
+	{
+		return this._roomId;
+	}
+
+	set roomId(roomId)
+	{
+		this._roomId = roomId;
 	}
 
 	get authId()
@@ -166,21 +146,9 @@ class Peer extends EventEmitter
 		this._inLobby = inLobby;
 	}
 
-	get authenticated()
+	get roles()
 	{
-		return this._authenticated;
-	}
-
-	set authenticated(authenticated)
-	{
-		if (authenticated !== this._authenticated)
-		{
-			const oldAuthenticated = this._authenticated;
-
-			this._authenticated = authenticated;
-
-			this.emit('authenticationChanged', { oldAuthenticated });
-		}
+		return this._roles;
 	}
 
 	get displayName()
@@ -262,6 +230,35 @@ class Peer extends EventEmitter
 		return this._consumers;
 	}
 
+	addRole(newRole)
+	{
+		if (!this._roles.includes(newRole))
+		{
+			this._roles.push(newRole);
+
+			logger.info('addRole() | [newRole:"%s]"', newRole);
+
+			this.emit('gotRole', { newRole });
+		}
+	}
+
+	removeRole(oldRole)
+	{
+		if (this._roles.includes(oldRole))
+		{
+			this._roles = this._roles.filter((role) => role !== oldRole);
+
+			logger.info('removeRole() | [oldRole:"%s]"', oldRole);
+
+			this.emit('lostRole', { oldRole });
+		}
+	}
+
+	hasRole(role)
+	{
+		return this._roles.includes(role);
+	}
+
 	addTransport(id, transport)
 	{
 		this.transports.set(id, transport);
@@ -319,7 +316,8 @@ class Peer extends EventEmitter
 		{
 			id          : this.id,
 			displayName : this.displayName,
-			picture     : this.picture
+			picture     : this.picture,
+			roles       : this.roles
 		};
 
 		return peerInfo;

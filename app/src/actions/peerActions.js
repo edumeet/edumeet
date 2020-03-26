@@ -45,3 +45,22 @@ export const setPeerPicture = (peerId, picture) =>
 		type    : 'SET_PEER_PICTURE',
 		payload : { peerId, picture }
 	});
+
+
+export const addPeerRole = (peerId, role) =>
+	({
+		type    : 'ADD_PEER_ROLE',
+		payload : { peerId, role }
+	});
+
+export const removePeerRole = (peerId, role) =>
+	({
+		type    : 'REMOVE_PEER_ROLE',
+		payload : { peerId, role }
+	});
+
+export const setPeerKickInProgress = (peerId, flag) =>
+	({
+		type    : 'SET_PEER_KICK_IN_PROGRESS',
+		payload : { peerId, flag }
+	});

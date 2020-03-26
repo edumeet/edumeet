@@ -1,24 +1,27 @@
 const initialState =
 {
-	name               : '',
-	state              : 'new', // new/connecting/connected/disconnected/closed,
-	locked             : false,
-	inLobby            : false,
-	signInRequired     : false,
-	accessCode         : '', // access code to the room if locked and joinByAccessCode == true
-	joinByAccessCode   : true, // if true: accessCode is a possibility to open the room
-	activeSpeakerId    : null,
-	torrentSupport     : false,
-	showSettings       : false,
-	fullScreenConsumer : null, // ConsumerID
-	windowConsumer     : null, // ConsumerID
-	toolbarsVisible    : true,
-	mode               : 'democratic',
-	selectedPeerId     : null,
-	spotlights         : [],
-	settingsOpen       : false,
-	lockDialogOpen     : false,
-	joined             : false
+	name                   : '',
+	state                  : 'new', // new/connecting/connected/disconnected/closed,
+	locked                 : false,
+	inLobby                : false,
+	signInRequired         : false,
+	accessCode             : '', // access code to the room if locked and joinByAccessCode == true
+	joinByAccessCode       : true, // if true: accessCode is a possibility to open the room
+	activeSpeakerId        : null,
+	torrentSupport         : false,
+	showSettings           : false,
+	fullScreenConsumer     : null, // ConsumerID
+	windowConsumer         : null, // ConsumerID
+	toolbarsVisible        : true,
+	mode                   : 'democratic',
+	selectedPeerId         : null,
+	spotlights             : [],
+	settingsOpen           : false,
+	lockDialogOpen         : false,
+	joined                 : false,
+	muteAllInProgress      : false,
+	stopAllVideoInProgress : false,
+	closeMeetingInProgress : false
 };
 
 const room = (state = initialState, action) =>
@@ -110,7 +113,7 @@ const room = (state = initialState, action) =>
 
 		case 'TOGGLE_JOINED':
 		{
-			const joined = !state.joined;
+			const joined = true;
 
 			return { ...state, joined };
 		}
@@ -162,6 +165,15 @@ const room = (state = initialState, action) =>
 
 			return { ...state, spotlights };
 		}
+
+		case 'MUTE_ALL_IN_PROGRESS':
+			return { ...state, muteAllInProgress: action.payload.flag };
+
+		case 'STOP_ALL_VIDEO_IN_PROGRESS':
+			return { ...state, stopAllVideoInProgress: action.payload.flag };
+
+		case 'CLOSE_MEETING_IN_PROGRESS':
+			return { ...state, closeMeetingInProgress: action.payload.flag };
 
 		default:
 			return state;

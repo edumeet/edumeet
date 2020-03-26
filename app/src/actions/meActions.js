@@ -15,6 +15,18 @@ export const loggedIn = (flag) =>
 		payload : { flag }
 	});
 
+export const addRole = (role) =>
+	({
+		type    : 'ADD_ROLE',
+		payload : { role }
+	});
+
+export const removeRole = (role) =>
+	({
+		type    : 'REMOVE_ROLE',
+		payload : { role }
+	});
+
 export const setPicture = (picture) =>
 	({
 		type    : 'SET_PICTURE',

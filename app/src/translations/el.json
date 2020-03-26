@@ -49,6 +49,9 @@
 	"room.spotlights": "Συμμετέχοντες στο Spotlight",
 	"room.passive": "Παθητικοί συμμετέχοντες",
 	"room.videoPaused": "Το βίντεο έχει σταματήσει",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
 
 	"tooltip.login": "Σύνδεση",
 	"tooltip.logout": "Αποσύνδεση",
@@ -60,6 +63,7 @@
 	"tooltip.lobby": "Εμφάνιση λόμπι",
 	"tooltip.settings": "Εμφάνιση ρυθμίσεων",
 	"tooltip.participants": "Εμφάνιση συμμετεχόντων",
+	"tooltip.kickParticipant": null,
 
 	"label.roomName": "Όνομα δωματίου",
 	"label.chooseRoomButton": "Συνέχεια",
@@ -75,8 +79,8 @@
 	"label.shareFile": "Διαμοιραστείτε ένα αρχείο",
 	"label.fileSharingUnsupported": "Ο διαμοιρασμός αρχείων δεν υποστηρίζεται",
 	"label.unknown": "Άγνωστο",
-	"label.democratic": "Democratic view",
-	"label.filmstrip": "Filmstrip view",
+	"label.democratic": null,
+	"label.filmstrip": null,
 	"label.low": "Χαμηλή",
 	"label.medium": "Μέτρια",
 	"label.high": "Υψηλή (HD)",

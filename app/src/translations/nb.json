@@ -49,6 +49,9 @@
 	"room.spotlights": "Deltakere i fokus",
 	"room.passive": "Passive deltakere",
 	"room.videoPaused": "Denne videoen er inaktiv",
+	"room.muteAll": "Demp alle",
+	"room.stopAllVideo": "Stopp all video",
+	"room.closeMeeting": "Avslutt møte",
 
 	"tooltip.login": "Logg in",
 	"tooltip.logout": "Logg ut",
@@ -60,6 +63,7 @@
 	"tooltip.lobby": "Vis lobby",
 	"tooltip.settings": "Vis innstillinger",
 	"tooltip.participants": "Vis deltakere",
+	"tooltip.kickParticipant": "Spark ut deltaker",
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",

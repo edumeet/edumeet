@@ -49,6 +49,9 @@
 	"room.spotlights": "Aktywni uczestnicy",
 	"room.passive": "Pasywni uczestnicy",
 	"room.videoPaused": "To wideo jest wstrzymane.",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
 
 	"tooltip.login": "Zaloguj",
 	"tooltip.logout": "Wyloguj",
@@ -60,6 +63,7 @@
 	"tooltip.lobby": "Pokaż poczekalnię",
 	"tooltip.settings": "Pokaż ustawienia",
 	"tooltip.participants": "Pokaż uczestników",
+	"tooltip.kickParticipant": null,
 
 	"label.roomName": "Nazwa konferencji",
 	"label.chooseRoomButton": "Kontynuuj",

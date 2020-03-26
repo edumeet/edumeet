@@ -11,7 +11,9 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
+import ListModerator from './ListModerator';
 import Volume from '../../Containers/Volume';
+import * as userRoles from '../../../reducers/userRoles';
 
 const styles = (theme) =>
 	({
@@ -76,6 +78,7 @@ class ParticipantList extends React.PureComponent
 		const {
 			roomClient,
 			advancedMode,
+			isModerator,
 			passivePeers,
 			selectedPeerId,
 			spotlightPeers,
@@ -84,6 +87,17 @@ class ParticipantList extends React.PureComponent
 
 		return (
 			<div className={classes.root} ref={(node) => { this.node = node; }}>
+				{ isModerator &&
+					<ul className={classes.list}>
+						<li className={classes.listheader}>
+							<FormattedMessage
+								id='room.moderatoractions'
+								defaultMessage='Moderator actions'
+							/>
+						</li>
+						<ListModerator />
+					</ul>
+				}
 				<ul className={classes.list}>
 					<li className={classes.listheader}>
 						<FormattedMessage
@@ -108,7 +122,7 @@ class ParticipantList extends React.PureComponent
 							})}
 							onClick={() => roomClient.setSelectedPeer(peerId)}
 						>
-							<ListPeer id={peerId} advancedMode={advancedMode}>
+							<ListPeer id={peerId} advancedMode={advancedMode} isModerator={isModerator}>
 								<Volume small id={peerId} />
 							</ListPeer>
 						</li>
@@ -129,7 +143,11 @@ class ParticipantList extends React.PureComponent
 							})}
 							onClick={() => roomClient.setSelectedPeer(peerId)}
 						>
-							<ListPeer id={peerId} advancedMode={advancedMode} />
+							<ListPeer
+								id={peerId}
+								advancedMode={advancedMode}
+								isModerator={isModerator}
+							/>
 						</li>
 					))}
 				</ul>
@@ -142,6 +160,7 @@ ParticipantList.propTypes =
 {
 	roomClient     : PropTypes.any.isRequired,
 	advancedMode   : PropTypes.bool,
+	isModerator    : PropTypes.bool,
 	passivePeers   : PropTypes.array,
 	selectedPeerId : PropTypes.string,
 	spotlightPeers : PropTypes.array,
@@ -151,6 +170,8 @@ ParticipantList.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
+		isModerator : state.me.roles.includes(userRoles.MODERATOR) ||
+			state.me.roles.includes(userRoles.ADMIN),
 		passivePeers   : passivePeersSelector(state),
 		selectedPeerId : state.room.selectedPeerId,
 		spotlightPeers : spotlightPeersSelector(state)
@@ -165,6 +186,7 @@ const ParticipantListContainer = withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				prev.me.roles === next.me.roles &&
 				prev.peers === next.peers &&
 				prev.room.spotlights === next.room.spotlights &&
 				prev.room.selectedPeerId === next.room.selectedPeerId

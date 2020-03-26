@@ -1,8 +1,11 @@
+import * as userRoles from './userRoles';
+
 const initialState =
 {
 	id                    : null,
 	picture               : null,
 	isMobile              : false,
+	roles                 : [ userRoles.ALL ],
 	canSendMic            : false,
 	canSendWebcam         : false,
 	canShareScreen        : false,
@@ -47,6 +50,24 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, loggedIn: flag };
+		}
+
+		case 'ADD_ROLE':
+		{
+			if (state.roles.includes(action.payload.role))
+				return state;
+
+			const roles = [ ...state.roles, action.payload.role ];
+
+			return { ...state, roles };
+		}
+
+		case 'REMOVE_ROLE':
+		{
+			const roles = state.roles.filter((role) =>
+				role !== action.payload.role);
+
+			return { ...state, roles };
 		}
 
 		case 'SET_PICTURE':

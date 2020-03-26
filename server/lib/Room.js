@@ -2,6 +2,7 @@ const EventEmitter = require('events').EventEmitter;
 const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
+const userRoles = require('../userRoles');
 const config = require('../config/config');
 
 const logger = new Logger('Room');
@@ -54,6 +55,12 @@ class Room extends EventEmitter
 		// Locked flag.
 		this._locked = false;
 
+		// Required roles to access
+		this._requiredRoles = [ userRoles.ALL ];
+
+		if ('requiredRolesForAccess' in config)
+			this._requiredRoles = config.requiredRolesForAccess;
+
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;
 
@@ -100,11 +107,8 @@ class Room extends EventEmitter
 		// Close the peers.
 		for (const peer in this._peers)
 		{
-			if (Object.prototype.hasOwnProperty.call(this._peers, peer))
-			{
-				if (!peer.closed)
-					peer.close();
-			}
+			if (!peer.closed)
+				peer.close();
 		}
 
 		this._peers = null;
@@ -118,26 +122,27 @@ class Room extends EventEmitter
 
 	handlePeer(peer)
 	{
-		logger.info('handlePeer() [peer:"%s"]', peer.id);
+		logger.info('handlePeer() [peer:"%s", roles:"%s"]', peer.id, peer.roles);
 
-		// This will allow reconnects to join despite lock
+		// Allow reconnections, remove old peer
 		if (this._peers[peer.id])
 		{
 			logger.warn(
 				'handleConnection() | there is already a peer with same peerId [peer:"%s"]',
 				peer.id);
 
-			peer.close();
+			this._peers[peer.id].close();
+		}
 
-			return;
-		}
+		// Always let ADMIN in, even if locked
+		if (peer.roles.includes(userRoles.ADMIN))
+			this._peerJoining(peer);
 		else if (this._locked)
-		{
 			this._parkPeer(peer);
-		}
 		else
 		{
-			peer.authenticated ?
+			// If the user has a role in config.requiredRolesForAccess, let them in
+			peer.roles.some((role) => this._requiredRoles.includes(role)) ?
 				this._peerJoining(peer) :
 				this._handleGuest(peer);
 		}
@@ -145,21 +150,12 @@ class Room extends EventEmitter
 
 	_handleGuest(peer)
 	{
-		if (config.requireSignInToAccess)
-		{
-			if (config.activateOnHostJoin && !this.checkEmpty())
-			{
-				this._peerJoining(peer);
-			}
-			else
-			{
-				this._parkPeer(peer);
-				this._notification(peer.socket, 'signInRequired');
-			}
-		}
+		if (config.activateOnHostJoin && !this.checkEmpty())
+			this._peerJoining(peer);
 		else
 		{
-			this._peerJoining(peer);
+			this._parkPeer(peer);
+			this._notification(peer.socket, 'signInRequired');
 		}
 	}
 
@@ -179,9 +175,26 @@ class Room extends EventEmitter
 			}
 		});
 
-		this._lobby.on('peerAuthenticated', (peer) =>
+		this._lobby.on('peerRolesChanged', (peer) =>
 		{
-			!this._locked && this._lobby.promotePeer(peer.id);
+			// Always let admin in, even if locked
+			if (peer.roles.includes(userRoles.ADMIN))
+			{
+				this._lobby.promotePeer(peer.id);
+
+				return;
+			}
+
+			// If the user has a role in config.requiredRolesForAccess, let them in
+			if (
+				!this._locked &&
+				peer.roles.some((role) => this._requiredRoles.includes(role))
+			)
+			{
+				this._lobby.promotePeer(peer.id);
+
+				return;
+			}
 		});
 
 		this._lobby.on('changeDisplayName', (changedPeer) =>
@@ -304,7 +317,6 @@ class Room extends EventEmitter
 		}, 10000);
 	}
 
-	// checks both room and lobby
 	checkEmpty()
 	{
 		return Object.keys(this._peers).length === 0;
@@ -324,12 +336,8 @@ class Room extends EventEmitter
 	{
 		peer.socket.join(this._roomId);
 
-		const index = this._lastN.indexOf(peer.id);
-
-		if (index === -1) // We don't have this peer, add to end
-		{
-			this._lastN.push(peer.id);
-		}
+		// If we don't have this peer, add to end
+		!this._lastN.includes(peer.id) && this._lastN.push(peer.id);
 
 		this._peers[peer.id] = peer;
 
@@ -402,25 +410,17 @@ class Room extends EventEmitter
 
 			// If the Peer was joined, notify all Peers.
 			if (peer.joined)
-			{
 				this._notification(peer.socket, 'peerClosed', { peerId: peer.id }, true);
-			}
 
-			const index = this._lastN.indexOf(peer.id);
-
-			if (index > -1) // We have this peer in the list, remove
-			{
-				this._lastN.splice(index, 1);
-			}
+			// Remove from lastN
+			this._lastN = this._lastN.filter((id) => id !== peer.id);
 
 			delete this._peers[peer.id];
 
 			// If this is the last Peer in the room and
 			// lobby is empty, close the room after a while.
 			if (this.checkEmpty() && this._lobby.checkEmpty())
-			{
 				this.selfDestructCountdown();
-			}
 		});
 
 		peer.on('displayNameChanged', ({ oldDisplayName }) =>
@@ -449,6 +449,32 @@ class Room extends EventEmitter
 				picture : peer.picture
 			}, true);
 		});
+
+		peer.on('gotRole', ({ newRole }) =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'gotRole', {
+				peerId : peer.id,
+				role   : newRole
+			}, true, true);
+		});
+
+		peer.on('lostRole', ({ oldRole }) =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'lostRole', {
+				peerId : peer.id,
+				role   : oldRole
+			}, true, true);
+		});
 	}
 
 	async _handleSocketRequest(peer, request, cb)
@@ -464,27 +490,6 @@ class Room extends EventEmitter
 
 			case 'join':
 			{
-
-				try
-				{
-					if (peer.socket.handshake.session.passport.user.displayName)
-					{
-						this._notification(
-							peer.socket,
-							'changeDisplayname',
-							{
-								peerId         : peer.id,
-								displayName    : peer.socket.handshake.session.passport.user.displayName,
-								oldDisplayName : ''
-							},
-							true
-						);
-					}
-				}
-				catch (error)
-				{
-					logger.error(error);
-				}
 				// Ensure the Peer is not already joined.
 				if (peer.joined)
 					throw new Error('Peer already joined');
@@ -512,7 +517,10 @@ class Room extends EventEmitter
 					.filter((joinedPeer) => joinedPeer.id !== peer.id)
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
-				cb(null, { peers: peerInfos });
+				cb(null, {
+					roles : peer.roles,
+					peers : peerInfos
+				});
 
 				// Mark the new Peer as joined.
 				peer.joined = true;
@@ -540,7 +548,8 @@ class Room extends EventEmitter
 						{
 							id          : peer.id,
 							displayName : displayName,
-							picture     : picture
+							picture     : picture,
+							roles       : peer.roles
 						}
 					);
 				}
@@ -1106,6 +1115,92 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:muteAll':
+			{
+				if (
+					!peer.hasRole(userRoles.MODERATOR) &&
+					!peer.hasRole(userRoles.ADMIN)
+				)
+					throw new Error('peer does not have moderator priveleges');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:mute', {
+					peerId : peer.id
+				}, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopAllVideo':
+			{
+				if (
+					!peer.hasRole(userRoles.MODERATOR) &&
+					!peer.hasRole(userRoles.ADMIN)
+				)
+					throw new Error('peer does not have moderator priveleges');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:stopVideo', {
+					peerId : peer.id
+				}, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:closeMeeting':
+			{
+				if (
+					!peer.hasRole(userRoles.MODERATOR) &&
+					!peer.hasRole(userRoles.ADMIN)
+				)
+					throw new Error('peer does not have moderator priveleges');
+
+				this._notification(
+					peer.socket,
+					'moderator:kick',
+					null,
+					true
+				);
+
+				cb();
+
+				// Close the room
+				this.close();
+
+				break;
+			}
+
+			case 'moderator:kickPeer':
+			{
+				if (
+					!peer.hasRole(userRoles.MODERATOR) &&
+					!peer.hasRole(userRoles.ADMIN)
+				)
+					throw new Error('peer does not have moderator priveleges');
+
+				const { peerId } = request.data;
+
+				const kickPeer = this._peers[peerId];
+
+				if (!kickPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(
+					kickPeer.socket,
+					'moderator:kick'
+				);
+
+				kickPeer.close();
+
+				cb();
+
+				break;
+			}
+
 			default:
 			{
 				logger.error('unknown request.method "%s"', request.method);
@@ -1319,13 +1414,16 @@ class Room extends EventEmitter
 		});
 	}
 
-	_notification(socket, method, data = {}, broadcast = false)
+	_notification(socket, method, data = {}, broadcast = false, includeSender = false)
 	{
 		if (broadcast)
 		{
 			socket.broadcast.to(this._roomId).emit(
 				'notification', { method, data }
 			);
+
+			if (includeSender)
+				socket.emit('notification', { method, data });
 		}
 		else
 		{

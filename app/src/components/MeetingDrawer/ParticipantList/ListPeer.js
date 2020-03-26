@@ -12,6 +12,7 @@ import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
 import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
+import ExitIcon from '@material-ui/icons/ExitToApp';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 import HandIcon from '../../../images/icon-hand-white.svg';
 
@@ -91,40 +92,6 @@ const styles = (theme) =>
 			flexDirection  : 'row',
 			justifyContent : 'flex-start',
 			alignItems     : 'center'
-		},
-		button :
-		{
-			flex               : '0 0 auto',
-			margin             : '0.3rem',
-			borderRadius       : 2,
-			backgroundColor    : 'rgba(0, 0, 0, 0.5)',
-			cursor             : 'pointer',
-			transitionProperty : 'opacity, background-color',
-			transitionDuration : '0.15s',
-			width              : 'var(--media-control-button-size)',
-			height             : 'var(--media-control-button-size)',
-			opacity            : 0.85,
-			'&:hover'          :
-			{
-				opacity : 1
-			},
-			'&.unsupported' :
-			{
-				pointerEvents : 'none'
-			},
-			'&.disabled' :
-			{
-				pointerEvents   : 'none',
-				backgroundColor : 'var(--media-control-botton-disabled)'
-			},
-			'&.on' :
-			{
-				backgroundColor : 'var(--media-control-botton-on)'
-			},
-			'&.off' :
-			{
-				backgroundColor : 'var(--media-control-botton-off)'
-			}
 		}
 	});
 
@@ -134,6 +101,7 @@ const ListPeer = (props) =>
 
 	const {
 		roomClient,
+		isModerator,
 		peer,
 		micConsumer,
 		screenConsumer,
@@ -185,9 +153,8 @@ const ListPeer = (props) =>
 						})}
 						color={ screenVisible ? 'primary' : 'secondary'}
 						disabled={ peer.peerScreenInProgress }
-						onClick={(e) =>
+						onClick={() =>
 							{
-								e.stopPropagation();
 								screenVisible ?
 									roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
 									roomClient.modifyPeerConsumer(peer.id, 'screen', false);
@@ -207,9 +174,8 @@ const ListPeer = (props) =>
 					})}
 					color={ micEnabled ? 'primary' : 'secondary'}
 					disabled={ peer.peerAudioInProgress }
-					onClick={(e) =>
+					onClick={() =>
 						{
-							e.stopPropagation();
 							micEnabled ?
 								roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
 								roomClient.modifyPeerConsumer(peer.id, 'mic', false);
@@ -221,6 +187,21 @@ const ListPeer = (props) =>
 						<MicOffIcon />
 					}
 				</IconButton>
+				{ isModerator &&
+					<IconButton
+						aria-label={intl.formatMessage({
+							id             : 'tooltip.kickParticipant',
+							defaultMessage : 'Kick out participant'
+						})}
+						disabled={ peer.peerKickInProgress }
+						onClick={() =>
+							{
+								roomClient.kickPeer(peer.id);
+							}}
+					>
+						<ExitIcon />
+					</IconButton>
+				}
 			</div>
 		</div>
 	);
@@ -230,6 +211,7 @@ ListPeer.propTypes =
 {
 	roomClient     : PropTypes.any.isRequired,
 	advancedMode   : PropTypes.bool,
+	isModerator    : PropTypes.bool,
 	peer           : appPropTypes.Peer.isRequired,
 	micConsumer    : appPropTypes.Consumer,
 	webcamConsumer : appPropTypes.Consumer,

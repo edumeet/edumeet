@@ -18,6 +18,7 @@ const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
 
+const userRoles = require('./userRoles');
 const {
 	loginHelper,
 	logoutHelper
@@ -190,7 +191,7 @@ function setupLTI(ltiConfig)
 				}
 				if (lti.lis_person_name_full)
 				{
-					user.displayName=lti.lis_person_name_full;
+					user.displayName = lti.lis_person_name_full;
 				}
 
 				// Perform local authentication if necessary
@@ -241,51 +242,6 @@ function setupOIDC(oidcIssuer)
 				_claims   : tokenset.claims
 			};
 
-			if (userinfo.picture != null)
-			{
-				if (!userinfo.picture.match(/^http/g))
-				{
-					user.picture = `data:image/jpeg;base64, ${userinfo.picture}`;
-				}
-				else
-				{
-					user.picture = userinfo.picture;
-				}
-			}
-
-			if (userinfo.nickname != null)
-			{
-				user.displayName = userinfo.nickname;
-			}
-
-			if (userinfo.name != null)
-			{
-				user.displayName = userinfo.name;
-			}
-
-			if (userinfo.email != null)
-			{
-				user.email = userinfo.email;
-			}
-
-			if (userinfo.given_name != null)
-			{
-				user.name={};
-				user.name.givenName = userinfo.given_name;
-			}
-
-			if (userinfo.family_name != null)
-			{
-				if (user.name == null) user.name={};
-				user.name.familyName = userinfo.family_name;
-			}
-
-			if (userinfo.middle_name != null)
-			{
-				if (user.name == null) user.name={};
-				user.name.middleName = userinfo.middle_name;
-			}
-
 			return done(null, user);
 		}
 	);
@@ -324,7 +280,8 @@ async function setupAuth()
 	{
 		passport.authenticate('oidc', {
 			state : base64.encode(JSON.stringify({
-				id : req.query.id
+				peerId : req.query.peerId,
+				roomId : req.query.roomId
 			}))
 		})(req, res, next);
 	});
@@ -341,6 +298,19 @@ async function setupAuth()
 	// logout
 	app.get('/auth/logout', (req, res) =>
 	{
+		const { peerId } = req.session;
+
+		const peer = peers.get(peerId);
+
+		if (peer)
+		{
+			for (const role of peer.roles)
+			{
+				if (role !== userRoles.ALL)
+					peer.removeRole(role);
+			}
+		}
+
 		req.logout();
 		res.send(logoutHelper());
 	});
@@ -349,35 +319,35 @@ async function setupAuth()
 	app.get(
 		'/auth/callback',
 		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
-		(req, res) =>
+		async (req, res) =>
 		{
 			const state = JSON.parse(base64.decode(req.query.state));
 
-			let displayName;
-			let picture;
+			const { peerId, roomId } = state;
 
-			if (req.user != null)
+			req.session.peerId = peerId;
+			req.session.roomId = roomId;
+
+			let peer = peers.get(peerId);
+
+			if (!peer) // User has no socket session yet, make temporary
+				peer = new Peer({ id: peerId, roomId });
+
+			if (peer && peer.roomId !== roomId) // The peer is mischievous
+				throw new Error('peer authenticated with wrong room');
+
+			if (peer && typeof config.userMapping === 'function')
 			{
-				if (req.user.displayName != null)
-					displayName = req.user.displayName;
-				else
-					displayName = '';
-
-				if (req.user.picture != null)
-					picture = req.user.picture;
-				else
-					picture = '/static/media/buddy.403cb9f6.svg';
+				await config.userMapping({
+					peer,
+					roomId,
+					userinfo : req.user._userinfo
+				});
 			}
 
-			const peer = peers.get(state.id);
-
-			peer && (peer.displayName = displayName);
-			peer && (peer.picture = picture);
-			peer && (peer.authenticated = true);
-
 			res.send(loginHelper({
-				displayName,
-				picture
+				displayName : peer.displayName,
+				picture     : peer.picture
 			}));
 		}
 	);
@@ -495,11 +465,35 @@ async function runWebSocketServer()
 		queue.push(async () =>
 		{
 			const room = await getOrCreateRoom({ roomId });
-			const peer = new Peer({ id: peerId, socket });
+			const peer = new Peer({ id: peerId, roomId, socket });
 
 			peers.set(peerId, peer);
 
 			peer.on('close', () => peers.delete(peerId));
+
+			if (
+				Boolean(socket.handshake.session.passport) &&
+				Boolean(socket.handshake.session.passport.user)
+			)
+			{
+				const {
+					id,
+					displayName,
+					picture,
+					email,
+					_userinfo
+				} = socket.handshake.session.passport.user;
+		
+				peer.authId= id;
+				peer.displayName = displayName;
+				peer.picture = picture;
+				peer.email = email;
+		
+				if (typeof config.userMapping === 'function')
+				{
+					await config.userMapping({ peer, roomId, userinfo: _userinfo });
+				}
+			}
 
 			room.handlePeer(peer);
 		})

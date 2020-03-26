@@ -4,7 +4,7 @@
 	"socket.reconnected": "Verbindung wieder herges|tellt",
 	"socket.requestError": "Fehler bei Serveranfrage",
 
-	"room.chooseRoom": "Choose the name of the room you would like to join",
+	"room.chooseRoom": null,
 	"room.cookieConsent": "Diese Seite verwendet Cookies, um die Benutzerfreundlichkeit zu erhöhen",
 	"room.consentUnderstand": "I understand",
 	"room.joined": "Konferenzraum betreten",
@@ -49,6 +49,9 @@
 	"room.spotlights": "Aktive Teinehmer",
 	"room.passive": "Passive Teilnehmer",
 	"room.videoPaused": "Video gestoppt",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
 
 	"tooltip.login": "Anmelden",
 	"tooltip.logout": "Abmelden",
@@ -60,9 +63,10 @@
 	"tooltip.lobby": "Warteraum",
 	"tooltip.settings": "Einstellungen",
 	"tooltip.participants": "Teilnehmer",
+	"tooltip.kickParticipant": null,
 
-	"label.roomName": "Room name",
-	"label.chooseRoomButton": "Continue",
+	"label.roomName": null,
+	"label.chooseRoomButton": null,
 	"label.yourName": "Dein Name",
 	"label.newWindow": "In separatem Fenster öffnen",
 	"label.fullscreen": "Vollbild",

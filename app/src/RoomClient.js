@@ -417,7 +417,7 @@ export default class RoomClient
 
 	login()
 	{
-		const url = `/auth/login?id=${this._peerId}`;
+		const url = `/auth/login?peerId=${this._peerId}&roomId=${this._roomId}`;
 
 		window.open(url, 'loginWindow');
 	}
@@ -433,16 +433,8 @@ export default class RoomClient
 
 		const { displayName, picture } = data;
 
-		if (store.getState().room.state === 'connected')
-		{
-			this.changeDisplayName(displayName);
-			this.changePicture(picture);
-		}
-		else
-		{
-			store.dispatch(settingsActions.setDisplayName(displayName));
-			store.dispatch(meActions.setPicture(picture));
-		}
+		store.dispatch(settingsActions.setDisplayName(displayName));
+		store.dispatch(meActions.setPicture(picture));
 
 		store.dispatch(meActions.loggedIn(true));
 
@@ -1153,6 +1145,86 @@ export default class RoomClient
 
 		store.dispatch(
 			lobbyPeerActions.setLobbyPeerPromotionInProgress(peerId, false));
+	}
+
+	async kickPeer(peerId)
+	{
+		logger.debug('kickPeer() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setPeerKickInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:kickPeer', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('kickPeer() failed: %o', error);
+		}
+
+		store.dispatch(
+			peerActions.setPeerKickInProgress(peerId, false));
+	}
+
+	async muteAllPeers()
+	{
+		logger.debug('muteAllPeers()');
+
+		store.dispatch(
+			roomActions.setMuteAllInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:muteAll');
+		}
+		catch (error)
+		{
+			logger.error('muteAllPeers() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setMuteAllInProgress(false));
+	}
+
+	async stopAllPeerVideo()
+	{
+		logger.debug('stopAllPeerVideo()');
+
+		store.dispatch(
+			roomActions.setStopAllVideoInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopAllVideo');
+		}
+		catch (error)
+		{
+			logger.error('stopAllPeerVideo() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setStopAllVideoInProgress(false));
+	}
+
+	async closeMeeting()
+	{
+		logger.debug('closeMeeting()');
+
+		store.dispatch(
+			roomActions.setCloseMeetingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:closeMeeting');
+		}
+		catch (error)
+		{
+			logger.error('closeMeeting() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setCloseMeetingInProgress(false));
 	}
 
 	// type: mic/webcam/screen
@@ -1914,10 +1986,10 @@ export default class RoomClient
 
 					case 'newPeer':
 					{
-						const { id, displayName, picture } = notification.data;
+						const { id, displayName, picture, roles } = notification.data;
 
 						store.dispatch(
-							peerActions.addPeer({ id, displayName, picture, consumers: [] }));
+							peerActions.addPeer({ id, displayName, picture, roles, consumers: [] }));
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2014,6 +2086,96 @@ export default class RoomClient
 						store.dispatch(
 							consumerActions.setConsumerScore(consumerId, score));
 	
+						break;
+					}
+
+					case 'moderator:mute':
+					{
+						// const { peerId } = notification.data;
+
+						if (this._micProducer && !this._micProducer.paused)
+						{
+							this.muteMic();
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'moderator.mute',
+										defaultMessage : 'Moderator muted your microphone'
+									})
+								}));
+						}
+
+						break;
+					}
+
+					case 'moderator:stopVideo':
+					{
+						// const { peerId } = notification.data;
+
+						this.disableWebcam();
+						this.disableScreenSharing();
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.mute',
+									defaultMessage : 'Moderator stopped your video'
+								})
+							}));
+
+						break;
+					}
+
+					case 'moderator:kick':
+					{
+						// Need some feedback
+						this.close();
+
+						break;
+					}
+
+					case 'gotRole':
+					{
+						const { peerId, role } = notification.data;
+
+						if (peerId === this._peerId)
+						{
+							store.dispatch(meActions.addRole(role));
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'roles.gotRole',
+										defaultMessage : `You got the role: ${role}`
+									})
+								}));
+						}
+						else
+							store.dispatch(peerActions.addPeerRole(peerId, role));
+
+						break;
+					}
+
+					case 'lostRole':
+					{
+						const { peerId, role } = notification.data;
+
+						if (peerId === this._peerId)
+						{
+							store.dispatch(meActions.removeRole(role));
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'roles.lostRole',
+										defaultMessage : `You lost the role: ${role}`
+									})
+								}));
+						}
+						else
+							store.dispatch(peerActions.removePeerRole(peerId, role));
+
 						break;
 					}
 	
@@ -2195,7 +2357,7 @@ export default class RoomClient
 					canShareFiles : this._torrentSupport
 				}));
 
-			const { peers } = await this.sendRequest(
+			const { roles, peers } = await this.sendRequest(
 				'join',
 				{
 					displayName     : displayName,
@@ -2203,7 +2365,25 @@ export default class RoomClient
 					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
 
-			logger.debug('_joinRoom() joined, got peers [peers:"%o"]', peers);
+			logger.debug('_joinRoom() joined [peers:"%o", roles:"%o"]', peers, roles);
+
+			const myRoles = store.getState().me.roles;
+
+			for (const role of roles)
+			{
+				if (!myRoles.includes(role))
+				{
+					store.dispatch(meActions.addRole(role));
+
+					store.dispatch(requestActions.notify(
+						{
+							text : intl.formatMessage({
+								id             : 'roles.gotRole',
+								defaultMessage : `You got the role: ${role}`
+							})
+						}));
+				}
+			}
 
 			for (const peer of peers)
 			{

@@ -16,6 +16,9 @@ const peer = (state = {}, action) =>
 
 		case 'SET_PEER_SCREEN_IN_PROGRESS':
 			return { ...state, peerScreenInProgress: action.payload.flag };
+
+		case 'SET_PEER_KICK_IN_PROGRESS':
+			return { ...state, peerKickInProgress: action.payload.flag };
 		
 		case 'SET_PEER_RAISE_HAND_STATE':
 			return { ...state, raiseHandState: action.payload.raiseHandState };
@@ -38,6 +41,21 @@ const peer = (state = {}, action) =>
 		case 'SET_PEER_PICTURE':
 		{
 			return { ...state, picture: action.payload.picture };
+		}
+
+		case 'ADD_PEER_ROLE':
+		{
+			const roles = [ ...state.roles, action.payload.role ];
+
+			return { ...state, roles };
+		}
+
+		case 'REMOVE_PEER_ROLE':
+		{
+			const roles = state.roles.filter((role) =>
+				role !== action.payload.role);
+
+			return { ...state, roles };
 		}
 
 		default:
@@ -71,6 +89,8 @@ const peers = (state = {}, action) =>
 		case 'SET_PEER_RAISE_HAND_STATE':
 		case 'SET_PEER_PICTURE':
 		case 'ADD_CONSUMER':
+		case 'ADD_PEER_ROLE':
+		case 'REMOVE_PEER_ROLE':
 		{
 			const oldPeer = state[action.payload.peerId];
 
@@ -82,6 +102,7 @@ const peers = (state = {}, action) =>
 			return { ...state, [oldPeer.id]: peer(oldPeer, action) };
 		}
 		
+		case 'SET_PEER_KICK_IN_PROGRESS':
 		case 'REMOVE_CONSUMER':
 		{
 			const oldPeer = state[action.payload.peerId];
