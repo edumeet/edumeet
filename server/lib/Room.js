@@ -1266,6 +1266,9 @@ class Room extends EventEmitter
 					rtpCapabilities : consumerPeer.rtpCapabilities,
 					paused          : producer.kind === 'video'
 				});
+
+			if (producer.kind === 'audio')
+				await consumer.setPriority(255);
 		}
 		catch (error)
 		{
