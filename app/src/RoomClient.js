@@ -220,6 +220,9 @@ export default class RoomClient
 		// Local mic hark
 		this._hark = null;
 
+		// Local MediaStream for hark
+		this._harkStream = null
+
 		// Local webcam mediasoup Producer.
 		this._webcamProducer = null;
 
@@ -268,8 +271,9 @@ export default class RoomClient
 	_startKeyListener()
 	{
 		// Add keypress event listner on document
-		document.addEventListener('keypress', (event) =>
+		document.addEventListener('keydown', (event) =>
 		{
+			if (event.repeat) return;
 			const key = String.fromCharCode(event.which);
 
 			const source = event.target;
@@ -278,11 +282,11 @@ export default class RoomClient
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
-				logger.debug('keyPress() [key:"%s"]', key);
+				logger.debug('keyDown() [key:"%s"]', key);
 
 				switch (key)
 				{
-					case 'a': // Activate advanced mode
+					case 'A': // Activate advanced mode
 					{
 						store.dispatch(settingsActions.toggleAdvancedMode());
 						store.dispatch(requestActions.notify(
@@ -321,8 +325,19 @@ export default class RoomClient
 						break;
 					}
 
-					case ' ':
-					case 'm': // Toggle microphone
+					case ' ': // Push To Talk start
+					{
+						if (this._micProducer)
+						{
+							if (this._micProducer.paused)
+							{
+								this.unmuteMic();
+							}
+						}
+
+						break;
+					}
+					case 'M': // Toggle microphone
 					{
 						if (this._micProducer)
 						{
@@ -367,7 +382,7 @@ export default class RoomClient
 						break;
 					}
 
-					case 'v': // Toggle video
+					case 'V': // Toggle video
 					{
 						if (this._webcamProducer)
 							this.disableWebcam();
@@ -384,6 +399,40 @@ export default class RoomClient
 				}
 			}
 		});
+		document.addEventListener('keyup', (event) =>
+		{
+			const key = String.fromCharCode(event.which);
+
+			const source = event.target;
+
+			const exclude = [ 'input', 'textarea' ];
+
+			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
+			{
+				logger.debug('keyUp() [key:"%s"]', key);
+
+				switch (key)
+				{
+					case ' ': // Push To Talk stop
+					{
+						if (this._micProducer)
+						{
+							if (!this._micProducer.paused)
+							{
+								this.muteMic();
+							}
+						}
+
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+			}
+		});
+
 	}
 
 	_startDevicesListener()
@@ -941,6 +990,16 @@ export default class RoomClient
 				'changeAudioDevice() | new selected webcam [device:%o]',
 				device);
 
+			if (this._hark != null)
+				this._hark.stop();
+
+			if (this._harkStream != null)
+			{
+				logger.debug('Stopping hark.');
+				this._harkStream.getAudioTracks()[0].stop();
+				this._harkStream = null;
+			}
+
 			if (this._micProducer && this._micProducer.track)
 				this._micProducer.track.stop();
 
@@ -962,17 +1021,14 @@ export default class RoomClient
 			if (this._micProducer)
 				this._micProducer.volume = 0;
 
-			const harkStream = new MediaStream();
+			this._harkStream = new MediaStream();
 
-			harkStream.addTrack(track);
+			this._harkStream.addTrack(track.clone());
 
-			if (!harkStream.getAudioTracks()[0])
+			if (!this._harkStream.getAudioTracks()[0])
 				throw new Error('changeAudioDevice(): given stream has no audio track');
 
-			if (this._hark != null)
-				this._hark.stop();
-
-			this._hark = hark(harkStream, { play: false });
+			this._hark = hark(this._harkStream, { play: false });
 
 			// eslint-disable-next-line no-unused-vars
 			this._hark.on('volume_change', (dBs, threshold) =>
@@ -995,6 +1051,14 @@ export default class RoomClient
 
 					store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
 				}
+			});
+			this._hark.on('speaking', function() 
+			{
+				store.dispatch(meActions.setIsSpeaking(true));
+			});
+			this._hark.on('stopped_speaking', function() 
+			{
+				store.dispatch(meActions.setIsSpeaking(false));
 			});
 			if (this._micProducer && this._micProducer.id)
 				store.dispatch(
@@ -2415,8 +2479,11 @@ export default class RoomClient
 					track,
 					codecOptions :
 					{
-						opusStereo : 1,
-						opusDtx    : 1
+						opusStereo          : false,
+						opusDtx             : true,
+						opusFec             : true,
+						opusPtime           : '3',
+						opusMaxPlaybackRate	: 48000
 					},
 					appData : 
 					{ source: 'mic' }
@@ -2458,17 +2525,20 @@ export default class RoomClient
 
 			this._micProducer.volume = 0;
 
-			const harkStream = new MediaStream();
-
-			harkStream.addTrack(track);
-
-			if (!harkStream.getAudioTracks()[0])
-				throw new Error('enableMic(): given stream has no audio track');
-
 			if (this._hark != null)
 				this._hark.stop();
 
-			this._hark = hark(harkStream, { play: false });
+			if (this._harkStream != null)
+				this._harkStream.getAudioTracks()[0].stop();
+
+			this._harkStream = new MediaStream();
+
+			this._harkStream.addTrack(track.clone());
+
+			if (!this._harkStream.getAudioTracks()[0])
+				throw new Error('enableMic(): given stream has no audio track');
+
+			this._hark = hark(this._harkStream, { play: false });
 
 			// eslint-disable-next-line no-unused-vars
 			this._hark.on('volume_change', (dBs, threshold) =>
@@ -2491,6 +2561,14 @@ export default class RoomClient
 
 					store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
 				}
+			});
+			this._hark.on('speaking', function() 
+			{
+				store.dispatch(meActions.setIsSpeaking(true));
+			});
+			this._hark.on('stopped_speaking', function() 
+			{
+				store.dispatch(meActions.setIsSpeaking(false));
 			});
 		}
 		catch (error)
