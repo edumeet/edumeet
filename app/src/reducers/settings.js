@@ -5,7 +5,8 @@ const initialState =
 	selectedAudioDevice : null,
 	advancedMode        : false,
 	resolution          : 'medium', // low, medium, high, veryhigh, ultra
-	lastN               : 4
+	lastN               : 4,
+	permanentTopBar		: true
 };
 
 const settings = (state = initialState, action) =>
