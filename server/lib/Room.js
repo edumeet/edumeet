@@ -107,8 +107,8 @@ class Room extends EventEmitter
 		// Close the peers.
 		for (const peer in this._peers)
 		{
-			if (!peer.closed)
-				peer.close();
+			if (!this._peers[peer].closed)
+				this._peers[peer].close();
 		}
 
 		this._peers = null;
