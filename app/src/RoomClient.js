@@ -2477,7 +2477,11 @@ export default class RoomClient
 			{
 				if (this._mediasoupDevice.canProduce('audio'))
 					if (!this._muted)
-						this.enableMic();
+					{
+						await this.enableMic();
+						if (peers.length > 4) 
+							this.muteMic();
+					}
 
 				if (joinVideo && this._mediasoupDevice.canProduce('video'))
 					this.enableWebcam();

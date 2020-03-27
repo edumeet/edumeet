@@ -78,31 +78,32 @@ const styles = (theme) =>
 			alignItems      : 'flex-end',
 			padding         : theme.spacing(1),
 			zIndex          : 21,
-			opacity         : 0,
+			opacity         : 1,
 			transition      : 'opacity 0.3s',
 			touchAction     : 'none',
 			pointerEvents   : 'none',
-			'&.hover'       :
-			{
-				opacity : 1
-			},
 			'& p' :
 			{
-				position  : 'absolute',
-				float     : 'left',
-				top       : '50%',
-				left      : '50%',
-				transform : 'translate(-50%, -50%)',
-				color     : 'rgba(255, 255, 255, 0.5)',
-				fontSize  : '7em',
-				margin    : 0
+				position   : 'absolute',
+				float      : 'left',
+				top        : '50%',
+				left       : '50%',
+				transform  : 'translate(-50%, -50%)',
+				color      : 'rgba(255, 255, 255, 0.5)',
+				fontSize   : '7em',
+				margin     : 0,
+				opacity    : 0,
+				'&.hover' :
+				{
+					opacity : 1
+				},
 			}
 		},
 		ptt :
 		{
 			position        : 'absolute',
 			float           : 'left',
-			bottom          : '10%',
+			top             : '10%',
 			left            : '50%',
 			transform       : 'translate(-50%, 0%)',
 			color           : 'rgba(255, 255, 255, 0.7)',
@@ -112,7 +113,7 @@ const styles = (theme) =>
 			padding         : '15px',
 			borderRadius    : '20px',
 			textAlign       : 'center',
-			opacity   : 0,
+			opacity         : 0,
 			'&.enabled' :
 			{
 				opacity : 1
@@ -292,7 +293,7 @@ const Me = (props) =>
 			>
 				<div className={classnames(classes.viewContainer)} style={style}>
 					<div
-						className={classnames(classes.controls, 'hover')}  
+						className={classnames(classes.controls)}  
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -313,7 +314,7 @@ const Me = (props) =>
 							}, 2000);
 						}}
 					>
-						<p className={classnames(hover ? 'hover' : null)}>
+						<p className={classnames(hover && 'hover')}>
 							<FormattedMessage
 								id='room.me'
 								defaultMessage='ME'
