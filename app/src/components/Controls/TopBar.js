@@ -79,7 +79,8 @@ const styles = (theme) =>
 		actionButton :
 		{
 			margin  : theme.spacing(1),
-			padding : 0
+			paddingLeft : 5,
+			paddingRight : 5
 		}
 	});
 
