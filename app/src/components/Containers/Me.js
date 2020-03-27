@@ -106,7 +106,7 @@ const styles = (theme) =>
 			left            : '50%',
 			transform       : 'translate(-50%, 0%)',
 			color           : 'rgba(255, 255, 255, 0.7)',
-			fontSize        : '2em',
+			fontSize        : '2vs',
 			backgroundColor : 'rgba(255, 0, 0, 0.5)',
 			margin          : '4px',
 			padding         : '15px',
@@ -439,7 +439,7 @@ const Me = (props) =>
 							roomClient.changeDisplayName(displayName);
 						}}
 					>
-						<Volume id={me.id} />
+						{ micState === 'muted' ? null : <Volume id={me.id} /> }
 					</VideoView>
 				</div>
 			</div>
