@@ -3,7 +3,6 @@ const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
 const { v4: uuidv4 } = require('uuid');
-const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
 const config = require('../config/config');
 
@@ -128,31 +127,15 @@ class Room extends EventEmitter
 	{
 		logger.info('handlePeer() [peer:"%s", roles:"%s", token:"%s"]', peer.id, peer.roles, token);
 
-		let verifiedPeer = false;
+		// This peer is returning, reconnect
+		const verifiedPeer = token && token === this._uuid;
 
-		if (token)
-		{
-			try
-			{
-				const decoded = jwt.verify(token, this._uuid);
-
-				if (decoded.id === peer.id)
-					verifiedPeer = true;
-			}
-			catch (err)
-			{
-				logger.warn('handlePeer() | invalid token');
-			}
-		}
-
-		// Allow reconnections, remove old peer
+		// Should not happen
 		if (this._peers[peer.id])
 		{
 			logger.warn(
 				'handleConnection() | there is already a peer with same peerId [peer:"%s"]',
 				peer.id);
-
-			this._peers[peer.id].close();
 		}
 
 		// Returning user
@@ -373,9 +356,7 @@ class Room extends EventEmitter
 		}
 		else
 		{
-			const token = jwt.sign({ id: peer.id }, this._uuid, { noTimestamp: true });
-
-			peer.socket.handshake.session.token = token;
+			peer.socket.handshake.session.token = this._uuid;
 
 			peer.socket.handshake.session.save();
 

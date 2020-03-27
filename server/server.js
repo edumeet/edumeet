@@ -464,10 +464,29 @@ async function runWebSocketServer()
 
 		queue.push(async () =>
 		{
-			const room = await getOrCreateRoom({ roomId });
-			const peer = new Peer({ id: peerId, roomId, socket });
-
 			const { token } = socket.handshake.session;
+
+			const room = await getOrCreateRoom({ roomId });
+
+			let peer = peers.get(peerId);
+
+			if (peer)
+			{
+				if (token)
+				{
+					peer.close();
+
+					peer = null;
+				}
+				else
+				{
+					socket.disconnect(true);
+
+					return;
+				}
+			}
+
+			peer = new Peer({ id: peerId, roomId, socket });
 
 			peers.set(peerId, peer);
 
