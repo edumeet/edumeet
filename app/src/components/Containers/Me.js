@@ -68,40 +68,42 @@ const styles = (theme) =>
 		},
 		controls :
 		{
-			position       : 'absolute',
-			width          : '100%',
-			height         : '100%',
-			display        : 'flex',
-			flexDirection  : 'column',
-			justifyContent : 'center',
-			alignItems     : 'flex-end',
-			padding        : theme.spacing(1),
-			zIndex         : 21,
-			touchAction    : 'none',
-			pointerEvents  : 'none',
-			'& p'          :
+			position        : 'absolute',
+			width           : '100%',
+			height          : '100%',
+			backgroundColor : 'rgba(0, 0, 0, 0.3)',
+			display         : 'flex',
+			flexDirection   : 'column',
+			justifyContent  : 'center',
+			alignItems      : 'flex-end',
+			padding         : theme.spacing(1),
+			zIndex          : 21,
+			opacity         : 1,
+			transition      : 'opacity 0.3s',
+			touchAction     : 'none',
+			pointerEvents   : 'none',
+			'& p' :
 			{
 				position   : 'absolute',
 				float      : 'left',
 				top        : '50%',
 				left       : '50%',
-				opacity    : 0,
-				transition : 'opacity 0.3s',
 				transform  : 'translate(-50%, -50%)',
 				color      : 'rgba(255, 255, 255, 0.5)',
 				fontSize   : '7em',
 				margin     : 0,
-				'&.hover'  :
+				opacity    : 0,
+				'&.hover' :
 				{
 					opacity : 1
-				}
+				},
 			}
 		},
 		ptt :
 		{
 			position        : 'absolute',
 			float           : 'left',
-			bottom          : '10%',
+			top             : '10%',
 			left            : '50%',
 			transform       : 'translate(-50%, 0%)',
 			color           : 'rgba(255, 255, 255, 0.7)',
@@ -112,7 +114,7 @@ const styles = (theme) =>
 			borderRadius    : '20px',
 			textAlign       : 'center',
 			opacity         : 0,
-			'&.enabled'     :
+			'&.enabled' :
 			{
 				opacity : 1
 			}
@@ -291,7 +293,7 @@ const Me = (props) =>
 			>
 				<div className={classnames(classes.viewContainer)} style={style}>
 					<div
-						className={classnames(classes.controls, 'hover')}  
+						className={classnames(classes.controls)}  
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -312,7 +314,7 @@ const Me = (props) =>
 							}, 2000);
 						}}
 					>
-						<p className={classnames(hover ? 'hover' : null)}>
+						<p className={classnames(hover && 'hover')}>
 							<FormattedMessage
 								id='room.me'
 								defaultMessage='ME'
