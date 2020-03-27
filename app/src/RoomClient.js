@@ -431,7 +431,8 @@ export default class RoomClient
 					}
 				}
 			}
-		});
+			event.preventDefault();
+		}, true);
 
 	}
 
@@ -1024,6 +1025,7 @@ export default class RoomClient
 			this._harkStream = new MediaStream();
 
 			this._harkStream.addTrack(track.clone());
+			this._harkStream.getAudioTracks()[0].enabled = true;
 
 			if (!this._harkStream.getAudioTracks()[0])
 				throw new Error('changeAudioDevice(): given stream has no audio track');
