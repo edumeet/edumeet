@@ -4,7 +4,6 @@ var config =
 	loginEnabled     : false,
 	developmentPort  : 3443,
 	productionPort   : 443,
-	multipartyServer : 'letsmeet.no',
 
 	/**
 	 * If defaultResolution is set, it will override user settings when joining:
