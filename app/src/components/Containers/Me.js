@@ -97,6 +97,26 @@ const styles = (theme) =>
 				fontSize  : '7em',
 				margin    : 0
 			}
+		},
+		ptt :
+		{
+			position        : 'absolute',
+			float           : 'left',
+			bottom          : '10%',
+			left            : '50%',
+			transform       : 'translate(-50%, 0%)',
+			color           : 'rgba(255, 255, 255, 0.7)',
+			fontSize        : '2vs',
+			backgroundColor : 'rgba(255, 0, 0, 0.5)',
+			margin          : '4px',
+			padding         : '15px',
+			borderRadius    : '20px',
+			textAlign       : 'center',
+			opacity   : 0,
+			'&.enabled' :
+			{
+				opacity : 1
+			}
 		}
 	});
 
@@ -272,7 +292,7 @@ const Me = (props) =>
 			>
 				<div className={classnames(classes.viewContainer)} style={style}>
 					<div
-						className={classnames(classes.controls, hover ? 'hover' : null)}
+						className={classnames(classes.controls, 'hover')}  
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -293,12 +313,20 @@ const Me = (props) =>
 							}, 2000);
 						}}
 					>
-						<p>
+						<p className={classnames(hover ? 'hover' : null)}>
 							<FormattedMessage
 								id='room.me'
 								defaultMessage='ME'
-							/>
+							/>					
 						</p>
+
+						<div className={classnames(classes.ptt, (micState ==='muted' && me.isSpeaking) ? 'enabled' : null)} >
+							<FormattedMessage
+								id='me.mutedPTT'
+								defaultMessage='You are muted: hold SPACE-BAR to speak!'
+							/>	
+						</div>
+
 						{ !me.isMobile &&
 							<React.Fragment>
 								<Tooltip title={micTip} placement={smallScreen ? 'top' : 'left'}>
@@ -416,7 +444,7 @@ const Me = (props) =>
 							roomClient.changeDisplayName(displayName);
 						}}
 					>
-						<Volume id={me.id} />
+						{ micState === 'muted' ? null : <Volume id={me.id} /> }
 					</VideoView>
 				</div>
 			</div>
