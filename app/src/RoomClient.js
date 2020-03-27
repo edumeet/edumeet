@@ -1520,6 +1520,28 @@ export default class RoomClient
 					})
 				}));
 
+			if (this._screenSharingProducer)
+				this._screenSharingProducer.close();
+
+			if (this._webcamProducer)
+				this._webcamProducer.close();
+
+			if (this._micProducer)
+				this._micProducer.close();
+
+			// Close mediasoup Transports.
+			if (this._sendTransport)
+			{
+				this._sendTransport.close();
+				this._sendTransport = null;
+			}
+
+			if (this._recvTransport)
+			{
+				this._recvTransport.close();
+				this._recvTransport = null;
+			}
+
 			store.dispatch(roomActions.setRoomState('connecting'));
 		});
 
@@ -1717,6 +1739,13 @@ export default class RoomClient
 						store.dispatch(roomActions.toggleJoined());
 						store.dispatch(roomActions.setInLobby(false));
 	
+						await this._joinRoom({ joinVideo });
+	
+						break;
+					}
+
+					case 'roomBack':
+					{
 						await this._joinRoom({ joinVideo });
 	
 						break;

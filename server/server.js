@@ -467,6 +467,8 @@ async function runWebSocketServer()
 			const room = await getOrCreateRoom({ roomId });
 			const peer = new Peer({ id: peerId, roomId, socket });
 
+			const { token } = socket.handshake.session;
+
 			peers.set(peerId, peer);
 
 			peer.on('close', () => peers.delete(peerId));
@@ -495,7 +497,7 @@ async function runWebSocketServer()
 				}
 			}
 
-			room.handlePeer(peer);
+			room.handlePeer({ peer, token });
 		})
 			.catch((error) =>
 			{

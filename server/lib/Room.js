@@ -2,6 +2,8 @@ const EventEmitter = require('events').EventEmitter;
 const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
+const { v4: uuidv4 } = require('uuid');
+const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
 const config = require('../config/config');
 
@@ -45,6 +47,8 @@ class Room extends EventEmitter
 
 		super();
 		this.setMaxListeners(Infinity);
+
+		this._uuid = uuidv4();
 
 		// Room ID.
 		this._roomId = roomId;
@@ -120,9 +124,26 @@ class Room extends EventEmitter
 		this.emit('close');
 	}
 
-	handlePeer(peer)
+	handlePeer({ peer, token })
 	{
-		logger.info('handlePeer() [peer:"%s", roles:"%s"]', peer.id, peer.roles);
+		logger.info('handlePeer() [peer:"%s", roles:"%s", token:"%s"]', peer.id, peer.roles, token);
+
+		let verifiedPeer = false;
+
+		if (token)
+		{
+			try
+			{
+				const decoded = jwt.verify(token, this._uuid);
+
+				if (decoded.id === peer.id)
+					verifiedPeer = true;
+			}
+			catch (err)
+			{
+				logger.warn('handlePeer() | invalid token');
+			}
+		}
 
 		// Allow reconnections, remove old peer
 		if (this._peers[peer.id])
@@ -134,8 +155,11 @@ class Room extends EventEmitter
 			this._peers[peer.id].close();
 		}
 
+		// Returning user
+		if (verifiedPeer)
+			this._peerJoining(peer, true);
 		// Always let ADMIN in, even if locked
-		if (peer.roles.includes(userRoles.ADMIN))
+		else if (peer.roles.includes(userRoles.ADMIN))
 			this._peerJoining(peer);
 		else if (this._locked)
 			this._parkPeer(peer);
@@ -332,7 +356,7 @@ class Room extends EventEmitter
 		}
 	}
 
-	async _peerJoining(peer)
+	async _peerJoining(peer, returning = false)
 	{
 		peer.socket.join(this._roomId);
 
@@ -343,45 +367,58 @@ class Room extends EventEmitter
 
 		this._handlePeer(peer);
 
-		let turnServers;
-
-		if ('turnAPIURI' in config)
+		if (returning)
 		{
-			try
-			{
-				const { data } = await axios.get(
-					config.turnAPIURI,
-					{
-						params : {
-							'uri_schema'  : 'turn',
-							'transport'   : 'tcp',
-							'ip_ver'      : 'ipv4',
-							'servercount' : '2',
-							'api_key'     : config.turnAPIKey,
-							'ip'          : peer.socket.request.connection.remoteAddress
-						}
-					});
-	
-				turnServers = [ {
-					urls       : data.uris,
-					username   : data.username,
-					credential : data.password
-				} ];
-			}
-			catch (error)
-			{
-				if ('backupTurnServers' in config)
-					turnServers = config.backupTurnServers;
-	
-				logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
-			}
+			this._notification(peer.socket, 'roomBack');
 		}
-		else if ('backupTurnServers' in config)
+		else
 		{
-			turnServers = config.backupTurnServers;
-		}
+			const token = jwt.sign({ id: peer.id }, this._uuid, { noTimestamp: true });
 
-		this._notification(peer.socket, 'roomReady', { turnServers });
+			peer.socket.handshake.session.token = token;
+
+			peer.socket.handshake.session.save();
+
+			let turnServers;
+	
+			if ('turnAPIURI' in config)
+			{
+				try
+				{
+					const { data } = await axios.get(
+						config.turnAPIURI,
+						{
+							params : {
+								'uri_schema'  : 'turn',
+								'transport'   : 'tcp',
+								'ip_ver'      : 'ipv4',
+								'servercount' : '2',
+								'api_key'     : config.turnAPIKey,
+								'ip'          : peer.socket.request.connection.remoteAddress
+							}
+						});
+		
+					turnServers = [ {
+						urls       : data.uris,
+						username   : data.username,
+						credential : data.password
+					} ];
+				}
+				catch (error)
+				{
+					if ('backupTurnServers' in config)
+						turnServers = config.backupTurnServers;
+		
+					logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
+				}
+			}
+			else if ('backupTurnServers' in config)
+			{
+				turnServers = config.backupTurnServers;
+			}
+	
+			this._notification(peer.socket, 'roomReady', { turnServers });
+		}
 	}
 
 	_handlePeer(peer)
