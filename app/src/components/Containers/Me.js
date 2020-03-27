@@ -68,34 +68,33 @@ const styles = (theme) =>
 		},
 		controls :
 		{
-			position        : 'absolute',
-			width           : '100%',
-			height          : '100%',
-			backgroundColor : 'rgba(0, 0, 0, 0.3)',
-			display         : 'flex',
-			flexDirection   : 'column',
-			justifyContent  : 'center',
-			alignItems      : 'flex-end',
-			padding         : theme.spacing(1),
-			zIndex          : 21,
-			opacity         : 0,
-			transition      : 'opacity 0.3s',
-			touchAction     : 'none',
-			pointerEvents   : 'none',
-			'&.hover'       :
+			position       : 'absolute',
+			width          : '100%',
+			height         : '100%',
+			display        : 'flex',
+			flexDirection  : 'column',
+			justifyContent : 'center',
+			alignItems     : 'flex-end',
+			padding        : theme.spacing(1),
+			zIndex         : 21,
+			touchAction    : 'none',
+			pointerEvents  : 'none',
+			'& p'          :
 			{
-				opacity : 1
-			},
-			'& p' :
-			{
-				position  : 'absolute',
-				float     : 'left',
-				top       : '50%',
-				left      : '50%',
-				transform : 'translate(-50%, -50%)',
-				color     : 'rgba(255, 255, 255, 0.5)',
-				fontSize  : '7em',
-				margin    : 0
+				position   : 'absolute',
+				float      : 'left',
+				top        : '50%',
+				left       : '50%',
+				opacity    : 0,
+				transition : 'opacity 0.3s',
+				transform  : 'translate(-50%, -50%)',
+				color      : 'rgba(255, 255, 255, 0.5)',
+				fontSize   : '7em',
+				margin     : 0,
+				'&.hover'  :
+				{
+					opacity : 1
+				}
 			}
 		},
 		ptt :
@@ -112,8 +111,8 @@ const styles = (theme) =>
 			padding         : '15px',
 			borderRadius    : '20px',
 			textAlign       : 'center',
-			opacity   : 0,
-			'&.enabled' :
+			opacity         : 0,
+			'&.enabled'     :
 			{
 				opacity : 1
 			}
@@ -317,13 +316,13 @@ const Me = (props) =>
 							<FormattedMessage
 								id='room.me'
 								defaultMessage='ME'
-							/>					
+							/>
 						</p>
 
 						<div className={classnames(classes.ptt, (micState ==='muted' && me.isSpeaking) ? 'enabled' : null)} >
 							<FormattedMessage
 								id='me.mutedPTT'
-								defaultMessage='You are muted: hold SPACE-BAR to speak!'
+								defaultMessage='You are muted, hold down SPACE-BAR to talk'
 							/>	
 						</div>
 

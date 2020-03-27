@@ -151,14 +151,14 @@ const ListPeer = (props) =>
 							id             : 'tooltip.muteScreenSharing',
 							defaultMessage : 'Mute participant share'
 						})}
-						color={ screenVisible ? 'primary' : 'secondary'}
-						disabled={ peer.peerScreenInProgress }
+						color={screenVisible ? 'primary' : 'secondary'}
+						disabled={peer.peerScreenInProgress}
 						onClick={() =>
-							{
-								screenVisible ?
-									roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
-									roomClient.modifyPeerConsumer(peer.id, 'screen', false);
-							}}
+						{
+							screenVisible ?
+								roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
+								roomClient.modifyPeerConsumer(peer.id, 'screen', false);
+						}}
 					>
 						{ screenVisible ?
 							<ScreenIcon />
@@ -172,14 +172,14 @@ const ListPeer = (props) =>
 						id             : 'tooltip.muteParticipant',
 						defaultMessage : 'Mute participant'
 					})}
-					color={ micEnabled ? 'primary' : 'secondary'}
-					disabled={ peer.peerAudioInProgress }
+					color={micEnabled ? 'primary' : 'secondary'}
+					disabled={peer.peerAudioInProgress}
 					onClick={() =>
-						{
-							micEnabled ?
-								roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-								roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-						}}
+					{
+						micEnabled ?
+							roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+							roomClient.modifyPeerConsumer(peer.id, 'mic', false);
+					}}
 				>
 					{ micEnabled ?
 						<MicIcon />
@@ -193,11 +193,11 @@ const ListPeer = (props) =>
 							id             : 'tooltip.kickParticipant',
 							defaultMessage : 'Kick out participant'
 						})}
-						disabled={ peer.peerKickInProgress }
+						disabled={peer.peerKickInProgress}
 						onClick={() =>
-							{
-								roomClient.kickPeer(peer.id);
-							}}
+						{
+							roomClient.kickPeer(peer.id);
+						}}
 					>
 						<ExitIcon />
 					</IconButton>

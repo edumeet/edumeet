@@ -52,6 +52,9 @@
 	"room.muteAll": "Demp alle",
 	"room.stopAllVideo": "Stopp all video",
 	"room.closeMeeting": "Avslutt møte",
+	"room.speechUnsupported": "Din nettleser støtter ikke stemmegjenkjenning",
+
+	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
 	"tooltip.login": "Logg in",
 	"tooltip.logout": "Logg ut",

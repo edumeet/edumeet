@@ -34,11 +34,11 @@ export const setPicture = (picture) =>
 	});
 
 export const setMediaCapabilities = ({
-		canSendMic,
-		canSendWebcam,
-		canShareScreen,
-		canShareFiles
-	}) =>
+	canSendMic,
+	canSendWebcam,
+	canShareScreen,
+	canShareFiles
+}) =>
 	({
 		type    : 'SET_MEDIA_CAPABILITIES',
 		payload : { canSendMic, canSendWebcam, canShareScreen, canShareFiles }
@@ -92,7 +92,7 @@ export const setDisplayNameInProgress = (flag) =>
 		payload : { flag }
 	});
 
-	export const setIsSpeaking = (flag) =>
+export const setIsSpeaking = (flag) =>
 	({
 		type    : 'SET_IS_SPEAKING',
 		payload : { flag }

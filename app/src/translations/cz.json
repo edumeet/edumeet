@@ -48,6 +48,12 @@
 	"room.spotlights": "Aktivní Účastníci",
 	"room.passive": "Pasivní Účastníci",
 	"room.videoPaused": "Toto video bylo pozastaveno",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
+	"room.speechUnsupported": null,
+
+	"me.mutedPTT": null,
 
 	"tooltip.login": "Přihlášení",
 	"tooltip.logout": "Odhlášení",

@@ -231,7 +231,7 @@ export default class RoomClient
 		this._hark = null;
 
 		// Local MediaStream for hark
-		this._harkStream = null
+		this._harkStream = null;
 
 		// Local webcam mediasoup Producer.
 		this._webcamProducer = null;
@@ -1162,21 +1162,30 @@ export default class RoomClient
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
-			if (stream){
+
+			if (stream)
+			{
 				const track = stream.getVideoTracks()[0];
-				if (track) {
+
+				if (track)
+				{
 					await this._webcamProducer.replaceTrack({ track });
 	
 					store.dispatch(
 						producerActions.setProducerTrack(this._webcamProducer.id, track));
 							
-				} else {
-					logger.warn('getVideoTracks Error: First Video Track is null')
+				}
+				else
+				{
+					logger.warn('getVideoTracks Error: First Video Track is null');
 				}
 	
-			} else {
-				logger.warn ('getUserMedia Error: Stream is null!') 
 			}
+			else
+			{
+				logger.warn('getUserMedia Error: Stream is null!');
+			}
+
 			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
 
 			await this._updateWebcams();
@@ -2340,7 +2349,7 @@ export default class RoomClient
 						dtlsParameters,
 						iceServers             : this._turnServers,
 						// TODO: Fix for issue #72
-						iceTransportPolicy : this._device.flag === 'firefox' ? 'relay' : undefined,
+						iceTransportPolicy     : this._device.flag === 'firefox' ? 'relay' : undefined,
 						proprietaryConstraints : PC_PROPRIETARY_CONSTRAINTS
 					});
 
@@ -2402,7 +2411,7 @@ export default class RoomClient
 					iceParameters,
 					iceCandidates,
 					dtlsParameters,
-					iceServers : this._turnServers,
+					iceServers         : this._turnServers,
 					// TODO: Fix for issue #72
 					iceTransportPolicy : this._device.flag === 'firefox' ? 'relay' : undefined
 				});

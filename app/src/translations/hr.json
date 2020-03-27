@@ -52,6 +52,9 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.speechUnsupported": null,
+
+	"me.mutedPTT": null,
 
 	"tooltip.login": "Prijava",
 	"tooltip.logout": "Odjava",

@@ -46,7 +46,6 @@ export const setPeerPicture = (peerId, picture) =>
 		payload : { peerId, picture }
 	});
 
-
 export const addPeerRole = (peerId, role) =>
 	({
 		type    : 'ADD_PEER_ROLE',
