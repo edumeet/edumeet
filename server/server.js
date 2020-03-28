@@ -469,21 +469,20 @@ async function runWebSocketServer()
 			const room = await getOrCreateRoom({ roomId });
 
 			let peer = peers.get(peerId);
+			let returning = false;
 
-			if (peer)
-			{
-				if (token)
-				{
+			if (peer && !token)
+			{ // Don't allow hijacking sessions
+				socket.disconnect(true);
+
+				return;
+			}
+			else if (token && room.verifyPeer({ id: peerId, token }))
+			{ // Returning user, remove if old peer exists
+				if (peer)
 					peer.close();
 
-					peer = null;
-				}
-				else
-				{
-					socket.disconnect(true);
-
-					return;
-				}
+				returning = true;
 			}
 
 			peer = new Peer({ id: peerId, roomId, socket });
@@ -516,7 +515,7 @@ async function runWebSocketServer()
 				}
 			}
 
-			room.handlePeer({ peer, token });
+			room.handlePeer({ peer, returning });
 		})
 			.catch((error) =>
 			{

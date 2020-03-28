@@ -3,6 +3,7 @@ const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
 const { v4: uuidv4 } = require('uuid');
+const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
 const config = require('../config/config');
 
@@ -123,12 +124,27 @@ class Room extends EventEmitter
 		this.emit('close');
 	}
 
-	handlePeer({ peer, token })
+	verifyPeer({ id, token })
 	{
-		logger.info('handlePeer() [peer:"%s", roles:"%s", token:"%s"]', peer.id, peer.roles, token);
+		try
+		{
+			const decoded = jwt.verify(token, this._uuid);
 
-		// This peer is returning, reconnect
-		const verifiedPeer = token && token === this._uuid;
+			logger.info('verifyPeer() [decoded:"%o"]', decoded);
+
+			return decoded.id === id;
+		}
+		catch (err)
+		{
+			logger.warn('verifyPeer() | invalid token');
+		}
+
+		return false;
+	}
+
+	handlePeer({ peer, returning })
+	{
+		logger.info('handlePeer() [peer:"%s", roles:"%s", returning:"%s"]', peer.id, peer.roles, returning);
 
 		// Should not happen
 		if (this._peers[peer.id])
@@ -139,7 +155,7 @@ class Room extends EventEmitter
 		}
 
 		// Returning user
-		if (verifiedPeer)
+		if (returning)
 			this._peerJoining(peer, true);
 		// Always let ADMIN in, even if locked
 		else if (peer.roles.includes(userRoles.ADMIN))
@@ -356,7 +372,9 @@ class Room extends EventEmitter
 		}
 		else
 		{
-			peer.socket.handshake.session.token = this._uuid;
+			const token = jwt.sign({ id: peer.id }, this._uuid, { noTimestamp: true });
+
+			peer.socket.handshake.session.token = token;
 
 			peer.socket.handshake.session.save();
 

@@ -1521,24 +1521,46 @@ export default class RoomClient
 				}));
 
 			if (this._screenSharingProducer)
+			{
 				this._screenSharingProducer.close();
 
+				store.dispatch(
+					producerActions.removeProducer(this._screenSharingProducer.id));
+
+				this._screenSharingProducer = null;
+			}
+
 			if (this._webcamProducer)
+			{
 				this._webcamProducer.close();
 
+				store.dispatch(
+					producerActions.removeProducer(this._webcamProducer.id));
+
+				this._webcamProducer = null;
+			}
+
 			if (this._micProducer)
+			{
 				this._micProducer.close();
 
-			// Close mediasoup Transports.
+				store.dispatch(
+					producerActions.removeProducer(this._micProducer.id));
+
+				this._micProducer = null;
+			}
+
 			if (this._sendTransport)
 			{
 				this._sendTransport.close();
+
 				this._sendTransport = null;
 			}
 
 			if (this._recvTransport)
 			{
 				this._recvTransport.close();
+
 				this._recvTransport = null;
 			}
 
