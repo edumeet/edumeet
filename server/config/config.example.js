@@ -64,6 +64,12 @@ module.exports =
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
 	httpOnly              : false,
+	// WebServer/Express trust proxy config for httpOnly mode
+	// You can find more info:
+	//  - https://expressjs.com/en/guide/behind-proxies.html
+	//  - https://www.npmjs.com/package/proxy-addr
+	// use case: loadbalancer backend
+	trustProxy           : '',
 	// This function will be called on successful login through oidc.
 	// Use this function to map your oidc userinfo to the Peer object.
 	// The roomId is equal to the room name.

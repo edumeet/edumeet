@@ -100,6 +100,10 @@ const session = expressSession({
 	}
 });
 
+if (config.trustProxy) {
+	app.set('trust proxy', config.trustProxy);
+}
+
 app.use(session);
 
 passport.serializeUser((user, done) =>
