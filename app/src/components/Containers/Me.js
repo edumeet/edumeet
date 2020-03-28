@@ -82,7 +82,7 @@ const styles = (theme) =>
 			transition      : 'opacity 0.3s',
 			touchAction     : 'none',
 			pointerEvents   : 'none',
-			'& p' :
+			'& p'           :
 			{
 				position   : 'absolute',
 				float      : 'left',
@@ -93,10 +93,11 @@ const styles = (theme) =>
 				fontSize   : '7em',
 				margin     : 0,
 				opacity    : 0,
-				'&.hover' :
+				transition : 'opacity 0.1s ease-in-out',
+				'&.hover'  :
 				{
 					opacity : 1
-				},
+				}
 			}
 		},
 		ptt :
@@ -114,9 +115,11 @@ const styles = (theme) =>
 			borderRadius    : '20px',
 			textAlign       : 'center',
 			opacity         : 0,
-			'&.enabled' :
+			transition      : 'opacity 1s ease',
+			'&.enabled'     :
 			{
-				opacity : 1
+				transition : 'opacity 0.1s',
+				opacity    : 1
 			}
 		}
 	});
