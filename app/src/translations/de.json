@@ -54,9 +54,9 @@
 	"room.closeMeeting": "Meeting schließen",
 	"room.speechUnsupported": "Dein Browser unterstützt keine Spracherkennung",
 
-  "me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+  	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
 	
-  "tooltip.login": "Anmelden",
+	"tooltip.login": "Anmelden",
 	"tooltip.logout": "Abmelden",
 	"tooltip.admitFromLobby": "Teilnehmer reinlassen",
 	"tooltip.lockRoom": "Raum abschließen",
