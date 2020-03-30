@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.2.1
+
+* Fix: permananent top bar by default
+* Fix: httpOnly mode https redirecet
+* Add some extra checks for video stream and track
+* Add Italian translation
+* Add Chech translation
+* Add new server option `trustPorxy` for loadbalancing http only use case.
+* Add HAproxy loadbalnce example
+* Add LTI LMS integration documentation
+* Fix spacing of close button
+
 ## 3.2
 
 * Add munin plugin
@@ -33,10 +45,10 @@
 
 * Updated to mediasoup v3
 * Replace lib "passport-datporten" with "openid-client" (a general OIDC certified client)
-  - OpenID Connect discovery
-  - Auth code flow
+  * OpenID Connect discovery
+  * Auth code flow
 * Add spdy http2 support.
-  - Notice it does not supports node 11.x
+  * Notice it does not supports node 11.x
 * Updated to Material UI v4
 
 ## 2.0
