@@ -49,6 +49,12 @@
 	"room.spotlights": "Partecipanti in Evidenza",
 	"room.passive": "Participanti Passivi",
 	"room.videoPaused": "Il video è in pausa",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
+	"room.speechUnsupported": null,
+	
+	"me.mutedPTT": null,
 
 	"tooltip.login": "Log in",
 	"tooltip.logout": "Log out",

@@ -52,8 +52,11 @@
 	"room.muteAll": "Alle stummschalten",
 	"room.stopAllVideo": "Alle Videos stoppen",
 	"room.closeMeeting": "Meeting schließen",
+	"room.speechUnsupported": "Dein Browser unterstützt keine Spracherkennung",
 
-	"tooltip.login": "Anmelden",
+  "me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+	
+  "tooltip.login": "Anmelden",
 	"tooltip.logout": "Abmelden",
 	"tooltip.admitFromLobby": "Teilnehmer reinlassen",
 	"tooltip.lockRoom": "Raum abschließen",

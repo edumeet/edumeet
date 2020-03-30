@@ -6,7 +6,7 @@ const initialState =
 	advancedMode        : false,
 	resolution          : 'medium', // low, medium, high, veryhigh, ultra
 	lastN               : 4,
-	permanentTopBar		: true
+	permanentTopBar     : true
 };
 
 const settings = (state = initialState, action) =>

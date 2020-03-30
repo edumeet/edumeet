@@ -287,28 +287,28 @@ class Filmstrip extends React.PureComponent
 }
 
 Filmstrip.propTypes = {
-	roomClient       : PropTypes.any.isRequired,
-	activeSpeakerId  : PropTypes.string,
-	advancedMode     : PropTypes.bool,
-	peers            : PropTypes.object.isRequired,
-	consumers        : PropTypes.object.isRequired,
-	myId             : PropTypes.string.isRequired,
-	selectedPeerId   : PropTypes.string,
-	spotlights       : PropTypes.array.isRequired,
-	boxes            : PropTypes.number,
-	classes          : PropTypes.object.isRequired
+	roomClient      : PropTypes.any.isRequired,
+	activeSpeakerId : PropTypes.string,
+	advancedMode    : PropTypes.bool,
+	peers           : PropTypes.object.isRequired,
+	consumers       : PropTypes.object.isRequired,
+	myId            : PropTypes.string.isRequired,
+	selectedPeerId  : PropTypes.string,
+	spotlights      : PropTypes.array.isRequired,
+	boxes           : PropTypes.number,
+	classes         : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		activeSpeakerId  : state.room.activeSpeakerId,
-		selectedPeerId   : state.room.selectedPeerId,
-		peers            : state.peers,
-		consumers        : state.consumers,
-		myId             : state.me.id,
-		spotlights       : state.room.spotlights,
-		boxes            : videoBoxesSelector(state)
+		activeSpeakerId : state.room.activeSpeakerId,
+		selectedPeerId  : state.room.selectedPeerId,
+		peers           : state.peers,
+		consumers       : state.consumers,
+		myId            : state.me.id,
+		spotlights      : state.room.spotlights,
+		boxes           : videoBoxesSelector(state)
 	};
 };
 

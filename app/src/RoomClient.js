@@ -231,7 +231,7 @@ export default class RoomClient
 		this._hark = null;
 
 		// Local MediaStream for hark
-		this._harkStream = null
+		this._harkStream = null;
 
 		// Local webcam mediasoup Producer.
 		this._webcamProducer = null;
@@ -1162,21 +1162,30 @@ export default class RoomClient
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
-			if (stream){
+
+			if (stream)
+			{
 				const track = stream.getVideoTracks()[0];
-				if (track) {
+
+				if (track)
+				{
 					await this._webcamProducer.replaceTrack({ track });
 	
 					store.dispatch(
 						producerActions.setProducerTrack(this._webcamProducer.id, track));
 							
-				} else {
-					logger.warn('getVideoTracks Error: First Video Track is null')
+				}
+				else
+				{
+					logger.warn('getVideoTracks Error: First Video Track is null');
 				}
 	
-			} else {
-				logger.warn ('getUserMedia Error: Stream is null!') 
 			}
+			else
+			{
+				logger.warn('getUserMedia Error: Stream is null!');
+			}
+
 			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
 
 			await this._updateWebcams();
@@ -1586,6 +1595,50 @@ export default class RoomClient
 					})
 				}));
 
+			if (this._screenSharingProducer)
+			{
+				this._screenSharingProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._screenSharingProducer.id));
+
+				this._screenSharingProducer = null;
+			}
+
+			if (this._webcamProducer)
+			{
+				this._webcamProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._webcamProducer.id));
+
+				this._webcamProducer = null;
+			}
+
+			if (this._micProducer)
+			{
+				this._micProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._micProducer.id));
+
+				this._micProducer = null;
+			}
+
+			if (this._sendTransport)
+			{
+				this._sendTransport.close();
+
+				this._sendTransport = null;
+			}
+
+			if (this._recvTransport)
+			{
+				this._recvTransport.close();
+
+				this._recvTransport = null;
+			}
+
 			store.dispatch(roomActions.setRoomState('connecting'));
 		});
 
@@ -1783,6 +1836,13 @@ export default class RoomClient
 						store.dispatch(roomActions.toggleJoined());
 						store.dispatch(roomActions.setInLobby(false));
 	
+						await this._joinRoom({ joinVideo });
+	
+						break;
+					}
+
+					case 'roomBack':
+					{
 						await this._joinRoom({ joinVideo });
 	
 						break;
@@ -2340,7 +2400,7 @@ export default class RoomClient
 						dtlsParameters,
 						iceServers             : this._turnServers,
 						// TODO: Fix for issue #72
-						iceTransportPolicy : this._device.flag === 'firefox' ? 'relay' : undefined,
+						iceTransportPolicy     : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined,
 						proprietaryConstraints : PC_PROPRIETARY_CONSTRAINTS
 					});
 
@@ -2402,9 +2462,9 @@ export default class RoomClient
 					iceParameters,
 					iceCandidates,
 					dtlsParameters,
-					iceServers : this._turnServers,
+					iceServers         : this._turnServers,
 					// TODO: Fix for issue #72
-					iceTransportPolicy : this._device.flag === 'firefox' ? 'relay' : undefined
+					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined
 				});
 
 			this._recvTransport.on(
@@ -2477,7 +2537,11 @@ export default class RoomClient
 			{
 				if (this._mediasoupDevice.canProduce('audio'))
 					if (!this._muted)
-						this.enableMic();
+					{
+						await this.enableMic();
+						if (peers.length > 4) 
+							this.muteMic();
+					}
 
 				if (joinVideo && this._mediasoupDevice.canProduce('video'))
 					this.enableWebcam();

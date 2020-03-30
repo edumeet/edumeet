@@ -47,7 +47,7 @@ const styles = (theme) =>
 		},
 		divider :
 		{
-			marginLeft : theme.spacing(3),
+			marginLeft : theme.spacing(3)
 		},
 		show :
 		{
@@ -364,7 +364,7 @@ TopBar.propTypes =
 	room               : appPropTypes.Room.isRequired,
 	peersLength        : PropTypes.number,
 	lobbyPeers         : PropTypes.array,
-	permanentTopBar       : PropTypes.bool,
+	permanentTopBar    : PropTypes.bool,
 	myPicture          : PropTypes.string,
 	loggedIn           : PropTypes.bool.isRequired,
 	loginEnabled       : PropTypes.bool.isRequired,
@@ -383,14 +383,14 @@ TopBar.propTypes =
 
 const mapStateToProps = (state) =>
 	({
-		room         : state.room,
-		peersLength  : peersLengthSelector(state),
-		lobbyPeers   : lobbyPeersKeySelector(state),
+		room            : state.room,
+		peersLength     : peersLengthSelector(state),
+		lobbyPeers      : lobbyPeersKeySelector(state),
 		permanentTopBar : state.settings.permanentTopBar,
-		loggedIn     : state.me.loggedIn,
-		loginEnabled : state.me.loginEnabled,
-		myPicture    : state.me.picture,
-		unread       : state.toolarea.unreadMessages +
+		loggedIn        : state.me.loggedIn,
+		loginEnabled    : state.me.loginEnabled,
+		myPicture       : state.me.picture,
+		unread          : state.toolarea.unreadMessages +
 			state.toolarea.unreadFiles
 	});
 

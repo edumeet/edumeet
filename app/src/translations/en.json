@@ -52,6 +52,9 @@
 	"room.muteAll": "Mute all",
 	"room.stopAllVideo": "Stop all video",
 	"room.closeMeeting": "Close meeting",
+	"room.speechUnsupported": "Your browser does not support speech recognition",
+
+	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
 	"tooltip.login": "Log in",
 	"tooltip.logout": "Log out",

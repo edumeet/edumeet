@@ -135,7 +135,7 @@ FullScreenView.propTypes =
 	consumer                 : appPropTypes.Consumer,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toolbarsVisible          : PropTypes.bool,
-	permanentTopBar             : PropTypes.bool,
+	permanentTopBar          : PropTypes.bool,
 	classes                  : PropTypes.object.isRequired
 };
 
@@ -143,7 +143,7 @@ const mapStateToProps = (state) =>
 	({
 		consumer        : state.consumers[state.room.fullScreenConsumer],
 		toolbarsVisible : state.room.toolbarsVisible,
-		permanentTopBar    : state.settings.permanentTopBar
+		permanentTopBar : state.settings.permanentTopBar
 	});
 
 const mapDispatchToProps = (dispatch) =>

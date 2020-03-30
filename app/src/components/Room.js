@@ -159,13 +159,13 @@ class Room extends React.PureComponent
 					<CookieConsent
 						buttonText={
 							<FormattedMessage
-								id = 'room.consentUnderstand'
-								defaultMessage = 'I understand'
+								id='room.consentUnderstand'
+								defaultMessage='I understand'
 							/>
 						}
 					>
 						<FormattedMessage
-							id = 'room.cookieConsent'
+							id='room.cookieConsent'
 							defaultMessage='This website uses cookies to enhance the user experience'
 						/>
 					</CookieConsent>

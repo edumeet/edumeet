@@ -353,15 +353,15 @@ const Settings = ({
 
 Settings.propTypes =
 {
-	roomClient           : PropTypes.any.isRequired,
-	me                   : appPropTypes.Me.isRequired,
-	room                 : appPropTypes.Room.isRequired,
-	settings             : PropTypes.object.isRequired,
-	onToggleAdvancedMode : PropTypes.func.isRequired,
+	roomClient              : PropTypes.any.isRequired,
+	me                      : appPropTypes.Me.isRequired,
+	room                    : appPropTypes.Room.isRequired,
+	settings                : PropTypes.object.isRequired,
+	onToggleAdvancedMode    : PropTypes.func.isRequired,
 	onTogglePermanentTopBar : PropTypes.func.isRequired,
-	handleChangeMode     : PropTypes.func.isRequired,
-	handleCloseSettings  : PropTypes.func.isRequired,
-	classes              : PropTypes.object.isRequired
+	handleChangeMode        : PropTypes.func.isRequired,
+	handleCloseSettings     : PropTypes.func.isRequired,
+	classes                 : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -374,10 +374,10 @@ const mapStateToProps = (state) =>
 };
 
 const mapDispatchToProps = {
-	onToggleAdvancedMode : settingsActions.toggleAdvancedMode,
+	onToggleAdvancedMode    : settingsActions.toggleAdvancedMode,
 	onTogglePermanentTopBar : settingsActions.togglePermanentTopBar,
-	handleChangeMode     : roomActions.setDisplayMode,
-	handleCloseSettings  : roomActions.setSettingsOpen
+	handleChangeMode        : roomActions.setDisplayMode,
+	handleCloseSettings     : roomActions.setSettingsOpen
 };
 
 export default withRoomContext(connect(
