@@ -346,7 +346,9 @@ async function setupAuth()
 	app.get('/auth/logout', (req, res) =>
 	{
 		req.logout();
-		res.send(logoutHelper());
+		req.session.destroy(function (err) {
+			res.send(logoutHelper());
+		});
 	});
 
 	// callback
