@@ -1,5 +1,7 @@
 const os = require('os');
 const userRoles = require('../userRoles');
+// const AwaitQueue = require('awaitqueue');
+// const axios = require('axios');
 
 module.exports =
 {
@@ -64,6 +66,41 @@ module.exports =
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
 	httpOnly              : false,
+	// This logger class will have the log function
+	// called every time there is a room created or destroyed,
+	// or peer created or destroyed. This would then be able
+	// to log to a file or external service.
+	/* StatusLogger          : class
+	{
+		constructor()
+		{
+			this._queue = new AwaitQueue();
+		}
+
+		// Array of rooms
+		// [
+		// { roomId : 'example', peers: 5 },
+		// { roomId : 'example2', peers: 4 }
+		// ]
+		// eslint-disable-next-line no-unused-vars
+		async log({ rooms, peers })
+		{
+			this._queue.push(async () =>
+			{
+				// Do your logging in here, use queue to keep correct order
+
+				// eslint-disable-next-line no-console
+				console.log('Number of rooms: ', rooms);
+				// eslint-disable-next-line no-console
+				console.log('Number of peers: ', peers);
+			})
+				.catch((error) =>
+				{
+					// eslint-disable-next-line no-console
+					console.log('error in log', error);
+				});
+		}
+	}, */
 	// This function will be called on successful login through oidc.
 	// Use this function to map your oidc userinfo to the Peer object.
 	// The roomId is equal to the room name.
@@ -124,6 +161,7 @@ module.exports =
 		peer.addRole(userRoles.AUTHENTICATED);
 	},
 	*/
+	// eslint-disable-next-line no-unused-vars
 	userMapping           : async ({ peer, roomId, userinfo }) =>
 	{
 		if (userinfo.picture != null)

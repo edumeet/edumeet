@@ -45,6 +45,11 @@ const logger = new Logger();
 
 const queue = new AwaitQueue();
 
+let statusLogger = null;
+
+if ('StatusLogger' in config)
+	statusLogger = new config.StatusLogger();
+
 // mediasoup Workers.
 // @type {Array<mediasoup.Worker>}
 const mediasoupWorkers = [];
@@ -157,6 +162,17 @@ async function run()
 			room.checkEmpty();
 		}
 	}, 10000);
+}
+
+function statusLog()
+{
+	if (statusLogger)
+	{
+		statusLogger.log({
+			rooms : rooms.size,
+			peers : peers.size
+		});
+	}
 }
 
 function setupLTI(ltiConfig)
@@ -361,7 +377,7 @@ async function runHttpsServer()
 
 	app.all('*', async (req, res, next) =>
 	{
-		if (req.secure || config.httpOnly )
+		if (req.secure || config.httpOnly)
 		{
 			const ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
 
@@ -489,7 +505,12 @@ async function runWebSocketServer()
 
 			peers.set(peerId, peer);
 
-			peer.on('close', () => peers.delete(peerId));
+			peer.on('close', () =>
+			{
+				peers.delete(peerId);
+
+				statusLog();
+			});
 
 			if (
 				Boolean(socket.handshake.session.passport) &&
@@ -516,6 +537,8 @@ async function runWebSocketServer()
 			}
 
 			room.handlePeer({ peer, returning });
+
+			statusLog();
 		})
 			.catch((error) =>
 			{
@@ -590,7 +613,14 @@ async function getOrCreateRoom({ roomId })
 
 		rooms.set(roomId, room);
 
-		room.on('close', () => rooms.delete(roomId));
+		statusLog();
+
+		room.on('close', () =>
+		{
+			rooms.delete(roomId);
+
+			statusLog();
+		});
 	}
 
 	return room;
