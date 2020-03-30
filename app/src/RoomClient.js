@@ -959,22 +959,6 @@ export default class RoomClient
 		}
 	}
 
-	async getAudioTrack()
-	{
-		await navigator.mediaDevices.getUserMedia(
-			{
-				audio : true, video : false 
-			});
-	}
-
-	async getVideoTrack()
-	{
-		await navigator.mediaDevices.getUserMedia(
-			{
-				audio : false, video : true 
-			});
-	}
-
 	async changeAudioDevice(deviceId)
 	{
 		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
@@ -1012,10 +996,18 @@ export default class RoomClient
 				{
 					audio :
 					{
-						deviceId : { exact: device.deviceId }
+						deviceId : { exact: device.deviceId },
+						sampleRate       : 48000,
+						channelCount     : 1,
+						volume           : 1.0,
+						autoGainControl  : true,
+						echoCancellation : false,
+						noiseSuppression : false,
+						sampleSize       : 16
 					}
-				});
-
+				}
+			);
+			logger.debug('Constraints: %o', stream.getAudioTracks()[0].getConstraints());
 			const track = stream.getAudioTracks()[0];
 
 			if (this._micProducer)
@@ -2687,10 +2679,18 @@ export default class RoomClient
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					audio : {
-						deviceId : { exact: deviceId }
+						deviceId : { exact: deviceId },
+						sampleRate       : 48000,
+						channelCount     : 1,
+						volume           : 1.0,
+						autoGainControl  : true,
+						echoCancellation : false,
+						noiseSuppression : false,
+						sampleSize       : 16
 					}
 				}
 			);
+			logger.debug('Constraints: %o', stream.getAudioTracks()[0].getConstraints());
 
 			track = stream.getAudioTracks()[0];
 
