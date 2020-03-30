@@ -333,7 +333,9 @@ async function setupAuth()
 		}
 
 		req.logout();
-		res.send(logoutHelper());
+		req.session.destroy(function (err) {
+			res.send(logoutHelper());
+		});
 	});
 
 	// callback
