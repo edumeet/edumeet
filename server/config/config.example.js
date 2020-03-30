@@ -77,11 +77,8 @@ module.exports =
 			this._queue = new AwaitQueue();
 		}
 
-		// Array of rooms
-		// [
-		// { roomId : 'example', peers: 5 },
-		// { roomId : 'example2', peers: 4 }
-		// ]
+		// rooms: number of rooms
+		// peers: number of peers
 		// eslint-disable-next-line no-unused-vars
 		async log({ rooms, peers })
 		{

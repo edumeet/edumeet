@@ -105,7 +105,8 @@ const session = expressSession({
 	}
 });
 
-if (config.trustProxy) {
+if (config.trustProxy)
+{
 	app.set('trust proxy', config.trustProxy);
 }
 
