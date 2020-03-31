@@ -3,30 +3,30 @@
 ## 3.2.1
 
 * Fix: permananent top bar by default
-* Fix: httpOnly mode https redirecet
+* Fix: `httpOnly` mode https redirect
 * Add some extra checks for video stream and track
 * Add Italian translation
-* Add Chech translation
-* Add new server option `trustPorxy` for loadbalancing http only use case.
-* Add HAproxy loadbalnce example
+* Add Czech translation
+* Add new server option `trustProxy` for load balancing http only use case
+* Add HAproxy load balance example
 * Add LTI LMS integration documentation
-* Fix spacing of close button
+* Fix spacing of leave button
+* Fix for sharing same file multiple times
 
 ## 3.2
 
 * Add munin plugin
-* Add muted=true search param to disble audio by deffault
+* Add `muted=true` search param to disable audio by default
 * Modify webtorrent tracker
 * Add key shortcut `space` for audio mute
 * Add key shortcut `v` for video mute
 * Add user configurable LastN
-* Add option to sticky top bar (sticky by default)
-* update mediasoup server
-* Add simulcast options to app config (disabled by default)
-* Add stats option to get counts of rooms and peers
-* Add httpOnly option for loadbalancer backend setups
+* Add option to permananent top bar (permanent by default)
+* Update mediasoup server
+* Add `simulcast` options to app config (disabled by default)
+* Add `stats` option to get counts of rooms and peers
+* Add `httpOnly` option for loadbalancer backend setups
 * LTI integration for LMS systems like moodle
-* Add muted=false search parameter
 * Add translations (12+1 languages)
 * Add support IPv6
 * Many other fixes and refactorings
