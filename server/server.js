@@ -171,7 +171,7 @@ function setupLTI(ltiConfig)
 
 	const ltiStrategy = new LTIStrategy(
 		ltiConfig,
-		function(req, lti, done)
+		(req, lti, done) =>
 		{
 			// LTI launch parameters
 			if (lti)
@@ -336,7 +336,7 @@ async function setupAuth()
 	// lti launch
 	app.post('/auth/lti',
 		passport.authenticate('lti', { failureRedirect: '/' }),
-		function(req, res)
+		(req, res) =>
 		{
 			res.redirect(`/${req.user.room}`);
 		}
@@ -346,9 +346,7 @@ async function setupAuth()
 	app.get('/auth/logout', (req, res) =>
 	{
 		req.logout();
-		req.session.destroy(function (err) {
-			res.send(logoutHelper());
-		});
+		req.session.destroy(() => res.send(logoutHelper()));
 	});
 
 	// callback
