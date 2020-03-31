@@ -11,9 +11,10 @@
 		"@material-ui/core": "^4.5.1",
 		"@material-ui/icons": "^4.5.1",
 		"bowser": "^2.7.0",
+		"create-torrent": "^4.4.1",
 		"dompurify": "^2.0.7",
 		"domready": "^1.0.8",
-		"end-of-stream": "1.4.0",
+		"end-of-stream": "1.4.1",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",
 		"is-electron": "^2.2.0",
@@ -37,7 +38,7 @@
 		"riek": "^1.1.0",
 		"socket.io-client": "^2.3.0",
 		"source-map-explorer": "^2.1.0",
-		"webtorrent": "^0.107.16"
+		"webtorrent": "^0.107.17"
 	},
 	"scripts": {
 		"analyze": "source-map-explorer build/static/js/*",
