@@ -14,6 +14,8 @@ import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
 
+let createTorrent;
+
 let WebTorrent;
 
 let saveAs;
@@ -756,26 +758,48 @@ export default class RoomClient
 				})
 			}));
 
-		this._webTorrent.seed(
-			files,
-			{ announceList: [ [ 'wss://tracker.lab.vvc.niif.hu:443' ] ] },
-			(torrent) =>
+		createTorrent(files, (err, torrent) =>
+		{
+			if (err)
 			{
-				store.dispatch(requestActions.notify(
+				return store.dispatch(requestActions.notify(
 					{
+						type : 'error',
 						text : intl.formatMessage({
-							id             : 'filesharing.successfulFileShare',
-							defaultMessage : 'File successfully shared'
+							id             : 'filesharing.unableToShare',
+							defaultMessage : 'Unable to share file'
 						})
 					}));
+			}
 
-				store.dispatch(fileActions.addFile(
-					this._peerId,
-					torrent.magnetURI
-				));
+			const existingTorrent = this._webTorrent.get(torrent);
 
-				this._sendFile(torrent.magnetURI);
-			});
+			if (existingTorrent)
+			{
+				return this._sendFile(existingTorrent.magnetURI);
+			}
+
+			this._webTorrent.seed(
+				files,
+				{ announceList: [ [ 'wss://tracker.lab.vvc.niif.hu:443' ] ] },
+				(newTorrent) =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							text : intl.formatMessage({
+								id             : 'filesharing.successfulFileShare',
+								defaultMessage : 'File successfully shared'
+							})
+						}));
+
+					store.dispatch(fileActions.addFile(
+						this._peerId,
+						newTorrent.magnetURI
+					));
+
+					this._sendFile(newTorrent.magnetURI);
+				});
+		});
 	}
 
 	// { file, name, picture }
@@ -1501,6 +1525,13 @@ export default class RoomClient
 
 	async _loadDynamicImports()
 	{
+		({ default: createTorrent } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "createtorrent" */
+			'create-torrent'
+		));
+
 		({ default: WebTorrent } = await import(
 
 			/* webpackPrefetch: true */
@@ -2356,7 +2387,7 @@ export default class RoomClient
 					}
 				}
 			});
-	
+
 			this._webTorrent.on('error', (error) =>
 			{
 				logger.error('Filesharing [error:"%o"]', error);
@@ -2364,7 +2395,10 @@ export default class RoomClient
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
-						text : intl.formatMessage({ id: 'filesharing.error', defaultMessage: 'There was a filesharing error' })
+						text : intl.formatMessage({
+							id             : 'filesharing.error',
+							defaultMessage : 'There was a filesharing error'
+						})
 					}));
 			});
 
