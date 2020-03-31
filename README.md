@@ -21,7 +21,6 @@ If you want the automatic approach, you can find a docker image [here](https://h
 If you want the ansible approach, you can find ansible role [here](https://github.com/misi/mm-ansible/).
 [![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
 
-
 ## Manual installation
 * Prerequisites:
 Currently multiparty-meeting will only run on nodejs v10.*
@@ -105,6 +104,12 @@ $ systemctl enable multiparty-meeting
 * 3443/tcp (default https webserver and signaling - adjustable in `server/config.js`)
 * 4443/tcp (default `npm start` port for developing with live browser reload, not needed in production enviroments - adjustable in app/package.json)
 * 40000-49999/udp/tcp (media ports - adjustable in `server/config.js`)
+
+## Load balanced installation
+To deploy this as a load balanced cluster, have a look at [HAproxy](HAproxy.md).
+
+## Learning management integration
+To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 
 ## TURN configuration
 
