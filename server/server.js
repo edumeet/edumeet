@@ -354,10 +354,10 @@ async function setupAuth()
 			if (!peer) // User has no socket session yet, make temporary
 				peer = new Peer({ id: peerId, roomId });
 
-			if (peer && peer.roomId !== roomId) // The peer is mischievous
+			if (peer.roomId !== roomId) // The peer is mischievous
 				throw new Error('peer authenticated with wrong room');
 
-			if (peer && typeof config.userMapping === 'function')
+			if (typeof config.userMapping === 'function')
 			{
 				await config.userMapping({
 					peer,
@@ -365,6 +365,8 @@ async function setupAuth()
 					userinfo : req.user._userinfo
 				});
 			}
+
+			peer.authenticated = true;
 
 			res.send(loginHelper({
 				displayName : peer.displayName,
@@ -530,10 +532,11 @@ async function runWebSocketServer()
 					_userinfo
 				} = socket.handshake.session.passport.user;
 		
-				peer.authId= id;
+				peer.authId = id;
 				peer.displayName = displayName;
 				peer.picture = picture;
 				peer.email = email;
+				peer.authenticated = true;
 		
 				if (typeof config.userMapping === 'function')
 				{

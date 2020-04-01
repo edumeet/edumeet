@@ -554,8 +554,9 @@ class Room extends EventEmitter
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
 				cb(null, {
-					roles : peer.roles,
-					peers : peerInfos
+					roles         : peer.roles,
+					peers         : peerInfos,
+					authenticated : peer.authenticated
 				});
 
 				// Mark the new Peer as joined.

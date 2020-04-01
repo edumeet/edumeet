@@ -25,6 +25,8 @@ class Peer extends EventEmitter
 
 		this._inLobby = false;
 
+		this._authenticated = false;
+
 		this._roles = [ userRoles.ALL ];
 
 		this._displayName = false;
@@ -144,6 +146,23 @@ class Peer extends EventEmitter
 	set inLobby(inLobby)
 	{
 		this._inLobby = inLobby;
+	}
+
+	get authenticated()
+	{
+		return this._authenticated;
+	}
+
+	set authenticated(authenticated)
+	{
+		if (authenticated !== this._authenticated)
+		{
+			const oldAuthenticated = this._authenticated;
+
+			this._authenticated = authenticated;
+
+			this.emit('authenticationChanged', { oldAuthenticated });
+		}
 	}
 
 	get roles()

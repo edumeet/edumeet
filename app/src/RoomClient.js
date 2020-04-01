@@ -2524,7 +2524,7 @@ export default class RoomClient
 					canShareFiles : this._torrentSupport
 				}));
 
-			const { roles, peers } = await this.sendRequest(
+			const { authenticated, roles, peers } = await this.sendRequest(
 				'join',
 				{
 					displayName     : displayName,
@@ -2532,7 +2532,14 @@ export default class RoomClient
 					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
 
-			logger.debug('_joinRoom() joined [peers:"%o", roles:"%o"]', peers, roles);
+			logger.debug(
+				'_joinRoom() joined [authenticated:"%s", peers:"%o", roles:"%o"]',
+				authenticated,
+				peers,
+				roles
+			);
+
+			store.dispatch(meActions.loggedIn(authenticated));
 
 			const myRoles = store.getState().me.roles;
 
