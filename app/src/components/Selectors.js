@@ -12,6 +12,10 @@ const peersKeySelector = createSelector(
 	peersSelector,
 	(peers) => Object.keys(peers)
 );
+const peersValueSelector = createSelector(
+	peersSelector,
+	(peers) => Object.values(peers)
+);
 
 export const lobbyPeersKeySelector = createSelector(
 	lobbyPeersSelector,
@@ -74,15 +78,23 @@ export const spotlightPeersSelector = createSelector(
 	(spotlights, peers) => peers.filter((peerId) => spotlights.includes(peerId))
 );
 
+export const spotlightSortedPeersSelector = createSelector(
+	spotlightsSelector,
+	peersValueSelector,
+	(spotlights, peers) => peers.filter((peer) => spotlights.includes(peer.id))
+		.sort((a, b) => a.displayName.localeCompare(b.displayName))
+);
+
 export const peersLengthSelector = createSelector(
 	peersSelector,
 	(peers) => Object.values(peers).length
 );
 
 export const passivePeersSelector = createSelector(
-	peersKeySelector,
+	peersValueSelector,
 	spotlightsSelector,
-	(peers, spotlights) => peers.filter((peerId) => !spotlights.includes(peerId))
+	(peers, spotlights) => peers.filter((peer) => !spotlights.includes(peer.id))
+		.sort((a, b) => a.displayName.localeCompare(b.displayName))
 );
 
 export const videoBoxesSelector = createSelector(

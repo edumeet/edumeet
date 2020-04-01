@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
 	passivePeersSelector,
-	spotlightPeersSelector
+	spotlightSortedPeersSelector
 } from '../../Selectors';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -114,16 +114,20 @@ class ParticipantList extends React.PureComponent
 							defaultMessage='Participants in Spotlight'
 						/>
 					</li>
-					{ spotlightPeers.map((peerId) => (
+					{ spotlightPeers.map((peer) => (
 						<li
-							key={peerId}
+							key={peer.id}
 							className={classNames(classes.listItem, {
-								selected : peerId === selectedPeerId
+								selected : peer.id === selectedPeerId
 							})}
-							onClick={() => roomClient.setSelectedPeer(peerId)}
+							onClick={() => roomClient.setSelectedPeer(peer.id)}
 						>
-							<ListPeer id={peerId} advancedMode={advancedMode} isModerator={isModerator}>
-								<Volume small id={peerId} />
+							<ListPeer
+								id={peer.id}
+								advancedMode={advancedMode}
+								isModerator={isModerator}
+							>
+								<Volume small id={peer.id} />
 							</ListPeer>
 						</li>
 					))}
@@ -135,16 +139,16 @@ class ParticipantList extends React.PureComponent
 							defaultMessage='Passive Participants'
 						/>
 					</li>
-					{ passivePeers.map((peerId) => (
+					{ passivePeers.map((peer) => (
 						<li
-							key={peerId}
+							key={peer.id}
 							className={classNames(classes.listItem, {
-								selected : peerId === selectedPeerId
+								selected : peer.id === selectedPeerId
 							})}
-							onClick={() => roomClient.setSelectedPeer(peerId)}
+							onClick={() => roomClient.setSelectedPeer(peer.id)}
 						>
 							<ListPeer
-								id={peerId}
+								id={peer.id}
 								advancedMode={advancedMode}
 								isModerator={isModerator}
 							/>
@@ -174,7 +178,7 @@ const mapStateToProps = (state) =>
 			state.me.roles.includes(userRoles.ADMIN),
 		passivePeers   : passivePeersSelector(state),
 		selectedPeerId : state.room.selectedPeerId,
-		spotlightPeers : spotlightPeersSelector(state)
+		spotlightPeers : spotlightSortedPeersSelector(state)
 	};
 };
 
