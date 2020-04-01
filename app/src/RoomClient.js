@@ -2371,10 +2371,8 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
-		const {
-			displayName,
-			picture
-		} = store.getState().settings;
+		const { displayName } = store.getState().settings;
+		const { picture } = store.getState().me;
 
 		try
 		{
@@ -2524,7 +2522,7 @@ export default class RoomClient
 					canShareFiles : this._torrentSupport
 				}));
 
-			const { roles, peers } = await this.sendRequest(
+			const { roles, peers, permissionsFromRoles, userRoles } = await this.sendRequest(
 				'join',
 				{
 					displayName     : displayName,
@@ -2533,6 +2531,9 @@ export default class RoomClient
 				});
 
 			logger.debug('_joinRoom() joined [peers:"%o", roles:"%o"]', peers, roles);
+
+			store.dispatch(roomActions.setUserRoles(userRoles));
+			store.dispatch(roomActions.setPermissionsFromRoles(permissionsFromRoles));
 
 			const myRoles = store.getState().me.roles;
 

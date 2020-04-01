@@ -41,6 +41,7 @@ const FileSharing = (props) =>
 
 	const {
 		canShareFiles,
+		canShare,
 		classes
 	} = props;
 
@@ -60,6 +61,7 @@ const FileSharing = (props) =>
 			<input
 				className={classes.input}
 				type='file'
+				disabled={!canShare}
 				onChange={handleFileChange}
 				id='share-files-button'
 			/>
@@ -68,7 +70,7 @@ const FileSharing = (props) =>
 					variant='contained'
 					component='span'
 					className={classes.button}
-					disabled={!canShareFiles}
+					disabled={!canShareFiles || !canShare}
 				>
 					{buttonDescription}
 				</Button>
@@ -83,6 +85,7 @@ FileSharing.propTypes = {
 	roomClient    : PropTypes.any.isRequired,
 	canShareFiles : PropTypes.bool.isRequired,
 	tabOpen       : PropTypes.bool.isRequired,
+	canShare      : PropTypes.bool.isRequired,
 	classes       : PropTypes.object.isRequired
 };
 
@@ -90,10 +93,26 @@ const mapStateToProps = (state) =>
 {
 	return {
 		canShareFiles : state.me.canShareFiles,
-		tabOpen       : state.toolarea.currentToolTab === 'files'
+		tabOpen       : state.toolarea.currentToolTab === 'files',
+		canShare      :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.SHARE_FILE.includes(role))
 	};
 };
 
 export default withRoomContext(connect(
-	mapStateToProps
+	mapStateToProps,
+	null,
+	null,
+	{
+		areStatesEqual : (next, prev) =>
+		{
+			return (
+				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+				prev.me.roles === next.me.roles &&
+				prev.me.canShareFiles === next.me.canShareFiles &&
+				prev.toolarea.currentToolTab === next.toolarea.currentToolTab
+			);
+		}
+	}
 )(withStyles(styles)(FileSharing)));

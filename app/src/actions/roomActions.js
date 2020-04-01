@@ -128,3 +128,15 @@ export const setCloseMeetingInProgress = (flag) =>
 		type    : 'CLOSE_MEETING_IN_PROGRESS',
 		payload : { flag }
 	});
+
+export const setUserRoles = (userRoles) =>
+	({
+		type    : 'SET_USER_ROLES',
+		payload : { userRoles }
+	});
+
+export const setPermissionsFromRoles = (permissionsFromRoles) =>
+	({
+		type    : 'SET_PERMISSIONS_FROM_ROLES',
+		payload : { permissionsFromRoles }
+	});

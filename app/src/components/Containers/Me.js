@@ -144,6 +144,7 @@ const Me = (props) =>
 		micProducer,
 		webcamProducer,
 		screenProducer,
+		canShareScreen,
 		classes,
 		theme
 	} = props;
@@ -396,7 +397,11 @@ const Me = (props) =>
 												defaultMessage : 'Start screen sharing'
 											})}
 											className={classes.fab}
-											disabled={!me.canShareScreen || me.screenShareInProgress}
+											disabled={
+												!canShareScreen ||
+												!me.canShareScreen ||
+												me.screenShareInProgress
+											}
 											color={screenState === 'on' ? 'primary' : 'default'}
 											size={smallButtons ? 'small' : 'large'}
 											onClick={() =>
@@ -537,6 +542,7 @@ Me.propTypes =
 	spacing        : PropTypes.number,
 	style          : PropTypes.object,
 	smallButtons   : PropTypes.bool,
+	canShareScreen : PropTypes.bool.isRequired,
 	classes        : PropTypes.object.isRequired,
 	theme          : PropTypes.object.isRequired
 };
@@ -544,10 +550,13 @@ Me.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
-		me            : state.me,
+		me             : state.me,
 		...meProducersSelector(state),
-		settings      : state.settings,
-		activeSpeaker : state.me.id === state.room.activeSpeakerId
+		settings       : state.settings,
+		activeSpeaker  : state.me.id === state.room.activeSpeakerId,
+		canShareScreen :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.SHARE_SCREEN.includes(role))
 	};
 };
 
@@ -559,6 +568,7 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
 				prev.me === next.me &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&

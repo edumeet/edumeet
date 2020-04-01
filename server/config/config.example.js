@@ -194,15 +194,37 @@ module.exports =
 			peer.email = userinfo.email;
 		}
 	},
-	// Required roles for Access. All users have the role "ALL" by default.
-	// Other roles need to be added in the "userMapping" function. This
-	// is an Array of roles. userRoles.ADMIN have all priveleges and access
-	// always.
+	// All users have the role "NORMAL" by default. Other roles need to be
+	// added in the "userMapping" function. The following accesses and
+	// permissions are arrays of roles. Roles can be changed in userRoles.js
 	//
 	// Example:
 	// [ userRoles.MODERATOR, userRoles.AUTHENTICATED ]
-	// This will allow all MODERATOR and AUTHENTICATED users access.
-	requiredRolesForAccess : [ userRoles.ALL ],
+	accessFromRoles        : {
+		// The role(s) will gain access to the room
+		// even if it is locked (!)
+		BYPASS_ROOM_LOCK : [ userRoles.ADMIN ],
+		// The role(s) will gain access to the room without
+		// going into the lobby. If you want to restrict access to your
+		// server to only directly allow authenticated users, you could
+		// add the userRoles.AUTHENTICATED to the user in the userMapping
+		// function, and change to BYPASS_LOBBY : [ userRoles.AUTHENTICATED ]
+		BYPASS_LOBBY     : [ userRoles.NORMAL ]
+	},
+	permissionsFromRoles   : {
+		// The role(s) have permission to lock/unlock a room
+		CHANGE_ROOM_LOCK : [ userRoles.NORMAL ],
+		// The role(s) have permission to promote a peer from the lobby
+		PROMOTE_PEER     : [ userRoles.NORMAL ],
+		// The role(s) have permission to send chat messages
+		SEND_CHAT        : [ userRoles.NORMAL ],
+		// The role(s) have permission to share screen
+		SHARE_SCREEN     : [ userRoles.NORMAL ],
+		// The role(s) have permission to share files
+		SHARE_FILE       : [ userRoles.NORMAL ],
+		// The role(s) have permission to moderate room (e.g. kick user)
+		MODERATE_ROOM    : [ userRoles.MODERATOR ]
+	},
 	// When truthy, the room will be open to all users when as long as there
 	// are allready users in the room
 	activateOnHostJoin     : true,
