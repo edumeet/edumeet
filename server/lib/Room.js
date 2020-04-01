@@ -946,16 +946,10 @@ class Room extends EventEmitter
 					throw new Error('Peer not yet joined');
 
 				const { displayName } = request.data;
-				const oldDisplayName = peer.displayName;
 
 				peer.displayName = displayName;
 
-				// Spread to others
-				this._notification(peer.socket, 'changeDisplayName', {
-					peerId         : peer.id,
-					displayName    : displayName,
-					oldDisplayName : oldDisplayName
-				}, true);
+				// This will be spread through events from the peer object
 
 				// Return no error
 				cb();
@@ -963,7 +957,7 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'changePicture':
+			/* case 'changePicture':
 			{
 				// Ensure the Peer is joined.
 				if (!peer.joined)
@@ -983,7 +977,7 @@ class Room extends EventEmitter
 				cb();
 
 				break;
-			}
+			} */
 
 			case 'chatMessage':
 			{
