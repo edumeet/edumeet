@@ -2239,13 +2239,15 @@ export default class RoomClient
 					canShareFiles : this._torrentSupport
 				}));
 
-			const { peers } = await this.sendRequest(
+			const { peers, authenticated } = await this.sendRequest(
 				'join',
 				{
 					displayName     : displayName,
 					picture         : picture,
 					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
+
+			store.dispatch(meActions.loggedIn(authenticated));
 
 			logger.debug('_joinRoom() joined, got peers [peers:"%o"]', peers);
 
