@@ -14,6 +14,8 @@ import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
 
+let createTorrent;
+
 let WebTorrent;
 
 let saveAs;
@@ -704,26 +706,48 @@ export default class RoomClient
 				})
 			}));
 
-		this._webTorrent.seed(
-			files,
-			{ announceList: [['wss://tracker.lab.vvc.niif.hu:443']] },
-			(torrent) =>
+		createTorrent(files, (err, torrent) =>
+		{
+			if (err)
 			{
-				store.dispatch(requestActions.notify(
+				return store.dispatch(requestActions.notify(
 					{
+						type : 'error',
 						text : intl.formatMessage({
-							id             : 'filesharing.successfulFileShare',
-							defaultMessage : 'File successfully shared'
+							id             : 'filesharing.unableToShare',
+							defaultMessage : 'Unable to share file'
 						})
 					}));
+			}
 
-				store.dispatch(fileActions.addFile(
-					this._peerId,
-					torrent.magnetURI
-				));
+			const existingTorrent = this._webTorrent.get(torrent);
 
-				this._sendFile(torrent.magnetURI);
-			});
+			if (existingTorrent)
+			{
+				return this._sendFile(existingTorrent.magnetURI);
+			}
+
+			this._webTorrent.seed(
+				files,
+				{ announceList: [ [ 'wss://tracker.lab.vvc.niif.hu:443' ] ] },
+				(newTorrent) =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							text : intl.formatMessage({
+								id             : 'filesharing.successfulFileShare',
+								defaultMessage : 'File successfully shared'
+							})
+						}));
+
+					store.dispatch(fileActions.addFile(
+						this._peerId,
+						newTorrent.magnetURI
+					));
+
+					this._sendFile(newTorrent.magnetURI);
+				});
+		});
 	}
 
 	// { file, name, picture }
@@ -1081,8 +1105,8 @@ export default class RoomClient
 			logger.debug(
 				'changeWebcam() | new selected webcam [device:%o]',
 				device);
-
-			this._webcamProducer.track.stop();
+			if (this._webcamProducer && this._webcamProducer.track)
+				this._webcamProducer.track.stop();
 
 			logger.debug('changeWebcam() | calling getUserMedia()');
 
@@ -1094,14 +1118,21 @@ export default class RoomClient
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
-
-			const track = stream.getVideoTracks()[0];
-
-			await this._webcamProducer.replaceTrack({ track });
-
-			store.dispatch(
-				producerActions.setProducerTrack(this._webcamProducer.id, track));
-
+			if (stream){
+				const track = stream.getVideoTracks()[0];
+				if (track) {
+					await this._webcamProducer.replaceTrack({ track });
+	
+					store.dispatch(
+						producerActions.setProducerTrack(this._webcamProducer.id, track));
+							
+				} else {
+					logger.warn('getVideoTracks Error: First Video Track is null')
+				}
+	
+			} else {
+				logger.warn ('getUserMedia Error: Stream is null!') 
+			}
 			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
 
 			await this._updateWebcams();
@@ -1337,6 +1368,13 @@ export default class RoomClient
 
 	async _loadDynamicImports()
 	{
+		({ default: createTorrent } = await import(
+
+			/* webpackPrefetch: true */
+			/* webpackChunkName: "createtorrent" */
+			'create-torrent'
+		));
+
 		({ default: WebTorrent } = await import(
 
 			/* webpackPrefetch: true */
@@ -2059,6 +2097,30 @@ export default class RoomClient
 
 		try
 		{
+			this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
+
+			this._webTorrent = this._torrentSupport && new WebTorrent({
+				tracker : {
+					rtcConfig : {
+						iceServers : this._turnServers
+					}
+				}
+			});
+
+			this._webTorrent.on('error', (error) =>
+			{
+				logger.error('Filesharing [error:"%o"]', error);
+	
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : intl.formatMessage({
+							id             : 'filesharing.error',
+							defaultMessage : 'There was a filesharing error'
+						})
+					}));
+			});
+
 			this._mediasoupDevice = new mediasoupClient.Device();
 
 			const routerRtpCapabilities =
@@ -2177,13 +2239,15 @@ export default class RoomClient
 					canShareFiles : this._torrentSupport
 				}));
 
-			const { peers } = await this.sendRequest(
+			const { peers, authenticated } = await this.sendRequest(
 				'join',
 				{
 					displayName     : displayName,
 					picture         : picture,
 					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
+
+			store.dispatch(meActions.loggedIn(authenticated));
 
 			logger.debug('_joinRoom() joined, got peers [peers:"%o"]', peers);
 

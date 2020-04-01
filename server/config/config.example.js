@@ -50,6 +50,12 @@ module.exports =
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
 	httpOnly              : false,
+	// WebServer/Express trust proxy config for httpOnly mode
+	// You can find more info:
+	//  - https://expressjs.com/en/guide/behind-proxies.html
+	//  - https://www.npmjs.com/package/proxy-addr
+	// use case: loadbalancer backend
+    trustProxy           : '',
 	// If this is set to true, only signed-in users will be able
 	// to join a room directly. Non-signed-in users (guests) will
 	// always be put in the lobby regardless of room lock status.
