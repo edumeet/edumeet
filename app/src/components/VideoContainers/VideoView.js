@@ -60,24 +60,95 @@ const styles = (theme) =>
 		{
 			display            : 'flex',
 			transitionProperty : 'opacity',
-			transitionDuration : '.15s',
-			'&.hidden'         :
-			{
-				opacity            : 0,
-				transitionDuration : '0s'
-			}
+			transitionDuration : '.15s'
 		},
 		box :
 		{
-			padding         : theme.spacing(0.5),
-			borderRadius    : 2,
-			backgroundColor : 'rgba(0, 0, 0, 0.25)',
-			'& p'           :
+			padding      : theme.spacing(0.5),
+			borderRadius : 2,
+			'& p'        :
 			{
 				userSelect : 'none',
 				margin     : 0,
 				color      : 'rgba(255, 255, 255, 0.7)',
 				fontSize   : '0.8em'
+			},
+			'&.left' :
+			{
+				backgroundColor : 'rgba(0, 0, 0, 0.25)'
+			},
+			'&.right' :
+			{
+				marginLeft : 'auto',
+				width      : 30
+			},
+			'&.hidden' :
+			{
+				opacity            : 0,
+				transitionDuration : '0s'
+			}
+		},
+		qualityBar :
+		{
+			height             : 6,
+			borderRadius       : 2,
+			background         : 'rgba(green, 0.65)',
+			transitionProperty : 'height background-color',
+			transitionDuration : '0.25s',
+			'&.score0'         :
+			{
+				width           : 0,
+				backgroundColor : 'rgba(246, 58, 15, 0.65)'
+			},
+			'&.score1' :
+			{
+				width           : '10%',
+				backgroundColor : 'rgba(246, 58, 15, 0.65)'
+			},
+			'&.score2' :
+			{
+				width           : '20%',
+				backgroundColor : 'rgba(246, 58, 15, 0.65)'
+			},
+			'&.score3' :
+			{
+				width           : '30%',
+				backgroundColor : 'rgba(246, 58, 15, 0.65)'
+			},
+			'&.score4' :
+			{
+				width           : '40%',
+				backgroundColor : 'rgba(246, 58, 15, 0.65)'
+			},
+			'&.score5' :
+			{
+				width           : '50%',
+				backgroundColor : 'rgba(242, 176, 30, 0.65)'
+			},
+			'&.score6' :
+			{
+				width           : '60%',
+				backgroundColor : 'rgba(242, 176, 30, 0.65)'
+			},
+			'&.score7' :
+			{
+				width           : '70%',
+				backgroundColor : 'rgba(242, 211, 27, 0.65)'
+			},
+			'&.score8' :
+			{
+				width           : '80%',
+				backgroundColor : 'rgba(242, 211, 27, 0.65)'
+			},
+			'&.score9' :
+			{
+				width           : '90%',
+				backgroundColor : 'rgba(134, 224, 30, 0.65)'
+			},
+			'&.score10' :
+			{
+				width           : '100%',
+				backgroundColor : 'rgba(134, 224, 30, 0.65)'
 			}
 		},
 		peer :
@@ -138,8 +209,8 @@ class VideoView extends React.PureComponent
 			advancedMode,
 			videoVisible,
 			videoMultiLayer,
-			// audioScore,
-			// videoScore,
+			audioScore,
+			videoScore,
 			// consumerSpatialLayers,
 			// consumerTemporalLayers,
 			consumerCurrentSpatialLayer,
@@ -161,12 +232,8 @@ class VideoView extends React.PureComponent
 		return (
 			<div className={classes.root}>
 				<div className={classes.info}>
-					<div className={classnames(classes.media, 
-						{
-							hidden : !advancedMode
-						})}
-					>
-						<div className={classes.box}>
+					<div className={classes.media}>
+						<div className={classnames(classes.box, 'left', { hidden: !advancedMode })}>
 							{ audioCodec && <p>{audioCodec}</p> }
 
 							{ videoCodec &&
@@ -187,6 +254,17 @@ class VideoView extends React.PureComponent
 								<p>{videoWidth}x{videoHeight}</p>
 							}
 						</div>
+						{ (audioScore || videoScore) &&
+							<div className={classnames(classes.box, 'right')}>
+								<div className={
+									classnames(
+										classes.qualityBar,
+										`score${videoScore ? videoScore.producerScore : audioScore.producerScore}`
+									)
+								}
+								/>
+							</div>
+						}
 					</div>
 
 					{ showPeerInfo &&
