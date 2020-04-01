@@ -135,6 +135,7 @@ const TopBar = (props) =>
 		toggleToolArea,
 		openUsersTab,
 		unread,
+		canLock,
 		classes
 	} = props;
 
@@ -271,6 +272,7 @@ const TopBar = (props) =>
 							})}
 							className={classes.actionButton}
 							color='inherit'
+							disabled={!canLock}
 							onClick={() =>
 							{
 								if (room.locked)
@@ -377,6 +379,7 @@ TopBar.propTypes =
 	toggleToolArea     : PropTypes.func.isRequired,
 	openUsersTab       : PropTypes.func.isRequired,
 	unread             : PropTypes.number.isRequired,
+	canLock            : PropTypes.bool.isRequired,
 	classes            : PropTypes.object.isRequired,
 	theme              : PropTypes.object.isRequired
 };
@@ -391,7 +394,10 @@ const mapStateToProps = (state) =>
 		loginEnabled    : state.me.loginEnabled,
 		myPicture       : state.me.picture,
 		unread          : state.toolarea.unreadMessages +
-			state.toolarea.unreadFiles
+			state.toolarea.unreadFiles,
+		canLock :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role))
 	});
 
 const mapDispatchToProps = (dispatch) =>
@@ -434,6 +440,7 @@ export default withRoomContext(connect(
 				prev.me.loggedIn === next.me.loggedIn &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&
+				prev.me.roles === next.me.roles &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles
 			);

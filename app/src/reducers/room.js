@@ -21,7 +21,16 @@ const initialState =
 	joined                 : false,
 	muteAllInProgress      : false,
 	stopAllVideoInProgress : false,
-	closeMeetingInProgress : false
+	closeMeetingInProgress : false,
+	userRoles              : { NORMAL: 'normal' }, // Default role
+	permissionsFromRoles   : {
+		CHANGE_ROOM_LOCK : [],
+		PROMOTE_PEER     : [],
+		SEND_CHAT        : [],
+		SHARE_SCREEN     : [],
+		SHARE_FILE       : [],
+		MODERATE_ROOM    : []
+	}
 };
 
 const room = (state = initialState, action) =>
@@ -174,6 +183,20 @@ const room = (state = initialState, action) =>
 
 		case 'CLOSE_MEETING_IN_PROGRESS':
 			return { ...state, closeMeetingInProgress: action.payload.flag };
+
+		case 'SET_USER_ROLES':
+		{
+			const { userRoles } = action.payload;
+
+			return { ...state, userRoles };
+		}
+
+		case 'SET_PERMISSIONS_FROM_ROLES':
+		{
+			const { permissionsFromRoles } = action.payload;
+
+			return { ...state, permissionsFromRoles };
+		}
 
 		default:
 			return state;

@@ -1,11 +1,9 @@
-import * as userRoles from './userRoles';
-
 const initialState =
 {
 	id                    : null,
 	picture               : null,
 	isMobile              : false,
-	roles                 : [ userRoles.ALL ],
+	roles                 : [ 'normal' ], // Default role
 	canSendMic            : false,
 	canSendWebcam         : false,
 	canShareScreen        : false,

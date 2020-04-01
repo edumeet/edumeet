@@ -59,12 +59,6 @@ class Room extends EventEmitter
 		// Locked flag.
 		this._locked = false;
 
-		// Required roles to access
-		this._requiredRoles = [ userRoles.ALL ];
-
-		if ('requiredRolesForAccess' in config)
-			this._requiredRoles = config.requiredRolesForAccess;
-
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;
 
@@ -157,15 +151,16 @@ class Room extends EventEmitter
 		// Returning user
 		if (returning)
 			this._peerJoining(peer, true);
-		// Always let ADMIN in, even if locked
-		else if (peer.roles.includes(userRoles.ADMIN))
+		else if ( // Has a role that is allowed to bypass room lock
+			peer.roles.some((role) => config.accessFromRoles.BYPASS_ROOM_LOCK.includes(role))
+		)
 			this._peerJoining(peer);
 		else if (this._locked)
 			this._parkPeer(peer);
 		else
 		{
-			// If the user has a role in config.requiredRolesForAccess, let them in
-			peer.roles.some((role) => this._requiredRoles.includes(role)) ?
+			// Has a role that is allowed to bypass lobby
+			peer.roles.some((role) => config.accessFromRoles.BYPASS_LOBBY.includes(role)) ?
 				this._peerJoining(peer) :
 				this._handleGuest(peer);
 		}
@@ -200,18 +195,18 @@ class Room extends EventEmitter
 
 		this._lobby.on('peerRolesChanged', (peer) =>
 		{
-			// Always let admin in, even if locked
-			if (peer.roles.includes(userRoles.ADMIN))
+			if ( // Has a role that is allowed to bypass room lock
+				peer.roles.some((role) => config.accessFromRoles.BYPASS_ROOM_LOCK.includes(role))
+			)
 			{
 				this._lobby.promotePeer(peer.id);
 
 				return;
 			}
 
-			// If the user has a role in config.requiredRolesForAccess, let them in
-			if (
+			if ( // Has a role that is allowed to bypass lobby
 				!this._locked &&
-				peer.roles.some((role) => this._requiredRoles.includes(role))
+				peer.roles.some((role) => config.accessFromRoles.BYPASS_LOBBY.includes(role))
 			)
 			{
 				this._lobby.promotePeer(peer.id);
@@ -554,9 +549,11 @@ class Room extends EventEmitter
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
 				cb(null, {
-					roles         : peer.roles,
-					peers         : peerInfos,
-					authenticated : peer.authenticated
+					roles                : peer.roles,
+					peers                : peerInfos,
+					authenticated        : peer.authenticated,
+					permissionsFromRoles : config.permissionsFromRoles,
+					userRoles            : userRoles
 				});
 
 				// Mark the new Peer as joined.
@@ -683,12 +680,19 @@ class Room extends EventEmitter
 
 			case 'produce':
 			{
+				let { appData } = request.data;
+
+				if (
+					appData.source === 'screen' &&
+					!peer.roles.some((role) => config.permissionsFromRoles.SHARE_SCREEN.includes(role))
+				)
+						throw new Error('peer not authorized');
+
 				// Ensure the Peer is joined.
 				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { transportId, kind, rtpParameters } = request.data;
-				let { appData } = request.data;
 				const transport = peer.getTransport(transportId);
 
 				if (!transport)
@@ -982,6 +986,11 @@ class Room extends EventEmitter
 
 			case 'chatMessage':
 			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.SEND_CHAT.includes(role))
+				)
+					throw new Error('peer not authorized');
+
 				const { chatMessage } = request.data;
 	
 				this._chatHistory.push(chatMessage);
@@ -1020,6 +1029,11 @@ class Room extends EventEmitter
 
 			case 'lockRoom':
 			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role))
+				)
+					throw new Error('peer not authorized');
+
 				this._locked = true;
 
 				// Spread to others
@@ -1035,6 +1049,11 @@ class Room extends EventEmitter
 
 			case 'unlockRoom':
 			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role))
+				)
+					throw new Error('peer not authorized');
+
 				this._locked = false;
 
 				// Spread to others
@@ -1090,6 +1109,11 @@ class Room extends EventEmitter
 
 			case 'promotePeer':
 			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.PROMOTE_PEER.includes(role))
+				)
+					throw new Error('peer not authorized');
+
 				const { peerId } = request.data;
 
 				this._lobby.promotePeer(peerId);
@@ -1102,6 +1126,11 @@ class Room extends EventEmitter
 
 			case 'promoteAllPeers':
 			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.PROMOTE_PEER.includes(role))
+				)
+					throw new Error('peer not authorized');
+
 				this._lobby.promoteAllPeers();
 
 				// Return no error
@@ -1112,6 +1141,11 @@ class Room extends EventEmitter
 
 			case 'sendFile':
 			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.SHARE_FILE.includes(role))
+				)
+					throw new Error('peer not authorized');
+
 				const { magnetUri } = request.data;
 	
 				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
@@ -1149,10 +1183,9 @@ class Room extends EventEmitter
 			case 'moderator:muteAll':
 			{
 				if (
-					!peer.hasRole(userRoles.MODERATOR) &&
-					!peer.hasRole(userRoles.ADMIN)
+					!peer.roles.some((role) => config.permissionsFromRoles.MODERATE_ROOM.includes(role))
 				)
-					throw new Error('peer does not have moderator priveleges');
+					throw new Error('peer not authorized');
 
 				// Spread to others
 				this._notification(peer.socket, 'moderator:mute', {
@@ -1167,10 +1200,9 @@ class Room extends EventEmitter
 			case 'moderator:stopAllVideo':
 			{
 				if (
-					!peer.hasRole(userRoles.MODERATOR) &&
-					!peer.hasRole(userRoles.ADMIN)
+					!peer.roles.some((role) => config.permissionsFromRoles.MODERATE_ROOM.includes(role))
 				)
-					throw new Error('peer does not have moderator priveleges');
+					throw new Error('peer not authorized');
 
 				// Spread to others
 				this._notification(peer.socket, 'moderator:stopVideo', {
@@ -1185,10 +1217,9 @@ class Room extends EventEmitter
 			case 'moderator:closeMeeting':
 			{
 				if (
-					!peer.hasRole(userRoles.MODERATOR) &&
-					!peer.hasRole(userRoles.ADMIN)
+					!peer.roles.some((role) => config.permissionsFromRoles.MODERATE_ROOM.includes(role))
 				)
-					throw new Error('peer does not have moderator priveleges');
+					throw new Error('peer not authorized');
 
 				this._notification(
 					peer.socket,
@@ -1208,10 +1239,9 @@ class Room extends EventEmitter
 			case 'moderator:kickPeer':
 			{
 				if (
-					!peer.hasRole(userRoles.MODERATOR) &&
-					!peer.hasRole(userRoles.ADMIN)
+					!peer.roles.some((role) => config.permissionsFromRoles.MODERATE_ROOM.includes(role))
 				)
-					throw new Error('peer does not have moderator priveleges');
+					throw new Error('peer not authorized');
 
 				const { peerId } = request.data;
 

@@ -27,7 +27,7 @@ class Peer extends EventEmitter
 
 		this._authenticated = false;
 
-		this._roles = [ userRoles.ALL ];
+		this._roles = [ userRoles.NORMAL ];
 
 		this._displayName = false;
 

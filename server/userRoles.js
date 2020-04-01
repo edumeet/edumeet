@@ -1,12 +1,11 @@
 module.exports = {
-	// Allowed to enter locked rooms + all other priveleges
+	// These can be changed
 	ADMIN         : 'admin',
-	// Allowed to enter restricted rooms if configured.
-	// Allowed to moderate users in a room (mute all,
-	// spotlight video, kick users)
 	MODERATOR     : 'moderator',
-	// Same as MODERATOR, but can't moderate users
+	PRESENTER     : 'presenter',
 	AUTHENTICATED : 'authenticated',
-	// No priveleges
-	ALL           : 'normal'
+	// Don't change anything after this point
+
+	// All users have this role by default, do not change or remove this role
+	NORMAL           : 'normal'
 };
