@@ -2405,6 +2405,9 @@ export default class RoomClient
 			const routerRtpCapabilities =
 				await this.sendRequest('getRouterRtpCapabilities');
 
+			routerRtpCapabilities.headerExtensions = routerRtpCapabilities.headerExtensions
+				.filter((ext) => ext.uri !== 'urn:3gpp:video-orientation');
+
 			await this._mediasoupDevice.load({ routerRtpCapabilities });
 
 			if (this._produce)
