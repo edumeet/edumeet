@@ -160,6 +160,8 @@ export default class RoomClient
 		if (displayName)
 			store.dispatch(settingsActions.setDisplayName(displayName));
 
+		this._tracker = 'wss://tracker.lab.vvc.niif.hu:443';
+
 		// Torrent support
 		this._torrentSupport = null;
 
@@ -781,7 +783,7 @@ export default class RoomClient
 
 			this._webTorrent.seed(
 				files,
-				{ announceList: [ [ 'wss://tracker.lab.vvc.niif.hu:443' ] ] },
+				{ announceList: [ [ this._tracker ] ] },
 				(newTorrent) =>
 				{
 					store.dispatch(requestActions.notify(
@@ -2526,6 +2528,7 @@ export default class RoomClient
 				authenticated,
 				roles,
 				peers,
+				tracker,
 				permissionsFromRoles,
 				userRoles
 			} = await this.sendRequest(
@@ -2542,6 +2545,8 @@ export default class RoomClient
 				peers,
 				roles
 			);
+
+			tracker && (this._tracker = tracker);
 
 			store.dispatch(meActions.loggedIn(authenticated));
 

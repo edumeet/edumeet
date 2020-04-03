@@ -551,6 +551,7 @@ class Room extends EventEmitter
 				cb(null, {
 					roles                : peer.roles,
 					peers                : peerInfos,
+					tracker              : config.fileTracker,
 					authenticated        : peer.authenticated,
 					permissionsFromRoles : config.permissionsFromRoles,
 					userRoles            : userRoles

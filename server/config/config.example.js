@@ -48,6 +48,7 @@ module.exports =
 			credential : 'example'
 		}
 	],
+	fileTracker  : 'wss://tracker.lab.vvc.niif.hu:443',
 	redisOptions : {},
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',
