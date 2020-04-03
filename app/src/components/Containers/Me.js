@@ -141,8 +141,7 @@ const Me = (props) =>
 		webcamProducer,
 		screenProducer,
 		canShareScreen,
-		classes,
-		theme
+		classes
 	} = props;
 
 	const videoVisible = (
@@ -312,7 +311,7 @@ const Me = (props) =>
 							}, 2000);
 						}}
 					>
-						<p className={hover && 'hover'}>
+						<p className={hover ? 'hover' : null}>
 							<FormattedMessage
 								id='room.me'
 								defaultMessage='ME'
@@ -455,7 +454,7 @@ const Me = (props) =>
 			</div>
 			{ screenProducer &&
 				<div
-					className={classnames(classes.root, 'screen', hover && 'hover')}
+					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
 					onMouseOver={() => setHover(true)}
 					onMouseOut={() => setHover(false)}
 					onTouchStart={() =>
@@ -501,7 +500,7 @@ const Me = (props) =>
 								}, 2000);
 							}}
 						>
-							<p className={hover && 'hover'}>
+							<p className={hover ? 'hover' : null}>
 								<FormattedMessage
 									id='room.me'
 									defaultMessage='ME'

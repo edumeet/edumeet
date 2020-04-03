@@ -168,8 +168,8 @@ const Peer = (props) =>
 					classnames(
 						classes.root,
 						'webcam',
-						hover && 'hover',
-						activeSpeaker && 'active-speaker'
+						hover ? 'hover' : null,
+						activeSpeaker ? 'active-speaker' : null
 					)
 				}
 				onMouseOver={() => setHover(true)}
@@ -206,7 +206,7 @@ const Peer = (props) =>
 					}
 
 					<div
-						className={classnames(classes.controls, hover && 'hover')}
+						className={classnames(classes.controls, hover ? 'hover' : null)}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -352,7 +352,7 @@ const Peer = (props) =>
 
 			{ screenConsumer &&
 				<div
-					className={classnames(classes.root, 'screen', hover && 'hover')}
+					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
 					onMouseOver={() => setHover(true)}
 					onMouseOut={() => setHover(false)}
 					onTouchStart={() =>
@@ -386,7 +386,7 @@ const Peer = (props) =>
 							</div>
 						}
 						<div
-							className={classnames(classes.controls, hover && 'hover')}
+							className={classnames(classes.controls, hover ? 'hover' : null)}
 							onMouseOver={() => setHover(true)}
 							onMouseOut={() => setHover(false)}
 							onTouchStart={() =>
