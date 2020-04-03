@@ -385,51 +385,53 @@ const Me = (props) =>
 									</Fab>
 								</div>
 							</Tooltip>
-							<Tooltip title={screenTip} placement='left'>
-								<div>
-									<Fab
-										aria-label={intl.formatMessage({
-											id             : 'device.startScreenSharing',
-											defaultMessage : 'Start screen sharing'
-										})}
-										className={classes.fab}
-										disabled={
-											!canShareScreen ||
-											!me.canShareScreen ||
-											me.screenShareInProgress
-										}
-										color={screenState === 'on' ? 'primary' : 'default'}
-										size={smallButtons ? 'small' : 'large'}
-										onClick={() =>
-										{
-											switch (screenState)
-											{
-												case 'on':
-												{
-													roomClient.disableScreenSharing();
-													break;
-												}
-												case 'off':
-												{
-													roomClient.enableScreenSharing();
-													break;
-												}
-												default:
-												{
-													break;
-												}
+							{ !me.isMobile &&
+								<Tooltip title={screenTip} placement='left'>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.startScreenSharing',
+												defaultMessage : 'Start screen sharing'
+											})}
+											className={classes.fab}
+											disabled={
+												!canShareScreen ||
+												!me.canShareScreen ||
+												me.screenShareInProgress
 											}
-										}}
-									>
-										{ (screenState === 'on' || screenState === 'unsupported') &&
-											<ScreenOffIcon/>
-										}
-										{ screenState === 'off' &&
-											<ScreenIcon/>
-										}
-									</Fab>
-								</div>
-							</Tooltip>
+											color={screenState === 'on' ? 'primary' : 'default'}
+											size={smallButtons ? 'small' : 'large'}
+											onClick={() =>
+											{
+												switch (screenState)
+												{
+													case 'on':
+													{
+														roomClient.disableScreenSharing();
+														break;
+													}
+													case 'off':
+													{
+														roomClient.enableScreenSharing();
+														break;
+													}
+													default:
+													{
+														break;
+													}
+												}
+											}}
+										>
+											{ (screenState === 'on' || screenState === 'unsupported') &&
+												<ScreenOffIcon/>
+											}
+											{ screenState === 'off' &&
+												<ScreenIcon/>
+											}
+										</Fab>
+									</div>
+								</Tooltip>
+							}
 						</React.Fragment>
 					</div>
 
