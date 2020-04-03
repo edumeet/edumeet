@@ -140,7 +140,6 @@ class Room extends React.PureComponent
 			room,
 			advancedMode,
 			toolAreaOpen,
-			isMobile,
 			toggleToolArea,
 			classes,
 			theme
@@ -223,7 +222,6 @@ Room.propTypes =
 	advancedMode       : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
-	isMobile           : PropTypes.bool,
 	toggleToolArea     : PropTypes.func.isRequired,
 	classes            : PropTypes.object.isRequired,
 	theme              : PropTypes.object.isRequired
@@ -233,8 +231,7 @@ const mapStateToProps = (state) =>
 	({
 		room         : state.room,
 		advancedMode : state.settings.advancedMode,
-		toolAreaOpen : state.toolarea.toolAreaOpen,
-		isMobile     : state.me.isMobile
+		toolAreaOpen : state.toolarea.toolAreaOpen
 	});
 
 const mapDispatchToProps = (dispatch) =>
@@ -259,8 +256,7 @@ export default connect(
 			return (
 				prev.room === next.room &&
 				prev.settings.advancedMode === next.settings.advancedMode &&
-				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
-				prev.me.isMobile === next.me.isMobile
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}
 	}
