@@ -128,8 +128,6 @@ export default class RoomClient
 			peerId,
 			accessCode,
 			device,
-			useSimulcast,
-			useSharingSimulcast,
 			produce,
 			forceTcp,
 			displayName,
@@ -142,8 +140,8 @@ export default class RoomClient
 			throw new Error('Missing device');
 
 		logger.debug(
-			'constructor() [peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s", displayName ""]',
-			peerId, device.flag, useSimulcast, produce, forceTcp, displayName);
+			'constructor() [peerId: "%s", device: "%s", produce: "%s", forceTcp: "%s", displayName ""]',
+			peerId, device.flag, produce, forceTcp, displayName);
 
 		this._signalingUrl = null;
 
@@ -166,13 +164,13 @@ export default class RoomClient
 		this._torrentSupport = null;
 
 		// Whether simulcast should be used.
-		this._useSimulcast = useSimulcast;
+		this._useSimulcast = false;
 
 		if ('simulcast' in window.config)
 			this._useSimulcast = window.config.simulcast;
 
 		// Whether simulcast should be used for sharing
-		this._useSharingSimulcast = useSharingSimulcast;
+		this._useSharingSimulcast = false;
 
 		if ('simulcastSharing' in window.config)
 			this._useSharingSimulcast = window.config.simulcastSharing;

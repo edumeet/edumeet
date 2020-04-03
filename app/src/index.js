@@ -104,8 +104,6 @@ function run()
 
 	const accessCode = parameters.get('code');
 	const produce = parameters.get('produce') !== 'false';
-	const useSimulcast = parameters.get('simulcast') === 'true';
-	const useSharingSimulcast = parameters.get('sharingSimulcast') === 'true';
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
@@ -125,8 +123,6 @@ function run()
 			peerId,
 			accessCode,
 			device,
-			useSimulcast,
-			useSharingSimulcast,
 			produce,
 			forceTcp,
 			displayName,
