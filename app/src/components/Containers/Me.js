@@ -76,6 +76,8 @@ const styles = (theme) =>
 			alignItems     : 'flex-end',
 			padding        : theme.spacing(1),
 			zIndex         : 21,
+			touchAction    : 'none',
+			pointerEvents  : 'none',
 			'& p'          :
 			{
 				position   : 'absolute',
