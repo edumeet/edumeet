@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { meProducersSelector } from '../Selectors';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
@@ -68,21 +67,16 @@ const styles = (theme) =>
 		},
 		controls :
 		{
-			position        : 'absolute',
-			width           : '100%',
-			height          : '100%',
-			backgroundColor : 'rgba(0, 0, 0, 0.3)',
-			display         : 'flex',
-			flexDirection   : 'column',
-			justifyContent  : 'center',
-			alignItems      : 'flex-end',
-			padding         : theme.spacing(1),
-			zIndex          : 21,
-			opacity         : 1,
-			transition      : 'opacity 0.3s',
-			touchAction     : 'none',
-			pointerEvents   : 'none',
-			'& p'           :
+			position       : 'absolute',
+			width          : '100%',
+			height         : '100%',
+			display        : 'flex',
+			flexDirection  : 'column',
+			justifyContent : 'center',
+			alignItems     : 'flex-end',
+			padding        : theme.spacing(1),
+			zIndex         : 21,
+			'& p'          :
 			{
 				position   : 'absolute',
 				float      : 'left',
@@ -261,8 +255,6 @@ const Me = (props) =>
 		'margin' : spacing
 	};
 
-	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
 	return (
 		<React.Fragment>
 			<div
@@ -295,9 +287,9 @@ const Me = (props) =>
 				}}
 				style={spacingStyle}
 			>
-				<div className={classnames(classes.viewContainer)} style={style}>
+				<div className={classes.viewContainer} style={style}>
 					<div
-						className={classnames(classes.controls)}  
+						className={classes.controls}  
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -318,124 +310,126 @@ const Me = (props) =>
 							}, 2000);
 						}}
 					>
-						<p className={classnames(hover && 'hover')}>
+						<p className={hover && 'hover'}>
 							<FormattedMessage
 								id='room.me'
 								defaultMessage='ME'
 							/>
 						</p>
 
-						<div className={classnames(classes.ptt, (micState ==='muted' && me.isSpeaking) ? 'enabled' : null)} >
+						<div className={classnames(
+							classes.ptt,
+							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
+						)}
+						>
 							<FormattedMessage
 								id='me.mutedPTT'
 								defaultMessage='You are muted, hold down SPACE-BAR to talk'
 							/>	
 						</div>
 
-						{ !me.isMobile &&
-							<React.Fragment>
-								<Tooltip title={micTip} placement={smallScreen ? 'top' : 'left'}>
-									<div>
-										<Fab
-											aria-label={intl.formatMessage({
-												id             : 'device.muteAudio',
-												defaultMessage : 'Mute audio'
-											})}
-											className={classes.fab}
-											disabled={!me.canSendMic || me.audioInProgress}
-											color={micState === 'on' ? 'default' : 'secondary'}
-											size={smallButtons ? 'small' : 'large'}
-											onClick={() =>
+						<React.Fragment>
+							<Tooltip title={micTip} placement='left'>
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'device.muteAudio',
+											defaultMessage : 'Mute audio'
+										})}
+										className={classes.fab}
+										disabled={!me.canSendMic || me.audioInProgress}
+										color={micState === 'on' ? 'default' : 'secondary'}
+										size={smallButtons ? 'small' : 'large'}
+										onClick={() =>
+										{
+											if (micState === 'off')
+												roomClient.enableMic();
+											else if (micState === 'on')
+												roomClient.muteMic();
+											else
+												roomClient.unmuteMic();
+										}}
+									>
+										{ micState === 'on' ?
+											<MicIcon />
+											:
+											<MicOffIcon />
+										}
+									</Fab>
+								</div>
+							</Tooltip>
+							<Tooltip title={webcamTip} placement='left'>
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'device.startVideo',
+											defaultMessage : 'Start video'
+										})}
+										className={classes.fab}
+										disabled={!me.canSendWebcam || me.webcamInProgress}
+										color={webcamState === 'on' ? 'default' : 'secondary'}
+										size={smallButtons ? 'small' : 'large'}
+										onClick={() =>
+										{
+											webcamState === 'on' ?
+												roomClient.disableWebcam() :
+												roomClient.enableWebcam();
+										}}
+									>
+										{ webcamState === 'on' ?
+											<VideoIcon />
+											:
+											<VideoOffIcon />
+										}
+									</Fab>
+								</div>
+							</Tooltip>
+							<Tooltip title={screenTip} placement='left'>
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'device.startScreenSharing',
+											defaultMessage : 'Start screen sharing'
+										})}
+										className={classes.fab}
+										disabled={
+											!canShareScreen ||
+											!me.canShareScreen ||
+											me.screenShareInProgress
+										}
+										color={screenState === 'on' ? 'primary' : 'default'}
+										size={smallButtons ? 'small' : 'large'}
+										onClick={() =>
+										{
+											switch (screenState)
 											{
-												if (micState === 'off')
-													roomClient.enableMic();
-												else if (micState === 'on')
-													roomClient.muteMic();
-												else
-													roomClient.unmuteMic();
-											}}
-										>
-											{ micState === 'on' ?
-												<MicIcon />
-												:
-												<MicOffIcon />
-											}
-										</Fab>
-									</div>
-								</Tooltip>
-								<Tooltip title={webcamTip} placement={smallScreen ? 'top' : 'left'}>
-									<div>
-										<Fab
-											aria-label={intl.formatMessage({
-												id             : 'device.startVideo',
-												defaultMessage : 'Start video'
-											})}
-											className={classes.fab}
-											disabled={!me.canSendWebcam || me.webcamInProgress}
-											color={webcamState === 'on' ? 'default' : 'secondary'}
-											size={smallButtons ? 'small' : 'large'}
-											onClick={() =>
-											{
-												webcamState === 'on' ?
-													roomClient.disableWebcam() :
-													roomClient.enableWebcam();
-											}}
-										>
-											{ webcamState === 'on' ?
-												<VideoIcon />
-												:
-												<VideoOffIcon />
-											}
-										</Fab>
-									</div>
-								</Tooltip>
-								<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'left'}>
-									<div>
-										<Fab
-											aria-label={intl.formatMessage({
-												id             : 'device.startScreenSharing',
-												defaultMessage : 'Start screen sharing'
-											})}
-											className={classes.fab}
-											disabled={
-												!canShareScreen ||
-												!me.canShareScreen ||
-												me.screenShareInProgress
-											}
-											color={screenState === 'on' ? 'primary' : 'default'}
-											size={smallButtons ? 'small' : 'large'}
-											onClick={() =>
-											{
-												switch (screenState)
+												case 'on':
 												{
-													case 'on':
-													{
-														roomClient.disableScreenSharing();
-														break;
-													}
-													case 'off':
-													{
-														roomClient.enableScreenSharing();
-														break;
-													}
-													default:
-													{
-														break;
-													}
+													roomClient.disableScreenSharing();
+													break;
 												}
-											}}
-										>
-											{ (screenState === 'on' || screenState === 'unsupported') &&
-												<ScreenOffIcon/>
+												case 'off':
+												{
+													roomClient.enableScreenSharing();
+													break;
+												}
+												default:
+												{
+													break;
+												}
 											}
-											{ screenState === 'off' &&
-												<ScreenIcon/>
-											}
-										</Fab>
-									</div>
-								</Tooltip>
-							</React.Fragment>
-						}
+										}}
+									>
+										{ (screenState === 'on' || screenState === 'unsupported') &&
+											<ScreenOffIcon/>
+										}
+										{ screenState === 'off' &&
+											<ScreenIcon/>
+										}
+									</Fab>
+								</div>
+							</Tooltip>
+						</React.Fragment>
 					</div>
 
 					<VideoView
@@ -481,9 +475,9 @@ const Me = (props) =>
 					}}
 					style={spacingStyle}
 				>
-					<div className={classnames(classes.viewContainer)} style={style}>
+					<div className={classes.viewContainer} style={style}>
 						<div
-							className={classnames(classes.controls, hover && 'hover')}
+							className={classes.controls}
 							onMouseOver={() => setHover(true)}
 							onMouseOut={() => setHover(false)}
 							onTouchStart={() =>
@@ -505,7 +499,7 @@ const Me = (props) =>
 								}, 2000);
 							}}
 						>
-							<p>
+							<p className={hover && 'hover'}>
 								<FormattedMessage
 									id='room.me'
 									defaultMessage='ME'

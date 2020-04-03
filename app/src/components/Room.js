@@ -23,7 +23,6 @@ import VideoWindow from './VideoWindow/VideoWindow';
 import LockDialog from './AccessControl/LockDialog/LockDialog';
 import Settings from './Settings/Settings';
 import TopBar from './Controls/TopBar';
-import MobileControls from './Controls/MobileControls';
 
 const TIMEOUT = 5 * 1000;
 
@@ -205,10 +204,6 @@ class Room extends React.PureComponent
 				</nav>
 
 				<View advancedMode={advancedMode} />
-
-				{ isMobile &&
-					<MobileControls />
-				}
 
 				{ room.lockDialogOpen &&
 					<LockDialog />
