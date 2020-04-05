@@ -103,7 +103,7 @@ const DialogTitle = withStyles(styles)((props) =>
 		};
 	}, []);
 
-	const { children, classes, myPicture, onLogin, ...other } = props;
+	const { children, classes, myPicture, onLogin, loggedIn, ...other } = props;
 
 	const handleTooltipClose = () =>
 	{
@@ -115,6 +115,17 @@ const DialogTitle = withStyles(styles)((props) =>
 		setOpen(true);
 	};
 
+	const loginTooltip = loggedIn ?
+		intl.formatMessage({
+			id             : 'tooltip.logout',
+			defaultMessage : 'Log out'
+		})
+		:
+		intl.formatMessage({
+			id             : 'tooltip.login',
+			defaultMessage : 'Log in'
+		});
+
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
 			{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
@@ -124,10 +135,7 @@ const DialogTitle = withStyles(styles)((props) =>
 					onClose={handleTooltipClose}
 					onOpen={handleTooltipOpen}
 					open={open}
-					title={intl.formatMessage({
-						id             : 'tooltip.login',
-						defaultMessage : 'Click to log in'
-					})}
+					title={loginTooltip}
 					placement='left'
 				>
 					<IconButton
@@ -207,10 +215,11 @@ const JoinDialog = ({
 			>
 				<DialogTitle
 					myPicture={myPicture}
-					onLogin={() => 
+					onLogin={() =>
 					{
 						loggedIn ? roomClient.logout() : roomClient.login();
 					}}
+					loggedIn={loggedIn}
 				>
 					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
 					<hr />

@@ -503,6 +503,8 @@ export default class RoomClient
 	{
 		logger.debug('receiveLogoutChildWindow()');
 
+		store.dispatch(meActions.setPicture(null));
+
 		store.dispatch(meActions.loggedIn(false));
 
 		store.dispatch(requestActions.notify(
