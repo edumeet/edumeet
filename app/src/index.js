@@ -34,7 +34,9 @@ import messagesPortuguese from './translations/pt';
 import messagesChinese from './translations/cn';
 import messagesSpanish from './translations/es';
 import messagesCroatian from './translations/hr';
-import messagesCzech from './translations/cz';
+import messagesCzech from './translations/cs';
+import messagesItalian from './translations/it';
+import messagesUkrainian from './translations/uk';
 
 import './index.css';
 
@@ -57,7 +59,9 @@ const messages =
 	'zh' : messagesChinese,
 	'es' : messagesSpanish,
 	'hr' : messagesCroatian,
-	'cz' : messagesCzech
+	'cs' : messagesCzech,
+	'it' : messagesItalian,
+	'uk' : messagesUkrainian
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code

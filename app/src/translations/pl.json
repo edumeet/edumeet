@@ -6,7 +6,7 @@
 
 	"room.chooseRoom": "Wybór konferencji",
 	"room.cookieConsent": "Ta strona internetowa wykorzystuje pliki cookie w celu zwiększenia wygody użytkowania.",
-	"room.consentUnderstand": "I understand",
+	"room.consentUnderstand": "Rozumiem",
 	"room.joined": "Podłączono do konferencji",
 	"room.cantJoin": "Brak możliwości dołączenia do pokoju",
 	"room.youLocked": "Zakluczono pokój",
@@ -103,7 +103,7 @@
 	"settings.selectRoomLayout": "Ustawienia układu konferencji",
 	"settings.advancedMode": "Tryb zaawansowany",
 	"settings.permanentTopBar": "Stały górny pasek",
-	"settings.lastn": "Liczba widocznych filmów",
+	"settings.lastn": "Liczba widocznych uczestników (zdalnych)",
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",

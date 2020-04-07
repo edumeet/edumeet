@@ -189,7 +189,7 @@ function setupLTI(ltiConfig)
 
 	const ltiStrategy = new LTIStrategy(
 		ltiConfig,
-		function(req, lti, done)
+		(req, lti, done) =>
 		{
 			// LTI launch parameters
 			if (lti)
@@ -310,7 +310,7 @@ async function setupAuth()
 	// lti launch
 	app.post('/auth/lti',
 		passport.authenticate('lti', { failureRedirect: '/' }),
-		function(req, res)
+		(req, res) =>
 		{
 			res.redirect(`/${req.user.room}`);
 		}
@@ -333,7 +333,7 @@ async function setupAuth()
 		}
 
 		req.logout();
-		res.send(logoutHelper());
+		req.session.destroy(() => res.send(logoutHelper()));
 	});
 
 	// callback
@@ -427,11 +427,17 @@ async function runHttpsServer()
 		// http
 		const redirectListener = http.createServer(app);
 
-		redirectListener.listen(config.listeningRedirectPort);
+		if(config.listeningHost)
+			redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
+		else
+			redirectListener.listen(config.listeningRedirectPort);
 	}
 
 	// https or http
-	mainListener.listen(config.listeningPort);
+	if(config.listeningHost)	
+		mainListener.listen(config.listeningPort, config.listeningHost);
+	else
+		mainListener.listen(config.listeningPort);
 }
 
 function isPathAlreadyTaken(url)
