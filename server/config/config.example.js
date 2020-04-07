@@ -58,6 +58,9 @@ module.exports =
 		cert : `${__dirname}/../certs/mediasoup-demo.localhost.cert.pem`,
 		key  : `${__dirname}/../certs/mediasoup-demo.localhost.key.pem`
 	},
+	// listening Host or IP 
+	// If ommitted listens on every IP. ("0.0.0.0" and "::")
+	//listeningHost: 'localhost',
 	// Listening port for https server.
 	listeningPort         : 443,
 	// Any http request is redirected to https.
