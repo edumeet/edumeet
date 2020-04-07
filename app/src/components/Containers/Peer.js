@@ -490,6 +490,7 @@ const Peer = (props) =>
 							videoTrack={screenConsumer && screenConsumer.track}
 							videoVisible={screenVisible}
 							videoCodec={screenConsumer && screenConsumer.codec}
+							videoScore={screenConsumer ? screenConsumer.score : null}
 						/>
 					</div>
 				</div>
