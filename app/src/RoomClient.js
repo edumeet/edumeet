@@ -1135,14 +1135,41 @@ export default class RoomClient
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
+				
+			if(stream){
+				const track = stream.getVideoTracks()[0];
 
-			const track = stream.getVideoTracks()[0];
-
-			await this._webcamProducer.replaceTrack({ track });
-
-			store.dispatch(
-				producerActions.setProducerTrack(this._webcamProducer.id, track));
-
+				if (track)
+				{
+					if (this._webcamProducer)
+					{
+						await this._webcamProducer.replaceTrack({ track });
+					}
+					else 
+					{
+						this._webcamProducer = await this._sendTransport.produce({
+							track,
+							appData : 
+							{
+								source : 'webcam'
+							}
+						});	
+					}
+					
+		
+					store.dispatch(
+						producerActions.setProducerTrack(this._webcamProducer.id, track));
+				}
+				else
+				{
+					logger.warn('getVideoTracks Error: First Video Track is null');
+				}
+	
+			}
+			else
+			{
+				logger.warn('getUserMedia Error: Stream is null!');
+			}
 			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
 			store.dispatch(settingsActions.setVideoResolution(resolution));
 
@@ -1195,11 +1222,24 @@ export default class RoomClient
 
 				if (track)
 				{
-					await this._webcamProducer.replaceTrack({ track });
-	
+					if (this._webcamProducer)
+					{
+						await this._webcamProducer.replaceTrack({ track });
+					}
+					else 
+					{
+						this._webcamProducer = await this._sendTransport.produce({
+							track,
+							appData : 
+							{
+								source : 'webcam'
+							}
+						});	
+					}
+		
 					store.dispatch(
 						producerActions.setProducerTrack(this._webcamProducer.id, track));
-							
+
 				}
 				else
 				{
