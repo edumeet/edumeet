@@ -146,7 +146,7 @@ export default class RoomClient
 		// Whether we should produce.
 		this._produce = produce;
 
-		// Wheter we force TCP
+		// Whether we force TCP
 		this._forceTcp = forceTcp;
 
 		// Use displayName
@@ -269,7 +269,7 @@ export default class RoomClient
 
 	_startKeyListener()
 	{
-		// Add keypress event listner on document
+		// Add keypress event listener on document
 		document.addEventListener('keypress', (event) =>
 		{
 			const key = String.fromCharCode(event.which);
@@ -572,7 +572,7 @@ export default class RoomClient
 					type : 'error',
 					text : intl.formatMessage({
 						id             : 'room.changeDisplayNameError',
-						defaultMessage : 'An error occured while changing your display name'
+						defaultMessage : 'An error occurred while changing your display name'
 					})
 				}));
 		}
@@ -1003,7 +1003,7 @@ export default class RoomClient
 			{
 				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 				//   Math.pow(10, dBs / 20)
-				// However it does not produce a visually useful output, so let exagerate
+				// However it does not produce a visually useful output, so let exaggerate
 				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
 				// minimize component renderings.
 				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
@@ -1618,7 +1618,7 @@ export default class RoomClient
 						{
 							// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 							//   Math.pow(10, dBs / 20)
-							// However it does not produce a visually useful output, so let exagerate
+							// However it does not produce a visually useful output, so let exaggerate
 							// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
 							// minimize component renderings.
 							let volume = Math.round(Math.pow(10, dBs / 85) * 10);
@@ -2265,7 +2265,7 @@ export default class RoomClient
 				this.updateSpotlights(spotlights);
 			});
 
-			// Don't produce if explicitely requested to not to do it.
+			// Don't produce if explicitly requested to not to do it.
 			if (this._produce)
 			{
 				if (this._mediasoupDevice.canProduce('audio'))
@@ -2278,7 +2278,7 @@ export default class RoomClient
 
 			store.dispatch(roomActions.setRoomState('connected'));
 
-			// Clean all the existing notifcations.
+			// Clean all the existing notifications.
 			store.dispatch(notificationActions.removeAllNotifications());
 
 			this.getServerHistory();
@@ -2539,7 +2539,7 @@ export default class RoomClient
 			{
 				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 				//   Math.pow(10, dBs / 20)
-				// However it does not produce a visually useful output, so let exagerate
+				// However it does not produce a visually useful output, so let exaggerate
 				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
 				// minimize component renderings.
 				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
@@ -2566,7 +2566,7 @@ export default class RoomClient
 					type : 'error',
 					text : intl.formatMessage({
 						id             : 'devices.microphoneError',
-						defaultMessage : 'An error occured while accessing your microphone'
+						defaultMessage : 'An error occurred while accessing your microphone'
 					})
 				}));
 
@@ -2736,7 +2736,7 @@ export default class RoomClient
 					type : 'error',
 					text : intl.formatMessage({
 						id             : 'devices.screenSharingError',
-						defaultMessage : 'An error occured while accessing your screen'
+						defaultMessage : 'An error occurred while accessing your screen'
 					})
 				}));
 
@@ -2912,7 +2912,7 @@ export default class RoomClient
 					type : 'error',
 					text : intl.formatMessage({
 						id             : 'devices.cameraError',
-						defaultMessage : 'An error occured while accessing your camera'
+						defaultMessage : 'An error occurred while accessing your camera'
 					})
 				}));
 
