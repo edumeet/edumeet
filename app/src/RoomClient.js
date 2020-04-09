@@ -959,6 +959,60 @@ export default class RoomClient
 		}
 	}
 
+	disconnectLocalHark() {
+		logger.debug('disconnectLocalHark() | Stopping harkStream.');
+		if (this._harkStream != null) {
+			this._harkStream.getAudioTracks()[0].stop();
+			this._harkStream = null;
+		}
+
+		if (this._hark != null) {
+			logger.debug('disconnectLocalHark() Stopping hark.');
+			this._hark.stop();
+		}
+	}
+
+	connectLocalHark(track) {
+		logger.debug('connectLocalHark() | Track:%o', track);
+		this._harkStream = new MediaStream();
+
+		this._harkStream.addTrack(track.clone());
+		this._harkStream.getAudioTracks()[0].enabled = true;
+
+		if (!this._harkStream.getAudioTracks()[0])
+			throw new Error('getMicStream():something went wrong with hark');
+
+		this._hark = hark(this._harkStream, { play: false });
+
+		// eslint-disable-next-line no-unused-vars
+		this._hark.on('volume_change', (dBs, threshold) => {
+			// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+			//   Math.pow(10, dBs / 20)
+			// However it does not produce a visually useful output, so let exagerate
+			// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+			// minimize component renderings.
+			let volume = Math.round(Math.pow(10, dBs / 85) * 10);
+
+			if (volume === 1)
+				volume = 0;
+
+			volume = Math.round(volume);
+
+			if (this._micProducer && volume !== this._micProducer.volume) {
+				this._micProducer.volume = volume;
+
+				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
+			}
+		});
+		this._hark.on('speaking', function () {
+			store.dispatch(meActions.setIsSpeaking(true));
+		});
+		this._hark.on('stopped_speaking', function () {
+			store.dispatch(meActions.setIsSpeaking(false));
+		});
+	}
+
+
 	async changeAudioDevice(deviceId)
 	{
 		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
@@ -967,7 +1021,7 @@ export default class RoomClient
 			meActions.setAudioInProgress(true));
 
 		try
-		{
+		{								
 			const device = this._audioDevices[deviceId];
 
 			if (!device)
@@ -977,15 +1031,7 @@ export default class RoomClient
 				'changeAudioDevice() | new selected webcam [device:%o]',
 				device);
 
-			if (this._hark != null)
-				this._hark.stop();
-
-			if (this._harkStream != null)
-			{
-				logger.debug('Stopping hark.');
-				this._harkStream.getAudioTracks()[0].stop();
-				this._harkStream = null;
-			}
+			this.disconnectLocalHark();
 
 			if (this._micProducer && this._micProducer.track)
 				this._micProducer.track.stop();
@@ -1015,47 +1061,8 @@ export default class RoomClient
 
 			if (this._micProducer)
 				this._micProducer.volume = 0;
+			this.connectLocalHark(track);
 
-			this._harkStream = new MediaStream();
-
-			this._harkStream.addTrack(track.clone());
-			this._harkStream.getAudioTracks()[0].enabled = true;
-
-			if (!this._harkStream.getAudioTracks()[0])
-				throw new Error('changeAudioDevice(): given stream has no audio track');
-
-			this._hark = hark(this._harkStream, { play: false });
-
-			// eslint-disable-next-line no-unused-vars
-			this._hark.on('volume_change', (dBs, threshold) =>
-			{
-				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-				//   Math.pow(10, dBs / 20)
-				// However it does not produce a visually useful output, so let exagerate
-				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-				// minimize component renderings.
-				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-				if (volume === 1)
-					volume = 0;
-
-				volume = Math.round(volume);
-
-				if (this._micProducer && volume !== this._micProducer.volume)
-				{
-					this._micProducer.volume = volume;
-
-					store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
-				}
-			});
-			this._hark.on('speaking', function() 
-			{
-				store.dispatch(meActions.setIsSpeaking(true));
-			});
-			this._hark.on('stopped_speaking', function() 
-			{
-				store.dispatch(meActions.setIsSpeaking(false));
-			});
 			if (this._micProducer && this._micProducer.id)
 				store.dispatch(
 					producerActions.setProducerTrack(this._micProducer.id, track));
@@ -2745,51 +2752,8 @@ export default class RoomClient
 
 			this._micProducer.volume = 0;
 
-			if (this._hark != null)
-				this._hark.stop();
+			this.connectLocalHark(track);
 
-			if (this._harkStream != null)
-				this._harkStream.getAudioTracks()[0].stop();
-
-			this._harkStream = new MediaStream();
-
-			this._harkStream.addTrack(track.clone());
-
-			if (!this._harkStream.getAudioTracks()[0])
-				throw new Error('enableMic(): given stream has no audio track');
-
-			this._hark = hark(this._harkStream, { play: false });
-
-			// eslint-disable-next-line no-unused-vars
-			this._hark.on('volume_change', (dBs, threshold) =>
-			{
-				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-				//   Math.pow(10, dBs / 20)
-				// However it does not produce a visually useful output, so let exagerate
-				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-				// minimize component renderings.
-				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-				if (volume === 1)
-					volume = 0;
-
-				volume = Math.round(volume);
-
-				if (this._micProducer && volume !== this._micProducer.volume)
-				{
-					this._micProducer.volume = volume;
-
-					store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
-				}
-			});
-			this._hark.on('speaking', function() 
-			{
-				store.dispatch(meActions.setIsSpeaking(true));
-			});
-			this._hark.on('stopped_speaking', function() 
-			{
-				store.dispatch(meActions.setIsSpeaking(false));
-			});
 		}
 		catch (error)
 		{
