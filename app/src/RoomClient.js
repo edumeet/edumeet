@@ -1136,7 +1136,8 @@ export default class RoomClient
 					}
 				});
 				
-			if(stream){
+			if (stream)
+			{
 				const track = stream.getVideoTracks()[0];
 
 				if (track)
@@ -1155,8 +1156,7 @@ export default class RoomClient
 							}
 						});	
 					}
-					
-		
+
 					store.dispatch(
 						producerActions.setProducerTrack(this._webcamProducer.id, track));
 				}
