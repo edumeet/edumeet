@@ -15,7 +15,7 @@
 	"room.cantUnLock":  "Otključavanje sobe nije moguće",
 	"room.locked":  "Soba je sada zaključana",
 	"room.unlocked":  "Soba je sada otključana",
-	"room.newLobbyPeer":  "U predvorju je novi učesnik",
+	"room.newLobbyPeer":  "Novi sudionik čeka u predvorju",
 	"room.lobbyPeerLeft": "Sudionik je napustio predvorje",
 	"room.lobbyPeerChangedDisplayName": "Sudionik u predvorju je promijenio ime u {displayName}",
 	"room.lobbyPeerChangedPicture": "Sudionik u predvorju je promijenio sliku",
@@ -47,7 +47,7 @@
 	"room.hiddenPeers": "{hiddenPeersCount, plural, one {participant} other {participants}}",
 	"room.me": "Ja",
 	"room.spotlights": "Sudionici u fokusu",
-	"room.passive": "Pasivni učesnici",
+	"room.passive": "Pasivni sudionici",
 	"room.videoPaused":  "Video pauziran",
 
 	"tooltip.login": "Prijava",
