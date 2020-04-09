@@ -2,7 +2,7 @@
 
 ## LTI
 
-Read more about IMS Global defined interface for tools like our VideoConference system integration with Learning Managment Systems(LMS) (e.g. moodle).
+Read more about IMS Global defined interface for tools like our VideoConference system integration with Learning Management Systems(LMS) (e.g. moodle).
 See: [IMS Global Learning Tool Interoperability](https://www.imsglobal.org/activity/learning-tools-interoperability)
 
 We implemented LTI interface version 1.0/1.1
@@ -57,5 +57,5 @@ Open fully the settings **Click on show more!!**
 
 ## moodle plugin
 
-Alternativly you can use multipartymeeting moodle plugin:
+Alternatively you can use multipartymeeting moodle plugin:
 [https://github.com/misi/moodle-mod_multipartymeeting](https://github.com/misi/moodle-mod_multipartymeeting)
