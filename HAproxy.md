@@ -83,7 +83,7 @@ trustProxy           : ['192.0.2.5'],
 
 ## Deploy HA proxy
 
-* Configure cerificate / letsencrypt for `meet.example.com`
+* Configure certificate / letsencrypt for `meet.example.com`
   * In this example we put a complete chain and private key in /root/certificate.pem.
 * Install and setup haproxy
 
