@@ -7,6 +7,12 @@ module.exports =
 	/*
 	auth :
 	{
+	// Add simple http basic auth for the whole Application.
+	    // https://en.wikipedia.org/wiki/Basic_access_authentication
+	    // the combination with the other auth methods was not tested.
+		basic: {
+			users: { "user1": "pass1", "user2":"pass2" }
+		},
 		lti :
 		{
 			consumerKey    : 'key',

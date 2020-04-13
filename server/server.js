@@ -26,6 +26,7 @@ const {
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
 const imsLti = require('ims-lti');
+const basicAuth = require('express-basic-auth');
 const redis = require('redis');
 const redisClient = redis.createClient(config.redisOptions);
 const { Issuer, Strategy } = require('openid-client');
@@ -299,6 +300,19 @@ function setupOIDC(oidcIssuer)
 
 async function setupAuth()
 {
+
+	// http basic auth
+	if (
+		typeof(config.auth.basic) !== 'undefined' &&
+		typeof(config.auth.basic.users) !== 'undefined'
+	)
+	{
+		app.use(basicAuth({
+			users: { ...config.auth.basic.users },
+			challenge: true // <--- needed to actually show the login dialog!
+		}));
+	}
+
 	// LTI
 	if (
 		typeof(config.auth.lti) !== 'undefined' &&
