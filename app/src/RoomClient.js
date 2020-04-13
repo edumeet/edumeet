@@ -2834,7 +2834,7 @@ export default class RoomClient
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					audio : {
-						deviceId : { exact: deviceId }
+						deviceId : { ideal: deviceId }
 					}
 				}
 			);
@@ -3192,7 +3192,7 @@ export default class RoomClient
 				{
 					video :
 					{
-						deviceId : { exact: deviceId },
+						deviceId : { ideal: deviceId },
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
