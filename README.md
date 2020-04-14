@@ -76,7 +76,7 @@ $ npm install
 $ cd server
 $ npm start
 ```
-* Note: Do not run the server as root. If you need to use port 80/443 make a iptables-mapping for that or use systemd configuration for that (see futher down this doc).
+* Note: Do not run the server as root. If you need to use port 80/443 make a iptables-mapping for that or use systemd configuration for that (see further down this doc).
 * Test your service in a webRTC enabled browser: `https://yourDomainOrIPAdress:3443/roomname`
 
 ## Deploy it in a server
@@ -102,7 +102,7 @@ $ systemctl enable multiparty-meeting
 ## Ports and firewall
 
 * 3443/tcp (default https webserver and signaling - adjustable in `server/config.js`)
-* 4443/tcp (default `npm start` port for developing with live browser reload, not needed in production enviroments - adjustable in app/package.json)
+* 4443/tcp (default `npm start` port for developing with live browser reload, not needed in production environments - adjustable in app/package.json)
 * 40000-49999/udp/tcp (media ports - adjustable in `server/config.js`)
 
 ## Load balanced installation
@@ -113,7 +113,7 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 
 ## TURN configuration
 
-* You need an addtional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `app/config.js`
+* You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `app/config.js`
 
 ## Authors
 
