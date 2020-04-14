@@ -283,7 +283,11 @@ export default class RoomClient
 	_startKeyListener()
 	{
 		// Add keypress event listener on document
+<<<<<<< HEAD
 		document.addEventListener('keydown', (event) =>
+=======
+		document.addEventListener('keypress', (event) =>
+>>>>>>> 250679c... Fix typos
 		{
 			if (event.repeat) return;
 			const key = String.fromCharCode(event.which);

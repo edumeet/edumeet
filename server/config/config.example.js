@@ -59,7 +59,7 @@ module.exports =
 		key  : `${__dirname}/../certs/mediasoup-demo.localhost.key.pem`
 	},
 	// listening Host or IP 
-	// If ommitted listens on every IP. ("0.0.0.0" and "::")
+	// If omitted listens on every IP. ("0.0.0.0" and "::")
 	//listeningHost: 'localhost',
 	// Listening port for https server.
 	listeningPort         : 443,
