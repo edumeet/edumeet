@@ -199,7 +199,7 @@ function setupLTI(ltiConfig)
 				if (lti.user_id && lti.custom_room)
 				{
 					user.id = lti.user_id;
-					user._lti = lti;
+					user._userinfo = { "lti" : lti };
 				}
 
 				if (lti.custom_room)
