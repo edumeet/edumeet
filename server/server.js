@@ -199,7 +199,7 @@ function setupLTI(ltiConfig)
 				if (lti.user_id && lti.custom_room)
 				{
 					user.id = lti.user_id;
-					user._lti = lti;
+					user._userinfo = { "lti" : lti };
 				}
 
 				if (lti.custom_room)
@@ -255,12 +255,15 @@ function setupOIDC(oidcIssuer)
 		{ client: oidcClient, params, passReqToCallback, usePKCE },
 		(tokenset, userinfo, done) =>
 		{
+			if (userinfo && tokenset) {
+				userinfo._tokenset_claims = tokenset.claims();
+			}
+
 			const user =
 			{
 				id        : tokenset.claims.sub,
 				provider  : tokenset.claims.iss,
-				_userinfo : userinfo,
-				_claims   : tokenset.claims
+				_userinfo : userinfo
 			};
 
 			return done(null, user);
