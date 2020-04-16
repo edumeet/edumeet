@@ -38,6 +38,13 @@ module.exports =
 	// URI and key for requesting geoip-based TURN server closest to the client
 	turnAPIKey        : 'examplekey',
 	turnAPIURI        : 'https://example.com/api/turn',
+	turnAPIparams	  :	{
+							'uri_schema'  : 'turn',
+							'transport'   : 'tcp',
+							'ip_ver'      : 'ipv4',
+							'servercount' : '2'	
+						},
+
 	// Backup turnservers if REST fails or is not configured
 	backupTurnServers : [
 		{

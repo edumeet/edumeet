@@ -383,10 +383,7 @@ class Room extends EventEmitter
 						config.turnAPIURI,
 						{
 							params : {
-								'uri_schema'  : 'turn',
-								'transport'   : 'tcp',
-								'ip_ver'      : 'ipv4',
-								'servercount' : '2',
+								...config.turnAPIparams,
 								'api_key'     : config.turnAPIKey,
 								'ip'          : peer.socket.request.connection.remoteAddress
 							}
