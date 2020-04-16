@@ -14,7 +14,7 @@ const App = (props) =>
 		room
 	} = props;
 
-	const { id } = useParams();
+	const id = useParams().id.toLowerCase();
 
 	useEffect(() =>
 	{
