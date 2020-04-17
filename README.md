@@ -23,7 +23,7 @@ If you want the ansible approach, you can find ansible role [here](https://githu
 
 ## Manual installation
 * Prerequisites:
-Currently multiparty-meeting will only run on nodejs v10.*
+Currently multiparty-meeting will only run on nodejs v13.x
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
