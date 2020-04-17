@@ -126,8 +126,8 @@
 
 	"devices.microphoneDisconnected": "Το μικρόφωνο αποσυνδέθηκε",
 	"devices.microphoneError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στο μικρόφωνό σας",
-	"devices.microPhoneMute": "Το μικρόφωνό σας είναι σε σίγαση",
-	"devices.micophoneUnMute": "Ανοίξτε το μικρόφωνό σας",
+	"devices.microphoneMute": "Το μικρόφωνό σας είναι σε σίγαση",
+	"devices.microphoneUnMute": "Ανοίξτε το μικρόφωνό σας",
 	"devices.microphoneEnable": "Ενεργοποίησε το μικρόφωνό σας",
 	"devices.microphoneMuteError": "Δεν είναι δυνατή η σίγαση του μικροφώνου σας",
 	"devices.microphoneUnMuteError": "Δεν είναι δυνατό το άνοιγμα του μικροφώνου σας",

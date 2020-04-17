@@ -122,8 +122,8 @@
 
 	"devices.microphoneDisconnected": "Mikrofon odpojen",
 	"devices.microphoneError": "Při přístupu k vašemu mikrofonu se vyskytla chyba",
-	"devices.microPhoneMute": "Mikrofon ztišen",
-	"devices.micophoneUnMute": "Ztišení mikrofonu zrušeno",
+	"devices.microphoneMute": "Mikrofon ztišen",
+	"devices.microphoneUnMute": "Ztišení mikrofonu zrušeno",
 	"devices.microphoneEnable": "Mikrofon povolen",
 	"devices.microphoneMuteError": "Není možné ztišit váš mikrofon",
 	"devices.microphoneUnMuteError": "Není možné zrušit ztišení vašeho mikrofonu",

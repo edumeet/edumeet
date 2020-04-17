@@ -126,8 +126,8 @@
 
 	"devices.microphoneDisconnected": "Microphone disconnected",
 	"devices.microphoneError": "An error occured while accessing your microphone",
-	"devices.microPhoneMute": "Muted your microphone",
-	"devices.micophoneUnMute": "Unmuted your microphone",
+	"devices.microphoneMute": "Muted your microphone",
+	"devices.miccophoneUnMute": "Unmuted your microphone",
 	"devices.microphoneEnable": "Enabled your microphone",
 	"devices.microphoneMuteError": "Unable to mute your microphone",
 	"devices.microphoneUnMuteError": "Unable to unmute your microphone",

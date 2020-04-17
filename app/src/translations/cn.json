@@ -126,8 +126,8 @@
 
 	"devices.microphoneDisconnected": "麦克风已断开",
 	"devices.microphoneError": "麦克风发生错误",
-	"devices.microPhoneMute": "麦克风静音",
-	"devices.micophoneUnMute": "取消麦克风静音",
+	"devices.microphoneMute": "麦克风静音",
+	"devices.microphoneUnMute": "取消麦克风静音",
 	"devices.microphoneEnable": "启用了麦克风",
 	"devices.microphoneMuteError": "无法使麦克风静音",
 	"devices.microphoneUnMuteError": "无法取消麦克风静音",
