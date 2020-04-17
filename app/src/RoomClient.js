@@ -269,8 +269,8 @@ export default class RoomClient
 
 	_startKeyListener()
 	{
-		// Add keypress event listener on document
-		document.addEventListener('keypress', (event) =>
+		// Add keyup event listener on document
+		document.addEventListener('keyup', (event) =>
 		{
 			const key = String.fromCharCode(event.which);
 
@@ -280,11 +280,11 @@ export default class RoomClient
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
-				logger.debug('keyPress() [key:"%s"]', key);
+				logger.debug('keyUp() [key:"%s"]', key);
 
 				switch (key)
 				{
-					case 'a': // Activate advanced mode
+					case 'A': // Activate advanced mode
 					{
 						store.dispatch(settingsActions.toggleAdvancedMode());
 						store.dispatch(requestActions.notify(
@@ -324,7 +324,7 @@ export default class RoomClient
 					}
 
 					case ' ':
-					case 'm': // Toggle microphone
+					case 'M': // Toggle microphone
 					{
 						if (this._micProducer)
 						{
@@ -369,7 +369,7 @@ export default class RoomClient
 						break;
 					}
 
-					case 'v': // Toggle video
+					case 'V': // Toggle video
 					{
 						if (this._webcamProducer)
 							this.disableWebcam();
