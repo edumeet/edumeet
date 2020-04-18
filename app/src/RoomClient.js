@@ -244,6 +244,8 @@ export default class RoomClient
 
 		this._audioDevices = {};
 
+		this._audioOutputDevices = {};
+
 		// mediasoup Consumers.
 		// @type {Map<String, mediasoupClient.Consumer>}
 		this._consumers = new Map();
@@ -1105,6 +1107,50 @@ export default class RoomClient
 
 		store.dispatch(
 			meActions.setAudioInProgress(false));
+	}
+
+	async changeAudioOutputDevice(deviceId)
+	{
+		logger.debug('changeAudioOutputDevice() [deviceId: %s]', deviceId);
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(true));
+
+		try
+		{
+			const device = this._audioOutputDevices[deviceId];
+
+			if (!device)
+				throw new Error('Selected audio output device no longer avaibale');
+
+			logger.debug(
+				'changeAudioOutputDevice() | new selected [audio output device:%o]',
+				device);
+			
+
+			
+			const audioElements = document.getElementById("audio");
+			for( let i=0; i<audioElements; i++){
+				if (typeof audioElements[0].setSinkId === 'function'){
+					if (i === 0) logger.debug('changeAudioOutputDevice()');
+					await audioElements[i].setSinkId(deviceId);
+				} else {
+					logger.debug('changeAudioOutputDevice() | setSinkId not implemented');
+					break;
+				}
+			};
+
+			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
+
+			await this._updateAudioOutputDevices();
+		}
+		catch (error)
+		{
+			logger.error('changeAudioOutputDevice() failed: %o', error);
+		}
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(false));
 	}
 
 	async changeVideoResolution(resolution)
@@ -2642,6 +2688,8 @@ export default class RoomClient
 				if (joinVideo && this._mediasoupDevice.canProduce('video'))
 					this.enableWebcam();
 			}
+			
+			this._updateAudioOutputDevices();
 
 			store.dispatch(roomActions.setRoomState('connected'));
 
@@ -3441,4 +3489,35 @@ export default class RoomClient
 			logger.error('_getWebcamDeviceId() failed:%o', error);
 		}
 	}
+
+	async _updateAudioOutputDevices()
+	{
+		logger.debug('_updateAudioOutputDevices()');
+
+		// Reset the list.
+		this._audioOutputDevices = {};
+
+		try
+		{
+			logger.debug('_updateAudioOutputDevices() | calling enumerateDevices()');
+
+			const devices = await navigator.mediaDevices.enumerateDevices();
+
+			for (const device of devices)
+			{
+				if (device.kind !== 'audiooutput')
+					continue;
+
+				this._audioOutputDevices[device.deviceId] = device;
+			}
+
+			store.dispatch(
+				meActions.setAudioOutputDevices(this._audioOutputDevices));
+		}
+		catch (error)
+		{
+			logger.error('_updateAudioOutputDevices() failed:%o', error);
+		}
+	}
+
 }

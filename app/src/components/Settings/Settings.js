@@ -130,6 +130,13 @@ const Settings = ({
 		audioDevices = Object.values(me.audioDevices);
 	else
 		audioDevices = [];
+		
+	let audioOutputDevices;
+
+	if (me.audioOutputDevices)
+		audioOutputDevices = Object.values(me.audioOutputDevices);
+	else
+		audioOutputDevices = [];
 
 	return (
 		<Dialog
@@ -221,6 +228,46 @@ const Settings = ({
 							intl.formatMessage({
 								id             : 'settings.cantSelectAudio',
 								defaultMessage : 'Unable to select audio device'
+							})
+						}
+					</FormHelperText>
+				</FormControl>
+			</form>
+			<form className={classes.setting} autoComplete='off'>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={settings.selectedAudioOutputDevice || ''}
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								roomClient.changeAudioOutputDevice(event.target.value);
+						}}
+						displayEmpty
+						name={intl.formatMessage({
+							id             : 'settings.audio.output',
+							defaultMessage : 'Audio output device'
+						})}
+						autoWidth
+						className={classes.selectEmpty}
+						disabled={audioOutputDevices.length === 0 || me.audioOutputInProgress}
+					>
+						{ audioOutputDevices.map((audioOutput, index) =>
+						{
+							return (
+								<MenuItem key={index} value={audioOutput.deviceId}>{audioOutput.label}</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						{ audioOutputDevices.length > 0 ?
+							intl.formatMessage({
+								id             : 'settings.selectAudio.output',
+								defaultMessage : 'Select audio output device'
+							})
+							:
+							intl.formatMessage({
+								id             : 'settings.cantSelectAudio.output',
+								defaultMessage : 'Unable to select audio output device'
 							})
 						}
 					</FormHelperText>

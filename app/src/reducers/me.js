@@ -97,6 +97,13 @@ const me = (state = initialState, action) =>
 			return { ...state, audioDevices: devices };
 		}
 
+		case 'SET_AUDIO_OUTPUT_DEVICES':
+		{
+			const { devices } = action.payload;
+
+			return { ...state, audioOutputDevices: devices };
+		}
+
 		case 'SET_WEBCAM_DEVICES':
 		{
 			const { devices } = action.payload;

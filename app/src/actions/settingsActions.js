@@ -4,6 +4,12 @@ export const setSelectedAudioDevice = (deviceId) =>
 		payload : { deviceId }
 	});
 
+export const setSelectedAudioOutputDevice = (deviceId) =>
+({
+	type    : 'CHANGE_AUDIO_OUTPUT_DEVICE',
+	payload : { deviceId }
+});
+
 export const setSelectedWebcamDevice = (deviceId) =>
 	({
 		type    : 'CHANGE_WEBCAM',
