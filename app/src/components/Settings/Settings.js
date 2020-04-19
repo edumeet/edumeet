@@ -244,7 +244,7 @@ const Settings = ({
 						}}
 						displayEmpty
 						name={intl.formatMessage({
-							id             : 'settings.audio.output',
+							id             : 'settings.audioOutput',
 							defaultMessage : 'Audio output device'
 						})}
 						autoWidth
@@ -261,12 +261,12 @@ const Settings = ({
 					<FormHelperText>
 						{ audioOutputDevices.length > 0 ?
 							intl.formatMessage({
-								id             : 'settings.selectAudio.output',
+								id             : 'settings.selectAudioOutput',
 								defaultMessage : 'Select audio output device'
 							})
 							:
 							intl.formatMessage({
-								id             : 'settings.cantSelectAudio.output',
+								id             : 'settings.cantSelectAudioOutput',
 								defaultMessage : 'Unable to select audio output device'
 							})
 						}
