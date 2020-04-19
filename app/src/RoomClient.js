@@ -1129,8 +1129,8 @@ export default class RoomClient
 			
 
 			
-			const audioElements = document.getElementById("audio");
-			for( let i=0; i<audioElements; i++){
+			const audioElements = document.getElementsByTagName("audio");
+			for( let i=0; i<audioElements.length; i++){
 				if (typeof audioElements[0].setSinkId === 'function'){
 					if (i === 0) logger.debug('changeAudioOutputDevice()');
 					await audioElements[i].setSinkId(deviceId);
