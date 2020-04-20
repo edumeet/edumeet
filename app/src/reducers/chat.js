@@ -30,6 +30,11 @@ const chat = (state = [], action) =>
 			return [ ...state, ...chatHistory ];
 		}
 
+		case 'CLEAR_CHAT':
+		{
+			return [];
+		}
+
 		default:
 			return state;
 	}

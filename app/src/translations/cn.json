@@ -52,6 +52,7 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.clearChat": null,
 	"room.speechUnsupported": null,
 
 	"me.mutedPTT": null,
@@ -143,5 +144,9 @@
 	"devices.screenSharingError": "访问屏幕时发生错误",
 
 	"devices.cameraDisconnected": "相机已断开连接",
-	"devices.cameraError": "访问相机时发生错误"
+	"devices.cameraError": "访问相机时发生错误",
+
+	"moderator.clearChat": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

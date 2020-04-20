@@ -1295,6 +1295,28 @@ export default class RoomClient
 			lobbyPeerActions.setLobbyPeerPromotionInProgress(peerId, false));
 	}
 
+	async clearChat()
+	{
+		logger.debug('clearChat()');
+
+		store.dispatch(
+			roomActions.setClearChatInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:clearChat');
+
+			store.dispatch(chatActions.clearChat());
+		}
+		catch (error)
+		{
+			logger.error('clearChat() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setClearChatInProgress(false));
+	}
+
 	async kickPeer(peerId)
 	{
 		logger.debug('kickPeer() [peerId:"%s"]', peerId);
@@ -2152,6 +2174,21 @@ export default class RoomClient
 						break;
 					}
 
+					case 'moderator:clearChat':
+					{
+						store.dispatch(chatActions.clearChat());
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.clearChat',
+									defaultMessage : 'Moderator cleared the chat'
+								})
+							}));
+
+						break;
+					}
+
 					case 'sendFile':
 					{
 						const { peerId, magnetUri } = notification.data;
@@ -2306,8 +2343,8 @@ export default class RoomClient
 							store.dispatch(requestActions.notify(
 								{
 									text : intl.formatMessage({
-										id             : 'moderator.mute',
-										defaultMessage : 'Moderator muted your microphone'
+										id             : 'moderator.muteAudio',
+										defaultMessage : 'Moderator muted your audio'
 									})
 								}));
 						}
@@ -2325,7 +2362,7 @@ export default class RoomClient
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
-									id             : 'moderator.mute',
+									id             : 'moderator.muteVideo',
 									defaultMessage : 'Moderator stopped your video'
 								})
 							}));

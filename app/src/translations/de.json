@@ -52,6 +52,7 @@
 	"room.muteAll": "Alle stummschalten",
 	"room.stopAllVideo": "Alle Videos stoppen",
 	"room.closeMeeting": "Meeting schließen",
+	"room.clearChat": null,
 	"room.speechUnsupported": "Dein Browser unterstützt keine Spracherkennung",
 
   	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
@@ -143,5 +144,9 @@
 	"devices.screenSharingError": "Fehler bei der Bildschirmfreigabe",
 
 	"devices.cameraDisconnected": "Kamera getrennt",
-	"devices.cameraError": "Fehler mit deiner Kamera"
+	"devices.cameraError": "Fehler mit deiner Kamera",
+
+	"moderator.clearChat": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }
