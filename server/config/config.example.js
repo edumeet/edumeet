@@ -38,6 +38,13 @@ module.exports =
 	// URI and key for requesting geoip-based TURN server closest to the client
 	turnAPIKey        : 'examplekey',
 	turnAPIURI        : 'https://example.com/api/turn',
+	turnAPIparams	  :	{
+							'uri_schema'  : 'turn',
+							'transport'   : 'tcp',
+							'ip_ver'      : 'ipv4',
+							'servercount' : '2'	
+						},
+
 	// Backup turnservers if REST fails or is not configured
 	backupTurnServers : [
 		{
@@ -59,7 +66,7 @@ module.exports =
 		key  : `${__dirname}/../certs/mediasoup-demo.localhost.key.pem`
 	},
 	// listening Host or IP 
-	// If ommitted listens on every IP. ("0.0.0.0" and "::")
+	// If omitted listens on every IP. ("0.0.0.0" and "::")
 	//listeningHost: 'localhost',
 	// Listening port for https server.
 	listeningPort         : 443,

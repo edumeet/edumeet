@@ -44,7 +44,7 @@ const lobbyPeers = (state = {}, action) =>
 
 			if (!oldLobbyPeer) 
 			{
-				// Tried to update non-existant lobbyPeer. Has probably been promoted, or left.
+				// Tried to update non-existent lobbyPeer. Has probably been promoted, or left.
 				return state;
 			}
 

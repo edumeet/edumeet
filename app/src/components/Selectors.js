@@ -82,7 +82,7 @@ export const spotlightSortedPeersSelector = createSelector(
 	spotlightsSelector,
 	peersValueSelector,
 	(spotlights, peers) => peers.filter((peer) => spotlights.includes(peer.id))
-		.sort((a, b) => a.displayName.localeCompare(b.displayName))
+		.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
 );
 
 export const peersLengthSelector = createSelector(
@@ -94,7 +94,7 @@ export const passivePeersSelector = createSelector(
 	peersValueSelector,
 	spotlightsSelector,
 	(peers, spotlights) => peers.filter((peer) => !spotlights.includes(peer.id))
-		.sort((a, b) => a.displayName.localeCompare(b.displayName))
+		.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
 );
 
 export const videoBoxesSelector = createSelector(
