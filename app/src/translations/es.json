@@ -133,8 +133,8 @@
 
 	"devices.microphoneDisconnected": "Micrófono desconectado",
 	"devices.microphoneError": "Hubo un error al acceder a su micrófono",
-	"devices.microPhoneMute": "Desactivar micrófono",
-	"devices.micophoneUnMute": "Activar micrófono",
+	"devices.microphoneMute": "Desactivar micrófono",
+	"devices.microphoneUnMute": "Activar micrófono",
 	"devices.microphoneEnable": "Micrófono activado",
 	"devices.microphoneMuteError": "No ha sido posible desactivar su micrófono",
 	"devices.microphoneUnMuteError": "No ha sido posible activar su micrófono",

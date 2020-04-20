@@ -126,8 +126,8 @@
 
 "devices.microphoneDisconnected": "Мікрофон відключений",
 "devices.microphoneError": "Сталася помилка під час доступу до мікрофона",
-"devices.microPhoneMute": "Вимкнено ваш мікрофон",
-"devices.micophoneUnMute": "Не ввімкнено ваш мікрофон",
+"devices.microphoneMute": "Вимкнено ваш мікрофон",
+"devices.microphoneUnMute": "Не ввімкнено ваш мікрофон",
 "devices.microphoneEnable": "Увімкнено мікрофон",
 "devices.microphoneMuteError": "Не вдається вимкнути мікрофон",
 "devices.microphoneUnMuteError": "Неможливо ввімкнути мікрофон",

@@ -132,8 +132,8 @@
 
 	"devices.microphoneDisconnected": "Microfono scollegato",
 	"devices.microphoneError": "Errore con l'accesso al microfono",
-	"devices.microPhoneMute": "Microfono silenziato",
-	"devices.micophoneUnMute": "Microfono riattivato",
+	"devices.microphoneMute": "Microfono silenziato",
+	"devices.microphoneUnMute": "Microfono riattivato",
 	"devices.microphoneEnable": "Microfono attivo",
 	"devices.microphoneMuteError": "Impossibile silenziare il microfono",
 	"devices.microphoneUnMuteError": "Impossibile riattivare il microfono",
