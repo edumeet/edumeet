@@ -4,9 +4,9 @@
 	"socket.reconnected": "Verbindung wieder herges|tellt",
 	"socket.requestError": "Fehler bei Serveranfrage",
 
-	"room.chooseRoom": "Choose the name of the room you would like to join",
+	"room.chooseRoom": "Wähle den Namen für den Raum, den du betreten möchtest",
 	"room.cookieConsent": "Diese Seite verwendet Cookies, um die Benutzerfreundlichkeit zu erhöhen",
-	"room.consentUnderstand": "I understand",
+	"room.consentUnderstand": "Ich stimme zu",
 	"room.joined": "Konferenzraum betreten",
 	"room.cantJoin": "Betreten des Raumes nicht möglich",
 	"room.youLocked": "Raum wurde abgeschlossen",
@@ -61,8 +61,8 @@
 	"tooltip.settings": "Einstellungen",
 	"tooltip.participants": "Teilnehmer",
 
-	"label.roomName": "Room name",
-	"label.chooseRoomButton": "Continue",
+	"label.roomName": "Name des Raumes",
+	"label.chooseRoomButton": "Weiter",
 	"label.yourName": "Dein Name",
 	"label.newWindow": "In separatem Fenster öffnen",
 	"label.fullscreen": "Vollbild",
