@@ -52,6 +52,7 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.clearChat": null,
 	"room.speechUnsupported": null,
 
 	"me.mutedPTT": null,
@@ -143,5 +144,9 @@
 	"devices.screenSharingError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στην οθόνη σας",
 
 	"devices.cameraDisconnected": "Η κάμερα αποσυνδέθηκε",
-	"devices.cameraError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στην κάμερά σας"
+	"devices.cameraError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στην κάμερά σας",
+
+	"moderator.clearChat": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

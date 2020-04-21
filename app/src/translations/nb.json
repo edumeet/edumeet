@@ -52,6 +52,7 @@
 	"room.muteAll": "Demp alle",
 	"room.stopAllVideo": "Stopp all video",
 	"room.closeMeeting": "Avslutt møte",
+	"room.clearChat": "Tøm chat",
 	"room.speechUnsupported": "Din nettleser støtter ikke stemmegjenkjenning",
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
@@ -143,5 +144,9 @@
 	"devices.screenSharingError": "Det skjedde noe feil med skjermdelingen din",
 
 	"devices.cameraDisconnected": "Kamera koblet fra",
-	"devices.cameraError": "Det skjedde noe feil med kameraet ditt"
+	"devices.cameraError": "Det skjedde noe feil med kameraet ditt",
+
+	"moderator.clearChat": "Moderator tømte chatten",
+	"moderator.muteAudio": "Moderator mutet lyden din",
+	"moderator.muteVideo": "Moderator mutet videoen din"
 }

@@ -52,6 +52,7 @@
 	"room.muteAll": "Utišaj sve",
 	"room.stopAllVideo": "Ugasi sve kamere",
 	"room.closeMeeting": "Završi sastanak",
+	"room.clearChat": null,
 	"room.speechUnsupported": "Vaš preglednik ne podržava prepoznavanje govora",
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
@@ -143,5 +144,9 @@
 	"devices.screenSharingError": "Greška prilikom pristupa ekranu",
 
 	"devices.cameraDisconnected": "Kamera odspojena",
-	"devices.cameraError": "Greška prilikom pristupa kameri"
+	"devices.cameraError": "Greška prilikom pristupa kameri",
+
+	"moderator.clearChat": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

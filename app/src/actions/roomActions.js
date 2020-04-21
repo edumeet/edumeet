@@ -129,6 +129,12 @@ export const setCloseMeetingInProgress = (flag) =>
 		payload : { flag }
 	});
 
+export const setClearChatInProgress = (flag) =>
+	({
+		type    : 'CLEAR_CHAT_IN_PROGRESS',
+		payload : { flag }
+	});
+
 export const setUserRoles = (userRoles) =>
 	({
 		type    : 'SET_USER_ROLES',

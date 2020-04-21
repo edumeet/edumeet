@@ -52,6 +52,7 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.clearChat": null,
 	"room.speechUnsupported": null,
 
 	"me.mutedPTT": null,
@@ -143,5 +144,9 @@
 	"devices.screenSharingError": "Hiba történt a képernyőd megosztása során",
 
 	"devices.cameraDisconnected": "A kamera kapcsolata lebomlott",
-	"devices.cameraError": "Hiba történt a kamera elérése során"
+	"devices.cameraError": "Hiba történt a kamera elérése során",
+
+	"moderator.clearChat": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

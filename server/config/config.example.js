@@ -229,6 +229,8 @@ module.exports =
 		PROMOTE_PEER     : [ userRoles.NORMAL ],
 		// The role(s) have permission to send chat messages
 		SEND_CHAT        : [ userRoles.NORMAL ],
+		// The role(s) have permission to moderate chat
+		MODERATE_CHAT    : [ userRoles.MODERATOR ],
 		// The role(s) have permission to share screen
 		SHARE_SCREEN     : [ userRoles.NORMAL ],
 		// The role(s) have permission to share files
