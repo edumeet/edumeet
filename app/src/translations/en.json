@@ -31,7 +31,7 @@
 	"room.loggedIn": "You are logged in",
 	"room.loggedOut": "You are logged out",
 	"room.changedDisplayName": "Your display name changed to {displayName}",
-	"room.changeDisplayNameError": "An error occured while changing your display name",
+	"room.changeDisplayNameError": "An error occurred while changing your display name",
 	"room.chatError": "Unable to send chat message",
 	"room.aboutToJoin": "You are about to join a meeting",
 	"room.roomId": "Room ID: {roomName}",
@@ -125,7 +125,7 @@
 	"device.stopScreenSharing": "Stop screen sharing",
 
 	"devices.microphoneDisconnected": "Microphone disconnected",
-	"devices.microphoneError": "An error occured while accessing your microphone",
+	"devices.microphoneError": "An error occurred while accessing your microphone",
 	"devices.microPhoneMute": "Muted your microphone",
 	"devices.micophoneUnMute": "Unmuted your microphone",
 	"devices.microphoneEnable": "Enabled your microphone",
@@ -133,8 +133,8 @@
 	"devices.microphoneUnMuteError": "Unable to unmute your microphone",
 
 	"devices.screenSharingDisconnected" : "Screen sharing disconnected",
-	"devices.screenSharingError": "An error occured while accessing your screen",
+	"devices.screenSharingError": "An error occurred while accessing your screen",
 
 	"devices.cameraDisconnected": "Camera disconnected",
-	"devices.cameraError": "An error occured while accessing your camera"
+	"devices.cameraError": "An error occurred while accessing your camera"
 }
