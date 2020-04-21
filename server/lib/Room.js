@@ -1178,6 +1178,24 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:clearFileSharing':
+			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.MODERATE_FILES.includes(role))
+				)
+					throw new Error('peer not authorized');
+	
+				this._fileHistory = [];
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:clearFileSharing', null, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
 			case 'raiseHand':
 			{
 				const { raisedHand } = request.data;

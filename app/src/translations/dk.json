@@ -53,6 +53,7 @@
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
 	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 
 	"me.mutedPTT": null,
@@ -147,6 +148,7 @@
 	"device.cameraError": "Der opstod en fejl ved tilkobling af dit kamera",
 
 	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null
 }

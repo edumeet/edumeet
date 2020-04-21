@@ -53,6 +53,7 @@
 	"room.stopAllVideo": "Stopp all video",
 	"room.closeMeeting": "Avslutt møte",
 	"room.clearChat": "Tøm chat",
+	"room.clearFileSharing": "Fjern filer",
 	"room.speechUnsupported": "Din nettleser støtter ikke stemmegjenkjenning",
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
@@ -147,6 +148,7 @@
 	"devices.cameraError": "Det skjedde noe feil med kameraet ditt",
 
 	"moderator.clearChat": "Moderator tømte chatten",
+	"moderator.clearFiles": "Moderator fjernet filer",
 	"moderator.muteAudio": "Moderator mutet lyden din",
 	"moderator.muteVideo": "Moderator mutet videoen din"
 }

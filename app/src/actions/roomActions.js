@@ -135,6 +135,12 @@ export const setClearChatInProgress = (flag) =>
 		payload : { flag }
 	});
 
+export const setClearFileSharingInProgress = (flag) =>
+	({
+		type    : 'CLEAR_FILE_SHARING_IN_PROGRESS',
+		payload : { flag }
+	});
+
 export const setUserRoles = (userRoles) =>
 	({
 		type    : 'SET_USER_ROLES',

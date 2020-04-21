@@ -1317,6 +1317,28 @@ export default class RoomClient
 			roomActions.setClearChatInProgress(false));
 	}
 
+	async clearFileSharing()
+	{
+		logger.debug('clearFileSharing()');
+
+		store.dispatch(
+			roomActions.setClearFileSharingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:clearFileSharing');
+
+			store.dispatch(fileActions.clearFiles());
+		}
+		catch (error)
+		{
+			logger.error('clearFileSharing() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setClearFileSharingInProgress(false));
+	}
+
 	async kickPeer(peerId)
 	{
 		logger.debug('kickPeer() [peerId:"%s"]', peerId);
@@ -2213,6 +2235,21 @@ export default class RoomClient
 								roomActions.setToolbarsVisible(true));
 							this._soundNotification();
 						}
+
+						break;
+					}
+
+					case 'moderator:clearFileSharing':
+					{
+						store.dispatch(fileActions.clearFiles());
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.clearFiles',
+									defaultMessage : 'Moderator cleared the files'
+								})
+							}));
 
 						break;
 					}

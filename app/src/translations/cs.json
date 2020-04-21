@@ -52,6 +52,7 @@
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
 	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 
 	"me.mutedPTT": null,
@@ -142,6 +143,7 @@
 	"devices.cameraError": "Při přístupu k vaší kameře se vyskytla chyba",
 
 	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null
 }
