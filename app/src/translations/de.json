@@ -107,7 +107,7 @@
 	"filesharing.save": "Speichern",
 	"filesharing.sharedFile": "{displayName} hat eine Datei geteilt",
 	"filesharing.download": "Herunterladen",
-	"filesharing.missingSeeds": "Wenn das Herunterladen nicht pausiert ist wahrscheinlich niemeand mehr im Raum der die Datei teilen kann. Datei muss erneut geteilt werden.",
+	"filesharing.missingSeeds": "Wenn das Herunterladen nicht pausiert, ist wahrscheinlich niemand mehr im Raum, der die Datei teilen kann. Datei muss erneut geteilt werden.",
 
 	"devices.devicesChanged": "Mediengeräte wurden aktualisiert und sind in Einstellungen verfügbar",
 
