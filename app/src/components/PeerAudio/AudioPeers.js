@@ -50,6 +50,7 @@ const AudioPeersContainer = connect(
 		{
 			return (
 				prev.consumers === next.consumers &&
+				prev.audioOutputDevice === next.audioOutputDevice &&
 				prev.settings === next.settings
 			);
 		}
