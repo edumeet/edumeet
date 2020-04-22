@@ -52,6 +52,8 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 
 	"me.mutedPTT": null,
@@ -143,5 +145,10 @@
 	"devices.screenSharingError": "Hubo un error al acceder a su pantalla",
 
 	"devices.cameraDisconnected": "Cámara desconectada",
-	"devices.cameraError": "Hubo un error al acceder a su cámara"
+	"devices.cameraError": "Hubo un error al acceder a su cámara",
+
+	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

@@ -4,9 +4,10 @@ export const setMe = ({ peerId, loginEnabled }) =>
 		payload : { peerId, loginEnabled }
 	});
 
-export const setIsMobile = () =>
+export const setBrowser = (browser) =>
 	({
-		type : 'SET_IS_MOBILE'
+		type    : 'SET_BROWSER',
+		payload : { browser }
 	});
 
 export const loggedIn = (flag) =>

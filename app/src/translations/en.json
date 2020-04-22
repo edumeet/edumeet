@@ -52,6 +52,8 @@
 	"room.muteAll": "Mute all",
 	"room.stopAllVideo": "Stop all video",
 	"room.closeMeeting": "Close meeting",
+	"room.clearChat": "Clear chat",
+	"room.clearFileSharing": "Clear files",
 	"room.speechUnsupported": "Your browser does not support speech recognition",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
@@ -143,5 +145,10 @@
 	"devices.screenSharingError": "An error occured while accessing your screen",
 
 	"devices.cameraDisconnected": "Camera disconnected",
-	"devices.cameraError": "An error occured while accessing your camera"
+	"devices.cameraError": "An error occured while accessing your camera",
+
+	"moderator.clearChat": "Moderator cleared the chat",
+	"moderator.clearFiles": "Moderator cleared the files",
+	"moderator.muteAudio": "Moderator muted your audio",
+	"moderator.muteVideo": "Moderator muted your video"
 }

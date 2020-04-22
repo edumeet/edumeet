@@ -1,34 +1,38 @@
 const initialState =
 {
-	name                   : '',
-	state                  : 'new', // new/connecting/connected/disconnected/closed,
-	locked                 : false,
-	inLobby                : false,
-	signInRequired         : false,
-	accessCode             : '', // access code to the room if locked and joinByAccessCode == true
-	joinByAccessCode       : true, // if true: accessCode is a possibility to open the room
-	activeSpeakerId        : null,
-	torrentSupport         : false,
-	showSettings           : false,
-	fullScreenConsumer     : null, // ConsumerID
-	windowConsumer         : null, // ConsumerID
-	toolbarsVisible        : true,
-	mode                   : 'democratic',
-	selectedPeerId         : null,
-	spotlights             : [],
-	settingsOpen           : false,
-	lockDialogOpen         : false,
-	joined                 : false,
-	muteAllInProgress      : false,
-	stopAllVideoInProgress : false,
-	closeMeetingInProgress : false,
-	userRoles              : { NORMAL: 'normal' }, // Default role
-	permissionsFromRoles   : {
+	name                       : '',
+	state                      : 'new', // new/connecting/connected/disconnected/closed,
+	locked                     : false,
+	inLobby                    : false,
+	signInRequired             : false,
+	accessCode                 : '', // access code to the room if locked and joinByAccessCode == true
+	joinByAccessCode           : true, // if true: accessCode is a possibility to open the room
+	activeSpeakerId            : null,
+	torrentSupport             : false,
+	showSettings               : false,
+	fullScreenConsumer         : null, // ConsumerID
+	windowConsumer             : null, // ConsumerID
+	toolbarsVisible            : true,
+	mode                       : 'democratic',
+	selectedPeerId             : null,
+	spotlights                 : [],
+	settingsOpen               : false,
+	lockDialogOpen             : false,
+	joined                     : false,
+	muteAllInProgress          : false,
+	stopAllVideoInProgress     : false,
+	closeMeetingInProgress     : false,
+	clearChatInProgress        : false,
+	clearFileSharingInProgress : false,
+	userRoles                  : { NORMAL: 'normal' }, // Default role
+	permissionsFromRoles       : {
 		CHANGE_ROOM_LOCK : [],
 		PROMOTE_PEER     : [],
 		SEND_CHAT        : [],
+		MODERATE_CHAT    : [],
 		SHARE_SCREEN     : [],
 		SHARE_FILE       : [],
+		MODERATE_FILES   : [],
 		MODERATE_ROOM    : []
 	}
 };
@@ -183,6 +187,12 @@ const room = (state = initialState, action) =>
 
 		case 'CLOSE_MEETING_IN_PROGRESS':
 			return { ...state, closeMeetingInProgress: action.payload.flag };
+
+		case 'CLEAR_CHAT_IN_PROGRESS':
+			return { ...state, clearChatInProgress: action.payload.flag };
+
+		case 'CLEAR_FILE_SHARING_IN_PROGRESS':
+			return { ...state, clearFileSharingInProgress: action.payload.flag };
 
 		case 'SET_USER_ROLES':
 		{

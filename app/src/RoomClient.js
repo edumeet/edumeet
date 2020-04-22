@@ -199,6 +199,9 @@ export default class RoomClient
 		// @type {mediasoupClient.Device}
 		this._mediasoupDevice = null;
 
+		// Put the browser info into state
+		store.dispatch(meActions.setBrowser(device));
+
 		// Our WebTorrent client
 		this._webTorrent = null;
 
@@ -206,13 +209,10 @@ export default class RoomClient
 			store.dispatch(settingsActions.setVideoResolution(defaultResolution));
 
 		// Max spotlights
-		if (device.bowser.getPlatformType() === 'desktop')
+		if (device.platform === 'desktop')
 			this._maxSpotlights = lastN;
 		else
-		{
 			this._maxSpotlights = mobileLastN;
-			store.dispatch(meActions.setIsMobile());
-		}
 
 		store.dispatch(
 			settingsActions.setLastN(this._maxSpotlights));
@@ -1295,6 +1295,50 @@ export default class RoomClient
 			lobbyPeerActions.setLobbyPeerPromotionInProgress(peerId, false));
 	}
 
+	async clearChat()
+	{
+		logger.debug('clearChat()');
+
+		store.dispatch(
+			roomActions.setClearChatInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:clearChat');
+
+			store.dispatch(chatActions.clearChat());
+		}
+		catch (error)
+		{
+			logger.error('clearChat() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setClearChatInProgress(false));
+	}
+
+	async clearFileSharing()
+	{
+		logger.debug('clearFileSharing()');
+
+		store.dispatch(
+			roomActions.setClearFileSharingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:clearFileSharing');
+
+			store.dispatch(fileActions.clearFiles());
+		}
+		catch (error)
+		{
+			logger.error('clearFileSharing() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setClearFileSharingInProgress(false));
+	}
+
 	async kickPeer(peerId)
 	{
 		logger.debug('kickPeer() [peerId:"%s"]', peerId);
@@ -2152,6 +2196,21 @@ export default class RoomClient
 						break;
 					}
 
+					case 'moderator:clearChat':
+					{
+						store.dispatch(chatActions.clearChat());
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.clearChat',
+									defaultMessage : 'Moderator cleared the chat'
+								})
+							}));
+
+						break;
+					}
+
 					case 'sendFile':
 					{
 						const { peerId, magnetUri } = notification.data;
@@ -2176,6 +2235,21 @@ export default class RoomClient
 								roomActions.setToolbarsVisible(true));
 							this._soundNotification();
 						}
+
+						break;
+					}
+
+					case 'moderator:clearFileSharing':
+					{
+						store.dispatch(fileActions.clearFiles());
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.clearFiles',
+									defaultMessage : 'Moderator cleared the files'
+								})
+							}));
 
 						break;
 					}
@@ -2306,8 +2380,8 @@ export default class RoomClient
 							store.dispatch(requestActions.notify(
 								{
 									text : intl.formatMessage({
-										id             : 'moderator.mute',
-										defaultMessage : 'Moderator muted your microphone'
+										id             : 'moderator.muteAudio',
+										defaultMessage : 'Moderator muted your audio'
 									})
 								}));
 						}
@@ -2325,7 +2399,7 @@ export default class RoomClient
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
-									id             : 'moderator.mute',
+									id             : 'moderator.muteVideo',
 									defaultMessage : 'Moderator stopped your video'
 								})
 							}));

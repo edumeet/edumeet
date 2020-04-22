@@ -52,6 +52,8 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 
 	"me.mutedPTT": null,
@@ -143,5 +145,10 @@
 	"devices.screenSharingError": "Der opstod en fejl ved adgang til skærmdeling",
 
 	"device.cameraDisconnected": "Kamera frakoblet",
-	"device.cameraError": "Der opstod en fejl ved tilkobling af dit kamera"
+	"device.cameraError": "Der opstod en fejl ved tilkobling af dit kamera",
+
+	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }
