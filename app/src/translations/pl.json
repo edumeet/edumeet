@@ -135,8 +135,8 @@
 
 	"devices.microphoneDisconnected": "Odłączono mikrofon",
 	"devices.microphoneError": "Błąd dostępu do mikrofonu",
-	"devices.microPhoneMute": "Wyciszenie mikrofonu włączone",
-	"devices.micophoneUnMute": "Wyciszenie mikrofonu wyłączone",
+	"devices.microphoneMute": "Wyciszenie mikrofonu włączone",
+	"devices.microphoneUnMute": "Wyciszenie mikrofonu wyłączone",
 	"devices.microphoneEnable": "Włączono mikrofon",
 	"devices.microphoneMuteError": "Nie można wyciszyć mikrofonu",
 	"devices.microphoneUnMuteError": "Nie można wyłączyć wyciszenia mikrofonu.",

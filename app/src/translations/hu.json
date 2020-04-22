@@ -135,8 +135,8 @@
 
 	"devices.microphoneDisconnected": "Microphone kapcsolat bontva",
 	"devices.microphoneError": "Hiba történt a mikrofon hangeszköz elérése közben",
-	"devices.microPhoneMute": "A mikrofon némítva lett",
-	"devices.micophoneUnMute": "A mikrofon némítása ki lett kapocsolva",
+	"devices.microphoneMute": "A mikrofon némítva lett",
+	"devices.microphoneUnMute": "A mikrofon némítása ki lett kapocsolva",
 	"devices.microphoneEnable": "A mikrofon engedéylezve",
 	"devices.microphoneMuteError": "Nem sikerült a mikrofonod némítása",
 	"devices.microphoneUnMuteError": "Nem sikerült a mikrofonod némításának kikapcsolása",

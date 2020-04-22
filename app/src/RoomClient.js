@@ -360,7 +360,7 @@ export default class RoomClient
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
-											id             : 'devices.microPhoneMute',
+											id             : 'devices.microphoneMute',
 											defaultMessage : 'Muted your microphone'
 										})
 									}));
@@ -372,7 +372,7 @@ export default class RoomClient
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
-											id             : 'devices.microPhoneUnMute',
+											id             : 'devices.microphoneUnMute',
 											defaultMessage : 'Unmuted your microphone'
 										})
 									}));
