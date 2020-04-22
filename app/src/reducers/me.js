@@ -2,7 +2,7 @@ const initialState =
 {
 	id                    : null,
 	picture               : null,
-	isMobile              : false,
+	browser               : null,
 	roles                 : [ 'normal' ], // Default role
 	canSendMic            : false,
 	canSendWebcam         : false,
@@ -39,9 +39,11 @@ const me = (state = initialState, action) =>
 			};
 		}
 
-		case 'SET_IS_MOBILE':
+		case 'SET_BROWSER':
 		{
-			return { ...state, isMobile: true };
+			const { browser } = action.payload;
+
+			return { ...state, browser };
 		}
 
 		case 'LOGGED_IN':

@@ -199,6 +199,9 @@ export default class RoomClient
 		// @type {mediasoupClient.Device}
 		this._mediasoupDevice = null;
 
+		// Put the browser info into state
+		store.dispatch(meActions.setBrowser(device));
+
 		// Our WebTorrent client
 		this._webTorrent = null;
 
@@ -206,13 +209,10 @@ export default class RoomClient
 			store.dispatch(settingsActions.setVideoResolution(defaultResolution));
 
 		// Max spotlights
-		if (device.bowser.getPlatformType() === 'desktop')
+		if (device.platform === 'desktop')
 			this._maxSpotlights = lastN;
 		else
-		{
 			this._maxSpotlights = mobileLastN;
-			store.dispatch(meActions.setIsMobile());
-		}
 
 		store.dispatch(
 			settingsActions.setLastN(this._maxSpotlights));
