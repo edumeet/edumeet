@@ -1126,19 +1126,16 @@ export default class RoomClient
 			logger.debug(
 				'changeAudioOutputDevice() | new selected [audio output device:%o]',
 				device);
-			
 
-			
-			const audioElements = document.getElementsByTagName("audio");
-			for( let i=0; i<audioElements.length; i++){
-				if (typeof audioElements[0].setSinkId === 'function'){
-					if (i === 0) logger.debug('changeAudioOutputDevice()');
+			const audioElements = document.getElementsByTagName('audio');
+
+			if (typeof audioElements[0].setSinkId === 'function')
+			{
+				for (let i = 0; i < audioElements.length; i++)
 					await audioElements[i].setSinkId(deviceId);
-				} else {
-					logger.debug('changeAudioOutputDevice() | setSinkId not implemented');
-					break;
-				}
-			};
+			}
+			else
+				logger.debug('changeAudioOutputDevice() | setSinkId not implemented');
 
 			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
 
