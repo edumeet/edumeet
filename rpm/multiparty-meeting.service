@@ -1,0 +1,19 @@
+[Unit]
+Description=multiparty-meeting is a audio / video meeting service running in the browser and powered by webRTC
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/multiparty-meeting
+ExecStart=/opt/multiparty-meeting/server/server.js
+Restart=always
+User=mm
+Group=mm
+WorkingDirectory=/opt/multiparty-meeting/server
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
