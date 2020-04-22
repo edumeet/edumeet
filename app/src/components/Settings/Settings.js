@@ -234,7 +234,9 @@ const Settings = ({
 					</FormHelperText>
 				</FormControl>
 			</form>
-			{ browser.name === 'chrome' &&
+			{ 	
+				window.config.audioOutputSupportedBrowsers && 
+				window.config.audioOutputSupportedBrowsers.includes(browser.name) &&
 				<form className={classes.setting} autoComplete='off'>
 					<FormControl className={classes.formControl}>
 						<Select
@@ -426,7 +428,7 @@ const mapStateToProps = (state) =>
 		me       : state.me,
 		room     : state.room,
 		settings : state.settings,
-		browser  : state.me.browser,
+		browser  : state.me.browser
 	};
 };
 
