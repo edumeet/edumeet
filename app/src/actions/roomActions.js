@@ -129,6 +129,18 @@ export const setCloseMeetingInProgress = (flag) =>
 		payload : { flag }
 	});
 
+export const setClearChatInProgress = (flag) =>
+	({
+		type    : 'CLEAR_CHAT_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const setClearFileSharingInProgress = (flag) =>
+	({
+		type    : 'CLEAR_FILE_SHARING_IN_PROGRESS',
+		payload : { flag }
+	});
+
 export const setUserRoles = (userRoles) =>
 	({
 		type    : 'SET_USER_ROLES',

@@ -16,10 +16,6 @@ const styles = (theme) =>
 			cursor   : 'auto',
 			display  : 'flex'
 		},
-		actionButtons :
-		{
-			display : 'flex'
-		},
 		divider :
 		{
 			marginLeft : theme.spacing(2)
@@ -43,7 +39,6 @@ const ListModerator = (props) =>
 					id             : 'room.muteAll',
 					defaultMessage : 'Mute all'
 				})}
-				className={classes.actionButton}
 				variant='contained'
 				color='secondary'
 				disabled={room.muteAllInProgress}
@@ -60,7 +55,6 @@ const ListModerator = (props) =>
 					id             : 'room.stopAllVideo',
 					defaultMessage : 'Stop all video'
 				})}
-				className={classes.actionButton}
 				variant='contained'
 				color='secondary'
 				disabled={room.stopAllVideoInProgress}
@@ -77,7 +71,6 @@ const ListModerator = (props) =>
 					id             : 'room.closeMeeting',
 					defaultMessage : 'Close meeting'
 				})}
-				className={classes.actionButton}
 				variant='contained'
 				color='secondary'
 				disabled={room.closeMeetingInProgress}

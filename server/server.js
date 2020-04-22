@@ -37,8 +37,8 @@ const interactiveServer = require('./lib/interactiveServer');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
-console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
-console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
+console.log('- config.mediasoup.worker.logLevel:', config.mediasoup.worker.logLevel);
+console.log('- config.mediasoup.worker.logTags:', config.mediasoup.worker.logTags);
 /* eslint-enable no-console */
 
 const logger = new Logger();

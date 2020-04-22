@@ -1005,6 +1005,24 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:clearChat':
+			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.MODERATE_CHAT.includes(role))
+				)
+					throw new Error('peer not authorized');
+	
+				this._chatHistory = [];
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:clearChat', null, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
 			case 'serverHistory':
 			{
 				// Return to sender
@@ -1160,6 +1178,24 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:clearFileSharing':
+			{
+				if (
+					!peer.roles.some((role) => config.permissionsFromRoles.MODERATE_FILES.includes(role))
+				)
+					throw new Error('peer not authorized');
+	
+				this._fileHistory = [];
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:clearFileSharing', null, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
 			case 'raiseHand':
 			{
 				const { raisedHand } = request.data;
@@ -1186,9 +1222,7 @@ class Room extends EventEmitter
 					throw new Error('peer not authorized');
 
 				// Spread to others
-				this._notification(peer.socket, 'moderator:mute', {
-					peerId : peer.id
-				}, true);
+				this._notification(peer.socket, 'moderator:mute', null, true);
 
 				cb();
 
@@ -1203,9 +1237,7 @@ class Room extends EventEmitter
 					throw new Error('peer not authorized');
 
 				// Spread to others
-				this._notification(peer.socket, 'moderator:stopVideo', {
-					peerId : peer.id
-				}, true);
+				this._notification(peer.socket, 'moderator:stopVideo', null, true);
 
 				cb();
 
@@ -1219,12 +1251,7 @@ class Room extends EventEmitter
 				)
 					throw new Error('peer not authorized');
 
-				this._notification(
-					peer.socket,
-					'moderator:kick',
-					null,
-					true
-				);
+				this._notification(peer.socket, 'moderator:kick', null,	true);
 
 				cb();
 
@@ -1248,10 +1275,7 @@ class Room extends EventEmitter
 				if (!kickPeer)
 					throw new Error(`peer with id "${peerId}" not found`);
 
-				this._notification(
-					kickPeer.socket,
-					'moderator:kick'
-				);
+				this._notification(kickPeer.socket, 'moderator:kick');
 
 				kickPeer.close();
 

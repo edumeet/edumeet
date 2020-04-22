@@ -385,7 +385,7 @@ const Me = (props) =>
 									</Fab>
 								</div>
 							</Tooltip>
-							{ !me.isMobile &&
+							{ me.browser.platform !== 'mobile' &&
 								<Tooltip title={screenTip} placement='left'>
 									<div>
 										<Fab

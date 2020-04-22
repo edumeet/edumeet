@@ -9,7 +9,7 @@ import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';
 import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
-import SignalCellular4BarIcon from '@material-ui/icons/SignalCellular4Bar';
+import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
 
 const styles = (theme) =>
 	({
@@ -217,7 +217,7 @@ class VideoView extends React.PureComponent
 				case 9:
 				case 10:
 				{
-					quality = <SignalCellular4BarIcon style={{ color: green[500] }}/>;
+					quality = <SignalCellularAltIcon style={{ color: green[500] }}/>;
 
 					break;
 				}
