@@ -135,8 +135,8 @@
 
 	"devices.microphoneDisconnected": "Mikrofon koblet fra",
 	"devices.microphoneError": "Det skjedde noe feil med mikrofonen din",
-	"devices.microPhoneMute": "Dempet mikrofonen",
-	"devices.micophoneUnMute": "Aktiverte mikrofonen",
+	"devices.microphoneMute": "Dempet mikrofonen",
+	"devices.microphoneUnMute": "Aktiverte mikrofonen",
 	"devices.microphoneEnable": "Aktiverte mikrofonen",
 	"devices.microphoneMuteError": "Klarte ikke å dempe mikrofonen",
 	"devices.microphoneUnMuteError": "Klarte ikke å aktivere mikrofonen",

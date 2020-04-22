@@ -135,8 +135,8 @@
 
 	"devices.microphoneDisconnected": "Mikrofon nicht verbunden",
 	"devices.microphoneError": "Fehler beim Zugriff auf dein Mikrofon",
-	"devices.microPhoneMute": "Mikrofon stummgeschaltet",
-	"devices.micophoneUnMute": "Mikrofon aktiviert",
+	"devices.microphoneMute": "Mikrofon stummgeschaltet",
+	"devices.microphoneUnMute": "Mikrofon aktiviert",
 	"devices.microphoneEnable": "Mikrofon aktiviert",
 	"devices.microphoneMuteError": "Kann Mikrofon nicht stummschalten",
 	"devices.microphoneUnMuteError": "Kann Mikrofon nicht aktivieren",

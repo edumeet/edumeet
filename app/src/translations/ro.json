@@ -135,8 +135,8 @@
 
 	"devices.microphoneDisconnected": "Microfonul e deconectat",
 	"devices.microphoneError": "A apărut o eroare la accesarea microfonului",
-	"devices.microPhoneMute": "Microfonul e dezactivat",
-	"devices.micophoneUnMute": "Retragerea dezactivării microfonului",
+	"devices.microphoneMute": "Microfonul e dezactivat",
+	"devices.microphoneUnMute": "Retragerea dezactivării microfonului",
 	"devices.microphoneEnable": "Microfonul e activat",
 	"devices.microphoneMuteError": "Încercarea de a dezactiva microfonului a eșuat",
 	"devices.microphoneUnMuteError": "Încercarea de a retrage dezactivarea microfonului a eșuat",
