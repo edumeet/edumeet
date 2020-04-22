@@ -1127,16 +1127,6 @@ export default class RoomClient
 				'changeAudioOutputDevice() | new selected [audio output device:%o]',
 				device);
 
-			const audioElements = document.getElementsByTagName('audio');
-
-			if (typeof audioElements[0].setSinkId === 'function')
-			{
-				for (let i = 0; i < audioElements.length; i++)
-					await audioElements[i].setSinkId(deviceId);
-			}
-			else
-				logger.debug('changeAudioOutputDevice() | setSinkId not implemented');
-
 			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
 
 			await this._updateAudioOutputDevices();
