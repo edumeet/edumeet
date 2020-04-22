@@ -58,6 +58,7 @@ const Settings = ({
 	room,
 	me,
 	settings,
+	browser,
 	onToggleAdvancedMode,
 	onTogglePermanentTopBar,
 	handleCloseSettings,
@@ -233,51 +234,53 @@ const Settings = ({
 					</FormHelperText>
 				</FormControl>
 			</form>
-			<form className={classes.setting} autoComplete='off'>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={settings.selectedAudioOutputDevice || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								roomClient.changeAudioOutputDevice(event.target.value);
-						}}
-						displayEmpty
-						name={intl.formatMessage({
-							id             : 'settings.audioOutput',
-							defaultMessage : 'Audio output device'
-						})}
-						autoWidth
-						className={classes.selectEmpty}
-						disabled={audioOutputDevices.length === 0 || me.audioOutputInProgress}
-					>
-						{ audioOutputDevices.map((audioOutput, index) =>
-						{
-							return (
-								<MenuItem
-									key={index}
-									value={audioOutput.deviceId}
-								>
-									{audioOutput.label}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						{ audioOutputDevices.length > 0 ?
-							intl.formatMessage({
-								id             : 'settings.selectAudioOutput',
-								defaultMessage : 'Select audio output device'
-							})
-							:
-							intl.formatMessage({
-								id             : 'settings.cantSelectAudioOutput',
-								defaultMessage : 'Unable to select audio output device'
-							})
-						}
-					</FormHelperText>
-				</FormControl>
-			</form>
+			{ browser.name === 'chrome' &&
+				<form className={classes.setting} autoComplete='off'>
+					<FormControl className={classes.formControl}>
+						<Select
+							value={settings.selectedAudioOutputDevice || ''}
+							onChange={(event) =>
+							{
+								if (event.target.value)
+									roomClient.changeAudioOutputDevice(event.target.value);
+							}}
+							displayEmpty
+							name={intl.formatMessage({
+								id             : 'settings.audioOutput',
+								defaultMessage : 'Audio output device'
+							})}
+							autoWidth
+							className={classes.selectEmpty}
+							disabled={audioOutputDevices.length === 0 || me.audioOutputInProgress}
+						>
+							{ audioOutputDevices.map((audioOutput, index) =>
+							{
+								return (
+									<MenuItem
+										key={index}
+										value={audioOutput.deviceId}
+									>
+										{audioOutput.label}
+									</MenuItem>
+								);
+							})}
+						</Select>
+						<FormHelperText>
+							{ audioOutputDevices.length > 0 ?
+								intl.formatMessage({
+									id             : 'settings.selectAudioOutput',
+									defaultMessage : 'Select audio output device'
+								})
+								:
+								intl.formatMessage({
+									id             : 'settings.cantSelectAudioOutput',
+									defaultMessage : 'Unable to select audio output device'
+								})
+							}
+						</FormHelperText>
+					</FormControl>
+				</form>
+			}
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
 					<Select
@@ -409,6 +412,7 @@ Settings.propTypes =
 	me                      : appPropTypes.Me.isRequired,
 	room                    : appPropTypes.Room.isRequired,
 	settings                : PropTypes.object.isRequired,
+	browser                 : PropTypes.object.isRequired,
 	onToggleAdvancedMode    : PropTypes.func.isRequired,
 	onTogglePermanentTopBar : PropTypes.func.isRequired,
 	handleChangeMode        : PropTypes.func.isRequired,
@@ -421,7 +425,8 @@ const mapStateToProps = (state) =>
 	return {
 		me       : state.me,
 		room     : state.room,
-		settings : state.settings
+		settings : state.settings,
+		browser  : state.me.browser,
 	};
 };
 
@@ -441,6 +446,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.me === next.me &&
+				prev.me.browser === next.me.browser &&
 				prev.room === next.room &&
 				prev.settings === next.settings
 			);
