@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
 import FileList from './FileList';
+import FileSharingModerator from './FileSharingModerator';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 
@@ -58,6 +59,7 @@ const FileSharing = (props) =>
 
 	return (
 		<Paper className={classes.root}>
+			<FileSharingModerator />
 			<input
 				className={classes.input}
 				type='file'

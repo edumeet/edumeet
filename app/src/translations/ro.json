@@ -53,6 +53,7 @@
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
 	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 
 	"me.mutedPTT": null,
@@ -147,6 +148,7 @@
 	"devices.cameraError": "A apărut o eroare la accesarea camerei video",
 
 	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null
 }

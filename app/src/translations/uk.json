@@ -53,6 +53,7 @@
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
 	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 
 	"tooltip.login": "Увійти",
@@ -144,6 +145,7 @@
 	"devices.cameraError": "Під час доступу до камери сталася помилка",
 
 	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null
 } 

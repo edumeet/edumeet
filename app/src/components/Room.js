@@ -139,7 +139,7 @@ class Room extends React.PureComponent
 	{
 		const {
 			room,
-			isMobile,
+			browser,
 			advancedMode,
 			toolAreaOpen,
 			toggleToolArea,
@@ -204,7 +204,7 @@ class Room extends React.PureComponent
 					</Hidden>
 				</nav>
 
-				{ isMobile &&
+				{ browser.platform === 'mobile' && browser.os !== 'ios' &&
 					<WakeLock />
 				}
 
@@ -225,7 +225,7 @@ class Room extends React.PureComponent
 Room.propTypes =
 {
 	room               : appPropTypes.Room.isRequired,
-	isMobile           : PropTypes.bool.isRequired,
+	browser            : PropTypes.object.isRequired,
 	advancedMode       : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
@@ -237,7 +237,7 @@ Room.propTypes =
 const mapStateToProps = (state) =>
 	({
 		room         : state.room,
-		isMobile     : state.me.isMobile,
+		browser      : state.me.browser,
 		advancedMode : state.settings.advancedMode,
 		toolAreaOpen : state.toolarea.toolAreaOpen
 	});
@@ -263,7 +263,7 @@ export default connect(
 		{
 			return (
 				prev.room === next.room &&
-				prev.me.isMobile === next.me.isMobile &&
+				prev.me.browser === next.me.browser &&
 				prev.settings.advancedMode === next.settings.advancedMode &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
