@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { micConsumerSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import PeerAudio from './PeerAudio';
-import settings from '../../reducers/settings';
 
 const AudioPeers = (props) =>
 {
@@ -21,7 +20,7 @@ const AudioPeers = (props) =>
 						<PeerAudio
 							key={micConsumer.id}
 							audioTrack={micConsumer.track}
-							audioOutputDevice={audioOutputDevice}			
+							audioOutputDevice={audioOutputDevice}
 						/>
 					);
 				})
@@ -39,7 +38,7 @@ AudioPeers.propTypes =
 const mapStateToProps = (state) =>
 	({
 		micConsumers      : micConsumerSelector(state),
-		audioOutputDevice : settings.selectedAudioOutputDevice
+		audioOutputDevice : state.settings.selectedAudioOutputDevice
 	});
 
 const AudioPeersContainer = connect(
@@ -50,7 +49,8 @@ const AudioPeersContainer = connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.consumers === next.consumers
+				prev.consumers === next.consumers &&
+				prev.settings === next.settings
 			);
 		}
 	}
