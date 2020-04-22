@@ -32,12 +32,13 @@ const AudioPeers = (props) =>
 
 AudioPeers.propTypes =
 {
-	micConsumers : PropTypes.array
+	micConsumers      : PropTypes.array,
+	audioOutputDevice : PropTypes.string
 };
 
 const mapStateToProps = (state) =>
 	({
-		micConsumers : micConsumerSelector(state),
+		micConsumers      : micConsumerSelector(state),
 		audioOutputDevice : settings.selectedAudioOutputDevice
 	});
 

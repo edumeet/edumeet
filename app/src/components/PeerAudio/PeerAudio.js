@@ -63,8 +63,9 @@ export default class PeerAudio extends React.PureComponent
 		}
 	}
 
-	_setOutputDevice(audioOutputDevice){
-		if(this._audioOutputDevice === audioOutputDevice)
+	_setOutputDevice(audioOutputDevice)
+	{
+		if (this._audioOutputDevice === audioOutputDevice)
 			return;
 		
 		this._audioOutputDevice = audioOutputDevice;
@@ -72,13 +73,12 @@ export default class PeerAudio extends React.PureComponent
 		const { audio } = this.refs;
 
 		if (audioOutputDevice && typeof audio.setSinkId === 'function')
-		{
 			audio.setSinkId(audioOutputDevice);
-		}
 	}
 }
 
 PeerAudio.propTypes =
 {
-	audioTrack : PropTypes.any
+	audioTrack        : PropTypes.any,
+	audioOutputDevice : PropTypes.string
 };

@@ -24,9 +24,9 @@ const settings = (state = initialState, action) =>
 		}
 
 		case 'CHANGE_AUDIO_OUTPUT_DEVICE':
-			{
-				return { ...state, selectedAudioOutputDevice: action.payload.deviceId };
-			}
+		{
+			return { ...state, selectedAudioOutputDevice: action.payload.deviceId };
+		}
 	
 		case 'SET_DISPLAY_NAME':
 		{

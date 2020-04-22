@@ -254,7 +254,12 @@ const Settings = ({
 						{ audioOutputDevices.map((audioOutput, index) =>
 						{
 							return (
-								<MenuItem key={index} value={audioOutput.deviceId}>{audioOutput.label}</MenuItem>
+								<MenuItem
+									key={index}
+									value={audioOutput.deviceId}
+								>
+									{audioOutput.label}
+								</MenuItem>
 							);
 						})}
 					</Select>

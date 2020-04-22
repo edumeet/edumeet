@@ -32,7 +32,7 @@ beforeEach(() =>
 			audioDevices          : null,
 			audioInProgress       : false,
 			audioOutputDevices    : null,
-            audioOutputInProgress : false,
+			audioOutputInProgress : false,
 			canSendMic            : false,
 			canSendWebcam         : false,
 			canShareFiles         : false,
