@@ -23,6 +23,11 @@ const settings = (state = initialState, action) =>
 			return { ...state, selectedAudioDevice: action.payload.deviceId };
 		}
 
+		case 'CHANGE_AUDIO_OUTPUT_DEVICE':
+		{
+			return { ...state, selectedAudioOutputDevice: action.payload.deviceId };
+		}
+	
 		case 'SET_DISPLAY_NAME':
 		{
 			const { displayName } = action.payload;

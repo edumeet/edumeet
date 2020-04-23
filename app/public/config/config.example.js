@@ -25,6 +25,16 @@ var config =
 		{ scaleResolutionDownBy: 2 },
 		{ scaleResolutionDownBy: 1 }
 	],
+	/**
+	 * White listing browsers that support audio output device selection.
+	 * It is not yet fully implemented in Firefox.
+	 * See: https://bugzilla.mozilla.org/show_bug.cgi?id=1498512
+	 */
+	audioOutputSupportedBrowsers :
+	[
+		'chrome', 
+		'opera'
+	],
 	// Socket.io request timeout
 	requestTimeout   : 10000,
 	transportOptions :

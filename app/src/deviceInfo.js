@@ -26,7 +26,7 @@ export default function()
 		flag,
 		os       : browser.getOSName(true), // ios, android, linux...
 		platform : browser.getPlatformType(true), // mobile, desktop, tablet
-		name     : browser.getBrowserName(),
+		name     : browser.getBrowserName(true),
 		version  : browser.getBrowserVersion(),
 		bowser   : browser
 	};

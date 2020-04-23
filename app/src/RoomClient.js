@@ -244,6 +244,8 @@ export default class RoomClient
 
 		this._audioDevices = {};
 
+		this._audioOutputDevices = {};
+
 		// mediasoup Consumers.
 		// @type {Map<String, mediasoupClient.Consumer>}
 		this._consumers = new Map();
@@ -456,6 +458,7 @@ export default class RoomClient
 
 			await this._updateAudioDevices();
 			await this._updateWebcams();
+			await this._updateAudioOutputDevices();
 
 			store.dispatch(requestActions.notify(
 				{
@@ -1105,6 +1108,37 @@ export default class RoomClient
 
 		store.dispatch(
 			meActions.setAudioInProgress(false));
+	}
+
+	async changeAudioOutputDevice(deviceId)
+	{
+		logger.debug('changeAudioOutputDevice() [deviceId: %s]', deviceId);
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(true));
+
+		try
+		{
+			const device = this._audioOutputDevices[deviceId];
+
+			if (!device)
+				throw new Error('Selected audio output device no longer avaibale');
+
+			logger.debug(
+				'changeAudioOutputDevice() | new selected [audio output device:%o]',
+				device);
+
+			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
+
+			await this._updateAudioOutputDevices();
+		}
+		catch (error)
+		{
+			logger.error('changeAudioOutputDevice() failed: %o', error);
+		}
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(false));
 	}
 
 	async changeVideoResolution(resolution)
@@ -2716,7 +2750,20 @@ export default class RoomClient
 				if (joinVideo && this._mediasoupDevice.canProduce('video'))
 					this.enableWebcam();
 			}
+			
+			await this._updateAudioOutputDevices();
 
+			const { selectedAudioOutputDevice } = store.getState().settings;
+
+			if (!selectedAudioOutputDevice && this._audioOutputDevices !== {})
+			{
+				store.dispatch(
+					settingsActions.setSelectedAudioOutputDevice(
+						Object.keys(this._audioOutputDevices)[0]
+					)
+				);
+			}
+		
 			store.dispatch(roomActions.setRoomState('connected'));
 
 			// Clean all the existing notifications.
@@ -3515,4 +3562,35 @@ export default class RoomClient
 			logger.error('_getWebcamDeviceId() failed:%o', error);
 		}
 	}
+
+	async _updateAudioOutputDevices()
+	{
+		logger.debug('_updateAudioOutputDevices()');
+
+		// Reset the list.
+		this._audioOutputDevices = {};
+
+		try
+		{
+			logger.debug('_updateAudioOutputDevices() | calling enumerateDevices()');
+
+			const devices = await navigator.mediaDevices.enumerateDevices();
+
+			for (const device of devices)
+			{
+				if (device.kind !== 'audiooutput')
+					continue;
+
+				this._audioOutputDevices[device.deviceId] = device;
+			}
+
+			store.dispatch(
+				meActions.setAudioOutputDevices(this._audioOutputDevices));
+		}
+		catch (error)
+		{
+			logger.error('_updateAudioOutputDevices() failed:%o', error);
+		}
+	}
+
 }

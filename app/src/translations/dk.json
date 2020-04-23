@@ -100,6 +100,10 @@
 	"settings.audio": "Lydenhed",
 	"settings.selectAudio": "Vælg lydenhed",
 	"settings.cantSelectAudio": "Kan ikke vælge lydenhed",
+	"settings.audioOutput": "Audio output enhed",
+	"settings.selectAudioOutput": "Vælg lydudgangsenhed",
+	"settings.cantSelectAudioOutput": "Kan ikke vælge lydoutputenhed",
+
 	"settings.resolution": "Vælg din videoopløsning",
 	"settings.layout": "Møde visning",
 	"settings.selectRoomLayout": "Vælg møde visning",
