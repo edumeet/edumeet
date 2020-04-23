@@ -58,7 +58,6 @@ const Settings = ({
 	room,
 	me,
 	settings,
-	browser,
 	onToggleAdvancedMode,
 	onTogglePermanentTopBar,
 	handleCloseSettings,
@@ -235,8 +234,8 @@ const Settings = ({
 				</FormControl>
 			</form>
 			{ 	
-				window.config.audioOutputSupportedBrowsers && 
-				window.config.audioOutputSupportedBrowsers.includes(browser.name) &&
+				'audioOutputSupportedBrowsers' in window.config &&
+				window.config.audioOutputSupportedBrowsers.includes(me.browser.name) &&
 				<form className={classes.setting} autoComplete='off'>
 					<FormControl className={classes.formControl}>
 						<Select
@@ -414,7 +413,6 @@ Settings.propTypes =
 	me                      : appPropTypes.Me.isRequired,
 	room                    : appPropTypes.Room.isRequired,
 	settings                : PropTypes.object.isRequired,
-	browser                 : PropTypes.object.isRequired,
 	onToggleAdvancedMode    : PropTypes.func.isRequired,
 	onTogglePermanentTopBar : PropTypes.func.isRequired,
 	handleChangeMode        : PropTypes.func.isRequired,
@@ -427,8 +425,7 @@ const mapStateToProps = (state) =>
 	return {
 		me       : state.me,
 		room     : state.room,
-		settings : state.settings,
-		browser  : state.me.browser
+		settings : state.settings
 	};
 };
 
@@ -448,7 +445,6 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.me === next.me &&
-				prev.me.browser === next.me.browser &&
 				prev.room === next.room &&
 				prev.settings === next.settings
 			);
