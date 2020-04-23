@@ -458,6 +458,7 @@ export default class RoomClient
 
 			await this._updateAudioDevices();
 			await this._updateWebcams();
+			await this._updateAudioOutputDevices();
 
 			store.dispatch(requestActions.notify(
 				{
