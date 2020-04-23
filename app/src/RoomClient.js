@@ -2750,8 +2750,19 @@ export default class RoomClient
 					this.enableWebcam();
 			}
 			
-			this._updateAudioOutputDevices();
+			await this._updateAudioOutputDevices();
 
+			const { selectedAudioOutputDevice } = store.getState().settings;
+
+			if (!selectedAudioOutputDevice && this._audioOutputDevices !== {})
+			{
+				store.dispatch(
+					settingsActions.setSelectedAudioOutputDevice(
+						Object.keys(this._audioOutputDevices)[0]
+					)
+				);
+			}
+		
 			store.dispatch(roomActions.setRoomState('connected'));
 
 			// Clean all the existing notifications.
