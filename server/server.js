@@ -240,7 +240,8 @@ function setupOIDC(oidcIssuer)
 	// redirect_uri defaults to client.redirect_uris[0]
 	// response type defaults to client.response_types[0], then 'code'
 	// scope defaults to 'openid'
-	const params = config.auth.oidc.clientOptions;
+	const params = (({clinet_id, redirect_uri, scope})=>({clinet_id, redirect_uri, scope}))(config.auth.oidc.clientOptions);
+
 
 	// optional, defaults to false, when true req is passed as a first
 	// argument to verify fn
