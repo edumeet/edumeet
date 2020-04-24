@@ -297,6 +297,125 @@ function setupOIDC(oidcIssuer)
 	passport.use('oidc', oidcStrategy);
 }
 
+/*
+ * This function should be passed a map mapping user data to HTTP header names.
+ *
+ * If the map is empty, finding the userid in REMOTE_USER is assumed.
+ *
+ * The accepted keys are:
+ *
+ * - id
+ * - nickname
+ * - name
+ * - email
+ * - givenName
+ * - surName
+ * - picture
+ * - room
+ * - provider
+ */
+function setupTrustedHeaders(headerMap)
+{
+	headers = [];
+	if (typeof(headerMap.id) != 'undefined') {
+		headers.push(headerMap.id);
+	} else {
+		headers.push("REMOTE_USER");
+		headerMap["id"] = "REMOTE_USER";
+	}
+	if (typeof(headerMap.name) != 'undefined') {
+		headers.push(headerMap.name);
+	}
+	if (typeof(headerMap.email) != 'undefined') {
+		headers.push(headerMap.email);
+	}
+	if (typeof(headerMap.givenName) != 'undefined') {
+		headers.push(headerMap.givenName);
+	}
+	if (typeof(headerMap.surName) != 'undefined') {
+		headers.push(headerMap.surName);
+	}
+	if (typeof(headerMap.picture) != 'undefined') {
+		headers.push(headerMap.picture);
+	}
+	if (typeof(headerMap.room) != 'undefined') {
+		headers.push(headerMap.room);
+	}
+	if (typeof(headerMap.provider) != 'undefined') {
+		headers.push(headerMap.provider);
+	}
+
+	const options = {
+		headers: headers,
+		passReqToCallback: true
+	}
+
+	trustedHeadersStrategy = new Strategy(options, function(req, requestHeaders, done) {
+		var user = null;
+
+		var user_id 		= requestHeaders[headerMap.id];
+		var user_name 		= requestHeaders[headerMap.name];
+		var user_nickname 	= requestHeaders[headerMap.nickname];
+		var user_email 		= requestHeaders[headerMap.email];
+		var user_givenName 	= requestHeaders[headerMap.givenName];
+		var user_surName 	= requestHeaders[headerMap.surName];
+		var user_picture 	= requestHeaders[headerMap.picture];
+		var user_room 		= requestHeaders[headerMap.room];
+		var user_provider	= requestHeaders[headerMap.provider];
+
+		const user =
+		{
+			id        : user_id,
+		};
+		
+		if (user_picture != null)
+		{
+			if (!user_picture.match(/^http/g))
+			{
+				user.picture = `data:image/jpeg;base64, ${user_picture}`;
+			}
+			else
+			{
+				user.picture = user_picture;
+			}
+		}
+
+		if (user_nickname != null)
+		{
+			user.displayName = user_nickname;
+		}
+		if (user_name != null)
+		{
+			user.displayName = user_name;
+		}
+		if (user_email != null)
+		{
+			user.email = user_email;
+		}
+		if (user_givenName != null)
+		{
+			user.name = {};
+			user.name.givenName = user_givenName;
+		}
+		if (user_surName != null)
+		{
+			if (user.name == null) user.name = {};
+			user.name.familyName = user_surName;
+		}
+		if (user_provider != null)
+		{
+			user.provider = user_provider;
+		}
+		if (user_room != null) 
+		{
+			user.room = user_room;
+		}
+
+		return done(null, user);
+	}
+	passport.use('trustedheaders', trustedHeadersStrategy);
+}
+
 async function setupAuth()
 {
 	// LTI
@@ -318,6 +437,13 @@ async function setupAuth()
 		// Setup authentication
 		setupOIDC(oidcIssuer);
 
+	}
+	// Trusted headers
+	if (typeof(config.auth.trustedheaders) !== 'undefined' &&
+	    typeof(config.auth.trustedheaders.headerMap) != 'undefined'
+	)
+	{
+		setupTrustedHeaders(config.auth.trustedheaders.headerMap);
 	}
 
 	app.use(passport.initialize());

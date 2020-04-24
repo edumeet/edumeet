@@ -28,6 +28,7 @@
 		"openid-client": "^3.7.3",
 		"passport": "^0.4.0",
 		"passport-lti": "0.0.7",
+		"passport-trusted-header": "1.1.0",
 		"pidusage": "^2.0.17",
 		"redis": "^2.8.0",
 		"socket.io": "^2.3.0",
