@@ -367,7 +367,7 @@ function setupTrustedHeaders(headerMap)
 		{
 			id        : user_id,
 		};
-		
+
 		if (user_picture != null)
 		{
 			if (!user_picture.match(/^http/g))
@@ -406,7 +406,7 @@ function setupTrustedHeaders(headerMap)
 		{
 			user.provider = user_provider;
 		}
-		if (user_room != null) 
+		if (user_room != null)
 		{
 			user.room = user_room;
 		}
