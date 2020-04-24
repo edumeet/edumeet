@@ -25,6 +25,11 @@ of `multiparty-meeting` but connected as an interactive client.
 | `PROM_PORT` | if set, enable exporter on this port |
 | `PROM_QUIET` | if set, include fewer labels |
 
+If `multiparty-meeting` was installed with 
+[`mm-absible`](https://github.com/misi/mm-ansible)
+it may be necessary to open the `iptables` firewall that was established
+with `ferm` for incoming TCP traffic on `PROM_PORT`.
+
 ## License
 
 MIT License (without copyright notice)
