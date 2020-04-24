@@ -51,6 +51,12 @@ export const setAudioDevices = (devices) =>
 		payload : { devices }
 	});
 
+export const setAudioOutputDevices = (devices) =>
+	({
+		type    : 'SET_AUDIO_OUTPUT_DEVICES',
+		payload : { devices }
+	});
+
 export const setWebcamDevices = (devices) =>
 	({
 		type    : 'SET_WEBCAM_DEVICES',
@@ -66,6 +72,12 @@ export const setMyRaiseHandState = (flag) =>
 export const setAudioInProgress = (flag) =>
 	({
 		type    : 'SET_AUDIO_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const setAudioOutputInProgress = (flag) =>
+	({
+		type    : 'SET_AUDIO_OUTPUT_IN_PROGRESS',
 		payload : { flag }
 	});
 	

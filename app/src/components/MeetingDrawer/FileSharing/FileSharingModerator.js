@@ -42,7 +42,7 @@ const FileSharingModerator = (props) =>
 	} = props;
 
 	if (!isFileSharingModerator)
-		return;
+		return null;
 
 	return (
 		<ul className={classes.root}>

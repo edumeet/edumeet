@@ -42,7 +42,7 @@ const ChatModerator = (props) =>
 	} = props;
 
 	if (!isChatModerator)
-		return;
+		return null;
 
 	return (
 		<ul className={classes.root}>
