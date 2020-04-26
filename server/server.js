@@ -25,6 +25,7 @@ const {
 // auth
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
+const passportTrustedHeader = require('passport-trusted-header');
 const imsLti = require('ims-lti');
 const redis = require('redis');
 const redisClient = redis.createClient(config.redisOptions);
@@ -33,6 +34,8 @@ const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
 const interactiveServer = require('./lib/interactiveServer');
+
+const util = require('util');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -317,42 +320,42 @@ function setupOIDC(oidcIssuer)
 function setupTrustedHeaders(headerMap)
 {
 	headers = [];
-	if (typeof(headerMap.id) != 'undefined') {
+	if (typeof(headerMap.id) !== 'undefined') {
 		headers.push(headerMap.id);
 	} else {
 		headers.push("REMOTE_USER");
-		headerMap["id"] = "REMOTE_USER";
+		headerMap["id"] == "REMOTE_USER";
 	}
-	if (typeof(headerMap.name) != 'undefined') {
+	if (typeof(headerMap.name) !== 'undefined') {
 		headers.push(headerMap.name);
 	}
-	if (typeof(headerMap.email) != 'undefined') {
+	if (typeof(headerMap.email) !== 'undefined') {
 		headers.push(headerMap.email);
 	}
-	if (typeof(headerMap.givenName) != 'undefined') {
+	if (typeof(headerMap.givenName) !== 'undefined') {
 		headers.push(headerMap.givenName);
 	}
-	if (typeof(headerMap.surName) != 'undefined') {
+	if (typeof(headerMap.surName) !== 'undefined') {
 		headers.push(headerMap.surName);
 	}
-	if (typeof(headerMap.picture) != 'undefined') {
+	if (typeof(headerMap.picture) !== 'undefined') {
 		headers.push(headerMap.picture);
 	}
-	if (typeof(headerMap.room) != 'undefined') {
+	if (typeof(headerMap.room) !== 'undefined') {
 		headers.push(headerMap.room);
 	}
-	if (typeof(headerMap.provider) != 'undefined') {
+	if (typeof(headerMap.provider) !== 'undefined') {
 		headers.push(headerMap.provider);
 	}
 
 	const options = {
-		headers: headers,
+		headers: headers.filter((e,p) => { headers.indexOf(e) == p}),
 		passReqToCallback: true
 	}
+	logger.debug(`headers: ${options.headers}`);
 
-	trustedHeadersStrategy = new Strategy(options, function(req, requestHeaders, done) {
-		var user = null;
-
+	trustedHeadersStrategy = new passportTrustedHeader.Strategy(options, (req, hdr, done) => {
+		const requestHeaders    = req.headers;
 		var user_id 		= requestHeaders[headerMap.id];
 		var user_name 		= requestHeaders[headerMap.name];
 		var user_nickname 	= requestHeaders[headerMap.nickname];
@@ -362,13 +365,23 @@ function setupTrustedHeaders(headerMap)
 		var user_picture 	= requestHeaders[headerMap.picture];
 		var user_room 		= requestHeaders[headerMap.room];
 		var user_provider	= requestHeaders[headerMap.provider];
+		logger.debug(util.inspect(requestHeaders));
+		logger.debug(`id: ${user_id}`);
+		logger.debug(`name: ${user_name}`);
+		logger.debug(`nickname: ${user_nickname}`);
+		logger.debug(`email: ${user_email}`);
+		logger.debug(`givenName: ${user_givenName}`);
+		logger.debug(`surName: ${user_surName}`);
+		logger.debug(`picture: ${user_picture}`);
+		logger.debug(`room: ${user_room}`);
+		logger.debug(`provider: ${user_provider}`);
 
 		const user =
 		{
 			id        : user_id,
 		};
 
-		if (user_picture != null)
+		if (user_picture != null && typeof(user_picture) !== undefined)
 		{
 			if (!user_picture.match(/^http/g))
 			{
@@ -380,12 +393,13 @@ function setupTrustedHeaders(headerMap)
 			}
 		}
 
-		if (user_nickname != null)
+		if (user_nickname != null && typeof(user_nickname) !== undefined)
 		{
 			user.displayName = user_nickname;
 		}
 		if (user_name != null)
 		{
+			user.name = user_name;
 			user.displayName = user_name;
 		}
 		if (user_email != null)
@@ -406,14 +420,15 @@ function setupTrustedHeaders(headerMap)
 		{
 			user.provider = user_provider;
 		}
-		if (user_room != null)
+		if (user_room != null && typeof(user_room) !== undefined)
 		{
 			user.room = user_room;
 		}
 
+		logger.debug(util.inspect(user));
 		return done(null, user);
-	}
-	passport.use('trustedheaders', trustedHeadersStrategy);
+	});
+	passport.use('trusted-header', trustedHeadersStrategy);
 }
 
 async function setupAuth()
@@ -440,23 +455,52 @@ async function setupAuth()
 	}
 	// Trusted headers
 	if (typeof(config.auth.trustedheaders) !== 'undefined' &&
-	    typeof(config.auth.trustedheaders.headerMap) != 'undefined'
+	    typeof(config.auth.trustedheaders.headerMap) !== 'undefined'
 	)
 	{
 		setupTrustedHeaders(config.auth.trustedheaders.headerMap);
 	}
-
 	app.use(passport.initialize());
 	app.use(passport.session());
-
 	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
-		passport.authenticate('oidc', {
-			state : base64.encode(JSON.stringify({
-				id : req.query.id
-			}))
-		})(req, res, next);
+		if (typeof(config.auth.oidc) !== 'undefined') {
+			passport.authenticate('oidc', {
+				state : base64.encode(JSON.stringify({
+					id : req.query.id
+				}))
+			})(req, res, next);
+		} else {
+			if (typeof(config.auth.trustedheaders) !== 'undefined') {
+				passport.authenticate('trusted-header', { failureRedirect: '/' }),
+				(req, res, next) => {
+					const peer = peers.get(req.query.id);
+
+					if (req.user != null)
+					{
+						if (req.user.displayName != null)
+							displayName = req.user.displayName;
+						else
+							displayName = '';
+
+						if (req.user.picture != null)
+							picture = req.user.picture;
+						else
+							picture = '/static/media/buddy.403cb9f6.svg';
+					}
+					peer && (peer.displayName = displayName);
+					peer && (peer.picture = picture);
+					peer && (peer.authenticated = true);
+
+					res.send(loginHelper({
+						displayName,
+						picture
+					}));
+					
+				}
+			}
+		}
 	});
 
 	// lti launch
