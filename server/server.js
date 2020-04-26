@@ -17,7 +17,7 @@ const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
-
+const gravatar = require('gravatar');
 const {
 	loginHelper,
 	logoutHelper
@@ -380,19 +380,6 @@ function setupTrustedHeaders(headerMap)
 		{
 			id        : user_id,
 		};
-
-		if (user_picture != null && typeof(user_picture) !== undefined)
-		{
-			if (!user_picture.match(/^http/g))
-			{
-				user.picture = `data:image/jpeg;base64, ${user_picture}`;
-			}
-			else
-			{
-				user.picture = user_picture;
-			}
-		}
-
 		if (user_nickname != null && typeof(user_nickname) !== undefined)
 		{
 			user.displayName = user_nickname;
@@ -423,6 +410,21 @@ function setupTrustedHeaders(headerMap)
 		if (user_room != null && typeof(user_room) !== undefined)
 		{
 			user.room = user_room;
+		}
+		if (user_picture != null && typeof(user_picture) !== undefined)
+		{
+			if (!user_picture.match(/^http/g))
+			{
+				user.picture = `data:image/jpeg;base64, ${user_picture}`;
+			}
+			else
+			{
+				user.picture = user_picture;
+			}
+		} else {
+			if (user_email != null) {
+				user.picture = gravatar.url(user_email, {s: '100', protocol: 'https'});
+			}
 		}
 
 		logger.debug(util.inspect(user));

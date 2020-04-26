@@ -22,6 +22,7 @@
 		"express": "^4.17.1",
 		"express-session": "^1.17.0",
 		"express-socket.io-session": "^1.3.5",
+		"gravatar": "1.8.0",
 		"helmet": "^3.21.2",
 		"ims-lti": "^3.0.2",
 		"mediasoup": "^3.5.5",
