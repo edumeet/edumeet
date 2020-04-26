@@ -257,6 +257,7 @@ export default class RoomClient
 		this._startKeyListener();
 
 		this._startDevicesListener();
+
 	}
 
 	close()
@@ -592,6 +593,21 @@ export default class RoomClient
 				);
 			}
 		});
+	}
+
+	async getTransportStats(transportId)
+	{
+
+		logger.debug('getTransportStats() [transportId: "%s"]', transportId);
+
+		try
+		{
+			return await this.sendRequest('getTransportStats', { transportId: transportId });
+		}
+		catch (error)
+		{ 
+			logger.error('getTransportStats() | failed: %o', error);
+		} 
 	}
 
 	async changeDisplayName(displayName)
@@ -1959,6 +1975,7 @@ export default class RoomClient
 			{
 				switch (notification.method)
 				{
+
 					case 'enteredLobby':
 					{
 						store.dispatch(roomActions.setInLobby(true));

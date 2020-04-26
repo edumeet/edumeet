@@ -10,6 +10,7 @@ import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
 import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
+import NetworkIndicator from '../Controls/NetworkIndicator';
 
 const styles = (theme) =>
 	({
@@ -267,20 +268,25 @@ class VideoView extends React.PureComponent
 						<div className={classes.peer}>
 							<div className={classes.box}>
 								{ isMe ?
-									<EditableInput
-										value={displayName}
-										propName='newDisplayName'
-										className={classes.displayNameEdit}
-										classLoading='loading'
-										classInvalid='invalid'
-										shouldBlockWhileLoading
-										editProps={{
-											maxLength   : 30,
-											autoCorrect : 'off',
-											spellCheck  : false
-										}}
-										onChange={({ newDisplayName }) => onChangeDisplayName(newDisplayName)}
-									/>
+									<React.Fragment>
+										<EditableInput
+											value={displayName}
+											propName='newDisplayName'
+											className={classes.displayNameEdit}
+											classLoading='loading'
+											classInvalid='invalid'
+											shouldBlockWhileLoading
+											editProps={{
+												maxLength   : 30,
+												autoCorrect : 'off',
+												spellCheck  : false
+											}}
+											onChange={
+												({ newDisplayName }) => 
+													onChangeDisplayName(newDisplayName)}
+										/>
+										<NetworkIndicator />
+									</React.Fragment>
 									:
 									<span className={classes.displayNameStatic}>
 										{displayName}
