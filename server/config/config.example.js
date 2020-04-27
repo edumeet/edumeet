@@ -64,7 +64,7 @@ module.exports =
 	// always be put in the lobby regardless of room lock status.
 	// If false, there is no difference between guests and signed-in
 	// users when joining.
-	requireSignInToAccess : true,
+	requireSignInToAccess : false,
 	// This flag has no effect when requireSignInToAccess is false
 	// When truthy, the room will be open to all users when the first
 	// authenticated user has already joined the room.
