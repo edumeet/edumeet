@@ -440,7 +440,9 @@ async function setupAuth()
 		typeof(config.auth.lti) !== 'undefined' &&
 		typeof(config.auth.lti.consumerKey) !== 'undefined' &&
 		typeof(config.auth.lti.consumerSecret) !== 'undefined'
-	) 	setupLTI(config.auth.lti);
+	) {
+		setupLTI(config.auth.lti);
+	}
 
 	// OIDC
 	if (
@@ -453,7 +455,6 @@ async function setupAuth()
 
 		// Setup authentication
 		setupOIDC(oidcIssuer);
-
 	}
 	// Trusted headers
 	if (typeof(config.auth.trustedheaders) !== 'undefined' &&
@@ -462,49 +463,87 @@ async function setupAuth()
 	{
 		setupTrustedHeaders(config.auth.trustedheaders.headerMap);
 	}
+
 	app.use(passport.initialize());
 	app.use(passport.session());
-	// loginparams
-	app.get('/auth/login', (req, res, next) =>
+	if (typeof(config.auth.trustedheaders) !== 'undefined') {
+		app.get('/auth/login',
+			passport.authenticate('trusted-header', { failureRedirect: '/' }),
+			(req, res, next) => {
+				const peer = peers.get(req.query.id);
+
+				if (req.user != null)
+				{
+					if (req.user.displayName != null)
+						displayName = req.user.displayName;
+					else
+						displayName = '';
+
+					if (req.user.picture != null)
+						picture = req.user.picture;
+					else
+						picture = '/static/media/buddy.403cb9f6.svg';
+				}
+				peer && (peer.displayName = displayName);
+				peer && (peer.picture = picture);
+				peer && (peer.authenticated = true);
+
+				res.send(loginHelper({
+					displayName,
+					picture
+				}));
+
+			}
+		);
+	}
+	if (typeof(config.auth.oidc) !== 'undefined')
 	{
-		if (typeof(config.auth.oidc) !== 'undefined') {
+		app.get('/auth/login', (req, res, next) =>
+		{
 			passport.authenticate('oidc', {
 				state : base64.encode(JSON.stringify({
 					id : req.query.id
-				}))
+					}))
 			})(req, res, next);
-		} else {
-			if (typeof(config.auth.trustedheaders) !== 'undefined') {
-				passport.authenticate('trusted-header', { failureRedirect: '/' }),
-				(req, res, next) => {
-					const peer = peers.get(req.query.id);
+		});
 
-					if (req.user != null)
-					{
-						if (req.user.displayName != null)
-							displayName = req.user.displayName;
-						else
-							displayName = '';
+		// callback
+		app.get(
+			'/auth/callback',
+			passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
+			(req, res) =>
+			{
+				const state = JSON.parse(base64.decode(req.query.state));
 
-						if (req.user.picture != null)
-							picture = req.user.picture;
-						else
-							picture = '/static/media/buddy.403cb9f6.svg';
-					}
-					peer && (peer.displayName = displayName);
-					peer && (peer.picture = picture);
-					peer && (peer.authenticated = true);
+				let displayName;
+				let picture;
 
-					res.send(loginHelper({
-						displayName,
-						picture
-					}));
-					
+				if (req.user != null)
+				{
+					if (req.user.displayName != null)
+						displayName = req.user.displayName;
+					else
+						displayName = '';
+
+					if (req.user.picture != null)
+						picture = req.user.picture;
+					else
+						picture = '/static/media/buddy.403cb9f6.svg';
 				}
-			}
-		}
-	});
 
+				const peer = peers.get(state.id);
+
+				peer && (peer.displayName = displayName);
+				peer && (peer.picture = picture);
+				peer && (peer.authenticated = true);
+
+				res.send(loginHelper({
+					displayName,
+					picture
+				}));
+			}
+		);
+	}
 	// lti launch
 	app.post('/auth/lti',
 		passport.authenticate('lti', { failureRedirect: '/' }),
@@ -521,42 +560,6 @@ async function setupAuth()
 		req.session.destroy(() => res.send(logoutHelper()));
 	});
 
-	// callback
-	app.get(
-		'/auth/callback',
-		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
-		(req, res) =>
-		{
-			const state = JSON.parse(base64.decode(req.query.state));
-
-			let displayName;
-			let picture;
-
-			if (req.user != null)
-			{
-				if (req.user.displayName != null)
-					displayName = req.user.displayName;
-				else
-					displayName = '';
-
-				if (req.user.picture != null)
-					picture = req.user.picture;
-				else
-					picture = '/static/media/buddy.403cb9f6.svg';
-			}
-
-			const peer = peers.get(state.id);
-
-			peer && (peer.displayName = displayName);
-			peer && (peer.picture = picture);
-			peer && (peer.authenticated = true);
-
-			res.send(loginHelper({
-				displayName,
-				picture
-			}));
-		}
-	);
 }
 
 async function runHttpsServer()

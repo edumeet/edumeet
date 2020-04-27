@@ -29,6 +29,30 @@ module.exports =
 				redirect_uri  : 'https://client.example.com/auth/callback'
 			}
 
+		},
+		trustedheaders:
+		{
+			// The following maps http headers to the user
+		        // info the application uses. The accepted keys are:
+		        //
+			// - id
+			// - nickname
+			// - name
+			// - email
+			// - givenName
+			// - surName
+			// - picture
+			// - room
+			// - provider
+			headerMap:
+			{
+			    id:        'HTTP_HEADER_ID',
+			    name:      'HTTP_HEADER_NAME',
+			    email:     'HTTP_HEADER_MAIL',
+			    givenName: 'HTTP_HEADER_GIVEN_NAME',
+			    surName:   'HTTP_HEADER_SURNAME',
+			    provider:  'HTTP_HEADER_ORG'
+			}
 		}
 	},
 	*/
