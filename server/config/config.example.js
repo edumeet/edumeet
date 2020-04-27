@@ -58,7 +58,7 @@ module.exports =
 	//  - https://expressjs.com/en/guide/behind-proxies.html
 	//  - https://www.npmjs.com/package/proxy-addr
 	// use case: loadbalancer backend
-    trustProxy           : '',
+	trustProxy           : '',
 	// If this is set to true, only signed-in users will be able
 	// to join a room directly. Non-signed-in users (guests) will
 	// always be put in the lobby regardless of room lock status.
