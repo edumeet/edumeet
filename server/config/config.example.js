@@ -151,11 +151,12 @@ module.exports =
 		{
 			listenIps :
 			[
-				// change ip to your servers IP address!
-				{ ip: '0.0.0.0', announcedIp: null }
+				// change 192.0.2.1 IPv4 to your server's IPv4 address!!
+				{ ip: '192.0.2.1', announcedIp: null }
 
 				// Can have multiple listening interfaces
-				// { ip: '::/0', announcedIp: null }
+				// change 2001:DB8::1 IPv6 to your server's IPv6 address!!
+				// { ip: '2001:DB8::1', announcedIp: null }
 			],
 			initialAvailableOutgoingBitrate : 1000000,
 			minimumAvailableOutgoingBitrate : 600000,
