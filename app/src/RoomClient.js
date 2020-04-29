@@ -873,7 +873,7 @@ export default class RoomClient
 				store.dispatch(
 					lobbyPeerActions.addLobbyPeer(peer.peerId));
 				store.dispatch(
-					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName));
+					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
 				store.dispatch(
 					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
 			});
