@@ -340,6 +340,7 @@ const Peer = (props) =>
 						videoMultiLayer={webcamConsumer && webcamConsumer.type !== 'simple'}
 						videoTrack={webcamConsumer && webcamConsumer.track}
 						videoVisible={videoVisible}
+						audioTrack={micConsumer && micConsumer.track}
 						audioCodec={micConsumer && micConsumer.codec}
 						videoCodec={webcamConsumer && webcamConsumer.codec}
 						audioScore={micConsumer ? micConsumer.score : null}

@@ -67,6 +67,15 @@ export const screenConsumerSelector = createSelector(
 	(consumers) => Object.values(consumers).filter((consumer) => consumer.source === 'screen')
 );
 
+export const passiveMicConsumerSelector = createSelector(
+	spotlightsSelector,
+	consumersSelect,
+	(spotlights, consumers) =>
+		Object.values(consumers).filter(
+			(consumer) => consumer.source === 'mic' && !spotlights.includes(consumer.peerId)
+		)
+);
+
 export const spotlightsLengthSelector = createSelector(
 	spotlightsSelector,
 	(spotlights) => spotlights.length
