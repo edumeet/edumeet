@@ -194,14 +194,14 @@ const TopBar = (props) =>
 						<MenuIcon />
 					</IconButton>
 				</PulsingBadge>
-				{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+				{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 				<Typography
 					className={classes.title}
 					variant='h6'
 					color='inherit'
 					noWrap
 				>
-					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
+					{ window.config.title ? window.config.title : 'Multiparty meeting' }
 				</Typography>
 				<div className={classes.grow} />
 				<div className={classes.actionButtons}>

@@ -233,8 +233,7 @@ const Settings = ({
 					</FormHelperText>
 				</FormControl>
 			</form>
-			{ 	
-				'audioOutputSupportedBrowsers' in window.config &&
+			{ 'audioOutputSupportedBrowsers' in window.config &&
 				window.config.audioOutputSupportedBrowsers.includes(me.browser.name) &&
 				<form className={classes.setting} autoComplete='off'>
 					<FormControl className={classes.formControl}>
@@ -355,7 +354,7 @@ const Settings = ({
 			/>
 			{ settings.advancedMode &&
 				<React.Fragment>
-					{ window.config && !window.config.lockLastN &&
+					{ !window.config.lockLastN &&
 						<form className={classes.setting} autoComplete='off'>
 							<FormControl className={classes.formControl}>
 								<Select
