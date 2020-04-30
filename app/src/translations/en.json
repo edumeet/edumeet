@@ -55,6 +55,7 @@
 	"room.clearChat": "Clear chat",
 	"room.clearFileSharing": "Clear files",
 	"room.speechUnsupported": "Your browser does not support speech recognition",
+	"room.moderatoractions": "Moderator actions",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -69,6 +70,8 @@
 	"tooltip.settings": "Show settings",
 	"tooltip.participants": "Show participants",
 	"tooltip.kickParticipant": "Kick out participant",
+	"tooltip.muteParticipant": "Mute participant",
+	"tooltip.muteParticipantVideo": "Mute participant video",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",

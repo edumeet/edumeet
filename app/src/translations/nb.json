@@ -55,6 +55,7 @@
 	"room.clearChat": "Tøm chat",
 	"room.clearFileSharing": "Fjern filer",
 	"room.speechUnsupported": "Din nettleser støtter ikke stemmegjenkjenning",
+	"room.moderatoractions": "Moderatorhandlinger",
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -69,6 +70,8 @@
 	"tooltip.settings": "Vis innstillinger",
 	"tooltip.participants": "Vis deltakere",
 	"tooltip.kickParticipant": "Spark ut deltaker",
+	"tooltip.muteParticipant": "Demp deltaker",
+	"tooltip.muteParticipantVideo": "Demp deltakervideo",
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",

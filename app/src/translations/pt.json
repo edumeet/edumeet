@@ -55,6 +55,7 @@
 	"room.clearChat": null,
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
+	"room.moderatoractions": null,
 
 	"me.mutedPTT": null,
 
@@ -69,6 +70,8 @@
 	"tooltip.settings": "Apresentar definições",
 	"tooltip.participants": "Apresentar participantes",
 	"tooltip.kickParticipant": null,
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
 
 	"label.roomName": "Nome da sala",
 	"label.chooseRoomButton": "Continuar",

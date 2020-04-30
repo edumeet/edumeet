@@ -49,6 +49,13 @@
 	"room.spotlights": "Gündemdeki Katılımcılar",
 	"room.passive": "Pasif Katılımcılar",
 	"room.videoPaused": "Video duraklatıldı",
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
+	"room.clearChat": null,
+	"room.clearFileSharing": null,
+	"room.speechUnsupported": null,
+	"room.moderatoractions": null,
 
 	"tooltip.login": "Giriş",
 	"tooltip.logout": "Çıkış",
@@ -60,6 +67,9 @@
 	"tooltip.lobby": "Lobiyi göster",
 	"tooltip.settings": "Ayarları göster",
 	"tooltip.participants": "Katılımcıları göster",
+	"tooltip.kickParticipant": null,
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
 
 	"label.roomName": "Oda adı",
 	"label.chooseRoomButton": "Devam",

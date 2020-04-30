@@ -8,6 +8,8 @@ import * as appPropTypes from '../../appPropTypes';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
 import IconButton from '@material-ui/core/IconButton';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
@@ -104,10 +106,17 @@ const ListPeer = (props) =>
 		isModerator,
 		peer,
 		micConsumer,
+		webcamConsumer,
 		screenConsumer,
 		children,
 		classes
 	} = props;
+
+	const webcamEnabled = (
+		Boolean(webcamConsumer) &&
+		!webcamConsumer.locallyPaused &&
+		!webcamConsumer.remotelyPaused
+	);
 
 	const micEnabled = (
 		Boolean(micConsumer) &&
@@ -153,8 +162,10 @@ const ListPeer = (props) =>
 						})}
 						color={screenVisible ? 'primary' : 'secondary'}
 						disabled={peer.peerScreenInProgress}
-						onClick={() =>
+						onClick={(e) =>
 						{
+							e.stopPropagation();
+
 							screenVisible ?
 								roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
 								roomClient.modifyPeerConsumer(peer.id, 'screen', false);
@@ -169,13 +180,37 @@ const ListPeer = (props) =>
 				}
 				<IconButton
 					aria-label={intl.formatMessage({
+						id             : 'tooltip.muteParticipantVideo',
+						defaultMessage : 'Mute participant video'
+					})}
+					color={webcamEnabled ? 'primary' : 'secondary'}
+					disabled={peer.peerVideoInProgress}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+
+						webcamEnabled ?
+							roomClient.modifyPeerConsumer(peer.id, 'webcam', true) :
+							roomClient.modifyPeerConsumer(peer.id, 'webcam', false);
+					}}
+				>
+					{ webcamEnabled ?
+						<VideocamIcon />
+						:
+						<VideocamOffIcon />
+					}
+				</IconButton>
+				<IconButton
+					aria-label={intl.formatMessage({
 						id             : 'tooltip.muteParticipant',
 						defaultMessage : 'Mute participant'
 					})}
 					color={micEnabled ? 'primary' : 'secondary'}
 					disabled={peer.peerAudioInProgress}
-					onClick={() =>
+					onClick={(e) =>
 					{
+						e.stopPropagation();
+
 						micEnabled ?
 							roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
 							roomClient.modifyPeerConsumer(peer.id, 'mic', false);
@@ -194,8 +229,10 @@ const ListPeer = (props) =>
 							defaultMessage : 'Kick out participant'
 						})}
 						disabled={peer.peerKickInProgress}
-						onClick={() =>
+						onClick={(e) =>
 						{
+							e.stopPropagation();
+
 							roomClient.kickPeer(peer.id);
 						}}
 					>
