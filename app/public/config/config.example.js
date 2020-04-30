@@ -42,17 +42,18 @@ var config =
 	{
 		tcp : true
 	},
-	lastN       : 4,
-	mobileLastN : 1,
+	defaultLayout : 'democratic', // democratic, filmstrip
+	lastN         : 4,
+	mobileLastN   : 1,
 	// Highest number of speakers user can select
-	maxLastN    : 5,
+	maxLastN      : 5,
 	// If truthy, users can NOT change number of speakers visible
-	lockLastN   : false,
-	background  : 'images/background.jpg',
+	lockLastN     : false,
+	background    : 'images/background.jpg',
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
-	title       : 'Multiparty meeting',
-	theme       :
+	title         : 'Multiparty meeting',
+	theme         :
 	{
 		palette :
 		{
