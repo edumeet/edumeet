@@ -316,6 +316,7 @@ const JoinDialog = ({
 							className={classes.green}
 							gutterBottom
 							variant='h6'
+							style={{ fontWeight: '600' }}
 							align='center'
 						>
 							<FormattedMessage
@@ -324,7 +325,11 @@ const JoinDialog = ({
 							/>
 						</DialogContentText>
 						{ room.signInRequired ?
-							<DialogContentText gutterBottom>
+							<DialogContentText
+								gutterBottom
+								variant='h5'
+								style={{ fontWeight: '600' }}
+							>
 								<FormattedMessage
 									id='room.emptyRequireLogin'
 									defaultMessage={
@@ -334,7 +339,11 @@ const JoinDialog = ({
 								/>
 							</DialogContentText>
 							:
-							<DialogContentText gutterBottom>
+							<DialogContentText
+								gutterBottom
+								variant='h5'
+								style={{ fontWeight: '600' }}
+							>
 								<FormattedMessage
 									id='room.locketWait'
 									defaultMessage='The room is locked - hang on until somebody lets you in ...'
