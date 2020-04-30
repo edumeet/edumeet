@@ -199,7 +199,7 @@ function setupLTI(ltiConfig)
 				if (lti.user_id && lti.custom_room)
 				{
 					user.id = lti.user_id;
-					user._userinfo = { "lti" : lti };
+					user._userinfo = { 'lti': lti };
 				}
 
 				if (lti.custom_room)
@@ -240,8 +240,18 @@ function setupOIDC(oidcIssuer)
 	// redirect_uri defaults to client.redirect_uris[0]
 	// response type defaults to client.response_types[0], then 'code'
 	// scope defaults to 'openid'
-	const params = (({clinet_id, redirect_uri, scope})=>({clinet_id, redirect_uri, scope}))(config.auth.oidc.clientOptions);
 
+	/* eslint-disable camelcase */
+	const params = (({
+		client_id,
+		redirect_uri,
+		scope
+	}) => ({
+		client_id,
+		redirect_uri,
+		scope
+	}))(config.auth.oidc.clientOptions);
+	/* eslint-enable camelcase */
 
 	// optional, defaults to false, when true req is passed as a first
 	// argument to verify fn
@@ -256,7 +266,9 @@ function setupOIDC(oidcIssuer)
 		{ client: oidcClient, params, passReqToCallback, usePKCE },
 		(tokenset, userinfo, done) =>
 		{
-			if (userinfo && tokenset) {
+			if (userinfo && tokenset)
+			{
+				// eslint-disable-next-line camelcase
 				userinfo._tokenset_claims = tokenset.claims();
 			}
 
@@ -431,14 +443,14 @@ async function runHttpsServer()
 		// http
 		const redirectListener = http.createServer(app);
 
-		if(config.listeningHost)
+		if (config.listeningHost)
 			redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
 		else
 			redirectListener.listen(config.listeningRedirectPort);
 	}
 
 	// https or http
-	if(config.listeningHost)	
+	if (config.listeningHost)
 		mainListener.listen(config.listeningPort, config.listeningHost);
 	else
 		mainListener.listen(config.listeningPort);
