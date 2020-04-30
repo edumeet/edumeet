@@ -674,7 +674,7 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				return store.dispatch(requestActions.notify(
+				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
@@ -682,6 +682,8 @@ export default class RoomClient
 							defaultMessage : 'Unable to save file'
 						})
 					}));
+
+				return;
 			}
 
 			saveAs(blob, file.name);
@@ -698,7 +700,9 @@ export default class RoomClient
 		if (existingTorrent)
 		{
 			// Never add duplicate torrents, use the existing one instead.
-			return this._handleTorrent(existingTorrent);
+			this._handleTorrent(existingTorrent);
+
+			return;
 		}
 
 		this._webTorrent.add(magnetUri, this._handleTorrent);
@@ -710,11 +714,13 @@ export default class RoomClient
 		// same file was sent multiple times.
 		if (torrent.progress === 1)
 		{
-			return store.dispatch(
+			store.dispatch(
 				fileActions.setFileDone(
 					torrent.magnetURI,
 					torrent.files
 				));
+
+			return;
 		}
 
 		let lastMove = 0;
@@ -757,7 +763,7 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				return store.dispatch(requestActions.notify(
+				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
@@ -765,13 +771,30 @@ export default class RoomClient
 							defaultMessage : 'Unable to share file'
 						})
 					}));
+
+				return;
 			}
 
 			const existingTorrent = this._webTorrent.get(torrent);
 
 			if (existingTorrent)
 			{
-				return this._sendFile(existingTorrent.magnetURI);
+				store.dispatch(requestActions.notify(
+					{
+						text : intl.formatMessage({
+							id             : 'filesharing.successfulFileShare',
+							defaultMessage : 'File successfully shared'
+						})
+					}));
+
+				store.dispatch(fileActions.addFile(
+					this._peerId,
+					existingTorrent.magnetURI
+				));
+
+				this._sendFile(existingTorrent.magnetURI);
+
+				return;
 			}
 
 			this._webTorrent.seed(
