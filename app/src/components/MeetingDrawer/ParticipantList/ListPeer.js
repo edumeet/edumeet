@@ -10,8 +10,8 @@ import { useIntl } from 'react-intl';
 import IconButton from '@material-ui/core/IconButton';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
-import MicIcon from '@material-ui/icons/Mic';
-import MicOffIcon from '@material-ui/icons/MicOff';
+import VolumeUpIcon from '@material-ui/icons/VolumeUp';
+import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
 import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 import ExitIcon from '@material-ui/icons/ExitToApp';
@@ -217,9 +217,9 @@ const ListPeer = (props) =>
 					}}
 				>
 					{ micEnabled ?
-						<MicIcon />
+						<VolumeUpIcon />
 						:
-						<MicOffIcon />
+						<VolumeOffIcon />
 					}
 				</IconButton>
 				{ isModerator &&
