@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
+import classnames from 'classnames';
 import isElectron from 'is-electron';
 import * as settingsActions from '../actions/settingsActions';
 import PropTypes from 'prop-types';
@@ -147,7 +148,9 @@ const DialogTitle = withStyles(styles)((props) =>
 						{ myPicture ?
 							<Avatar src={myPicture} className={classes.largeAvatar} />
 							:
-							<AccountCircle className={classes.largeIcon} />
+							<AccountCircle
+								className={classnames(classes.largeIcon, loggedIn && classes.green)}
+							/>
 						}
 					</IconButton>
 				</Tooltip>

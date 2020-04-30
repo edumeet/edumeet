@@ -80,6 +80,10 @@ const styles = (theme) =>
 		{
 			margin  : theme.spacing(1, 0),
 			padding : theme.spacing(0, 1)
+		},
+		green :
+		{
+			color : 'rgba(0, 153, 0, 1)'
 		}
 	});
 
@@ -335,7 +339,7 @@ const TopBar = (props) =>
 								{ myPicture ?
 									<Avatar src={myPicture} />
 									:
-									<AccountCircle />
+									<AccountCircle className={loggedIn && classes.green} />
 								}
 							</IconButton>
 						</Tooltip>
