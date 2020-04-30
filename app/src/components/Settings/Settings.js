@@ -355,36 +355,41 @@ const Settings = ({
 			/>
 			{ settings.advancedMode &&
 				<React.Fragment>
-					<form className={classes.setting} autoComplete='off'>
-						<FormControl className={classes.formControl}>
-							<Select
-								value={settings.lastN || ''}
-								onChange={(event) =>
-								{
-									if (event.target.value)
-										roomClient.changeMaxSpotlights(event.target.value);
-								}}
-								name='Last N'
-								autoWidth
-								className={classes.selectEmpty}
-							>
-								{ [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ].map((lastN) =>
-								{
-									return (
-										<MenuItem key={lastN} value={lastN}>
-											{lastN}
-										</MenuItem>
-									);
-								})}
-							</Select>
-							<FormHelperText>
-								<FormattedMessage
-									id='settings.lastn'
-									defaultMessage='Number of visible videos'
-								/>
-							</FormHelperText>
-						</FormControl>
-					</form>
+					{ window.config && !window.config.lockLastN &&
+						<form className={classes.setting} autoComplete='off'>
+							<FormControl className={classes.formControl}>
+								<Select
+									value={settings.lastN || ''}
+									onChange={(event) =>
+									{
+										if (event.target.value)
+											roomClient.changeMaxSpotlights(event.target.value);
+									}}
+									name='Last N'
+									autoWidth
+									className={classes.selectEmpty}
+								>
+									{ Array.from(
+										{ length: window.config.maxLastN || 10 },
+										(_, i) => i + 1
+									).map((lastN) =>
+									{
+										return (
+											<MenuItem key={lastN} value={lastN}>
+												{lastN}
+											</MenuItem>
+										);
+									})}
+								</Select>
+								<FormHelperText>
+									<FormattedMessage
+										id='settings.lastn'
+										defaultMessage='Number of visible videos'
+									/>
+								</FormHelperText>
+							</FormControl>
+						</form>
+					}
 					<FormControlLabel
 						className={classes.setting}
 						control={<Checkbox checked={settings.permanentTopBar} onChange={onTogglePermanentTopBar} value='permanentTopBar' />}
