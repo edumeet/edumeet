@@ -9,6 +9,27 @@ const config = require('../config/config');
 
 const logger = new Logger('Room');
 
+// In case they are not configured properly
+const accessFromRoles =
+{
+	BYPASS_ROOM_LOCK : [ userRoles.ADMIN ],
+	BYPASS_LOBBY     : [ userRoles.NORMAL ],
+	...config.accessFromRoles
+};
+
+const permissionsFromRoles =
+{
+	CHANGE_ROOM_LOCK : [ userRoles.NORMAL ],
+	PROMOTE_PEER     : [ userRoles.NORMAL ],
+	SEND_CHAT        : [ userRoles.NORMAL ],
+	MODERATE_CHAT    : [ userRoles.MODERATOR ],
+	SHARE_SCREEN     : [ userRoles.NORMAL ],
+	SHARE_FILE       : [ userRoles.NORMAL ],
+	MODERATE_FILES   : [ userRoles.MODERATOR ],
+	MODERATE_ROOM    : [ userRoles.MODERATOR ],
+	...config.permissionsFromRoles
+};
+
 class Room extends EventEmitter
 {
 	/**
@@ -187,7 +208,11 @@ class Room extends EventEmitter
 
 			this._peerJoining(promotedPeer);
 
-			for (const peer of this._getJoinedPeers())
+			for (
+				const peer of this._getPeersWithPermission({
+					permission : permissionsFromRoles.PROMOTE_PEER
+				})
+			)
 			{
 				this._notification(peer.socket, 'lobby:promotedPeer', { peerId: id });
 			}
@@ -219,7 +244,11 @@ class Room extends EventEmitter
 		{
 			const { id, displayName } = changedPeer;
 
-			for (const peer of this._getJoinedPeers())
+			for (
+				const peer of this._getPeersWithPermission({
+					permission : permissionsFromRoles.PROMOTE_PEER
+				})
+			)
 			{
 				this._notification(peer.socket, 'lobby:changeDisplayName', { peerId: id, displayName });
 			}
@@ -229,7 +258,11 @@ class Room extends EventEmitter
 		{
 			const { id, picture } = changedPeer;
 
-			for (const peer of this._getJoinedPeers())
+			for (
+				const peer of this._getPeersWithPermission({
+					permission : permissionsFromRoles.PROMOTE_PEER
+				})
+			)
 			{
 				this._notification(peer.socket, 'lobby:changePicture', { peerId: id, picture });
 			}
@@ -241,7 +274,11 @@ class Room extends EventEmitter
 
 			const { id } = closedPeer;
 
-			for (const peer of this._getJoinedPeers())
+			for (
+				const peer of this._getPeersWithPermission({
+					permission : permissionsFromRoles.PROMOTE_PEER
+				})
+			)
 			{
 				this._notification(peer.socket, 'lobby:peerClosed', { peerId: id });
 			}
@@ -344,7 +381,11 @@ class Room extends EventEmitter
 	{
 		this._lobby.parkPeer(parkPeer);
 
-		for (const peer of this._getJoinedPeers())
+		for (
+			const peer of this._getPeersWithPermission({
+				permission : permissionsFromRoles.PROMOTE_PEER
+			})
+		)
 		{
 			this._notification(peer.socket, 'parkedPeer', { peerId: parkPeer.id });
 		}
@@ -1450,6 +1491,19 @@ class Room extends EventEmitter
 	{
 		return Object.values(this._peers)
 			.filter((peer) => peer.joined && peer !== excludePeer);
+	}
+
+	_getPeersWithPermission({ permission = null, excludePeer = undefined, joined = true })
+	{
+		return Object.values(this._peers)
+			.filter(
+				(peer) =>
+					peer.joined === joined &&
+					peer !== excludePeer &&
+					peer.roles.some(
+						(role) => permission.includes(role)
+					)
+			);
 	}
 
 	_timeoutCallback(callback)

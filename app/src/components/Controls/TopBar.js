@@ -136,6 +136,7 @@ const TopBar = (props) =>
 		openUsersTab,
 		unread,
 		canLock,
+		canPromote,
 		classes
 	} = props;
 
@@ -305,6 +306,7 @@ const TopBar = (props) =>
 									defaultMessage : 'Show lobby'
 								})}
 								color='inherit'
+								disabled={!canPromote}
 								onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
 							>
 								<PulsingBadge
@@ -380,6 +382,7 @@ TopBar.propTypes =
 	openUsersTab       : PropTypes.func.isRequired,
 	unread             : PropTypes.number.isRequired,
 	canLock            : PropTypes.bool.isRequired,
+	canPromote         : PropTypes.bool.isRequired,
 	classes            : PropTypes.object.isRequired,
 	theme              : PropTypes.object.isRequired
 };
@@ -397,7 +400,10 @@ const mapStateToProps = (state) =>
 			state.toolarea.unreadFiles,
 		canLock :
 			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role))
+				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role)),
+		canPromote :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.PROMOTE_PEER.includes(role))
 	});
 
 const mapDispatchToProps = (dispatch) =>
