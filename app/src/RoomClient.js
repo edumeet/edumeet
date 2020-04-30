@@ -31,8 +31,7 @@ let Spotlights;
 let requestTimeout,
 	transportOptions,
 	lastN,
-	mobileLastN,
-	defaultResolution;
+	mobileLastN;
 
 if (process.env.NODE_ENV !== 'test')
 {
@@ -40,8 +39,7 @@ if (process.env.NODE_ENV !== 'test')
 		requestTimeout,
 		transportOptions,
 		lastN,
-		mobileLastN,
-		defaultResolution
+		mobileLastN
 	} = window.config);
 }
 
@@ -204,9 +202,6 @@ export default class RoomClient
 
 		// Our WebTorrent client
 		this._webTorrent = null;
-
-		if (defaultResolution)
-			store.dispatch(settingsActions.setVideoResolution(defaultResolution));
 
 		// Max spotlights
 		if (device.platform === 'desktop')
@@ -532,11 +527,6 @@ export default class RoomClient
 					logger.error('_soundAlert.play() | failed: %o', error);
 				});
 		}
-	}
-
-	notify(text)
-	{
-		store.dispatch(requestActions.notify({ text: text }));
 	}
 
 	timeoutCallback(callback)
