@@ -4,6 +4,12 @@ export const setSelectedAudioDevice = (deviceId) =>
 		payload : { deviceId }
 	});
 
+export const setSelectedAudioOutputDevice = (deviceId) =>
+	({
+		type    : 'CHANGE_AUDIO_OUTPUT_DEVICE',
+		payload : { deviceId }
+	});
+
 export const setSelectedWebcamDevice = (deviceId) =>
 	({
 		type    : 'CHANGE_WEBCAM',
@@ -30,6 +36,16 @@ export const toggleAdvancedMode = () =>
 export const togglePermanentTopBar = () =>
 	({
 		type : 'TOGGLE_PERMANENT_TOPBAR'
+	});
+
+export const toggleHiddenControls = () =>
+	({
+		type : 'TOGGLE_HIDDEN_CONTROLS'
+	});
+
+export const toggleNotificationSounds = () =>
+	({
+		type : 'TOGGLE_NOTIFICATION_SOUNDS'
 	});
 
 export const setLastN = (lastN) =>

@@ -23,6 +23,8 @@ import VideoWindow from './VideoWindow/VideoWindow';
 import LockDialog from './AccessControl/LockDialog/LockDialog';
 import Settings from './Settings/Settings';
 import TopBar from './Controls/TopBar';
+import WakeLock from 'react-wakelock-react16';
+import ExtraVideo from './Controls/ExtraVideo';
 
 const TIMEOUT = 5 * 1000;
 
@@ -138,6 +140,7 @@ class Room extends React.PureComponent
 	{
 		const {
 			room,
+			browser,
 			advancedMode,
 			toolAreaOpen,
 			toggleToolArea,
@@ -157,13 +160,13 @@ class Room extends React.PureComponent
 					<CookieConsent
 						buttonText={
 							<FormattedMessage
-								id = 'room.consentUnderstand'
-								defaultMessage = 'I understand'
+								id='room.consentUnderstand'
+								defaultMessage='I understand'
 							/>
 						}
 					>
 						<FormattedMessage
-							id = 'room.cookieConsent'
+							id='room.cookieConsent'
 							defaultMessage='This website uses cookies to enhance the user experience'
 						/>
 					</CookieConsent>
@@ -202,6 +205,10 @@ class Room extends React.PureComponent
 					</Hidden>
 				</nav>
 
+				{ browser.platform === 'mobile' && browser.os !== 'ios' &&
+					<WakeLock />
+				}
+
 				<View advancedMode={advancedMode} />
 
 				{ room.lockDialogOpen &&
@@ -211,6 +218,10 @@ class Room extends React.PureComponent
 				{ room.settingsOpen &&
 					<Settings />
 				}
+
+				{ room.extraVideoOpen &&
+					<ExtraVideo />
+				}
 			</div>
 		);
 	}
@@ -219,6 +230,7 @@ class Room extends React.PureComponent
 Room.propTypes =
 {
 	room               : appPropTypes.Room.isRequired,
+	browser            : PropTypes.object.isRequired,
 	advancedMode       : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
@@ -230,6 +242,7 @@ Room.propTypes =
 const mapStateToProps = (state) =>
 	({
 		room         : state.room,
+		browser      : state.me.browser,
 		advancedMode : state.settings.advancedMode,
 		toolAreaOpen : state.toolarea.toolAreaOpen
 	});
@@ -255,6 +268,7 @@ export default connect(
 		{
 			return (
 				prev.room === next.room &&
+				prev.me.browser === next.me.browser &&
 				prev.settings.advancedMode === next.settings.advancedMode &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);

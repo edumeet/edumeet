@@ -34,14 +34,32 @@ export const setPeerScreenInProgress = (peerId, flag) =>
 		payload : { peerId, flag }
 	});
 
-export const setPeerRaiseHandState = (peerId, raiseHandState) =>
+export const setPeerRaisedHand = (peerId, raisedHand, raisedHandTimestamp) =>
 	({
-		type    : 'SET_PEER_RAISE_HAND_STATE',
-		payload : { peerId, raiseHandState }
+		type    : 'SET_PEER_RAISED_HAND',
+		payload : { peerId, raisedHand, raisedHandTimestamp }
 	});
 
 export const setPeerPicture = (peerId, picture) =>
 	({
 		type    : 'SET_PEER_PICTURE',
 		payload : { peerId, picture }
+	});
+
+export const addPeerRole = (peerId, role) =>
+	({
+		type    : 'ADD_PEER_ROLE',
+		payload : { peerId, role }
+	});
+
+export const removePeerRole = (peerId, role) =>
+	({
+		type    : 'REMOVE_PEER_ROLE',
+		payload : { peerId, role }
+	});
+
+export const setPeerKickInProgress = (peerId, flag) =>
+	({
+		type    : 'SET_PEER_KICK_IN_PROGRESS',
+		payload : { peerId, flag }
 	});

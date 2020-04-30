@@ -15,3 +15,8 @@ export const addChatHistory = (chatHistory) =>
 		type    : 'ADD_CHAT_HISTORY',
 		payload : { chatHistory }
 	});
+
+export const clearChat = () =>
+	({
+		type : 'CLEAR_CHAT'
+	});

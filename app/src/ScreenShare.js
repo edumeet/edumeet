@@ -225,10 +225,7 @@ export default class ScreenShare
 						return new DisplayMediaScreenShare();
 				}
 				case 'chrome':
-				{
-					return new DisplayMediaScreenShare();
-				}
-				case 'msedge':
+				case 'edge':
 				{
 					return new DisplayMediaScreenShare();
 				}

@@ -143,7 +143,8 @@ class Democratic extends React.PureComponent
 			<div
 				className={classnames(
 					classes.root,
-					toolbarsVisible || permanentTopBar ? classes.showingToolBar : classes.hiddenToolBar
+					toolbarsVisible || permanentTopBar ?
+						classes.showingToolBar : classes.hiddenToolBar
 				)}
 				ref={this.peersRef}
 			>
@@ -171,12 +172,12 @@ class Democratic extends React.PureComponent
 
 Democratic.propTypes =
 {
-	advancedMode     : PropTypes.bool,
-	boxes            : PropTypes.number,
-	spotlightsPeers  : PropTypes.array.isRequired,
-	toolbarsVisible  : PropTypes.bool.isRequired,
-	permanentTopBar     : PropTypes.bool,
-	classes          : PropTypes.object.isRequired
+	advancedMode    : PropTypes.bool,
+	boxes           : PropTypes.number,
+	spotlightsPeers : PropTypes.array.isRequired,
+	toolbarsVisible : PropTypes.bool.isRequired,
+	permanentTopBar : PropTypes.bool,
+	classes         : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -185,7 +186,7 @@ const mapStateToProps = (state) =>
 		boxes           : videoBoxesSelector(state),
 		spotlightsPeers : spotlightPeersSelector(state),
 		toolbarsVisible : state.room.toolbarsVisible,
-		permanentTopBar    : state.settings.permanentTopBar
+		permanentTopBar : state.settings.permanentTopBar
 	};
 };
 

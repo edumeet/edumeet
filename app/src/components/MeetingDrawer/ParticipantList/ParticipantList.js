@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
 	passivePeersSelector,
-	spotlightPeersSelector
+	spotlightSortedPeersSelector
 } from '../../Selectors';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
+import ListModerator from './ListModerator';
 import Volume from '../../Containers/Volume';
 
 const styles = (theme) =>
@@ -30,12 +31,10 @@ const styles = (theme) =>
 		},
 		listheader :
 		{
-			padding    : theme.spacing(1),
 			fontWeight : 'bolder'
 		},
 		listItem :
 		{
-			padding      : theme.spacing(1),
 			width        : '100%',
 			overflow     : 'hidden',
 			cursor       : 'pointer',
@@ -76,6 +75,7 @@ class ParticipantList extends React.PureComponent
 		const {
 			roomClient,
 			advancedMode,
+			isModerator,
 			passivePeers,
 			selectedPeerId,
 			spotlightPeers,
@@ -84,6 +84,17 @@ class ParticipantList extends React.PureComponent
 
 		return (
 			<div className={classes.root} ref={(node) => { this.node = node; }}>
+				{ isModerator &&
+					<ul className={classes.list}>
+						<li className={classes.listheader}>
+							<FormattedMessage
+								id='room.moderatoractions'
+								defaultMessage='Moderator actions'
+							/>
+						</li>
+						<ListModerator />
+					</ul>
+				}
 				<ul className={classes.list}>
 					<li className={classes.listheader}>
 						<FormattedMessage
@@ -100,16 +111,20 @@ class ParticipantList extends React.PureComponent
 							defaultMessage='Participants in Spotlight'
 						/>
 					</li>
-					{ spotlightPeers.map((peerId) => (
+					{ spotlightPeers.map((peer) => (
 						<li
-							key={peerId}
+							key={peer.id}
 							className={classNames(classes.listItem, {
-								selected : peerId === selectedPeerId
+								selected : peer.id === selectedPeerId
 							})}
-							onClick={() => roomClient.setSelectedPeer(peerId)}
+							onClick={() => roomClient.setSelectedPeer(peer.id)}
 						>
-							<ListPeer id={peerId} advancedMode={advancedMode}>
-								<Volume small id={peerId} />
+							<ListPeer
+								id={peer.id}
+								advancedMode={advancedMode}
+								isModerator={isModerator}
+							>
+								<Volume small id={peer.id} />
 							</ListPeer>
 						</li>
 					))}
@@ -121,15 +136,19 @@ class ParticipantList extends React.PureComponent
 							defaultMessage='Passive Participants'
 						/>
 					</li>
-					{ passivePeers.map((peerId) => (
+					{ passivePeers.map((peer) => (
 						<li
-							key={peerId}
+							key={peer.id}
 							className={classNames(classes.listItem, {
-								selected : peerId === selectedPeerId
+								selected : peer.id === selectedPeerId
 							})}
-							onClick={() => roomClient.setSelectedPeer(peerId)}
+							onClick={() => roomClient.setSelectedPeer(peer.id)}
 						>
-							<ListPeer id={peerId} advancedMode={advancedMode} />
+							<ListPeer
+								id={peer.id}
+								advancedMode={advancedMode}
+								isModerator={isModerator}
+							/>
 						</li>
 					))}
 				</ul>
@@ -142,6 +161,7 @@ ParticipantList.propTypes =
 {
 	roomClient     : PropTypes.any.isRequired,
 	advancedMode   : PropTypes.bool,
+	isModerator    : PropTypes.bool,
 	passivePeers   : PropTypes.array,
 	selectedPeerId : PropTypes.string,
 	spotlightPeers : PropTypes.array,
@@ -151,9 +171,12 @@ ParticipantList.propTypes =
 const mapStateToProps = (state) =>
 {
 	return {
+		isModerator :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.MODERATE_ROOM.includes(role)),
 		passivePeers   : passivePeersSelector(state),
 		selectedPeerId : state.room.selectedPeerId,
-		spotlightPeers : spotlightPeersSelector(state)
+		spotlightPeers : spotlightSortedPeersSelector(state)
 	};
 };
 
@@ -165,6 +188,8 @@ const ParticipantListContainer = withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+				prev.me.roles === next.me.roles &&
 				prev.peers === next.peers &&
 				prev.room.spotlights === next.room.spotlights &&
 				prev.room.selectedPeerId === next.room.selectedPeerId
