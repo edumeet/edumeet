@@ -465,9 +465,9 @@ export default class RoomClient
 		});
 	}
 
-	login()
+	login(roomId = this._roomId)
 	{
-		const url = `/auth/login?peerId=${this._peerId}&roomId=${this._roomId}`;
+		const url = `/auth/login?peerId=${this._peerId}&roomId=${roomId}`;
 
 		window.open(url, 'loginWindow');
 	}
