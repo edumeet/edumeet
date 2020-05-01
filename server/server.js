@@ -133,8 +133,8 @@ async function run()
 	// Open the interactive server.
 	await interactiveServer(rooms, peers);
 
-        // start Prometheus exporter
-        await promExporter(rooms, peers);
+	// start Prometheus exporter
+	await promExporter(rooms, peers);
 
 	if (typeof(config.auth) === 'undefined')
 	{
