@@ -336,7 +336,8 @@ class Peer extends EventEmitter
 			id          : this.id,
 			displayName : this.displayName,
 			picture     : this.picture,
-			roles       : this.roles
+			roles       : this.roles,
+			raisedHand  : this.raisedHand
 		};
 
 		return peerInfo;
