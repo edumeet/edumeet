@@ -172,27 +172,21 @@ class Filmstrip extends React.PureComponent
 		window.removeEventListener('resize', this.updateDimensions);
 	}
 
-	componentWillUpdate(nextProps)
-	{
-		if (nextProps !== this.props)
-		{
-			if (
-				nextProps.activeSpeakerId != null &&
-				nextProps.activeSpeakerId !== this.props.myId
-			)
-			{
-				// eslint-disable-next-line react/no-did-update-set-state
-				this.setState({
-					lastSpeaker : nextProps.activeSpeakerId
-				});
-			}
-		}
-	}
-
 	componentDidUpdate(prevProps)
 	{
 		if (prevProps !== this.props)
 		{
+			if (
+				this.props.activeSpeakerId != null &&
+				this.props.activeSpeakerId !== this.props.myId
+			)
+			{
+				// eslint-disable-next-line react/no-did-update-set-state
+				this.setState({
+					lastSpeaker : this.props.activeSpeakerId
+				});
+			}
+
 			this.updateDimensions();
 		}
 	}
