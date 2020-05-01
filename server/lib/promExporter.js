@@ -25,15 +25,15 @@ const metadata = {
 common_labels = function(both, fn) {
 	for (let [room_id, room] of rooms) {
 		for (let [peer_id, peer] of peers) {
-				if (fn(peer)) {
-					let display_name = peer._displayName;
+			if (fn(peer)) {
+				let display_name = peer._displayName;
 
-					let user_agent = peer._socket.client.request.headers['user-agent'];
-					let kind = both.kind;
-					let codec = both.rtpParameters.codecs[0].mimeType.split('/')[1];
-					return { room_id, peer_id, display_name, user_agent, kind, codec };
-				}
-		 }
+				let user_agent = peer._socket.client.request.headers['user-agent'];
+				let kind = both.kind;
+				let codec = both.rtpParameters.codecs[0].mimeType.split('/')[1];
+				return { room_id, peer_id, display_name, user_agent, kind, codec };
+			}
+		}
 	}
 	throw new Error('cannot find generic labels');
 }
