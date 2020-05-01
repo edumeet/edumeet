@@ -597,13 +597,21 @@ class Room extends EventEmitter
 					.filter((joinedPeer) => joinedPeer.id !== peer.id)
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
+				const lobbyPeers = this._lobby.peerList();
+
 				cb(null, {
 					roles                : peer.roles,
 					peers                : peerInfos,
 					tracker              : config.fileTracker,
 					authenticated        : peer.authenticated,
 					permissionsFromRoles : permissionsFromRoles,
-					userRoles            : userRoles
+					userRoles            : userRoles,
+					chatHistory          : this._chatHistory,
+					fileHistory          : this._fileHistory,
+					lastNHistory         : this._lastN,
+					locked               : this._locked,
+					lobbyPeers           : lobbyPeers,
+					accessCode           : this._accessCode
 				});
 
 				// Mark the new Peer as joined.
@@ -1074,26 +1082,6 @@ class Room extends EventEmitter
 
 				// Return no error
 				cb();
-
-				break;
-			}
-
-			case 'serverHistory':
-			{
-				// Return to sender
-				const lobbyPeers = this._lobby.peerList();
-
-				cb(
-					null,
-					{
-						chatHistory  : this._chatHistory,
-						fileHistory  : this._fileHistory,
-						lastNHistory : this._lastN,
-						locked       : this._locked,
-						lobbyPeers   : lobbyPeers,
-						accessCode   : this._accessCode
-					}
-				);
 
 				break;
 			}

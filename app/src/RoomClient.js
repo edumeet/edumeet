@@ -844,62 +844,6 @@ export default class RoomClient
 		}
 	}
 
-	async getServerHistory()
-	{
-		logger.debug('getServerHistory()');
-
-		try
-		{
-			const {
-				chatHistory,
-				fileHistory,
-				lastNHistory,
-				locked,
-				lobbyPeers,
-				accessCode
-			} = await this.sendRequest('serverHistory');
-
-			(chatHistory.length > 0) && store.dispatch(
-				chatActions.addChatHistory(chatHistory));
-
-			(fileHistory.length > 0) && store.dispatch(
-				fileActions.addFileHistory(fileHistory));
-
-			if (lastNHistory.length > 0)
-			{
-				logger.debug('Got lastNHistory');
-
-				// Remove our self from list
-				const index = lastNHistory.indexOf(this._peerId);
-
-				lastNHistory.splice(index, 1);
-
-				this._spotlights.addSpeakerList(lastNHistory);
-			}
-
-			locked ? 
-				store.dispatch(roomActions.setRoomLocked()) :
-				store.dispatch(roomActions.setRoomUnLocked());
-
-			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
-			{
-				store.dispatch(
-					lobbyPeerActions.addLobbyPeer(peer.peerId));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
-			});
-
-			(accessCode != null) && store.dispatch(
-				roomActions.setAccessCode(accessCode));
-		}
-		catch (error)
-		{
-			logger.error('getServerHistory() | failed: %o', error);
-		}
-	}
-
 	async muteMic()
 	{
 		logger.debug('muteMic()');
@@ -2733,7 +2677,13 @@ export default class RoomClient
 				peers,
 				tracker,
 				permissionsFromRoles,
-				userRoles
+				userRoles,
+				chatHistory,
+				fileHistory,
+				lastNHistory,
+				locked,
+				lobbyPeers,
+				accessCode
 			} = await this.sendRequest(
 				'join',
 				{
@@ -2788,6 +2738,38 @@ export default class RoomClient
 				this.updateSpotlights(spotlights);
 			});
 
+			(chatHistory.length > 0) && store.dispatch(
+				chatActions.addChatHistory(chatHistory));
+
+			(fileHistory.length > 0) && store.dispatch(
+				fileActions.addFileHistory(fileHistory));
+
+			if (lastNHistory.length > 0)
+			{
+				logger.debug('_joinRoom() | got lastN history');
+
+				this._spotlights.addSpeakerList(
+					lastNHistory.filter((peerId) => peerId !== this._peerId)
+				);
+			}
+
+			locked ? 
+				store.dispatch(roomActions.setRoomLocked()) :
+				store.dispatch(roomActions.setRoomUnLocked());
+
+			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
+			{
+				store.dispatch(
+					lobbyPeerActions.addLobbyPeer(peer.peerId));
+				store.dispatch(
+					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
+				store.dispatch(
+					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+			});
+
+			(accessCode != null) && store.dispatch(
+				roomActions.setAccessCode(accessCode));
+
 			// Don't produce if explicitly requested to not to do it.
 			if (this._produce)
 			{
@@ -2820,8 +2802,6 @@ export default class RoomClient
 
 			// Clean all the existing notifications.
 			store.dispatch(notificationActions.removeAllNotifications());
-
-			this.getServerHistory();
 
 			store.dispatch(requestActions.notify(
 				{
