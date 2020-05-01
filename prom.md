@@ -30,10 +30,6 @@ If `multiparty-meeting` was installed with
 it may be necessary to open the `iptables` firewall that was established
 with `ferm` for incoming TCP traffic on `PROM_PORT`.
 
-## License
-
-MIT License (without copyright notice)
-
 ## Metrics
 
 | metric | value |
