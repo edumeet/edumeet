@@ -81,11 +81,14 @@ class FullView extends React.PureComponent
 		this._setTracks(videoTrack);
 	}
 
-	componentDidUpdate()
+	componentDidUpdate(prevProps)
 	{
-		const { videoTrack } = this.props;
+		if (prevProps !== this.props)
+		{
+			const { videoTrack } = this.props;
 
-		this._setTracks(videoTrack);
+			this._setTracks(videoTrack);
+		}
 	}
 
 	_setTracks(videoTrack)
