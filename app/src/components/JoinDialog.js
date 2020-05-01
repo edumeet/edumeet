@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
+import classnames from 'classnames';
 import isElectron from 'is-electron';
 import * as settingsActions from '../actions/settingsActions';
 import PropTypes from 'prop-types';
@@ -128,9 +129,9 @@ const DialogTitle = withStyles(styles)((props) =>
 
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 			<Typography variant='h5'>{children}</Typography>
-			{ window.config && window.config.loginEnabled &&
+			{ window.config.loginEnabled &&
 				<Tooltip
 					onClose={handleTooltipClose}
 					onOpen={handleTooltipOpen}
@@ -147,7 +148,9 @@ const DialogTitle = withStyles(styles)((props) =>
 						{ myPicture ?
 							<Avatar src={myPicture} className={classes.largeAvatar} />
 							:
-							<AccountCircle className={classes.largeIcon} />
+							<AccountCircle
+								className={classnames(classes.largeIcon, loggedIn && classes.green)}
+							/>
 						}
 					</IconButton>
 				</Tooltip>
@@ -217,11 +220,11 @@ const JoinDialog = ({
 					myPicture={myPicture}
 					onLogin={() =>
 					{
-						loggedIn ? roomClient.logout() : roomClient.login();
+						loggedIn ? roomClient.logout() : roomClient.login(roomId);
 					}}
 					loggedIn={loggedIn}
 				>
-					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
+					{ window.config.title ? window.config.title : 'Multiparty meeting' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>
@@ -316,6 +319,7 @@ const JoinDialog = ({
 							className={classes.green}
 							gutterBottom
 							variant='h6'
+							style={{ fontWeight: '600' }}
 							align='center'
 						>
 							<FormattedMessage
@@ -324,7 +328,11 @@ const JoinDialog = ({
 							/>
 						</DialogContentText>
 						{ room.signInRequired ?
-							<DialogContentText gutterBottom>
+							<DialogContentText
+								gutterBottom
+								variant='h5'
+								style={{ fontWeight: '600' }}
+							>
 								<FormattedMessage
 									id='room.emptyRequireLogin'
 									defaultMessage={
@@ -334,7 +342,11 @@ const JoinDialog = ({
 								/>
 							</DialogContentText>
 							:
-							<DialogContentText gutterBottom>
+							<DialogContentText
+								gutterBottom
+								variant='h5'
+								style={{ fontWeight: '600' }}
+							>
 								<FormattedMessage
 									id='room.locketWait'
 									defaultMessage='The room is locked - hang on until somebody lets you in ...'

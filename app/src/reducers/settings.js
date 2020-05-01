@@ -4,7 +4,8 @@ const initialState =
 	selectedWebcam      : null,
 	selectedAudioDevice : null,
 	advancedMode        : false,
-	resolution          : 'medium', // low, medium, high, veryhigh, ultra
+	// low, medium, high, veryhigh, ultra
+	resolution          : window.config.defaultResolution || 'medium',
 	lastN               : 4,
 	permanentTopBar     : true
 };

@@ -80,6 +80,10 @@ const styles = (theme) =>
 		{
 			margin  : theme.spacing(1, 0),
 			padding : theme.spacing(0, 1)
+		},
+		green :
+		{
+			color : 'rgba(0, 153, 0, 1)'
 		}
 	});
 
@@ -136,6 +140,7 @@ const TopBar = (props) =>
 		openUsersTab,
 		unread,
 		canLock,
+		canPromote,
 		classes
 	} = props;
 
@@ -194,14 +199,14 @@ const TopBar = (props) =>
 						<MenuIcon />
 					</IconButton>
 				</PulsingBadge>
-				{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+				{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 				<Typography
 					className={classes.title}
 					variant='h6'
 					color='inherit'
 					noWrap
 				>
-					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
+					{ window.config.title ? window.config.title : 'Multiparty meeting' }
 				</Typography>
 				<div className={classes.grow} />
 				<div className={classes.actionButtons}>
@@ -305,6 +310,7 @@ const TopBar = (props) =>
 									defaultMessage : 'Show lobby'
 								})}
 								color='inherit'
+								disabled={!canPromote}
 								onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
 							>
 								<PulsingBadge
@@ -333,7 +339,7 @@ const TopBar = (props) =>
 								{ myPicture ?
 									<Avatar src={myPicture} />
 									:
-									<AccountCircle />
+									<AccountCircle className={loggedIn && classes.green} />
 								}
 							</IconButton>
 						</Tooltip>
@@ -380,6 +386,7 @@ TopBar.propTypes =
 	openUsersTab       : PropTypes.func.isRequired,
 	unread             : PropTypes.number.isRequired,
 	canLock            : PropTypes.bool.isRequired,
+	canPromote         : PropTypes.bool.isRequired,
 	classes            : PropTypes.object.isRequired,
 	theme              : PropTypes.object.isRequired
 };
@@ -397,7 +404,10 @@ const mapStateToProps = (state) =>
 			state.toolarea.unreadFiles,
 		canLock :
 			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role))
+				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role)),
+		canPromote :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.PROMOTE_PEER.includes(role))
 	});
 
 const mapDispatchToProps = (dispatch) =>

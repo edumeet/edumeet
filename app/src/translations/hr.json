@@ -55,6 +55,7 @@
 	"room.clearChat": null,
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": "Vaš preglednik ne podržava prepoznavanje govora",
+	"room.moderatoractions": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 
@@ -69,6 +70,8 @@
 	"tooltip.settings": "Prikaži postavke",
 	"tooltip.participants": "Pokažite sudionike",
 	"tooltip.kickParticipant": "Izbaci sudionika",
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
 
 	"label.roomName": "Naziv sobe",
 	"label.chooseRoomButton": "Nastavi",

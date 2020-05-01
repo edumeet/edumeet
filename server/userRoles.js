@@ -7,5 +7,5 @@ module.exports = {
 	// Don't change anything after this point
 
 	// All users have this role by default, do not change or remove this role
-	NORMAL           : 'normal'
+	NORMAL : 'normal'
 };

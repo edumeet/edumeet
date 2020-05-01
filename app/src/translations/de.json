@@ -55,6 +55,7 @@
 	"room.clearChat": null,
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": "Dein Browser unterstützt keine Spracherkennung",
+	"room.moderatoractions": null,
 
   	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
 	
@@ -69,6 +70,8 @@
 	"tooltip.settings": "Einstellungen",
 	"tooltip.participants": "Teilnehmer",
 	"tooltip.kickParticipant": "Teilnehmer rauswerfen",
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
 
 	"label.roomName": "Name des Raums",
 	"label.chooseRoomButton": "Weiter",

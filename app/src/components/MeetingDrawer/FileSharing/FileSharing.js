@@ -36,7 +36,7 @@ const FileSharing = (props) =>
 	{
 		if (event.target.files.length > 0)
 		{
-			props.roomClient.shareFiles(event.target.files);
+			await props.roomClient.shareFiles(event.target.files);
 		}
 	};
 
@@ -65,6 +65,8 @@ const FileSharing = (props) =>
 				type='file'
 				disabled={!canShare}
 				onChange={handleFileChange}
+				// Need to reset to be able to share same file twice
+				onClick={(e) => (e.target.value = null)}
 				id='share-files-button'
 			/>
 			<label htmlFor='share-files-button'>

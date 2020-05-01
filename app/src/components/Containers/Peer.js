@@ -12,8 +12,8 @@ import { useIntl, FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
 import Tooltip from '@material-ui/core/Tooltip';
 import Fab from '@material-ui/core/Fab';
-import MicIcon from '@material-ui/icons/Mic';
-import MicOffIcon from '@material-ui/icons/MicOff';
+import VolumeUpIcon from '@material-ui/icons/VolumeUp';
+import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import NewWindowIcon from '@material-ui/icons/OpenInNew';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import Volume from './Volume';
@@ -252,9 +252,9 @@ const Peer = (props) =>
 									}}
 								>
 									{ micEnabled ?
-										<MicIcon />
+										<VolumeUpIcon />
 										:
-										<MicOffIcon />
+										<VolumeOffIcon />
 									}
 								</Fab>
 							</div>
@@ -340,6 +340,7 @@ const Peer = (props) =>
 						videoMultiLayer={webcamConsumer && webcamConsumer.type !== 'simple'}
 						videoTrack={webcamConsumer && webcamConsumer.track}
 						videoVisible={videoVisible}
+						audioTrack={micConsumer && micConsumer.track}
 						audioCodec={micConsumer && micConsumer.codec}
 						videoCodec={webcamConsumer && webcamConsumer.codec}
 						audioScore={micConsumer ? micConsumer.score : null}

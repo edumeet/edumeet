@@ -55,6 +55,7 @@
 	"room.clearChat": null,
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
+	"room.moderatoractions": null,
 
 	"me.mutedPTT": null,
 
@@ -69,6 +70,8 @@
 	"tooltip.settings": "Beállítások",
 	"tooltip.participants": "Résztvevők",
 	"tooltip.kickParticipant": null,
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
