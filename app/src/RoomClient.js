@@ -2052,6 +2052,8 @@ export default class RoomClient
 							lobbyPeerActions.addLobbyPeer(peerId));
 						store.dispatch(
 							roomActions.setToolbarsVisible(true));
+
+						this._soundNotification();
 	
 						store.dispatch(requestActions.notify(
 							{
@@ -2061,6 +2063,43 @@ export default class RoomClient
 								})
 							}));
 	
+						break;
+					}
+
+					case 'parkedPeers':
+					{
+						const { lobbyPeers } = notification.data;
+
+						if (lobbyPeers.length > 0)
+						{
+							lobbyPeers.forEach((peer) =>
+							{
+								store.dispatch(
+									lobbyPeerActions.addLobbyPeer(peer.peerId));
+								store.dispatch(
+									lobbyPeerActions.setLobbyPeerDisplayName(
+										peer.displayName,
+										peer.peerId
+									)
+								);
+								store.dispatch(
+									lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+							});
+	
+							store.dispatch(
+								roomActions.setToolbarsVisible(true));
+
+							this._soundNotification();
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'room.newLobbyPeer',
+										defaultMessage : 'New participant entered the lobby'
+									})
+								}));
+						}
+
 						break;
 					}
 	

@@ -530,6 +530,17 @@ class Room extends EventEmitter
 				peerId : peer.id,
 				role   : newRole
 			}, true, true);
+
+			// Got permission to promote peers, notify peer of
+			// peers in lobby
+			if (permissionsFromRoles.PROMOTE_PEER.includes(newRole))
+			{
+				const lobbyPeers = this._lobby.peerList();
+
+				lobbyPeers.length > 0 && this._notification(peer.socket, 'parkedPeers', {
+					lobbyPeers
+				});
+			}
 		});
 
 		peer.on('lostRole', ({ oldRole }) =>
