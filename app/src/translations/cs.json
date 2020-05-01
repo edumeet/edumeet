@@ -58,6 +58,9 @@
 
 	"me.mutedPTT": null,
 
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
 	"tooltip.login": "Přihlášení",
 	"tooltip.logout": "Odhlášení",
 	"tooltip.admitFromLobby": "Povolit uživatele z Přijímací místnosti",

@@ -59,6 +59,9 @@
 
 	"me.mutedPTT": null,
 
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
 	"tooltip.login": "Σύνδεση",
 	"tooltip.logout": "Αποσύνδεση",
 	"tooltip.admitFromLobby": "Admit from lobby",

@@ -2457,7 +2457,9 @@ export default class RoomClient
 								{
 									text : intl.formatMessage({
 										id             : 'roles.gotRole',
-										defaultMessage : `You got the role: ${role}`
+										defaultMessage : 'You got the role: {role}'
+									}, {
+										role
 									})
 								}));
 						}
@@ -2479,7 +2481,9 @@ export default class RoomClient
 								{
 									text : intl.formatMessage({
 										id             : 'roles.lostRole',
-										defaultMessage : `You lost the role: ${role}`
+										defaultMessage : 'You lost the role: {role}'
+									}, {
+										role
 									})
 								}));
 						}

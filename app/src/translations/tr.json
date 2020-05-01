@@ -57,6 +57,11 @@
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
 
+	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
 	"tooltip.login": "Giriş",
 	"tooltip.logout": "Çıkış",
 	"tooltip.admitFromLobby": "Lobiden içeri al",

@@ -59,6 +59,9 @@
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
 	"tooltip.login": "Prijava",
 	"tooltip.logout": "Odjava",
 	"tooltip.admitFromLobby": "Pusti iz predvorja",

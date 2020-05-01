@@ -59,6 +59,9 @@
 
 	"me.mutedPTT": null,
 
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
 	"tooltip.login": "登录",
 	"tooltip.logout": "注销",
 	"tooltip.admitFromLobby": "从大厅允许",

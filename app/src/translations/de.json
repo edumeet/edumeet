@@ -57,7 +57,10 @@
 	"room.speechUnsupported": "Dein Browser unterstützt keine Spracherkennung",
 	"room.moderatoractions": null,
 
-  	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 	
 	"tooltip.login": "Anmelden",
 	"tooltip.logout": "Abmelden",

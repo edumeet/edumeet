@@ -59,6 +59,9 @@
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
+	"roles.gotRole": "Du fikk rollen: {role}",
+	"roles.lostRole": "Du mistet rollen: {role}",
+
 	"tooltip.login": "Logg in",
 	"tooltip.logout": "Logg ut",
 	"tooltip.admitFromLobby": "Slipp inn fra lobby",

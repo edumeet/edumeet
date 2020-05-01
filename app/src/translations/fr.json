@@ -59,6 +59,9 @@
 
 	"me.mutedPTT": null,
 
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
 	"tooltip.login": "Connexion",
 	"tooltip.logout": "Déconnexion",
 	"tooltip.admitFromLobby": "Autorisé depuis la salle d'attente",

@@ -59,6 +59,9 @@
 
 	"me.mutedPTT": null,
 
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
 	"tooltip.login": "Log ind",
 	"tooltip.logout": "Log ud",
 	"tooltip.admitFromLobby": "Giv adgang fra lobbyen",

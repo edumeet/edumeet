@@ -59,6 +59,9 @@
 
 	"me.mutedPTT": null,
 
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
 	"tooltip.login": "Entrar",
 	"tooltip.logout": "Sair",
 	"tooltip.admitFromLobby": "Admitir da sala de espera",

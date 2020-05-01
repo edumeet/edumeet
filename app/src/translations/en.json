@@ -59,6 +59,9 @@
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
+	"roles.gotRole": "You got the role: {role}",
+	"roles.lostRole": "You lost the role: {role}",
+
 	"tooltip.login": "Log in",
 	"tooltip.logout": "Log out",
 	"tooltip.admitFromLobby": "Admit from lobby",
