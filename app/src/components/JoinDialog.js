@@ -149,7 +149,7 @@ const DialogTitle = withStyles(styles)((props) =>
 							<Avatar src={myPicture} className={classes.largeAvatar} />
 							:
 							<AccountCircle
-								className={classnames(classes.largeIcon, loggedIn && classes.green)}
+								className={classnames(classes.largeIcon, loggedIn ? classes.green : null)}
 							/>
 						}
 					</IconButton>

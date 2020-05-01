@@ -81,6 +81,10 @@ const styles = (theme) =>
 			margin  : theme.spacing(1, 0),
 			padding : theme.spacing(0, 1)
 		},
+		disabledButton :
+		{
+			margin : theme.spacing(1, 0)
+		},
 		green :
 		{
 			color : 'rgba(0, 153, 0, 1)'
@@ -270,32 +274,34 @@ const TopBar = (props) =>
 						</IconButton>
 					</Tooltip>
 					<Tooltip title={lockTooltip}>
-						<IconButton
-							aria-label={intl.formatMessage({
-								id             : 'tooltip.lockRoom',
-								defaultMessage : 'Lock room'
-							})}
-							className={classes.actionButton}
-							color='inherit'
-							disabled={!canLock}
-							onClick={() =>
-							{
-								if (room.locked)
+						<span className={classes.disabledButton}>
+							<IconButton
+								aria-label={intl.formatMessage({
+									id             : 'tooltip.lockRoom',
+									defaultMessage : 'Lock room'
+								})}
+								className={classes.actionButton}
+								color='inherit'
+								disabled={!canLock}
+								onClick={() =>
 								{
-									roomClient.unlockRoom();
+									if (room.locked)
+									{
+										roomClient.unlockRoom();
+									}
+									else
+									{
+										roomClient.lockRoom();
+									}
+								}}
+							>
+								{ room.locked ?
+									<LockIcon />
+									:
+									<LockOpenIcon />
 								}
-								else
-								{
-									roomClient.lockRoom();
-								}
-							}}
-						>
-							{ room.locked ?
-								<LockIcon />
-								:
-								<LockOpenIcon />
-							}
-						</IconButton>
+							</IconButton>
+						</span>
 					</Tooltip>
 					{ lobbyPeers.length > 0 &&
 						<Tooltip 
@@ -304,22 +310,25 @@ const TopBar = (props) =>
 								defaultMessage : 'Show lobby'
 							})}
 						>
-							<IconButton
-								aria-label={intl.formatMessage({
-									id             : 'tooltip.lobby',
-									defaultMessage : 'Show lobby'
-								})}
-								color='inherit'
-								disabled={!canPromote}
-								onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
-							>
-								<PulsingBadge
-									color='secondary'
-									badgeContent={lobbyPeers.length}
+							<span className={classes.disabledButton}>
+								<IconButton
+									aria-label={intl.formatMessage({
+										id             : 'tooltip.lobby',
+										defaultMessage : 'Show lobby'
+									})}
+									className={classes.actionButton}
+									color='inherit'
+									disabled={!canPromote}
+									onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
 								>
-									<SecurityIcon />
-								</PulsingBadge>
-							</IconButton>
+									<PulsingBadge
+										color='secondary'
+										badgeContent={lobbyPeers.length}
+									>
+										<SecurityIcon />
+									</PulsingBadge>
+								</IconButton>
+							</span>
 						</Tooltip>
 					}
 					{ loginEnabled &&
@@ -339,7 +348,7 @@ const TopBar = (props) =>
 								{ myPicture ?
 									<Avatar src={myPicture} />
 									:
-									<AccountCircle className={loggedIn && classes.green} />
+									<AccountCircle className={loggedIn ? classes.green : null} />
 								}
 							</IconButton>
 						</Tooltip>
