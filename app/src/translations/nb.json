@@ -122,6 +122,7 @@
 	"settings.permanentTopBar": "Permanent topplinje",
 	"settings.lastn": "Antall videoer synlig",
 	"settings.hiddenControls": "Skjul media knapper",
+	"settings.notificationSounds": "Varslingslyder",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

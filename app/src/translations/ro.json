@@ -122,6 +122,7 @@
 	"settings.permanentTopBar": "Bara de sus permanentă",
 	"settings.lastn": "Numărul de videoclipuri vizibile",
 	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Încercarea de a salva fișierul a eșuat",
 	"filesharing.startingFileShare": "Partajarea fișierului",

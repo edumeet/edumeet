@@ -121,6 +121,7 @@
 	"settings.permanentTopBar": null,
 	"settings.lastn": null,
 	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",

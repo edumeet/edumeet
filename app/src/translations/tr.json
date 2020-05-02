@@ -119,6 +119,7 @@
 	"settings.permanentTopBar": "Üst barı kalıcı yap",
 	"settings.lastn": "İzlenebilir video sayısı",
 	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",

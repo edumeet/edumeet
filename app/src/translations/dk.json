@@ -122,6 +122,7 @@
 	"settings.permanentTopBar": "Permanent øverste linje",
 	"settings.lastn": "Antal synlige videoer",
 	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Kan ikke gemme fil",
 	"filesharing.startingFileShare": "Forsøger at dele filen",

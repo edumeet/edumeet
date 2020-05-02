@@ -122,6 +122,7 @@
 	"settings.permanentTopBar": "Μόνιμη μπάρα κορυφής",
 	"settings.lastn": "Αριθμός ορατών βίντεο",
 	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Αδυναμία αποθήκευσης του αρχείου",
 	"filesharing.startingFileShare": "Προσπάθεια διαμοιρασμού αρχείου",

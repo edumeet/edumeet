@@ -516,16 +516,21 @@ export default class RoomClient
 
 	_soundNotification()
 	{
-		const alertPromise = this._soundAlert.play();
+		const { notificationSounds } = store.getState().settings;
 
-		if (alertPromise !== undefined)
+		if (notificationSounds)
 		{
-			alertPromise
-				.then()
-				.catch((error) =>
-				{
-					logger.error('_soundAlert.play() | failed: %o', error);
-				});
+			const alertPromise = this._soundAlert.play();
+
+			if (alertPromise !== undefined)
+			{
+				alertPromise
+					.then()
+					.catch((error) =>
+					{
+						logger.error('_soundAlert.play() | failed: %o', error);
+					});
+			}
 		}
 	}
 
@@ -2342,6 +2347,8 @@ export default class RoomClient
 
 						store.dispatch(
 							peerActions.addPeer({ id, displayName, picture, roles, consumers: [] }));
+
+						this._soundNotification();
 
 						store.dispatch(requestActions.notify(
 							{

@@ -28,6 +28,7 @@ const AdvancedSettings = ({
 	roomClient,
 	settings,
 	onToggleAdvancedMode,
+	onToggleNotificationSounds,
 	classes
 }) =>
 {
@@ -41,6 +42,14 @@ const AdvancedSettings = ({
 				label={intl.formatMessage({
 					id             : 'settings.advancedMode',
 					defaultMessage : 'Advanced mode'
+				})}
+			/>
+			<FormControlLabel
+				className={classes.setting}
+				control={<Checkbox checked={settings.notificationSounds} onChange={onToggleNotificationSounds} value='notificationSounds' />}
+				label={intl.formatMessage({
+					id             : 'settings.notificationSounds',
+					defaultMessage : 'Notification sounds'
 				})}
 			/>
 			{ !window.config.lockLastN &&
@@ -84,10 +93,11 @@ const AdvancedSettings = ({
 
 AdvancedSettings.propTypes =
 {
-	roomClient           : PropTypes.any.isRequired,
-	settings             : PropTypes.object.isRequired,
-	onToggleAdvancedMode : PropTypes.func.isRequired,
-	classes              : PropTypes.object.isRequired
+	roomClient                 : PropTypes.any.isRequired,
+	settings                   : PropTypes.object.isRequired,
+	onToggleAdvancedMode       : PropTypes.func.isRequired,
+	onToggleNotificationSounds : PropTypes.func.isRequired,
+	classes                    : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -96,7 +106,8 @@ const mapStateToProps = (state) =>
 	});
 
 const mapDispatchToProps = {
-	onToggleAdvancedMode : settingsActions.toggleAdvancedMode
+	onToggleAdvancedMode       : settingsActions.toggleAdvancedMode,
+	onToggleNotificationSounds : settingsActions.toggleNotificationSounds
 };
 
 export default withRoomContext(connect(

@@ -122,6 +122,7 @@
 	"settings.permanentTopBar": "Barra superior permanente",
 	"settings.lastn": "Cantidad de videos visibles",
 	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "No ha sido posible guardar el fichero",
 	"filesharing.startingFileShare": "Intentando compartir el fichero",

@@ -122,6 +122,7 @@
 	"settings.permanentTopBar": "Állandó felső sáv",
 	"settings.lastn": "A látható videók száma",
 	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

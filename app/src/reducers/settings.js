@@ -8,7 +8,8 @@ const initialState =
 	resolution          : window.config.defaultResolution || 'medium',
 	lastN               : 4,
 	permanentTopBar     : true,
-	hiddenControls      : false
+	hiddenControls      : false,
+	notificationSounds  : true
 };
 
 const settings = (state = initialState, action) =>
@@ -63,6 +64,13 @@ const settings = (state = initialState, action) =>
 			const hiddenControls = !state.hiddenControls;
 
 			return { ...state, hiddenControls };
+		}
+
+		case 'TOGGLE_NOTIFICATION_SOUNDS':
+		{
+			const notificationSounds = !state.notificationSounds;
+
+			return { ...state, notificationSounds };
 		}
 
 		case 'SET_VIDEO_RESOLUTION':

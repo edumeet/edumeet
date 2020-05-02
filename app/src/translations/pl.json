@@ -122,6 +122,7 @@
 	"settings.permanentTopBar": "Stały górny pasek",
 	"settings.lastn": "Liczba widocznych uczestników (zdalnych)",
 	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",
