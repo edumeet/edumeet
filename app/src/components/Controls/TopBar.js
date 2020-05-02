@@ -431,7 +431,7 @@ const mapDispatchToProps = (dispatch) =>
 		},
 		setLockDialogOpen : (lockDialogOpen) =>
 		{
-			dispatch(roomActions.setLockDialogOpen({ lockDialogOpen }));
+			dispatch(roomActions.setLockDialogOpen(lockDialogOpen));
 		},
 		toggleToolArea : () =>
 		{

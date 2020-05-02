@@ -64,7 +64,7 @@ export const setSettingsTab = (tab) =>
 		payload : { tab }
 	});
 
-export const setLockDialogOpen = ({ lockDialogOpen }) =>
+export const setLockDialogOpen = (lockDialogOpen) =>
 	({
 		type    : 'SET_LOCK_DIALOG_OPEN',
 		payload : { lockDialogOpen }

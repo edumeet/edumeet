@@ -15,14 +15,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import Button from '@material-ui/core/Button';
-// import FormLabel from '@material-ui/core/FormLabel';
-// import FormControl from '@material-ui/core/FormControl';
-// import FormGroup from '@material-ui/core/FormGroup';
-// import FormControlLabel from '@material-ui/core/FormControlLabel';
-// import Checkbox from '@material-ui/core/Checkbox';
-// import InputLabel from '@material-ui/core/InputLabel';
-// import OutlinedInput from '@material-ui/core/OutlinedInput';
-// import Switch from '@material-ui/core/Switch';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListLobbyPeer from './ListLobbyPeer';
@@ -59,10 +51,8 @@ const styles = (theme) =>
 	});
 
 const LockDialog = ({
-	// roomClient,
 	room,
 	handleCloseLockDialog,
-	// handleAccessCode,
 	lobbyPeers,
 	classes
 }) =>
@@ -71,7 +61,7 @@ const LockDialog = ({
 		<Dialog
 			className={classes.root}
 			open={room.lockDialogOpen}
-			onClose={() => handleCloseLockDialog({ lockDialogOpen: false })}
+			onClose={() => handleCloseLockDialog(false)}
 			classes={{
 				paper : classes.dialogPaper
 			}}
@@ -82,54 +72,6 @@ const LockDialog = ({
 					defaultMessage='Lobby administration'
 				/>
 			</DialogTitle>
-			{/*
-			<FormControl component='fieldset' className={classes.formControl}>
-				<FormLabel component='legend'>Room lock</FormLabel>
-				<FormGroup>
-					<FormControlLabel
-						control={
-							<Switch checked={room.locked} onChange={() => 
-							{
-								if (room.locked)
-								{
-									roomClient.unlockRoom();
-								}
-								else
-								{
-									roomClient.lockRoom();
-								}
-							}}
-							/>}
-						label='Lock'
-					/>
-						TODO: access code
-					<FormControlLabel disabled={ room.locked ? false : true } 
-						control={
-							<Checkbox checked={room.joinByAccessCode} 
-								onChange={
-									(event) => roomClient.setJoinByAccessCode(event.target.checked)
-								}
-							/>}
-						label='Join by Access code'
-					/>
-					<InputLabel htmlFor='access-code-input' />
-					<OutlinedInput 
-						disabled={ room.locked ? false : true }
-						id='acces-code-input'
-						label='Access code'
-						labelWidth={0}
-						variant='outlined'
-						value={room.accessCode}
-						onChange={(event) => handleAccessCode(event.target.value)}
-					>
-					</OutlinedInput>
-					<Button onClick={() => roomClient.setAccessCode(room.accessCode)} color='primary'>
-							save
-					</Button>
-					
-				</FormGroup>
-			</FormControl>
-			*/}
 			{ lobbyPeers.length > 0 ?
 				<List 
 					dense
@@ -160,7 +102,7 @@ const LockDialog = ({
 				</DialogContent>
 			}
 			<DialogActions>
-				<Button onClick={() => handleCloseLockDialog({ lockDialogOpen: false })} color='primary'>
+				<Button onClick={() => handleCloseLockDialog(false)} color='primary'>
 					<FormattedMessage
 						id='label.close'
 						defaultMessage='Close'
@@ -173,7 +115,6 @@ const LockDialog = ({
 
 LockDialog.propTypes =
 {
-	// roomClient            : PropTypes.any.isRequired,
 	room                  : appPropTypes.Room.isRequired,
 	handleCloseLockDialog : PropTypes.func.isRequired,
 	handleAccessCode      : PropTypes.func.isRequired,
@@ -202,12 +143,7 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room.locked === next.room.locked &&
-				prev.room.joinByAccessCode === next.room.joinByAccessCode &&
-				prev.room.accessCode === next.room.accessCode &&
-				prev.room.code === next.room.code &&
-				prev.room.lockDialogOpen === next.room.lockDialogOpen &&
-				prev.room.codeHidden === next.room.codeHidden &&
+				prev.room === next.room &&
 				prev.lobbyPeers === next.lobbyPeers
 			);
 		}
