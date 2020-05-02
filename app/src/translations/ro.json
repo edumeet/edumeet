@@ -99,6 +99,9 @@
 	"label.veryHigh": "Rezoluție foarte înaltă (FHD)",
 	"label.ultra": "Rezoluție ultra înaltă (UHD)",
 	"label.close": "Închide",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
 
 	"settings.settings": "Setări",
 	"settings.camera": "Cameră video",

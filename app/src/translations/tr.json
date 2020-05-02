@@ -99,6 +99,9 @@
 	"label.veryHigh": "Çok Yüksek (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Kapat",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
 
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",

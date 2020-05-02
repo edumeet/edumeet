@@ -98,6 +98,9 @@
 	"label.veryHigh": "Velmi vysoké (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Zavřít",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",

@@ -99,6 +99,9 @@
 	"label.veryHigh": "Дуже високий (FHD)",
 	"label.ultra": "Ультра (UHD)",
 	"label.close": "Закрити",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
 
 	"settings.settings": "Налаштування",
 	"settings.camera": "Камера",

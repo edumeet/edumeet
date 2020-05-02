@@ -99,6 +99,9 @@
 	"label.veryHigh": "非常高 (FHD)",
 	"label.ultra": "超高 (UHD)",
 	"label.close": "关闭",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
 
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",

@@ -99,6 +99,9 @@
 	"label.veryHigh": "Meget høj (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Luk",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
 
 	"settings.settings": "Indstillinger",
 	"settings.camera": "Kamera",

@@ -20,6 +20,7 @@ const initialState =
 	selectedPeerId             : null,
 	spotlights                 : [],
 	settingsOpen               : false,
+	currentSettingsTab         : 'media', // media, appearence, advanced
 	lockDialogOpen             : false,
 	joined                     : false,
 	muteAllInProgress          : false,
@@ -111,6 +112,13 @@ const room = (state = initialState, action) =>
 			const { settingsOpen } = action.payload;
 
 			return { ...state, settingsOpen };
+		}
+
+		case 'SET_SETTINGS_TAB':
+		{
+			const { tab } = action.payload;
+
+			return { ...state, currentSettingsTab: tab };
 		}
 
 		case 'SET_ROOM_ACTIVE_SPEAKER':

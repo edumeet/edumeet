@@ -99,6 +99,9 @@
 	"label.veryHigh": "Nagyon magas (FHD)",
 	"label.ultra": "Ultra magas (UHD)",
 	"label.close": "Bezár",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
 
 	"settings.settings": "Beállítások",
 	"settings.camera": "Kamera",

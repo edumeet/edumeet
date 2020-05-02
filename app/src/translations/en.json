@@ -99,6 +99,9 @@
 	"label.veryHigh": "Very high (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Close",
+	"label.media": "Media",
+	"label.appearence": "Appearence",
+	"label.advanced": "Advanced",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",

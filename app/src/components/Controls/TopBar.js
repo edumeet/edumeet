@@ -427,7 +427,7 @@ const mapDispatchToProps = (dispatch) =>
 		},
 		setSettingsOpen : (settingsOpen) =>
 		{
-			dispatch(roomActions.setSettingsOpen({ settingsOpen }));
+			dispatch(roomActions.setSettingsOpen(settingsOpen));
 		},
 		setLockDialogOpen : (lockDialogOpen) =>
 		{

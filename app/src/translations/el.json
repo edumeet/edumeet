@@ -99,6 +99,9 @@
 	"label.veryHigh": "Πολύ υψηλή (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Κλείσιμο",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
 
 	"settings.settings": "Ρυθμίσεις",
 	"settings.camera": "Κάμερα",
