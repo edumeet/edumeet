@@ -82,7 +82,7 @@ const styles = (theme) =>
 			{
 				opacity : 0.2
 			},
-			'&.raise-hand' :
+			'&.raisedHand' :
 			{
 				backgroundImage : `url(${HandIcon})`
 			}
@@ -140,12 +140,12 @@ const ListPeer = (props) =>
 				{peer.displayName}
 			</div>
 			<div className={classes.indicators}>
-				{ peer.raiseHandState &&
+				{ peer.raisedHand &&
 					<div className={
 						classnames(
-							classes.icon, 'raise-hand', {
-								on  : peer.raiseHandState,
-								off : !peer.raiseHandState
+							classes.icon, 'raisedHand', {
+								on  : peer.raisedHand,
+								off : !peer.raisedHand
 							}
 						)
 					}

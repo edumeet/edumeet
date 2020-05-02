@@ -63,7 +63,7 @@ const styles = (theme) =>
 			{
 				opacity : 1
 			},
-			'&.raise-hand' :
+			'&.raisedHand' :
 			{
 				backgroundImage : `url(${HandIcon})`,
 				opacity         : 1
@@ -92,7 +92,7 @@ const ListMe = (props) =>
 
 				<div className={classes.indicators}>
 					{ me.raisedHand &&
-						<div className={classnames(classes.icon, 'raise-hand')} />
+						<div className={classnames(classes.icon, 'raisedHand')} />
 					}
 				</div>
 			</div>

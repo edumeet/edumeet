@@ -42,8 +42,8 @@ beforeEach(() =>
 			loggedIn              : false,
 			loginEnabled          : true,
 			picture               : null,
-			raiseHand             : false,
-			raiseHandInProgress   : false,
+			raisedHand            : false,
+			raisedHandInProgress  : false,
 			screenShareInProgress : false,
 			webcamDevices         : null,
 			webcamInProgress      : false

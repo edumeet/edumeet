@@ -1505,30 +1505,30 @@ export default class RoomClient
 		}
 	}
 
-	async sendRaiseHandState(state)
+	async setRaisedHand(raisedHand)
 	{
-		logger.debug('sendRaiseHandState: ', state);
+		logger.debug('setRaisedHand: ', raisedHand);
 
 		store.dispatch(
-			meActions.setMyRaiseHandStateInProgress(true));
+			meActions.setRaisedHandInProgress(true));
 
 		try
 		{
-			await this.sendRequest('raiseHand', { raiseHandState: state });
+			await this.sendRequest('raisedHand', { raisedHand });
 
 			store.dispatch(
-				meActions.setMyRaiseHandState(state));
+				meActions.setRaisedHand(raisedHand));
 		}
 		catch (error)
 		{
-			logger.error('sendRaiseHandState() | failed: %o', error);
+			logger.error('setRaisedHand() | [error:"%o"]', error);
 
 			// We need to refresh the component for it to render changed state
-			store.dispatch(meActions.setMyRaiseHandState(!state));
+			store.dispatch(meActions.setRaisedHand(!raisedHand));
 		}
 
 		store.dispatch(
-			meActions.setMyRaiseHandStateInProgress(false));
+			meActions.setRaisedHandInProgress(false));
 	}
 
 	async setMaxSendingSpatialLayer(spatialLayer)
@@ -2201,6 +2201,15 @@ export default class RoomClient
 						const { peerId, picture } = notification.data;
 
 						store.dispatch(peerActions.setPeerPicture(peerId, picture));
+
+						break;
+					}
+
+					case 'raisedHand':
+					{
+						const { peerId, raisedHand } = notification.data;
+
+						store.dispatch(peerActions.setPeerRaisedHand(peerId, raisedHand));
 
 						break;
 					}

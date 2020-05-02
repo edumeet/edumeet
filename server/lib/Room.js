@@ -1251,14 +1251,14 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'raiseHand':
+			case 'raisedHand':
 			{
 				const { raisedHand } = request.data;
 
 				peer.raisedHand = raisedHand;
 
 				// Spread to others
-				this._notification(peer.socket, 'raiseHand', {
+				this._notification(peer.socket, 'raisedHand', {
 					peerId     : peer.id,
 					raisedHand : raisedHand
 				}, true);
