@@ -75,6 +75,7 @@
 	"tooltip.kickParticipant": "Kick out participant",
 	"tooltip.muteParticipant": "Mute participant",
 	"tooltip.muteParticipantVideo": "Mute participant video",
+	"tooltip.raisedHand": "Raise hand",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",

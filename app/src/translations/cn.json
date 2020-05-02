@@ -75,6 +75,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",

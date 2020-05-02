@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { makePeerConsumerSelector } from '../../Selectors';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import * as appPropTypes from '../../appPropTypes';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
@@ -16,31 +15,26 @@ import ScreenIcon from '@material-ui/icons/ScreenShare';
 import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 import ExitIcon from '@material-ui/icons/ExitToApp';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
-import HandIcon from '../../../images/icon-hand-white.svg';
+import PanIcon from '@material-ui/icons/PanTool';
 
 const styles = (theme) =>
 	({
 		root :
 		{
-			padding  : theme.spacing(1),
 			width    : '100%',
 			overflow : 'hidden',
 			cursor   : 'auto',
 			display  : 'flex'
 		},
-		listPeer :
-		{
-			display : 'flex'
-		},
 		avatar :
 		{
 			borderRadius : '50%',
-			height       : '2rem'
+			height       : '2rem',
+			marginTop    : theme.spacing(1)
 		},
 		peerInfo :
 		{
 			fontSize    : '1rem',
-			border      : 'none',
 			display     : 'flex',
 			paddingLeft : theme.spacing(1),
 			flexGrow    : 1,
@@ -48,52 +42,12 @@ const styles = (theme) =>
 		},
 		indicators :
 		{
-			left           : 0,
-			top            : 0,
-			display        : 'flex',
-			flexDirection  : 'row',
-			justifyContent : 'flex-start',
-			alignItems     : 'center',
-			transition     : 'opacity 0.3s'
+			display : 'flex',
+			padding : theme.spacing(1.5)
 		},
-		icon :
+		green :
 		{
-			flex               : '0 0 auto',
-			margin             : '0.3rem',
-			borderRadius       : 2,
-			backgroundPosition : 'center',
-			backgroundSize     : '75%',
-			backgroundRepeat   : 'no-repeat',
-			backgroundColor    : 'rgba(0, 0, 0, 0.5)',
-			transitionProperty : 'opacity, background-color',
-			transitionDuration : '0.15s',
-			width              : 'var(--media-control-button-size)',
-			height             : 'var(--media-control-button-size)',
-			opacity            : 0.85,
-			'&:hover'          :
-			{
-				opacity : 1
-			},
-			'&.on' :
-			{
-				opacity : 1
-			},
-			'&.off' :
-			{
-				opacity : 0.2
-			},
-			'&.raisedHand' :
-			{
-				backgroundImage : `url(${HandIcon})`
-			}
-		},
-		controls :
-		{
-			float          : 'right',
-			display        : 'flex',
-			flexDirection  : 'row',
-			justifyContent : 'flex-start',
-			alignItems     : 'center'
+			color : 'rgba(0, 153, 0, 1)'
 		}
 	});
 
@@ -141,105 +95,95 @@ const ListPeer = (props) =>
 			</div>
 			<div className={classes.indicators}>
 				{ peer.raisedHand &&
-					<div className={
-						classnames(
-							classes.icon, 'raisedHand', {
-								on  : peer.raisedHand,
-								off : !peer.raisedHand
-							}
-						)
-					}
-					/>
+					<PanIcon className={classes.green} />
 				}
 			</div>
+			{ screenConsumer &&
+				<IconButton
+					aria-label={intl.formatMessage({
+						id             : 'tooltip.muteScreenSharing',
+						defaultMessage : 'Mute participant share'
+					})}
+					color={screenVisible ? 'primary' : 'secondary'}
+					disabled={peer.peerScreenInProgress}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+
+						screenVisible ?
+							roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
+							roomClient.modifyPeerConsumer(peer.id, 'screen', false);
+					}}
+				>
+					{ screenVisible ?
+						<ScreenIcon />
+						:
+						<ScreenOffIcon />
+					}
+				</IconButton>
+			}
+			<IconButton
+				aria-label={intl.formatMessage({
+					id             : 'tooltip.muteParticipantVideo',
+					defaultMessage : 'Mute participant video'
+				})}
+				color={webcamEnabled ? 'primary' : 'secondary'}
+				disabled={peer.peerVideoInProgress}
+				onClick={(e) =>
+				{
+					e.stopPropagation();
+
+					webcamEnabled ?
+						roomClient.modifyPeerConsumer(peer.id, 'webcam', true) :
+						roomClient.modifyPeerConsumer(peer.id, 'webcam', false);
+				}}
+			>
+				{ webcamEnabled ?
+					<VideocamIcon />
+					:
+					<VideocamOffIcon />
+				}
+			</IconButton>
+			<IconButton
+				aria-label={intl.formatMessage({
+					id             : 'tooltip.muteParticipant',
+					defaultMessage : 'Mute participant'
+				})}
+				color={micEnabled ? 'primary' : 'secondary'}
+				disabled={peer.peerAudioInProgress}
+				onClick={(e) =>
+				{
+					e.stopPropagation();
+
+					micEnabled ?
+						roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+						roomClient.modifyPeerConsumer(peer.id, 'mic', false);
+				}}
+			>
+				{ micEnabled ?
+					<VolumeUpIcon />
+					:
+					<VolumeOffIcon />
+				}
+			</IconButton>
+			{ isModerator &&
+				<IconButton
+					aria-label={intl.formatMessage({
+						id             : 'tooltip.kickParticipant',
+						defaultMessage : 'Kick out participant'
+					})}
+					disabled={peer.peerKickInProgress}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+
+						roomClient.kickPeer(peer.id);
+					}}
+				>
+					<ExitIcon />
+				</IconButton>
+			}
 			{children}
-			<div className={classes.controls}>
-				{ screenConsumer &&
-					<IconButton
-						aria-label={intl.formatMessage({
-							id             : 'tooltip.muteScreenSharing',
-							defaultMessage : 'Mute participant share'
-						})}
-						color={screenVisible ? 'primary' : 'secondary'}
-						disabled={peer.peerScreenInProgress}
-						onClick={(e) =>
-						{
-							e.stopPropagation();
-
-							screenVisible ?
-								roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
-								roomClient.modifyPeerConsumer(peer.id, 'screen', false);
-						}}
-					>
-						{ screenVisible ?
-							<ScreenIcon />
-							:
-							<ScreenOffIcon />
-						}
-					</IconButton>
-				}
-				<IconButton
-					aria-label={intl.formatMessage({
-						id             : 'tooltip.muteParticipantVideo',
-						defaultMessage : 'Mute participant video'
-					})}
-					color={webcamEnabled ? 'primary' : 'secondary'}
-					disabled={peer.peerVideoInProgress}
-					onClick={(e) =>
-					{
-						e.stopPropagation();
-
-						webcamEnabled ?
-							roomClient.modifyPeerConsumer(peer.id, 'webcam', true) :
-							roomClient.modifyPeerConsumer(peer.id, 'webcam', false);
-					}}
-				>
-					{ webcamEnabled ?
-						<VideocamIcon />
-						:
-						<VideocamOffIcon />
-					}
-				</IconButton>
-				<IconButton
-					aria-label={intl.formatMessage({
-						id             : 'tooltip.muteParticipant',
-						defaultMessage : 'Mute participant'
-					})}
-					color={micEnabled ? 'primary' : 'secondary'}
-					disabled={peer.peerAudioInProgress}
-					onClick={(e) =>
-					{
-						e.stopPropagation();
-
-						micEnabled ?
-							roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-							roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-					}}
-				>
-					{ micEnabled ?
-						<VolumeUpIcon />
-						:
-						<VolumeOffIcon />
-					}
-				</IconButton>
-				{ isModerator &&
-					<IconButton
-						aria-label={intl.formatMessage({
-							id             : 'tooltip.kickParticipant',
-							defaultMessage : 'Kick out participant'
-						})}
-						disabled={peer.peerKickInProgress}
-						onClick={(e) =>
-						{
-							e.stopPropagation();
-
-							roomClient.kickPeer(peer.id);
-						}}
-					>
-						<ExitIcon />
-					</IconButton>
-				}
-			</div>
 		</div>
 	);
 };

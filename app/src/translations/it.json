@@ -74,6 +74,7 @@
 	"tooltip.participants": "Mostra partecipanti",
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Nome della stanza",
 	"label.chooseRoomButton": "Continua",
