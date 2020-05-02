@@ -162,4 +162,4 @@ function run()
 	);
 }
 
-serviceWorker.unregister();
+serviceWorker.register();
