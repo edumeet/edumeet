@@ -106,6 +106,11 @@ export const passivePeersSelector = createSelector(
 		.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
 );
 
+export const raisedHandsSelector = createSelector(
+	peersValueSelector,
+	(peers) => peers.reduce((a, b) => (a + (b.raisedHand ? 1 : 0)), 0)
+);
+
 export const videoBoxesSelector = createSelector(
 	spotlightsLengthSelector,
 	screenProducersSelector,

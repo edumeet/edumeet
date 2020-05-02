@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
 	lobbyPeersKeySelector,
-	peersLengthSelector
+	peersLengthSelector,
+	raisedHandsSelector
 } from '../Selectors';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
@@ -410,7 +411,7 @@ const mapStateToProps = (state) =>
 		loginEnabled    : state.me.loginEnabled,
 		myPicture       : state.me.picture,
 		unread          : state.toolarea.unreadMessages +
-			state.toolarea.unreadFiles,
+			state.toolarea.unreadFiles + raisedHandsSelector(state),
 		canLock :
 			state.me.roles.some((role) =>
 				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role)),
