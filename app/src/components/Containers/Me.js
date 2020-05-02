@@ -116,7 +116,8 @@ const styles = (theme) =>
 			fontSize        : '2vs',
 			backgroundColor : 'rgba(255, 0, 0, 0.5)',
 			margin          : '4px',
-			padding         : '15px',
+			padding         : theme.spacing(2),
+			zIndex          : 31,
 			borderRadius    : '20px',
 			textAlign       : 'center',
 			opacity         : 0,
@@ -298,6 +299,16 @@ const Me = (props) =>
 				style={spacingStyle}
 			>
 				<div className={classes.viewContainer} style={style}>
+					<div className={classnames(
+						classes.ptt,
+						(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
+					)}
+					>
+						<FormattedMessage
+							id='me.mutedPTT'
+							defaultMessage='You are muted, hold down SPACE-BAR to talk'
+						/>	
+					</div>
 					<div
 						className={classnames(
 							classes.controls,
@@ -330,17 +341,6 @@ const Me = (props) =>
 								defaultMessage='ME'
 							/>
 						</p>
-
-						<div className={classnames(
-							classes.ptt,
-							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
-						)}
-						>
-							<FormattedMessage
-								id='me.mutedPTT'
-								defaultMessage='You are muted, hold down SPACE-BAR to talk'
-							/>	
-						</div>
 
 						<React.Fragment>
 							<Tooltip title={micTip} placement='left'>
