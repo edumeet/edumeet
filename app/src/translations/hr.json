@@ -56,6 +56,8 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": "Vaš preglednik ne podržava prepoznavanje govora",
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 

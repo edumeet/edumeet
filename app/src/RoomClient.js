@@ -2211,6 +2211,39 @@ export default class RoomClient
 
 						store.dispatch(peerActions.setPeerRaisedHand(peerId, raisedHand));
 
+						const { displayName } = store.getState().peers[peerId];
+
+						let text;
+
+						if (raisedHand)
+						{
+							text = intl.formatMessage({
+								id             : 'room.raisedHand',
+								defaultMessage : '{displayName} raised their hand'
+							}, {
+								displayName
+							});
+						}
+						else
+						{
+							text = intl.formatMessage({
+								id             : 'room.loweredHand',
+								defaultMessage : '{displayName} put their hand down'
+							}, {
+								displayName
+							});
+						}
+
+						if (displayName)
+						{
+							store.dispatch(requestActions.notify(
+								{
+									text
+								}));
+						}
+
+						this._soundNotification();
+
 						break;
 					}
 

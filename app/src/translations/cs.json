@@ -55,6 +55,8 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
 
 	"me.mutedPTT": null,
 

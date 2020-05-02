@@ -56,6 +56,8 @@
 	"room.clearFileSharing": "Fjern filer",
 	"room.speechUnsupported": "Din nettleser støtter ikke stemmegjenkjenning",
 	"room.moderatoractions": "Moderatorhandlinger",
+	"room.raisedHand": "{displayName} rakk opp hånden",
+	"room.loweredHand": "{displayName} tok ned hånden",
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 

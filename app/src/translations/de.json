@@ -56,6 +56,8 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": "Dein Browser unterstützt keine Spracherkennung",
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
 
 	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
 
