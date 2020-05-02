@@ -78,7 +78,16 @@ const styles = (theme) =>
 			zIndex         : 21,
 			touchAction    : 'none',
 			pointerEvents  : 'none',
-			'& p'          :
+			'&.hide'       :
+			{
+				transition : 'opacity 0.1s ease-in-out',
+				opacity    : 0
+			},
+			'&.hover' :
+			{
+				opacity : 1
+			},
+			'& p' :
 			{
 				position   : 'absolute',
 				float      : 'left',
@@ -290,7 +299,11 @@ const Me = (props) =>
 			>
 				<div className={classes.viewContainer} style={style}>
 					<div
-						className={classes.controls}  
+						className={classnames(
+							classes.controls,
+							settings.hiddenControls ? 'hide' : null,
+							hover ? 'hover' : null
+						)}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -480,7 +493,11 @@ const Me = (props) =>
 				>
 					<div className={classes.viewContainer} style={style}>
 						<div
-							className={classes.controls}
+							className={classnames(
+								classes.controls,
+								settings.hiddenControls ? 'hide' : null,
+								hover ? 'hover' : null
+							)}
 							onMouseOver={() => setHover(true)}
 							onMouseOut={() => setHover(false)}
 							onTouchStart={() =>

@@ -119,6 +119,7 @@
 	"settings.advancedMode": "Розширений режим",
 	"settings.permanentTopBar": "Постійний верхній рядок",
 	"settings.lastn": "Кількість видимих ​​відео",
+	"settings.hiddenControls": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",

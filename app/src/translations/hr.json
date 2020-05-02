@@ -119,6 +119,7 @@
 	"settings.advancedMode": "Napredne mogućnosti",
 	"settings.permanentTopBar": "Stalna gornja šipka",
 	"settings.lastn": "Broj vidljivih videozapisa",
+	"settings.hiddenControls": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",

@@ -116,6 +116,7 @@
 	"settings.advancedMode": "Detaylı mod",
 	"settings.permanentTopBar": "Üst barı kalıcı yap",
 	"settings.lastn": "İzlenebilir video sayısı",
+	"settings.hiddenControls": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",

@@ -119,6 +119,7 @@
 	"settings.advancedMode": "Tryb zaawansowany",
 	"settings.permanentTopBar": "Stały górny pasek",
 	"settings.lastn": "Liczba widocznych uczestników (zdalnych)",
+	"settings.hiddenControls": null,
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",

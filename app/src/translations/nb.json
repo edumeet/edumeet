@@ -119,6 +119,7 @@
 	"settings.advancedMode": "Avansert modus",
 	"settings.permanentTopBar": "Permanent topplinje",
 	"settings.lastn": "Antall videoer synlig",
+	"settings.hiddenControls": "Skjul media knapper",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

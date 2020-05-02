@@ -29,6 +29,7 @@ const AppearenceSettings = ({
 	room,
 	settings,
 	onTogglePermanentTopBar,
+	onToggleHiddenControls,
 	handleChangeMode,
 	classes
 }) =>
@@ -92,6 +93,14 @@ const AppearenceSettings = ({
 					defaultMessage : 'Permanent top bar'
 				})}
 			/>
+			<FormControlLabel
+				className={classes.setting}
+				control={<Checkbox checked={settings.hiddenControls} onChange={onToggleHiddenControls} value='hiddenControls' />}
+				label={intl.formatMessage({
+					id             : 'settings.hiddenControls',
+					defaultMessage : 'Hidden media controls'
+				})}
+			/>
 		</React.Fragment>
 	);
 };
@@ -101,6 +110,7 @@ AppearenceSettings.propTypes =
 	room                    : appPropTypes.Room.isRequired,
 	settings                : PropTypes.object.isRequired,
 	onTogglePermanentTopBar : PropTypes.func.isRequired,
+	onToggleHiddenControls  : PropTypes.func.isRequired,
 	handleChangeMode        : PropTypes.func.isRequired,
 	classes                 : PropTypes.object.isRequired
 };
@@ -113,6 +123,7 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = {
 	onTogglePermanentTopBar : settingsActions.togglePermanentTopBar,
+	onToggleHiddenControls  : settingsActions.toggleHiddenControls,
 	handleChangeMode        : roomActions.setDisplayMode
 };
 

@@ -119,6 +119,7 @@
 	"settings.advancedMode": "Advanced mode",
 	"settings.permanentTopBar": "Permanent top bar",
 	"settings.lastn": "Number of visible videos",
+	"settings.hiddenControls": "Hidden media controls",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

@@ -119,6 +119,7 @@
 	"settings.advancedMode": "Erweiterter Modus",
 	"settings.permanentTopBar": "Permanente obere Leiste",
 	"settings.lastn": "Anzahl der sichtbaren Videos",
+	"settings.hiddenControls": null,
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",

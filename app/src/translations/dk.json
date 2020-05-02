@@ -113,13 +113,13 @@
 	"settings.audioOutput": "Audio output enhed",
 	"settings.selectAudioOutput": "Vælg lydudgangsenhed",
 	"settings.cantSelectAudioOutput": "Kan ikke vælge lydoutputenhed",
-
 	"settings.resolution": "Vælg din videoopløsning",
 	"settings.layout": "Møde visning",
 	"settings.selectRoomLayout": "Vælg møde visning",
 	"settings.advancedMode": "Avanceret tilstand",
 	"settings.permanentTopBar": "Permanent øverste linje",
 	"settings.lastn": "Antal synlige videoer",
+	"settings.hiddenControls": null,
 
 	"filesharing.saveFileError": "Kan ikke gemme fil",
 	"filesharing.startingFileShare": "Forsøger at dele filen",
