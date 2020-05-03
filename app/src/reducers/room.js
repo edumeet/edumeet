@@ -36,6 +36,7 @@ const initialState =
 		SEND_CHAT        : [],
 		MODERATE_CHAT    : [],
 		SHARE_SCREEN     : [],
+		EXTRA_VIDEO      : [],
 		SHARE_FILE       : [],
 		MODERATE_FILES   : [],
 		MODERATE_ROOM    : []

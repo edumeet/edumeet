@@ -235,6 +235,8 @@ module.exports =
 		MODERATE_CHAT    : [ userRoles.MODERATOR ],
 		// The role(s) have permission to share screen
 		SHARE_SCREEN     : [ userRoles.NORMAL ],
+		// The role(s) have permission to produce extra video
+		EXTRA_VIDEO      : [ userRoles.NORMAL ],
 		// The role(s) have permission to share files
 		SHARE_FILE       : [ userRoles.NORMAL ],
 		// The role(s) have permission to moderate files

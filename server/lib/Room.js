@@ -24,6 +24,7 @@ const permissionsFromRoles =
 	SEND_CHAT        : [ userRoles.NORMAL ],
 	MODERATE_CHAT    : [ userRoles.MODERATOR ],
 	SHARE_SCREEN     : [ userRoles.NORMAL ],
+	EXTRA_VIDEO      : [ userRoles.NORMAL ],
 	SHARE_FILE       : [ userRoles.NORMAL ],
 	MODERATE_FILES   : [ userRoles.MODERATOR ],
 	MODERATE_ROOM    : [ userRoles.MODERATOR ],
@@ -744,6 +745,13 @@ class Room extends EventEmitter
 					appData.source === 'screen' &&
 					!peer.roles.some(
 						(role) => permissionsFromRoles.SHARE_SCREEN.includes(role))
+				)
+					throw new Error('peer not authorized');
+
+				if (
+					appData.source === 'extravideo' &&
+					!peer.roles.some(
+						(role) => permissionsFromRoles.EXTRA_VIDEO.includes(role))
 				)
 					throw new Error('peer not authorized');
 

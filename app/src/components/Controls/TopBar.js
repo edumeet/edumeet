@@ -165,6 +165,7 @@ const TopBar = (props) =>
 		toggleToolArea,
 		openUsersTab,
 		unread,
+		canProduceExtraVideo,
 		canLock,
 		canPromote,
 		classes
@@ -414,6 +415,7 @@ const TopBar = (props) =>
 			>
 				<MenuItem
 					dense
+					disabled={!canProduceExtraVideo}
 					onClick={() =>
 					{
 						handleMoreActionsClose();
@@ -435,28 +437,29 @@ const TopBar = (props) =>
 
 TopBar.propTypes =
 {
-	roomClient         : PropTypes.object.isRequired,
-	room               : appPropTypes.Room.isRequired,
-	peersLength        : PropTypes.number,
-	lobbyPeers         : PropTypes.array,
-	permanentTopBar    : PropTypes.bool,
-	myPicture          : PropTypes.string,
-	loggedIn           : PropTypes.bool.isRequired,
-	loginEnabled       : PropTypes.bool.isRequired,
-	fullscreenEnabled  : PropTypes.bool,
-	fullscreen         : PropTypes.bool,
-	onFullscreen       : PropTypes.func.isRequired,
-	setToolbarsVisible : PropTypes.func.isRequired,
-	setSettingsOpen    : PropTypes.func.isRequired,
-	setExtraVideoOpen  : PropTypes.func.isRequired,
-	setLockDialogOpen  : PropTypes.func.isRequired,
-	toggleToolArea     : PropTypes.func.isRequired,
-	openUsersTab       : PropTypes.func.isRequired,
-	unread             : PropTypes.number.isRequired,
-	canLock            : PropTypes.bool.isRequired,
-	canPromote         : PropTypes.bool.isRequired,
-	classes            : PropTypes.object.isRequired,
-	theme              : PropTypes.object.isRequired
+	roomClient           : PropTypes.object.isRequired,
+	room                 : appPropTypes.Room.isRequired,
+	peersLength          : PropTypes.number,
+	lobbyPeers           : PropTypes.array,
+	permanentTopBar      : PropTypes.bool,
+	myPicture            : PropTypes.string,
+	loggedIn             : PropTypes.bool.isRequired,
+	loginEnabled         : PropTypes.bool.isRequired,
+	fullscreenEnabled    : PropTypes.bool,
+	fullscreen           : PropTypes.bool,
+	onFullscreen         : PropTypes.func.isRequired,
+	setToolbarsVisible   : PropTypes.func.isRequired,
+	setSettingsOpen      : PropTypes.func.isRequired,
+	setExtraVideoOpen    : PropTypes.func.isRequired,
+	setLockDialogOpen    : PropTypes.func.isRequired,
+	toggleToolArea       : PropTypes.func.isRequired,
+	openUsersTab         : PropTypes.func.isRequired,
+	unread               : PropTypes.number.isRequired,
+	canProduceExtraVideo : PropTypes.bool.isRequired,
+	canLock              : PropTypes.bool.isRequired,
+	canPromote           : PropTypes.bool.isRequired,
+	classes              : PropTypes.object.isRequired,
+	theme                : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -470,6 +473,9 @@ const mapStateToProps = (state) =>
 		myPicture       : state.me.picture,
 		unread          : state.toolarea.unreadMessages +
 			state.toolarea.unreadFiles + raisedHandsSelector(state),
+		canProduceExtraVideo :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.EXTRA_VIDEO.includes(role)),
 		canLock :
 			state.me.roles.some((role) =>
 				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role)),
