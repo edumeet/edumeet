@@ -150,6 +150,7 @@ const Me = (props) =>
 		micProducer,
 		webcamProducer,
 		screenProducer,
+		extraVideoProducers,
 		canShareScreen,
 		classes
 	} = props;
@@ -467,6 +468,112 @@ const Me = (props) =>
 					</VideoView>
 				</div>
 			</div>
+			{ extraVideoProducers.map((producer) =>
+			{
+				return (
+					<div key={producer.id}
+						className={
+							classnames(
+								classes.root,
+								'webcam',
+								hover ? 'hover' : null,
+								activeSpeaker ? 'active-speaker' : null
+							)
+						}
+						onMouseOver={() => setHover(true)}
+						onMouseOut={() => setHover(false)}
+						onTouchStart={() =>
+						{
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
+
+							setHover(true);
+						}}
+						onTouchEnd={() =>
+						{
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
+
+							touchTimeout = setTimeout(() =>
+							{
+								setHover(false);
+							}, 2000);
+						}}
+						style={spacingStyle}
+					>
+						<div className={classes.viewContainer} style={style}>
+							<div
+								className={classnames(
+									classes.controls,
+									settings.hiddenControls ? 'hide' : null,
+									hover ? 'hover' : null
+								)}
+								onMouseOver={() => setHover(true)}
+								onMouseOut={() => setHover(false)}
+								onTouchStart={() =>
+								{
+									if (touchTimeout)
+										clearTimeout(touchTimeout);
+
+									setHover(true);
+								}}
+								onTouchEnd={() =>
+								{
+									if (touchTimeout)
+										clearTimeout(touchTimeout);
+
+									touchTimeout = setTimeout(() =>
+									{
+										setHover(false);
+									}, 2000);
+								}}
+							>
+								<p className={hover ? 'hover' : null}>
+									<FormattedMessage
+										id='room.me'
+										defaultMessage='ME'
+									/>
+								</p>
+
+								<Tooltip title={webcamTip} placement='left'>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.stopVideo',
+												defaultMessage : 'Stop video'
+											})}
+											className={classes.fab}
+											disabled={!me.canSendWebcam || me.webcamInProgress}
+											size={smallButtons ? 'small' : 'large'}
+											onClick={() =>
+											{
+												roomClient.disableExtraVideo(producer.id);
+											}}
+										>
+											<VideoIcon />
+										</Fab>
+									</div>
+								</Tooltip>
+							</div>
+
+							<VideoView
+								isMe
+								advancedMode={advancedMode}
+								peer={me}
+								displayName={settings.displayName}
+								showPeerInfo
+								videoTrack={producer && producer.track}
+								videoVisible={videoVisible}
+								videoCodec={producer && producer.codec}
+								onChangeDisplayName={(displayName) =>
+								{
+									roomClient.changeDisplayName(displayName);
+								}}
+							/>
+						</div>
+					</div>
+				);
+			})}
 			{ screenProducer &&
 				<div
 					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
@@ -545,20 +652,21 @@ const Me = (props) =>
 
 Me.propTypes =
 {
-	roomClient     : PropTypes.any.isRequired,
-	advancedMode   : PropTypes.bool,
-	me             : appPropTypes.Me.isRequired,
-	settings       : PropTypes.object,
-	activeSpeaker  : PropTypes.bool,
-	micProducer    : appPropTypes.Producer,
-	webcamProducer : appPropTypes.Producer,
-	screenProducer : appPropTypes.Producer,
-	spacing        : PropTypes.number,
-	style          : PropTypes.object,
-	smallButtons   : PropTypes.bool,
-	canShareScreen : PropTypes.bool.isRequired,
-	classes        : PropTypes.object.isRequired,
-	theme          : PropTypes.object.isRequired
+	roomClient          : PropTypes.any.isRequired,
+	advancedMode        : PropTypes.bool,
+	me                  : appPropTypes.Me.isRequired,
+	settings            : PropTypes.object,
+	activeSpeaker       : PropTypes.bool,
+	micProducer         : appPropTypes.Producer,
+	webcamProducer      : appPropTypes.Producer,
+	screenProducer      : appPropTypes.Producer,
+	extraVideoProducers : PropTypes.arrayOf(appPropTypes.Producer),
+	spacing             : PropTypes.number,
+	style               : PropTypes.object,
+	smallButtons        : PropTypes.bool,
+	canShareScreen      : PropTypes.bool.isRequired,
+	classes             : PropTypes.object.isRequired,
+	theme               : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>

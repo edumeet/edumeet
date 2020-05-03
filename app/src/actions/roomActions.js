@@ -58,6 +58,12 @@ export const setSettingsOpen = (settingsOpen) =>
 		payload : { settingsOpen }
 	});
 
+export const setExtraVideoOpen = (extraVideoOpen) =>
+	({
+		type    : 'SET_EXTRA_VIDEO_OPEN',
+		payload : { extraVideoOpen }
+	});
+
 export const setSettingsTab = (tab) =>
 	({
 		type    : 'SET_SETTINGS_TAB',

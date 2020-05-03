@@ -58,6 +58,7 @@
 	"room.moderatoractions": "Moderator actions",
 	"room.raisedHand": "{displayName} raised their hand",
 	"room.loweredHand": "{displayName} put their hand down",
+	"room.extraVideo": "Extra video",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -104,6 +105,7 @@
 	"label.media": "Media",
 	"label.appearence": "Appearence",
 	"label.advanced": "Advanced",
+	"label.addVideo": "Add video",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",

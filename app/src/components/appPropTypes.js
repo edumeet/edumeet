@@ -18,9 +18,9 @@ export const Me = PropTypes.shape(
 export const Producer = PropTypes.shape(
 	{
 		id          : PropTypes.string.isRequired,
-		source      : PropTypes.oneOf([ 'mic', 'webcam', 'screen' ]).isRequired,
+		source      : PropTypes.oneOf([ 'mic', 'webcam', 'screen', 'extravideo' ]).isRequired,
 		deviceLabel : PropTypes.string,
-		type        : PropTypes.oneOf([ 'front', 'back', 'screen' ]),
+		type        : PropTypes.oneOf([ 'front', 'back', 'screen', 'extravideo' ]),
 		paused      : PropTypes.bool.isRequired,
 		track       : PropTypes.any,
 		codec       : PropTypes.string.isRequired
@@ -37,7 +37,7 @@ export const Consumer = PropTypes.shape(
 	{
 		id             : PropTypes.string.isRequired,
 		peerId         : PropTypes.string.isRequired,
-		source         : PropTypes.oneOf([ 'mic', 'webcam', 'screen' ]).isRequired,
+		source         : PropTypes.oneOf([ 'mic', 'webcam', 'screen', 'extravideo' ]).isRequired,
 		locallyPaused  : PropTypes.bool.isRequired,
 		remotelyPaused : PropTypes.bool.isRequired,
 		profile        : PropTypes.oneOf([ 'none', 'default', 'low', 'medium', 'high' ]),

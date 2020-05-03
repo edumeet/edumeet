@@ -58,6 +58,7 @@
 	"room.moderatoractions": "Moderatorhandlinger",
 	"room.raisedHand": "{displayName} rakk opp hånden",
 	"room.loweredHand": "{displayName} tok ned hånden",
+	"room.extraVideo": "Ekstra video",
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -104,6 +105,7 @@
 	"label.media": "Media",
 	"label.appearence": "Utseende",
 	"label.advanced": "Avansert",
+	"label.addVideo": "Legg til video",
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",

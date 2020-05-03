@@ -20,6 +20,7 @@ const initialState =
 	selectedPeerId             : null,
 	spotlights                 : [],
 	settingsOpen               : false,
+	extraVideoOpen             : false,
 	currentSettingsTab         : 'media', // media, appearence, advanced
 	lockDialogOpen             : false,
 	joined                     : false,
@@ -112,6 +113,13 @@ const room = (state = initialState, action) =>
 			const { settingsOpen } = action.payload;
 
 			return { ...state, settingsOpen };
+		}
+
+		case 'SET_EXTRA_VIDEO_OPEN':
+		{
+			const { extraVideoOpen } = action.payload;
+
+			return { ...state, extraVideoOpen };
 		}
 
 		case 'SET_SETTINGS_TAB':

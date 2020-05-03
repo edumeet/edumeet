@@ -125,6 +125,7 @@ const Peer = (props) =>
 		micConsumer,
 		webcamConsumer,
 		screenConsumer,
+		extraVideoConsumers,
 		toggleConsumerFullscreen,
 		toggleConsumerWindow,
 		spacing,
@@ -351,6 +352,161 @@ const Peer = (props) =>
 				</div>
 			</div>
 
+			{ extraVideoConsumers.map((consumer) =>
+			{
+				return (
+					<div key={consumer.id}
+						className={
+							classnames(
+								classes.root,
+								'webcam',
+								hover ? 'hover' : null,
+								activeSpeaker ? 'active-speaker' : null
+							)
+						}
+						onMouseOver={() => setHover(true)}
+						onMouseOut={() => setHover(false)}
+						onTouchStart={() =>
+						{
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
+		
+							setHover(true);
+						}}
+						onTouchEnd={() =>
+						{
+							if (touchTimeout)
+								clearTimeout(touchTimeout);
+		
+							touchTimeout = setTimeout(() =>
+							{
+								setHover(false);
+							}, 2000);
+						}}
+						style={rootStyle}
+					>
+						<div className={classnames(classes.viewContainer)}>
+							{ !videoVisible &&
+								<div className={classes.videoInfo}>
+									<p>
+										<FormattedMessage
+											id='room.videoPaused'
+											defaultMessage='This video is paused'
+										/>
+									</p>
+								</div>
+							}
+		
+							<div
+								className={classnames(classes.controls, hover ? 'hover' : null)}
+								onMouseOver={() => setHover(true)}
+								onMouseOut={() => setHover(false)}
+								onTouchStart={() =>
+								{
+									if (touchTimeout)
+										clearTimeout(touchTimeout);
+				
+									setHover(true);
+								}}
+								onTouchEnd={() =>
+								{
+									if (touchTimeout)
+										clearTimeout(touchTimeout);
+				
+									touchTimeout = setTimeout(() =>
+									{
+										setHover(false);
+									}, 2000);
+								}}
+							>
+								{ browser.platform !== 'mobile' &&
+									<Tooltip
+										title={intl.formatMessage({
+											id             : 'label.newWindow',
+											defaultMessage : 'New window'
+										})}
+										placement={smallScreen ? 'top' : 'left'}
+									>
+										<div>
+											<Fab
+												aria-label={intl.formatMessage({
+													id             : 'label.newWindow',
+													defaultMessage : 'New window'
+												})}
+												className={classes.fab}
+												disabled={
+													!videoVisible ||
+													(windowConsumer === consumer.id)
+												}
+												size={smallButtons ? 'small' : 'large'}
+												onClick={() =>
+												{
+													toggleConsumerWindow(consumer);
+												}}
+											>
+												<NewWindowIcon />
+											</Fab>
+										</div>
+									</Tooltip>
+								}
+		
+								<Tooltip
+									title={intl.formatMessage({
+										id             : 'label.fullscreen',
+										defaultMessage : 'Fullscreen'
+									})}
+									placement={smallScreen ? 'top' : 'left'}
+								>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'label.fullscreen',
+												defaultMessage : 'Fullscreen'
+											})}
+											className={classes.fab}
+											disabled={!videoVisible}
+											size={smallButtons ? 'small' : 'large'}
+											onClick={() =>
+											{
+												toggleConsumerFullscreen(consumer);
+											}}
+										>
+											<FullScreenIcon />
+										</Fab>
+									</div>
+								</Tooltip>
+							</div>
+		
+							<VideoView
+								advancedMode={advancedMode}
+								peer={peer}
+								displayName={peer.displayName}
+								showPeerInfo
+								consumerSpatialLayers={consumer ? consumer.spatialLayers : null}
+								consumerTemporalLayers={consumer ? consumer.temporalLayers : null}
+								consumerCurrentSpatialLayer={
+									consumer ? consumer.currentSpatialLayer : null
+								}
+								consumerCurrentTemporalLayer={
+									consumer ? consumer.currentTemporalLayer : null
+								}
+								consumerPreferredSpatialLayer={
+									consumer ? consumer.preferredSpatialLayer : null
+								}
+								consumerPreferredTemporalLayer={
+									consumer ? consumer.preferredTemporalLayer : null
+								}
+								videoMultiLayer={consumer && consumer.type !== 'simple'}
+								videoTrack={consumer && consumer.track}
+								videoVisible={videoVisible}
+								videoCodec={consumer && consumer.codec}
+								videoScore={consumer ? consumer.score : null}
+							/>
+						</div>
+					</div>
+				);
+			})}
+
 			{ screenConsumer &&
 				<div
 					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
@@ -508,6 +664,7 @@ Peer.propTypes =
 	micConsumer              : appPropTypes.Consumer,
 	webcamConsumer           : appPropTypes.Consumer,
 	screenConsumer           : appPropTypes.Consumer,
+	extraVideoConsumers      : PropTypes.arrayOf(appPropTypes.Consumer),
 	windowConsumer           : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
 	browser                  : PropTypes.object.isRequired,

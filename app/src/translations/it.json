@@ -58,6 +58,7 @@
 	"room.moderatoractions": null,
 	"room.raisedHand": null,
 	"room.loweredHand": null,
+	"room.extraVideo": null,
 	
 	"me.mutedPTT": null,
 
@@ -103,6 +104,7 @@
 	"label.media": null,
 	"label.appearence": null,
 	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",
