@@ -56,8 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Zaloguj",
 	"tooltip.logout": "Wyloguj",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Nazwa konferencji",
 	"label.chooseRoomButton": "Kontynuuj",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "Bardzo wysoka (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Zamknij",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "Tryb zaawansowany",
 	"settings.permanentTopBar": "Stały górny pasek",
 	"settings.lastn": "Liczba widocznych uczestników (zdalnych)",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",

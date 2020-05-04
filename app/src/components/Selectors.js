@@ -37,6 +37,11 @@ export const screenProducersSelector = createSelector(
 	(producers) => Object.values(producers).filter((producer) => producer.source === 'screen')
 );
 
+export const extraVideoProducersSelector = createSelector(
+	producersSelect,
+	(producers) => Object.values(producers).filter((producer) => producer.source === 'extravideo')
+);
+
 export const micProducerSelector = createSelector(
 	producersSelect,
 	(producers) => Object.values(producers).find((producer) => producer.source === 'mic')
@@ -65,6 +70,24 @@ export const webcamConsumerSelector = createSelector(
 export const screenConsumerSelector = createSelector(
 	consumersSelect,
 	(consumers) => Object.values(consumers).filter((consumer) => consumer.source === 'screen')
+);
+
+export const spotlightScreenConsumerSelector = createSelector(
+	spotlightsSelector,
+	consumersSelect,
+	(spotlights, consumers) =>
+		Object.values(consumers).filter(
+			(consumer) => consumer.source === 'screen' && spotlights.includes(consumer.peerId)
+		)
+);
+
+export const spotlightExtraVideoConsumerSelector = createSelector(
+	spotlightsSelector,
+	consumersSelect,
+	(spotlights, consumers) =>
+		Object.values(consumers).filter(
+			(consumer) => consumer.source === 'extravideo' && spotlights.includes(consumer.peerId)
+		)
 );
 
 export const passiveMicConsumerSelector = createSelector(
@@ -106,24 +129,41 @@ export const passivePeersSelector = createSelector(
 		.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
 );
 
+export const raisedHandsSelector = createSelector(
+	peersValueSelector,
+	(peers) => peers.reduce((a, b) => (a + (b.raisedHand ? 1 : 0)), 0)
+);
+
 export const videoBoxesSelector = createSelector(
 	spotlightsLengthSelector,
 	screenProducersSelector,
-	screenConsumerSelector,
-	(spotlightsLength, screenProducers, screenConsumers) =>
-		spotlightsLength + 1 + screenProducers.length + screenConsumers.length
+	spotlightScreenConsumerSelector,
+	extraVideoProducersSelector,
+	spotlightExtraVideoConsumerSelector,
+	(
+		spotlightsLength,
+		screenProducers,
+		screenConsumers,
+		extraVideoProducers,
+		extraVideoConsumers
+	) =>
+		spotlightsLength + 1 + screenProducers.length +
+		screenConsumers.length + extraVideoProducers.length +
+		extraVideoConsumers.length
 );
 
 export const meProducersSelector = createSelector(
 	micProducerSelector,
 	webcamProducerSelector,
 	screenProducerSelector,
-	(micProducer, webcamProducer, screenProducer) =>
+	extraVideoProducersSelector,
+	(micProducer, webcamProducer, screenProducer, extraVideoProducers) =>
 	{
 		return {
 			micProducer,
 			webcamProducer,
-			screenProducer
+			screenProducer,
+			extraVideoProducers
 		};
 	}
 );
@@ -146,8 +186,10 @@ export const makePeerConsumerSelector = () =>
 				consumersArray.find((consumer) => consumer.source === 'webcam');
 			const screenConsumer =
 				consumersArray.find((consumer) => consumer.source === 'screen');
+			const extraVideoConsumers =
+				consumersArray.filter((consumer) => consumer.source === 'extravideo');
 
-			return { micConsumer, webcamConsumer, screenConsumer };
+			return { micConsumer, webcamConsumer, screenConsumer, extraVideoConsumers };
 		}
 	);
 };

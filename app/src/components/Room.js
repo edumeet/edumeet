@@ -24,6 +24,7 @@ import LockDialog from './AccessControl/LockDialog/LockDialog';
 import Settings from './Settings/Settings';
 import TopBar from './Controls/TopBar';
 import WakeLock from 'react-wakelock-react16';
+import ExtraVideo from './Controls/ExtraVideo';
 
 const TIMEOUT = 5 * 1000;
 
@@ -216,6 +217,10 @@ class Room extends React.PureComponent
 
 				{ room.settingsOpen &&
 					<Settings />
+				}
+
+				{ room.extraVideoOpen &&
+					<ExtraVideo />
 				}
 			</div>
 		);

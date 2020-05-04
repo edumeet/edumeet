@@ -56,8 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Σύνδεση",
 	"tooltip.logout": "Αποσύνδεση",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Όνομα δωματίου",
 	"label.chooseRoomButton": "Συνέχεια",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "Πολύ υψηλή (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Κλείσιμο",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Ρυθμίσεις",
 	"settings.camera": "Κάμερα",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "Προηγμένη λειτουργία",
 	"settings.permanentTopBar": "Μόνιμη μπάρα κορυφής",
 	"settings.lastn": "Αριθμός ορατών βίντεο",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Αδυναμία αποθήκευσης του αρχείου",
 	"filesharing.startingFileShare": "Προσπάθεια διαμοιρασμού αρχείου",

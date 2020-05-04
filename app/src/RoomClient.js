@@ -233,6 +233,9 @@ export default class RoomClient
 		// Local webcam mediasoup Producer.
 		this._webcamProducer = null;
 
+		// Extra videos being produced
+		this._extraVideoProducers = new Map();
+
 		// Map of webcam MediaDeviceInfos indexed by deviceId.
 		// @type {Map<String, MediaDeviceInfos>}
 		this._webcams = {};
@@ -516,16 +519,21 @@ export default class RoomClient
 
 	_soundNotification()
 	{
-		const alertPromise = this._soundAlert.play();
+		const { notificationSounds } = store.getState().settings;
 
-		if (alertPromise !== undefined)
+		if (notificationSounds)
 		{
-			alertPromise
-				.then()
-				.catch((error) =>
-				{
-					logger.error('_soundAlert.play() | failed: %o', error);
-				});
+			const alertPromise = this._soundAlert.play();
+
+			if (alertPromise !== undefined)
+			{
+				alertPromise
+					.then()
+					.catch((error) =>
+					{
+						logger.error('_soundAlert.play() | failed: %o', error);
+					});
+			}
 		}
 	}
 
@@ -841,62 +849,6 @@ export default class RoomClient
 						defaultMessage : 'Unable to share file'
 					})
 				}));
-		}
-	}
-
-	async getServerHistory()
-	{
-		logger.debug('getServerHistory()');
-
-		try
-		{
-			const {
-				chatHistory,
-				fileHistory,
-				lastNHistory,
-				locked,
-				lobbyPeers,
-				accessCode
-			} = await this.sendRequest('serverHistory');
-
-			(chatHistory.length > 0) && store.dispatch(
-				chatActions.addChatHistory(chatHistory));
-
-			(fileHistory.length > 0) && store.dispatch(
-				fileActions.addFileHistory(fileHistory));
-
-			if (lastNHistory.length > 0)
-			{
-				logger.debug('Got lastNHistory');
-
-				// Remove our self from list
-				const index = lastNHistory.indexOf(this._peerId);
-
-				lastNHistory.splice(index, 1);
-
-				this._spotlights.addSpeakerList(lastNHistory);
-			}
-
-			locked ? 
-				store.dispatch(roomActions.setRoomLocked()) :
-				store.dispatch(roomActions.setRoomUnLocked());
-
-			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
-			{
-				store.dispatch(
-					lobbyPeerActions.addLobbyPeer(peer.peerId));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
-			});
-
-			(accessCode != null) && store.dispatch(
-				roomActions.setAccessCode(accessCode));
-		}
-		catch (error)
-		{
-			logger.error('getServerHistory() | failed: %o', error);
 		}
 	}
 
@@ -1561,30 +1513,30 @@ export default class RoomClient
 		}
 	}
 
-	async sendRaiseHandState(state)
+	async setRaisedHand(raisedHand)
 	{
-		logger.debug('sendRaiseHandState: ', state);
+		logger.debug('setRaisedHand: ', raisedHand);
 
 		store.dispatch(
-			meActions.setMyRaiseHandStateInProgress(true));
+			meActions.setRaisedHandInProgress(true));
 
 		try
 		{
-			await this.sendRequest('raiseHand', { raiseHandState: state });
+			await this.sendRequest('raisedHand', { raisedHand });
 
 			store.dispatch(
-				meActions.setMyRaiseHandState(state));
+				meActions.setRaisedHand(raisedHand));
 		}
 		catch (error)
 		{
-			logger.error('sendRaiseHandState() | failed: %o', error);
+			logger.error('setRaisedHand() | [error:"%o"]', error);
 
 			// We need to refresh the component for it to render changed state
-			store.dispatch(meActions.setMyRaiseHandState(!state));
+			store.dispatch(meActions.setRaisedHand(!raisedHand));
 		}
 
 		store.dispatch(
-			meActions.setMyRaiseHandStateInProgress(false));
+			meActions.setRaisedHandInProgress(false));
 	}
 
 	async setMaxSendingSpatialLayer(spatialLayer)
@@ -2052,6 +2004,8 @@ export default class RoomClient
 							lobbyPeerActions.addLobbyPeer(peerId));
 						store.dispatch(
 							roomActions.setToolbarsVisible(true));
+
+						this._soundNotification();
 	
 						store.dispatch(requestActions.notify(
 							{
@@ -2061,6 +2015,43 @@ export default class RoomClient
 								})
 							}));
 	
+						break;
+					}
+
+					case 'parkedPeers':
+					{
+						const { lobbyPeers } = notification.data;
+
+						if (lobbyPeers.length > 0)
+						{
+							lobbyPeers.forEach((peer) =>
+							{
+								store.dispatch(
+									lobbyPeerActions.addLobbyPeer(peer.peerId));
+								store.dispatch(
+									lobbyPeerActions.setLobbyPeerDisplayName(
+										peer.displayName,
+										peer.peerId
+									)
+								);
+								store.dispatch(
+									lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+							});
+	
+							store.dispatch(
+								roomActions.setToolbarsVisible(true));
+
+							this._soundNotification();
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'room.newLobbyPeer',
+										defaultMessage : 'New participant entered the lobby'
+									})
+								}));
+						}
+
 						break;
 					}
 	
@@ -2222,6 +2213,48 @@ export default class RoomClient
 						break;
 					}
 
+					case 'raisedHand':
+					{
+						const { peerId, raisedHand } = notification.data;
+
+						store.dispatch(peerActions.setPeerRaisedHand(peerId, raisedHand));
+
+						const { displayName } = store.getState().peers[peerId];
+
+						let text;
+
+						if (raisedHand)
+						{
+							text = intl.formatMessage({
+								id             : 'room.raisedHand',
+								defaultMessage : '{displayName} raised their hand'
+							}, {
+								displayName
+							});
+						}
+						else
+						{
+							text = intl.formatMessage({
+								id             : 'room.loweredHand',
+								defaultMessage : '{displayName} put their hand down'
+							}, {
+								displayName
+							});
+						}
+
+						if (displayName)
+						{
+							store.dispatch(requestActions.notify(
+								{
+									text
+								}));
+						}
+
+						this._soundNotification();
+
+						break;
+					}
+
 					case 'chatMessage':
 					{
 						const { peerId, chatMessage } = notification.data;
@@ -2317,6 +2350,8 @@ export default class RoomClient
 
 						store.dispatch(
 							peerActions.addPeer({ id, displayName, picture, roles, consumers: [] }));
+
+						this._soundNotification();
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2474,7 +2509,9 @@ export default class RoomClient
 								{
 									text : intl.formatMessage({
 										id             : 'roles.gotRole',
-										defaultMessage : `You got the role: ${role}`
+										defaultMessage : 'You got the role: {role}'
+									}, {
+										role
 									})
 								}));
 						}
@@ -2496,7 +2533,9 @@ export default class RoomClient
 								{
 									text : intl.formatMessage({
 										id             : 'roles.lostRole',
-										defaultMessage : `You lost the role: ${role}`
+										defaultMessage : 'You lost the role: {role}'
+									}, {
+										role
 									})
 								}));
 						}
@@ -2694,7 +2733,13 @@ export default class RoomClient
 				peers,
 				tracker,
 				permissionsFromRoles,
-				userRoles
+				userRoles,
+				chatHistory,
+				fileHistory,
+				lastNHistory,
+				locked,
+				lobbyPeers,
+				accessCode
 			} = await this.sendRequest(
 				'join',
 				{
@@ -2749,6 +2794,38 @@ export default class RoomClient
 				this.updateSpotlights(spotlights);
 			});
 
+			(chatHistory.length > 0) && store.dispatch(
+				chatActions.addChatHistory(chatHistory));
+
+			(fileHistory.length > 0) && store.dispatch(
+				fileActions.addFileHistory(fileHistory));
+
+			if (lastNHistory.length > 0)
+			{
+				logger.debug('_joinRoom() | got lastN history');
+
+				this._spotlights.addSpeakerList(
+					lastNHistory.filter((peerId) => peerId !== this._peerId)
+				);
+			}
+
+			locked ? 
+				store.dispatch(roomActions.setRoomLocked()) :
+				store.dispatch(roomActions.setRoomUnLocked());
+
+			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
+			{
+				store.dispatch(
+					lobbyPeerActions.addLobbyPeer(peer.peerId));
+				store.dispatch(
+					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
+				store.dispatch(
+					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+			});
+
+			(accessCode != null) && store.dispatch(
+				roomActions.setAccessCode(accessCode));
+
 			// Don't produce if explicitly requested to not to do it.
 			if (this._produce)
 			{
@@ -2781,8 +2858,6 @@ export default class RoomClient
 
 			// Clean all the existing notifications.
 			store.dispatch(notificationActions.removeAllNotifications());
-
-			this.getServerHistory();
 
 			store.dispatch(requestActions.notify(
 				{
@@ -2931,6 +3006,159 @@ export default class RoomClient
 					text : 'Unable to set join by access code.'
 				}));
 		}
+	}
+
+	async addExtraVideo(videoDeviceId)
+	{
+		logger.debug(
+			'addExtraVideo() [videoDeviceId:"%s"]',
+			videoDeviceId
+		);
+
+		store.dispatch(
+			roomActions.setExtraVideoOpen(false));
+
+		if (!this._mediasoupDevice.canProduce('video'))
+		{
+			logger.error('enableWebcam() | cannot produce video');
+
+			return;
+		}
+
+		let track;
+
+		store.dispatch(
+			meActions.setWebcamInProgress(true));
+
+		try
+		{
+			const device = this._webcams[videoDeviceId];
+			const resolution = store.getState().settings.resolution;
+
+			if (!device)
+				throw new Error('no webcam devices');
+			
+			logger.debug(
+				'addExtraVideo() | new selected webcam [device:%o]',
+				device);
+
+			logger.debug('_setWebcamProducer() | calling getUserMedia()');
+
+			const stream = await navigator.mediaDevices.getUserMedia(
+				{
+					video :
+					{
+						deviceId : { ideal: videoDeviceId },
+						...VIDEO_CONSTRAINS[resolution]
+					}
+				});
+
+			track = stream.getVideoTracks()[0];
+
+			let producer;
+
+			if (this._useSimulcast)
+			{
+				// If VP9 is the only available video codec then use SVC.
+				const firstVideoCodec = this._mediasoupDevice
+					.rtpCapabilities
+					.codecs
+					.find((c) => c.kind === 'video');
+
+				let encodings;
+
+				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+					encodings = VIDEO_KSVC_ENCODINGS;
+				else if ('simulcastEncodings' in window.config)
+					encodings = window.config.simulcastEncodings;
+				else
+					encodings = VIDEO_SIMULCAST_ENCODINGS;
+
+				producer = await this._sendTransport.produce(
+					{
+						track,
+						encodings,
+						codecOptions :
+						{
+							videoGoogleStartBitrate : 1000
+						},
+						appData : 
+						{
+							source : 'extravideo'
+						}
+					});
+			}
+			else
+			{
+				producer = await this._sendTransport.produce({
+					track,
+					appData : 
+					{
+						source : 'extravideo'
+					}
+				});
+			}
+
+			this._extraVideoProducers.set(producer.id, producer);
+
+			store.dispatch(producerActions.addProducer(
+				{
+					id            : producer.id,
+					deviceLabel   : device.label,
+					source        : 'extravideo',
+					paused        : producer.paused,
+					track         : producer.track,
+					rtpParameters : producer.rtpParameters,
+					codec         : producer.rtpParameters.codecs[0].mimeType.split('/')[1]
+				}));
+
+			// store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
+
+			await this._updateWebcams();
+
+			producer.on('transportclose', () =>
+			{
+				this._extraVideoProducers.delete(producer.id);
+
+				producer = null;
+			});
+
+			producer.on('trackended', () =>
+			{
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : intl.formatMessage({
+							id             : 'devices.cameraDisconnected',
+							defaultMessage : 'Camera disconnected'
+						})
+					}));
+
+				this.disableExtraVideo(producer.id)
+					.catch(() => {});
+			});
+
+			logger.debug('addExtraVideo() succeeded');
+		}
+		catch (error)
+		{
+			logger.error('addExtraVideo() failed:%o', error);
+
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'devices.cameraError',
+						defaultMessage : 'An error occurred while accessing your camera'
+					})
+				}));
+
+			if (track)
+				track.stop();
+		}
+
+		store.dispatch(
+			meActions.setWebcamInProgress(false));
 	}
 
 	async enableMic()
@@ -3431,6 +3659,37 @@ export default class RoomClient
 
 		store.dispatch(
 			meActions.setWebcamInProgress(false));
+	}
+
+	async disableExtraVideo(id)
+	{
+		logger.debug('disableExtraVideo()');
+
+		const producer = this._extraVideoProducers.get(id);
+
+		if (!producer)
+			return;
+
+		store.dispatch(meActions.setWebcamInProgress(true));
+
+		producer.close();
+
+		store.dispatch(
+			producerActions.removeProducer(id));
+
+		try
+		{
+			await this.sendRequest(
+				'closeProducer', { producerId: id });
+		}
+		catch (error)
+		{
+			logger.error('disableWebcam() [error:"%o"]', error);
+		}
+
+		this._extraVideoProducers.delete(id);
+
+		store.dispatch(meActions.setWebcamInProgress(false));
 	}
 
 	async disableWebcam()

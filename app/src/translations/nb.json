@@ -56,8 +56,14 @@
 	"room.clearFileSharing": "Fjern filer",
 	"room.speechUnsupported": "Din nettleser støtter ikke stemmegjenkjenning",
 	"room.moderatoractions": "Moderatorhandlinger",
+	"room.raisedHand": "{displayName} rakk opp hånden",
+	"room.loweredHand": "{displayName} tok ned hånden",
+	"room.extraVideo": "Ekstra video",
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
+
+	"roles.gotRole": "Du fikk rollen: {role}",
+	"roles.lostRole": "Du mistet rollen: {role}",
 
 	"tooltip.login": "Logg in",
 	"tooltip.logout": "Logg ut",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": "Spark ut deltaker",
 	"tooltip.muteParticipant": "Demp deltaker",
 	"tooltip.muteParticipantVideo": "Demp deltakervideo",
+	"tooltip.raisedHand": "Rekk opp hånden",
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "Veldig høy (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Lukk",
+	"label.media": "Media",
+	"label.appearence": "Utseende",
+	"label.advanced": "Avansert",
+	"label.addVideo": "Legg til video",
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "Avansert modus",
 	"settings.permanentTopBar": "Permanent topplinje",
 	"settings.lastn": "Antall videoer synlig",
+	"settings.hiddenControls": "Skjul media knapper",
+	"settings.notificationSounds": "Varslingslyder",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

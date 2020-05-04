@@ -38,6 +38,16 @@ export const togglePermanentTopBar = () =>
 		type : 'TOGGLE_PERMANENT_TOPBAR'
 	});
 
+export const toggleHiddenControls = () =>
+	({
+		type : 'TOGGLE_HIDDEN_CONTROLS'
+	});
+
+export const toggleNotificationSounds = () =>
+	({
+		type : 'TOGGLE_NOTIFICATION_SOUNDS'
+	});
+
 export const setLastN = (lastN) =>
 	({
 		type    : 'SET_LAST_N',

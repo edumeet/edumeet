@@ -34,10 +34,10 @@ export const setPeerScreenInProgress = (peerId, flag) =>
 		payload : { peerId, flag }
 	});
 
-export const setPeerRaiseHandState = (peerId, raiseHandState) =>
+export const setPeerRaisedHand = (peerId, raisedHand) =>
 	({
-		type    : 'SET_PEER_RAISE_HAND_STATE',
-		payload : { peerId, raiseHandState }
+		type    : 'SET_PEER_RAISED_HAND',
+		payload : { peerId, raisedHand }
 	});
 
 export const setPeerPicture = (peerId, picture) =>

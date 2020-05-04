@@ -52,13 +52,25 @@ export const setJoinByAccessCode = (joinByAccessCode) =>
 		payload : { joinByAccessCode }
 	});
 
-export const setSettingsOpen = ({ settingsOpen }) =>
+export const setSettingsOpen = (settingsOpen) =>
 	({
 		type    : 'SET_SETTINGS_OPEN',
 		payload : { settingsOpen }
 	});
 
-export const setLockDialogOpen = ({ lockDialogOpen }) =>
+export const setExtraVideoOpen = (extraVideoOpen) =>
+	({
+		type    : 'SET_EXTRA_VIDEO_OPEN',
+		payload : { extraVideoOpen }
+	});
+
+export const setSettingsTab = (tab) =>
+	({
+		type    : 'SET_SETTINGS_TAB',
+		payload : { tab }
+	});
+
+export const setLockDialogOpen = (lockDialogOpen) =>
 	({
 		type    : 'SET_LOCK_DIALOG_OPEN',
 		payload : { lockDialogOpen }

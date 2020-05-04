@@ -56,8 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Connexion",
 	"tooltip.logout": "Déconnexion",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Nom de la salle",
 	"label.chooseRoomButton": "Continuer",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "Très Haute Définition (FHD)",
 	"label.ultra": "Ultra Haute Définition",
 	"label.close": "Fermer",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Paramètres",
 	"settings.camera": "Caméra",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "Mode avancé",
 	"settings.permanentTopBar": "Barre supérieure permanente",
 	"settings.lastn": "Nombre de vidéos visibles",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",

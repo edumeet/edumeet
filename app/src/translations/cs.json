@@ -55,8 +55,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Přihlášení",
 	"tooltip.logout": "Odhlášení",
@@ -71,6 +77,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Jméno místnosti",
 	"label.chooseRoomButton": "Pokračovat",
@@ -94,6 +101,10 @@
 	"label.veryHigh": "Velmi vysoké (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Zavřít",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",
@@ -109,6 +120,10 @@
 	"settings.layout": "Rozvržení místnosti",
 	"settings.selectRoomLayout": "Vyberte rozvržení místnosti",
 	"settings.advancedMode": "Pokočilý mód",
+	"settings.permanentTopBar": null,
+	"settings.lastn": null,
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",

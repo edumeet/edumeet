@@ -24,6 +24,7 @@ const permissionsFromRoles =
 	SEND_CHAT        : [ userRoles.NORMAL ],
 	MODERATE_CHAT    : [ userRoles.MODERATOR ],
 	SHARE_SCREEN     : [ userRoles.NORMAL ],
+	EXTRA_VIDEO      : [ userRoles.NORMAL ],
 	SHARE_FILE       : [ userRoles.NORMAL ],
 	MODERATE_FILES   : [ userRoles.MODERATOR ],
 	MODERATE_ROOM    : [ userRoles.MODERATOR ],
@@ -530,6 +531,17 @@ class Room extends EventEmitter
 				peerId : peer.id,
 				role   : newRole
 			}, true, true);
+
+			// Got permission to promote peers, notify peer of
+			// peers in lobby
+			if (permissionsFromRoles.PROMOTE_PEER.includes(newRole))
+			{
+				const lobbyPeers = this._lobby.peerList();
+
+				lobbyPeers.length > 0 && this._notification(peer.socket, 'parkedPeers', {
+					lobbyPeers
+				});
+			}
 		});
 
 		peer.on('lostRole', ({ oldRole }) =>
@@ -586,13 +598,21 @@ class Room extends EventEmitter
 					.filter((joinedPeer) => joinedPeer.id !== peer.id)
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
+				const lobbyPeers = this._lobby.peerList();
+
 				cb(null, {
 					roles                : peer.roles,
 					peers                : peerInfos,
 					tracker              : config.fileTracker,
 					authenticated        : peer.authenticated,
 					permissionsFromRoles : permissionsFromRoles,
-					userRoles            : userRoles
+					userRoles            : userRoles,
+					chatHistory          : this._chatHistory,
+					fileHistory          : this._fileHistory,
+					lastNHistory         : this._lastN,
+					locked               : this._locked,
+					lobbyPeers           : lobbyPeers,
+					accessCode           : this._accessCode
 				});
 
 				// Mark the new Peer as joined.
@@ -725,6 +745,13 @@ class Room extends EventEmitter
 					appData.source === 'screen' &&
 					!peer.roles.some(
 						(role) => permissionsFromRoles.SHARE_SCREEN.includes(role))
+				)
+					throw new Error('peer not authorized');
+
+				if (
+					appData.source === 'extravideo' &&
+					!peer.roles.some(
+						(role) => permissionsFromRoles.EXTRA_VIDEO.includes(role))
 				)
 					throw new Error('peer not authorized');
 
@@ -1067,26 +1094,6 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'serverHistory':
-			{
-				// Return to sender
-				const lobbyPeers = this._lobby.peerList();
-
-				cb(
-					null,
-					{
-						chatHistory  : this._chatHistory,
-						fileHistory  : this._fileHistory,
-						lastNHistory : this._lastN,
-						locked       : this._locked,
-						lobbyPeers   : lobbyPeers,
-						accessCode   : this._accessCode
-					}
-				);
-
-				break;
-			}
-
 			case 'lockRoom':
 			{
 				if (
@@ -1252,14 +1259,14 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'raiseHand':
+			case 'raisedHand':
 			{
 				const { raisedHand } = request.data;
 
 				peer.raisedHand = raisedHand;
 
 				// Spread to others
-				this._notification(peer.socket, 'raiseHand', {
+				this._notification(peer.socket, 'raisedHand', {
 					peerId     : peer.id,
 					raisedHand : raisedHand
 				}, true);

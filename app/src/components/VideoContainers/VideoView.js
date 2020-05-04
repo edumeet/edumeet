@@ -345,11 +345,14 @@ class VideoView extends React.PureComponent
 		}
 	}
 
-	componentWillUpdate()
+	componentDidUpdate(prevProps)
 	{
-		const { videoTrack, audioTrack } = this.props;
+		if (prevProps !== this.props)
+		{
+			const { videoTrack, audioTrack } = this.props;
 
-		this._setTracks(videoTrack, audioTrack);
+			this._setTracks(videoTrack, audioTrack);
+		}
 	}
 
 	_setTracks(videoTrack, audioTrack)

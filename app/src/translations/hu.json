@@ -56,8 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Belépés",
 	"tooltip.logout": "Kilépés",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "Nagyon magas (FHD)",
 	"label.ultra": "Ultra magas (UHD)",
 	"label.close": "Bezár",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Beállítások",
 	"settings.camera": "Kamera",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "Részletes információk",
 	"settings.permanentTopBar": "Állandó felső sáv",
 	"settings.lastn": "A látható videók száma",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

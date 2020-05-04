@@ -56,8 +56,14 @@
 	"room.clearFileSharing": "Clear files",
 	"room.speechUnsupported": "Your browser does not support speech recognition",
 	"room.moderatoractions": "Moderator actions",
+	"room.raisedHand": "{displayName} raised their hand",
+	"room.loweredHand": "{displayName} put their hand down",
+	"room.extraVideo": "Extra video",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
+
+	"roles.gotRole": "You got the role: {role}",
+	"roles.lostRole": "You lost the role: {role}",
 
 	"tooltip.login": "Log in",
 	"tooltip.logout": "Log out",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": "Kick out participant",
 	"tooltip.muteParticipant": "Mute participant",
 	"tooltip.muteParticipantVideo": "Mute participant video",
+	"tooltip.raisedHand": "Raise hand",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "Very high (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Close",
+	"label.media": "Media",
+	"label.appearence": "Appearence",
+	"label.advanced": "Advanced",
+	"label.addVideo": "Add video",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "Advanced mode",
 	"settings.permanentTopBar": "Permanent top bar",
 	"settings.lastn": "Number of visible videos",
+	"settings.hiddenControls": "Hidden media controls",
+	"settings.notificationSounds": "Notification sounds",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

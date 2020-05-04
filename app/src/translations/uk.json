@@ -56,6 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
+
+	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Увійти",
 	"tooltip.logout": "Вихід",
@@ -70,6 +78,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Назва кімнати",
 	"label.chooseRoomButton": "Продовжити",
@@ -93,6 +102,10 @@
 	"label.veryHigh": "Дуже високий (FHD)",
 	"label.ultra": "Ультра (UHD)",
 	"label.close": "Закрити",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Налаштування",
 	"settings.camera": "Камера",
@@ -110,6 +123,8 @@
 	"settings.advancedMode": "Розширений режим",
 	"settings.permanentTopBar": "Постійний верхній рядок",
 	"settings.lastn": "Кількість видимих ​​відео",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",

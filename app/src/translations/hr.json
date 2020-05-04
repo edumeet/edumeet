@@ -56,8 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": "Vaš preglednik ne podržava prepoznavanje govora",
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Prijava",
 	"tooltip.logout": "Odjava",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": "Izbaci sudionika",
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Naziv sobe",
 	"label.chooseRoomButton": "Nastavi",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "Vrlo visoka (FHD)",
 	"label.ultra": "Ultra visoka (UHD)",
 	"label.close": "Zatvori",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings":  "Postavke",
 	"settings.camera": "Kamera",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "Napredne mogućnosti",
 	"settings.permanentTopBar": "Stalna gornja šipka",
 	"settings.lastn": "Broj vidljivih videozapisa",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",

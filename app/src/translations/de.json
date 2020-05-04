@@ -56,8 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": "Dein Browser unterstützt keine Spracherkennung",
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 
-  	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 	
 	"tooltip.login": "Anmelden",
 	"tooltip.logout": "Abmelden",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": "Teilnehmer rauswerfen",
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Name des Raums",
 	"label.chooseRoomButton": "Weiter",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "Sehr hoch (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Schließen",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "Erweiterter Modus",
 	"settings.permanentTopBar": "Permanente obere Leiste",
 	"settings.lastn": "Anzahl der sichtbaren Videos",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",

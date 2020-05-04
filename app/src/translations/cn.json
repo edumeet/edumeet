@@ -56,8 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "登录",
 	"tooltip.logout": "注销",
@@ -72,6 +78,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",
@@ -95,6 +102,10 @@
 	"label.veryHigh": "非常高 (FHD)",
 	"label.ultra": "超高 (UHD)",
 	"label.close": "关闭",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",
@@ -112,6 +123,8 @@
 	"settings.advancedMode": "高级模式",
 	"settings.permanentTopBar": "永久顶吧",
 	"settings.lastn": "可见视频数量",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "无法保存文件",
 	"filesharing.startingFileShare": "正在尝试共享文件",

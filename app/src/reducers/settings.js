@@ -7,7 +7,9 @@ const initialState =
 	// low, medium, high, veryhigh, ultra
 	resolution          : window.config.defaultResolution || 'medium',
 	lastN               : 4,
-	permanentTopBar     : true
+	permanentTopBar     : true,
+	hiddenControls      : false,
+	notificationSounds  : true
 };
 
 const settings = (state = initialState, action) =>
@@ -55,6 +57,20 @@ const settings = (state = initialState, action) =>
 			const permanentTopBar = !state.permanentTopBar;
 
 			return { ...state, permanentTopBar };
+		}
+
+		case 'TOGGLE_HIDDEN_CONTROLS':
+		{
+			const hiddenControls = !state.hiddenControls;
+
+			return { ...state, hiddenControls };
+		}
+
+		case 'TOGGLE_NOTIFICATION_SOUNDS':
+		{
+			const notificationSounds = !state.notificationSounds;
+
+			return { ...state, notificationSounds };
 		}
 
 		case 'SET_VIDEO_RESOLUTION':

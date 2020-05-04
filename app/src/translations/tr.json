@@ -56,6 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
+
+	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Giriş",
 	"tooltip.logout": "Çıkış",
@@ -70,6 +78,7 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Oda adı",
 	"label.chooseRoomButton": "Devam",
@@ -93,6 +102,10 @@
 	"label.veryHigh": "Çok Yüksek (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Kapat",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",
@@ -107,6 +120,8 @@
 	"settings.advancedMode": "Detaylı mod",
 	"settings.permanentTopBar": "Üst barı kalıcı yap",
 	"settings.lastn": "İzlenebilir video sayısı",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",

@@ -63,9 +63,9 @@ export const setWebcamDevices = (devices) =>
 		payload : { devices }
 	});
 
-export const setMyRaiseHandState = (flag) =>
+export const setRaisedHand = (flag) =>
 	({
-		type    : 'SET_MY_RAISE_HAND_STATE',
+		type    : 'SET_RAISED_HAND',
 		payload : { flag }
 	});
 
@@ -93,9 +93,9 @@ export const setScreenShareInProgress = (flag) =>
 		payload : { flag }
 	});
 
-export const setMyRaiseHandStateInProgress = (flag) =>
+export const setRaisedHandInProgress = (flag) =>
 	({
-		type    : 'SET_MY_RAISE_HAND_STATE_IN_PROGRESS',
+		type    : 'SET_RAISED_HAND_IN_PROGRESS',
 		payload : { flag }
 	});
 

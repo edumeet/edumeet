@@ -56,8 +56,14 @@
 	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
 	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
 	
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Log in",
 	"tooltip.logout": "Log out",
@@ -71,6 +77,7 @@
 	"tooltip.participants": "Mostra partecipanti",
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Nome della stanza",
 	"label.chooseRoomButton": "Continua",
@@ -94,6 +101,10 @@
 	"label.veryHigh": "Molto alta (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Chiudi",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",
@@ -111,6 +122,8 @@
 	"settings.advancedMode": "Modalità avanzata",
 	"settings.permanentTopBar": "Barra superiore permanente",
 	"settings.lastn": "Numero di video visibili",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",
