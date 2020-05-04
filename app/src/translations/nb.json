@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} rakk opp hånden",
 	"room.loweredHand": "{displayName} tok ned hånden",
 	"room.extraVideo": "Ekstra video",
+	"room.overRoomLimit": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 

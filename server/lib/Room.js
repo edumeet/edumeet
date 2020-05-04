@@ -177,6 +177,9 @@ class Room extends EventEmitter
 			peer.roles.some((role) => accessFromRoles.BYPASS_ROOM_LOCK.includes(role))
 		)
 			this._peerJoining(peer);
+		else if ('maxUsersPerRoom' in config &&(this._getJoinedPeers().length + this._lobby.peerList().length) >= config.maxUsersPerRoom) {
+			this._handleOverRoomLimit(peer);
+		}
 		else if (this._locked)
 			this._parkPeer(peer);
 		else
@@ -186,6 +189,11 @@ class Room extends EventEmitter
 				this._peerJoining(peer) :
 				this._handleGuest(peer);
 		}
+	}
+
+	_handleOverRoomLimit(peer)
+	{
+		this._notification(peer.socket, 'overRoomLimit');
 	}
 
 	_handleGuest(peer)

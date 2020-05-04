@@ -1963,6 +1963,13 @@ export default class RoomClient
 						break;
 					}
 						
+					case 'overRoomLimit':
+					{
+						store.dispatch(roomActions.setOverRoomLimit(true));
+
+						break;
+					}
+
 					case 'roomReady':
 					{
 						const { turnServers } = notification.data;

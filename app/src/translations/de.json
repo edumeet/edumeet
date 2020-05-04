@@ -59,6 +59,7 @@
 	"room.raisedHand": null,
 	"room.loweredHand": null,
 	"room.extraVideo": null,
+	"room.overRoomLimit": null,
 
 	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
 

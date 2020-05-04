@@ -83,6 +83,10 @@ const styles = (theme) =>
 		green :
 		{
 			color : 'rgba(0, 153, 0, 1)'
+		},
+		red :
+		{
+			color : 'rgba(153, 0, 0, 1)'
 		}
 	});
 
@@ -281,6 +285,16 @@ const JoinDialog = ({
 						}}
 						fullWidth
 					/>
+					{!room.inLobby && room.overRoomLimit &&
+							<DialogContentText className={classes.red} variant='h6' gutterBottom>
+								<FormattedMessage
+									id='room.overRoomLimit'
+									defaultMessage={
+										`The room is full. Retry after some time.`
+									}
+								/>
+							</DialogContentText>
+					}
 
 				</DialogContent>
 
@@ -419,6 +433,7 @@ export default withRoomContext(connect(
 			return (
 				prev.room.inLobby === next.room.inLobby &&
 				prev.room.signInRequired === next.room.signInRequired &&
+				prev.room.overRoomLimit === next.room.overRoomLimit &&
 				prev.settings.displayName === next.settings.displayName &&
 				prev.me.displayNameInProgress === next.me.displayNameInProgress &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
