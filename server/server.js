@@ -158,6 +158,7 @@ async function run()
 	// Run WebSocketServer.
 	await runWebSocketServer();
 
+	// eslint-disable-next-line no-unused-vars
 	function errorHandler(err, req, res, next) 
 	{
 		const trackingId = uuidv4();
