@@ -92,6 +92,7 @@
 	"label.filesharing": "Partajarea fișierelor",
 	"label.participants": "Participanți",
 	"label.shareFile": "Partajează fișierul",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Partajarea fișierelor nu este acceptată",
 	"label.unknown": "Necunoscut",
 	"label.democratic": "Distribuție egală a dimensiunii imaginii", 

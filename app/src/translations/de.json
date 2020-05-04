@@ -92,6 +92,7 @@
 	"label.filesharing": "Dateien",
 	"label.participants": "Teilnehmer",
 	"label.shareFile": "Datei hochladen",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Dateifreigabe nicht unterstützt",
 	"label.unknown": "Unbekannt",
 	"label.democratic": "Demokratisch",

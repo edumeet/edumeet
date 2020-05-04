@@ -92,6 +92,7 @@
 	"label.filesharing": "Fájl megosztás",
 	"label.participants": "Résztvevők",
 	"label.shareFile": "Fájl megosztása",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Fájl megosztás nem támogatott",
 	"label.unknown": "Ismeretlen",
 	"label.democratic": "Egyforma képméretű képkiosztás",

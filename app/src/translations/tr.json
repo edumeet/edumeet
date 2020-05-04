@@ -92,6 +92,7 @@
 	"label.filesharing": "Dosya paylaşım",
 	"label.participants": "Katılımcı",
 	"label.shareFile": "Dosya paylaş",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Dosya paylaşımı desteklenmiyor",
 	"label.unknown": "Bilinmeyen",
 	"label.democratic": "Demokratik görünüm",

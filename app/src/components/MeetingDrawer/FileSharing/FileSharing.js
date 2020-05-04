@@ -42,6 +42,7 @@ const FileSharing = (props) =>
 
 	const {
 		canShareFiles,
+		browser,
 		canShare,
 		classes
 	} = props;
@@ -50,6 +51,17 @@ const FileSharing = (props) =>
 		intl.formatMessage({
 			id             : 'label.shareFile',
 			defaultMessage : 'Share file'
+		})
+		:
+		intl.formatMessage({
+			id             : 'label.fileSharingUnsupported',
+			defaultMessage : 'File sharing not supported'
+		});
+
+	const buttonGalleryDescription = canShareFiles ?
+		intl.formatMessage({
+			id             : 'label.shareGalleryFile',
+			defaultMessage : 'Share from gallery'
 		})
 		:
 		intl.formatMessage({
@@ -69,6 +81,14 @@ const FileSharing = (props) =>
 				onClick={(e) => (e.target.value = null)}
 				id='share-files-button'
 			/>
+			<input
+				className={classes.input}
+				type='file'
+				disabled={!canShare}
+				onChange={handleFileChange}
+				accept="image/*"
+				id='share-files-gallery-button'
+			/>
 			<label htmlFor='share-files-button'>
 				<Button
 					variant='contained'
@@ -79,7 +99,18 @@ const FileSharing = (props) =>
 					{buttonDescription}
 				</Button>
 			</label>
-
+			{
+			(browser.platform === 'mobile') && canShareFiles && canShare && <label htmlFor='share-files-gallery-button'>
+				<Button
+					variant='contained'
+					component='span'
+					className={classes.button}
+					disabled={!canShareFiles || !canShare}
+				>
+					{buttonGalleryDescription}
+				</Button>
+			</label>
+			}
 			<FileList />
 		</Paper>
 	);
@@ -87,6 +118,7 @@ const FileSharing = (props) =>
 
 FileSharing.propTypes = {
 	roomClient    : PropTypes.any.isRequired,
+	browser            : PropTypes.object.isRequired,
 	canShareFiles : PropTypes.bool.isRequired,
 	tabOpen       : PropTypes.bool.isRequired,
 	canShare      : PropTypes.bool.isRequired,
@@ -97,6 +129,7 @@ const mapStateToProps = (state) =>
 {
 	return {
 		canShareFiles : state.me.canShareFiles,
+		browser      : state.me.browser,
 		tabOpen       : state.toolarea.currentToolTab === 'files',
 		canShare      :
 			state.me.roles.some((role) =>
@@ -113,6 +146,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+				prev.me.browser === next.me.browser &&
 				prev.me.roles === next.me.roles &&
 				prev.me.canShareFiles === next.me.canShareFiles &&
 				prev.toolarea.currentToolTab === next.toolarea.currentToolTab

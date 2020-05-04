@@ -92,6 +92,7 @@
 	"label.filesharing": "Fildeling",
 	"label.participants": "Deltakere",
 	"label.shareFile": "Del fil",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Fildeling ikke støttet",
 	"label.unknown": "Ukjent",
 	"label.democratic": "Demokratisk",
