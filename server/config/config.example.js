@@ -60,6 +60,8 @@ module.exports =
 	// When truthy, the room will be open to all users when the first
 	// authenticated user has already joined the room.
 	activateOnHostJoin    : true,
+	// Room size before spreading to new router
+	routerScaleSize       : 20,
 	// Mediasoup settings
 	mediasoup             :
 	{
