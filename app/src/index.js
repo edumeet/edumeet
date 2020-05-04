@@ -38,6 +38,7 @@ import messagesCzech from './translations/cs';
 import messagesItalian from './translations/it';
 import messagesUkrainian from './translations/uk';
 import messagesTurkish from './translations/tr';
+import messagesLatvian from './translations/lv';
 
 import './index.css';
 
@@ -63,7 +64,8 @@ const messages =
 	'cs' : messagesCzech,
 	'it' : messagesItalian,
 	'uk' : messagesUkrainian,
-	'tr' : messagesTurkish
+	'tr' : messagesTurkish,
+	'lv' : messagesLatvian
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code
