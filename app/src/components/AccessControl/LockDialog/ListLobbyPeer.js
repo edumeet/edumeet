@@ -27,6 +27,7 @@ const ListLobbyPeer = (props) =>
 	const {
 		roomClient,
 		peer,
+		promotionInProgress,
 		canPromote,
 		classes
 	} = props;
@@ -55,7 +56,11 @@ const ListLobbyPeer = (props) =>
 				})}
 			>
 				<IconButton
-					disabled={!canPromote || peer.promotionInProgress}
+					disabled={
+						!canPromote ||
+						peer.promotionInProgress ||
+						promotionInProgress
+					}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
@@ -71,18 +76,20 @@ const ListLobbyPeer = (props) =>
 
 ListLobbyPeer.propTypes =
 {
-	roomClient   : PropTypes.any.isRequired,
-	advancedMode : PropTypes.bool,
-	peer         : PropTypes.object.isRequired,
-	canPromote   : PropTypes.bool.isRequired,
-	classes      : PropTypes.object.isRequired
+	roomClient          : PropTypes.any.isRequired,
+	advancedMode        : PropTypes.bool,
+	peer                : PropTypes.object.isRequired,
+	promotionInProgress : PropTypes.bool.isRequired,
+	canPromote          : PropTypes.bool.isRequired,
+	classes             : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state, { id }) =>
 {
 	return {
-		peer       : state.lobbyPeers[id],
-		canPromote :
+		peer                : state.lobbyPeers[id],
+		promotionInProgress : state.room.lobbyPeersPromotionInProgress,
+		canPromote          :
 			state.me.roles.some((role) =>
 				state.room.permissionsFromRoles.PROMOTE_PEER.includes(role))
 	};
@@ -97,6 +104,8 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+				prev.room.lobbyPeersPromotionInProgress ===
+					next.room.lobbyPeersPromotionInProgress &&
 				prev.me.roles === next.me.roles &&
 				prev.lobbyPeers === next.lobbyPeers
 			);

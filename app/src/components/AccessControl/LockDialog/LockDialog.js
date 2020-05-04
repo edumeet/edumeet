@@ -51,9 +51,11 @@ const styles = (theme) =>
 	});
 
 const LockDialog = ({
+	roomClient,
 	room,
 	handleCloseLockDialog,
 	lobbyPeers,
+	canPromote,
 	classes
 }) =>
 {
@@ -102,6 +104,20 @@ const LockDialog = ({
 				</DialogContent>
 			}
 			<DialogActions>
+				<Button
+					disabled={
+						lobbyPeers.length === 0 ||
+						!canPromote ||
+						room.lobbyPeersPromotionInProgress
+					}
+					onClick={() => roomClient.promoteAllLobbyPeers()}
+					color='primary'
+				>
+					<FormattedMessage
+						id='label.promoteAllPeers'
+						defaultMessage='Promote all'
+					/>
+				</Button>
 				<Button onClick={() => handleCloseLockDialog(false)} color='primary'>
 					<FormattedMessage
 						id='label.close'
@@ -115,10 +131,12 @@ const LockDialog = ({
 
 LockDialog.propTypes =
 {
+	roomClient            : PropTypes.object.isRequired,
 	room                  : appPropTypes.Room.isRequired,
 	handleCloseLockDialog : PropTypes.func.isRequired,
 	handleAccessCode      : PropTypes.func.isRequired,
 	lobbyPeers            : PropTypes.array,
+	canPromote            : PropTypes.bool,
 	classes               : PropTypes.object.isRequired
 };
 
@@ -126,7 +144,10 @@ const mapStateToProps = (state) =>
 {
 	return {
 		room       : state.room,
-		lobbyPeers : lobbyPeersKeySelector(state)
+		lobbyPeers : lobbyPeersKeySelector(state),
+		canPromote :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.PROMOTE_PEER.includes(role))
 	};
 };
 
@@ -144,6 +165,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room === next.room &&
+				prev.me.roles === next.me.roles &&
 				prev.lobbyPeers === next.lobbyPeers
 			);
 		}

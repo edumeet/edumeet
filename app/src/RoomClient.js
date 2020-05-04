@@ -1274,6 +1274,26 @@ export default class RoomClient
 			roomActions.setSelectedPeer(peerId));
 	}
 
+	async promoteAllLobbyPeers()
+	{
+		logger.debug('promoteAllLobbyPeers()');
+
+		store.dispatch(
+			roomActions.setLobbyPeersPromotionInProgress(true));
+
+		try
+		{
+			await this.sendRequest('promoteAllPeers');
+		}
+		catch (error)
+		{
+			logger.error('promoteAllLobbyPeers() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setLobbyPeersPromotionInProgress(false));
+	}
+
 	async promoteLobbyPeer(peerId)
 	{
 		logger.debug('promoteLobbyPeer() [peerId:"%s"]', peerId);

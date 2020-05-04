@@ -63,8 +63,8 @@ class Lobby extends EventEmitter
 
 		for (const peer in this._peers)
 		{
-			if (peer.socket)
-				this.promotePeer(peer.id);
+			if (!this._peers[peer].closed)
+				this.promotePeer(peer);
 		}
 	}
 

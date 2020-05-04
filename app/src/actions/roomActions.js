@@ -123,6 +123,12 @@ export const toggleConsumerFullscreen = (consumerId) =>
 		payload : { consumerId }
 	});
 
+export const setLobbyPeersPromotionInProgress = (flag) =>
+	({
+		type    : 'SET_LOBBY_PEERS_PROMOTION_IN_PROGRESS',
+		payload : { flag }
+	});
+
 export const setMuteAllInProgress = (flag) =>
 	({
 		type    : 'MUTE_ALL_IN_PROGRESS',
