@@ -424,11 +424,16 @@ const TopBar = (props) =>
 				>
 					<VideoCallIcon
 						aria-label={intl.formatMessage({
-							id             : 'tooltip.settings',
-							defaultMessage : 'Show settings'
+							id             : 'label.addVideo',
+							defaultMessage : 'Add video'
 						})}
 					/>
-					<p className={classes.moreAction}>Add video</p>
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='label.addVideo'
+							defaultMessage='Add video'
+						/>
+					</p>
 				</MenuItem>
 			</Menu>
 		</React.Fragment>
