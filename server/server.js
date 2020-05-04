@@ -134,9 +134,10 @@ async function run()
 	await interactiveServer(rooms, peers);
 
 	// start Prometheus exporter
-	if (config.prometheus) {
+	if (config.prometheus)
+	{
 		await promExporter(rooms, peers, config.prometheus);
-        }
+	}
 
 	if (typeof(config.auth) === 'undefined')
 	{
