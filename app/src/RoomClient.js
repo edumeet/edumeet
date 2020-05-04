@@ -2235,9 +2235,19 @@ export default class RoomClient
 
 					case 'raisedHand':
 					{
-						const { peerId, raisedHand } = notification.data;
+						const {
+							peerId,
+							raisedHand,
+							raisedHandTimestamp
+						} = notification.data;
 
-						store.dispatch(peerActions.setPeerRaisedHand(peerId, raisedHand));
+						store.dispatch(
+							peerActions.setPeerRaisedHand(
+								peerId,
+								raisedHand,
+								raisedHandTimestamp
+							)
+						);
 
 						const { displayName } = store.getState().peers[peerId];
 

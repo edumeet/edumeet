@@ -1267,8 +1267,9 @@ class Room extends EventEmitter
 
 				// Spread to others
 				this._notification(peer.socket, 'raisedHand', {
-					peerId     : peer.id,
-					raisedHand : raisedHand
+					peerId              : peer.id,
+					raisedHand          : raisedHand,
+					raisedHandTimestamp : peer.raisedHandTimestamp
 				}, true);
 
 				// Return no error

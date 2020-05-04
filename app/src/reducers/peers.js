@@ -21,7 +21,11 @@ const peer = (state = {}, action) =>
 			return { ...state, peerKickInProgress: action.payload.flag };
 		
 		case 'SET_PEER_RAISED_HAND':
-			return { ...state, raisedHand: action.payload.raisedHand };
+			return {
+				...state,
+				raisedHand          : action.payload.raisedHand,
+				raisedHandTimestamp : action.payload.raisedHandTimestamp
+			};
 		
 		case 'ADD_CONSUMER':
 		{
