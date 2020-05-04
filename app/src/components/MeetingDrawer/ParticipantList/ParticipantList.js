@@ -31,12 +31,10 @@ const styles = (theme) =>
 		},
 		listheader :
 		{
-			padding    : theme.spacing(1),
 			fontWeight : 'bolder'
 		},
 		listItem :
 		{
-			padding      : theme.spacing(1),
 			width        : '100%',
 			overflow     : 'hidden',
 			cursor       : 'pointer',

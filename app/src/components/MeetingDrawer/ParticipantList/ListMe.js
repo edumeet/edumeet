@@ -16,8 +16,7 @@ const styles = (theme) =>
 			width    : '100%',
 			overflow : 'hidden',
 			cursor   : 'auto',
-			display  : 'flex',
-			padding  : theme.spacing(1)
+			display  : 'flex'
 		},
 		avatar :
 		{
