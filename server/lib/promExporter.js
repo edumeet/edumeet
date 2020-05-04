@@ -52,33 +52,6 @@ set_value = function(key, m, labels, v) {
 	}
 }
 
-addr = async function(ip, port) {
-	if ('PROM_DEIDENTIFY' in process.env) {
-		let a = ip.split('.')
-		for (let i = 0; i < a.length - 2; i++) {
-			a[i] = 'xx';
-		}
-		return `${a.join('.')}:${port}`;
-	}
-	else if ('PROM_NUMERIC' in process.env) {
-		return `${ip}:${port}`;
-	}
-	else {
-		try {
-			let a = await resolver.reverse(ip);
-			ip = a[0];
-		}
-		catch (err) {
-			logger.error(`reverse DNS query failed: ${ip} ${err.code}`);
-		}
-		return `${ip}:${port}`;
-	}
-}
-
-quiet = function(s) {
-	return 'PROM_QUIET' in process.env ? '' : s;
-}
-
 collect = async function(registry, rooms, peers) {
 
 	metrics = function(subsystem) {
@@ -191,45 +164,63 @@ collect = async function(registry, rooms, peers) {
 	}
 }
 
-module.exports = async function(rooms, peers) {
-	try {
-		logger.debug(`PROM_DEIDENTIFY=${process.env.PROM_DEIDENTIFY}`);
-		logger.debug(`PROM_NUMERIC=${process.env.PROM_NUMERIC}`);
-		logger.debug(`PROM_PORT=${process.env.PROM_PORT}`);
-		logger.debug(`PROM_QUIET=${process.env.PROM_QUIET}`);
-		let s_port = process.env.PROM_PORT;
-		if (!s_port) {
-			logger.info('exporter disabled');
+module.exports = async function(rooms, peers, config) {
+
+	addr = async function(ip, port) {
+		if (config.deidentify) {
+			let a = ip.split('.')
+			for (let i = 0; i < a.length - 2; i++) {
+				a[i] = 'xx';
+			}
+			return `${a.join('.')}:${port}`;
+		}
+		else if (config.numeric) {
+			return `${ip}:${port}`;
 		}
 		else {
-			let n_port = Number(s_port);
-			if (Number.isNaN(n_port)) {
-				throw new TypeError(`PROM_PORT has illegal value: ${s_port}`);
+			try {
+				let a = await resolver.reverse(ip);
+				ip = a[0];
 			}
-
-			mediasoup.observer.on('newworker', worker => {
-				logger.debug(`observing newworker ${worker.pid} #${workers.size}`);
-				workers.set(worker.pid, worker);
-				worker.observer.on('close', () => {
-					logger.debug(`observing close worker ${worker.pid} #${workers.size - 1}`);
-					workers.delete(worker.pid);
-				});
-			});
-
-			let app = express();
-			app.get('/', async (req, res) => {
-				logger.debug(`GET ${req.originalUrl}`);
-				let registry = new prom.Registry();
-				await collect(registry, rooms, peers);
-				res.set('Content-Type', registry.contentType);
-				let data = registry.metrics();
-				res.end(data);
-			});
-			let server = app.listen(n_port, () => {
-				address = server.address();
-				logger.info(`listening ${address.address}:${address.port}`);
-			});
+			catch (err) {
+				logger.error(`reverse DNS query failed: ${ip} ${err.code}`);
+			}
+			return `${ip}:${port}`;
 		}
+	}
+
+	quiet = function(s) {
+		return config.quiet ? '' : s;
+	}
+
+	try {
+		logger.debug(`config.deidentify=${config.deidentify}`);
+		logger.debug(`config.numeric=${config.numeric}`);
+		logger.debug(`config.port=${config.port}`);
+		logger.debug(`config.quiet=${config.quiet}`);
+
+		mediasoup.observer.on('newworker', worker => {
+			logger.debug(`observing newworker ${worker.pid} #${workers.size}`);
+			workers.set(worker.pid, worker);
+			worker.observer.on('close', () => {
+				logger.debug(`observing close worker ${worker.pid} #${workers.size - 1}`);
+				workers.delete(worker.pid);
+			});
+		});
+
+		let app = express();
+		app.get('/', async (req, res) => {
+			logger.debug(`GET ${req.originalUrl}`);
+			let registry = new prom.Registry();
+			await collect(registry, rooms, peers);
+			res.set('Content-Type', registry.contentType);
+			let data = registry.metrics();
+			res.end(data);
+		});
+		let server = app.listen(config.port || 8889, () => {
+			address = server.address();
+			logger.info(`listening ${address.address}:${address.port}`);
+		});
 	}
 	catch (err) {
 		logger.error(err);

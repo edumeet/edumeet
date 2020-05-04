@@ -342,4 +342,13 @@ module.exports =
 			maxIncomingBitrate              : 1500000
 		}
 	}
+	// Prometheus exporter
+	/*
+	prometheus: {
+		deidentify: false, // deidentify IP addresses
+		numeric: false, // show numeric IP addresses
+		port: 8889, // allocated port
+		quiet: false // include fewer labels
+	}
+	*/
 };

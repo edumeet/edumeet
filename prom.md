@@ -3,7 +3,7 @@
 The goal of this version is to offer a few basic metrics for
 initial testing. The set of supported metrics can be extended.
 
-The current implementation is
+The current implementation is partly
 [unconventional](https://prometheus.io/docs/instrumenting/writing_exporters)
 in that it creates new metrics each time but does not register a
 custom collector. Reasons are that the exporter should
@@ -17,18 +17,13 @@ of `multiparty-meeting` but connected as an interactive client.
 
 ## Configuration
 
-| `.env` | description |
-|--------|-------|
-| `DEBUG` | e.g. `*WARN*,*ERROR*,*:prom` for debugging |
-| `PROM_DEIDENTIFY` | if set, deidentify IP addresses |
-| `PROM_NUMERIC` | if set, show numerical IP addresses |
-| `PROM_PORT` | if set, enable exporter on this port |
-| `PROM_QUIET` | if set, include fewer labels |
+See `prometheus` in `server/config/config.example.js` for options and
+applicable defaults.
 
 If `multiparty-meeting` was installed with 
 [`mm-absible`](https://github.com/misi/mm-ansible)
-it may be necessary to open the `iptables` firewall that was established
-with `ferm` for incoming TCP traffic on `PROM_PORT`.
+it may be necessary to open the `iptables` firewall for incoming TCP traffic
+on the allocated port (see `/etc/ferm/ferm.conf`).
 
 ## Metrics
 
