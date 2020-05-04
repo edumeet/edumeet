@@ -246,9 +246,17 @@ module.exports =
 	},
 	// When truthy, the room will be open to all users when as long as there
 	// are allready users in the room
-	activateOnHostJoin : true,
+	activateOnHostJoin    : true,
+	// If this is set to true, only signed-in users will be able
+	// to join a room directly. Non-signed-in users (guests) will
+	// always be put in the lobby regardless of room lock status.
+	// If false, there is no difference between guests and signed-in
+	// users when joining.
+	requireSignInToAccess : true,
+	// Room size before spreading to new router
+	routerScaleSize       : 20,
 	// Mediasoup settings
-	mediasoup          :
+	mediasoup             :
 	{
 		numWorkers : Object.keys(os.cpus()).length,
 		// mediasoup Worker settings.
