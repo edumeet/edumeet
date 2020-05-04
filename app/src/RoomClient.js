@@ -298,6 +298,16 @@ export default class RoomClient
 
 				switch (key)
 				{
+					case String.fromCharCode(37):
+					{
+						this._spotlights.setPrevAsSelected();
+						break;
+					}
+					case String.fromCharCode(39):
+					{
+						this._spotlights.setNextAsSelected();
+						break;
+					}
 					case 'A': // Activate advanced mode
 					{
 						store.dispatch(settingsActions.toggleAdvancedMode());
