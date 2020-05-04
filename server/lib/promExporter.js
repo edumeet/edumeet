@@ -35,7 +35,7 @@ common_labels = function(both, fn) {
 			}
 		}
 	}
-	throw new Error('cannot find generic labels');
+	throw new Error('cannot find common labels');
 }
 
 set_value = function(key, m, labels, v) {
@@ -48,10 +48,9 @@ set_value = function(key, m, labels, v) {
 		m.set(labels, v);
 		break;
 	default:
-		throw new Error(`unexpected metric: ${metric}`);
+		throw new Error(`unexpected metric: ${m}`);
 	}
 }
-
 
 addr = async function(ip, port) {
 	if ('PROM_DEIDENTIFY' in process.env) {
@@ -59,10 +58,10 @@ addr = async function(ip, port) {
 		for (let i = 0; i < a.length - 2; i++) {
 			a[i] = 'xx';
 		}
-		return a.join('.');
+		return `${a.join('.')}:${port}`;
 	}
 	else if ('PROM_NUMERIC' in process.env) {
-		return ip;
+		return `${ip}:${port}`;
 	}
 	else {
 		try {
