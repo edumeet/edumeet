@@ -25,6 +25,10 @@ const styles = (theme) =>
 		button :
 		{
 			margin : theme.spacing(1)
+		},
+		shareButtonsWrapper :
+		{
+			display       : 'flex'
 		}
 	});
 
@@ -72,45 +76,47 @@ const FileSharing = (props) =>
 	return (
 		<Paper className={classes.root}>
 			<FileSharingModerator />
-			<input
-				className={classes.input}
-				type='file'
-				disabled={!canShare}
-				onChange={handleFileChange}
-				// Need to reset to be able to share same file twice
-				onClick={(e) => (e.target.value = null)}
-				id='share-files-button'
-			/>
-			<input
-				className={classes.input}
-				type='file'
-				disabled={!canShare}
-				onChange={handleFileChange}
-				accept="image/*"
-				id='share-files-gallery-button'
-			/>
-			<label htmlFor='share-files-button'>
-				<Button
-					variant='contained'
-					component='span'
-					className={classes.button}
-					disabled={!canShareFiles || !canShare}
-				>
-					{buttonDescription}
-				</Button>
-			</label>
-			{
-			(browser.platform === 'mobile') && canShareFiles && canShare && <label htmlFor='share-files-gallery-button'>
-				<Button
-					variant='contained'
-					component='span'
-					className={classes.button}
-					disabled={!canShareFiles || !canShare}
-				>
-					{buttonGalleryDescription}
-				</Button>
-			</label>
-			}
+			<div className={classes.shareButtonsWrapper} >
+				<input
+					className={classes.input}
+					type='file'
+					disabled={!canShare}
+					onChange={handleFileChange}
+					// Need to reset to be able to share same file twice
+					onClick={(e) => (e.target.value = null)}
+					id='share-files-button'
+				/>
+				<input
+					className={classes.input}
+					type='file'
+					disabled={!canShare}
+					onChange={handleFileChange}
+					accept="image/*"
+					id='share-files-gallery-button'
+				/>
+				<label htmlFor='share-files-button'>
+					<Button
+						variant='contained'
+						component='span'
+						className={classes.button}
+						disabled={!canShareFiles || !canShare}
+					>
+						{buttonDescription}
+					</Button>
+				</label>
+				{
+				(browser.platform === 'mobile') && canShareFiles && canShare && <label htmlFor='share-files-gallery-button'>
+					<Button
+						variant='contained'
+						component='span'
+						className={classes.button}
+						disabled={!canShareFiles || !canShare}
+					>
+						{buttonGalleryDescription}
+					</Button>
+				</label>
+				}
+			</div>
 			<FileList />
 		</Paper>
 	);
