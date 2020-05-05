@@ -6,7 +6,7 @@ const initialState =
 	locked                        : false,
 	inLobby                       : false,
 	signInRequired                : false,
-	overRoomLimit              : false,
+	overRoomLimit                 : false,
 	// access code to the room if locked and joinByAccessCode == true
 	accessCode                    : '',
 	// if true: accessCode is a possibility to open the room

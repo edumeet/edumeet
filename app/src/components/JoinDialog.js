@@ -286,14 +286,14 @@ const JoinDialog = ({
 						fullWidth
 					/>
 					{!room.inLobby && room.overRoomLimit &&
-							<DialogContentText className={classes.red} variant='h6' gutterBottom>
-								<FormattedMessage
-									id='room.overRoomLimit'
-									defaultMessage={
-										`The room is full. Retry after some time.`
-									}
-								/>
-							</DialogContentText>
+						<DialogContentText className={classes.red} variant='h6' gutterBottom>
+							<FormattedMessage
+								id='room.overRoomLimit'
+								defaultMessage={
+									'The room is full. Retry after some time.'
+								}
+							/>
+						</DialogContentText>
 					}
 
 				</DialogContent>
