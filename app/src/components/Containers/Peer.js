@@ -63,8 +63,8 @@ const styles = (theme) =>
 		smallContainer :
 		{
 			backgroundColor : 'rgba(255, 255, 255, 0.9)',
-			margin          : theme.spacing(0.25),
-			padding         : theme.spacing(0.75),
+			margin          : '0.5vmin',
+			padding         : '0.5vmin',
 			boxShadow       : '0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12)',
 			pointerEvents   : 'auto',
 			transition      : 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
