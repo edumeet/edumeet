@@ -30,6 +30,7 @@ let requestTimeout,
 	transportOptions,
 	lastN,
 	mobileLastN,
+	defaultAudio,
 	defaultResolution;
 
 if (process.env.NODE_ENV !== 'test')
@@ -39,6 +40,7 @@ if (process.env.NODE_ENV !== 'test')
 		transportOptions,
 		lastN,
 		mobileLastN,
+		defaultAudio,
 		defaultResolution
 	} = window.config);
 }
@@ -202,6 +204,9 @@ export default class RoomClient
 
 		if (defaultResolution)
 			store.dispatch(settingsActions.setVideoResolution(defaultResolution));
+
+		if (defaultAudio)
+			store.dispatch(settingsActions.setDefaultAudio(defaultAudio));
 
 		// Max spotlights
 		if (device.bowser.getPlatformType() === 'desktop')
@@ -1036,23 +1041,24 @@ export default class RoomClient
 			if (this._micProducer && this._micProducer.track)
 				this._micProducer.track.stop();
 
-			logger.debug('changeAudioDevice() | calling getUserMedia()');
+			logger.debug('changeAudioDevice() | calling getUserMedia() %o', store.getState().settings);
 
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					audio :
 					{
-						deviceId : { exact: device.deviceId },
-						sampleRate       : 48000,
-						channelCount     : 1,
-						volume           : 1.0,
-						autoGainControl  : true,
-						echoCancellation : false,
-						noiseSuppression : false,
-						sampleSize       : 16
+						deviceId         : { exact: device.deviceId },
+						sampleRate       : store.getState().settings.sampleRate,
+						channelCount     : store.getState().settings.channelCount,
+						volume           : store.getState().settings.volume,
+						autoGainControl  : store.getState().settings.autoGainControl,
+						echoCancellation : store.getState().settings.echoCancellation,
+						noiseSuppression : store.getState().settings.noiseSuppression,
+						sampleSize       : store.getState().settings.sampleSize
 					}
 				}
 			);
+
 			logger.debug('Constraints: %o', stream.getAudioTracks()[0].getConstraints());
 			const track = stream.getAudioTracks()[0];
 
@@ -2697,6 +2703,7 @@ export default class RoomClient
 					}
 				}
 			);
+
 			logger.debug('Constraints: %o', stream.getAudioTracks()[0].getConstraints());
 
 			track = stream.getAudioTracks()[0];

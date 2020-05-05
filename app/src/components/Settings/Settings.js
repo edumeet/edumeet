@@ -60,6 +60,9 @@ const Settings = ({
 	settings,
 	onToggleAdvancedMode,
 	onTogglePermanentTopBar,
+	setEchoCancellation,
+	setAutoGainControl,
+	setNoiseSuppression,
 	handleCloseSettings,
 	handleChangeMode,
 	classes
@@ -331,6 +334,49 @@ const Settings = ({
 					</form>
 					<FormControlLabel
 						className={classes.setting}
+						control={
+							<Checkbox checked={settings.echoCancellation} onChange={
+								(event) =>
+								{
+									setEchoCancellation(event.target.checked);
+									roomClient.changeAudioDevice(settings.selectedAudioDevice);
+								}}
+							/>}
+						label={intl.formatMessage({
+							id             : 'settings.echoCancellation',
+							defaultMessage : 'Echo Cancellation'
+						})}
+					/>
+					<FormControlLabel
+						className={classes.setting}
+						control={
+							<Checkbox checked={settings.autoGainControl} onChange={
+								(event) => {
+									setAutoGainControl(event.target.checked);
+									roomClient.changeAudioDevice(settings.selectedAudioDevice);
+								}}
+							/>}
+						label={intl.formatMessage({
+							id: 'settings.autoGainControl',
+							defaultMessage: 'Auto Gain Control'
+						})}
+					/>
+					<FormControlLabel
+						className={classes.setting}
+						control={
+							<Checkbox checked={settings.noiseSuppression} onChange={
+								(event) => {
+									setNoiseSuppression(event.target.checked);
+									roomClient.changeAudioDevice(settings.selectedAudioDevice);
+								}}
+							/>}
+						label={intl.formatMessage({
+							id: 'settings.noiseSuppression',
+							defaultMessage: 'Noise Suppression'
+						})}
+					/>
+					<FormControlLabel
+						className={classes.setting}
 						control={<Checkbox checked={settings.permanentTopBar} onChange={onTogglePermanentTopBar} value='permanentTopBar' />}
 						label={intl.formatMessage({
 							id             : 'settings.permanentTopBar',
@@ -359,6 +405,9 @@ Settings.propTypes =
 	settings                : PropTypes.object.isRequired,
 	onToggleAdvancedMode    : PropTypes.func.isRequired,
 	onTogglePermanentTopBar : PropTypes.func.isRequired,
+	setEchoCancellation     : PropTypes.func.isRequired,
+	setAutoGainControl      : PropTypes.func.isRequired,
+	setNoiseSuppression     : PropTypes.func.isRequired,
 	handleChangeMode        : PropTypes.func.isRequired,
 	handleCloseSettings     : PropTypes.func.isRequired,
 	classes                 : PropTypes.object.isRequired
@@ -376,6 +425,9 @@ const mapStateToProps = (state) =>
 const mapDispatchToProps = {
 	onToggleAdvancedMode    : settingsActions.toggleAdvancedMode,
 	onTogglePermanentTopBar : settingsActions.togglePermanentTopBar,
+	setEchoCancellation     : settingsActions.setEchoCancellation,
+	setAutoGainControl      : settingsActions.toggleAutoGainControl,
+	setNoiseSuppression     : settingsActions.toggleNoiseSuppression,
 	handleChangeMode        : roomActions.setDisplayMode,
 	handleCloseSettings     : roomActions.setSettingsOpen
 };

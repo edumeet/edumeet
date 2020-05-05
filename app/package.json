@@ -11,6 +11,7 @@
 		"@material-ui/core": "^4.5.1",
 		"@material-ui/icons": "^4.5.1",
 		"bowser": "^2.7.0",
+		"classnames": "^2.2.6",
 		"dompurify": "^2.0.7",
 		"domready": "^1.0.8",
 		"end-of-stream": "1.4.0",
