@@ -65,6 +65,7 @@ const ListMe = (props) =>
 				})}
 				className={me.raisedHand ? classes.green : null}
 				disabled={me.raisedHandInProgress}
+				color='primary'
 				onClick={(e) =>
 				{
 					e.stopPropagation();

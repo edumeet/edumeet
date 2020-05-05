@@ -61,6 +61,7 @@ const ListLobbyPeer = (props) =>
 						peer.promotionInProgress ||
 						promotionInProgress
 					}
+					color='primary'
 					onClick={(e) =>
 					{
 						e.stopPropagation();
