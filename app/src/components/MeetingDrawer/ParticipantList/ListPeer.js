@@ -173,6 +173,7 @@ const ListPeer = (props) =>
 						defaultMessage : 'Kick out participant'
 					})}
 					disabled={peer.peerKickInProgress}
+					color='secondary'
 					onClick={(e) =>
 					{
 						e.stopPropagation();
