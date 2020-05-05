@@ -197,8 +197,8 @@ function statusLog()
 	if (statusLogger)
 	{
 		statusLogger.log({
-			rooms : rooms.size,
-			peers : peers.size
+			rooms : rooms,
+			peers : peers
 		});
 	}
 }
