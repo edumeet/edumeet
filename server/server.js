@@ -56,10 +56,6 @@ if ('StatusLogger' in config)
 // @type {Array<mediasoup.Worker>}
 const mediasoupWorkers = [];
 
-// Index of next mediasoup Worker to use.
-// @type {Number}
-let nextMediasoupWorkerIdx = 0;
-
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
 
@@ -637,19 +633,6 @@ async function runMediasoupWorkers()
 
 		mediasoupWorkers.push(worker);
 	}
-}
-
-/**
- * Get next mediasoup Worker.
- */
-function getMediasoupWorker()
-{
-	const worker = mediasoupWorkers[nextMediasoupWorkerIdx];
-
-	if (++nextMediasoupWorkerIdx === mediasoupWorkers.length)
-		nextMediasoupWorkerIdx = 0;
-
-	return worker;
 }
 
 /**
