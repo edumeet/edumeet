@@ -318,6 +318,7 @@ const Me = (props) =>
 				style={spacingStyle}
 			>
 				
+				{ me.browser.platform !== 'mobile' &&
 				<div className={classnames(
 					classes.ptt,
 					(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
@@ -328,6 +329,7 @@ const Me = (props) =>
 						defaultMessage='You are muted, hold down SPACE-BAR to talk'
 					/>	
 				</div>
+				}
 				<div className={classes.viewContainer} style={style}>
 					<div
 						className={classnames(
