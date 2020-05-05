@@ -92,6 +92,7 @@
 	"label.filesharing": "Обмін файлами",
 	"label.participants": "Учасники",
 	"label.shareFile": "Надіслати файл",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Обмін файлами не підтримується",
 	"label.unknown": "Невідомо",
 	"label.democrat": "Демократичний вигляд",

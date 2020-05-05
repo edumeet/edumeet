@@ -92,6 +92,7 @@
 	"label.filesharing": "Dijeljenje datoteka",
 	"label.participants": "Sudionici",
 	"label.shareFile": "Dijeli datoteku",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Dijeljenje datoteka nije podržano",
 	"label.unknown": "Nepoznato",
 	"label.democratic":"Demokratski prikaz",

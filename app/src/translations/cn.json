@@ -92,6 +92,7 @@
 	"label.filesharing": "文件共享",
 	"label.participants": "参与者",
 	"label.shareFile": "共享文件",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "不支持文件共享",
 	"label.unknown": "未知",
 	"label.democratic": "民主视图",

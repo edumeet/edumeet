@@ -92,6 +92,7 @@
 	"label.filesharing": "Διαμοιρασμοός αρχείου",
 	"label.participants": "Συμμετέχοντες",
 	"label.shareFile": "Διαμοιραστείτε ένα αρχείο",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Ο διαμοιρασμός αρχείων δεν υποστηρίζεται",
 	"label.unknown": "Άγνωστο",
 	"label.democratic": null,
