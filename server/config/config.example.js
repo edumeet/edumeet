@@ -247,10 +247,11 @@ module.exports =
 	// When truthy, the room will be open to all users when as long as there
 	// are allready users in the room
 	activateOnHostJoin : true,
-	// When set, maxUsersPerRoom defines how many users can join a single room. If not set, there is not limit.
+	// When set, maxUsersPerRoom defines how many users can join
+	// a single room. If not set, there is no limit.
 	// maxUsersPerRoom    : 20,
 	// Room size before spreading to new router
-	routerScaleSize    : 20,
+	routerScaleSize    : 40,
 	// Mediasoup settings
 	mediasoup          :
 	{

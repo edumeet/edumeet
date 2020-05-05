@@ -31,7 +31,7 @@ const permissionsFromRoles =
 	...config.permissionsFromRoles
 };
 
-const ROUTER_SCALE_SIZE = config.routerScaleSize || 20;
+const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 
 class Room extends EventEmitter
 {
@@ -48,6 +48,9 @@ class Room extends EventEmitter
 	{
 		logger.info('create() [roomId:"%s"]', roomId);
 
+		// Shuffle workers to get random cores
+		let shuffledWorkers = mediasoupWorkers.sort(() => Math.random() - 0.5);
+
 		// Router media codecs.
 		const mediaCodecs = config.mediasoup.router.mediaCodecs;
 
@@ -55,7 +58,7 @@ class Room extends EventEmitter
 
 		let firstRouter = null;
 
-		for (const worker of mediasoupWorkers)
+		for (const worker of shuffledWorkers)
 		{
 			const router = await worker.createRouter({ mediaCodecs });
 
@@ -74,6 +77,7 @@ class Room extends EventEmitter
 			});
 
 		firstRouter = null;
+		shuffledWorkers = null;
 
 		return new Room({ roomId, mediasoupRouters, audioLevelObserver });
 	}
