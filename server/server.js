@@ -35,6 +35,7 @@ const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
 const interactiveServer = require('./lib/interactiveServer');
 const promExporter = require('./lib/promExporter');
+const { v4: uuidv4 } = require('uuid');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -156,6 +157,25 @@ async function run()
 
 	// Run WebSocketServer.
 	await runWebSocketServer();
+
+	// eslint-disable-next-line no-unused-vars
+	function errorHandler(err, req, res, next) 
+	{
+		const trackingId = uuidv4();
+
+		res.status(500).send(
+			`<h1>Internal Server Error</h1>
+			<p>If you report this error, please also report this 
+			<i>tracking ID</i> which makes it possible to locate your session
+			in the logs which are available to the system administrator: 
+			<b>${trackingId}</b></p>`
+		);
+		logger.error(
+			'Express error handler dump with tracking ID: %s, error dump: %o', 
+			trackingId, err);
+	}
+
+	app.use(errorHandler);
 
 	// Log rooms status every 30 seconds.
 	setInterval(() =>
