@@ -127,7 +127,7 @@ const styles = (theme) =>
 		{
 			position        : 'absolute',
 			float           : 'left',
-			top             : '10%',
+			top             : '30%',
 			left            : '50%',
 			transform       : 'translate(-50%, 0%)',
 			color           : 'rgba(255, 255, 255, 0.7)',
@@ -317,19 +317,18 @@ const Me = (props) =>
 				}}
 				style={spacingStyle}
 			>
+				
+				<div className={classnames(
+					classes.ptt,
+					(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
+				)}
+				>
+					<FormattedMessage
+						id='me.mutedPTT'
+						defaultMessage='You are muted, hold down SPACE-BAR to talk'
+					/>	
+				</div>
 				<div className={classes.viewContainer} style={style}>
-					{ !smallContainer &&
-						<div className={classnames(
-							classes.ptt,
-							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
-						)}
-						>
-							<FormattedMessage
-								id='me.mutedPTT'
-								defaultMessage='You are muted, hold down SPACE-BAR to talk'
-							/>	
-						</div>
-					}
 					<div
 						className={classnames(
 							classes.controls,
