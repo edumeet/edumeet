@@ -80,6 +80,7 @@
 	"tooltip.muteParticipant": "Résztvevő némítása",
 	"tooltip.muteParticipantVideo": "Résztvevő video némítása",
 	"tooltip.raisedHand": "Jelentkezés",
+	"tooltip.muteScreenSharing": null,
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",

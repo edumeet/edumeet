@@ -79,6 +79,7 @@
 	"tooltip.muteParticipant": "Muta partecipante",
 	"tooltip.muteParticipantVideo": "Ferma video partecipante",
 	"tooltip.raisedHand": "Mano alzata",
+	"tooltip.muteScreenSharing": null,
 
 	"label.roomName": "Nome della stanza",
 	"label.chooseRoomButton": "Continua",

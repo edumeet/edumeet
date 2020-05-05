@@ -7,6 +7,7 @@ import * as appPropTypes from '../../appPropTypes';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
@@ -99,90 +100,122 @@ const ListPeer = (props) =>
 				}
 			</div>
 			{ screenConsumer &&
-				<IconButton
-					aria-label={intl.formatMessage({
+				<Tooltip
+					title={intl.formatMessage({
 						id             : 'tooltip.muteScreenSharing',
 						defaultMessage : 'Mute participant share'
 					})}
-					color={screenVisible ? 'primary' : 'secondary'}
-					disabled={peer.peerScreenInProgress}
-					onClick={(e) =>
-					{
-						e.stopPropagation();
-
-						screenVisible ?
-							roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
-							roomClient.modifyPeerConsumer(peer.id, 'screen', false);
-					}}
+					placement='bottom'
 				>
-					{ screenVisible ?
-						<ScreenIcon />
-						:
-						<ScreenOffIcon />
-					}
-				</IconButton>
+					<IconButton
+						aria-label={intl.formatMessage({
+							id             : 'tooltip.muteScreenSharing',
+							defaultMessage : 'Mute participant share'
+						})}
+						color={screenVisible ? 'primary' : 'secondary'}
+						disabled={peer.peerScreenInProgress}
+						onClick={(e) =>
+						{
+							e.stopPropagation();
+
+							screenVisible ?
+								roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
+								roomClient.modifyPeerConsumer(peer.id, 'screen', false);
+						}}
+					>
+						{ screenVisible ?
+							<ScreenIcon />
+							:
+							<ScreenOffIcon />
+						}
+					</IconButton>
+				</Tooltip>
 			}
-			<IconButton
-				aria-label={intl.formatMessage({
+			<Tooltip
+				title={intl.formatMessage({
 					id             : 'tooltip.muteParticipantVideo',
 					defaultMessage : 'Mute participant video'
 				})}
-				color={webcamEnabled ? 'primary' : 'secondary'}
-				disabled={peer.peerVideoInProgress}
-				onClick={(e) =>
-				{
-					e.stopPropagation();
-
-					webcamEnabled ?
-						roomClient.modifyPeerConsumer(peer.id, 'webcam', true) :
-						roomClient.modifyPeerConsumer(peer.id, 'webcam', false);
-				}}
+				placement='bottom'
 			>
-				{ webcamEnabled ?
-					<VideocamIcon />
-					:
-					<VideocamOffIcon />
-				}
-			</IconButton>
-			<IconButton
-				aria-label={intl.formatMessage({
-					id             : 'tooltip.muteParticipant',
-					defaultMessage : 'Mute participant'
-				})}
-				color={micEnabled ? 'primary' : 'secondary'}
-				disabled={peer.peerAudioInProgress}
-				onClick={(e) =>
-				{
-					e.stopPropagation();
-
-					micEnabled ?
-						roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-						roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-				}}
-			>
-				{ micEnabled ?
-					<VolumeUpIcon />
-					:
-					<VolumeOffIcon />
-				}
-			</IconButton>
-			{ isModerator &&
 				<IconButton
 					aria-label={intl.formatMessage({
-						id             : 'tooltip.kickParticipant',
-						defaultMessage : 'Kick out participant'
+						id             : 'tooltip.muteParticipantVideo',
+						defaultMessage : 'Mute participant video'
 					})}
-					disabled={peer.peerKickInProgress}
-					color='secondary'
+					color={webcamEnabled ? 'primary' : 'secondary'}
+					disabled={peer.peerVideoInProgress}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
 
-						roomClient.kickPeer(peer.id);
+						webcamEnabled ?
+							roomClient.modifyPeerConsumer(peer.id, 'webcam', true) :
+							roomClient.modifyPeerConsumer(peer.id, 'webcam', false);
 					}}
 				>
-					<ExitIcon />
+					{ webcamEnabled ?
+						<VideocamIcon />
+						:
+						<VideocamOffIcon />
+					}
 				</IconButton>
+			</Tooltip>
+			<Tooltip
+				title={intl.formatMessage({
+					id             : 'tooltip.muteParticipant',
+					defaultMessage : 'Mute participant'
+				})}
+				placement='bottom'
+			>
+				<IconButton
+					aria-label={intl.formatMessage({
+						id             : 'tooltip.muteParticipant',
+						defaultMessage : 'Mute participant'
+					})}
+					color={micEnabled ? 'primary' : 'secondary'}
+					disabled={peer.peerAudioInProgress}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+
+						micEnabled ?
+							roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+							roomClient.modifyPeerConsumer(peer.id, 'mic', false);
+					}}
+				>
+					{ micEnabled ?
+						<VolumeUpIcon />
+						:
+						<VolumeOffIcon />
+					}
+				</IconButton>
+			</Tooltip>
+			{ isModerator &&
+				<Tooltip
+					title={intl.formatMessage({
+						id             : 'tooltip.kickParticipant',
+						defaultMessage : 'Kick out participant'
+					})}
+					placement='bottom'
+				>
+					<IconButton
+						aria-label={intl.formatMessage({
+							id             : 'tooltip.kickParticipant',
+							defaultMessage : 'Kick out participant'
+						})}
+						disabled={peer.peerKickInProgress}
+						color='secondary'
+						onClick={(e) =>
+						{
+							e.stopPropagation();
+
+							roomClient.kickPeer(peer.id);
+						}}
+					>
+						<ExitIcon />
+					</IconButton>
+				</Tooltip>
 			}
 			{children}
 		</div>

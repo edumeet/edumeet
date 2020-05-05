@@ -80,6 +80,7 @@
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
+	"tooltip.muteScreenSharing": null,
 
 	"label.roomName": "Назва кімнати",
 	"label.chooseRoomButton": "Продовжити",

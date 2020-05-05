@@ -80,6 +80,7 @@
 	"tooltip.muteParticipant": "Demp deltaker",
 	"tooltip.muteParticipantVideo": "Demp deltakervideo",
 	"tooltip.raisedHand": "Rekk opp hånden",
+	"tooltip.muteScreenSharing": "Demp deltaker skjermdeling",
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",

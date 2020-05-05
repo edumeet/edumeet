@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import * as appPropTypes from '../../appPropTypes';
 import { useIntl } from 'react-intl';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 import PanIcon from '@material-ui/icons/PanTool';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 
@@ -58,23 +59,31 @@ const ListMe = (props) =>
 			<div className={classes.peerInfo}>
 				{settings.displayName}
 			</div>
-			<IconButton
-				aria-label={intl.formatMessage({
+			<Tooltip
+				title={intl.formatMessage({
 					id             : 'tooltip.raisedHand',
 					defaultMessage : 'Raise hand'
 				})}
-				className={me.raisedHand ? classes.green : null}
-				disabled={me.raisedHandInProgress}
-				color='primary'
-				onClick={(e) =>
-				{
-					e.stopPropagation();
-
-					roomClient.setRaisedHand(!me.raisedHand);
-				}}
+				placement='bottom'
 			>
-				<PanIcon />
-			</IconButton>
+				<IconButton
+					aria-label={intl.formatMessage({
+						id             : 'tooltip.raisedHand',
+						defaultMessage : 'Raise hand'
+					})}
+					className={me.raisedHand ? classes.green : null}
+					disabled={me.raisedHandInProgress}
+					color='primary'
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+
+						roomClient.setRaisedHand(!me.raisedHand);
+					}}
+				>
+					<PanIcon />
+				</IconButton>
+			</Tooltip>
 		</div>
 	);
 };
