@@ -49,7 +49,7 @@ const styles = () =>
 			},
 			'&.active' :
 			{
-				opacity : '0.6'
+				borderColor : 'var(--selected-peer-border-color)'
 			}
 		},
 		hiddenToolBar :
@@ -279,7 +279,7 @@ class Filmstrip extends React.PureComponent
 								<Me
 									advancedMode={advancedMode}
 									style={peerStyle}
-									smallButtons
+									smallContainer
 								/>
 							</div>
 						</Grid>
@@ -302,7 +302,7 @@ class Filmstrip extends React.PureComponent
 												advancedMode={advancedMode}
 												id={peerId}
 												style={peerStyle}
-												smallButtons
+												smallContainer
 											/>
 										</div>
 									</Grid>
