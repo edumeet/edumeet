@@ -2811,7 +2811,9 @@ export default class RoomClient
 						{
 							text : intl.formatMessage({
 								id             : 'roles.gotRole',
-								defaultMessage : `You got the role: ${role}`
+								defaultMessage : 'You got the role: {role}'
+							}, {
+								role
 							})
 						}));
 				}
