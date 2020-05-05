@@ -3,6 +3,16 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import EditableInput from '../Controls/EditableInput';
+import Logger from '../../Logger';
+import { green, yellow, orange, red } from '@material-ui/core/colors';
+import SignalCellularOffIcon from '@material-ui/icons/SignalCellularOff';
+import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';
+import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
+import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
+import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
+import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
+
+const logger = new Logger('VideoView');
 
 const styles = (theme) =>
 	({
@@ -88,69 +98,6 @@ const styles = (theme) =>
 				transitionDuration : '0s'
 			}
 		},
-		qualityBar :
-		{
-			height             : 6,
-			borderRadius       : 2,
-			background         : 'rgba(green, 0.65)',
-			transitionProperty : 'height background-color',
-			transitionDuration : '0.25s',
-			'&.score0'         :
-			{
-				width           : 0,
-				backgroundColor : 'rgba(246, 58, 15, 0.65)'
-			},
-			'&.score1' :
-			{
-				width           : '10%',
-				backgroundColor : 'rgba(246, 58, 15, 0.65)'
-			},
-			'&.score2' :
-			{
-				width           : '20%',
-				backgroundColor : 'rgba(246, 58, 15, 0.65)'
-			},
-			'&.score3' :
-			{
-				width           : '30%',
-				backgroundColor : 'rgba(246, 58, 15, 0.65)'
-			},
-			'&.score4' :
-			{
-				width           : '40%',
-				backgroundColor : 'rgba(246, 58, 15, 0.65)'
-			},
-			'&.score5' :
-			{
-				width           : '50%',
-				backgroundColor : 'rgba(242, 176, 30, 0.65)'
-			},
-			'&.score6' :
-			{
-				width           : '60%',
-				backgroundColor : 'rgba(242, 176, 30, 0.65)'
-			},
-			'&.score7' :
-			{
-				width           : '70%',
-				backgroundColor : 'rgba(242, 211, 27, 0.65)'
-			},
-			'&.score8' :
-			{
-				width           : '80%',
-				backgroundColor : 'rgba(242, 211, 27, 0.65)'
-			},
-			'&.score9' :
-			{
-				width           : '90%',
-				backgroundColor : 'rgba(134, 224, 30, 0.65)'
-			},
-			'&.score10' :
-			{
-				width           : '100%',
-				backgroundColor : 'rgba(134, 224, 30, 0.65)'
-			}
-		},
 		peer :
 		{
 			display : 'flex'
@@ -189,6 +136,10 @@ class VideoView extends React.PureComponent
 			videoWidth  : null,
 			videoHeight : null
 		};
+
+		// Latest received audio track
+		// @type {MediaStreamTrack}
+		this._audioTrack = null;
 
 		// Latest received video track.
 		// @type {MediaStreamTrack}
@@ -229,6 +180,62 @@ class VideoView extends React.PureComponent
 			videoHeight
 		} = this.state;
 
+		let quality = <SignalCellularOffIcon style={{ color: red[500] }}/>;
+
+		if (videoScore || audioScore)
+		{
+			const score = videoScore ? videoScore : audioScore;
+
+			switch (score.producerScore)
+			{
+				case 0:
+				case 1:
+				{
+					quality = <SignalCellular0BarIcon style={{ color: red[500] }}/>;
+
+					break;
+				}
+
+				case 2:
+				case 3:
+				{
+					quality = <SignalCellular1BarIcon style={{ color: red[500] }}/>;
+
+					break;
+				}
+
+				case 4:
+				case 5:
+				case 6:
+				{
+					quality = <SignalCellular2BarIcon style={{ color: orange[500] }}/>;
+
+					break;
+				}
+
+				case 7:
+				case 8:
+				{
+					quality = <SignalCellular3BarIcon style={{ color: yellow[500] }}/>;
+
+					break;
+				}
+
+				case 9:
+				case 10:
+				{
+					quality = <SignalCellularAltIcon style={{ color: green[500] }}/>;
+
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+			}
+		}
+
 		return (
 			<div className={classes.root}>
 				<div className={classes.info}>
@@ -254,15 +261,11 @@ class VideoView extends React.PureComponent
 								<p>{videoWidth}x{videoHeight}</p>
 							}
 						</div>
-						{ (audioScore || videoScore) &&
+						{ !isMe &&
 							<div className={classnames(classes.box, 'right')}>
-								<div className={
-									classnames(
-										classes.qualityBar,
-										`score${videoScore ? videoScore.producerScore : audioScore.producerScore}`
-									)
+								{ 
+									quality
 								}
-								/>
 							</div>
 						}
 					</div>
@@ -296,7 +299,7 @@ class VideoView extends React.PureComponent
 				</div>
 
 				<video
-					ref='video'
+					ref='videoElement'
 					className={classnames(classes.video, {
 						hidden  : !videoVisible,
 						'isMe'  : isMe && !isScreen,
@@ -304,6 +307,16 @@ class VideoView extends React.PureComponent
 					})}
 					autoPlay
 					playsInline
+					muted
+					controls={false}
+				/>
+
+				<audio
+					ref='audioElement'
+					autoPlay
+					playsInline
+					muted={isMe}
+					controls={false}
 				/>
 
 				{children}
@@ -313,52 +326,87 @@ class VideoView extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { videoTrack } = this.props;
+		const { videoTrack, audioTrack } = this.props;
 
-		this._setTracks(videoTrack);
+		this._setTracks(videoTrack, audioTrack);
 	}
 
 	componentWillUnmount()
 	{
 		clearInterval(this._videoResolutionTimer);
+
+		const { videoElement } = this.refs;
+
+		if (videoElement)
+		{
+			videoElement.oncanplay = null;
+			videoElement.onplay = null;
+			videoElement.onpause = null;
+		}
 	}
 
-	// eslint-disable-next-line camelcase
-	UNSAFE_componentWillReceiveProps(nextProps)
+	componentDidUpdate(prevProps)
 	{
-		const { videoTrack } = nextProps;
+		if (prevProps !== this.props)
+		{
+			const { videoTrack, audioTrack } = this.props;
 
-		this._setTracks(videoTrack);
-
+			this._setTracks(videoTrack, audioTrack);
+		}
 	}
 
-	_setTracks(videoTrack)
+	_setTracks(videoTrack, audioTrack)
 	{
-		if (this._videoTrack === videoTrack)
+		if (this._videoTrack === videoTrack && this._audioTrack === audioTrack)
 			return;
 
 		this._videoTrack = videoTrack;
+		this._audioTrack = audioTrack;
 
 		clearInterval(this._videoResolutionTimer);
 		this._hideVideoResolution();
 
-		const { video } = this.refs;
+		const { videoElement, audioElement } = this.refs;
 
 		if (videoTrack)
 		{
 			const stream = new MediaStream();
 
-			if (videoTrack)
-				stream.addTrack(videoTrack);
+			stream.addTrack(videoTrack);
 
-			video.srcObject = stream;
+			videoElement.srcObject = stream;
 
-			if (videoTrack)
-				this._showVideoResolution();
+			videoElement.oncanplay = () => this.setState({ videoCanPlay: true });
+
+			videoElement.onplay = () =>
+			{
+				audioElement.play()
+					.catch((error) => logger.warn('audioElement.play() [error:"%o]', error));
+			};
+
+			videoElement.play()
+				.catch((error) => logger.warn('videoElement.play() [error:"%o]', error));
+
+			this._showVideoResolution();
 		}
 		else
 		{
-			video.srcObject = null;
+			videoElement.srcObject = null;
+		}
+
+		if (audioTrack)
+		{
+			const stream = new MediaStream();
+
+			stream.addTrack(audioTrack);
+			audioElement.srcObject = stream;
+
+			audioElement.play()
+				.catch((error) => logger.warn('audioElement.play() [error:"%o]', error));
+		}
+		else
+		{
+			audioElement.srcObject = null;
 		}
 	}
 
@@ -367,16 +415,19 @@ class VideoView extends React.PureComponent
 		this._videoResolutionTimer = setInterval(() =>
 		{
 			const { videoWidth, videoHeight } = this.state;
-			const { video } = this.refs;
+			const { videoElement } = this.refs;
 
 			// Don't re-render if nothing changed.
-			if (video.videoWidth === videoWidth && video.videoHeight === videoHeight)
+			if (
+				videoElement.videoWidth === videoWidth &&
+				videoElement.videoHeight === videoHeight
+			)
 				return;
 
 			this.setState(
 				{
-					videoWidth  : video.videoWidth,
-					videoHeight : video.videoHeight
+					videoWidth  : videoElement.videoWidth,
+					videoHeight : videoElement.videoHeight
 				});
 		}, 1000);
 	}
@@ -396,6 +447,7 @@ VideoView.propTypes =
 	videoContain                   : PropTypes.bool,
 	advancedMode                   : PropTypes.bool,
 	videoTrack                     : PropTypes.any,
+	audioTrack                     : PropTypes.any,
 	videoVisible                   : PropTypes.bool.isRequired,
 	consumerSpatialLayers          : PropTypes.number,
 	consumerTemporalLayers         : PropTypes.number,

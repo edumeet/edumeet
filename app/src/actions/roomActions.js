@@ -40,6 +40,12 @@ export const setSignInRequired = (signInRequired) =>
 		payload : { signInRequired }
 	});
 
+export const setOverRoomLimit = (overRoomLimit) =>
+	({
+		type    : 'SET_OVER_ROOM_LIMIT',
+		payload : { overRoomLimit }
+	});
+
 export const setAccessCode = (accessCode) =>
 	({
 		type    : 'SET_ACCESS_CODE',
@@ -52,13 +58,25 @@ export const setJoinByAccessCode = (joinByAccessCode) =>
 		payload : { joinByAccessCode }
 	});
 
-export const setSettingsOpen = ({ settingsOpen }) =>
+export const setSettingsOpen = (settingsOpen) =>
 	({
 		type    : 'SET_SETTINGS_OPEN',
 		payload : { settingsOpen }
 	});
 
-export const setLockDialogOpen = ({ lockDialogOpen }) =>
+export const setExtraVideoOpen = (extraVideoOpen) =>
+	({
+		type    : 'SET_EXTRA_VIDEO_OPEN',
+		payload : { extraVideoOpen }
+	});
+
+export const setSettingsTab = (tab) =>
+	({
+		type    : 'SET_SETTINGS_TAB',
+		payload : { tab }
+	});
+
+export const setLockDialogOpen = (lockDialogOpen) =>
 	({
 		type    : 'SET_LOCK_DIALOG_OPEN',
 		payload : { lockDialogOpen }
@@ -111,6 +129,12 @@ export const toggleConsumerFullscreen = (consumerId) =>
 		payload : { consumerId }
 	});
 
+export const setLobbyPeersPromotionInProgress = (flag) =>
+	({
+		type    : 'SET_LOBBY_PEERS_PROMOTION_IN_PROGRESS',
+		payload : { flag }
+	});
+
 export const setMuteAllInProgress = (flag) =>
 	({
 		type    : 'MUTE_ALL_IN_PROGRESS',
@@ -126,6 +150,18 @@ export const setStopAllVideoInProgress = (flag) =>
 export const setCloseMeetingInProgress = (flag) =>
 	({
 		type    : 'CLOSE_MEETING_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const setClearChatInProgress = (flag) =>
+	({
+		type    : 'CLEAR_CHAT_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const setClearFileSharingInProgress = (flag) =>
+	({
+		type    : 'CLEAR_FILE_SHARING_IN_PROGRESS',
 		payload : { flag }
 	});
 

@@ -20,8 +20,12 @@ const peer = (state = {}, action) =>
 		case 'SET_PEER_KICK_IN_PROGRESS':
 			return { ...state, peerKickInProgress: action.payload.flag };
 		
-		case 'SET_PEER_RAISE_HAND_STATE':
-			return { ...state, raiseHandState: action.payload.raiseHandState };
+		case 'SET_PEER_RAISED_HAND':
+			return {
+				...state,
+				raisedHand          : action.payload.raisedHand,
+				raisedHandTimestamp : action.payload.raisedHandTimestamp
+			};
 		
 		case 'ADD_CONSUMER':
 		{
@@ -86,7 +90,7 @@ const peers = (state = {}, action) =>
 		case 'SET_PEER_VIDEO_IN_PROGRESS':
 		case 'SET_PEER_AUDIO_IN_PROGRESS':
 		case 'SET_PEER_SCREEN_IN_PROGRESS':
-		case 'SET_PEER_RAISE_HAND_STATE':
+		case 'SET_PEER_RAISED_HAND':
 		case 'SET_PEER_PICTURE':
 		case 'ADD_CONSUMER':
 		case 'ADD_PEER_ROLE':

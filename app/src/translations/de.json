@@ -52,9 +52,19 @@
 	"room.muteAll": "Alle stummschalten",
 	"room.stopAllVideo": "Alle Videos stoppen",
 	"room.closeMeeting": "Meeting schließen",
+	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": "Dein Browser unterstützt keine Spracherkennung",
+	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
+	"room.overRoomLimit": null,
 
-  	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 	
 	"tooltip.login": "Anmelden",
 	"tooltip.logout": "Abmelden",
@@ -67,6 +77,9 @@
 	"tooltip.settings": "Einstellungen",
 	"tooltip.participants": "Teilnehmer",
 	"tooltip.kickParticipant": "Teilnehmer rauswerfen",
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Name des Raums",
 	"label.chooseRoomButton": "Weiter",
@@ -80,6 +93,7 @@
 	"label.filesharing": "Dateien",
 	"label.participants": "Teilnehmer",
 	"label.shareFile": "Datei hochladen",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Dateifreigabe nicht unterstützt",
 	"label.unknown": "Unbekannt",
 	"label.democratic": "Demokratisch",
@@ -90,6 +104,11 @@
 	"label.veryHigh": "Sehr hoch (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Schließen",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
+	"label.promoteAllPeers": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",
@@ -98,12 +117,17 @@
 	"settings.audio": "Audiogerät",
 	"settings.selectAudio": "Wähle ein Audiogerät",
 	"settings.cantSelectAudio": "Kann Audiogerät nicht aktivieren",
+	"settings.audioOutput": "Audioausgabegerät",
+	"settings.selectAudioOutput": "Wähle ein Audioausgabegerät",
+	"settings.cantSelectAudioOutput": "Kann Audioausgabegerät nicht aktivieren",
 	"settings.resolution": "Wähle eine Auflösung",
 	"settings.layout": "Raumlayout",
 	"settings.selectRoomLayout": "Wähle ein Raumlayout",
 	"settings.advancedMode": "Erweiterter Modus",
 	"settings.permanentTopBar": "Permanente obere Leiste",
 	"settings.lastn": "Anzahl der sichtbaren Videos",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",
@@ -133,8 +157,8 @@
 
 	"devices.microphoneDisconnected": "Mikrofon nicht verbunden",
 	"devices.microphoneError": "Fehler beim Zugriff auf dein Mikrofon",
-	"devices.microPhoneMute": "Mikrofon stummgeschaltet",
-	"devices.micophoneUnMute": "Mikrofon aktiviert",
+	"devices.microphoneMute": "Mikrofon stummgeschaltet",
+	"devices.microphoneUnMute": "Mikrofon aktiviert",
 	"devices.microphoneEnable": "Mikrofon aktiviert",
 	"devices.microphoneMuteError": "Kann Mikrofon nicht stummschalten",
 	"devices.microphoneUnMuteError": "Kann Mikrofon nicht aktivieren",
@@ -143,5 +167,10 @@
 	"devices.screenSharingError": "Fehler bei der Bildschirmfreigabe",
 
 	"devices.cameraDisconnected": "Kamera getrennt",
-	"devices.cameraError": "Fehler mit deiner Kamera"
+	"devices.cameraError": "Fehler mit deiner Kamera",
+
+	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

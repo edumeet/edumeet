@@ -52,9 +52,19 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
+	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
+	"room.overRoomLimit": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Entrar",
 	"tooltip.logout": "Salir",
@@ -67,6 +77,9 @@
 	"tooltip.settings": "Mostrar ajustes",
 	"tooltip.participants": "Mostrar participantes",
 	"tooltip.kickParticipant": null,
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Nombre de la sala",
 	"label.chooseRoomButton": "Continuar",
@@ -80,6 +93,7 @@
 	"label.filesharing": "Compartir ficheros",
 	"label.participants": "Participantes",
 	"label.shareFile": "Compartir fichero",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Compartir ficheros no está disponible",
 	"label.unknown": "Desconocido",
 	"label.democratic": "Vista democrática",
@@ -90,6 +104,11 @@
 	"label.veryHigh": "Muy alta (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Cerrar",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
+	"label.promoteAllPeers": null,
 
 	"settings.settings": "Ajustes",
 	"settings.camera": "Cámara",
@@ -98,12 +117,17 @@
 	"settings.audio": "Dispositivo de sonido",
 	"settings.selectAudio": "Seleccione dispositivo de sonido",
 	"settings.cantSelectAudio": "No ha sido posible seleccionar el dispositivo de sonido",
+	"settings.audioOutput": "Dispositivo de salida de audio",
+	"settings.selectAudioOutput": "Seleccionar dispositivo de salida de audio",
+	"settings.cantSelectAudioOutput": "No se puede seleccionar el dispositivo de salida de audio",
 	"settings.resolution": "Seleccione su resolución de imagen",
 	"settings.layout": "Disposición de la sala",
 	"settings.selectRoomLayout": "Seleccione la disposición de la sala",
 	"settings.advancedMode": "Modo avanzado",
 	"settings.permanentTopBar": "Barra superior permanente",
 	"settings.lastn": "Cantidad de videos visibles",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "No ha sido posible guardar el fichero",
 	"filesharing.startingFileShare": "Intentando compartir el fichero",
@@ -133,8 +157,8 @@
 
 	"devices.microphoneDisconnected": "Micrófono desconectado",
 	"devices.microphoneError": "Hubo un error al acceder a su micrófono",
-	"devices.microPhoneMute": "Desactivar micrófono",
-	"devices.micophoneUnMute": "Activar micrófono",
+	"devices.microphoneMute": "Desactivar micrófono",
+	"devices.microphoneUnMute": "Activar micrófono",
 	"devices.microphoneEnable": "Micrófono activado",
 	"devices.microphoneMuteError": "No ha sido posible desactivar su micrófono",
 	"devices.microphoneUnMuteError": "No ha sido posible activar su micrófono",
@@ -143,5 +167,10 @@
 	"devices.screenSharingError": "Hubo un error al acceder a su pantalla",
 
 	"devices.cameraDisconnected": "Cámara desconectada",
-	"devices.cameraError": "Hubo un error al acceder a su cámara"
+	"devices.cameraError": "Hubo un error al acceder a su cámara",
+
+	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

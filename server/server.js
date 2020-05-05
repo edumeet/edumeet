@@ -34,11 +34,13 @@ const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
 const interactiveServer = require('./lib/interactiveServer');
+const promExporter = require('./lib/promExporter');
+const { v4: uuidv4 } = require('uuid');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
-console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
-console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
+console.log('- config.mediasoup.worker.logLevel:', config.mediasoup.worker.logLevel);
+console.log('- config.mediasoup.worker.logTags:', config.mediasoup.worker.logTags);
 /* eslint-enable no-console */
 
 const logger = new Logger();
@@ -53,10 +55,6 @@ if ('StatusLogger' in config)
 // mediasoup Workers.
 // @type {Array<mediasoup.Worker>}
 const mediasoupWorkers = [];
-
-// Index of next mediasoup Worker to use.
-// @type {Number}
-let nextMediasoupWorkerIdx = 0;
 
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
@@ -132,6 +130,12 @@ async function run()
 	// Open the interactive server.
 	await interactiveServer(rooms, peers);
 
+	// start Prometheus exporter
+	if (config.prometheus)
+	{
+		await promExporter(rooms, peers, config.prometheus);
+	}
+
 	if (typeof(config.auth) === 'undefined')
 	{
 		logger.warn('Auth is not configured properly!');
@@ -149,6 +153,25 @@ async function run()
 
 	// Run WebSocketServer.
 	await runWebSocketServer();
+
+	// eslint-disable-next-line no-unused-vars
+	function errorHandler(err, req, res, next) 
+	{
+		const trackingId = uuidv4();
+
+		res.status(500).send(
+			`<h1>Internal Server Error</h1>
+			<p>If you report this error, please also report this 
+			<i>tracking ID</i> which makes it possible to locate your session
+			in the logs which are available to the system administrator: 
+			<b>${trackingId}</b></p>`
+		);
+		logger.error(
+			'Express error handler dump with tracking ID: %s, error dump: %o', 
+			trackingId, err);
+	}
+
+	app.use(errorHandler);
 
 	// Log rooms status every 30 seconds.
 	setInterval(() =>
@@ -189,7 +212,7 @@ function setupLTI(ltiConfig)
 
 	const ltiStrategy = new LTIStrategy(
 		ltiConfig,
-		function(req, lti, done)
+		(req, lti, done) =>
 		{
 			// LTI launch parameters
 			if (lti)
@@ -199,7 +222,7 @@ function setupLTI(ltiConfig)
 				if (lti.user_id && lti.custom_room)
 				{
 					user.id = lti.user_id;
-					user._lti = lti;
+					user._userinfo = { 'lti': lti };
 				}
 
 				if (lti.custom_room)
@@ -240,7 +263,18 @@ function setupOIDC(oidcIssuer)
 	// redirect_uri defaults to client.redirect_uris[0]
 	// response type defaults to client.response_types[0], then 'code'
 	// scope defaults to 'openid'
-	const params = config.auth.oidc.clientOptions;
+
+	/* eslint-disable camelcase */
+	const params = (({
+		client_id,
+		redirect_uri,
+		scope
+	}) => ({
+		client_id,
+		redirect_uri,
+		scope
+	}))(config.auth.oidc.clientOptions);
+	/* eslint-enable camelcase */
 
 	// optional, defaults to false, when true req is passed as a first
 	// argument to verify fn
@@ -255,12 +289,17 @@ function setupOIDC(oidcIssuer)
 		{ client: oidcClient, params, passReqToCallback, usePKCE },
 		(tokenset, userinfo, done) =>
 		{
+			if (userinfo && tokenset)
+			{
+				// eslint-disable-next-line camelcase
+				userinfo._tokenset_claims = tokenset.claims();
+			}
+
 			const user =
 			{
 				id        : tokenset.claims.sub,
 				provider  : tokenset.claims.iss,
-				_userinfo : userinfo,
-				_claims   : tokenset.claims
+				_userinfo : userinfo
 			};
 
 			return done(null, user);
@@ -310,7 +349,7 @@ async function setupAuth()
 	// lti launch
 	app.post('/auth/lti',
 		passport.authenticate('lti', { failureRedirect: '/' }),
-		function(req, res)
+		(req, res) =>
 		{
 			res.redirect(`/${req.user.room}`);
 		}
@@ -333,7 +372,7 @@ async function setupAuth()
 		}
 
 		req.logout();
-		res.send(logoutHelper());
+		req.session.destroy(() => res.send(logoutHelper()));
 	});
 
 	// callback
@@ -427,11 +466,17 @@ async function runHttpsServer()
 		// http
 		const redirectListener = http.createServer(app);
 
-		redirectListener.listen(config.listeningRedirectPort);
+		if (config.listeningHost)
+			redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
+		else
+			redirectListener.listen(config.listeningRedirectPort);
 	}
 
 	// https or http
-	mainListener.listen(config.listeningPort);
+	if (config.listeningHost)
+		mainListener.listen(config.listeningPort, config.listeningHost);
+	else
+		mainListener.listen(config.listeningPort);
 }
 
 function isPathAlreadyTaken(url)
@@ -591,19 +636,6 @@ async function runMediasoupWorkers()
 }
 
 /**
- * Get next mediasoup Worker.
- */
-function getMediasoupWorker()
-{
-	const worker = mediasoupWorkers[nextMediasoupWorkerIdx];
-
-	if (++nextMediasoupWorkerIdx === mediasoupWorkers.length)
-		nextMediasoupWorkerIdx = 0;
-
-	return worker;
-}
-
-/**
  * Get a Room instance (or create one if it does not exist).
  */
 async function getOrCreateRoom({ roomId })
@@ -615,9 +647,9 @@ async function getOrCreateRoom({ roomId })
 	{
 		logger.info('creating a new Room [roomId:"%s"]', roomId);
 
-		const mediasoupWorker = getMediasoupWorker();
+		// const mediasoupWorker = getMediasoupWorker();
 
-		room = await Room.create({ mediasoupWorker, roomId });
+		room = await Room.create({ mediasoupWorkers, roomId });
 
 		rooms.set(roomId, room);
 

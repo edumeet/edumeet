@@ -36,8 +36,15 @@ module.exports =
 	},
 	*/
 	// URI and key for requesting geoip-based TURN server closest to the client
-	turnAPIKey        : 'examplekey',
-	turnAPIURI        : 'https://example.com/api/turn',
+	turnAPIKey    : 'examplekey',
+	turnAPIURI    : 'https://example.com/api/turn',
+	turnAPIparams : {
+		'uri_schema' 	: 'turn',
+		'transport' 		: 'tcp',
+		'ip_ver'    		: 'ipv4',
+		'servercount'	: '2'
+	},
+
 	// Backup turnservers if REST fails or is not configured
 	backupTurnServers : [
 		{
@@ -53,20 +60,31 @@ module.exports =
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',
 	cookieName   : 'multiparty-meeting.sid',
+	// if you use encrypted private key the set the passphrase
 	tls          :
 	{
 		cert : `${__dirname}/../certs/mediasoup-demo.localhost.cert.pem`,
+		// passphrase: 'key_password'
 		key  : `${__dirname}/../certs/mediasoup-demo.localhost.key.pem`
 	},
+	// listening Host or IP 
+	// If omitted listens on every IP. ("0.0.0.0" and "::")
+	// listeningHost: 'localhost',
 	// Listening port for https server.
 	listeningPort         : 443,
 	// Any http request is redirected to https.
-	// Listening port for http server. 
+	// Listening port for http server.
 	listeningRedirectPort : 80,
 	// Listens only on http, only on listeningPort
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
 	httpOnly              : false,
+	// WebServer/Express trust proxy config for httpOnly mode
+	// You can find more info:
+	//  - https://expressjs.com/en/guide/behind-proxies.html
+	//  - https://www.npmjs.com/package/proxy-addr
+	// use case: loadbalancer backend
+	trustProxy            : '',
 	// This logger class will have the log function
 	// called every time there is a room created or destroyed,
 	// or peer created or destroyed. This would then be able
@@ -99,12 +117,6 @@ module.exports =
 				});
 		}
 	}, */
-	// WebServer/Express trust proxy config for httpOnly mode
-	// You can find more info:
-	//  - https://expressjs.com/en/guide/behind-proxies.html
-	//  - https://www.npmjs.com/package/proxy-addr
-	// use case: loadbalancer backend
-	trustProxy            : '',
 	// This function will be called on successful login through oidc.
 	// Use this function to map your oidc userinfo to the Peer object.
 	// The roomId is equal to the room name.
@@ -201,7 +213,7 @@ module.exports =
 	//
 	// Example:
 	// [ userRoles.MODERATOR, userRoles.AUTHENTICATED ]
-	accessFromRoles        : {
+	accessFromRoles : {
 		// The role(s) will gain access to the room
 		// even if it is locked (!)
 		BYPASS_ROOM_LOCK : [ userRoles.ADMIN ],
@@ -212,25 +224,36 @@ module.exports =
 		// function, and change to BYPASS_LOBBY : [ userRoles.AUTHENTICATED ]
 		BYPASS_LOBBY     : [ userRoles.NORMAL ]
 	},
-	permissionsFromRoles   : {
+	permissionsFromRoles : {
 		// The role(s) have permission to lock/unlock a room
 		CHANGE_ROOM_LOCK : [ userRoles.NORMAL ],
 		// The role(s) have permission to promote a peer from the lobby
 		PROMOTE_PEER     : [ userRoles.NORMAL ],
 		// The role(s) have permission to send chat messages
 		SEND_CHAT        : [ userRoles.NORMAL ],
+		// The role(s) have permission to moderate chat
+		MODERATE_CHAT    : [ userRoles.MODERATOR ],
 		// The role(s) have permission to share screen
 		SHARE_SCREEN     : [ userRoles.NORMAL ],
+		// The role(s) have permission to produce extra video
+		EXTRA_VIDEO      : [ userRoles.NORMAL ],
 		// The role(s) have permission to share files
 		SHARE_FILE       : [ userRoles.NORMAL ],
+		// The role(s) have permission to moderate files
+		MODERATE_FILES   : [ userRoles.MODERATOR ],
 		// The role(s) have permission to moderate room (e.g. kick user)
 		MODERATE_ROOM    : [ userRoles.MODERATOR ]
 	},
 	// When truthy, the room will be open to all users when as long as there
 	// are allready users in the room
-	activateOnHostJoin     : true,
+	activateOnHostJoin : true,
+	// When set, maxUsersPerRoom defines how many users can join
+	// a single room. If not set, there is no limit.
+	// maxUsersPerRoom    : 20,
+	// Room size before spreading to new router
+	routerScaleSize    : 40,
 	// Mediasoup settings
-	mediasoup              :
+	mediasoup          :
 	{
 		numWorkers : Object.keys(os.cpus()).length,
 		// mediasoup Worker settings.
@@ -311,11 +334,12 @@ module.exports =
 		{
 			listenIps :
 			[
-				// change ip to your servers IP address!
-				{ ip: '0.0.0.0', announcedIp: null }
+				// change 192.0.2.1 IPv4 to your server's IPv4 address!!
+				{ ip: '192.0.2.1', announcedIp: null }
 
 				// Can have multiple listening interfaces
-				// { ip: '::/0', announcedIp: null }
+				// change 2001:DB8::1 IPv6 to your server's IPv6 address!!
+				// { ip: '2001:DB8::1', announcedIp: null }
 			],
 			initialAvailableOutgoingBitrate : 1000000,
 			minimumAvailableOutgoingBitrate : 600000,
@@ -323,4 +347,13 @@ module.exports =
 			maxIncomingBitrate              : 1500000
 		}
 	}
+	// Prometheus exporter
+	/*
+	prometheus: {
+		deidentify: false, // deidentify IP addresses
+		numeric: false, // show numeric IP addresses
+		port: 8889, // allocated port
+		quiet: false // include fewer labels
+	}
+	*/
 };

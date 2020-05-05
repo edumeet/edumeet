@@ -10,14 +10,7 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			padding  : theme.spacing(1),
-			width    : '100%',
-			overflow : 'hidden',
-			cursor   : 'auto',
-			display  : 'flex'
-		},
-		actionButtons :
-		{
+			padding : theme.spacing(1),
 			display : 'flex'
 		},
 		divider :
@@ -43,7 +36,6 @@ const ListModerator = (props) =>
 					id             : 'room.muteAll',
 					defaultMessage : 'Mute all'
 				})}
-				className={classes.actionButton}
 				variant='contained'
 				color='secondary'
 				disabled={room.muteAllInProgress}
@@ -60,7 +52,6 @@ const ListModerator = (props) =>
 					id             : 'room.stopAllVideo',
 					defaultMessage : 'Stop all video'
 				})}
-				className={classes.actionButton}
 				variant='contained'
 				color='secondary'
 				disabled={room.stopAllVideoInProgress}
@@ -77,7 +68,6 @@ const ListModerator = (props) =>
 					id             : 'room.closeMeeting',
 					defaultMessage : 'Close meeting'
 				})}
-				className={classes.actionButton}
 				variant='contained'
 				color='secondary'
 				disabled={room.closeMeetingInProgress}

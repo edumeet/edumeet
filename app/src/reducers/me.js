@@ -2,7 +2,7 @@ const initialState =
 {
 	id                    : null,
 	picture               : null,
-	isMobile              : false,
+	browser               : null,
 	roles                 : [ 'normal' ], // Default role
 	canSendMic            : false,
 	canSendWebcam         : false,
@@ -15,8 +15,8 @@ const initialState =
 	screenShareInProgress : false,
 	displayNameInProgress : false,
 	loginEnabled          : false,
-	raiseHand             : false,
-	raiseHandInProgress   : false,
+	raisedHand            : false,
+	raisedHandInProgress  : false,
 	loggedIn              : false,
 	isSpeaking            : false
 };
@@ -39,9 +39,11 @@ const me = (state = initialState, action) =>
 			};
 		}
 
-		case 'SET_IS_MOBILE':
+		case 'SET_BROWSER':
 		{
-			return { ...state, isMobile: true };
+			const { browser } = action.payload;
+
+			return { ...state, browser };
 		}
 
 		case 'LOGGED_IN':
@@ -97,6 +99,13 @@ const me = (state = initialState, action) =>
 			return { ...state, audioDevices: devices };
 		}
 
+		case 'SET_AUDIO_OUTPUT_DEVICES':
+		{
+			const { devices } = action.payload;
+
+			return { ...state, audioOutputDevices: devices };
+		}
+
 		case 'SET_WEBCAM_DEVICES':
 		{
 			const { devices } = action.payload;
@@ -125,18 +134,18 @@ const me = (state = initialState, action) =>
 			return { ...state, screenShareInProgress: flag };
 		}
 
-		case 'SET_MY_RAISE_HAND_STATE':
+		case 'SET_RAISED_HAND':
 		{
 			const { flag } = action.payload;
 
-			return { ...state, raiseHand: flag };
+			return { ...state, raisedHand: flag };
 		}
 
-		case 'SET_MY_RAISE_HAND_STATE_IN_PROGRESS':
+		case 'SET_RAISED_HAND_IN_PROGRESS':
 		{
 			const { flag } = action.payload;
 
-			return { ...state, raiseHandInProgress: flag };
+			return { ...state, raisedHandInProgress: flag };
 		}
 
 		case 'SET_DISPLAY_NAME_IN_PROGRESS':

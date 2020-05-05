@@ -47,7 +47,8 @@ class Lobby extends EventEmitter
 		return Object.values(this._peers).map((peer) =>
 			({
 				peerId      : peer.id,
-				displayName : peer.displayName 
+				displayName : peer.displayName,
+				picture     : peer.picture
 			}));
 	}
 
@@ -62,8 +63,8 @@ class Lobby extends EventEmitter
 
 		for (const peer in this._peers)
 		{
-			if (peer.socket)
-				this.promotePeer(peer.id);
+			if (!this._peers[peer].closed)
+				this.promotePeer(peer);
 		}
 	}
 

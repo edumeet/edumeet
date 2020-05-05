@@ -1,6 +1,6 @@
 {
 	"name": "multiparty-meeting",
-	"version": "3.2.0",
+	"version": "3.3.0",
 	"private": true,
 	"description": "multiparty meeting service",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
@@ -11,6 +11,7 @@
 		"@material-ui/core": "^4.5.1",
 		"@material-ui/icons": "^4.5.1",
 		"bowser": "^2.7.0",
+		"classnames": "^2.2.6",
 		"create-torrent": "^4.4.1",
 		"dompurify": "^2.0.7",
 		"domready": "^1.0.8",
@@ -29,7 +30,8 @@
 		"react-intl": "^3.4.0",
 		"react-redux": "^7.1.1",
 		"react-router-dom": "^5.1.2",
-		"react-scripts": "3.0.1",
+		"react-scripts": "3.4.1",
+		"react-wakelock-react16": "0.0.7",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
 		"redux-persist": "^6.0.0",
@@ -58,6 +60,7 @@
 	],
 	"devDependencies": {
 		"electron": "^7.1.1",
+		"eslint-plugin-react": "^7.19.0",
 		"foreman": "^3.0.1",
 		"redux-mock-store": "^1.5.3"
 	}

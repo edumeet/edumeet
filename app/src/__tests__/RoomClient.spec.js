@@ -1,6 +1,6 @@
 import RoomClient from '../RoomClient';
 
-describe('new RoomClient() without paramaters throws Error', () =>
+describe('new RoomClient() without parameters throws Error', () =>
 {
 	test('Matches the snapshot', () =>
 	{

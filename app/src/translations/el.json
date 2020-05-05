@@ -52,9 +52,19 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
+	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
+	"room.overRoomLimit": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Σύνδεση",
 	"tooltip.logout": "Αποσύνδεση",
@@ -67,6 +77,9 @@
 	"tooltip.settings": "Εμφάνιση ρυθμίσεων",
 	"tooltip.participants": "Εμφάνιση συμμετεχόντων",
 	"tooltip.kickParticipant": null,
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
 
 	"label.roomName": "Όνομα δωματίου",
 	"label.chooseRoomButton": "Συνέχεια",
@@ -80,6 +93,7 @@
 	"label.filesharing": "Διαμοιρασμοός αρχείου",
 	"label.participants": "Συμμετέχοντες",
 	"label.shareFile": "Διαμοιραστείτε ένα αρχείο",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Ο διαμοιρασμός αρχείων δεν υποστηρίζεται",
 	"label.unknown": "Άγνωστο",
 	"label.democratic": null,
@@ -90,6 +104,11 @@
 	"label.veryHigh": "Πολύ υψηλή (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Κλείσιμο",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
+	"label.promoteAllPeers": null,
 
 	"settings.settings": "Ρυθμίσεις",
 	"settings.camera": "Κάμερα",
@@ -98,12 +117,17 @@
 	"settings.audio": "Συσκευή ήχου",
 	"settings.selectAudio": "Επιλογή συσκευής ήχου",
 	"settings.cantSelectAudio": "Αδυναμία επιλογής συσκευής ήχου",
+	"settings.audioOutput": "Συσκευή εξόδου ήχου",
+	"settings.selectAudioOutput": "Επιλέξτε συσκευή εξόδου ήχου",
+	"settings.cantSelectAudioOutput": "Δεν είναι δυνατή η επιλογή συσκευής εξόδου ήχου",
 	"settings.resolution": "Επιλέξτε την ανάλυση του video",
 	"settings.layout": "Περιβάλλον δωματίου",
 	"settings.selectRoomLayout": "Επιλογή περιβάλλοντος δωματίου",
 	"settings.advancedMode": "Προηγμένη λειτουργία",
 	"settings.permanentTopBar": "Μόνιμη μπάρα κορυφής",
 	"settings.lastn": "Αριθμός ορατών βίντεο",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Αδυναμία αποθήκευσης του αρχείου",
 	"filesharing.startingFileShare": "Προσπάθεια διαμοιρασμού αρχείου",
@@ -133,8 +157,8 @@
 
 	"devices.microphoneDisconnected": "Το μικρόφωνο αποσυνδέθηκε",
 	"devices.microphoneError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στο μικρόφωνό σας",
-	"devices.microPhoneMute": "Το μικρόφωνό σας είναι σε σίγαση",
-	"devices.micophoneUnMute": "Ανοίξτε το μικρόφωνό σας",
+	"devices.microphoneMute": "Το μικρόφωνό σας είναι σε σίγαση",
+	"devices.microphoneUnMute": "Ανοίξτε το μικρόφωνό σας",
 	"devices.microphoneEnable": "Ενεργοποίησε το μικρόφωνό σας",
 	"devices.microphoneMuteError": "Δεν είναι δυνατή η σίγαση του μικροφώνου σας",
 	"devices.microphoneUnMuteError": "Δεν είναι δυνατό το άνοιγμα του μικροφώνου σας",
@@ -143,5 +167,10 @@
 	"devices.screenSharingError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στην οθόνη σας",
 
 	"devices.cameraDisconnected": "Η κάμερα αποσυνδέθηκε",
-	"devices.cameraError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στην κάμερά σας"
+	"devices.cameraError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στην κάμερά σας",
+
+	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

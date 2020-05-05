@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
+import classnames from 'classnames';
 import isElectron from 'is-electron';
 import * as settingsActions from '../actions/settingsActions';
 import PropTypes from 'prop-types';
@@ -82,6 +83,10 @@ const styles = (theme) =>
 		green :
 		{
 			color : 'rgba(0, 153, 0, 1)'
+		},
+		red :
+		{
+			color : 'rgba(153, 0, 0, 1)'
 		}
 	});
 
@@ -128,9 +133,9 @@ const DialogTitle = withStyles(styles)((props) =>
 
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 			<Typography variant='h5'>{children}</Typography>
-			{ window.config && window.config.loginEnabled &&
+			{ window.config.loginEnabled &&
 				<Tooltip
 					onClose={handleTooltipClose}
 					onOpen={handleTooltipOpen}
@@ -147,7 +152,9 @@ const DialogTitle = withStyles(styles)((props) =>
 						{ myPicture ?
 							<Avatar src={myPicture} className={classes.largeAvatar} />
 							:
-							<AccountCircle className={classes.largeIcon} />
+							<AccountCircle
+								className={classnames(classes.largeIcon, loggedIn ? classes.green : null)}
+							/>
 						}
 					</IconButton>
 				</Tooltip>
@@ -217,11 +224,11 @@ const JoinDialog = ({
 					myPicture={myPicture}
 					onLogin={() =>
 					{
-						loggedIn ? roomClient.logout() : roomClient.login();
+						loggedIn ? roomClient.logout() : roomClient.login(roomId);
 					}}
 					loggedIn={loggedIn}
 				>
-					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
+					{ window.config.title ? window.config.title : 'Multiparty meeting' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>
@@ -278,6 +285,16 @@ const JoinDialog = ({
 						}}
 						fullWidth
 					/>
+					{!room.inLobby && room.overRoomLimit &&
+						<DialogContentText className={classes.red} variant='h6' gutterBottom>
+							<FormattedMessage
+								id='room.overRoomLimit'
+								defaultMessage={
+									'The room is full, retry after some time.'
+								}
+							/>
+						</DialogContentText>
+					}
 
 				</DialogContent>
 
@@ -316,6 +333,7 @@ const JoinDialog = ({
 							className={classes.green}
 							gutterBottom
 							variant='h6'
+							style={{ fontWeight: '600' }}
 							align='center'
 						>
 							<FormattedMessage
@@ -324,7 +342,11 @@ const JoinDialog = ({
 							/>
 						</DialogContentText>
 						{ room.signInRequired ?
-							<DialogContentText gutterBottom>
+							<DialogContentText
+								gutterBottom
+								variant='h5'
+								style={{ fontWeight: '600' }}
+							>
 								<FormattedMessage
 									id='room.emptyRequireLogin'
 									defaultMessage={
@@ -334,7 +356,11 @@ const JoinDialog = ({
 								/>
 							</DialogContentText>
 							:
-							<DialogContentText gutterBottom>
+							<DialogContentText
+								gutterBottom
+								variant='h5'
+								style={{ fontWeight: '600' }}
+							>
 								<FormattedMessage
 									id='room.locketWait'
 									defaultMessage='The room is locked - hang on until somebody lets you in ...'
@@ -407,6 +433,7 @@ export default withRoomContext(connect(
 			return (
 				prev.room.inLobby === next.room.inLobby &&
 				prev.room.signInRequired === next.room.signInRequired &&
+				prev.room.overRoomLimit === next.room.overRoomLimit &&
 				prev.settings.displayName === next.settings.displayName &&
 				prev.me.displayNameInProgress === next.me.displayNameInProgress &&
 				prev.me.loginEnabled === next.me.loginEnabled &&

@@ -31,8 +31,7 @@ let Spotlights;
 let requestTimeout,
 	transportOptions,
 	lastN,
-	mobileLastN,
-	defaultResolution;
+	mobileLastN;
 
 if (process.env.NODE_ENV !== 'test')
 {
@@ -40,8 +39,7 @@ if (process.env.NODE_ENV !== 'test')
 		requestTimeout,
 		transportOptions,
 		lastN,
-		mobileLastN,
-		defaultResolution
+		mobileLastN
 	} = window.config);
 }
 
@@ -151,7 +149,7 @@ export default class RoomClient
 		// Whether we should produce.
 		this._produce = produce;
 
-		// Wheter we force TCP
+		// Whether we force TCP
 		this._forceTcp = forceTcp;
 
 		// Use displayName
@@ -199,20 +197,17 @@ export default class RoomClient
 		// @type {mediasoupClient.Device}
 		this._mediasoupDevice = null;
 
+		// Put the browser info into state
+		store.dispatch(meActions.setBrowser(device));
+
 		// Our WebTorrent client
 		this._webTorrent = null;
 
-		if (defaultResolution)
-			store.dispatch(settingsActions.setVideoResolution(defaultResolution));
-
 		// Max spotlights
-		if (device.bowser.getPlatformType() === 'desktop')
+		if (device.platform === 'desktop')
 			this._maxSpotlights = lastN;
 		else
-		{
 			this._maxSpotlights = mobileLastN;
-			store.dispatch(meActions.setIsMobile());
-		}
 
 		store.dispatch(
 			settingsActions.setLastN(this._maxSpotlights));
@@ -238,11 +233,16 @@ export default class RoomClient
 		// Local webcam mediasoup Producer.
 		this._webcamProducer = null;
 
+		// Extra videos being produced
+		this._extraVideoProducers = new Map();
+
 		// Map of webcam MediaDeviceInfos indexed by deviceId.
 		// @type {Map<String, MediaDeviceInfos>}
 		this._webcams = {};
 
 		this._audioDevices = {};
+
+		this._audioOutputDevices = {};
 
 		// mediasoup Consumers.
 		// @type {Map<String, mediasoupClient.Consumer>}
@@ -282,7 +282,7 @@ export default class RoomClient
 
 	_startKeyListener()
 	{
-		// Add keypress event listner on document
+		// Add keydown event listener on document
 		document.addEventListener('keydown', (event) =>
 		{
 			if (event.repeat) return;
@@ -360,7 +360,7 @@ export default class RoomClient
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
-											id             : 'devices.microPhoneMute',
+											id             : 'devices.microphoneMute',
 											defaultMessage : 'Muted your microphone'
 										})
 									}));
@@ -372,7 +372,7 @@ export default class RoomClient
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
-											id             : 'devices.microPhoneUnMute',
+											id             : 'devices.microphoneUnMute',
 											defaultMessage : 'Unmuted your microphone'
 										})
 									}));
@@ -456,6 +456,7 @@ export default class RoomClient
 
 			await this._updateAudioDevices();
 			await this._updateWebcams();
+			await this._updateAudioOutputDevices();
 
 			store.dispatch(requestActions.notify(
 				{
@@ -467,9 +468,9 @@ export default class RoomClient
 		});
 	}
 
-	login()
+	login(roomId = this._roomId)
 	{
-		const url = `/auth/login?peerId=${this._peerId}&roomId=${this._roomId}`;
+		const url = `/auth/login?peerId=${this._peerId}&roomId=${roomId}`;
 
 		window.open(url, 'loginWindow');
 	}
@@ -518,22 +519,22 @@ export default class RoomClient
 
 	_soundNotification()
 	{
-		const alertPromise = this._soundAlert.play();
+		const { notificationSounds } = store.getState().settings;
 
-		if (alertPromise !== undefined)
+		if (notificationSounds)
 		{
-			alertPromise
-				.then()
-				.catch((error) =>
-				{
-					logger.error('_soundAlert.play() | failed: %o', error);
-				});
-		}
-	}
+			const alertPromise = this._soundAlert.play();
 
-	notify(text)
-	{
-		store.dispatch(requestActions.notify({ text: text }));
+			if (alertPromise !== undefined)
+			{
+				alertPromise
+					.then()
+					.catch((error) =>
+					{
+						logger.error('_soundAlert.play() | failed: %o', error);
+					});
+			}
+		}
 	}
 
 	timeoutCallback(callback)
@@ -626,7 +627,7 @@ export default class RoomClient
 					type : 'error',
 					text : intl.formatMessage({
 						id             : 'room.changeDisplayNameError',
-						defaultMessage : 'An error occured while changing your display name'
+						defaultMessage : 'An error occurred while changing your display name'
 					})
 				}));
 		}
@@ -681,7 +682,7 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				return store.dispatch(requestActions.notify(
+				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
@@ -689,6 +690,8 @@ export default class RoomClient
 							defaultMessage : 'Unable to save file'
 						})
 					}));
+
+				return;
 			}
 
 			saveAs(blob, file.name);
@@ -705,7 +708,9 @@ export default class RoomClient
 		if (existingTorrent)
 		{
 			// Never add duplicate torrents, use the existing one instead.
-			return this._handleTorrent(existingTorrent);
+			this._handleTorrent(existingTorrent);
+
+			return;
 		}
 
 		this._webTorrent.add(magnetUri, this._handleTorrent);
@@ -717,11 +722,13 @@ export default class RoomClient
 		// same file was sent multiple times.
 		if (torrent.progress === 1)
 		{
-			return store.dispatch(
+			store.dispatch(
 				fileActions.setFileDone(
 					torrent.magnetURI,
 					torrent.files
 				));
+
+			return;
 		}
 
 		let lastMove = 0;
@@ -764,7 +771,7 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				return store.dispatch(requestActions.notify(
+				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
@@ -772,13 +779,30 @@ export default class RoomClient
 							defaultMessage : 'Unable to share file'
 						})
 					}));
+
+				return;
 			}
 
 			const existingTorrent = this._webTorrent.get(torrent);
 
 			if (existingTorrent)
 			{
-				return this._sendFile(existingTorrent.magnetURI);
+				store.dispatch(requestActions.notify(
+					{
+						text : intl.formatMessage({
+							id             : 'filesharing.successfulFileShare',
+							defaultMessage : 'File successfully shared'
+						})
+					}));
+
+				store.dispatch(fileActions.addFile(
+					this._peerId,
+					existingTorrent.magnetURI
+				));
+
+				this._sendFile(existingTorrent.magnetURI);
+
+				return;
 			}
 
 			this._webTorrent.seed(
@@ -825,62 +849,6 @@ export default class RoomClient
 						defaultMessage : 'Unable to share file'
 					})
 				}));
-		}
-	}
-
-	async getServerHistory()
-	{
-		logger.debug('getServerHistory()');
-
-		try
-		{
-			const {
-				chatHistory,
-				fileHistory,
-				lastNHistory,
-				locked,
-				lobbyPeers,
-				accessCode
-			} = await this.sendRequest('serverHistory');
-
-			(chatHistory.length > 0) && store.dispatch(
-				chatActions.addChatHistory(chatHistory));
-
-			(fileHistory.length > 0) && store.dispatch(
-				fileActions.addFileHistory(fileHistory));
-
-			if (lastNHistory.length > 0)
-			{
-				logger.debug('Got lastNHistory');
-
-				// Remove our self from list
-				const index = lastNHistory.indexOf(this._peerId);
-
-				lastNHistory.splice(index, 1);
-
-				this._spotlights.addSpeakerList(lastNHistory);
-			}
-
-			locked ? 
-				store.dispatch(roomActions.setRoomLocked()) :
-				store.dispatch(roomActions.setRoomUnLocked());
-
-			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
-			{
-				store.dispatch(
-					lobbyPeerActions.addLobbyPeer(peer.peerId));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
-			});
-
-			(accessCode != null) && store.dispatch(
-				roomActions.setAccessCode(accessCode));
-		}
-		catch (error)
-		{
-			logger.error('getServerHistory() | failed: %o', error);
 		}
 	}
 
@@ -1065,7 +1033,7 @@ export default class RoomClient
 			{
 				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 				//   Math.pow(10, dBs / 20)
-				// However it does not produce a visually useful output, so let exagerate
+				// However it does not produce a visually useful output, so let exaggerate
 				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
 				// minimize component renderings.
 				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
@@ -1107,6 +1075,37 @@ export default class RoomClient
 			meActions.setAudioInProgress(false));
 	}
 
+	async changeAudioOutputDevice(deviceId)
+	{
+		logger.debug('changeAudioOutputDevice() [deviceId: %s]', deviceId);
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(true));
+
+		try
+		{
+			const device = this._audioOutputDevices[deviceId];
+
+			if (!device)
+				throw new Error('Selected audio output device no longer avaibale');
+
+			logger.debug(
+				'changeAudioOutputDevice() | new selected [audio output device:%o]',
+				device);
+
+			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
+
+			await this._updateAudioOutputDevices();
+		}
+		catch (error)
+		{
+			logger.error('changeAudioOutputDevice() failed: %o', error);
+		}
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(false));
+	}
+
 	async changeVideoResolution(resolution)
 	{
 		logger.debug('changeVideoResolution() [resolution: %s]', resolution);
@@ -1135,14 +1134,41 @@ export default class RoomClient
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
+				
+			if (stream)
+			{
+				const track = stream.getVideoTracks()[0];
 
-			const track = stream.getVideoTracks()[0];
+				if (track)
+				{
+					if (this._webcamProducer)
+					{
+						await this._webcamProducer.replaceTrack({ track });
+					}
+					else 
+					{
+						this._webcamProducer = await this._sendTransport.produce({
+							track,
+							appData : 
+							{
+								source : 'webcam'
+							}
+						});	
+					}
 
-			await this._webcamProducer.replaceTrack({ track });
-
-			store.dispatch(
-				producerActions.setProducerTrack(this._webcamProducer.id, track));
-
+					store.dispatch(
+						producerActions.setProducerTrack(this._webcamProducer.id, track));
+				}
+				else
+				{
+					logger.warn('getVideoTracks Error: First Video Track is null');
+				}
+	
+			}
+			else
+			{
+				logger.warn('getUserMedia Error: Stream is null!');
+			}
 			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
 			store.dispatch(settingsActions.setVideoResolution(resolution));
 
@@ -1195,11 +1221,24 @@ export default class RoomClient
 
 				if (track)
 				{
-					await this._webcamProducer.replaceTrack({ track });
-	
+					if (this._webcamProducer)
+					{
+						await this._webcamProducer.replaceTrack({ track });
+					}
+					else 
+					{
+						this._webcamProducer = await this._sendTransport.produce({
+							track,
+							appData : 
+							{
+								source : 'webcam'
+							}
+						});	
+					}
+		
 					store.dispatch(
 						producerActions.setProducerTrack(this._webcamProducer.id, track));
-							
+
 				}
 				else
 				{
@@ -1235,6 +1274,26 @@ export default class RoomClient
 			roomActions.setSelectedPeer(peerId));
 	}
 
+	async promoteAllLobbyPeers()
+	{
+		logger.debug('promoteAllLobbyPeers()');
+
+		store.dispatch(
+			roomActions.setLobbyPeersPromotionInProgress(true));
+
+		try
+		{
+			await this.sendRequest('promoteAllPeers');
+		}
+		catch (error)
+		{
+			logger.error('promoteAllLobbyPeers() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setLobbyPeersPromotionInProgress(false));
+	}
+
 	async promoteLobbyPeer(peerId)
 	{
 		logger.debug('promoteLobbyPeer() [peerId:"%s"]', peerId);
@@ -1253,6 +1312,50 @@ export default class RoomClient
 
 		store.dispatch(
 			lobbyPeerActions.setLobbyPeerPromotionInProgress(peerId, false));
+	}
+
+	async clearChat()
+	{
+		logger.debug('clearChat()');
+
+		store.dispatch(
+			roomActions.setClearChatInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:clearChat');
+
+			store.dispatch(chatActions.clearChat());
+		}
+		catch (error)
+		{
+			logger.error('clearChat() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setClearChatInProgress(false));
+	}
+
+	async clearFileSharing()
+	{
+		logger.debug('clearFileSharing()');
+
+		store.dispatch(
+			roomActions.setClearFileSharingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:clearFileSharing');
+
+			store.dispatch(fileActions.clearFiles());
+		}
+		catch (error)
+		{
+			logger.error('clearFileSharing() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setClearFileSharingInProgress(false));
 	}
 
 	async kickPeer(peerId)
@@ -1430,30 +1533,30 @@ export default class RoomClient
 		}
 	}
 
-	async sendRaiseHandState(state)
+	async setRaisedHand(raisedHand)
 	{
-		logger.debug('sendRaiseHandState: ', state);
+		logger.debug('setRaisedHand: ', raisedHand);
 
 		store.dispatch(
-			meActions.setMyRaiseHandStateInProgress(true));
+			meActions.setRaisedHandInProgress(true));
 
 		try
 		{
-			await this.sendRequest('raiseHand', { raiseHandState: state });
+			await this.sendRequest('raisedHand', { raisedHand });
 
 			store.dispatch(
-				meActions.setMyRaiseHandState(state));
+				meActions.setRaisedHand(raisedHand));
 		}
 		catch (error)
 		{
-			logger.error('sendRaiseHandState() | failed: %o', error);
+			logger.error('setRaisedHand() | [error:"%o"]', error);
 
 			// We need to refresh the component for it to render changed state
-			store.dispatch(meActions.setMyRaiseHandState(!state));
+			store.dispatch(meActions.setRaisedHand(!raisedHand));
 		}
 
 		store.dispatch(
-			meActions.setMyRaiseHandStateInProgress(false));
+			meActions.setRaisedHandInProgress(false));
 	}
 
 	async setMaxSendingSpatialLayer(spatialLayer)
@@ -1800,7 +1903,7 @@ export default class RoomClient
 						{
 							// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 							//   Math.pow(10, dBs / 20)
-							// However it does not produce a visually useful output, so let exagerate
+							// However it does not produce a visually useful output, so let exaggerate
 							// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
 							// minimize component renderings.
 							let volume = Math.round(Math.pow(10, dBs / 85) * 10);
@@ -1860,6 +1963,13 @@ export default class RoomClient
 						break;
 					}
 						
+					case 'overRoomLimit':
+					{
+						store.dispatch(roomActions.setOverRoomLimit(true));
+
+						break;
+					}
+
 					case 'roomReady':
 					{
 						const { turnServers } = notification.data;
@@ -1921,6 +2031,8 @@ export default class RoomClient
 							lobbyPeerActions.addLobbyPeer(peerId));
 						store.dispatch(
 							roomActions.setToolbarsVisible(true));
+
+						this._soundNotification();
 	
 						store.dispatch(requestActions.notify(
 							{
@@ -1930,6 +2042,43 @@ export default class RoomClient
 								})
 							}));
 	
+						break;
+					}
+
+					case 'parkedPeers':
+					{
+						const { lobbyPeers } = notification.data;
+
+						if (lobbyPeers.length > 0)
+						{
+							lobbyPeers.forEach((peer) =>
+							{
+								store.dispatch(
+									lobbyPeerActions.addLobbyPeer(peer.peerId));
+								store.dispatch(
+									lobbyPeerActions.setLobbyPeerDisplayName(
+										peer.displayName,
+										peer.peerId
+									)
+								);
+								store.dispatch(
+									lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+							});
+	
+							store.dispatch(
+								roomActions.setToolbarsVisible(true));
+
+							this._soundNotification();
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'room.newLobbyPeer',
+										defaultMessage : 'New participant entered the lobby'
+									})
+								}));
+						}
+
 						break;
 					}
 	
@@ -2091,6 +2240,58 @@ export default class RoomClient
 						break;
 					}
 
+					case 'raisedHand':
+					{
+						const {
+							peerId,
+							raisedHand,
+							raisedHandTimestamp
+						} = notification.data;
+
+						store.dispatch(
+							peerActions.setPeerRaisedHand(
+								peerId,
+								raisedHand,
+								raisedHandTimestamp
+							)
+						);
+
+						const { displayName } = store.getState().peers[peerId];
+
+						let text;
+
+						if (raisedHand)
+						{
+							text = intl.formatMessage({
+								id             : 'room.raisedHand',
+								defaultMessage : '{displayName} raised their hand'
+							}, {
+								displayName
+							});
+						}
+						else
+						{
+							text = intl.formatMessage({
+								id             : 'room.loweredHand',
+								defaultMessage : '{displayName} put their hand down'
+							}, {
+								displayName
+							});
+						}
+
+						if (displayName)
+						{
+							store.dispatch(requestActions.notify(
+								{
+									text
+								}));
+						}
+
+						this._soundNotification();
+
+						break;
+					}
+
 					case 'chatMessage':
 					{
 						const { peerId, chatMessage } = notification.data;
@@ -2108,6 +2309,21 @@ export default class RoomClient
 								roomActions.setToolbarsVisible(true));
 							this._soundNotification();
 						}
+
+						break;
+					}
+
+					case 'moderator:clearChat':
+					{
+						store.dispatch(chatActions.clearChat());
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.clearChat',
+									defaultMessage : 'Moderator cleared the chat'
+								})
+							}));
 
 						break;
 					}
@@ -2140,6 +2356,21 @@ export default class RoomClient
 						break;
 					}
 
+					case 'moderator:clearFileSharing':
+					{
+						store.dispatch(fileActions.clearFiles());
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.clearFiles',
+									defaultMessage : 'Moderator cleared the files'
+								})
+							}));
+
+						break;
+					}
+
 					case 'producerScore':
 					{
 						const { producerId, score } = notification.data;
@@ -2156,6 +2387,8 @@ export default class RoomClient
 
 						store.dispatch(
 							peerActions.addPeer({ id, displayName, picture, roles, consumers: [] }));
+
+						this._soundNotification();
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2266,8 +2499,8 @@ export default class RoomClient
 							store.dispatch(requestActions.notify(
 								{
 									text : intl.formatMessage({
-										id             : 'moderator.mute',
-										defaultMessage : 'Moderator muted your microphone'
+										id             : 'moderator.muteAudio',
+										defaultMessage : 'Moderator muted your audio'
 									})
 								}));
 						}
@@ -2285,7 +2518,7 @@ export default class RoomClient
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
-									id             : 'moderator.mute',
+									id             : 'moderator.muteVideo',
 									defaultMessage : 'Moderator stopped your video'
 								})
 							}));
@@ -2313,7 +2546,9 @@ export default class RoomClient
 								{
 									text : intl.formatMessage({
 										id             : 'roles.gotRole',
-										defaultMessage : `You got the role: ${role}`
+										defaultMessage : 'You got the role: {role}'
+									}, {
+										role
 									})
 								}));
 						}
@@ -2335,7 +2570,9 @@ export default class RoomClient
 								{
 									text : intl.formatMessage({
 										id             : 'roles.lostRole',
-										defaultMessage : `You lost the role: ${role}`
+										defaultMessage : 'You lost the role: {role}'
+									}, {
+										role
 									})
 								}));
 						}
@@ -2533,7 +2770,13 @@ export default class RoomClient
 				peers,
 				tracker,
 				permissionsFromRoles,
-				userRoles
+				userRoles,
+				chatHistory,
+				fileHistory,
+				lastNHistory,
+				locked,
+				lobbyPeers,
+				accessCode
 			} = await this.sendRequest(
 				'join',
 				{
@@ -2588,7 +2831,39 @@ export default class RoomClient
 				this.updateSpotlights(spotlights);
 			});
 
-			// Don't produce if explicitely requested to not to do it.
+			(chatHistory.length > 0) && store.dispatch(
+				chatActions.addChatHistory(chatHistory));
+
+			(fileHistory.length > 0) && store.dispatch(
+				fileActions.addFileHistory(fileHistory));
+
+			if (lastNHistory.length > 0)
+			{
+				logger.debug('_joinRoom() | got lastN history');
+
+				this._spotlights.addSpeakerList(
+					lastNHistory.filter((peerId) => peerId !== this._peerId)
+				);
+			}
+
+			locked ? 
+				store.dispatch(roomActions.setRoomLocked()) :
+				store.dispatch(roomActions.setRoomUnLocked());
+
+			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
+			{
+				store.dispatch(
+					lobbyPeerActions.addLobbyPeer(peer.peerId));
+				store.dispatch(
+					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
+				store.dispatch(
+					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+			});
+
+			(accessCode != null) && store.dispatch(
+				roomActions.setAccessCode(accessCode));
+
+			// Don't produce if explicitly requested to not to do it.
 			if (this._produce)
 			{
 				if (this._mediasoupDevice.canProduce('audio'))
@@ -2602,13 +2877,24 @@ export default class RoomClient
 				if (joinVideo && this._mediasoupDevice.canProduce('video'))
 					this.enableWebcam();
 			}
+			
+			await this._updateAudioOutputDevices();
 
+			const { selectedAudioOutputDevice } = store.getState().settings;
+
+			if (!selectedAudioOutputDevice && this._audioOutputDevices !== {})
+			{
+				store.dispatch(
+					settingsActions.setSelectedAudioOutputDevice(
+						Object.keys(this._audioOutputDevices)[0]
+					)
+				);
+			}
+		
 			store.dispatch(roomActions.setRoomState('connected'));
 
-			// Clean all the existing notifcations.
+			// Clean all the existing notifications.
 			store.dispatch(notificationActions.removeAllNotifications());
-
-			this.getServerHistory();
 
 			store.dispatch(requestActions.notify(
 				{
@@ -2759,6 +3045,159 @@ export default class RoomClient
 		}
 	}
 
+	async addExtraVideo(videoDeviceId)
+	{
+		logger.debug(
+			'addExtraVideo() [videoDeviceId:"%s"]',
+			videoDeviceId
+		);
+
+		store.dispatch(
+			roomActions.setExtraVideoOpen(false));
+
+		if (!this._mediasoupDevice.canProduce('video'))
+		{
+			logger.error('enableWebcam() | cannot produce video');
+
+			return;
+		}
+
+		let track;
+
+		store.dispatch(
+			meActions.setWebcamInProgress(true));
+
+		try
+		{
+			const device = this._webcams[videoDeviceId];
+			const resolution = store.getState().settings.resolution;
+
+			if (!device)
+				throw new Error('no webcam devices');
+			
+			logger.debug(
+				'addExtraVideo() | new selected webcam [device:%o]',
+				device);
+
+			logger.debug('_setWebcamProducer() | calling getUserMedia()');
+
+			const stream = await navigator.mediaDevices.getUserMedia(
+				{
+					video :
+					{
+						deviceId : { ideal: videoDeviceId },
+						...VIDEO_CONSTRAINS[resolution]
+					}
+				});
+
+			track = stream.getVideoTracks()[0];
+
+			let producer;
+
+			if (this._useSimulcast)
+			{
+				// If VP9 is the only available video codec then use SVC.
+				const firstVideoCodec = this._mediasoupDevice
+					.rtpCapabilities
+					.codecs
+					.find((c) => c.kind === 'video');
+
+				let encodings;
+
+				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+					encodings = VIDEO_KSVC_ENCODINGS;
+				else if ('simulcastEncodings' in window.config)
+					encodings = window.config.simulcastEncodings;
+				else
+					encodings = VIDEO_SIMULCAST_ENCODINGS;
+
+				producer = await this._sendTransport.produce(
+					{
+						track,
+						encodings,
+						codecOptions :
+						{
+							videoGoogleStartBitrate : 1000
+						},
+						appData : 
+						{
+							source : 'extravideo'
+						}
+					});
+			}
+			else
+			{
+				producer = await this._sendTransport.produce({
+					track,
+					appData : 
+					{
+						source : 'extravideo'
+					}
+				});
+			}
+
+			this._extraVideoProducers.set(producer.id, producer);
+
+			store.dispatch(producerActions.addProducer(
+				{
+					id            : producer.id,
+					deviceLabel   : device.label,
+					source        : 'extravideo',
+					paused        : producer.paused,
+					track         : producer.track,
+					rtpParameters : producer.rtpParameters,
+					codec         : producer.rtpParameters.codecs[0].mimeType.split('/')[1]
+				}));
+
+			// store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
+
+			await this._updateWebcams();
+
+			producer.on('transportclose', () =>
+			{
+				this._extraVideoProducers.delete(producer.id);
+
+				producer = null;
+			});
+
+			producer.on('trackended', () =>
+			{
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : intl.formatMessage({
+							id             : 'devices.cameraDisconnected',
+							defaultMessage : 'Camera disconnected'
+						})
+					}));
+
+				this.disableExtraVideo(producer.id)
+					.catch(() => {});
+			});
+
+			logger.debug('addExtraVideo() succeeded');
+		}
+		catch (error)
+		{
+			logger.error('addExtraVideo() failed:%o', error);
+
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'devices.cameraError',
+						defaultMessage : 'An error occurred while accessing your camera'
+					})
+				}));
+
+			if (track)
+				track.stop();
+		}
+
+		store.dispatch(
+			meActions.setWebcamInProgress(false));
+	}
+
 	async enableMic()
 	{
 		if (this._micProducer)
@@ -2794,7 +3233,7 @@ export default class RoomClient
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					audio : {
-						deviceId : { exact: deviceId }
+						deviceId : { ideal: deviceId }
 					}
 				}
 			);
@@ -2872,7 +3311,7 @@ export default class RoomClient
 			{
 				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 				//   Math.pow(10, dBs / 20)
-				// However it does not produce a visually useful output, so let exagerate
+				// However it does not produce a visually useful output, so let exaggerate
 				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
 				// minimize component renderings.
 				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
@@ -2907,7 +3346,7 @@ export default class RoomClient
 					type : 'error',
 					text : intl.formatMessage({
 						id             : 'devices.microphoneError',
-						defaultMessage : 'An error occured while accessing your microphone'
+						defaultMessage : 'An error occurred while accessing your microphone'
 					})
 				}));
 
@@ -3074,7 +3513,7 @@ export default class RoomClient
 					type : 'error',
 					text : intl.formatMessage({
 						id             : 'devices.screenSharingError',
-						defaultMessage : 'An error occured while accessing your screen'
+						defaultMessage : 'An error occurred while accessing your screen'
 					})
 				}));
 
@@ -3152,7 +3591,7 @@ export default class RoomClient
 				{
 					video :
 					{
-						deviceId : { exact: deviceId },
+						deviceId : { ideal: deviceId },
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
@@ -3247,7 +3686,7 @@ export default class RoomClient
 					type : 'error',
 					text : intl.formatMessage({
 						id             : 'devices.cameraError',
-						defaultMessage : 'An error occured while accessing your camera'
+						defaultMessage : 'An error occurred while accessing your camera'
 					})
 				}));
 
@@ -3257,6 +3696,37 @@ export default class RoomClient
 
 		store.dispatch(
 			meActions.setWebcamInProgress(false));
+	}
+
+	async disableExtraVideo(id)
+	{
+		logger.debug('disableExtraVideo()');
+
+		const producer = this._extraVideoProducers.get(id);
+
+		if (!producer)
+			return;
+
+		store.dispatch(meActions.setWebcamInProgress(true));
+
+		producer.close();
+
+		store.dispatch(
+			producerActions.removeProducer(id));
+
+		try
+		{
+			await this.sendRequest(
+				'closeProducer', { producerId: id });
+		}
+		catch (error)
+		{
+			logger.error('disableWebcam() [error:"%o"]', error);
+		}
+
+		this._extraVideoProducers.delete(id);
+
+		store.dispatch(meActions.setWebcamInProgress(false));
 	}
 
 	async disableWebcam()
@@ -3401,4 +3871,35 @@ export default class RoomClient
 			logger.error('_getWebcamDeviceId() failed:%o', error);
 		}
 	}
+
+	async _updateAudioOutputDevices()
+	{
+		logger.debug('_updateAudioOutputDevices()');
+
+		// Reset the list.
+		this._audioOutputDevices = {};
+
+		try
+		{
+			logger.debug('_updateAudioOutputDevices() | calling enumerateDevices()');
+
+			const devices = await navigator.mediaDevices.enumerateDevices();
+
+			for (const device of devices)
+			{
+				if (device.kind !== 'audiooutput')
+					continue;
+
+				this._audioOutputDevices[device.deviceId] = device;
+			}
+
+			store.dispatch(
+				meActions.setAudioOutputDevices(this._audioOutputDevices));
+		}
+		catch (error)
+		{
+			logger.error('_updateAudioOutputDevices() failed:%o', error);
+		}
+	}
+
 }
