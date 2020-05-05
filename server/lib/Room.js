@@ -31,6 +31,8 @@ const permissionsFromRoles =
 	...config.permissionsFromRoles
 };
 
+const ROUTER_SCALE_SIZE = config.routerScaleSize || 20;
+
 class Room extends EventEmitter
 {
 	/**
@@ -38,32 +40,45 @@ class Room extends EventEmitter
 	 *
 	 * @async
 	 *
-	 * @param {mediasoup.Worker} mediasoupWorker - The mediasoup Worker in which a new
+	 * @param {mediasoup.Worker} mediasoupWorkers - The mediasoup Worker in which a new
 	 *   mediasoup Router must be created.
 	 * @param {String} roomId - Id of the Room instance.
 	 */
-	static async create({ mediasoupWorker, roomId })
+	static async create({ mediasoupWorkers, roomId })
 	{
 		logger.info('create() [roomId:"%s"]', roomId);
 
 		// Router media codecs.
 		const mediaCodecs = config.mediasoup.router.mediaCodecs;
 
-		// Create a mediasoup Router.
-		const mediasoupRouter = await mediasoupWorker.createRouter({ mediaCodecs });
+		const mediasoupRouters = new Map();
 
-		// Create a mediasoup AudioLevelObserver.
-		const audioLevelObserver = await mediasoupRouter.createAudioLevelObserver(
+		let firstRouter = null;
+
+		for (const worker of mediasoupWorkers)
+		{
+			const router = await worker.createRouter({ mediaCodecs });
+
+			if (!firstRouter)
+				firstRouter = router;
+
+			mediasoupRouters.set(router.id, router);
+		}
+
+		// Create a mediasoup AudioLevelObserver on first router
+		const audioLevelObserver = await firstRouter.createAudioLevelObserver(
 			{
 				maxEntries : 1,
 				threshold  : -80,
 				interval   : 800
 			});
 
-		return new Room({ roomId, mediasoupRouter, audioLevelObserver });
+		firstRouter = null;
+
+		return new Room({ roomId, mediasoupRouters, audioLevelObserver });
 	}
 
-	constructor({ roomId, mediasoupRouter, audioLevelObserver })
+	constructor({ roomId, mediasoupRouters, audioLevelObserver })
 	{
 		logger.info('constructor() [roomId:"%s"]', roomId);
 
@@ -98,8 +113,13 @@ class Room extends EventEmitter
 
 		this._peers = {};
 
-		// mediasoup Router instance.
-		this._mediasoupRouter = mediasoupRouter;
+		// Array of mediasoup Router instances.
+		this._mediasoupRouters = mediasoupRouters;
+
+		// The router we are currently putting peers in
+		this._routerIterator = this._mediasoupRouters.values();
+
+		this._currentRouter = this._routerIterator.next().value;
 
 		// mediasoup AudioLevelObserver.
 		this._audioLevelObserver = audioLevelObserver;
@@ -122,7 +142,13 @@ class Room extends EventEmitter
 
 		this._closed = true;
 
+		this._chatHistory = null;
+
+		this._fileHistory = null;
+
 		this._lobby.close();
+
+		this._lobby = null;
 
 		// Close the peers.
 		for (const peer in this._peers)
@@ -133,8 +159,19 @@ class Room extends EventEmitter
 
 		this._peers = null;
 
-		// Close the mediasoup Router.
-		this._mediasoupRouter.close();
+		// Close the mediasoup Routers.
+		for (const router of this._mediasoupRouters.values())
+		{
+			router.close();
+		}
+
+		this._routerIterator = null;
+
+		this._currentRouter = null;
+
+		this._mediasoupRouters.clear();
+
+		this._audioLevelObserver = null;
 
 		// Emit 'close' event.
 		this.emit('close');
@@ -401,6 +438,9 @@ class Room extends EventEmitter
 
 		this._peers[peer.id] = peer;
 
+		// Assign routerId
+		peer.routerId = await this._getRouterId();
+
 		this._handlePeer(peer);
 
 		if (returning)
@@ -560,11 +600,14 @@ class Room extends EventEmitter
 
 	async _handleSocketRequest(peer, request, cb)
 	{
+		const router =
+			this._mediasoupRouters.get(peer.routerId);
+
 		switch (request.method)
 		{
 			case 'getRouterRtpCapabilities':
 			{
-				cb(null, this._mediasoupRouter.rtpCapabilities);
+				cb(null, router.rtpCapabilities);
 
 				break;
 			}
@@ -673,7 +716,7 @@ class Room extends EventEmitter
 					webRtcTransportOptions.enableTcp = true;
 				}
 
-				const transport = await this._mediasoupRouter.createWebRtcTransport(
+				const transport = await router.createWebRtcTransport(
 					webRtcTransportOptions
 				);
 
@@ -771,6 +814,19 @@ class Room extends EventEmitter
 
 				const producer =
 					await transport.produce({ kind, rtpParameters, appData });
+
+				const pipeRouters = this._getRoutersToPipeTo(peer.routerId);
+
+				for (const [ routerId, destinationRouter ] of this._mediasoupRouters)
+				{
+					if (pipeRouters.includes(routerId))
+					{
+						await router.pipeToRouter({
+							producerId : producer.id,
+							router     : destinationRouter
+						});
+					}
+				}
 
 				// Store the Producer into the Peer data Object.
 				peer.addProducer(producer.id, producer);
@@ -1379,6 +1435,8 @@ class Room extends EventEmitter
 			producer.id
 		);
 
+		const router = this._mediasoupRouters.get(producerPeer.routerId);
+
 		// Optimization:
 		// - Create the server-side Consumer. If video, do it paused.
 		// - Tell its Peer about it and wait for its response.
@@ -1389,7 +1447,7 @@ class Room extends EventEmitter
 		// NOTE: Don't create the Consumer if the remote Peer cannot consume it.
 		if (
 			!consumerPeer.rtpCapabilities ||
-			!this._mediasoupRouter.canConsume(
+			!router.canConsume(
 				{
 					producerId      : producer.id,
 					rtpCapabilities : consumerPeer.rtpCapabilities
@@ -1600,6 +1658,84 @@ class Room extends EventEmitter
 		{
 			socket.emit('notification', { method, data });
 		}
+	}
+
+	async _pipeProducersToNewRouter()
+	{
+		const peersToPipe =
+			Object.values(this._peers)
+				.filter((peer) => peer.routerId !== this._currentRouter.id);
+
+		for (const peer of peersToPipe)
+		{
+			const srcRouter = this._mediasoupRouters.get(peer.routerId);
+
+			for (const producerId of peer.producers.keys())
+			{
+				await srcRouter.pipeToRouter({
+					producerId,
+					router : this._currentRouter
+				});
+			}
+		}
+	}
+
+	async _getRouterId()
+	{
+		if (this._currentRouter)
+		{
+			const routerLoad =
+				Object.values(this._peers)
+					.filter((peer) => peer.routerId === this._currentRouter.id).length;
+
+			if (routerLoad >= ROUTER_SCALE_SIZE)
+			{
+				this._currentRouter = this._routerIterator.next().value;
+
+				if (this._currentRouter)
+				{
+					await this._pipeProducersToNewRouter();
+
+					return this._currentRouter.id;
+				}
+			}
+			else
+			{
+				return this._currentRouter.id;
+			}
+		}
+
+		return this._getLeastLoadedRouter();
+	}
+
+	// Returns an array of router ids we need to pipe to
+	_getRoutersToPipeTo(originRouterId)
+	{
+		return Object.values(this._peers)
+			.map((peer) => peer.routerId)
+			.filter((routerId, index, self) =>
+				routerId !== originRouterId && self.indexOf(routerId) === index
+			);
+	}
+
+	_getLeastLoadedRouter()
+	{
+		let load = Infinity;
+		let id;
+
+		for (const routerId of this._mediasoupRouters.keys())
+		{
+			const routerLoad = 
+				Object.values(this._peers).filter((peer) => peer.routerId === routerId).length;
+
+			if (routerLoad < load)
+			{
+				id = routerId;
+				load = routerLoad;
+			}
+		}
+
+		return id;
 	}
 }
 

@@ -247,6 +247,8 @@ module.exports =
 	// When truthy, the room will be open to all users when as long as there
 	// are allready users in the room
 	activateOnHostJoin : true,
+	// Room size before spreading to new router
+	routerScaleSize    : 20,
 	// Mediasoup settings
 	mediasoup          :
 	{

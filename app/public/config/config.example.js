@@ -33,7 +33,7 @@ var config =
 	 */
 	audioOutputSupportedBrowsers :
 	[
-		'chrome', 
+		'chrome',
 		'opera'
 	],
 	// Socket.io request timeout

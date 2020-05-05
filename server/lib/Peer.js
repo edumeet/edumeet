@@ -39,6 +39,8 @@ class Peer extends EventEmitter
 
 		this._email = null;
 
+		this._routerId = null;
+
 		this._rtpCapabilities = null;
 
 		this._raisedHand = false;
@@ -236,6 +238,16 @@ class Peer extends EventEmitter
 	set email(email)
 	{
 		this._email = email;
+	}
+
+	get routerId()
+	{
+		return this._routerId;
+	}
+
+	set routerId(routerId)
+	{
+		this._routerId = routerId;
 	}
 
 	get rtpCapabilities()
