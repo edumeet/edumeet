@@ -123,6 +123,9 @@ class Filmstrip extends React.PureComponent
 
 		const root = this.rootContainer.current;
 
+		if (!root)
+			return;
+
 		const availableWidth = root.clientWidth;
 		// Grid is:
 		// 4/5 speaker
