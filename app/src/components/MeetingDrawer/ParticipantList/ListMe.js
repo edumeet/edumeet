@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
+import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../../appPropTypes';
 import { useIntl } from 'react-intl';
@@ -23,7 +24,7 @@ const styles = (theme) =>
 		{
 			borderRadius : '50%',
 			height       : '2rem',
-			marginTop    : theme.spacing(1)
+			marginTop    : theme.spacing(0.5)
 		},
 		peerInfo :
 		{
@@ -32,6 +33,10 @@ const styles = (theme) =>
 			paddingLeft : theme.spacing(1),
 			flexGrow    : 1,
 			alignItems  : 'center'
+		},
+		buttons :
+		{
+			padding : theme.spacing(1)
 		},
 		green :
 		{
@@ -71,7 +76,9 @@ const ListMe = (props) =>
 						id             : 'tooltip.raisedHand',
 						defaultMessage : 'Raise hand'
 					})}
-					className={me.raisedHand ? classes.green : null}
+					className={
+						classnames(me.raisedHand ? classes.green : null, classes.buttons)
+					}
 					disabled={me.raisedHandInProgress}
 					color='primary'
 					onClick={(e) =>

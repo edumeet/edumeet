@@ -1533,6 +1533,26 @@ export default class RoomClient
 		}
 	}
 
+	async lowerPeerHand(peerId)
+	{
+		logger.debug('lowerPeerHand() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setPeerRaisedHandInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:lowerHand', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('lowerPeerHand() | [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setPeerRaisedHandInProgress(peerId, false));
+	}
+
 	async setRaisedHand(raisedHand)
 	{
 		logger.debug('setRaisedHand: ', raisedHand);
@@ -2530,6 +2550,13 @@ export default class RoomClient
 					{
 						// Need some feedback
 						this.close();
+
+						break;
+					}
+
+					case 'moderator:lowerHand':
+					{
+						this.setRaisedHand(false);
 
 						break;
 					}

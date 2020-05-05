@@ -1430,6 +1430,29 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:lowerHand':
+			{
+				if (
+					!peer.roles.some(
+						(role) => permissionsFromRoles.MODERATE_ROOM.includes(role)
+					)
+				)
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const lowerPeer = this._peers[peerId];
+
+				if (!lowerPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(lowerPeer.socket, 'moderator:lowerHand');
+
+				cb();
+
+				break;
+			}
+
 			default:
 			{
 				logger.error('unknown request.method "%s"', request.method);

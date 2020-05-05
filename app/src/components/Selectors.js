@@ -12,7 +12,8 @@ const peersKeySelector = createSelector(
 	peersSelector,
 	(peers) => Object.keys(peers)
 );
-const peersValueSelector = createSelector(
+
+export const peersValueSelector = createSelector(
 	peersSelector,
 	(peers) => Object.values(peers)
 );
@@ -113,8 +114,31 @@ export const spotlightPeersSelector = createSelector(
 export const spotlightSortedPeersSelector = createSelector(
 	spotlightsSelector,
 	peersValueSelector,
-	(spotlights, peers) => peers.filter((peer) => spotlights.includes(peer.id))
-		.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
+	(spotlights, peers) =>
+		peers.filter((peer) => spotlights.includes(peer.id) && !peer.raisedHand)
+			.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
+);
+
+const raisedHandSortedPeers = createSelector(
+	peersValueSelector,
+	(peers) => peers.filter((peer) => peer.raisedHand)
+		.sort((a, b) => a.raisedHandTimestamp - b.raisedHandTimestamp)
+);
+
+const peersSortedSelector = createSelector(
+	spotlightsSelector,
+	peersValueSelector,
+	(spotlights, peers) =>
+		peers.filter((peer) => !spotlights.includes(peer.id) && !peer.raisedHand)
+			.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
+);
+
+export const participantListSelector = createSelector(
+	raisedHandSortedPeers,
+	spotlightSortedPeersSelector,
+	peersSortedSelector,
+	(raisedHands, spotlights, peers) =>
+		[ ...raisedHands, ...spotlights, ...peers ]
 );
 
 export const peersLengthSelector = createSelector(
