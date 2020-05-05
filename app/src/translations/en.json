@@ -59,7 +59,7 @@
 	"room.raisedHand": "{displayName} raised their hand",
 	"room.loweredHand": "{displayName} put their hand down",
 	"room.extraVideo": "Extra video",
-	"room.overRoomLimit": null,
+	"room.overRoomLimit": "The room is full, retry after some time.",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -93,7 +93,7 @@
 	"label.filesharing": "File sharing",
 	"label.participants": "Participants",
 	"label.shareFile": "Share file",
-	"label.shareGalleryFile": null,
+	"label.shareGalleryFile": "Share image",
 	"label.fileSharingUnsupported": "File sharing not supported",
 	"label.unknown": "Unknown",
 	"label.democratic": "Democratic view",

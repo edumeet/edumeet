@@ -65,7 +65,7 @@ const FileSharing = (props) =>
 	const buttonGalleryDescription = canShareFiles ?
 		intl.formatMessage({
 			id             : 'label.shareGalleryFile',
-			defaultMessage : 'Share from gallery'
+			defaultMessage : 'Share image'
 		})
 		:
 		intl.formatMessage({

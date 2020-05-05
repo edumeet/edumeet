@@ -290,7 +290,7 @@ const JoinDialog = ({
 							<FormattedMessage
 								id='room.overRoomLimit'
 								defaultMessage={
-									'The room is full. Retry after some time.'
+									'The room is full, retry after some time.'
 								}
 							/>
 						</DialogContentText>
