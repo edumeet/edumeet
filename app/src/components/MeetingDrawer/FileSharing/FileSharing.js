@@ -28,7 +28,7 @@ const styles = (theme) =>
 		},
 		shareButtonsWrapper :
 		{
-			display       : 'flex'
+			display : 'flex'
 		}
 	});
 
@@ -91,7 +91,7 @@ const FileSharing = (props) =>
 					type='file'
 					disabled={!canShare}
 					onChange={handleFileChange}
-					accept="image/*"
+					accept='image/*'
 					id='share-files-gallery-button'
 				/>
 				<label htmlFor='share-files-button'>
@@ -105,16 +105,16 @@ const FileSharing = (props) =>
 					</Button>
 				</label>
 				{
-				(browser.platform === 'mobile') && canShareFiles && canShare && <label htmlFor='share-files-gallery-button'>
-					<Button
-						variant='contained'
-						component='span'
-						className={classes.button}
-						disabled={!canShareFiles || !canShare}
-					>
-						{buttonGalleryDescription}
-					</Button>
-				</label>
+					(browser.platform === 'mobile') && canShareFiles && canShare && <label htmlFor='share-files-gallery-button'>
+						<Button
+							variant='contained'
+							component='span'
+							className={classes.button}
+							disabled={!canShareFiles || !canShare}
+						>
+							{buttonGalleryDescription}
+						</Button>
+					</label>
 				}
 			</div>
 			<FileList />
@@ -124,7 +124,7 @@ const FileSharing = (props) =>
 
 FileSharing.propTypes = {
 	roomClient    : PropTypes.any.isRequired,
-	browser            : PropTypes.object.isRequired,
+	browser       : PropTypes.object.isRequired,
 	canShareFiles : PropTypes.bool.isRequired,
 	tabOpen       : PropTypes.bool.isRequired,
 	canShare      : PropTypes.bool.isRequired,
@@ -135,7 +135,7 @@ const mapStateToProps = (state) =>
 {
 	return {
 		canShareFiles : state.me.canShareFiles,
-		browser      : state.me.browser,
+		browser       : state.me.browser,
 		tabOpen       : state.toolarea.currentToolTab === 'files',
 		canShare      :
 			state.me.roles.some((role) =>
