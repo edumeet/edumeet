@@ -6,6 +6,7 @@ const initialState =
 	locked                        : false,
 	inLobby                       : false,
 	signInRequired                : false,
+	overRoomLimit                 : false,
 	// access code to the room if locked and joinByAccessCode == true
 	accessCode                    : '',
 	// if true: accessCode is a possibility to open the room
@@ -88,7 +89,12 @@ const room = (state = initialState, action) =>
 
 			return { ...state, signInRequired };
 		}
+		case 'SET_OVER_ROOM_LIMIT':
+		{
+			const { overRoomLimit } = action.payload;
 
+			return { ...state, overRoomLimit };
+		}
 		case 'SET_ACCESS_CODE':
 		{
 			const { accessCode } = action.payload;

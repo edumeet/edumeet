@@ -40,6 +40,12 @@ export const setSignInRequired = (signInRequired) =>
 		payload : { signInRequired }
 	});
 
+export const setOverRoomLimit = (overRoomLimit) =>
+	({
+		type    : 'SET_OVER_ROOM_LIMIT',
+		payload : { overRoomLimit }
+	});
+
 export const setAccessCode = (accessCode) =>
 	({
 		type    : 'SET_ACCESS_CODE',

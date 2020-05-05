@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} raised their hand",
 	"room.loweredHand": "{displayName} put their hand down",
 	"room.extraVideo": "Extra video",
+	"room.overRoomLimit": null,
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
