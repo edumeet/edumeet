@@ -110,6 +110,7 @@
 	"label.advanced": "Részletek",
 	"label.addVideo": "Videó hozzáadása",
 	"label.promoteAllPeers": "Mindenkit beengedek",
+	"label.moreActions": null,
 
 	"settings.settings": "Beállítások",
 	"settings.camera": "Kamera",

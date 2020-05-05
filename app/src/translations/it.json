@@ -109,6 +109,7 @@
 	"label.advanced": "Avanzate",
 	"label.addVideo": "Aggiungi video",
 	"label.promoteAllPeers": "Promuovi tutti",
+	"label.moreActions": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",

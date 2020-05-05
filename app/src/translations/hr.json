@@ -110,6 +110,7 @@
 	"label.advanced": "Napredno",
 	"label.addVideo": "Dodaj video",
 	"label.promoteAllPeers": "Promoviraj sve",
+	"label.moreActions": null,
 
 	"settings.settings":  "Postavke",
 	"settings.camera": "Kamera",
