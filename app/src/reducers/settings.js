@@ -86,6 +86,13 @@ const settings = (state = initialState, action) =>
 			return { ...state, noiseSuppression };
 		}
 
+		case 'SET_DEFAULT_AUDIO':
+		{
+			const { audio } = action.payload;
+
+			return { ...state, audio };
+		}
+
 		case 'TOGGLE_AUTO_GAIN_CONTROL':
 		{
 			const autoGainControl = !state.autoGainControl;
