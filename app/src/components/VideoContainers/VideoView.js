@@ -215,16 +215,16 @@ class VideoView extends React.PureComponent
 
 				case 7:
 				case 8:
+				case 9:
 				{
 					quality = <SignalCellular3BarIcon style={{ color: yellow[500] }}/>;
 
 					break;
 				}
 
-				case 9:
 				case 10:
 				{
-					quality = <SignalCellularAltIcon style={{ color: green[500] }}/>;
+					quality = null; // <SignalCellularAltIcon style={{ color: green[500] }}/>;
 
 					break;
 				}
@@ -261,7 +261,7 @@ class VideoView extends React.PureComponent
 								<p>{videoWidth}x{videoHeight}</p>
 							}
 						</div>
-						{ !isMe &&
+						{ !isMe && 
 							<div className={classnames(classes.box, 'right')}>
 								{ 
 									quality
