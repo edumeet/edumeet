@@ -56,10 +56,10 @@ export const setNoiseSuppression = (noiseSuppression) =>
 		payload : { noiseSuppression }
 	});
 
-export const setDefaultAudio = (defaultAudio) =>
+export const setDefaultAudio = (audio) =>
 	({
 		type    : 'SET_DEFAULT_AUDIO',
-		payload : { defaultAudio }
+		payload : { audio }
 	});
 
 export const toggleEchoCancellation = () =>

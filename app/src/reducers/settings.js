@@ -16,7 +16,8 @@ const initialState =
 	lastN               : 4,
 	permanentTopBar     : true,
 	hiddenControls      : false,
-	notificationSounds  : true
+	notificationSounds  : true,
+	...window.config.defaultAudio
 };
 
 const settings = (state = initialState, action) =>
@@ -89,7 +90,7 @@ const settings = (state = initialState, action) =>
 
 		case 'SET_NOISE_SUPPRESSION':
 		{
-			const { noiseSuppression } = action.payload;
+			const { noiseSuppression } = action.payload;
 
 			return { ...state, noiseSuppression };
 		}

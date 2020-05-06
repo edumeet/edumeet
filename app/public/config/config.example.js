@@ -47,7 +47,7 @@ var config =
 		sampleRate       : 48000,
 		channelCount     : 1,
 		volume           : 1.0,
-		autoGainControl  : false,
+		autoGainControl  : true,
 		echoCancellation : true,
 		noiseSuppression : true,
 		sampleSize       : 16
