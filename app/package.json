@@ -27,6 +27,7 @@
 		"react": "^16.10.2",
 		"react-cookie-consent": "^2.5.0",
 		"react-dom": "^16.10.2",
+		"react-flip-toolkit": "^7.0.9",
 		"react-intl": "^3.4.0",
 		"react-redux": "^7.1.1",
 		"react-router-dom": "^5.1.2",

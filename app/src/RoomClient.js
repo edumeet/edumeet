@@ -31,8 +31,7 @@ let Spotlights;
 let requestTimeout,
 	transportOptions,
 	lastN,
-	mobileLastN,
-	defaultResolution;
+	mobileLastN;
 
 if (process.env.NODE_ENV !== 'test')
 {
@@ -40,8 +39,7 @@ if (process.env.NODE_ENV !== 'test')
 		requestTimeout,
 		transportOptions,
 		lastN,
-		mobileLastN,
-		defaultResolution
+		mobileLastN
 	} = window.config);
 }
 
@@ -204,9 +202,6 @@ export default class RoomClient
 
 		// Our WebTorrent client
 		this._webTorrent = null;
-
-		if (defaultResolution)
-			store.dispatch(settingsActions.setVideoResolution(defaultResolution));
 
 		// Max spotlights
 		if (device.platform === 'desktop')
@@ -1111,6 +1106,37 @@ export default class RoomClient
 			meActions.setAudioOutputInProgress(false));
 	}
 
+	async changeAudioOutputDevice(deviceId)
+	{
+		logger.debug('changeAudioOutputDevice() [deviceId: %s]', deviceId);
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(true));
+
+		try
+		{
+			const device = this._audioOutputDevices[deviceId];
+
+			if (!device)
+				throw new Error('Selected audio output device no longer avaibale');
+
+			logger.debug(
+				'changeAudioOutputDevice() | new selected [audio output device:%o]',
+				device);
+
+			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
+
+			await this._updateAudioOutputDevices();
+		}
+		catch (error)
+		{
+			logger.error('changeAudioOutputDevice() failed: %o', error);
+		}
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(false));
+	}
+
 	async changeVideoResolution(resolution)
 	{
 		logger.debug('changeVideoResolution() [resolution: %s]', resolution);
@@ -1538,6 +1564,26 @@ export default class RoomClient
 		}
 	}
 
+	async lowerPeerHand(peerId)
+	{
+		logger.debug('lowerPeerHand() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setPeerRaisedHandInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:lowerHand', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('lowerPeerHand() | [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setPeerRaisedHandInProgress(peerId, false));
+	}
+
 	async setRaisedHand(raisedHand)
 	{
 		logger.debug('setRaisedHand: ', raisedHand);
@@ -1739,6 +1785,49 @@ export default class RoomClient
 			if (this._screenSharingProducer)
 			{
 				this._screenSharingProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._screenSharingProducer.id));
+
+				this._screenSharingProducer = null;
+			}
+
+			if (this._webcamProducer)
+			{
+				this._webcamProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._webcamProducer.id));
+
+				this._webcamProducer = null;
+			}
+
+			if (this._micProducer)
+			{
+				this._micProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._micProducer.id));
+
+				this._micProducer = null;
+			}
+
+			if (this._sendTransport)
+			{
+				this._sendTransport.close();
+
+				this._sendTransport = null;
+			}
+
+			if (this._recvTransport)
+			{
+				this._recvTransport.close();
+
+				this._recvTransport = null;
+			}
+
+			store.dispatch(roomActions.setRoomState('connecting'));
+		});
 
 				store.dispatch(
 					producerActions.removeProducer(this._screenSharingProducer.id));
@@ -2535,6 +2624,13 @@ export default class RoomClient
 					{
 						// Need some feedback
 						this.close();
+
+						break;
+					}
+
+					case 'moderator:lowerHand':
+					{
+						this.setRaisedHand(false);
 
 						break;
 					}

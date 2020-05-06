@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import * as appPropTypes from '../../appPropTypes';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
+import { green } from '@material-ui/core/colors';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import VideocamIcon from '@material-ui/icons/Videocam';
@@ -17,6 +18,7 @@ import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 import ExitIcon from '@material-ui/icons/ExitToApp';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 import PanIcon from '@material-ui/icons/PanTool';
+import RecordVoiceOverIcon from '@material-ui/icons/RecordVoiceOver';
 
 const styles = (theme) =>
 	({
@@ -31,7 +33,7 @@ const styles = (theme) =>
 		{
 			borderRadius : '50%',
 			height       : '2rem',
-			marginTop    : theme.spacing(1)
+			marginTop    : theme.spacing(0.5)
 		},
 		peerInfo :
 		{
@@ -44,11 +46,16 @@ const styles = (theme) =>
 		indicators :
 		{
 			display : 'flex',
-			padding : theme.spacing(1.5)
+			padding : theme.spacing(1)
+		},
+		buttons :
+		{
+			padding : theme.spacing(1)
 		},
 		green :
 		{
-			color : 'rgba(0, 153, 0, 1)'
+			color      : 'rgba(0, 153, 0, 1)',
+			marginLeft : theme.spacing(2)
 		}
 	});
 
@@ -59,6 +66,7 @@ const ListPeer = (props) =>
 	const {
 		roomClient,
 		isModerator,
+		spotlight,
 		peer,
 		micConsumer,
 		webcamConsumer,
@@ -94,11 +102,30 @@ const ListPeer = (props) =>
 			<div className={classes.peerInfo}>
 				{peer.displayName}
 			</div>
-			<div className={classes.indicators}>
-				{ peer.raisedHand &&
-					<PanIcon className={classes.green} />
-				}
-			</div>
+			{ peer.raisedHand &&
+				<IconButton
+					className={classes.buttons}
+					style={{ color: green[500] }}
+					disabled={!isModerator || peer.raisedHandInProgress}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+
+						roomClient.lowerPeerHand(peer.id);
+					}}
+				>
+					<PanIcon />
+				</IconButton>
+			}
+			{ spotlight &&
+				<IconButton
+					className={classes.buttons}
+					style={{ color: green[500] }}
+					disabled
+				>
+					<RecordVoiceOverIcon />
+				</IconButton>
+			}
 			{ screenConsumer &&
 				<Tooltip
 					title={intl.formatMessage({
@@ -114,6 +141,7 @@ const ListPeer = (props) =>
 						})}
 						color={screenVisible ? 'primary' : 'secondary'}
 						disabled={peer.peerScreenInProgress}
+						className={classes.buttons}
 						onClick={(e) =>
 						{
 							e.stopPropagation();
@@ -145,6 +173,7 @@ const ListPeer = (props) =>
 					})}
 					color={webcamEnabled ? 'primary' : 'secondary'}
 					disabled={peer.peerVideoInProgress}
+					className={classes.buttons}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
@@ -175,6 +204,7 @@ const ListPeer = (props) =>
 					})}
 					color={micEnabled ? 'primary' : 'secondary'}
 					disabled={peer.peerAudioInProgress}
+					className={classes.buttons}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
@@ -205,6 +235,7 @@ const ListPeer = (props) =>
 							defaultMessage : 'Kick out participant'
 						})}
 						disabled={peer.peerKickInProgress}
+						className={classes.buttons}
 						color='secondary'
 						onClick={(e) =>
 						{
@@ -227,6 +258,7 @@ ListPeer.propTypes =
 	roomClient     : PropTypes.any.isRequired,
 	advancedMode   : PropTypes.bool,
 	isModerator    : PropTypes.bool,
+	spotlight      : PropTypes.bool,
 	peer           : appPropTypes.Peer.isRequired,
 	micConsumer    : appPropTypes.Consumer,
 	webcamConsumer : appPropTypes.Consumer,
