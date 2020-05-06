@@ -12,6 +12,10 @@ const peersKeySelector = createSelector(
 	peersSelector,
 	(peers) => Object.keys(peers)
 );
+const peersValueSelector = createSelector(
+	peersSelector,
+	(peers) => Object.values(peers)
+);
 
 export const peersValueSelector = createSelector(
 	peersSelector,
