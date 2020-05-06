@@ -127,6 +127,7 @@
 	"settings.lastn": "İzlenebilir video sayısı",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",

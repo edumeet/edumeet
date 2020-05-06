@@ -130,6 +130,7 @@
 	"settings.lastn": "Number of visible videos",
 	"settings.hiddenControls": "Hidden media controls",
 	"settings.notificationSounds": "Notification sounds",
+	"settings.showNotifications": "Show notifications",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

@@ -130,6 +130,7 @@
 	"settings.lastn": "Antall videoer synlig",
 	"settings.hiddenControls": "Skjul media knapper",
 	"settings.notificationSounds": "Varslingslyder",
+	"settings.showNotifications": "Vis varslinger",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

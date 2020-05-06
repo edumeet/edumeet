@@ -124,6 +124,7 @@
 	"settings.lastn": "Jums redzamo video/kameru skaits",
 	"settings.hiddenControls": "Slēpto mediju vadība",
 	"settings.notificationSounds": "Paziņojumu skaņas",
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",

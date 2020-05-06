@@ -38,6 +38,11 @@ export const togglePermanentTopBar = () =>
 		type : 'TOGGLE_PERMANENT_TOPBAR'
 	});
 
+export const toggleShowNotifications = () =>
+	({
+		type : 'TOGGLE_SHOW_NOTIFICATIONS'
+	});
+
 export const setEchoCancellation = (echoCancellation) =>
 	({
 		type    : 'SET_ECHO_CANCELLATION',

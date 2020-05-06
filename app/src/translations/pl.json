@@ -130,6 +130,7 @@
 	"settings.lastn": "Liczba widocznych uczestników (zdalnych)",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",

@@ -130,6 +130,7 @@
 	"settings.lastn": "Αριθμός ορατών βίντεο",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Αδυναμία αποθήκευσης του αρχείου",
 	"filesharing.startingFileShare": "Προσπάθεια διαμοιρασμού αρχείου",

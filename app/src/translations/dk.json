@@ -130,6 +130,7 @@
 	"settings.lastn": "Antal synlige videoer",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Kan ikke gemme fil",
 	"filesharing.startingFileShare": "Forsøger at dele filen",

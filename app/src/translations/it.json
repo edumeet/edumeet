@@ -129,6 +129,7 @@
 	"settings.lastn": "Numero di video visibili",
 	"settings.hiddenControls": "Controlli media nascosti",
 	"settings.notificationSounds": "Suoni di notifica",
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",

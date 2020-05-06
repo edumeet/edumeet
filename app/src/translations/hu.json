@@ -130,6 +130,7 @@
 	"settings.lastn": "A látható videók száma",
 	"settings.hiddenControls": "Média Gombok automatikus elrejtése",
 	"settings.notificationSounds": "Értesítések hangjelzéssel",
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

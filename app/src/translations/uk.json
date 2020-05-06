@@ -130,6 +130,7 @@
 	"settings.lastn": "Кількість видимих ​​відео",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",

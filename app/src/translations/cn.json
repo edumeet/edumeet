@@ -130,6 +130,7 @@
 	"settings.lastn": "可见视频数量",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "无法保存文件",
 	"filesharing.startingFileShare": "正在尝试共享文件",

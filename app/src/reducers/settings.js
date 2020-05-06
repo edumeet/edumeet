@@ -16,6 +16,7 @@ const initialState =
 	lastN               : 4,
 	permanentTopBar     : true,
 	hiddenControls      : false,
+	showNotifications   : true,
 	notificationSounds  : true,
 	...window.config.defaultAudio
 };
@@ -156,6 +157,13 @@ const settings = (state = initialState, action) =>
 			const notificationSounds = !state.notificationSounds;
 
 			return { ...state, notificationSounds };
+		}
+
+		case 'TOGGLE_SHOW_NOTIFICATIONS':
+		{
+			const showNotifications = !state.showNotifications;
+
+			return { ...state, showNotifications };
 		}
 
 		case 'SET_VIDEO_RESOLUTION':

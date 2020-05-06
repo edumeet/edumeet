@@ -130,6 +130,7 @@
 	"settings.lastn": "Número de vídeos visíveis",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Impossível de gravar o ficheiro",
 	"filesharing.startingFileShare": "Tentando partilha de ficheiro",

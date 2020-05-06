@@ -130,6 +130,7 @@
 	"settings.lastn": "Broj vidljivih videozapisa",
 	"settings.hiddenControls": "Skrivene kontrole medija",
 	"settings.notificationSounds": "Zvuk obavijesti",
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",
