@@ -7,6 +7,7 @@ import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
 import PropTypes from 'prop-types';
+import { Flipper, Flipped } from 'react-flip-toolkit';
 import { FormattedMessage } from 'react-intl';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
@@ -110,32 +111,38 @@ class ParticipantList extends React.PureComponent
 							defaultMessage='Participants'
 						/>
 					</li>
-					{ participants.map((peer) => (
-						<li
-							key={peer.id}
-							className={classnames(classes.listItem, {
-								selected : peer.id === selectedPeerId
-							})}
-							onClick={() => roomClient.setSelectedPeer(peer.id)}
-						>
-							{ spotlights.includes(peer.id) ?
-								<ListPeer
-									id={peer.id}
-									advancedMode={advancedMode}
-									isModerator={isModerator}
-									spotlight
+					<Flipper
+						flipKey={participants}
+					>
+						{ participants.map((peer) => (
+							<Flipped key={peer.id} flipId={peer.id}>
+								<li
+									key={peer.id}
+									className={classnames(classes.listItem, {
+										selected : peer.id === selectedPeerId
+									})}
+									onClick={() => roomClient.setSelectedPeer(peer.id)}
 								>
-									<Volume small id={peer.id} />
-								</ListPeer>
-								:
-								<ListPeer
-									id={peer.id}
-									advancedMode={advancedMode}
-									isModerator={isModerator}
-								/>
-							}
-						</li>
-					))}
+									{ spotlights.includes(peer.id) ?
+										<ListPeer
+											id={peer.id}
+											advancedMode={advancedMode}
+											isModerator={isModerator}
+											spotlight
+										>
+											<Volume small id={peer.id} />
+										</ListPeer>
+										:
+										<ListPeer
+											id={peer.id}
+											advancedMode={advancedMode}
+											isModerator={isModerator}
+										/>
+									}
+								</li>
+							</Flipped>
+						))}
+					</Flipper>
 				</ul>
 			</div>
 		);
