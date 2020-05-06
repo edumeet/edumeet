@@ -257,7 +257,8 @@ const MediaSettings = ({
 					className={classes.setting}
 					control={
 						<Checkbox checked={settings.echoCancellation} onChange={
-							(event) => {
+							(event) => 
+							{
 								setEchoCancellation(event.target.checked);
 								roomClient.changeAudioDevice(settings.selectedAudioDevice);
 							}}
@@ -271,7 +272,8 @@ const MediaSettings = ({
 					className={classes.setting}
 					control={
 						<Checkbox checked={settings.autoGainControl} onChange={
-							(event) => {
+							(event) => 
+							{
 								setAutoGainControl(event.target.checked);
 								roomClient.changeAudioDevice(settings.selectedAudioDevice);
 							}}
@@ -285,7 +287,8 @@ const MediaSettings = ({
 					className={classes.setting}
 					control={
 						<Checkbox checked={settings.noiseSuppression} onChange={
-							(event) => {
+							(event) => 
+							{
 								setNoiseSuppression(event.target.checked);
 								roomClient.changeAudioDevice(settings.selectedAudioDevice);
 							}}

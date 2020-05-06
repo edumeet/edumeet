@@ -953,20 +953,24 @@ export default class RoomClient
 		}
 	}
 
-	disconnectLocalHark() {
+	disconnectLocalHark() 
+	{
 		logger.debug('disconnectLocalHark() | Stopping harkStream.');
-		if (this._harkStream != null) {
+		if (this._harkStream != null) 
+		{
 			this._harkStream.getAudioTracks()[0].stop();
 			this._harkStream = null;
 		}
 
-		if (this._hark != null) {
+		if (this._hark != null) 
+		{
 			logger.debug('disconnectLocalHark() Stopping hark.');
 			this._hark.stop();
 		}
 	}
 
-	connectLocalHark(track) {
+	connectLocalHark(track) 
+	{
 		logger.debug('connectLocalHark() | Track:%o', track);
 		this._harkStream = new MediaStream();
 
@@ -979,7 +983,8 @@ export default class RoomClient
 		this._hark = hark(this._harkStream, { play: false });
 
 		// eslint-disable-next-line no-unused-vars
-		this._hark.on('volume_change', (dBs, threshold) => {
+		this._hark.on('volume_change', (dBs, threshold) => 
+		{
 			// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
 			//   Math.pow(10, dBs / 20)
 			// However it does not produce a visually useful output, so let exagerate
@@ -992,20 +997,22 @@ export default class RoomClient
 
 			volume = Math.round(volume);
 
-			if (this._micProducer && volume !== this._micProducer.volume) {
+			if (this._micProducer && volume !== this._micProducer.volume) 
+			{
 				this._micProducer.volume = volume;
 
 				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
 			}
 		});
-		this._hark.on('speaking', function () {
+		this._hark.on('speaking', function() 
+		{
 			store.dispatch(meActions.setIsSpeaking(true));
 		});
-		this._hark.on('stopped_speaking', function () {
+		this._hark.on('stopped_speaking', function()
+		{
 			store.dispatch(meActions.setIsSpeaking(false));
 		});
 	}
-
 
 	async changeAudioDevice(deviceId)
 	{
@@ -1073,37 +1080,6 @@ export default class RoomClient
 
 		store.dispatch(
 			meActions.setAudioInProgress(false));
-	}
-
-	async changeAudioOutputDevice(deviceId)
-	{
-		logger.debug('changeAudioOutputDevice() [deviceId: %s]', deviceId);
-
-		store.dispatch(
-			meActions.setAudioOutputInProgress(true));
-
-		try
-		{
-			const device = this._audioOutputDevices[deviceId];
-
-			if (!device)
-				throw new Error('Selected audio output device no longer avaibale');
-
-			logger.debug(
-				'changeAudioOutputDevice() | new selected [audio output device:%o]',
-				device);
-
-			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
-
-			await this._updateAudioOutputDevices();
-		}
-		catch (error)
-		{
-			logger.error('changeAudioOutputDevice() failed: %o', error);
-		}
-
-		store.dispatch(
-			meActions.setAudioOutputInProgress(false));
 	}
 
 	async changeAudioOutputDevice(deviceId)
@@ -1785,49 +1761,6 @@ export default class RoomClient
 			if (this._screenSharingProducer)
 			{
 				this._screenSharingProducer.close();
-
-				store.dispatch(
-					producerActions.removeProducer(this._screenSharingProducer.id));
-
-				this._screenSharingProducer = null;
-			}
-
-			if (this._webcamProducer)
-			{
-				this._webcamProducer.close();
-
-				store.dispatch(
-					producerActions.removeProducer(this._webcamProducer.id));
-
-				this._webcamProducer = null;
-			}
-
-			if (this._micProducer)
-			{
-				this._micProducer.close();
-
-				store.dispatch(
-					producerActions.removeProducer(this._micProducer.id));
-
-				this._micProducer = null;
-			}
-
-			if (this._sendTransport)
-			{
-				this._sendTransport.close();
-
-				this._sendTransport = null;
-			}
-
-			if (this._recvTransport)
-			{
-				this._recvTransport.close();
-
-				this._recvTransport = null;
-			}
-
-			store.dispatch(roomActions.setRoomState('connecting'));
-		});
 
 				store.dispatch(
 					producerActions.removeProducer(this._screenSharingProducer.id));
