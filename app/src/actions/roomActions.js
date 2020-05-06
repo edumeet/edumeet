@@ -70,6 +70,18 @@ export const setExtraVideoOpen = (extraVideoOpen) =>
 		payload : { extraVideoOpen }
 	});
 
+export const setHelpOpen = (helpOpen) =>
+	({
+		type    : 'SET_HELP_OPEN',
+		payload : { helpOpen }
+	});
+
+export const setAboutOpen = (aboutOpen) =>
+	({
+		type    : 'SET_ABOUT_OPEN',
+		payload : { aboutOpen }
+	});
+
 export const setSettingsTab = (tab) =>
 	({
 		type    : 'SET_SETTINGS_TAB',

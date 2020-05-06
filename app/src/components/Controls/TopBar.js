@@ -36,6 +36,8 @@ import VideoCallIcon from '@material-ui/icons/VideoCall';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import HelpIcon from '@material-ui/icons/Help';
+import InfoIcon from '@material-ui/icons/Info';
 
 const styles = (theme) =>
 	({
@@ -192,6 +194,8 @@ const TopBar = (props) =>
 		onFullscreen,
 		setSettingsOpen,
 		setExtraVideoOpen,
+		setHelpOpen,
+		setAboutOpen,
 		setLockDialogOpen,
 		toggleToolArea,
 		openUsersTab,
@@ -483,6 +487,46 @@ const TopBar = (props) =>
 								/>
 							</p>
 						</MenuItem>
+						<MenuItem 
+							onClick={() => 
+							{
+								handleMenuClose();
+								setHelpOpen(!room.helpOpen);
+							}}
+						>
+							<HelpIcon
+								aria-label={intl.formatMessage({
+									id             : 'label.help',
+									defaultMessage : 'Help'
+								})}
+							/>
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='label.help'
+									defaultMessage='Help'
+								/>
+							</p>
+						</MenuItem>
+						<MenuItem 
+							onClick={() => 
+							{
+								handleMenuClose();
+								setAboutOpen(!room.aboutOpen);
+							}}
+						>
+							<InfoIcon
+								aria-label={intl.formatMessage({
+									id             : 'label.about',
+									defaultMessage : 'About'
+								})}
+							/>
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='label.about'
+									defaultMessage='About'
+								/>
+							</p>
+						</MenuItem>
 					</Paper>
 				}
 			</Popover>
@@ -694,6 +738,8 @@ TopBar.propTypes =
 	setToolbarsVisible   : PropTypes.func.isRequired,
 	setSettingsOpen      : PropTypes.func.isRequired,
 	setExtraVideoOpen    : PropTypes.func.isRequired,
+	setHelpOpen          : PropTypes.func.isRequired,
+	setAboutOpen         : PropTypes.func.isRequired,
 	setLockDialogOpen    : PropTypes.func.isRequired,
 	toggleToolArea       : PropTypes.func.isRequired,
 	openUsersTab         : PropTypes.func.isRequired,
@@ -740,6 +786,14 @@ const mapDispatchToProps = (dispatch) =>
 		setExtraVideoOpen : (extraVideoOpen) =>
 		{
 			dispatch(roomActions.setExtraVideoOpen(extraVideoOpen));
+		},
+		setHelpOpen : (helpOpen) =>
+		{
+			dispatch(roomActions.setHelpOpen(helpOpen));
+		},
+		setAboutOpen : (aboutOpen) =>
+		{
+			dispatch(roomActions.setAboutOpen(aboutOpen));
 		},
 		setLockDialogOpen : (lockDialogOpen) =>
 		{

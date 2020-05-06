@@ -25,6 +25,8 @@ import Settings from './Settings/Settings';
 import TopBar from './Controls/TopBar';
 import WakeLock from 'react-wakelock-react16';
 import ExtraVideo from './Controls/ExtraVideo';
+import Help from './Controls/Help';
+import About from './Controls/About';
 
 const TIMEOUT = 5 * 1000;
 
@@ -222,6 +224,13 @@ class Room extends React.PureComponent
 				{ room.extraVideoOpen &&
 					<ExtraVideo />
 				}
+				{ room.helpOpen &&
+					<Help />
+				}
+				{ room.aboutOpen &&
+					<About />
+				}
+
 			</div>
 		);
 	}
