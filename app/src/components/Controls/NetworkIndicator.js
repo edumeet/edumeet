@@ -59,7 +59,8 @@ class NetworkIndicator extends React.Component
 			currBitrate : 0,
 			maxBitrate  : 0,
 			avgBitrate  : 0,
-			medBitrate  : 0
+			medBitrate  : 1,
+			probeCount  : 0
 		};
 	}
 
@@ -125,12 +126,12 @@ class NetworkIndicator extends React.Component
 		// probe
 		const probe = [ ...this.state.probe ]; // clone
 
-		const sec = new Date().getSeconds()
-			.toString()
-			.split('')
-			.map(Number)[1];
+		if (this.state.probeCount < 5) 
+			this.setState({ probeCount: this.state.probeCount + 1}); 
+		else 
+			this.setState({ probeCount: 1 }); 
 
-		probe[sec] = currBitrate; // add/update next element
+		probe[this.state.probeCount] = currBitrate; // add/update next element
 
 		// median
 		const med = (arr) =>
@@ -171,6 +172,7 @@ class NetworkIndicator extends React.Component
 		logger.warn('[maxBitrate: "%s"]', maxBitrate);
 		logger.warn('[medBitrate: "%s"]', medBitrate);
 		logger.warn('[avgBitrate: "%s"]', avgBitrate);
+		logger.warn('[probeCount: "%s"]', this.state.probeCount);
 	}
 
 	componentDidMount()
