@@ -117,6 +117,8 @@ class Room extends EventEmitter
 
 		this._peers = {};
 
+		this._selfDestructTimeout = null;
+
 		// Array of mediasoup Router instances.
 		this._mediasoupRouters = mediasoupRouters;
 
@@ -145,6 +147,11 @@ class Room extends EventEmitter
 		logger.debug('close()');
 
 		this._closed = true;
+
+		if (this._selfDestructTimeout)
+			clearTimeout(this._selfDestructTimeout);
+
+		this._selfDestructTimeout = null;
 
 		this._chatHistory = null;
 
@@ -411,7 +418,10 @@ class Room extends EventEmitter
 	{
 		logger.debug('selfDestructCountdown() started');
 
-		setTimeout(() =>
+		if (this._selfDestructTimeout)
+			clearTimeout(this._selfDestructTimeout);
+
+		this._selfDestructTimeout = setTimeout(() =>
 		{
 			if (this._closed)
 				return;
