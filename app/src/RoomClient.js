@@ -475,9 +475,9 @@ export default class RoomClient
 		window.open(url, 'loginWindow');
 	}
 
-	logout()
+	logout(roomId = this._roomId)
 	{
-		window.open('/auth/logout', 'logoutWindow');
+		window.open(`/auth/logout?peerId=${this._peerId}&roomId=${roomId}`, 'logoutWindow');
 	}
 
 	receiveLoginChildWindow(data)
