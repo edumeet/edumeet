@@ -669,7 +669,14 @@ class Room extends EventEmitter
 					.filter((joinedPeer) => joinedPeer.id !== peer.id)
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
-				const lobbyPeers = this._lobby.peerList();
+				let lobbyPeers = [];
+				
+				if ( // Allowed to promote peers, notify about lobbypeers
+					peer.roles.some((role) =>
+						permissionsFromRoles.PROMOTE_PEER.includes(role)
+					)
+				)
+					lobbyPeers = this._lobby.peerList();
 
 				cb(null, {
 					roles                : peer.roles,
