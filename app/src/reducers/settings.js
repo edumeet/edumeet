@@ -11,9 +11,12 @@ const initialState =
 	echoCancellation    : true,
 	noiseSuppression    : true,
 	sampleSize          : 16,
-	resolution          : 'medium', // low, medium, high, veryhigh, ultra
+	// low, medium, high, veryhigh, ultra
+	resolution          : window.config.defaultResolution || 'medium',
 	lastN               : 4,
-	permanentTopBar     : true
+	permanentTopBar     : true,
+	hiddenControls      : false,
+	notificationSounds  : true
 };
 
 const settings = (state = initialState, action) =>
@@ -30,6 +33,11 @@ const settings = (state = initialState, action) =>
 			return { ...state, selectedAudioDevice: action.payload.deviceId };
 		}
 
+		case 'CHANGE_AUDIO_OUTPUT_DEVICE':
+		{
+			return { ...state, selectedAudioOutputDevice: action.payload.deviceId };
+		}
+	
 		case 'SET_DISPLAY_NAME':
 		{
 			const { displayName } = action.payload;
@@ -133,6 +141,20 @@ const settings = (state = initialState, action) =>
 			const permanentTopBar = !state.permanentTopBar;
 
 			return { ...state, permanentTopBar };
+		}
+
+		case 'TOGGLE_HIDDEN_CONTROLS':
+		{
+			const hiddenControls = !state.hiddenControls;
+
+			return { ...state, hiddenControls };
+		}
+
+		case 'TOGGLE_NOTIFICATION_SOUNDS':
+		{
+			const notificationSounds = !state.notificationSounds;
+
+			return { ...state, notificationSounds };
 		}
 
 		case 'SET_VIDEO_RESOLUTION':

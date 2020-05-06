@@ -34,7 +34,11 @@ import messagesPortuguese from './translations/pt';
 import messagesChinese from './translations/cn';
 import messagesSpanish from './translations/es';
 import messagesCroatian from './translations/hr';
-import messagesCzech from './translations/cz';
+import messagesCzech from './translations/cs';
+import messagesItalian from './translations/it';
+import messagesUkrainian from './translations/uk';
+import messagesTurkish from './translations/tr';
+import messagesLatvian from './translations/lv';
 
 import './index.css';
 
@@ -57,7 +61,11 @@ const messages =
 	'zh' : messagesChinese,
 	'es' : messagesSpanish,
 	'hr' : messagesCroatian,
-	'cz' : messagesCzech
+	'cs' : messagesCzech,
+	'it' : messagesItalian,
+	'uk' : messagesUkrainian,
+	'tr' : messagesTurkish,
+	'lv' : messagesLatvian
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code
@@ -104,8 +112,6 @@ function run()
 
 	const accessCode = parameters.get('code');
 	const produce = parameters.get('produce') !== 'false';
-	const useSimulcast = parameters.get('simulcast') === 'true';
-	const useSharingSimulcast = parameters.get('sharingSimulcast') === 'true';
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
@@ -125,8 +131,6 @@ function run()
 			peerId,
 			accessCode,
 			device,
-			useSimulcast,
-			useSharingSimulcast,
 			produce,
 			forceTcp,
 			displayName,

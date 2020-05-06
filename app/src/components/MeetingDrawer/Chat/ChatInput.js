@@ -54,6 +54,7 @@ const ChatInput = (props) =>
 		roomClient,
 		displayName,
 		picture,
+		canChat,
 		classes
 	} = props;
 
@@ -66,6 +67,7 @@ const ChatInput = (props) =>
 					defaultMessage : 'Enter chat message...'
 				})}
 				value={message || ''}
+				disabled={!canChat}
 				onChange={handleChange}
 				onKeyPress={(ev) =>
 				{
@@ -89,6 +91,7 @@ const ChatInput = (props) =>
 				color='primary'
 				className={classes.iconButton}
 				aria-label='Send'
+				disabled={!canChat}
 				onClick={() =>
 				{
 					if (message && message !== '')
@@ -112,13 +115,17 @@ ChatInput.propTypes =
 	roomClient  : PropTypes.object.isRequired,
 	displayName : PropTypes.string,
 	picture     : PropTypes.string,
+	canChat     : PropTypes.bool.isRequired,
 	classes     : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
 		displayName : state.settings.displayName,
-		picture     : state.me.picture
+		picture     : state.me.picture,
+		canChat     :
+			state.me.roles.some((role) =>
+				state.room.permissionsFromRoles.SEND_CHAT.includes(role))
 	});
 
 export default withRoomContext(
@@ -130,6 +137,8 @@ export default withRoomContext(
 			areStatesEqual : (next, prev) =>
 			{
 				return (
+					prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+					prev.me.roles === next.me.roles &&
 					prev.settings.displayName === next.settings.displayName &&
 					prev.me.picture === next.me.picture
 				);

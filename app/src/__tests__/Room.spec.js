@@ -31,6 +31,8 @@ beforeEach(() =>
 		me         : {
 			audioDevices          : null,
 			audioInProgress       : false,
+			audioOutputDevices    : null,
+			audioOutputInProgress : false,
 			canSendMic            : false,
 			canSendWebcam         : false,
 			canShareFiles         : false,
@@ -40,8 +42,8 @@ beforeEach(() =>
 			loggedIn              : false,
 			loginEnabled          : true,
 			picture               : null,
-			raiseHand             : false,
-			raiseHandInProgress   : false,
+			raisedHand            : false,
+			raisedHandInProgress  : false,
 			screenShareInProgress : false,
 			webcamDevices         : null,
 			webcamInProgress      : false
@@ -72,11 +74,12 @@ beforeEach(() =>
 			windowConsumer     : null
 		},
 		settings : {
-			advancedMode        : true,
-			displayName         : 'Jest Tester',
-			resolution          : 'ultra',
-			selectedAudioDevice : 'default',
-			selectedWebcam      : 'soifjsiajosjfoi'
+			advancedMode              : true,
+			displayName               : 'Jest Tester',
+			resolution                : 'ultra',
+			selectedAudioDevice       : 'default',
+			selectedAudioOutputDevice : 'default',
+			selectedWebcam            : 'soifjsiajosjfoi'
 		},
 		toolarea : {
 			currentToolTab : 'chat',

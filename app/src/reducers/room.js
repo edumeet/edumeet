@@ -1,27 +1,48 @@
 const initialState =
 {
-	name                   : '',
-	state                  : 'new', // new/connecting/connected/disconnected/closed,
-	locked                 : false,
-	inLobby                : false,
-	signInRequired         : false,
-	accessCode             : '', // access code to the room if locked and joinByAccessCode == true
-	joinByAccessCode       : true, // if true: accessCode is a possibility to open the room
-	activeSpeakerId        : null,
-	torrentSupport         : false,
-	showSettings           : false,
-	fullScreenConsumer     : null, // ConsumerID
-	windowConsumer         : null, // ConsumerID
-	toolbarsVisible        : true,
-	mode                   : 'democratic',
-	selectedPeerId         : null,
-	spotlights             : [],
-	settingsOpen           : false,
-	lockDialogOpen         : false,
-	joined                 : false,
-	muteAllInProgress      : false,
-	stopAllVideoInProgress : false,
-	closeMeetingInProgress : false
+	name                          : '',
+	// new/connecting/connected/disconnected/closed,
+	state                         : 'new',
+	locked                        : false,
+	inLobby                       : false,
+	signInRequired                : false,
+	overRoomLimit                 : false,
+	// access code to the room if locked and joinByAccessCode == true
+	accessCode                    : '',
+	// if true: accessCode is a possibility to open the room
+	joinByAccessCode              : true, 
+	activeSpeakerId               : null,
+	torrentSupport                : false,
+	showSettings                  : false,
+	fullScreenConsumer            : null, // ConsumerID
+	windowConsumer                : null, // ConsumerID
+	toolbarsVisible               : true,
+	mode                          : window.config.defaultLayout || 'democratic',
+	selectedPeerId                : null,
+	spotlights                    : [],
+	settingsOpen                  : false,
+	extraVideoOpen                : false,
+	currentSettingsTab            : 'media', // media, appearence, advanced
+	lockDialogOpen                : false,
+	joined                        : false,
+	muteAllInProgress             : false,
+	lobbyPeersPromotionInProgress : false,
+	stopAllVideoInProgress        : false,
+	closeMeetingInProgress        : false,
+	clearChatInProgress           : false,
+	clearFileSharingInProgress    : false,
+	userRoles                     : { NORMAL: 'normal' }, // Default role
+	permissionsFromRoles          : {
+		CHANGE_ROOM_LOCK : [],
+		PROMOTE_PEER     : [],
+		SEND_CHAT        : [],
+		MODERATE_CHAT    : [],
+		SHARE_SCREEN     : [],
+		EXTRA_VIDEO      : [],
+		SHARE_FILE       : [],
+		MODERATE_FILES   : [],
+		MODERATE_ROOM    : []
+	}
 };
 
 const room = (state = initialState, action) =>
@@ -68,7 +89,12 @@ const room = (state = initialState, action) =>
 
 			return { ...state, signInRequired };
 		}
+		case 'SET_OVER_ROOM_LIMIT':
+		{
+			const { overRoomLimit } = action.payload;
 
+			return { ...state, overRoomLimit };
+		}
 		case 'SET_ACCESS_CODE':
 		{
 			const { accessCode } = action.payload;
@@ -95,6 +121,20 @@ const room = (state = initialState, action) =>
 			const { settingsOpen } = action.payload;
 
 			return { ...state, settingsOpen };
+		}
+
+		case 'SET_EXTRA_VIDEO_OPEN':
+		{
+			const { extraVideoOpen } = action.payload;
+
+			return { ...state, extraVideoOpen };
+		}
+
+		case 'SET_SETTINGS_TAB':
+		{
+			const { tab } = action.payload;
+
+			return { ...state, currentSettingsTab: tab };
 		}
 
 		case 'SET_ROOM_ACTIVE_SPEAKER':
@@ -166,6 +206,9 @@ const room = (state = initialState, action) =>
 			return { ...state, spotlights };
 		}
 
+		case 'SET_LOBBY_PEERS_PROMOTION_IN_PROGRESS':
+			return { ...state, lobbyPeersPromotionInProgress: action.payload.flag };
+
 		case 'MUTE_ALL_IN_PROGRESS':
 			return { ...state, muteAllInProgress: action.payload.flag };
 
@@ -174,6 +217,26 @@ const room = (state = initialState, action) =>
 
 		case 'CLOSE_MEETING_IN_PROGRESS':
 			return { ...state, closeMeetingInProgress: action.payload.flag };
+
+		case 'CLEAR_CHAT_IN_PROGRESS':
+			return { ...state, clearChatInProgress: action.payload.flag };
+
+		case 'CLEAR_FILE_SHARING_IN_PROGRESS':
+			return { ...state, clearFileSharingInProgress: action.payload.flag };
+
+		case 'SET_USER_ROLES':
+		{
+			const { userRoles } = action.payload;
+
+			return { ...state, userRoles };
+		}
+
+		case 'SET_PERMISSIONS_FROM_ROLES':
+		{
+			const { permissionsFromRoles } = action.payload;
+
+			return { ...state, permissionsFromRoles };
+		}
 
 		default:
 			return state;

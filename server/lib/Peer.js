@@ -23,9 +23,15 @@ class Peer extends EventEmitter
 
 		this._joined = false;
 
+		this._joinedTimestamp = null;
+
 		this._inLobby = false;
 
-		this._roles = [ userRoles.ALL ];
+		this._authenticated = false;
+
+		this._authenticatedTimestamp = null;
+
+		this._roles = [ userRoles.NORMAL ];
 
 		this._displayName = false;
 
@@ -33,9 +39,13 @@ class Peer extends EventEmitter
 
 		this._email = null;
 
+		this._routerId = null;
+
 		this._rtpCapabilities = null;
 
 		this._raisedHand = false;
+
+		this._raisedHandTimestamp = null;
 
 		this._transports = new Map();
 
@@ -133,7 +143,16 @@ class Peer extends EventEmitter
 
 	set joined(joined)
 	{
+		joined ?
+			this._joinedTimestamp = Date.now() :
+			this._joinedTimestamp = null;
+
 		this._joined = joined;
+	}
+
+	get joinedTimestamp()
+	{
+		return this._joinedTimestamp;
 	}
 
 	get inLobby()
@@ -144,6 +163,32 @@ class Peer extends EventEmitter
 	set inLobby(inLobby)
 	{
 		this._inLobby = inLobby;
+	}
+
+	get authenticated()
+	{
+		return this._authenticated;
+	}
+
+	set authenticated(authenticated)
+	{
+		if (authenticated !== this._authenticated)
+		{
+			authenticated ?
+				this._authenticatedTimestamp = Date.now() :
+				this._authenticatedTimestamp = null;
+
+			const oldAuthenticated = this._authenticated;
+
+			this._authenticated = authenticated;
+
+			this.emit('authenticationChanged', { oldAuthenticated });
+		}
+	}
+
+	get authenticatedTimestamp()
+	{
+		return this._authenticatedTimestamp;
 	}
 
 	get roles()
@@ -195,6 +240,16 @@ class Peer extends EventEmitter
 		this._email = email;
 	}
 
+	get routerId()
+	{
+		return this._routerId;
+	}
+
+	set routerId(routerId)
+	{
+		this._routerId = routerId;
+	}
+
 	get rtpCapabilities()
 	{
 		return this._rtpCapabilities;
@@ -212,7 +267,16 @@ class Peer extends EventEmitter
 
 	set raisedHand(raisedHand)
 	{
+		raisedHand ?
+			this._raisedHandTimestamp = Date.now() :
+			this._raisedHandTimestamp = null;
+
 		this._raisedHand = raisedHand;
+	}
+
+	get raisedHandTimestamp()
+	{
+		return this._raisedHandTimestamp;
 	}
 
 	get transports()
@@ -314,10 +378,12 @@ class Peer extends EventEmitter
 	{
 		const peerInfo =
 		{
-			id          : this.id,
-			displayName : this.displayName,
-			picture     : this.picture,
-			roles       : this.roles
+			id                  : this.id,
+			displayName         : this.displayName,
+			picture             : this.picture,
+			roles               : this.roles,
+			raisedHand          : this.raisedHand,
+			raisedHandTimestamp : this.raisedHandTimestamp
 		};
 
 		return peerInfo;

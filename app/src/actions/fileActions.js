@@ -33,3 +33,8 @@ export const setFileDone = (magnetUri, sharedFiles) =>
 		type    : 'SET_FILE_DONE',
 		payload : { magnetUri, sharedFiles }
 	});
+
+export const clearFiles = () =>
+	({
+		type : 'CLEAR_FILES'
+	});

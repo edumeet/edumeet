@@ -6,7 +6,7 @@
 
 	"room.chooseRoom": "Wybór konferencji",
 	"room.cookieConsent": "Ta strona internetowa wykorzystuje pliki cookie w celu zwiększenia wygody użytkowania.",
-	"room.consentUnderstand": "I understand",
+	"room.consentUnderstand": "Rozumiem",
 	"room.joined": "Podłączono do konferencji",
 	"room.cantJoin": "Brak możliwości dołączenia do pokoju",
 	"room.youLocked": "Zakluczono pokój",
@@ -52,9 +52,19 @@
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
 	"room.closeMeeting": null,
+	"room.clearChat": null,
+	"room.clearFileSharing": null,
 	"room.speechUnsupported": null,
+	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
+	"room.overRoomLimit": null,
 
 	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
 
 	"tooltip.login": "Zaloguj",
 	"tooltip.logout": "Wyloguj",
@@ -67,6 +77,10 @@
 	"tooltip.settings": "Pokaż ustawienia",
 	"tooltip.participants": "Pokaż uczestników",
 	"tooltip.kickParticipant": null,
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
+	"tooltip.muteScreenSharing": null,
 
 	"label.roomName": "Nazwa konferencji",
 	"label.chooseRoomButton": "Kontynuuj",
@@ -80,6 +94,7 @@
 	"label.filesharing": "Udostępnianie plików",
 	"label.participants": "Uczestnicy",
 	"label.shareFile": "Udostępnij plik",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Udostępnianie plików nie jest obsługiwane",
 	"label.unknown": "Nieznane",
 	"label.democratic": "Układ demokratyczny",
@@ -90,6 +105,12 @@
 	"label.veryHigh": "Bardzo wysoka (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Zamknij",
+	"label.media": null,
+	"label.appearence": null,
+	"label.advanced": null,
+	"label.addVideo": null,
+	"label.promoteAllPeers": null,
+	"label.moreActions": null,
 
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",
@@ -98,12 +119,17 @@
 	"settings.audio": "Urządzenie audio",
 	"settings.selectAudio": "Wybór urządzenia audio",
 	"settings.cantSelectAudio": "Nie można wybrać urządzenia audio",
+	"settings.audioOutput": "Urządzenie wyjściowe audio",
+	"settings.selectAudioOutput": "Wybierz urządzenie wyjściowe audio",
+	"settings.cantSelectAudioOutput": "Nie można wybrać urządzenia wyjściowego audio",
 	"settings.resolution": "Wybór rozdzielczości wideo",
 	"settings.layout": "Układ konferencji",
 	"settings.selectRoomLayout": "Ustawienia układu konferencji",
 	"settings.advancedMode": "Tryb zaawansowany",
 	"settings.permanentTopBar": "Stały górny pasek",
-	"settings.lastn": "Liczba widocznych filmów",
+	"settings.lastn": "Liczba widocznych uczestników (zdalnych)",
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",
@@ -133,8 +159,8 @@
 
 	"devices.microphoneDisconnected": "Odłączono mikrofon",
 	"devices.microphoneError": "Błąd dostępu do mikrofonu",
-	"devices.microPhoneMute": "Wyciszenie mikrofonu włączone",
-	"devices.micophoneUnMute": "Wyciszenie mikrofonu wyłączone",
+	"devices.microphoneMute": "Wyciszenie mikrofonu włączone",
+	"devices.microphoneUnMute": "Wyciszenie mikrofonu wyłączone",
 	"devices.microphoneEnable": "Włączono mikrofon",
 	"devices.microphoneMuteError": "Nie można wyciszyć mikrofonu",
 	"devices.microphoneUnMuteError": "Nie można wyłączyć wyciszenia mikrofonu.",
@@ -143,5 +169,10 @@
 	"devices.screenSharingError": "Wystąpił błąd podczas uzyskiwania dostępu do ekranu",
 
 	"devices.cameraDisconnected": "Kamera odłączona",
-	"devices.cameraError": "Wystąpił błąd podczas uzyskiwania dostępu do kamery"
+	"devices.cameraError": "Wystąpił błąd podczas uzyskiwania dostępu do kamery",
+
+	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null
 }

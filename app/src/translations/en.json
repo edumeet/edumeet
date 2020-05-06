@@ -52,9 +52,19 @@
 	"room.muteAll": "Mute all",
 	"room.stopAllVideo": "Stop all video",
 	"room.closeMeeting": "Close meeting",
+	"room.clearChat": "Clear chat",
+	"room.clearFileSharing": "Clear files",
 	"room.speechUnsupported": "Your browser does not support speech recognition",
+	"room.moderatoractions": "Moderator actions",
+	"room.raisedHand": "{displayName} raised their hand",
+	"room.loweredHand": "{displayName} put their hand down",
+	"room.extraVideo": "Extra video",
+	"room.overRoomLimit": "The room is full, retry after some time.",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
+
+	"roles.gotRole": "You got the role: {role}",
+	"roles.lostRole": "You lost the role: {role}",
 
 	"tooltip.login": "Log in",
 	"tooltip.logout": "Log out",
@@ -67,6 +77,10 @@
 	"tooltip.settings": "Show settings",
 	"tooltip.participants": "Show participants",
 	"tooltip.kickParticipant": "Kick out participant",
+	"tooltip.muteParticipant": "Mute participant",
+	"tooltip.muteParticipantVideo": "Mute participant video",
+	"tooltip.raisedHand": "Raise hand",
+	"tooltip.muteScreenSharing": "Mute participant share",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -80,6 +94,7 @@
 	"label.filesharing": "File sharing",
 	"label.participants": "Participants",
 	"label.shareFile": "Share file",
+	"label.shareGalleryFile": "Share image",
 	"label.fileSharingUnsupported": "File sharing not supported",
 	"label.unknown": "Unknown",
 	"label.democratic": "Democratic view",
@@ -90,6 +105,12 @@
 	"label.veryHigh": "Very high (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Close",
+	"label.media": "Media",
+	"label.appearence": "Appearence",
+	"label.advanced": "Advanced",
+	"label.addVideo": "Add video",
+	"label.promoteAllPeers": "Promote all",
+	"label.moreActions": "More actions",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
@@ -98,12 +119,17 @@
 	"settings.audio": "Audio device",
 	"settings.selectAudio": "Select audio device",
 	"settings.cantSelectAudio": "Unable to select audio device",
+	"settings.audioOutput": "Audio output device",
+	"settings.selectAudioOutput": "Select audio output device",
+	"settings.cantSelectAudioOutput": "Unable to select audio output device",
 	"settings.resolution": "Select your video resolution",
 	"settings.layout": "Room layout",
 	"settings.selectRoomLayout": "Select room layout",
 	"settings.advancedMode": "Advanced mode",
 	"settings.permanentTopBar": "Permanent top bar",
 	"settings.lastn": "Number of visible videos",
+	"settings.hiddenControls": "Hidden media controls",
+	"settings.notificationSounds": "Notification sounds",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",
@@ -133,8 +159,8 @@
 
 	"devices.microphoneDisconnected": "Microphone disconnected",
 	"devices.microphoneError": "An error occured while accessing your microphone",
-	"devices.microPhoneMute": "Muted your microphone",
-	"devices.micophoneUnMute": "Unmuted your microphone",
+	"devices.microphoneMute": "Muted your microphone",
+	"devices.microphoneUnMute": "Unmuted your microphone",
 	"devices.microphoneEnable": "Enabled your microphone",
 	"devices.microphoneMuteError": "Unable to mute your microphone",
 	"devices.microphoneUnMuteError": "Unable to unmute your microphone",
@@ -143,5 +169,10 @@
 	"devices.screenSharingError": "An error occured while accessing your screen",
 
 	"devices.cameraDisconnected": "Camera disconnected",
-	"devices.cameraError": "An error occured while accessing your camera"
+	"devices.cameraError": "An error occured while accessing your camera",
+
+	"moderator.clearChat": "Moderator cleared the chat",
+	"moderator.clearFiles": "Moderator cleared the files",
+	"moderator.muteAudio": "Moderator muted your audio",
+	"moderator.muteVideo": "Moderator muted your video"
 }

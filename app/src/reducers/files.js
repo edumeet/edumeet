@@ -85,6 +85,9 @@ const files = (state = {}, action) =>
 			return { ...state, [magnetUri]: newFile };
 		}
 
+		case 'CLEAR_FILES':
+			return {};
+
 		default:
 			return state;
 	}
