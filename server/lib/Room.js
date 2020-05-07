@@ -1387,8 +1387,6 @@ class Room extends EventEmitter
 
 				this._notification(mutePeer.socket, 'moderator:mute');
 
-				mutePeer.close();
-
 				cb();
 
 				break;
@@ -1428,8 +1426,6 @@ class Room extends EventEmitter
 					throw new Error(`peer with id "${peerId}" not found`);
 
 				this._notification(stopVideoPeer.socket, 'moderator:stopVideo');
-
-				//stopVideoPeer.close();
 
 				cb();
 
