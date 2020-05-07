@@ -1390,7 +1390,7 @@ export default class RoomClient
 		logger.debug('mutePeer() [peerId:"%s"]', peerId);
 
 		store.dispatch(
-			roomActions.setMutePeerInProgress(peerId, true));
+			peerActions.setMutePeerInProgress(peerId, true));
 
 		try
 		{
@@ -1402,7 +1402,7 @@ export default class RoomClient
 		}
 
 		store.dispatch(
-			roomActions.setMutePeerInProgress(false));
+			peerActions.setMutePeerInProgress(false));
 	}
 
 	async stopPeerVideo(peerId)
@@ -1410,7 +1410,7 @@ export default class RoomClient
 		logger.debug('stopPeerVideo() [peerId:"%s"]', peerId);
 
 		store.dispatch(
-			roomActions.setStopPeerVideoInProgress(peerId, true));
+			peerActions.setStopPeerVideoInProgress(peerId, true));
 
 		try
 		{
@@ -1422,7 +1422,7 @@ export default class RoomClient
 		}
 
 		store.dispatch(
-			roomActions.setStopPeerVideoInProgress(false));
+			peerActions.setStopPeerVideoInProgress(false));
 	}
 
 	async muteAllPeers()
