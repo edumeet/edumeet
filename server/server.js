@@ -494,7 +494,7 @@ function isPathAlreadyTaken(url)
  */
 async function runWebSocketServer()
 {
-	io = require('socket.io')(mainListener);
+	io = require('socket.io')(mainListener, { path: '/' });
 
 	io.use(
 		sharedSession(session, {

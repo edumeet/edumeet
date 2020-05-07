@@ -129,7 +129,8 @@ export default class RoomClient
 			produce,
 			forceTcp,
 			displayName,
-			muted
+			muted,
+			basePath
 		} = {})
 	{
 		if (!peerId)
@@ -151,6 +152,9 @@ export default class RoomClient
 
 		// Whether we force TCP
 		this._forceTcp = forceTcp;
+
+		// URL basepath
+		this._basePath = basePath;
 
 		// Use displayName
 		if (displayName)
@@ -1719,7 +1723,7 @@ export default class RoomClient
 
 		this._screenSharing = ScreenShare.create(this._device);
 
-		this._signalingSocket = io(this._signalingUrl);
+		this._signalingSocket = io(this._signalingUrl, { path: this._basePath });
 
 		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
