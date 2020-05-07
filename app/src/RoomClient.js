@@ -1723,7 +1723,7 @@ export default class RoomClient
 
 		this._screenSharing = ScreenShare.create(this._device);
 
-		this._signalingSocket = io(this._signalingUrl, { path: this._basePath });
+		this._signalingSocket = io(this._signalingUrl);
 
 		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
