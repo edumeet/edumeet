@@ -60,6 +60,9 @@
 	"room.loweredHand": "{displayName} put their hand down",
 	"room.extraVideo": "Extra video",
 	"room.overRoomLimit": "The room is full, retry after some time.",
+	"room.help": "Help",
+	"room.about": "About",
+	"room.shortcutKeys": "Shortcut Keys",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 

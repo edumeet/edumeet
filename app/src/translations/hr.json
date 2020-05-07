@@ -60,6 +60,9 @@
 	"room.loweredHand": "{displayName} je spustio ruku",
 	"room.extraVideo": "Dodatni video",
 	"room.overRoomLimit": "Soba je popunjena, pokušajte ponovno kasnije.",
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 

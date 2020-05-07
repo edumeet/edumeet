@@ -60,6 +60,9 @@
 	"room.loweredHand": "{displayName} leeresztette a kezét",
 	"room.extraVideo": "Kiegészítő videó",
 	"room.overRoomLimit": "A konferenciaszoba betelt..",
+	"room.help": "Segítség",
+	"room.about": "Névjegy",
+	"room.shortcutKeys": "Billentyűparancsok",
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a szóköz billentyűt",
 

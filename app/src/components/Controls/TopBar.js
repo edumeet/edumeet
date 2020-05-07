@@ -496,13 +496,13 @@ const TopBar = (props) =>
 						>
 							<HelpIcon
 								aria-label={intl.formatMessage({
-									id             : 'label.help',
+									id             : 'room.help',
 									defaultMessage : 'Help'
 								})}
 							/>
 							<p className={classes.moreAction}>
 								<FormattedMessage
-									id='label.help'
+									id='room.help'
 									defaultMessage='Help'
 								/>
 							</p>
@@ -516,13 +516,13 @@ const TopBar = (props) =>
 						>
 							<InfoIcon
 								aria-label={intl.formatMessage({
-									id             : 'label.about',
+									id             : 'room.about',
 									defaultMessage : 'About'
 								})}
 							/>
 							<p className={classes.moreAction}>
 								<FormattedMessage
-									id='label.about'
+									id='room.about'
 									defaultMessage='About'
 								/>
 							</p>
