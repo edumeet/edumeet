@@ -1402,7 +1402,7 @@ export default class RoomClient
 		}
 
 		store.dispatch(
-			peerActions.setMutePeerInProgress(false));
+			peerActions.setMutePeerInProgress(peerId, false));
 	}
 
 	async stopPeerVideo(peerId)
@@ -1422,7 +1422,7 @@ export default class RoomClient
 		}
 
 		store.dispatch(
-			peerActions.setStopPeerVideoInProgress(false));
+			peerActions.setStopPeerVideoInProgress(peerId, false));
 	}
 
 	async muteAllPeers()
