@@ -126,7 +126,7 @@ const ListPeer = (props) =>
 					<RecordVoiceOverIcon />
 				</IconButton>
 			}
-			{ screenConsumer &&
+			{ screenConsumer && spotlight &&
 				<Tooltip
 					title={intl.formatMessage({
 						id             : 'tooltip.muteScreenSharing',
@@ -159,37 +159,39 @@ const ListPeer = (props) =>
 					</IconButton>
 				</Tooltip>
 			}
-			<Tooltip
-				title={intl.formatMessage({
-					id             : 'tooltip.muteParticipantVideo',
-					defaultMessage : 'Mute participant video'
-				})}
-				placement='bottom'
-			>
-				<IconButton
-					aria-label={intl.formatMessage({
+			{ spotlight &&
+				<Tooltip
+					title={intl.formatMessage({
 						id             : 'tooltip.muteParticipantVideo',
 						defaultMessage : 'Mute participant video'
 					})}
-					color={webcamEnabled ? 'primary' : 'secondary'}
-					disabled={peer.peerVideoInProgress}
-					className={classes.buttons}
-					onClick={(e) =>
-					{
-						e.stopPropagation();
-
-						webcamEnabled ?
-							roomClient.modifyPeerConsumer(peer.id, 'webcam', true) :
-							roomClient.modifyPeerConsumer(peer.id, 'webcam', false);
-					}}
+					placement='bottom'
 				>
-					{ webcamEnabled ?
-						<VideocamIcon />
-						:
-						<VideocamOffIcon />
-					}
-				</IconButton>
-			</Tooltip>
+					<IconButton
+						aria-label={intl.formatMessage({
+							id             : 'tooltip.muteParticipantVideo',
+							defaultMessage : 'Mute participant video'
+						})}
+						color={webcamEnabled ? 'primary' : 'secondary'}
+						disabled={peer.peerVideoInProgress}
+						className={classes.buttons}
+						onClick={(e) =>
+						{
+							e.stopPropagation();
+
+							webcamEnabled ?
+								roomClient.modifyPeerConsumer(peer.id, 'webcam', true) :
+								roomClient.modifyPeerConsumer(peer.id, 'webcam', false);
+						}}
+					>
+						{ webcamEnabled ?
+							<VideocamIcon />
+							:
+							<VideocamOffIcon />
+						}
+					</IconButton>
+				</Tooltip>
+			}
 			<Tooltip
 				title={intl.formatMessage({
 					id             : 'tooltip.muteParticipant',
