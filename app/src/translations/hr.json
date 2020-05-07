@@ -131,6 +131,10 @@
 	"settings.hiddenControls": "Skrivene kontrole medija",
 	"settings.notificationSounds": "Zvuk obavijesti",
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",

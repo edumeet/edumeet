@@ -131,6 +131,10 @@
 	"settings.hiddenControls": "Hidden media controls",
 	"settings.notificationSounds": "Notification sounds",
 	"settings.showNotifications": "Show notifications",
+	"settings.buttonControlBar": "Separate media controls",
+	"settings.echoCancellation": "Echo cancellation",
+	"settings.autoGainControl": "Auto gain control",
+	"settings.noiseSuppression": "Noise suppression",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

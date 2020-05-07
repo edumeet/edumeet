@@ -131,6 +131,10 @@
 	"settings.hiddenControls": "Média Gombok automatikus elrejtése",
 	"settings.notificationSounds": "Értesítések hangjelzéssel",
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

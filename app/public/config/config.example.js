@@ -52,18 +52,21 @@ var config =
 		noiseSuppression : true,
 		sampleSize       : 16
 	},
-	background    : 'images/background.jpg',
-	defaultLayout : 'democratic', // democratic, filmstrip
-	lastN         : 4,
-	mobileLastN   : 1,
+	background       : 'images/background.jpg',
+	defaultLayout    : 'democratic', // democratic, filmstrip
+	// If true, will show media control buttons in separate
+	// control bar, not in the ME container.
+	buttonControlBar : false,
+	lastN            : 4,
+	mobileLastN      : 1,
 	// Highest number of speakers user can select
-	maxLastN      : 5,
+	maxLastN         : 5,
 	// If truthy, users can NOT change number of speakers visible
-	lockLastN     : false,
+	lockLastN        : false,
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
-	title         : 'Multiparty meeting',
-	theme         :
+	title            : 'Multiparty meeting',
+	theme            :
 	{
 		palette :
 		{

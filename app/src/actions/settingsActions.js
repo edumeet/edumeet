@@ -38,6 +38,11 @@ export const togglePermanentTopBar = () =>
 		type : 'TOGGLE_PERMANENT_TOPBAR'
 	});
 
+export const toggleButtonControlBar = () =>
+	({
+		type : 'TOGGLE_BUTTON_CONTROL_BAR'
+	});
+
 export const toggleShowNotifications = () =>
 	({
 		type : 'TOGGLE_SHOW_NOTIFICATIONS'

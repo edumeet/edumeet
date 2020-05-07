@@ -265,7 +265,7 @@ const MediaSettings = ({
 						/>}
 					label={intl.formatMessage({
 						id             : 'settings.echoCancellation',
-						defaultMessage : 'Echo Cancellation'
+						defaultMessage : 'Echo cancellation'
 					})}
 				/>
 				<FormControlLabel
@@ -280,7 +280,7 @@ const MediaSettings = ({
 						/>}
 					label={intl.formatMessage({
 						id             : 'settings.autoGainControl',
-						defaultMessage : 'Auto Gain Control'
+						defaultMessage : 'Auto gain control'
 					})}
 				/>
 				<FormControlLabel
@@ -295,7 +295,7 @@ const MediaSettings = ({
 						/>}
 					label={intl.formatMessage({
 						id             : 'settings.noiseSuppression',
-						defaultMessage : 'Noise Suppression'
+						defaultMessage : 'Noise suppression'
 					})}
 				/>
 			</form>

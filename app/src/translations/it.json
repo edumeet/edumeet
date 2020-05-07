@@ -130,6 +130,10 @@
 	"settings.hiddenControls": "Controlli media nascosti",
 	"settings.notificationSounds": "Suoni di notifica",
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",

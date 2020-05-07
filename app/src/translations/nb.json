@@ -131,6 +131,10 @@
 	"settings.hiddenControls": "Skjul media knapper",
 	"settings.notificationSounds": "Varslingslyder",
 	"settings.showNotifications": "Vis varslinger",
+	"settings.buttonControlBar": "Separate media knapper",
+	"settings.echoCancellation": "Echokansellering",
+	"settings.autoGainControl": "Auto gain kontroll",
+	"settings.noiseSuppression": "Støy reduksjon",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",
