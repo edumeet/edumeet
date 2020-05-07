@@ -69,3 +69,15 @@ export const setPeerKickInProgress = (peerId, flag) =>
 		type    : 'SET_PEER_KICK_IN_PROGRESS',
 		payload : { peerId, flag }
 	});
+
+export const setMutePeerInProgress = (peerId, flag) =>
+	({
+		type    : 'STOP_PEER_AUDIO_IN_PROGRESS',
+		payload : { peerId, flag }
+	});
+
+export const setStopPeerVideoInProgress = (peerId, flag) =>
+	({
+		type    : 'STOP_PEER_VIDEO_IN_PROGRESS',
+		payload : { peerId, flag }
+	});

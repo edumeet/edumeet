@@ -261,7 +261,7 @@ const ListPeer = (props) =>
 				<IconButton
 					className={classes.buttons}
 					style={{ color: green[500] }}
-					disabled={!isModerator || peer.peerAudioInProgress}
+					disabled={!isModerator || peer.stopPeerAudioInProgress}
 					onClick={(e) =>
 					{
 						e.stopPropagation();
@@ -288,7 +288,7 @@ const ListPeer = (props) =>
 				<IconButton
 					className={classes.buttons}
 					style={{ color: green[500] }}
-					disabled={!isModerator || peer.peerVideoInProgress}
+					disabled={!isModerator || peer.stopPeerVideoInProgress}
 					onClick={(e) =>
 					{
 						e.stopPropagation();

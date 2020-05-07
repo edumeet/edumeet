@@ -1378,8 +1378,16 @@ class Room extends EventEmitter
 				)
 					throw new Error('peer not authorized');
 
-				// Spread to others
-				this._notification(peer.socket, 'moderator:mute', null, true);
+				const { peerId } = request.data;
+
+				const mutePeer = this._peers[peerId];
+
+				if (!mutePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(mutePeer.socket, 'moderator:mute');
+
+				mutePeer.close();
 
 				cb();
 
@@ -1412,8 +1420,16 @@ class Room extends EventEmitter
 				)
 					throw new Error('peer not authorized');
 
-				// Spread to others
-				this._notification(peer.socket, 'moderator:stopVideo', null, true);
+				const { peerId } = request.data;
+
+				const stopVideoPeer = this._peers[peerId];
+
+				if (!stopVideoPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(stopVideoPeer.socket, 'moderator:stopVideo');
+
+				//stopVideoPeer.close();
 
 				cb();
 
