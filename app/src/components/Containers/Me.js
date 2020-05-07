@@ -77,28 +77,28 @@ const styles = (theme) =>
 		{
 			position : 'relative',
 			width    : '100%',
-			height   : '100%',
-			'& p'    :
+			height   : '100%'
+		},
+		meTag :
+		{
+			position   : 'absolute',
+			float      : 'left',
+			top        : '50%',
+			left       : '50%',
+			transform  : 'translate(-50%, -50%)',
+			color      : 'rgba(255, 255, 255, 0.5)',
+			fontSize   : '7em',
+			zIndex     : 30,
+			margin     : 0,
+			opacity    : 0,
+			transition : 'opacity 0.1s ease-in-out',
+			'&.hover'  :
 			{
-				position   : 'absolute',
-				float      : 'left',
-				top        : '50%',
-				left       : '50%',
-				transform  : 'translate(-50%, -50%)',
-				color      : 'rgba(255, 255, 255, 0.5)',
-				fontSize   : '7em',
-				zIndex     : 30,
-				margin     : 0,
-				opacity    : 0,
-				transition : 'opacity 0.1s ease-in-out',
-				'&.hover'  :
-				{
-					opacity : 1
-				},
-				'&.smallContainer' :
-				{
-					fontSize : '3em'
-				}
+				opacity : 1
+			},
+			'&.smallContainer' :
+			{
+				fontSize : '3em'
 			}
 		},
 		controls :
@@ -333,6 +333,7 @@ const Me = (props) =>
 					}
 					<p className={
 						classnames(
+							classes.meTag,
 							hover ? 'hover' : null,
 							smallContainer ? 'smallContainer' : null
 						)}
