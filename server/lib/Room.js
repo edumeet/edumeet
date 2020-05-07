@@ -1369,6 +1369,29 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:mute':
+			{
+				if (
+					!peer.roles.some(
+						(role) => permissionsFromRoles.MODERATE_ROOM.includes(role)
+					)
+				)
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const mutePeer = this._peers[peerId];
+
+				if (!mutePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(mutePeer.socket, 'moderator:mute');
+
+				cb();
+
+				break;
+			}
+
 			case 'moderator:muteAll':
 			{
 				if (
@@ -1380,6 +1403,29 @@ class Room extends EventEmitter
 
 				// Spread to others
 				this._notification(peer.socket, 'moderator:mute', null, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopVideo':
+			{
+				if (
+					!peer.roles.some(
+						(role) => permissionsFromRoles.MODERATE_ROOM.includes(role)
+					)
+				)
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const stopVideoPeer = this._peers[peerId];
+
+				if (!stopVideoPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(stopVideoPeer.socket, 'moderator:stopVideo');
 
 				cb();
 

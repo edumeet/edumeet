@@ -1389,6 +1389,46 @@ export default class RoomClient
 			peerActions.setPeerKickInProgress(peerId, false));
 	}
 
+	async mutePeer(peerId)
+	{
+		logger.debug('mutePeer() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setMutePeerInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:mute', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('mutePeer() failed: %o', error);
+		}
+
+		store.dispatch(
+			peerActions.setMutePeerInProgress(peerId, false));
+	}
+
+	async stopPeerVideo(peerId)
+	{
+		logger.debug('stopPeerVideo() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setStopPeerVideoInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopVideo', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('stopPeerVideo() failed: %o', error);
+		}
+
+		store.dispatch(
+			peerActions.setStopPeerVideoInProgress(peerId, false));
+	}
+
 	async muteAllPeers()
 	{
 		logger.debug('muteAllPeers()');

@@ -11,6 +11,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import MicIcon from '@material-ui/icons/Mic';
+import MicOffIcon from '@material-ui/icons/MicOff';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
@@ -249,6 +251,60 @@ const ListPeer = (props) =>
 						<ExitIcon />
 					</IconButton>
 				</Tooltip>
+			}
+			{ isModerator && micConsumer &&
+				<Tooltip
+				title={intl.formatMessage({
+					id             : 'tooltip.muteParticipant',
+					defaultMessage : 'Mute globally participant mic'
+				})}
+				placement='bottom'
+			>
+				<IconButton
+					className={classes.buttons}
+					style={{ color: green[500] }}
+					disabled={!isModerator || peer.stopPeerAudioInProgress}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+
+						roomClient.mutePeer(peer.id);
+					}}
+				>
+					{ !micConsumer.remotelyPaused ?
+						<MicIcon />
+						:
+						<MicOffIcon />
+					}
+				</IconButton>
+			</Tooltip>
+			}
+			{ isModerator && webcamConsumer && 
+				<Tooltip
+				title={intl.formatMessage({
+					id             : 'tooltip.muteParticipantVideo',
+					defaultMessage : 'Mute globally participant video'
+				})}
+				placement='bottom'
+			>
+				<IconButton
+					className={classes.buttons}
+					style={{ color: green[500] }}
+					disabled={!isModerator || peer.stopPeerVideoInProgress}
+					onClick={(e) =>
+					{
+						e.stopPropagation();
+
+						roomClient.stopPeerVideo(peer.id);
+					}}
+				>
+					{ !webcamConsumer.remotelyPaused ?
+						<VideocamIcon />
+						:
+						<VideocamOffIcon />
+					}
+				</IconButton>
+			</Tooltip>
 			}
 			{children}
 		</div>
