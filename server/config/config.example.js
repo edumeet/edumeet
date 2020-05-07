@@ -96,8 +96,8 @@ module.exports =
 			this._queue = new AwaitQueue();
 		}
 
-		// rooms: number of rooms
-		// peers: number of peers
+		// rooms: rooms object
+		// peers: peers object
 		// eslint-disable-next-line no-unused-vars
 		async log({ rooms, peers })
 		{
@@ -106,9 +106,9 @@ module.exports =
 				// Do your logging in here, use queue to keep correct order
 
 				// eslint-disable-next-line no-console
-				console.log('Number of rooms: ', rooms);
+				console.log('Number of rooms: ', rooms.size);
 				// eslint-disable-next-line no-console
-				console.log('Number of peers: ', peers);
+				console.log('Number of peers: ', peers.size);
 			})
 				.catch((error) =>
 				{

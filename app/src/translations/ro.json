@@ -80,6 +80,7 @@
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
+	"tooltip.muteScreenSharing": null,
 
 	"label.roomName": "Numele camerei",
 	"label.chooseRoomButton": "Continuare",
@@ -109,6 +110,7 @@
 	"label.advanced": null,
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
+	"label.moreActions": null,
 
 	"settings.settings": "Setări",
 	"settings.camera": "Cameră video",
@@ -128,6 +130,7 @@
 	"settings.lastn": "Numărul de videoclipuri vizibile",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Încercarea de a salva fișierul a eșuat",
 	"filesharing.startingFileShare": "Partajarea fișierului",

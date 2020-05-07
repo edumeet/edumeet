@@ -224,7 +224,7 @@ const JoinDialog = ({
 					myPicture={myPicture}
 					onLogin={() =>
 					{
-						loggedIn ? roomClient.logout() : roomClient.login(roomId);
+						loggedIn ? roomClient.logout(roomId) : roomClient.login(roomId);
 					}}
 					loggedIn={loggedIn}
 				>

@@ -142,6 +142,7 @@ class Room extends React.PureComponent
 			room,
 			browser,
 			advancedMode,
+			showNotifications,
 			toolAreaOpen,
 			toggleToolArea,
 			classes,
@@ -178,7 +179,9 @@ class Room extends React.PureComponent
 
 				<AudioPeers />
 
-				<Notifications />
+				{ showNotifications &&
+					<Notifications />
+				}
 
 				<CssBaseline />
 
@@ -232,6 +235,7 @@ Room.propTypes =
 	room               : appPropTypes.Room.isRequired,
 	browser            : PropTypes.object.isRequired,
 	advancedMode       : PropTypes.bool.isRequired,
+	showNotifications  : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
 	toggleToolArea     : PropTypes.func.isRequired,
@@ -241,10 +245,11 @@ Room.propTypes =
 
 const mapStateToProps = (state) =>
 	({
-		room         : state.room,
-		browser      : state.me.browser,
-		advancedMode : state.settings.advancedMode,
-		toolAreaOpen : state.toolarea.toolAreaOpen
+		room              : state.room,
+		browser           : state.me.browser,
+		advancedMode      : state.settings.advancedMode,
+		showNotifications : state.settings.showNotifications,
+		toolAreaOpen      : state.toolarea.toolAreaOpen
 	});
 
 const mapDispatchToProps = (dispatch) =>
@@ -270,6 +275,7 @@ export default connect(
 				prev.room === next.room &&
 				prev.me.browser === next.me.browser &&
 				prev.settings.advancedMode === next.settings.advancedMode &&
+				prev.settings.showNotifications === next.settings.showNotifications &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}

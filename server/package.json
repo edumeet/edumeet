@@ -7,7 +7,7 @@
 	"license": "MIT",
 	"main": "lib/index.js",
 	"scripts": {
-		"start": "DEBUG=${DEBUG:='*mediasoup* *INFO* *WARN* *ERROR*'} INTERACTIVE=${INTERACTIVE:='true'} node server.js",
+		"start": "node server.js",
 		"connect": "node connect.js",
 		"lint": "eslint -c .eslintrc.json --ext .js *.js lib/"
 	},

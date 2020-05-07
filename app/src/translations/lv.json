@@ -79,6 +79,7 @@
 	"tooltip.muteParticipant": "Noklusināt dalībnieku",
 	"tooltip.muteParticipantVideo": "Atslēgt dalībnieka video",
 	"tooltip.raisedHand": "Pacelt roku",
+	"tooltip.muteScreenSharing": null,
 
 	"label.roomName": "Sapulces telpas nosaukums (ID)",
 	"label.chooseRoomButton": "Turpināt",
@@ -106,6 +107,7 @@
 	"label.appearence": "Izskats",
 	"label.advanced": "Advancēts",
 	"label.addVideo": "Pievienot video",
+	"label.moreActions": null,
 
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",
@@ -122,6 +124,7 @@
 	"settings.lastn": "Jums redzamo video/kameru skaits",
 	"settings.hiddenControls": "Slēpto mediju vadība",
 	"settings.notificationSounds": "Paziņojumu skaņas",
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",

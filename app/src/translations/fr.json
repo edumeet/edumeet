@@ -80,6 +80,7 @@
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
+	"tooltip.muteScreenSharing": null,
 
 	"label.roomName": "Nom de la salle",
 	"label.chooseRoomButton": "Continuer",
@@ -109,6 +110,7 @@
 	"label.advanced": null,
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
+	"label.moreActions": null,
 
 	"settings.settings": "Paramètres",
 	"settings.camera": "Caméra",
@@ -128,6 +130,7 @@
 	"settings.lastn": "Nombre de vidéos visibles",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",

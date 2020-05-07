@@ -80,6 +80,7 @@
 	"tooltip.muteParticipant": "Mute participant",
 	"tooltip.muteParticipantVideo": "Mute participant video",
 	"tooltip.raisedHand": "Raise hand",
+	"tooltip.muteScreenSharing": "Mute participant share",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -109,6 +110,7 @@
 	"label.advanced": "Advanced",
 	"label.addVideo": "Add video",
 	"label.promoteAllPeers": "Promote all",
+	"label.moreActions": "More actions",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
@@ -128,6 +130,7 @@
 	"settings.lastn": "Number of visible videos",
 	"settings.hiddenControls": "Hidden media controls",
 	"settings.notificationSounds": "Notification sounds",
+	"settings.showNotifications": "Show notifications",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

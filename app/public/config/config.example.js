@@ -42,6 +42,17 @@ var config =
 	{
 		tcp : true
 	},
+	defaultAudio : 
+	{
+		sampleRate       : 48000,
+		channelCount     : 1,
+		volume           : 1.0,
+		autoGainControl  : true,
+		echoCancellation : true,
+		noiseSuppression : true,
+		sampleSize       : 16
+	},
+	background    : 'images/background.jpg',
 	defaultLayout : 'democratic', // democratic, filmstrip
 	lastN         : 4,
 	mobileLastN   : 1,
@@ -49,7 +60,6 @@ var config =
 	maxLastN      : 5,
 	// If truthy, users can NOT change number of speakers visible
 	lockLastN     : false,
-	background    : 'images/background.jpg',
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
 	title         : 'Multiparty meeting',

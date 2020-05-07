@@ -16,11 +16,13 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Avatar from '@material-ui/core/Avatar';
 import Badge from '@material-ui/core/Badge';
+import Paper from '@material-ui/core/Paper';
 import ExtensionIcon from '@material-ui/icons/Extension';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
@@ -33,6 +35,7 @@ import LockOpenIcon from '@material-ui/icons/LockOpen';
 import VideoCallIcon from '@material-ui/icons/VideoCall';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
+import MoreIcon from '@material-ui/icons/MoreVert';
 
 const styles = (theme) =>
 	({
@@ -77,9 +80,17 @@ const styles = (theme) =>
 				display : 'block'
 			}
 		},
-		actionButtons :
-		{
-			display : 'flex'
+		sectionDesktop : {
+			display                      : 'none',
+			[theme.breakpoints.up('md')] : {
+				display : 'flex'
+			}
+		},
+		sectionMobile : {
+			display                      : 'flex',
+			[theme.breakpoints.up('md')] : {
+				display : 'none'
+			}
 		},
 		actionButton :
 		{
@@ -96,7 +107,7 @@ const styles = (theme) =>
 		},
 		moreAction :
 		{
-			margin : theme.spacing(0, 0, 0, 1)
+			margin : theme.spacing(0.5, 0, 0.5, 1.5)
 		}
 	});
 
@@ -135,16 +146,36 @@ const TopBar = (props) =>
 {
 	const intl = useIntl();
 
-	const [ moreActionsElement, setMoreActionsElement ] = useState(null);
+	const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
+	const [ anchorEl, setAnchorEl ] = useState(null);
+	const [ currentMenu, setCurrentMenu ] = useState(null);
 
-	const handleMoreActionsOpen = (event) =>
+	const handleExited = () =>
 	{
-		setMoreActionsElement(event.currentTarget);
+		setCurrentMenu(null);
 	};
 
-	const handleMoreActionsClose = () =>
+	const handleMobileMenuOpen = (event) =>
 	{
-		setMoreActionsElement(null);
+		setMobileMoreAnchorEl(event.currentTarget);
+	};
+
+	const handleMobileMenuClose = () =>
+	{
+		setMobileMoreAnchorEl(null);
+	};
+
+	const handleMenuOpen = (event, menu) =>
+	{
+		setAnchorEl(event.currentTarget);
+		setCurrentMenu(menu);
+	};
+
+	const handleMenuClose = () =>
+	{
+		setAnchorEl(null);
+
+		handleMobileMenuClose();
 	};
 
 	const {
@@ -171,7 +202,8 @@ const TopBar = (props) =>
 		classes
 	} = props;
 
-	const isMoreActionsMenuOpen = Boolean(moreActionsElement);
+	const isMenuOpen = Boolean(anchorEl);
+	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
 	const lockTooltip = room.locked ?
 		intl.formatMessage({
@@ -239,10 +271,15 @@ const TopBar = (props) =>
 						{ window.config.title ? window.config.title : 'Multiparty meeting' }
 					</Typography>
 					<div className={classes.grow} />
-					<div className={classes.actionButtons}>
+					<div className={classes.sectionDesktop}>
 						<IconButton
+							aria-owns={
+								isMenuOpen &&
+								currentMenu === 'moreActions' ?
+									'material-appbar' : undefined
+							}
 							aria-haspopup='true'
-							onClick={handleMoreActionsOpen}
+							onClick={(event) => handleMenuOpen(event, 'moreActions')}
 							color='inherit'
 						>
 							<ExtensionIcon />
@@ -386,52 +423,253 @@ const TopBar = (props) =>
 								</IconButton>
 							</Tooltip>
 						}
-						<div className={classes.divider} />
-						<Button
-							aria-label={intl.formatMessage({
-								id             : 'label.leave',
-								defaultMessage : 'Leave'
-							})}
-							className={classes.actionButton}
-							variant='contained'
-							color='secondary'
-							onClick={() => roomClient.close()}
-						>
-							<FormattedMessage
-								id='label.leave'
-								defaultMessage='Leave'
-							/>
-						</Button>
 					</div>
+					<div className={classes.sectionMobile}>
+						<IconButton
+							aria-haspopup='true'
+							onClick={handleMobileMenuOpen}
+							color='inherit'
+						>
+							<MoreIcon />
+						</IconButton>
+					</div>
+					<div className={classes.divider} />
+					<Button
+						aria-label={intl.formatMessage({
+							id             : 'label.leave',
+							defaultMessage : 'Leave'
+						})}
+						className={classes.actionButton}
+						variant='contained'
+						color='secondary'
+						onClick={() => roomClient.close()}
+					>
+						<FormattedMessage
+							id='label.leave'
+							defaultMessage='Leave'
+						/>
+					</Button>
 				</Toolbar>
 			</AppBar>
-			<Menu
-				anchorEl={moreActionsElement}
+			<Popover
+				anchorEl={anchorEl}
 				anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
 				transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-				open={isMoreActionsMenuOpen}
-				onClose={handleMoreActionsClose}
+				open={isMenuOpen}
+				onClose={handleMenuClose}
+				onExited={handleExited}
 				getContentAnchorEl={null}
 			>
+				{ currentMenu === 'moreActions' &&
+					<Paper>
+						<MenuItem
+							disabled={!canProduceExtraVideo}
+							onClick={() =>
+							{
+								handleMenuClose();
+								setExtraVideoOpen(!room.extraVideoOpen);
+							}}
+						>
+							<VideoCallIcon
+								aria-label={intl.formatMessage({
+									id             : 'label.addVideo',
+									defaultMessage : 'Add video'
+								})}
+							/>
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='label.addVideo'
+									defaultMessage='Add video'
+								/>
+							</p>
+						</MenuItem>
+					</Paper>
+				}
+			</Popover>
+			<Menu
+				anchorEl={mobileMoreAnchorEl}
+				anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+				transformOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+				open={isMobileMenuOpen}
+				onClose={handleMenuClose}
+				getContentAnchorEl={null}
+			>
+				{ loginEnabled &&
+					<MenuItem
+						aria-label={loginTooltip}
+						onClick={() => 
+						{
+							handleMenuClose();
+							loggedIn ? roomClient.logout() : roomClient.login();
+						}}
+					>
+						{ myPicture ?
+							<Avatar src={myPicture} />
+							:
+							<AccountCircle className={loggedIn ? classes.green : null} />
+						}
+						{ loggedIn ?
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='tooltip.logout'
+									defaultMessage='Log out'
+								/>
+							</p>
+							:
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='tooltip.login'
+									defaultMessage='Log in'
+								/>
+							</p>
+						}
+					</MenuItem>
+				}
 				<MenuItem
-					dense
-					disabled={!canProduceExtraVideo}
+					aria-label={lockTooltip}
+					disabled={!canLock}
 					onClick={() =>
 					{
-						handleMoreActionsClose();
-						setExtraVideoOpen(!room.extraVideoOpen);
+						handleMenuClose();
+
+						if (room.locked)
+						{
+							roomClient.unlockRoom();
+						}
+						else
+						{
+							roomClient.lockRoom();
+						}
 					}}
 				>
-					<VideoCallIcon
-						aria-label={intl.formatMessage({
-							id             : 'label.addVideo',
-							defaultMessage : 'Add video'
-						})}
-					/>
+					{ room.locked ?
+						<LockIcon />
+						:
+						<LockOpenIcon />
+					}
+					{ room.locked ?
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.unLockRoom'
+								defaultMessage='Unlock room'
+							/>
+						</p>
+						:
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.lockRoom'
+								defaultMessage='Lock room'
+							/>
+						</p>
+					}
+				</MenuItem>
+				<MenuItem
+					aria-label={intl.formatMessage({
+						id             : 'tooltip.settings',
+						defaultMessage : 'Show settings'
+					})}
+					onClick={() =>
+					{
+						handleMenuClose();
+						setSettingsOpen(!room.settingsOpen);
+					}}
+				>
+					<SettingsIcon />
 					<p className={classes.moreAction}>
 						<FormattedMessage
-							id='label.addVideo'
-							defaultMessage='Add video'
+							id='tooltip.settings'
+							defaultMessage='Show settings'
+						/>
+					</p>
+				</MenuItem>
+				{ lobbyPeers.length > 0 &&
+					<MenuItem 
+						aria-label={intl.formatMessage({
+							id             : 'tooltip.lobby',
+							defaultMessage : 'Show lobby'
+						})}
+						disabled={!canPromote}
+						onClick={() =>
+						{
+							handleMenuClose();
+							setLockDialogOpen(!room.lockDialogOpen);
+						}}
+					>
+						<PulsingBadge
+							color='secondary'
+							badgeContent={lobbyPeers.length}
+						>
+							<SecurityIcon />
+						</PulsingBadge>
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.lobby'
+								defaultMessage='Show lobby'
+							/>
+						</p>
+					</MenuItem>
+				}
+				<MenuItem
+					aria-label={intl.formatMessage({
+						id             : 'tooltip.participants',
+						defaultMessage : 'Show participants'
+					})}
+					onClick={() =>
+					{
+						handleMenuClose();
+						openUsersTab();
+					}}
+				>
+					<Badge
+						color='primary'
+						badgeContent={peersLength + 1}
+					>
+						<PeopleIcon />
+					</Badge>
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='tooltip.participants'
+							defaultMessage='Show participants'
+						/>
+					</p>
+				</MenuItem>
+				{ fullscreenEnabled &&
+					<MenuItem
+						aria-label={intl.formatMessage({
+							id             : 'tooltip.enterFullscreen',
+							defaultMessage : 'Enter fullscreen'
+						})}
+						onClick={() =>
+						{
+							handleMenuClose();
+							onFullscreen();
+						}}
+					>
+						{ fullscreen ?
+							<FullScreenExitIcon />
+							:
+							<FullScreenIcon />
+						}
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.enterFullscreen'
+								defaultMessage='Enter fullscreen'
+							/>
+						</p>
+					</MenuItem>
+				}
+				<MenuItem
+					aria-label={intl.formatMessage({
+						id             : 'label.moreActions',
+						defaultMessage : 'Add video'
+					})}
+					onClick={(event) => handleMenuOpen(event, 'moreActions')}
+				>
+					<ExtensionIcon />
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='label.moreActions'
+							defaultMessage='More actions'
 						/>
 					</p>
 				</MenuItem>

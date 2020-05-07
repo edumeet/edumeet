@@ -117,6 +117,8 @@ class Room extends EventEmitter
 
 		this._peers = {};
 
+		this._selfDestructTimeout = null;
+
 		// Array of mediasoup Router instances.
 		this._mediasoupRouters = mediasoupRouters;
 
@@ -145,6 +147,11 @@ class Room extends EventEmitter
 		logger.debug('close()');
 
 		this._closed = true;
+
+		if (this._selfDestructTimeout)
+			clearTimeout(this._selfDestructTimeout);
+
+		this._selfDestructTimeout = null;
 
 		this._chatHistory = null;
 
@@ -411,7 +418,10 @@ class Room extends EventEmitter
 	{
 		logger.debug('selfDestructCountdown() started');
 
-		setTimeout(() =>
+		if (this._selfDestructTimeout)
+			clearTimeout(this._selfDestructTimeout);
+
+		this._selfDestructTimeout = setTimeout(() =>
 		{
 			if (this._closed)
 				return;
@@ -659,7 +669,14 @@ class Room extends EventEmitter
 					.filter((joinedPeer) => joinedPeer.id !== peer.id)
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
-				const lobbyPeers = this._lobby.peerList();
+				let lobbyPeers = [];
+				
+				if ( // Allowed to promote peers, notify about lobbypeers
+					peer.roles.some((role) =>
+						permissionsFromRoles.PROMOTE_PEER.includes(role)
+					)
+				)
+					lobbyPeers = this._lobby.peerList();
 
 				cb(null, {
 					roles                : peer.roles,
@@ -1424,6 +1441,29 @@ class Room extends EventEmitter
 				this._notification(kickPeer.socket, 'moderator:kick');
 
 				kickPeer.close();
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:lowerHand':
+			{
+				if (
+					!peer.roles.some(
+						(role) => permissionsFromRoles.MODERATE_ROOM.includes(role)
+					)
+				)
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const lowerPeer = this._peers[peerId];
+
+				if (!lowerPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(lowerPeer.socket, 'moderator:lowerHand');
 
 				cb();
 

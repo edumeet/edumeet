@@ -127,69 +127,58 @@ let oidcStrategy;
 
 async function run()
 {
-	// Open the interactive server.
-	await interactiveServer(rooms, peers);
-
-	// start Prometheus exporter
-	if (config.prometheus)
+	try
 	{
-		await promExporter(rooms, peers, config.prometheus);
-	}
+		// Open the interactive server.
+		await interactiveServer(rooms, peers);
 
-	if (typeof(config.auth) === 'undefined')
-	{
-		logger.warn('Auth is not configured properly!');
-	}
-	else
-	{
-		await setupAuth();
-	}
-
-	// Run a mediasoup Worker.
-	await runMediasoupWorkers();
-
-	// Run HTTPS server.
-	await runHttpsServer();
-
-	// Run WebSocketServer.
-	await runWebSocketServer();
-
-	// eslint-disable-next-line no-unused-vars
-	function errorHandler(err, req, res, next) 
-	{
-		const trackingId = uuidv4();
-
-		res.status(500).send(
-			`<h1>Internal Server Error</h1>
-			<p>If you report this error, please also report this 
-			<i>tracking ID</i> which makes it possible to locate your session
-			in the logs which are available to the system administrator: 
-			<b>${trackingId}</b></p>`
-		);
-		logger.error(
-			'Express error handler dump with tracking ID: %s, error dump: %o', 
-			trackingId, err);
-	}
-
-	app.use(errorHandler);
-
-	// Log rooms status every 30 seconds.
-	setInterval(() =>
-	{
-		for (const room of rooms.values())
+		// start Prometheus exporter
+		if (config.prometheus)
 		{
-			room.logStatus();
+			await promExporter(rooms, peers, config.prometheus);
 		}
-	}, 120000);
 
-	// check for deserted rooms
-	setInterval(() =>
-	{
-		for (const room of rooms.values())
+		if (typeof(config.auth) === 'undefined')
 		{
-			room.checkEmpty();
+			logger.warn('Auth is not configured properly!');
 		}
-	}, 10000);
+		else
+		{
+			await setupAuth();
+		}
+
+		// Run a mediasoup Worker.
+		await runMediasoupWorkers();
+
+		// Run HTTPS server.
+		await runHttpsServer();
+
+		// Run WebSocketServer.
+		await runWebSocketServer();
+
+		const errorHandler = (err, req, res, next) =>
+		{
+			const trackingId = uuidv4();
+	
+			res.status(500).send(
+				`<h1>Internal Server Error</h1>
+				<p>If you report this error, please also report this 
+				<i>tracking ID</i> which makes it possible to locate your session
+				in the logs which are available to the system administrator: 
+				<b>${trackingId}</b></p>`
+			);
+			logger.error(
+				'Express error handler dump with tracking ID: %s, error dump: %o', 
+				trackingId, err);
+		};
+
+		// eslint-disable-next-line no-unused-vars
+		app.use(errorHandler);
+	}
+	catch (error)
+	{
+		logger.error('run() [error:"%o"]', error);
+	}
 }
 
 function statusLog()
@@ -197,8 +186,8 @@ function statusLog()
 	if (statusLogger)
 	{
 		statusLogger.log({
-			rooms : rooms.size,
-			peers : peers.size
+			rooms : rooms,
+			peers : peers
 		});
 	}
 }
