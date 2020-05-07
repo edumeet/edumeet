@@ -59,8 +59,9 @@ class NetworkIndicator extends React.Component
 			currBitrate : 0,
 			maxBitrate  : 0,
 			avgBitrate  : 0,
-			medBitrate  : 1,
-			probeCount  : 0
+			medBitrate  : 0,
+			probeCount  : 1,
+			probeLimit  : 3
 		};
 	}
 
@@ -116,22 +117,19 @@ class NetworkIndicator extends React.Component
 	{
 		const rc = this.props.roomClient;
 
-		const recv = await rc.getTransportStats(rc._recvTransport.id);
+		var probe = [ ...this.state.probe ]; // clone
+		
+		var probeCount = this.state.probeCount
 
-		const send = await rc.getTransportStats(rc._sendTransport.id);
+		var probeLimit  = this.state.probeLimit
 
-		// current
-		const currBitrate = Math.round(send[0].recvBitrate / 1024 / 8); // in kb
+		var currBitrate = this.state.currBitrate
 
-		// probe
-		const probe = [ ...this.state.probe ]; // clone
+		var recv = this.state.recv
 
-		if (this.state.probeCount < 5) 
-			this.setState({ probeCount: this.state.probeCount + 1}); 
-		else 
-			this.setState({ probeCount: 1 }); 
+		var send = this.state.send
 
-		probe[this.state.probeCount] = currBitrate; // add/update next element
+		probe[probeCount] = currBitrate; // add/update next element
 
 		// median
 		const med = (arr) =>
@@ -155,13 +153,25 @@ class NetworkIndicator extends React.Component
 			.reduce((a, b) => a + b);
 
 		const percent = 
-			await Math.round(this.state.currBitrate / this.state.medBitrate * 100); 
+			await Math.round(currBitrate / medBitrate * 100); 
+
+		var x = (rc._recvTransport) ? (await rc.getTransportStats(rc._recvTransport.id)) : null
+
+		var y = (rc._sendTransport) ? (await rc.getTransportStats(rc._sendTransport.id)) : null
+
+		if(x && y ) 
+		{
+
+			this.setState({ 
+				recv : x[0],
+				send : y[0]
+			});
+		}
 
 		this.setState({ 
-			recv : recv[0], 
-			send : send[0], 
 			probe,
-			currBitrate,
+			probeCount: (probeCount < probeLimit) ? probeCount + 1 : 1 ,
+			currBitrate : (send) ? Math.round(send.recvBitrate / 1024 / 8) : 0,
 			maxBitrate,
 			avgBitrate,
 			medBitrate,
