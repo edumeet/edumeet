@@ -60,6 +60,7 @@ const ButtonControlBar = (props) =>
 	const {
 		roomClient,
 		toolbarsVisible,
+		hiddenControls,
 		me,
 		micProducer,
 		webcamProducer,
@@ -133,7 +134,11 @@ const ButtonControlBar = (props) =>
 	return (
 		<div
 			className={
-				classnames(classes.root, toolbarsVisible ? classes.show : classes.hide)
+				classnames(
+					classes.root,
+					hiddenControls ?
+						(toolbarsVisible ? classes.show : classes.hide) :
+						classes.show)
 			}
 		>
 			<Tooltip title={micTip} placement={smallScreen ? 'top' : 'right'}>
@@ -224,6 +229,7 @@ ButtonControlBar.propTypes =
 {
 	roomClient      : PropTypes.any.isRequired,
 	toolbarsVisible : PropTypes.bool.isRequired,
+	hiddenControls  : PropTypes.bool.isRequired,
 	me              : appPropTypes.Me.isRequired,
 	micProducer     : appPropTypes.Producer,
 	webcamProducer  : appPropTypes.Producer,
@@ -235,6 +241,7 @@ ButtonControlBar.propTypes =
 const mapStateToProps = (state) =>
 	({
 		toolbarsVisible : state.room.toolbarsVisible,
+		hiddenControls  : state.settings.hiddenControls,
 		...meProducersSelector(state),
 		me              : state.me
 	});
@@ -248,6 +255,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.settings.hiddenControls === next.settings.hiddenControls &&
 				prev.producers === next.producers &&
 				prev.me === next.me
 			);

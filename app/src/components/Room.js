@@ -27,7 +27,7 @@ import WakeLock from 'react-wakelock-react16';
 import ExtraVideo from './Controls/ExtraVideo';
 import ButtonControlBar from './Controls/ButtonControlBar';
 
-const TIMEOUT = 5 * 1000;
+const TIMEOUT = window.config.hideTimeout || 5000;
 
 const styles = (theme) =>
 	({

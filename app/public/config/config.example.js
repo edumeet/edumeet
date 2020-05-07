@@ -57,6 +57,8 @@ var config =
 	// If true, will show media control buttons in separate
 	// control bar, not in the ME container.
 	buttonControlBar : false,
+	// Timeout for autohiding topbar and button control bar
+	hideTimeout      : 3000,
 	lastN            : 4,
 	mobileLastN      : 1,
 	// Highest number of speakers user can select
