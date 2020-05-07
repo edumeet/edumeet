@@ -60,7 +60,7 @@ class NetworkIndicator extends React.Component
 			maxBitrate  : 0,
 			avgBitrate  : 0,
 			medBitrate  : 0,
-			probeCount  : 1,
+			probeCount  : 0,
 			probeLimit  : 3
 		};
 	}
@@ -170,7 +170,7 @@ class NetworkIndicator extends React.Component
 
 		this.setState({ 
 			probe,
-			probeCount: (probeCount < probeLimit) ? probeCount + 1 : 1 ,
+			probeCount: (probeCount < probeLimit - 1) ? probeCount + 1 : 0 ,
 			currBitrate : (send) ? Math.round(send.recvBitrate / 1024 / 8) : 0,
 			maxBitrate,
 			avgBitrate,
