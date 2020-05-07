@@ -59,6 +59,9 @@
 	"room.loweredHand": null,
 	"room.extraVideo": null,
 	"room.overRoomLimit": null,
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
 
 	"me.mutedPTT": null,
 

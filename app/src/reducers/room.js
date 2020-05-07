@@ -22,6 +22,8 @@ const initialState =
 	spotlights                    : [],
 	settingsOpen                  : false,
 	extraVideoOpen                : false,
+	helpOpen                      : false,
+	aboutOpen                     : false,
 	currentSettingsTab            : 'media', // media, appearence, advanced
 	lockDialogOpen                : false,
 	joined                        : false,
@@ -130,6 +132,20 @@ const room = (state = initialState, action) =>
 			return { ...state, extraVideoOpen };
 		}
 
+		case 'SET_HELP_OPEN':
+		{
+			const { helpOpen } = action.payload;
+
+			return { ...state, helpOpen };
+		}
+
+		case 'SET_ABOUT_OPEN':
+		{
+			const { aboutOpen } = action.payload;
+
+			return { ...state, aboutOpen };
+		}
+			
 		case 'SET_SETTINGS_TAB':
 		{
 			const { tab } = action.payload;
