@@ -61,7 +61,8 @@ class NetworkIndicator extends React.Component
 			avgBitrate  : 0,
 			medBitrate  : 0,
 			probeCount  : 0,
-			probeLimit  : 3
+			probeLimit  : 3,
+			highestBitrate: 0
 		};
 	}
 
@@ -125,6 +126,8 @@ class NetworkIndicator extends React.Component
 
 		var currBitrate = this.state.currBitrate
 
+		var highestBitrate = this.state.highestBitrate
+
 		var recv = this.state.recv
 
 		var send = this.state.send
@@ -144,6 +147,8 @@ class NetworkIndicator extends React.Component
 		
 		// maximum
 		let maxBitrate = Math.max(...probe);
+
+		highestBitrate = (currBitrate > highestBitrate) ? currBitrate : highestBitrate;
 
 		maxBitrate = (currBitrate > maxBitrate) ? currBitrate : maxBitrate; 
 
@@ -175,7 +180,8 @@ class NetworkIndicator extends React.Component
 			maxBitrate,
 			avgBitrate,
 			medBitrate,
-			percent
+			percent,
+			highestBitrate
 		});
 
 		logger.warn('[currBitrate: "%s"]', currBitrate);
