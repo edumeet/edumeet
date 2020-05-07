@@ -135,6 +135,18 @@ export const setLobbyPeersPromotionInProgress = (flag) =>
 		payload : { flag }
 	});
 
+export const setMutePeerInProgress = (flag) =>
+	({
+		type    : 'MUTE_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const setStopPeerVideoInProgress = (flag) =>
+	({
+		type    : 'STOP_PEER_VIDEO_IN_PROGRESS',
+		payload : { flag }
+	});
+
 export const setMuteAllInProgress = (flag) =>
 	({
 		type    : 'MUTE_ALL_IN_PROGRESS',

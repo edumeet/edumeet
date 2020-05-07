@@ -1369,6 +1369,23 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:mute':
+			{
+				if (
+					!peer.roles.some(
+						(role) => permissionsFromRoles.MODERATE_ROOM.includes(role)
+					)
+				)
+					throw new Error('peer not authorized');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:mute', null, true);
+
+				cb();
+
+				break;
+			}
+
 			case 'moderator:muteAll':
 			{
 				if (
@@ -1380,6 +1397,23 @@ class Room extends EventEmitter
 
 				// Spread to others
 				this._notification(peer.socket, 'moderator:mute', null, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopVideo':
+			{
+				if (
+					!peer.roles.some(
+						(role) => permissionsFromRoles.MODERATE_ROOM.includes(role)
+					)
+				)
+					throw new Error('peer not authorized');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:stopVideo', null, true);
 
 				cb();
 
