@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { withRoomContext } from '../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
+import { permissions } from '../../../permissions';
+import { makePermissionSelector } from '../../Selectors';
 import Button from '@material-ui/core/Button';
 
 const styles = (theme) =>
@@ -76,16 +78,21 @@ ChatModerator.propTypes =
 	classes         : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
-	({
-		isChatModerator :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.MODERATE_CHAT.includes(role)),
-		room : state.room
-	});
+const makeMapStateToProps = () =>
+{
+	const hasPermission = makePermissionSelector(permissions.MODERATE_CHAT);
+
+	const mapStateToProps = (state) =>
+		({
+			isChatModerator : hasPermission(state),
+			room            : state.room
+		});
+
+	return mapStateToProps;
+};
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	null,
 	null,
 	{
@@ -93,7 +100,8 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room === next.room &&
-				prev.me === next.me
+				prev.me === next.me &&
+				prev.peers === next.peers
 			);
 		}
 	}

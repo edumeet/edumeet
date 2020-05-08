@@ -4,13 +4,12 @@ import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import EditableInput from '../Controls/EditableInput';
 import Logger from '../../Logger';
-import { green, yellow, orange, red } from '@material-ui/core/colors';
+import { yellow, orange, red } from '@material-ui/core/colors';
 import SignalCellularOffIcon from '@material-ui/icons/SignalCellularOff';
 import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';
 import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
-import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
 
 const logger = new Logger('VideoView');
 
@@ -162,8 +161,6 @@ class VideoView extends React.PureComponent
 			videoMultiLayer,
 			audioScore,
 			videoScore,
-			// consumerSpatialLayers,
-			// consumerTemporalLayers,
 			consumerCurrentSpatialLayer,
 			consumerCurrentTemporalLayer,
 			consumerPreferredSpatialLayer,
@@ -215,16 +212,16 @@ class VideoView extends React.PureComponent
 
 				case 7:
 				case 8:
+				case 9:
 				{
 					quality = <SignalCellular3BarIcon style={{ color: yellow[500] }}/>;
 
 					break;
 				}
 
-				case 9:
 				case 10:
 				{
-					quality = <SignalCellularAltIcon style={{ color: green[500] }}/>;
+					quality = null;
 
 					break;
 				}
@@ -261,7 +258,7 @@ class VideoView extends React.PureComponent
 								<p>{videoWidth}x{videoHeight}</p>
 							}
 						</div>
-						{ !isMe &&
+						{ !isMe && 
 							<div className={classnames(classes.box, 'right')}>
 								{ 
 									quality

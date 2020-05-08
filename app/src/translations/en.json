@@ -60,6 +60,9 @@
 	"room.loweredHand": "{displayName} put their hand down",
 	"room.extraVideo": "Extra video",
 	"room.overRoomLimit": "The room is full, retry after some time.",
+	"room.help": "Help",
+	"room.about": "About",
+	"room.shortcutKeys": "Shortcut Keys",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -80,6 +83,7 @@
 	"tooltip.muteParticipant": "Mute participant",
 	"tooltip.muteParticipantVideo": "Mute participant video",
 	"tooltip.raisedHand": "Raise hand",
+	"tooltip.muteScreenSharing": "Mute participant share",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -109,6 +113,7 @@
 	"label.advanced": "Advanced",
 	"label.addVideo": "Add video",
 	"label.promoteAllPeers": "Promote all",
+	"label.moreActions": "More actions",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
@@ -128,6 +133,11 @@
 	"settings.lastn": "Number of visible videos",
 	"settings.hiddenControls": "Hidden media controls",
 	"settings.notificationSounds": "Notification sounds",
+	"settings.showNotifications": "Show notifications",
+	"settings.buttonControlBar": "Separate media controls",
+	"settings.echoCancellation": "Echo cancellation",
+	"settings.autoGainControl": "Auto gain control",
+	"settings.noiseSuppression": "Noise suppression",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

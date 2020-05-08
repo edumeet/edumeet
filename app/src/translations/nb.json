@@ -60,6 +60,9 @@
 	"room.loweredHand": "{displayName} tok ned hånden",
 	"room.extraVideo": "Ekstra video",
 	"room.overRoomLimit": "Rommet er fullt, prøv igjen om litt.",
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -80,6 +83,7 @@
 	"tooltip.muteParticipant": "Demp deltaker",
 	"tooltip.muteParticipantVideo": "Demp deltakervideo",
 	"tooltip.raisedHand": "Rekk opp hånden",
+	"tooltip.muteScreenSharing": "Demp deltaker skjermdeling",
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",
@@ -109,6 +113,7 @@
 	"label.advanced": "Avansert",
 	"label.addVideo": "Legg til video",
 	"label.promoteAllPeers": "Slipp inn alle",
+	"label.moreActions": "Flere handlinger",
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
@@ -128,6 +133,11 @@
 	"settings.lastn": "Antall videoer synlig",
 	"settings.hiddenControls": "Skjul media knapper",
 	"settings.notificationSounds": "Varslingslyder",
+	"settings.showNotifications": "Vis varslinger",
+	"settings.buttonControlBar": "Separate media knapper",
+	"settings.echoCancellation": "Echokansellering",
+	"settings.autoGainControl": "Auto gain kontroll",
+	"settings.noiseSuppression": "Støy reduksjon",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

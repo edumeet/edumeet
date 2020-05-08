@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-	lobbyPeersKeySelector
+	lobbyPeersKeySelector,
+	makePermissionSelector
 } from '../../Selectors';
+import { permissions } from '../../../permissions';
 import * as appPropTypes from '../../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
@@ -140,15 +142,20 @@ LockDialog.propTypes =
 	classes               : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
+const makeMapStateToProps = () =>
 {
-	return {
-		room       : state.room,
-		lobbyPeers : lobbyPeersKeySelector(state),
-		canPromote :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.PROMOTE_PEER.includes(role))
+	const hasPermission = makePermissionSelector(permissions.PROMOTE_PEER);
+
+	const mapStateToProps = (state) =>
+	{
+		return {
+			room       : state.room,
+			lobbyPeers : lobbyPeersKeySelector(state),
+			canPromote : hasPermission(state)
+		};
 	};
+
+	return mapStateToProps;
 };
 
 const mapDispatchToProps = {
@@ -157,7 +164,7 @@ const mapDispatchToProps = {
 };
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	mapDispatchToProps,
 	null,
 	{
@@ -166,6 +173,7 @@ export default withRoomContext(connect(
 			return (
 				prev.room === next.room &&
 				prev.me.roles === next.me.roles &&
+				prev.peers === next.peers &&
 				prev.lobbyPeers === next.lobbyPeers
 			);
 		}

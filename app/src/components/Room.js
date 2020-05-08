@@ -25,8 +25,11 @@ import Settings from './Settings/Settings';
 import TopBar from './Controls/TopBar';
 import WakeLock from 'react-wakelock-react16';
 import ExtraVideo from './Controls/ExtraVideo';
+import ButtonControlBar from './Controls/ButtonControlBar';
+import Help from './Controls/Help';
+import About from './Controls/About';
 
-const TIMEOUT = 5 * 1000;
+const TIMEOUT = window.config.hideTimeout || 5000;
 
 const styles = (theme) =>
 	({
@@ -142,6 +145,8 @@ class Room extends React.PureComponent
 			room,
 			browser,
 			advancedMode,
+			showNotifications,
+			buttonControlBar,
 			toolAreaOpen,
 			toggleToolArea,
 			classes,
@@ -178,7 +183,9 @@ class Room extends React.PureComponent
 
 				<AudioPeers />
 
-				<Notifications />
+				{ showNotifications &&
+					<Notifications />
+				}
 
 				<CssBaseline />
 
@@ -211,6 +218,10 @@ class Room extends React.PureComponent
 
 				<View advancedMode={advancedMode} />
 
+				{ buttonControlBar &&
+					<ButtonControlBar />
+				}
+
 				{ room.lockDialogOpen &&
 					<LockDialog />
 				}
@@ -222,6 +233,13 @@ class Room extends React.PureComponent
 				{ room.extraVideoOpen &&
 					<ExtraVideo />
 				}
+				{ room.helpOpen &&
+					<Help />
+				}
+				{ room.aboutOpen &&
+					<About />
+				}
+
 			</div>
 		);
 	}
@@ -232,6 +250,8 @@ Room.propTypes =
 	room               : appPropTypes.Room.isRequired,
 	browser            : PropTypes.object.isRequired,
 	advancedMode       : PropTypes.bool.isRequired,
+	showNotifications  : PropTypes.bool.isRequired,
+	buttonControlBar   : PropTypes.bool.isRequired,
 	toolAreaOpen       : PropTypes.bool.isRequired,
 	setToolbarsVisible : PropTypes.func.isRequired,
 	toggleToolArea     : PropTypes.func.isRequired,
@@ -241,10 +261,12 @@ Room.propTypes =
 
 const mapStateToProps = (state) =>
 	({
-		room         : state.room,
-		browser      : state.me.browser,
-		advancedMode : state.settings.advancedMode,
-		toolAreaOpen : state.toolarea.toolAreaOpen
+		room              : state.room,
+		browser           : state.me.browser,
+		advancedMode      : state.settings.advancedMode,
+		showNotifications : state.settings.showNotifications,
+		buttonControlBar  : state.settings.buttonControlBar,
+		toolAreaOpen      : state.toolarea.toolAreaOpen
 	});
 
 const mapDispatchToProps = (dispatch) =>
@@ -270,6 +292,8 @@ export default connect(
 				prev.room === next.room &&
 				prev.me.browser === next.me.browser &&
 				prev.settings.advancedMode === next.settings.advancedMode &&
+				prev.settings.showNotifications === next.settings.showNotifications &&
+				prev.settings.buttonControlBar === next.settings.buttonControlBar &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}

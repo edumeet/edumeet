@@ -30,6 +30,8 @@ const AppearenceSettings = ({
 	settings,
 	onTogglePermanentTopBar,
 	onToggleHiddenControls,
+	onToggleButtonControlBar,
+	onToggleShowNotifications,
 	handleChangeMode,
 	classes
 }) =>
@@ -101,18 +103,36 @@ const AppearenceSettings = ({
 					defaultMessage : 'Hidden media controls'
 				})}
 			/>
+			<FormControlLabel
+				className={classes.setting}
+				control={<Checkbox checked={settings.buttonControlBar} onChange={onToggleButtonControlBar} value='buttonControlBar' />}
+				label={intl.formatMessage({
+					id             : 'settings.buttonControlBar',
+					defaultMessage : 'Separate media controls'
+				})}
+			/>
+			<FormControlLabel
+				className={classes.setting}
+				control={<Checkbox checked={settings.showNotifications} onChange={onToggleShowNotifications} value='showNotifications' />}
+				label={intl.formatMessage({
+					id             : 'settings.showNotifications',
+					defaultMessage : 'Show notifications'
+				})}
+			/>
 		</React.Fragment>
 	);
 };
 
 AppearenceSettings.propTypes =
 {
-	room                    : appPropTypes.Room.isRequired,
-	settings                : PropTypes.object.isRequired,
-	onTogglePermanentTopBar : PropTypes.func.isRequired,
-	onToggleHiddenControls  : PropTypes.func.isRequired,
-	handleChangeMode        : PropTypes.func.isRequired,
-	classes                 : PropTypes.object.isRequired
+	room                      : appPropTypes.Room.isRequired,
+	settings                  : PropTypes.object.isRequired,
+	onTogglePermanentTopBar   : PropTypes.func.isRequired,
+	onToggleHiddenControls    : PropTypes.func.isRequired,
+	onToggleButtonControlBar  : PropTypes.func.isRequired,
+	onToggleShowNotifications : PropTypes.func.isRequired,
+	handleChangeMode          : PropTypes.func.isRequired,
+	classes                   : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -122,9 +142,11 @@ const mapStateToProps = (state) =>
 	});
 
 const mapDispatchToProps = {
-	onTogglePermanentTopBar : settingsActions.togglePermanentTopBar,
-	onToggleHiddenControls  : settingsActions.toggleHiddenControls,
-	handleChangeMode        : roomActions.setDisplayMode
+	onTogglePermanentTopBar   : settingsActions.togglePermanentTopBar,
+	onToggleHiddenControls    : settingsActions.toggleHiddenControls,
+	onToggleShowNotifications : settingsActions.toggleShowNotifications,
+	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
+	handleChangeMode          : roomActions.setDisplayMode
 };
 
 export default connect(

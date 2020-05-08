@@ -1,5 +1,8 @@
 import { createSelector } from 'reselect';
 
+const meRolesSelect = (state) => state.me.roles;
+const roomPermissionsSelect = (state) => state.room.roomPermissions;
+const roomAllowWhenRoleMissing = (state) => state.room.allowWhenRoleMissing;
 const producersSelect = (state) => state.producers;
 const consumersSelect = (state) => state.consumers;
 const spotlightsSelector = (state) => state.room.spotlights;
@@ -12,7 +15,8 @@ const peersKeySelector = createSelector(
 	peersSelector,
 	(peers) => Object.keys(peers)
 );
-const peersValueSelector = createSelector(
+
+export const peersValueSelector = createSelector(
 	peersSelector,
 	(peers) => Object.values(peers)
 );
@@ -113,8 +117,31 @@ export const spotlightPeersSelector = createSelector(
 export const spotlightSortedPeersSelector = createSelector(
 	spotlightsSelector,
 	peersValueSelector,
-	(spotlights, peers) => peers.filter((peer) => spotlights.includes(peer.id))
-		.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
+	(spotlights, peers) =>
+		peers.filter((peer) => spotlights.includes(peer.id) && !peer.raisedHand)
+			.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
+);
+
+const raisedHandSortedPeers = createSelector(
+	peersValueSelector,
+	(peers) => peers.filter((peer) => peer.raisedHand)
+		.sort((a, b) => a.raisedHandTimestamp - b.raisedHandTimestamp)
+);
+
+const peersSortedSelector = createSelector(
+	spotlightsSelector,
+	peersValueSelector,
+	(spotlights, peers) =>
+		peers.filter((peer) => !spotlights.includes(peer.id) && !peer.raisedHand)
+			.sort((a, b) => String(a.displayName || '').localeCompare(String(b.displayName || '')))
+);
+
+export const participantListSelector = createSelector(
+	raisedHandSortedPeers,
+	spotlightSortedPeersSelector,
+	peersSortedSelector,
+	(raisedHands, spotlights, peers) =>
+		[ ...raisedHands, ...spotlights, ...peers ]
 );
 
 export const peersLengthSelector = createSelector(
@@ -190,6 +217,56 @@ export const makePeerConsumerSelector = () =>
 				consumersArray.filter((consumer) => consumer.source === 'extravideo');
 
 			return { micConsumer, webcamConsumer, screenConsumer, extraVideoConsumers };
+		}
+	);
+};
+
+// Very important that the Components that use this
+// selector need to check at least these state changes:
+//
+// areStatesEqual : (next, prev) =>
+// {
+// 		return (
+// 			prev.room.roomPermissions === next.room.roomPermissions &&
+// 			prev.room.allowWhenRoleMissing === next.room.allowWhenRoleMissing &&
+// 			prev.peers === next.peers &&
+// 			prev.me.roles === next.me.roles
+// 		);
+// }
+export const makePermissionSelector = (permission) =>
+{
+	return createSelector(
+		meRolesSelect,
+		roomPermissionsSelect,
+		roomAllowWhenRoleMissing,
+		peersValueSelector,
+		(roles, roomPermissions, allowWhenRoleMissing, peers) =>
+		{
+			if (!roomPermissions)
+				return false;
+
+			const permitted = roles.some((role) =>
+				roomPermissions[permission].includes(role)
+			);
+		
+			if (permitted)
+				return true;
+
+			if (!allowWhenRoleMissing)
+				return false;
+
+			// Allow if config is set, and no one is present
+			if (allowWhenRoleMissing.includes(permission) &&
+				peers.filter(
+					(peer) =>
+						peer.roles.some(
+							(role) => roomPermissions[permission].includes(role)
+						)
+				).length === 0
+			)
+				return true;
+		
+			return false;
 		}
 	);
 };

@@ -26,6 +26,12 @@ const peer = (state = {}, action) =>
 				raisedHand          : action.payload.raisedHand,
 				raisedHandTimestamp : action.payload.raisedHandTimestamp
 			};
+
+		case 'SET_PEER_RAISED_HAND_IN_PROGRESS':
+			return {
+				...state,
+				raisedHandInProgress : action.payload.flag
+			};
 		
 		case 'ADD_CONSUMER':
 		{
@@ -62,6 +68,18 @@ const peer = (state = {}, action) =>
 			return { ...state, roles };
 		}
 
+		case 'STOP_PEER_AUDIO_IN_PROGRESS':
+			return {
+				...state,
+				stopPeerAudioInProgress : action.payload.flag
+			};
+
+		case 'STOP_PEER_VIDEO_IN_PROGRESS':
+			return {
+				...state,
+				stopPeerVideoInProgress : action.payload.flag
+			};
+
 		default:
 			return state;
 	}
@@ -91,10 +109,13 @@ const peers = (state = {}, action) =>
 		case 'SET_PEER_AUDIO_IN_PROGRESS':
 		case 'SET_PEER_SCREEN_IN_PROGRESS':
 		case 'SET_PEER_RAISED_HAND':
+		case 'SET_PEER_RAISED_HAND_IN_PROGRESS':
 		case 'SET_PEER_PICTURE':
 		case 'ADD_CONSUMER':
 		case 'ADD_PEER_ROLE':
 		case 'REMOVE_PEER_ROLE':
+		case 'STOP_PEER_AUDIO_IN_PROGRESS':
+		case 'STOP_PEER_VIDEO_IN_PROGRESS':
 		{
 			const oldPeer = state[action.payload.peerId];
 
