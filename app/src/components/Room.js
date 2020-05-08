@@ -249,7 +249,6 @@ class Room extends React.PureComponent
 								anchor={theme.direction === 'rtl' ? 'right' : 'left'}
 								open={toolAreaOpen}
 								onClose={() => toggleToolArea()}
-								onOpen={() => toggleToolArea()}
 								classes={{
 									paper : classes.drawerPaper
 								}}
