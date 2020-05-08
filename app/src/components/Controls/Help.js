@@ -17,6 +17,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
 const shortcuts=[
+	{ key: 'h', label: 'room.help', defaultMessage: 'Help' },
 	{ key: 'm', label: 'device.muteAudio', defaultMessage: 'Mute Audio' },
 	{ key: 'v', label: 'device.stopVideo', defaultMessage: 'Mute Video' },
 	{ key: '1', label: 'label.democratic', defaultMessage: 'Democratic View' },

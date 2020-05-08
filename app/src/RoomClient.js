@@ -408,6 +408,13 @@ export default class RoomClient
 						break;
 					}
 
+					case 'H': // Open help dialog
+					{
+						store.dispatch(roomActions.setHelpOpen(true));
+
+						break;
+					}
+
 					default:
 					{
 						break;
