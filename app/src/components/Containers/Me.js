@@ -132,7 +132,7 @@ const styles = (theme) =>
 		{
 			position        : 'absolute',
 			float           : 'left',
-			top             : '50%',
+			top             : '25%',
 			left            : '50%',
 			transform       : 'translate(-50%, 0%)',
 			color           : 'rgba(255, 255, 255, 0.7)',
