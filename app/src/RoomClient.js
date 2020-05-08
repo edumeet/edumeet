@@ -2124,15 +2124,21 @@ export default class RoomClient
 							lobbyPeers.forEach((peer) =>
 							{
 								store.dispatch(
-									lobbyPeerActions.addLobbyPeer(peer.peerId));
+									lobbyPeerActions.addLobbyPeer(peer.id));
+
 								store.dispatch(
 									lobbyPeerActions.setLobbyPeerDisplayName(
 										peer.displayName,
-										peer.peerId
+										peer.id
 									)
 								);
+
 								store.dispatch(
-									lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+									lobbyPeerActions.setLobbyPeerPicture(
+										peer.picture,
+										peer.id
+									)
+								);
 							});
 	
 							store.dispatch(
@@ -2930,11 +2936,11 @@ export default class RoomClient
 			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
 			{
 				store.dispatch(
-					lobbyPeerActions.addLobbyPeer(peer.peerId));
+					lobbyPeerActions.addLobbyPeer(peer.id));
 				store.dispatch(
-					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
+					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.id));
 				store.dispatch(
-					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+					lobbyPeerActions.setLobbyPeerPicture(peer.picture, peer.id));
 			});
 
 			(accessCode != null) && store.dispatch(

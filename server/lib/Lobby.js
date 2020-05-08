@@ -46,7 +46,7 @@ class Lobby extends EventEmitter
 
 		return Object.values(this._peers).map((peer) =>
 			({
-				peerId      : peer.id,
+				id          : peer.id,
 				displayName : peer.displayName,
 				picture     : peer.picture
 			}));
