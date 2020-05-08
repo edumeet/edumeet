@@ -132,12 +132,12 @@ const styles = (theme) =>
 		{
 			position        : 'absolute',
 			float           : 'left',
-			top             : '10%',
+			top             : '25%',
 			left            : '50%',
 			transform       : 'translate(-50%, 0%)',
 			color           : 'rgba(255, 255, 255, 0.7)',
-			fontSize        : '2vs',
-			backgroundColor : 'rgba(255, 0, 0, 0.5)',
+			fontSize        : '1.3em',
+			backgroundColor : 'rgba(255, 0, 0, 0.9)',
 			margin          : '4px',
 			padding         : theme.spacing(2),
 			zIndex          : 31,
@@ -322,19 +322,20 @@ const Me = (props) =>
 				}}
 				style={spacingStyle}
 			>
+				
+				{ me.browser.platform !== 'mobile' &&
+				<div className={classnames(
+					classes.ptt,
+					(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
+				)}
+				>
+					<FormattedMessage
+						id='me.mutedPTT'
+						defaultMessage='You are muted, hold down SPACE-BAR to talk'
+					/>	
+				</div>
+				}
 				<div className={classes.viewContainer} style={style}>
-					{ !smallContainer &&
-						<div className={classnames(
-							classes.ptt,
-							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
-						)}
-						>
-							<FormattedMessage
-								id='me.mutedPTT'
-								defaultMessage='You are muted, hold down SPACE-BAR to talk'
-							/>	
-						</div>
-					}
 					<p className={
 						classnames(
 							classes.meTag,
