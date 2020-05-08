@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { meProducersSelector } from '../Selectors';
+import {
+	meProducersSelector,
+	makePermissionSelector
+} from '../Selectors';
+import { permissions } from '../../permissions';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -807,32 +811,37 @@ Me.propTypes =
 	theme               : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
+const makeMapStateToProps = () =>
 {
-	return {
-		me             : state.me,
-		...meProducersSelector(state),
-		settings       : state.settings,
-		activeSpeaker  : state.me.id === state.room.activeSpeakerId,
-		canShareScreen :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.SHARE_SCREEN.includes(role))
+	const hasPermission = makePermissionSelector(permissions.SHARE_SCREEN);
+
+	const mapStateToProps = (state) =>
+	{
+		return {
+			me             : state.me,
+			...meProducersSelector(state),
+			settings       : state.settings,
+			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
+			canShareScreen : hasPermission(state)
+		};
 	};
+
+	return mapStateToProps;
 };
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	null,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+				prev.room === next.room &&
 				prev.me === next.me &&
+				prev.peers === next.peers &&
 				prev.producers === next.producers &&
-				prev.settings === next.settings &&
-				prev.room.activeSpeakerId === next.room.activeSpeakerId
+				prev.settings === next.settings
 			);
 		}
 	}

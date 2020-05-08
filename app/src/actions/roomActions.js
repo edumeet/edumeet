@@ -177,14 +177,14 @@ export const setClearFileSharingInProgress = (flag) =>
 		payload : { flag }
 	});
 
-export const setUserRoles = (userRoles) =>
+export const setRoomPermissions = (roomPermissions) =>
 	({
-		type    : 'SET_USER_ROLES',
-		payload : { userRoles }
+		type    : 'SET_ROOM_PERMISSIONS',
+		payload : { roomPermissions }
 	});
 
-export const setPermissionsFromRoles = (permissionsFromRoles) =>
+export const setAllowWhenRoleMissing = (allowWhenRoleMissing) =>
 	({
-		type    : 'SET_PERMISSIONS_FROM_ROLES',
-		payload : { permissionsFromRoles }
+		type    : 'SET_ALLOW_WHEN_ROLE_MISSING',
+		payload : { allowWhenRoleMissing }
 	});

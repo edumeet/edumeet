@@ -4,8 +4,10 @@ import PropTypes from 'prop-types';
 import {
 	lobbyPeersKeySelector,
 	peersLengthSelector,
-	raisedHandsSelector
+	raisedHandsSelector,
+	makePermissionSelector
 } from '../Selectors';
+import { permissions } from '../../permissions';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
@@ -751,27 +753,35 @@ TopBar.propTypes =
 	theme                : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
-	({
-		room            : state.room,
-		peersLength     : peersLengthSelector(state),
-		lobbyPeers      : lobbyPeersKeySelector(state),
-		permanentTopBar : state.settings.permanentTopBar,
-		loggedIn        : state.me.loggedIn,
-		loginEnabled    : state.me.loginEnabled,
-		myPicture       : state.me.picture,
-		unread          : state.toolarea.unreadMessages +
-			state.toolarea.unreadFiles + raisedHandsSelector(state),
-		canProduceExtraVideo :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.EXTRA_VIDEO.includes(role)),
-		canLock :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role)),
-		canPromote :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.PROMOTE_PEER.includes(role))
-	});
+const makeMapStateToProps = () =>
+{
+	const hasExtraVideoPermission =
+		makePermissionSelector(permissions.EXTRA_VIDEO);
+
+	const hasLockPermission =
+		makePermissionSelector(permissions.CHANGE_ROOM_LOCK);
+
+	const hasPromotionPermission =
+		makePermissionSelector(permissions.PROMOTE_PEER);
+
+	const mapStateToProps = (state) =>
+		({
+			room            : state.room,
+			peersLength     : peersLengthSelector(state),
+			lobbyPeers      : lobbyPeersKeySelector(state),
+			permanentTopBar : state.settings.permanentTopBar,
+			loggedIn        : state.me.loggedIn,
+			loginEnabled    : state.me.loginEnabled,
+			myPicture       : state.me.picture,
+			unread          : state.toolarea.unreadMessages +
+				state.toolarea.unreadFiles + raisedHandsSelector(state),
+			canProduceExtraVideo : hasExtraVideoPermission(state),
+			canLock              : hasLockPermission(state),
+			canPromote           : hasPromotionPermission(state)
+		});
+
+	return mapStateToProps;
+};
 
 const mapDispatchToProps = (dispatch) =>
 	({
@@ -811,7 +821,7 @@ const mapDispatchToProps = (dispatch) =>
 	});
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	mapDispatchToProps,
 	null,
 	{

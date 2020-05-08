@@ -2847,8 +2847,8 @@ export default class RoomClient
 				roles,
 				peers,
 				tracker,
-				permissionsFromRoles,
-				userRoles,
+				roomPermissions,
+				allowWhenRoleMissing,
 				chatHistory,
 				fileHistory,
 				lastNHistory,
@@ -2874,8 +2874,10 @@ export default class RoomClient
 
 			store.dispatch(meActions.loggedIn(authenticated));
 
-			store.dispatch(roomActions.setUserRoles(userRoles));
-			store.dispatch(roomActions.setPermissionsFromRoles(permissionsFromRoles));
+			store.dispatch(roomActions.setRoomPermissions(roomPermissions));
+
+			if (allowWhenRoleMissing)
+				store.dispatch(roomActions.setAllowWhenRoleMissing(allowWhenRoleMissing));
 
 			const myRoles = store.getState().me.roles;
 
