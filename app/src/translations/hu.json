@@ -136,7 +136,7 @@
 	"settings.showNotifications": "Értesítések megjelenítése",
 	"settings.buttonControlBar": "Médiavezérlő gombok leválasztása",
 	"settings.echoCancellation": "Visszhangelnyomás",
-	"settings.autoGainControl": "Automatikus hangerősítés",
+	"settings.autoGainControl": "Automatikus hangerő",
 	"settings.noiseSuppression": "Zajelnyomás",
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
