@@ -368,38 +368,45 @@ async function setupAuth()
 	app.get(
 		'/auth/callback',
 		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
-		async (req, res) =>
+		async (req, res, next) =>
 		{
-			const state = JSON.parse(base64.decode(req.query.state));
-
-			const { peerId, roomId } = state;
-
-			req.session.peerId = peerId;
-			req.session.roomId = roomId;
-
-			let peer = peers.get(peerId);
-
-			if (!peer) // User has no socket session yet, make temporary
-				peer = new Peer({ id: peerId, roomId });
-
-			if (peer.roomId !== roomId) // The peer is mischievous
-				throw new Error('peer authenticated with wrong room');
-
-			if (typeof config.userMapping === 'function')
+			try
 			{
-				await config.userMapping({
-					peer,
-					roomId,
-					userinfo : req.user._userinfo
-				});
+				const state = JSON.parse(base64.decode(req.query.state));
+
+				const { peerId, roomId } = state;
+	
+				req.session.peerId = peerId;
+				req.session.roomId = roomId;
+	
+				let peer = peers.get(peerId);
+	
+				if (!peer) // User has no socket session yet, make temporary
+					peer = new Peer({ id: peerId, roomId });
+	
+				if (peer.roomId !== roomId) // The peer is mischievous
+					throw new Error('peer authenticated with wrong room');
+	
+				if (typeof config.userMapping === 'function')
+				{
+					await config.userMapping({
+						peer,
+						roomId,
+						userinfo : req.user._userinfo
+					});
+				}
+	
+				peer.authenticated = true;
+	
+				res.send(loginHelper({
+					displayName : peer.displayName,
+					picture     : peer.picture
+				}));
 			}
-
-			peer.authenticated = true;
-
-			res.send(loginHelper({
-				displayName : peer.displayName,
-				picture     : peer.picture
-			}));
+			catch (error)
+			{
+				return next(error);
+			}
 		}
 	);
 }
@@ -586,7 +593,8 @@ async function runWebSocketServer()
 			{
 				logger.error('room creation or room joining failed [error:"%o"]', error);
 
-				socket.disconnect(true);
+				if (socket)
+					socket.disconnect(true);
 
 				return;
 			});
