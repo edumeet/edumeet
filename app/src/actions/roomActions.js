@@ -130,6 +130,11 @@ export const setSpotlights = (spotlights) =>
 		payload : { spotlights }
 	});
 
+export const clearSpotlights = () =>
+	({
+		type : 'CLEAR_SPOTLIGHTS'
+	});
+
 export const toggleJoined = () =>
 	({
 		type : 'TOGGLE_JOINED'

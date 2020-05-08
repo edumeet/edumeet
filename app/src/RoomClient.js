@@ -940,14 +940,10 @@ export default class RoomClient
 			{
 				if (consumer.kind === 'video')
 				{
-					if (spotlights.indexOf(consumer.appData.peerId) > -1)
-					{
+					if (spotlights.includes(consumer.appData.peerId))
 						await this._resumeConsumer(consumer);
-					}
 					else
-					{
 						await this._pauseConsumer(consumer);
-					}
 				}
 			}
 		}
@@ -1516,9 +1512,7 @@ export default class RoomClient
 				if (consumer.appData.peerId === peerId && consumer.appData.source === type)
 				{
 					if (mute)
-					{
 						await this._pauseConsumer(consumer);
-					}
 					else
 						await this._resumeConsumer(consumer);
 				}
@@ -1846,6 +1840,11 @@ export default class RoomClient
 				this._recvTransport = null;
 			}
 
+			this._spotlights.clearSpotlights();
+
+			store.dispatch(peerActions.clearPeers());
+			store.dispatch(consumerActions.clearConsumers());
+			store.dispatch(roomActions.clearSpotlights());
 			store.dispatch(roomActions.setRoomState('connecting'));
 		});
 
@@ -2561,8 +2560,6 @@ export default class RoomClient
 
 					case 'moderator:mute':
 					{
-						// const { peerId } = notification.data;
-
 						if (this._micProducer && !this._micProducer.paused)
 						{
 							this.muteMic();
@@ -2581,8 +2578,6 @@ export default class RoomClient
 
 					case 'moderator:stopVideo':
 					{
-						// const { peerId } = notification.data;
-
 						this.disableWebcam();
 						this.disableScreenSharing();
 

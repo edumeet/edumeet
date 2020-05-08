@@ -10,6 +10,11 @@ export const removePeer = (peerId) =>
 		payload : { peerId }
 	});
 
+export const clearPeers = () =>
+	({
+		type : 'CLEAR_PEERS'
+	});
+
 export const setPeerDisplayName = (displayName, peerId) =>
 	({
 		type    : 'SET_PEER_DISPLAY_NAME',

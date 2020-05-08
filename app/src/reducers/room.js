@@ -212,6 +212,11 @@ const room = (state = initialState, action) =>
 			return { ...state, spotlights };
 		}
 
+		case 'CLEAR_SPOTLIGHTS':
+		{
+			return { ...state, spotlights: [] };
+		}
+
 		case 'SET_LOBBY_PEERS_PROMOTION_IN_PROGRESS':
 			return { ...state, lobbyPeersPromotionInProgress: action.payload.flag };
 
