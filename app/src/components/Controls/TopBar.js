@@ -312,18 +312,25 @@ const TopBar = (props) =>
 					</Typography>
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						<IconButton
-							aria-owns={
-								isMenuOpen &&
-								currentMenu === 'moreActions' ?
-									'material-appbar' : undefined
-							}
-							aria-haspopup='true'
-							onClick={(event) => handleMenuOpen(event, 'moreActions')}
-							color='inherit'
+						<Tooltip 
+							title={intl.formatMessage({
+								id             : 'label.moreActions',
+								defaultMessage : 'More actions'
+							})}
 						>
-							<ExtensionIcon />
-						</IconButton>
+							<IconButton
+								aria-owns={
+									isMenuOpen &&
+									currentMenu === 'moreActions' ?
+										'material-appbar' : undefined
+								}
+								aria-haspopup='true'
+								onClick={(event) => handleMenuOpen(event, 'moreActions')}
+								color='inherit'
+							>
+								<ExtensionIcon />
+							</IconButton>
+						</Tooltip>
 						{ fullscreenEnabled &&
 							<Tooltip title={fullscreenTooltip}>
 								<IconButton
