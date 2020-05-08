@@ -138,6 +138,7 @@
 	"settings.echoCancellation": "Echo cancellation",
 	"settings.autoGainControl": "Auto gain control",
 	"settings.noiseSuppression": "Noise suppression",
+	"settings.drawerOverlayed": "Side drawer over content",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

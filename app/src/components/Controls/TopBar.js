@@ -14,6 +14,7 @@ import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../actions/roomActions';
 import * as toolareaActions from '../../actions/toolareaActions';
 import { useIntl, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -43,6 +44,31 @@ import InfoIcon from '@material-ui/icons/Info';
 
 const styles = (theme) =>
 	({
+		persistentDrawerOpen :
+		{
+			width                          : 'calc(100% - 30vw)',
+			marginLeft                     : '30vw',
+			[theme.breakpoints.down('lg')] :
+			{
+				width      : 'calc(100% - 40vw)',
+				marginLeft : '40vw'
+			},
+			[theme.breakpoints.down('md')] :
+			{
+				width      : 'calc(100% - 50vw)',
+				marginLeft : '50vw'
+			},
+			[theme.breakpoints.down('sm')] :
+			{
+				width      : 'calc(100% - 70vw)',
+				marginLeft : '70vw'
+			},
+			[theme.breakpoints.down('xs')] :
+			{
+				width      : 'calc(100% - 90vw)',
+				marginLeft : '90vw'
+			}
+		},
 		menuButton :
 		{
 			margin  : 0,
@@ -188,6 +214,9 @@ const TopBar = (props) =>
 		peersLength,
 		lobbyPeers,
 		permanentTopBar,
+		drawerOverlayed,
+		toolAreaOpen,
+		isMobile,
 		myPicture,
 		loggedIn,
 		loginEnabled,
@@ -248,7 +277,12 @@ const TopBar = (props) =>
 		<React.Fragment>
 			<AppBar
 				position='fixed'
-				className={room.toolbarsVisible || permanentTopBar ? classes.show : classes.hide}
+				className={classnames(
+					room.toolbarsVisible || permanentTopBar ?
+						classes.show : classes.hide,
+					!(isMobile || drawerOverlayed) && toolAreaOpen ?
+						classes.persistentDrawerOpen : null
+				)}
 			>
 				<Toolbar>
 					<PulsingBadge
@@ -728,9 +762,12 @@ TopBar.propTypes =
 {
 	roomClient           : PropTypes.object.isRequired,
 	room                 : appPropTypes.Room.isRequired,
+	isMobile             : PropTypes.bool.isRequired,
 	peersLength          : PropTypes.number,
 	lobbyPeers           : PropTypes.array,
-	permanentTopBar      : PropTypes.bool,
+	permanentTopBar      : PropTypes.bool.isRequired,
+	drawerOverlayed      : PropTypes.bool.isRequired,
+	toolAreaOpen         : PropTypes.bool.isRequired,
 	myPicture            : PropTypes.string,
 	loggedIn             : PropTypes.bool.isRequired,
 	loginEnabled         : PropTypes.bool.isRequired,
@@ -767,9 +804,12 @@ const makeMapStateToProps = () =>
 	const mapStateToProps = (state) =>
 		({
 			room            : state.room,
+			isMobile        : state.me.browser.platform === 'mobile',
 			peersLength     : peersLengthSelector(state),
 			lobbyPeers      : lobbyPeersKeySelector(state),
 			permanentTopBar : state.settings.permanentTopBar,
+			drawerOverlayed : state.settings.drawerOverlayed,
+			toolAreaOpen    : state.toolarea.toolAreaOpen,
 			loggedIn        : state.me.loggedIn,
 			loginEnabled    : state.me.loginEnabled,
 			myPicture       : state.me.picture,
@@ -832,12 +872,15 @@ export default withRoomContext(connect(
 				prev.peers === next.peers &&
 				prev.lobbyPeers === next.lobbyPeers &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
+				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
 				prev.me.loggedIn === next.me.loggedIn &&
+				prev.me.browser === next.me.browser &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&
 				prev.me.roles === next.me.roles &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
-				prev.toolarea.unreadFiles === next.toolarea.unreadFiles
+				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}
 	}

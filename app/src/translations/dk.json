@@ -138,6 +138,7 @@
 	"settings.echoCancellation": null,
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Kan ikke gemme fil",
 	"filesharing.startingFileShare": "Forsøger at dele filen",

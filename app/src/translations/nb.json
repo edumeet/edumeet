@@ -138,6 +138,7 @@
 	"settings.echoCancellation": "Echokansellering",
 	"settings.autoGainControl": "Auto gain kontroll",
 	"settings.noiseSuppression": "Støy reduksjon",
+	"settings.drawerOverlayed": "Sidemeny over innhold",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

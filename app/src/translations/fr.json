@@ -138,6 +138,7 @@
 	"settings.echoCancellation": null,
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",

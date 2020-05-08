@@ -135,6 +135,7 @@
 	"settings.echoCancellation": null,
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",

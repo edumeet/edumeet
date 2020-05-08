@@ -138,6 +138,7 @@
 	"settings.echoCancellation": null,
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",

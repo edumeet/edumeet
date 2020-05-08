@@ -22,6 +22,7 @@ const styles = (theme) =>
 			display        : 'flex',
 			flexDirection  : 'row',
 			flexWrap       : 'wrap',
+			overflow       : 'hidden',
 			justifyContent : 'center',
 			alignItems     : 'center',
 			alignContent   : 'center'
@@ -189,6 +190,7 @@ Democratic.propTypes =
 	toolbarsVisible  : PropTypes.bool.isRequired,
 	permanentTopBar  : PropTypes.bool.isRequired,
 	buttonControlBar : PropTypes.bool.isRequired,
+	toolAreaOpen     : PropTypes.bool.isRequired,
 	classes          : PropTypes.object.isRequired
 };
 
@@ -199,7 +201,8 @@ const mapStateToProps = (state) =>
 		spotlightsPeers  : spotlightPeersSelector(state),
 		toolbarsVisible  : state.room.toolbarsVisible,
 		permanentTopBar  : state.settings.permanentTopBar,
-		buttonControlBar : state.settings.buttonControlBar
+		buttonControlBar : state.settings.buttonControlBar,
+		toolAreaOpen     : state.toolarea.toolAreaOpen
 	};
 };
 
@@ -217,7 +220,8 @@ export default connect(
 				prev.room.spotlights === next.room.spotlights &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
-				prev.settings.buttonControlBar === next.settings.buttonControlBar
+				prev.settings.buttonControlBar === next.settings.buttonControlBar &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}
 	}

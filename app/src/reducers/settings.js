@@ -19,6 +19,7 @@ const initialState =
 	showNotifications   : true,
 	notificationSounds  : true,
 	buttonControlBar    : window.config.buttonControlBar || false,
+	drawerOverlayed     : window.config.drawerOverlayed || true,
 	...window.config.defaultAudio
 };
 
@@ -151,6 +152,13 @@ const settings = (state = initialState, action) =>
 			const buttonControlBar = !state.buttonControlBar;
 
 			return { ...state, buttonControlBar };
+		}
+
+		case 'TOGGLE_DRAWER_OVERLAYED':
+		{
+			const drawerOverlayed = !state.drawerOverlayed;
+
+			return { ...state, drawerOverlayed };
 		}
 
 		case 'TOGGLE_HIDDEN_CONTROLS':

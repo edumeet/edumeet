@@ -43,6 +43,11 @@ export const toggleButtonControlBar = () =>
 		type : 'TOGGLE_BUTTON_CONTROL_BAR'
 	});
 
+export const toggleDrawerOverlayed = () =>
+	({
+		type : 'TOGGLE_DRAWER_OVERLAYED'
+	});
+
 export const toggleShowNotifications = () =>
 	({
 		type : 'TOGGLE_SHOW_NOTIFICATIONS'

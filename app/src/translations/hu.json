@@ -138,6 +138,7 @@
 	"settings.echoCancellation": "Visszhangelnyomás",
 	"settings.autoGainControl": "Automatikus hangerő",
 	"settings.noiseSuppression": "Zajelnyomás",
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

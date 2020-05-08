@@ -137,6 +137,7 @@
 	"settings.echoCancellation": null,
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",

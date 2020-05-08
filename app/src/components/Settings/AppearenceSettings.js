@@ -26,12 +26,14 @@ const styles = (theme) =>
 	});
 
 const AppearenceSettings = ({
+	isMobile,
 	room,
 	settings,
 	onTogglePermanentTopBar,
 	onToggleHiddenControls,
 	onToggleButtonControlBar,
 	onToggleShowNotifications,
+	onToggleDrawerOverlayed,
 	handleChangeMode,
 	classes
 }) =>
@@ -111,6 +113,16 @@ const AppearenceSettings = ({
 					defaultMessage : 'Separate media controls'
 				})}
 			/>
+			{ !isMobile &&
+				<FormControlLabel
+					className={classes.setting}
+					control={<Checkbox checked={settings.drawerOverlayed} onChange={onToggleDrawerOverlayed} value='drawerOverlayed' />}
+					label={intl.formatMessage({
+						id             : 'settings.drawerOverlayed',
+						defaultMessage : 'Side drawer over content'
+					})}
+				/>
+			}
 			<FormControlLabel
 				className={classes.setting}
 				control={<Checkbox checked={settings.showNotifications} onChange={onToggleShowNotifications} value='showNotifications' />}
@@ -125,18 +137,21 @@ const AppearenceSettings = ({
 
 AppearenceSettings.propTypes =
 {
+	isMobile                  : PropTypes.bool.isRequired,
 	room                      : appPropTypes.Room.isRequired,
 	settings                  : PropTypes.object.isRequired,
 	onTogglePermanentTopBar   : PropTypes.func.isRequired,
 	onToggleHiddenControls    : PropTypes.func.isRequired,
 	onToggleButtonControlBar  : PropTypes.func.isRequired,
 	onToggleShowNotifications : PropTypes.func.isRequired,
+	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
 	handleChangeMode          : PropTypes.func.isRequired,
 	classes                   : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
+		isMobile : state.me.browser.platform === 'mobile',
 		room     : state.room,
 		settings : state.settings
 	});
@@ -146,6 +161,7 @@ const mapDispatchToProps = {
 	onToggleHiddenControls    : settingsActions.toggleHiddenControls,
 	onToggleShowNotifications : settingsActions.toggleShowNotifications,
 	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
+	onToggleDrawerOverlayed   : settingsActions.toggleDrawerOverlayed,
 	handleChangeMode          : roomActions.setDisplayMode
 };
 
@@ -157,6 +173,7 @@ export default connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				prev.me.browser === next.me.browser &&
 				prev.room === next.room &&
 				prev.settings === next.settings
 			);
