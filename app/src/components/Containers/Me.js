@@ -336,7 +336,7 @@ const Me = (props) =>
 				</div>
 				}
 				<div className={classes.viewContainer} style={style}>
-									<p className={
+					<p className={
 						classnames(
 							classes.meTag,
 							hover ? 'hover' : null,
