@@ -60,6 +60,9 @@
 	"room.loweredHand": null,
 	"room.extraVideo": null,
 	"room.overRoomLimit": null,
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
 
 	"me.mutedPTT": null,
 
@@ -131,6 +134,11 @@
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",

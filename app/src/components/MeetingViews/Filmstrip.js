@@ -25,6 +25,7 @@ const styles = () =>
 			height              : '100%',
 			width               : '100%',
 			display             : 'grid',
+			overflow            : 'hidden',
 			gridTemplateColumns : '1fr',
 			gridTemplateRows    : '1fr 0.25fr'
 		},
@@ -334,6 +335,7 @@ Filmstrip.propTypes = {
 	spotlights      : PropTypes.array.isRequired,
 	boxes           : PropTypes.number,
 	toolbarsVisible : PropTypes.bool.isRequired,
+	toolAreaOpen    : PropTypes.bool.isRequired,
 	permanentTopBar : PropTypes.bool,
 	classes         : PropTypes.object.isRequired
 };
@@ -349,6 +351,7 @@ const mapStateToProps = (state) =>
 		spotlights      : state.room.spotlights,
 		boxes           : videoBoxesSelector(state),
 		toolbarsVisible : state.room.toolbarsVisible,
+		toolAreaOpen    : state.toolarea.toolAreaOpen,
 		permanentTopBar : state.settings.permanentTopBar
 	};
 };
@@ -364,6 +367,7 @@ export default withRoomContext(connect(
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.selectedPeerId === next.room.selectedPeerId &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
 				prev.peers === next.peers &&
 				prev.consumers === next.consumers &&

@@ -60,6 +60,9 @@
 	"room.loweredHand": "{displayName} je spustio ruku",
 	"room.extraVideo": "Dodatni video",
 	"room.overRoomLimit": "Soba je popunjena, pokušajte ponovno kasnije.",
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 
@@ -131,6 +134,11 @@
 	"settings.hiddenControls": "Skrivene kontrole medija",
 	"settings.notificationSounds": "Zvuk obavijesti",
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",

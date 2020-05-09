@@ -59,6 +59,9 @@
 	"room.raisedHand": "{displayName} pacēla roku",
 	"room.loweredHand": "{displayName} nolaida roku",
 	"room.extraVideo": "Papildus video",
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
 
 	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
 
@@ -125,6 +128,11 @@
 	"settings.hiddenControls": "Slēpto mediju vadība",
 	"settings.notificationSounds": "Paziņojumu skaņas",
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",

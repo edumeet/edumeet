@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
+import { permissions } from '../../../permissions';
+import { makePermissionSelector } from '../../Selectors';
 import FileList from './FileList';
 import FileSharingModerator from './FileSharingModerator';
 import Paper from '@material-ui/core/Paper';
@@ -131,30 +133,36 @@ FileSharing.propTypes = {
 	classes       : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
+const makeMapStateToProps = () =>
 {
-	return {
-		canShareFiles : state.me.canShareFiles,
-		browser       : state.me.browser,
-		tabOpen       : state.toolarea.currentToolTab === 'files',
-		canShare      :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.SHARE_FILE.includes(role))
+	const hasPermission = makePermissionSelector(permissions.SHARE_FILE);
+
+	const mapStateToProps = (state) =>
+	{
+		return {
+			canShareFiles : state.me.canShareFiles,
+			browser       : state.me.browser,
+			tabOpen       : state.toolarea.currentToolTab === 'files',
+			canShare      : hasPermission(state)
+		};
 	};
+
+	return mapStateToProps;
 };
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	null,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+				prev.room === next.room &&
 				prev.me.browser === next.me.browser &&
 				prev.me.roles === next.me.roles &&
 				prev.me.canShareFiles === next.me.canShareFiles &&
+				prev.peers === next.peers &&
 				prev.toolarea.currentToolTab === next.toolarea.currentToolTab
 			);
 		}

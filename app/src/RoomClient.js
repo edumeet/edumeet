@@ -129,7 +129,8 @@ export default class RoomClient
 			produce,
 			forceTcp,
 			displayName,
-			muted
+			muted,
+			basePath
 		} = {})
 	{
 		if (!peerId)
@@ -151,6 +152,9 @@ export default class RoomClient
 
 		// Whether we force TCP
 		this._forceTcp = forceTcp;
+
+		// URL basepath
+		this._basePath = basePath;
 
 		// Use displayName
 		if (displayName)
@@ -400,6 +404,13 @@ export default class RoomClient
 							this.disableWebcam();
 						else
 							this.enableWebcam();
+
+						break;
+					}
+
+					case 'H': // Open help dialog
+					{
+						store.dispatch(roomActions.setHelpOpen(true));
 
 						break;
 					}
@@ -936,14 +947,10 @@ export default class RoomClient
 			{
 				if (consumer.kind === 'video')
 				{
-					if (spotlights.indexOf(consumer.appData.peerId) > -1)
-					{
+					if (spotlights.includes(consumer.appData.peerId))
 						await this._resumeConsumer(consumer);
-					}
 					else
-					{
 						await this._pauseConsumer(consumer);
-					}
 				}
 			}
 		}
@@ -1385,6 +1392,46 @@ export default class RoomClient
 			peerActions.setPeerKickInProgress(peerId, false));
 	}
 
+	async mutePeer(peerId)
+	{
+		logger.debug('mutePeer() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setMutePeerInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:mute', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('mutePeer() failed: %o', error);
+		}
+
+		store.dispatch(
+			peerActions.setMutePeerInProgress(peerId, false));
+	}
+
+	async stopPeerVideo(peerId)
+	{
+		logger.debug('stopPeerVideo() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setStopPeerVideoInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopVideo', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('stopPeerVideo() failed: %o', error);
+		}
+
+		store.dispatch(
+			peerActions.setStopPeerVideoInProgress(peerId, false));
+	}
+
 	async muteAllPeers()
 	{
 		logger.debug('muteAllPeers()');
@@ -1472,9 +1519,7 @@ export default class RoomClient
 				if (consumer.appData.peerId === peerId && consumer.appData.source === type)
 				{
 					if (mute)
-					{
 						await this._pauseConsumer(consumer);
-					}
 					else
 						await this._resumeConsumer(consumer);
 				}
@@ -1802,6 +1847,11 @@ export default class RoomClient
 				this._recvTransport = null;
 			}
 
+			this._spotlights.clearSpotlights();
+
+			store.dispatch(peerActions.clearPeers());
+			store.dispatch(consumerActions.clearConsumers());
+			store.dispatch(roomActions.clearSpotlights());
 			store.dispatch(roomActions.setRoomState('connecting'));
 		});
 
@@ -2081,15 +2131,21 @@ export default class RoomClient
 							lobbyPeers.forEach((peer) =>
 							{
 								store.dispatch(
-									lobbyPeerActions.addLobbyPeer(peer.peerId));
+									lobbyPeerActions.addLobbyPeer(peer.id));
+
 								store.dispatch(
 									lobbyPeerActions.setLobbyPeerDisplayName(
 										peer.displayName,
-										peer.peerId
+										peer.id
 									)
 								);
+
 								store.dispatch(
-									lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+									lobbyPeerActions.setLobbyPeerPicture(
+										peer.picture,
+										peer.id
+									)
+								);
 							});
 	
 							store.dispatch(
@@ -2517,8 +2573,6 @@ export default class RoomClient
 
 					case 'moderator:mute':
 					{
-						// const { peerId } = notification.data;
-
 						if (this._micProducer && !this._micProducer.paused)
 						{
 							this.muteMic();
@@ -2537,8 +2591,6 @@ export default class RoomClient
 
 					case 'moderator:stopVideo':
 					{
-						// const { peerId } = notification.data;
-
 						this.disableWebcam();
 						this.disableScreenSharing();
 
@@ -2803,8 +2855,8 @@ export default class RoomClient
 				roles,
 				peers,
 				tracker,
-				permissionsFromRoles,
-				userRoles,
+				roomPermissions,
+				allowWhenRoleMissing,
 				chatHistory,
 				fileHistory,
 				lastNHistory,
@@ -2830,8 +2882,10 @@ export default class RoomClient
 
 			store.dispatch(meActions.loggedIn(authenticated));
 
-			store.dispatch(roomActions.setUserRoles(userRoles));
-			store.dispatch(roomActions.setPermissionsFromRoles(permissionsFromRoles));
+			store.dispatch(roomActions.setRoomPermissions(roomPermissions));
+
+			if (allowWhenRoleMissing)
+				store.dispatch(roomActions.setAllowWhenRoleMissing(allowWhenRoleMissing));
 
 			const myRoles = store.getState().me.roles;
 
@@ -2889,11 +2943,11 @@ export default class RoomClient
 			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
 			{
 				store.dispatch(
-					lobbyPeerActions.addLobbyPeer(peer.peerId));
+					lobbyPeerActions.addLobbyPeer(peer.id));
 				store.dispatch(
-					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
+					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.id));
 				store.dispatch(
-					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
+					lobbyPeerActions.setLobbyPeerPicture(peer.picture, peer.id));
 			});
 
 			(accessCode != null) && store.dispatch(

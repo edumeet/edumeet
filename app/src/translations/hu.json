@@ -60,6 +60,9 @@
 	"room.loweredHand": "{displayName} leeresztette a kezét",
 	"room.extraVideo": "Kiegészítő videó",
 	"room.overRoomLimit": "A konferenciaszoba betelt..",
+	"room.help": "Segítség",
+	"room.about": "Névjegy",
+	"room.shortcutKeys": "Billentyűparancsok",
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a szóköz billentyűt",
 
@@ -130,7 +133,12 @@
 	"settings.lastn": "A látható videók száma",
 	"settings.hiddenControls": "Média Gombok automatikus elrejtése",
 	"settings.notificationSounds": "Értesítések hangjelzéssel",
-	"settings.showNotifications": null,
+	"settings.showNotifications": "Értesítések megjelenítése",
+	"settings.buttonControlBar": "Médiavezérlő gombok leválasztása",
+	"settings.echoCancellation": "Visszhangelnyomás",
+	"settings.autoGainControl": "Automatikus hangerő",
+	"settings.noiseSuppression": "Zajelnyomás",
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

@@ -60,7 +60,10 @@
 	"room.loweredHand": "{displayName} ha abbassato la mano",
 	"room.extraVideo": "Video extra",
 	"room.overRoomLimit": null,
-	
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
+
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
 	"roles.gotRole": "Hai ottenuto il ruolo: {role}",
@@ -130,6 +133,11 @@
 	"settings.hiddenControls": "Controlli media nascosti",
 	"settings.notificationSounds": "Suoni di notifica",
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",

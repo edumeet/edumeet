@@ -95,6 +95,15 @@ export default class Spotlights extends EventEmitter
 		});
 	}
 
+	clearSpotlights()
+	{
+		this._started = false;
+
+		this._peerList = [];
+		this._selectedSpotlights = [];
+		this._currentSpotlights = [];
+	}
+
 	_newPeer(id)
 	{
 		logger.debug(

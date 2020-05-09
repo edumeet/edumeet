@@ -60,6 +60,9 @@
 	"room.loweredHand": "{displayName} tok ned hånden",
 	"room.extraVideo": "Ekstra video",
 	"room.overRoomLimit": "Rommet er fullt, prøv igjen om litt.",
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -131,6 +134,11 @@
 	"settings.hiddenControls": "Skjul media knapper",
 	"settings.notificationSounds": "Varslingslyder",
 	"settings.showNotifications": "Vis varslinger",
+	"settings.buttonControlBar": "Separate media knapper",
+	"settings.echoCancellation": "Echokansellering",
+	"settings.autoGainControl": "Auto gain kontroll",
+	"settings.noiseSuppression": "Støy reduksjon",
+	"settings.drawerOverlayed": "Sidemeny over innhold",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

@@ -115,6 +115,13 @@ function run()
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
+
+	const { pathname } = window.location;
+
+	let basePath = pathname.substring(0, pathname.lastIndexOf('/'));
+
+	if (!basePath)
+		basePath = '/';
 	
 	// Get current device.
 	const device = deviceInfo();
@@ -134,7 +141,8 @@ function run()
 			produce,
 			forceTcp,
 			displayName,
-			muted
+			muted,
+			basePath
 		});
 
 	global.CLIENT = roomClient;
@@ -146,7 +154,7 @@ function run()
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
 						<RoomContext.Provider value={roomClient}>
 							<SnackbarProvider>
-								<Router>
+								<Router basename={basePath}>
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
 											<Route exact path='/' component={ChooseRoom} />

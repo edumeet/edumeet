@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-	participantListSelector
+	participantListSelector,
+	makePermissionSelector
 } from '../../Selectors';
+import { permissions } from '../../../permissions';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
@@ -160,31 +162,34 @@ ParticipantList.propTypes =
 	classes        : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
+const makeMapStateToProps = () =>
 {
-	return {
-		isModerator :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.MODERATE_ROOM.includes(role)),
-		participants   : participantListSelector(state),
-		spotlights     : state.room.spotlights,
-		selectedPeerId : state.room.selectedPeerId
+	const hasPermission = makePermissionSelector(permissions.MODERATE_ROOM);
+
+	const mapStateToProps = (state) =>
+	{
+		return {
+			isModerator    : hasPermission(state),
+			participants   : participantListSelector(state),
+			spotlights     : state.room.spotlights,
+			selectedPeerId : state.room.selectedPeerId
+		};
 	};
+
+	return mapStateToProps;
 };
 
 const ParticipantListContainer = withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	null,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+				prev.room === next.room &&
 				prev.me.roles === next.me.roles &&
-				prev.peers === next.peers &&
-				prev.room.spotlights === next.room.spotlights &&
-				prev.room.selectedPeerId === next.room.selectedPeerId
+				prev.peers === next.peers
 			);
 		}
 	}
