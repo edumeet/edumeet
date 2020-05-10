@@ -290,6 +290,28 @@ const Me = (props) =>
 		'margin' : spacing
 	};
 
+	let audioScore = null;
+
+	if (micProducer && micProducer.score)
+	{
+		audioScore =
+			micProducer.score.reduce(
+				(prev, curr) =>
+					(prev.score < curr.score ? prev : curr)
+			);
+	}
+
+	let videoScore = null;
+
+	if (webcamProducer && webcamProducer.score)
+	{
+		videoScore =
+			webcamProducer.score.reduce(
+				(prev, curr) =>
+					(prev.score < curr.score ? prev : curr)
+			);
+	}
+
 	return (
 		<React.Fragment>
 			<div
@@ -576,6 +598,7 @@ const Me = (props) =>
 
 					<VideoView
 						isMe
+						VideoView
 						advancedMode={advancedMode}
 						peer={me}
 						displayName={settings.displayName}
@@ -584,6 +607,8 @@ const Me = (props) =>
 						videoVisible={videoVisible}
 						audioCodec={micProducer && micProducer.codec}
 						videoCodec={webcamProducer && webcamProducer.codec}
+						audioScore={audioScore}
+						videoScore={videoScore}
 						onChangeDisplayName={(displayName) =>
 						{
 							roomClient.changeDisplayName(displayName);
@@ -627,6 +652,18 @@ const Me = (props) =>
 						style={spacingStyle}
 					>
 						<div className={classes.viewContainer} style={style}>
+							<p className={
+								classnames(
+									classes.meTag,
+									hover ? 'hover' : null,
+									smallContainer ? 'smallContainer' : null
+								)}
+							>
+								<FormattedMessage
+									id='room.me'
+									defaultMessage='ME'
+								/>
+							</p>
 							<div
 								className={classnames(
 									classes.controls,
@@ -653,13 +690,6 @@ const Me = (props) =>
 									}, 2000);
 								}}
 							>
-								<p className={hover ? 'hover' : null}>
-									<FormattedMessage
-										id='room.me'
-										defaultMessage='ME'
-									/>
-								</p>
-
 								<Tooltip title={webcamTip} placement='left'>
 									{ smallContainer ?
 										<IconButton
@@ -742,40 +772,18 @@ const Me = (props) =>
 					style={spacingStyle}
 				>
 					<div className={classes.viewContainer} style={style}>
-						<div
-							className={classnames(
-								classes.controls,
-								settings.hiddenControls ? 'hide' : null,
-								hover ? 'hover' : null
+						<p className={
+							classnames(
+								classes.meTag,
+								hover ? 'hover' : null,
+								smallContainer ? 'smallContainer' : null
 							)}
-							onMouseOver={() => setHover(true)}
-							onMouseOut={() => setHover(false)}
-							onTouchStart={() =>
-							{
-								if (touchTimeout)
-									clearTimeout(touchTimeout);
-			
-								setHover(true);
-							}}
-							onTouchEnd={() =>
-							{
-
-								if (touchTimeout)
-									clearTimeout(touchTimeout);
-			
-								touchTimeout = setTimeout(() =>
-								{
-									setHover(false);
-								}, 2000);
-							}}
 						>
-							<p className={hover ? 'hover' : null}>
-								<FormattedMessage
-									id='room.me'
-									defaultMessage='ME'
-								/>
-							</p>
-						</div>
+							<FormattedMessage
+								id='room.me'
+								defaultMessage='ME'
+							/>
+						</p>
 						
 						<VideoView
 							isMe
