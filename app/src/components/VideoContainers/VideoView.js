@@ -10,7 +10,6 @@ import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
 import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
-import NetworkIndicator from '../Controls/NetworkIndicator';
 
 const styles = (theme) =>
 	({
@@ -24,6 +23,7 @@ const styles = (theme) =>
 			flexDirection : 'column',
 			overflow      : 'hidden'
 		},
+
 		video :
 		{
 			flex               : '100 100 auto',
@@ -94,7 +94,43 @@ const styles = (theme) =>
 			{
 				opacity            : 0,
 				transitionDuration : '0s'
-			}
+			},
+			'& .netInfo' :
+				{
+					display           : 'grid',
+					gap               : '1px 5px',
+					gridTemplateAreas : '\
+						"AcodL		Acod	Acod	Acod	Acod" \
+						"VcodL		Vcod	Vcod	Vcod	Vcod" \
+						"ResL		Res		Res		Res		Res" \
+						"RecvL		RecvBps RecvBps RecvSum RecvSum" \
+						"SendL		SendBps SendBps SendSum SendSum" \
+						"IPlocL		IPloc	IPloc	IPloc	IPloc" \
+						"IPsrvL		IPsrv	IPsrv	IPsrv	IPsrv" \
+						"STLcurrL	STLcurr	STLcurr STLcurr STLcurr" \
+						"STLprefL	STLpref STLpref STLpref STLpref"',
+					
+					'& .AcodL'    : { gridArea: 'AcodL' },
+					'& .Acod'     : { gridArea: 'Acod' },
+					'& .VcodL'    : { gridArea: 'VcodL' },
+					'& .Vcod'     : { gridArea: 'Vcod' },
+					'& .ResL'     : { gridArea: 'ResL' },
+					'& .Res'      : { gridArea: 'Res' },
+					'& .RecvL'    : { gridArea: 'RecvL' },
+					'& .RecvBps'  : { gridArea: 'RecvBps', justifySelf: 'flex-end' },
+					'& .RecvSum'  : { gridArea: 'RecvSum', justifySelf: 'flex-end' },
+					'& .SendL'    : { gridArea: 'SendL' },
+					'& .SendBps'  : { gridArea: 'SendBps', justifySelf: 'flex-end' },
+					'& .SendSum'  : { gridArea: 'SendSum', justifySelf: 'flex-end' },
+					'& .IPlocL'   : { gridArea: 'IPlocL' },
+					'& .IPloc'    : { gridArea: 'IPloc' },
+					'& .IPsrvL'   : { gridArea: 'IPsrvL' },
+					'& .IPsrv'    : { gridArea: 'IPsrv' },
+					'& .STLcurrL' : { gridArea: 'STLcurrL' },
+					'& .STLcurr'  : { gridArea: 'STLcurr' },
+					'& .STLprefL' : { gridArea: 'STLprefL' },
+					'& .STLpref'  : { gridArea: 'STLpref' }
+				}
 		},
 		peer :
 		{
@@ -166,7 +202,8 @@ class VideoView extends React.PureComponent
 			videoCodec,
 			onChangeDisplayName,
 			children,
-			classes
+			classes,
+			netInfo
 		} = this.props;
 
 		const {
@@ -235,25 +272,76 @@ class VideoView extends React.PureComponent
 				<div className={classes.info}>
 					<div className={classes.media}>
 						<div className={classnames(classes.box, 'left', { hidden: !advancedMode })}>
-							{ audioCodec && <p>{audioCodec}</p> }
+							<p className={'netInfo'}>
+								{ audioCodec && 
+								<React.Fragment>
+									<span className={'AcodL'}>Acod: </span>
+									<span className={'Acod'}>
+										{audioCodec}
+									</span> 
+								</React.Fragment>
+								}
 
-							{ videoCodec &&
-								<p>
-									{videoCodec}
-								</p>
-							}
+								{ videoCodec &&
+								<React.Fragment>
+									<span className={'VcodL'}>Vcod: </span>
+									<span className={'Vcod'}>
+										{videoCodec}
+									</span>
+								</React.Fragment>
+								}
 
-							{ videoMultiLayer &&
-								<p>
-									{`current spatial-temporal layers: ${consumerCurrentSpatialLayer} ${consumerCurrentTemporalLayer}`}
-									<br />
-									{`preferred spatial-temporal layers: ${consumerPreferredSpatialLayer} ${consumerPreferredTemporalLayer}`}
-								</p>
-							}
+								{ (videoVisible && videoWidth !== null) &&
+								<React.Fragment>
+									<span className={'ResL'}>Res: </span>
+									<span className={'Res'}>
+										{videoWidth}x{videoHeight}
+									</span>
+								</React.Fragment>
+								}
 
-							{ (videoVisible && videoWidth !== null) &&
-								<p>{videoWidth}x{videoHeight}</p>
-							}
+								{ isMe && 
+									(netInfo.recv && netInfo.send && netInfo.send.iceSelectedTuple) &&
+									<React.Fragment>
+										<span className={'RecvL'}>Recv: </span>
+										<span className={'RecvBps'}>
+											{(netInfo.recv.sendBitrate/8/1024/1024).toFixed(2)}MB/s
+										</span> 
+										<span className={'RecvSum'}>
+											{(netInfo.recv.bytesSent/1024/1024).toFixed(2)}MB
+										</span>
+
+										<span className={'SendL'}>Send: </span>
+										<span className={'SendBps'}>
+											{(netInfo.send.recvBitrate/8/1024/1024).toFixed(2)}MB/s
+										</span>
+										<span className={'SendSum'}>
+											{(netInfo.send.bytesReceived/1024/1024).toFixed(2)}MB
+										</span>
+									
+										<span className={'IPlocL'}>IPloc: </span>
+										<span className={'IPloc'}>
+											{netInfo.send.iceSelectedTuple.remoteIp}
+										</span>
+									
+										<span className={'IPsrvL'}>IPsrv: </span>
+										<span className={'IPsrv'}>
+											{netInfo.send.iceSelectedTuple.localIp}
+										</span>
+									</React.Fragment>
+								}
+							
+								{ videoMultiLayer &&
+								<React.Fragment>
+									<span className={'STLcurrL'}>STLcurr: </span>
+									<span className={'STLcurr'}>{consumerCurrentSpatialLayer} {consumerCurrentTemporalLayer}</span>
+									
+									<span className={'STLprefL'}>STLpref: </span>
+									<span className={'STLpref'}>{consumerPreferredSpatialLayer} {consumerPreferredTemporalLayer}</span>
+								</React.Fragment>
+								}
+							</p>
+
 						</div>
 						{ !isMe &&
 							<div className={classnames(classes.box, 'right')}>
@@ -285,7 +373,6 @@ class VideoView extends React.PureComponent
 												({ newDisplayName }) => 
 													onChangeDisplayName(newDisplayName)}
 										/>
-										<NetworkIndicator />
 									</React.Fragment>
 									:
 									<span className={classes.displayNameStatic}>
@@ -412,7 +499,8 @@ VideoView.propTypes =
 	videoCodec                     : PropTypes.string,
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
-	classes                        : PropTypes.object.isRequired
+	classes                        : PropTypes.object.isRequired,
+	netInfo               						   : PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(VideoView);

@@ -141,7 +141,8 @@ const Me = (props) =>
 		webcamProducer,
 		screenProducer,
 		canShareScreen,
-		classes
+		classes,
+		transports
 	} = props;
 
 	const videoVisible = (
@@ -445,6 +446,7 @@ const Me = (props) =>
 						videoVisible={videoVisible}
 						audioCodec={micProducer && micProducer.codec}
 						videoCodec={webcamProducer && webcamProducer.codec}
+						netInfo={transports && transports}
 						onChangeDisplayName={(displayName) =>
 						{
 							roomClient.changeDisplayName(displayName);
@@ -541,7 +543,9 @@ Me.propTypes =
 	smallButtons   : PropTypes.bool,
 	canShareScreen : PropTypes.bool.isRequired,
 	classes        : PropTypes.object.isRequired,
-	theme          : PropTypes.object.isRequired
+	theme          : PropTypes.object.isRequired,
+	transports     : PropTypes.object.isRequired
+
 };
 
 const mapStateToProps = (state) =>
@@ -553,7 +557,8 @@ const mapStateToProps = (state) =>
 		activeSpeaker  : state.me.id === state.room.activeSpeakerId,
 		canShareScreen :
 			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.SHARE_SCREEN.includes(role))
+				state.room.permissionsFromRoles.SHARE_SCREEN.includes(role)),
+		transports : state.transports
 	};
 };
 
@@ -569,7 +574,8 @@ export default withRoomContext(connect(
 				prev.me === next.me &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
-				prev.room.activeSpeakerId === next.room.activeSpeakerId
+				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
+				prev.transports === next.transports
 			);
 		}
 	}

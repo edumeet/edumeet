@@ -13,6 +13,7 @@ import * as lobbyPeerActions from './actions/lobbyPeerActions';
 import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
+import * as transportActions from './actions/transportActions';
 
 let createTorrent;
 
@@ -257,6 +258,8 @@ export default class RoomClient
 		this._startKeyListener();
 
 		this._startDevicesListener();
+
+		this._getTransportStats();
 
 	}
 
@@ -595,14 +598,33 @@ export default class RoomClient
 		});
 	}
 
-	async getTransportStats(transportId)
+	async _getTransportStats()
 	{
-
-		logger.debug('getTransportStats() [transportId: "%s"]', transportId);
-
 		try
 		{
-			return await this.sendRequest('getTransportStats', { transportId: transportId });
+			setInterval(async () => 
+			{
+				if (this._recvTransport)
+				{
+					logger.debug('getTransportStats() - recv [transportId: "%s"]', this._recvTransport.id);
+
+					const recv = await this.sendRequest('getTransportStats', { transportId: this._recvTransport.id });
+
+					store.dispatch(
+						transportActions.addTransportStats(recv, 'recv'));
+				}
+
+				if (this._sendTransport)
+				{
+					logger.debug('getTransportStats() - send [transportId: "%s"]', this._sendTransport.id);
+
+					const send = await this.sendRequest('getTransportStats', { transportId: this._sendTransport.id });
+
+					store.dispatch(
+						transportActions.addTransportStats(send, 'send'));
+				}
+
+			}, 1000);
 		}
 		catch (error)
 		{ 

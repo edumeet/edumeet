@@ -11,14 +11,16 @@ import chat from './chat';
 import toolarea from './toolarea';
 import files from './files';
 import settings from './settings';
+import transports from './transports';
 
 export default combineReducers({
 	room,
 	me,
 	producers,
+	consumers,
+	transports,
 	peers,
 	lobbyPeers,
-	consumers,
 	peerVolumes,
 	notifications,
 	chat,
