@@ -183,5 +183,6 @@
 	"moderator.clearChat": "Moderator cleared the chat",
 	"moderator.clearFiles": "Moderator cleared the files",
 	"moderator.muteAudio": "Moderator muted your audio",
-	"moderator.muteVideo": "Moderator muted your video"
+	"moderator.muteVideo": "Moderator muted your video",
+	"moderator.muteScreenSharing": "Moderator muted your screen sharing"
 }
