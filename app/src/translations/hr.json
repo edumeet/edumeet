@@ -84,6 +84,9 @@
 	"tooltip.muteParticipantVideo": "Ne primaj video sudionika",
 	"tooltip.raisedHand": "Podigni ruku",
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Naziv sobe",
 	"label.chooseRoomButton": "Nastavi",

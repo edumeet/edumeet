@@ -84,6 +84,9 @@
 	"tooltip.muteParticipantVideo": "Ferma video partecipante",
 	"tooltip.raisedHand": "Mano alzata",
 	"tooltip.muteScreenSharing": "Ferma condivisione schermo partecipante",
+	"tooltip.muteParticipantAudioModerator": "Muta partecipante",
+	"tooltip.muteParticipantVideoModerator": "Ferma video partecipante",
+	"tooltip.muteScreenSharingModerator": "Ferma condivisione schermo partecipante",
 
 	"label.roomName": "Nome della stanza",
 	"label.chooseRoomButton": "Continua",

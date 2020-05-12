@@ -84,6 +84,9 @@
 	"tooltip.muteParticipantVideo": "Demp deltakervideo",
 	"tooltip.raisedHand": "Rekk opp hånden",
 	"tooltip.muteScreenSharing": "Demp deltaker skjermdeling",
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",

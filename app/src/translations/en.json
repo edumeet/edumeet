@@ -84,6 +84,9 @@
 	"tooltip.muteParticipantVideo": "Mute participant video",
 	"tooltip.raisedHand": "Raise hand",
 	"tooltip.muteScreenSharing": "Mute participant share",
+	"tooltip.muteParticipantAudioModerator": "Mute participant audio globally",
+	"tooltip.muteParticipantVideoModerator": "Mute participant video globally",
+	"tooltip.muteScreenSharingModerator": "Mute participant screen share globally",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",

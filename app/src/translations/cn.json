@@ -84,6 +84,9 @@
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",

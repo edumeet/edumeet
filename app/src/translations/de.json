@@ -84,6 +84,9 @@
 	"tooltip.muteParticipantVideo": "Video stoppen",
 	"tooltip.raisedHand": "Hand heben",
 	"tooltip.muteScreenSharing": "Stoppe Bildschirmfreigabe",
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Name des Raums",
 	"label.chooseRoomButton": "Weiter",

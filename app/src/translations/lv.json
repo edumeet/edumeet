@@ -83,6 +83,9 @@
 	"tooltip.muteParticipantVideo": "Atslēgt dalībnieka video",
 	"tooltip.raisedHand": "Pacelt roku",
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Sapulces telpas nosaukums (ID)",
 	"label.chooseRoomButton": "Turpināt",
