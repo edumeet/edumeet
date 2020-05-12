@@ -310,7 +310,7 @@ class VideoView extends React.PureComponent
 									<React.Fragment>
 										<span className={'RecvL'}>Recv: </span>
 										<span className={'RecvBps'}>
-											{(netInfo.recv.sendBitrate/8/1024/1024).toFixed(2)}MB/s
+											{(netInfo.recv.sendBitrate/1024/1024).toFixed(2)}Mb/s
 										</span> 
 										<span className={'RecvSum'}>
 											{(netInfo.recv.bytesSent/1024/1024).toFixed(2)}MB
@@ -318,7 +318,7 @@ class VideoView extends React.PureComponent
 
 										<span className={'SendL'}>Send: </span>
 										<span className={'SendBps'}>
-											{(netInfo.send.recvBitrate/8/1024/1024).toFixed(2)}MB/s
+											{(netInfo.send.recvBitrate/1024/1024).toFixed(2)}Mb/s
 										</span>
 										<span className={'SendSum'}>
 											{(netInfo.send.bytesReceived/1024/1024).toFixed(2)}MB
