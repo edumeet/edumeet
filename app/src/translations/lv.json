@@ -183,5 +183,9 @@
 	"moderator.clearFiles": "Moderators notīrīja failus",
 	"moderator.muteAudio": "Moderators noklusināja jūsu mikrofonu",
 	"moderator.muteVideo": "Moderators atslēdza jūsu kameru",
-	"moderator.muteScreenSharing": null
+	"moderator.muteScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

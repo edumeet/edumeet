@@ -189,5 +189,9 @@
 	"moderator.clearFiles": "Moderator je izbrisao datoteke",
 	"moderator.muteAudio": "Moderator je utišao tvoj zvuk",
 	"moderator.muteVideo": "Moderator je zaustavio tvoj video",
-	"moderator.muteScreenSharing": null
+	"moderator.muteScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }
