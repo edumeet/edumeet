@@ -10,6 +10,11 @@ export const removePeer = (peerId) =>
 		payload : { peerId }
 	});
 
+export const clearPeers = () =>
+	({
+		type : 'CLEAR_PEERS'
+	});
+
 export const setPeerDisplayName = (displayName, peerId) =>
 	({
 		type    : 'SET_PEER_DISPLAY_NAME',
@@ -34,10 +39,16 @@ export const setPeerScreenInProgress = (peerId, flag) =>
 		payload : { peerId, flag }
 	});
 
-export const setPeerRaiseHandState = (peerId, raiseHandState) =>
+export const setPeerRaisedHand = (peerId, raisedHand, raisedHandTimestamp) =>
 	({
-		type    : 'SET_PEER_RAISE_HAND_STATE',
-		payload : { peerId, raiseHandState }
+		type    : 'SET_PEER_RAISED_HAND',
+		payload : { peerId, raisedHand, raisedHandTimestamp }
+	});
+
+export const setPeerRaisedHandInProgress = (peerId, flag) =>
+	({
+		type    : 'SET_PEER_RAISED_HAND_IN_PROGRESS',
+		payload : { peerId, flag }
 	});
 
 export const setPeerPicture = (peerId, picture) =>
@@ -61,5 +72,17 @@ export const removePeerRole = (peerId, role) =>
 export const setPeerKickInProgress = (peerId, flag) =>
 	({
 		type    : 'SET_PEER_KICK_IN_PROGRESS',
+		payload : { peerId, flag }
+	});
+
+export const setMutePeerInProgress = (peerId, flag) =>
+	({
+		type    : 'STOP_PEER_AUDIO_IN_PROGRESS',
+		payload : { peerId, flag }
+	});
+
+export const setStopPeerVideoInProgress = (peerId, flag) =>
+	({
+		type    : 'STOP_PEER_VIDEO_IN_PROGRESS',
 		payload : { peerId, flag }
 	});

@@ -86,7 +86,7 @@ const DialogTitle = withStyles(styles)((props) =>
 
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 			<Typography variant='h5'>{children}</Typography>
 		</MuiDialogTitle>
 	);
@@ -125,7 +125,7 @@ const ChooseRoom = ({
 				}}
 			>
 				<DialogTitle>
-					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
+					{ window.config.title ? window.config.title : 'Multiparty meeting' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>

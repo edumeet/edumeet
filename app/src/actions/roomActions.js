@@ -40,6 +40,12 @@ export const setSignInRequired = (signInRequired) =>
 		payload : { signInRequired }
 	});
 
+export const setOverRoomLimit = (overRoomLimit) =>
+	({
+		type    : 'SET_OVER_ROOM_LIMIT',
+		payload : { overRoomLimit }
+	});
+
 export const setAccessCode = (accessCode) =>
 	({
 		type    : 'SET_ACCESS_CODE',
@@ -52,13 +58,37 @@ export const setJoinByAccessCode = (joinByAccessCode) =>
 		payload : { joinByAccessCode }
 	});
 
-export const setSettingsOpen = ({ settingsOpen }) =>
+export const setSettingsOpen = (settingsOpen) =>
 	({
 		type    : 'SET_SETTINGS_OPEN',
 		payload : { settingsOpen }
 	});
 
-export const setLockDialogOpen = ({ lockDialogOpen }) =>
+export const setExtraVideoOpen = (extraVideoOpen) =>
+	({
+		type    : 'SET_EXTRA_VIDEO_OPEN',
+		payload : { extraVideoOpen }
+	});
+
+export const setHelpOpen = (helpOpen) =>
+	({
+		type    : 'SET_HELP_OPEN',
+		payload : { helpOpen }
+	});
+
+export const setAboutOpen = (aboutOpen) =>
+	({
+		type    : 'SET_ABOUT_OPEN',
+		payload : { aboutOpen }
+	});
+
+export const setSettingsTab = (tab) =>
+	({
+		type    : 'SET_SETTINGS_TAB',
+		payload : { tab }
+	});
+
+export const setLockDialogOpen = (lockDialogOpen) =>
 	({
 		type    : 'SET_LOCK_DIALOG_OPEN',
 		payload : { lockDialogOpen }
@@ -100,6 +130,11 @@ export const setSpotlights = (spotlights) =>
 		payload : { spotlights }
 	});
 
+export const clearSpotlights = () =>
+	({
+		type : 'CLEAR_SPOTLIGHTS'
+	});
+
 export const toggleJoined = () =>
 	({
 		type : 'TOGGLE_JOINED'
@@ -109,6 +144,12 @@ export const toggleConsumerFullscreen = (consumerId) =>
 	({
 		type    : 'TOGGLE_FULLSCREEN_CONSUMER',
 		payload : { consumerId }
+	});
+
+export const setLobbyPeersPromotionInProgress = (flag) =>
+	({
+		type    : 'SET_LOBBY_PEERS_PROMOTION_IN_PROGRESS',
+		payload : { flag }
 	});
 
 export const setMuteAllInProgress = (flag) =>
@@ -141,14 +182,14 @@ export const setClearFileSharingInProgress = (flag) =>
 		payload : { flag }
 	});
 
-export const setUserRoles = (userRoles) =>
+export const setRoomPermissions = (roomPermissions) =>
 	({
-		type    : 'SET_USER_ROLES',
-		payload : { userRoles }
+		type    : 'SET_ROOM_PERMISSIONS',
+		payload : { roomPermissions }
 	});
 
-export const setPermissionsFromRoles = (permissionsFromRoles) =>
+export const setAllowWhenRoleMissing = (allowWhenRoleMissing) =>
 	({
-		type    : 'SET_PERMISSIONS_FROM_ROLES',
-		payload : { permissionsFromRoles }
+		type    : 'SET_ALLOW_WHEN_ROLE_MISSING',
+		payload : { allowWhenRoleMissing }
 	});

@@ -37,6 +37,8 @@ import messagesCroatian from './translations/hr';
 import messagesCzech from './translations/cs';
 import messagesItalian from './translations/it';
 import messagesUkrainian from './translations/uk';
+import messagesTurkish from './translations/tr';
+import messagesLatvian from './translations/lv';
 
 import './index.css';
 
@@ -61,7 +63,9 @@ const messages =
 	'hr' : messagesCroatian,
 	'cs' : messagesCzech,
 	'it' : messagesItalian,
-	'uk' : messagesUkrainian
+	'uk' : messagesUkrainian,
+	'tr' : messagesTurkish,
+	'lv' : messagesLatvian
 };
 
 const locale = navigator.language.split(/[-_]/)[0]; // language without region code
@@ -111,6 +115,13 @@ function run()
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
+
+	const { pathname } = window.location;
+
+	let basePath = pathname.substring(0, pathname.lastIndexOf('/'));
+
+	if (!basePath)
+		basePath = '/';
 	
 	// Get current device.
 	const device = deviceInfo();
@@ -130,7 +141,8 @@ function run()
 			produce,
 			forceTcp,
 			displayName,
-			muted
+			muted,
+			basePath
 		});
 
 	global.CLIENT = roomClient;
@@ -142,7 +154,7 @@ function run()
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
 						<RoomContext.Provider value={roomClient}>
 							<SnackbarProvider>
-								<Router>
+								<Router basename={basePath}>
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
 											<Route exact path='/' component={ChooseRoom} />

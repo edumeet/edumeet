@@ -10,6 +10,11 @@ export const removeConsumer = (consumerId, peerId) =>
 		payload : { consumerId, peerId }
 	});
 
+export const clearConsumers = () =>
+	({
+		type : 'CLEAR_CONSUMERS'
+	});
+
 export const setConsumerPaused = (consumerId, originator) =>
 	({
 		type    : 'SET_CONSUMER_PAUSED',

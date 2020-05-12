@@ -31,13 +31,15 @@ export default class PeerAudio extends React.PureComponent
 		this._setOutputDevice(audioOutputDevice);
 	}
 
-	// eslint-disable-next-line camelcase
-	UNSAFE_componentWillReceiveProps(nextProps)
+	componentDidUpdate(prevProps)
 	{
-		const { audioTrack, audioOutputDevice } = nextProps;
+		if (prevProps !== this.props)
+		{
+			const { audioTrack, audioOutputDevice } = this.props;
 	
-		this._setTrack(audioTrack);
-		this._setOutputDevice(audioOutputDevice);
+			this._setTrack(audioTrack);
+			this._setOutputDevice(audioOutputDevice);
+		}
 	}
 
 	_setTrack(audioTrack)

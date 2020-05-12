@@ -4,18 +4,16 @@ import PropTypes from 'prop-types';
 import { withRoomContext } from '../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
+import { permissions } from '../../../permissions';
+import { makePermissionSelector } from '../../Selectors';
 import Button from '@material-ui/core/Button';
 
 const styles = (theme) =>
 	({
 		root :
 		{
-			padding         : theme.spacing(1),
-			width           : '100%',
-			overflow        : 'hidden',
-			cursor          : 'auto',
 			display         : 'flex',
-			listStyleType   : 'none',
+			padding         : theme.spacing(1),
 			boxShadow       : '0 2px 5px 2px rgba(0, 0, 0, 0.2)',
 			backgroundColor : 'rgba(255, 255, 255, 1)'
 		},
@@ -80,16 +78,21 @@ FileSharingModerator.propTypes =
 	classes                : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
-	({
-		isFileSharingModerator :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.MODERATE_FILES.includes(role)),
-		room : state.room
-	});
+const makeMapStateToProps = () =>
+{
+	const hasPermission = makePermissionSelector(permissions.MODERATE_FILES);
+
+	const mapStateToProps = (state) =>
+		({
+			isFileSharingModerator : hasPermission(state),
+			room                   : state.room
+		});
+
+	return mapStateToProps;
+};
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	null,
 	null,
 	{
@@ -97,7 +100,8 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room === next.room &&
-				prev.me === next.me
+				prev.me === next.me &&
+				prev.peers === next.peers
 			);
 		}
 	}

@@ -10,11 +10,8 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			padding  : theme.spacing(1),
-			width    : '100%',
-			overflow : 'hidden',
-			cursor   : 'auto',
-			display  : 'flex'
+			padding : theme.spacing(1),
+			display : 'flex'
 		},
 		divider :
 		{

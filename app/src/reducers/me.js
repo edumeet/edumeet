@@ -15,8 +15,8 @@ const initialState =
 	screenShareInProgress : false,
 	displayNameInProgress : false,
 	loginEnabled          : false,
-	raiseHand             : false,
-	raiseHandInProgress   : false,
+	raisedHand            : false,
+	raisedHandInProgress  : false,
 	loggedIn              : false,
 	isSpeaking            : false
 };
@@ -134,18 +134,18 @@ const me = (state = initialState, action) =>
 			return { ...state, screenShareInProgress: flag };
 		}
 
-		case 'SET_MY_RAISE_HAND_STATE':
+		case 'SET_RAISED_HAND':
 		{
 			const { flag } = action.payload;
 
-			return { ...state, raiseHand: flag };
+			return { ...state, raisedHand: flag };
 		}
 
-		case 'SET_MY_RAISE_HAND_STATE_IN_PROGRESS':
+		case 'SET_RAISED_HAND_IN_PROGRESS':
 		{
 			const { flag } = action.payload;
 
-			return { ...state, raiseHandInProgress: flag };
+			return { ...state, raisedHandInProgress: flag };
 		}
 
 		case 'SET_DISPLAY_NAME_IN_PROGRESS':

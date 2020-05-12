@@ -94,7 +94,7 @@ const Message = (props) =>
 				<Typography variant='caption'>
 					{ self ?
 						intl.formatMessage({
-							id : 'room.me',
+							id             : 'room.me',
 							defaultMessage : 'Me'
 						})
 						:

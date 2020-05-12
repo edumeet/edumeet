@@ -1,14 +1,15 @@
 {
 	"name": "multiparty-meeting-server",
-	"version": "3.2.0",
+	"version": "3.3.0",
 	"private": true,
 	"description": "multiparty meeting server",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
 	"license": "MIT",
 	"main": "lib/index.js",
 	"scripts": {
-		"start": "DEBUG=${DEBUG:='*mediasoup* *INFO* *WARN* *ERROR*'} INTERACTIVE=${INTERACTIVE:='true'} node server.js",
-		"connect": "node connect.js"
+		"start": "node server.js",
+		"connect": "node connect.js",
+		"lint": "eslint -c .eslintrc.json --ext .js *.js lib/"
 	},
 	"dependencies": {
 		"awaitqueue": "^1.0.0",
@@ -31,9 +32,13 @@
 		"passport": "^0.4.0",
 		"passport-lti": "0.0.7",
 		"pidusage": "^2.0.17",
+		"prom-client": ">=12.0.0",
 		"redis": "^2.8.0",
 		"socket.io": "^2.3.0",
 		"spdy": "^4.0.1",
 		"uuid": "^7.0.2"
+	},
+	"devDependencies": {
+		"eslint": "6.8.0"
 	}
 }
