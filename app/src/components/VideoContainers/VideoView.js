@@ -74,42 +74,27 @@ const styles = (theme) =>
 		{
 			padding      : theme.spacing(0.5),
 			borderRadius : 2,
-			'& p'        :
-			{
-				userSelect : 'none',
-				margin     : 0,
-				color      : 'rgba(255, 255, 255, 0.7)',
-				fontSize   : '0.8em'
-			},
+			userSelect   : 'none',
+			margin       : 0,
+			color        : 'rgba(255, 255, 255, 0.7)',
+			fontSize     : '0.8em',
+
 			'&.left' :
-			{
-				backgroundColor : 'rgba(0, 0, 0, 0.25)'
-			},
-			'&.right' :
-			{
-				marginLeft : 'auto',
-				width      : 30
-			},
-			'&.hidden' :
-			{
-				opacity            : 0,
-				transitionDuration : '0s'
-			},
-			'& .netInfo' :
 				{
+					backgroundColor   : 'rgba(0, 0, 0, 0.25)',
 					display           : 'grid',
 					gap               : '1px 5px',
 					gridTemplateAreas : '\
-						"AcodL		Acod	Acod	Acod	Acod" \
-						"VcodL		Vcod	Vcod	Vcod	Vcod" \
-						"ResL		Res		Res		Res		Res" \
-						"RecvL		RecvBps RecvBps RecvSum RecvSum" \
-						"SendL		SendBps SendBps SendSum SendSum" \
-						"IPlocL		IPloc	IPloc	IPloc	IPloc" \
-						"IPsrvL		IPsrv	IPsrv	IPsrv	IPsrv" \
-						"STLcurrL	STLcurr	STLcurr STLcurr STLcurr" \
-						"STLprefL	STLpref STLpref STLpref STLpref"',
-					
+				"AcodL		Acod	Acod	Acod	Acod" \
+					"VcodL		Vcod	Vcod	Vcod	Vcod" \
+					"ResL		Res		Res		Res		Res" \
+					"RecvL		RecvBps RecvBps RecvSum RecvSum" \
+					"SendL		SendBps SendBps SendSum SendSum" \
+					"IPlocL		IPloc	IPloc	IPloc	IPloc" \
+					"IPsrvL		IPsrv	IPsrv	IPsrv	IPsrv" \
+					"STLcurrL	STLcurr	STLcurr STLcurr STLcurr" \
+					"STLprefL	STLpref STLpref STLpref STLpref"',
+
 					'& .AcodL'    : { gridArea: 'AcodL' },
 					'& .Acod'     : { gridArea: 'Acod' },
 					'& .VcodL'    : { gridArea: 'VcodL' },
@@ -130,7 +115,18 @@ const styles = (theme) =>
 					'& .STLcurr'  : { gridArea: 'STLcurr' },
 					'& .STLprefL' : { gridArea: 'STLprefL' },
 					'& .STLpref'  : { gridArea: 'STLpref' }
-				}
+
+				},
+			'&.right' :
+			{
+				marginLeft : 'auto',
+				width      : 30
+			},
+			'&.hidden' :
+			{
+				opacity            : 0,
+				transitionDuration : '0s'
+			}
 		},
 		peer :
 		{
@@ -272,35 +268,34 @@ class VideoView extends React.PureComponent
 				<div className={classes.info}>
 					<div className={classes.media}>
 						<div className={classnames(classes.box, 'left', { hidden: !advancedMode })}>
-							<p className={'netInfo'}>
-								{ audioCodec && 
+							{ audioCodec && 
 								<React.Fragment>
 									<span className={'AcodL'}>Acod: </span>
 									<span className={'Acod'}>
 										{audioCodec}
 									</span> 
 								</React.Fragment>
-								}
+							}
 
-								{ videoCodec &&
+							{ videoCodec &&
 								<React.Fragment>
 									<span className={'VcodL'}>Vcod: </span>
 									<span className={'Vcod'}>
 										{videoCodec}
 									</span>
 								</React.Fragment>
-								}
+							}
 
-								{ (videoVisible && videoWidth !== null) &&
+							{ (videoVisible && videoWidth !== null) &&
 								<React.Fragment>
 									<span className={'ResL'}>Res: </span>
 									<span className={'Res'}>
 										{videoWidth}x{videoHeight}
 									</span>
 								</React.Fragment>
-								}
+							}
 
-								{ isMe && 
+							{ isMe && 
 									(netInfo.recv && netInfo.send && netInfo.send.iceSelectedTuple) &&
 									<React.Fragment>
 										<span className={'RecvL'}>Recv: </span>
@@ -329,9 +324,9 @@ class VideoView extends React.PureComponent
 											{netInfo.send.iceSelectedTuple.localIp}
 										</span>
 									</React.Fragment>
-								}
+							}
 							
-								{ videoMultiLayer &&
+							{ videoMultiLayer &&
 								<React.Fragment>
 									<span className={'STLcurrL'}>STLcurr: </span>
 									<span className={'STLcurr'}>{consumerCurrentSpatialLayer} {consumerCurrentTemporalLayer}</span>
@@ -339,8 +334,7 @@ class VideoView extends React.PureComponent
 									<span className={'STLprefL'}>STLpref: </span>
 									<span className={'STLpref'}>{consumerPreferredSpatialLayer} {consumerPreferredTemporalLayer}</span>
 								</React.Fragment>
-								}
-							</p>
+							}
 
 						</div>
 						{ !isMe &&
