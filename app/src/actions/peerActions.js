@@ -92,4 +92,3 @@ export const setStopPeerScreenSharingInProgress = (peerId, flag) =>
 		type    : 'STOP_PEER_SCREEN_SHARING_IN_PROGRESS',
 		payload : { peerId, flag }
 	});
-
