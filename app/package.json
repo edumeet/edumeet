@@ -32,7 +32,6 @@
 		"react-router-dom": "^5.1.2",
 		"react-scripts": "3.4.1",
 		"react-wakelock-react16": "0.0.7",
-		"react-wifi-indicator": "^1.0.1",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
 		"redux-persist": "^6.0.0",
