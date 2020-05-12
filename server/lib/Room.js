@@ -1441,6 +1441,25 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:stopScreenSharing':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const stopVideoPeer = this._peers[peerId];
+
+				if (!stopVideoPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(stopVideoPeer.socket, 'moderator:stopScreenSharing');
+
+				cb();
+
+				break;
+			}
+
 			case 'moderator:closeMeeting':
 			{
 				if (!this._hasPermission(peer, MODERATE_ROOM))
