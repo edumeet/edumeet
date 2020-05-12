@@ -64,7 +64,7 @@
 	"room.about": "Impressum",
 	"room.shortcutKeys": "Tastaturkürzel",
 
-	"me.mutedPTT": "Du bist stummgeschalted, Halte die SPACE-Taste um zu sprechen",
+	"me.mutedPTT": "Du bist stummgeschaltet. Halte die SPACE-Taste um zu sprechen",
 
 	"roles.gotRole": "Rolle erhalten: {role}",
 	"roles.lostRole": "Rolle entzogen: {role}",
@@ -110,9 +110,9 @@
 	"label.close": "Schließen",
 	"label.media": "Audio / Video",
 	"label.appearence": "Erscheinung",
-	"label.advanced": "Erweiter",
+	"label.advanced": "Erweitert",
 	"label.addVideo": "Video hinzufügen",
-	"label.promoteAllPeers": "Alle Teinehmer einlassen",
+	"label.promoteAllPeers": "Alle Teilnehmer reinlassen",
 	"label.moreActions": "Weitere Aktionen",
 
 	"settings.settings": "Einstellungen",
@@ -134,7 +134,7 @@
 	"settings.hiddenControls": "Medienwerkzeugleiste automatisch ausblenden",
 	"settings.notificationSounds": "Audiosignal bei Benachrichtigungen",
 	"settings.showNotifications": "Zeige Benachrichtigungen",
-	"settings.buttonControlBar": "Seperate seitliche Medienwerkzeugleiste",
+	"settings.buttonControlBar": "Separate seitliche Medienwerkzeugleiste",
 	"settings.echoCancellation": "Echounterdrückung",
 	"settings.autoGainControl": "Automatische Pegelregelung (Audioeingang)",
 	"settings.noiseSuppression": "Rauschunterdrückung",
