@@ -84,9 +84,9 @@
 	"tooltip.muteParticipantVideo": "Résztvevő videóstreamének némítása",
 	"tooltip.raisedHand": "Jelentkezés",
 	"tooltip.muteScreenSharing": "Képernyőmegosztás szüneteltetése",
-	"tooltip.muteParticipantAudioModerator": null,
-	"tooltip.muteParticipantVideoModerator": null,
-	"tooltip.muteScreenSharingModerator": null,
+	"tooltip.muteParticipantAudioModerator": "Résztvevő hangjának általános némítása",
+	"tooltip.muteParticipantVideoModerator": "Résztvevő videójának általános némítása",
+	"tooltip.muteScreenSharingModerator": "Résztvevő képernyőmegosztásának általános némítása",
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
@@ -141,7 +141,7 @@
 	"settings.echoCancellation": "Visszhangelnyomás",
 	"settings.autoGainControl": "Automatikus hangerő",
 	"settings.noiseSuppression": "Zajelnyomás",
-	"settings.drawerOverlayed": null,
+	"settings.drawerOverlayed": "Oldalsáv a tartalom felett",
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",
