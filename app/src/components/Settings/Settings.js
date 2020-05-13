@@ -95,7 +95,7 @@ const Settings = ({
 				/>
 				<Tab
 					label={intl.formatMessage({
-						id             : 'label.appearence',
+						id             : 'label.appearance',
 						defaultMessage : 'Appearence'
 					})}
 				/>

@@ -1,5 +1,23 @@
 const os = require('os');
 const userRoles = require('../userRoles');
+
+const {
+	BYPASS_ROOM_LOCK,
+	BYPASS_LOBBY
+} = require('../access');
+
+const {
+	CHANGE_ROOM_LOCK,
+	PROMOTE_PEER,
+	SEND_CHAT,
+	MODERATE_CHAT,
+	SHARE_SCREEN,
+	EXTRA_VIDEO,
+	SHARE_FILE,
+	MODERATE_FILES,
+	MODERATE_ROOM
+} = require('../permissions');
+
 // const AwaitQueue = require('awaitqueue');
 // const axios = require('axios');
 
@@ -96,8 +114,8 @@ module.exports =
 			this._queue = new AwaitQueue();
 		}
 
-		// rooms: number of rooms
-		// peers: number of peers
+		// rooms: rooms object
+		// peers: peers object
 		// eslint-disable-next-line no-unused-vars
 		async log({ rooms, peers })
 		{
@@ -106,9 +124,9 @@ module.exports =
 				// Do your logging in here, use queue to keep correct order
 
 				// eslint-disable-next-line no-console
-				console.log('Number of rooms: ', rooms);
+				console.log('Number of rooms: ', rooms.size);
 				// eslint-disable-next-line no-console
-				console.log('Number of peers: ', peers);
+				console.log('Number of peers: ', peers.size);
 			})
 				.catch((error) =>
 				{
@@ -216,39 +234,50 @@ module.exports =
 	accessFromRoles : {
 		// The role(s) will gain access to the room
 		// even if it is locked (!)
-		BYPASS_ROOM_LOCK : [ userRoles.ADMIN ],
+		[BYPASS_ROOM_LOCK] : [ userRoles.ADMIN ],
 		// The role(s) will gain access to the room without
 		// going into the lobby. If you want to restrict access to your
 		// server to only directly allow authenticated users, you could
 		// add the userRoles.AUTHENTICATED to the user in the userMapping
 		// function, and change to BYPASS_LOBBY : [ userRoles.AUTHENTICATED ]
-		BYPASS_LOBBY     : [ userRoles.NORMAL ]
+		[BYPASS_LOBBY]     : [ userRoles.NORMAL ]
 	},
 	permissionsFromRoles : {
 		// The role(s) have permission to lock/unlock a room
-		CHANGE_ROOM_LOCK : [ userRoles.NORMAL ],
+		[CHANGE_ROOM_LOCK] : [ userRoles.MODERATOR ],
 		// The role(s) have permission to promote a peer from the lobby
-		PROMOTE_PEER     : [ userRoles.NORMAL ],
+		[PROMOTE_PEER]     : [ userRoles.NORMAL ],
 		// The role(s) have permission to send chat messages
-		SEND_CHAT        : [ userRoles.NORMAL ],
+		[SEND_CHAT]        : [ userRoles.NORMAL ],
 		// The role(s) have permission to moderate chat
-		MODERATE_CHAT    : [ userRoles.MODERATOR ],
+		[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
 		// The role(s) have permission to share screen
-		SHARE_SCREEN     : [ userRoles.NORMAL ],
+		[SHARE_SCREEN]     : [ userRoles.NORMAL ],
 		// The role(s) have permission to produce extra video
-		EXTRA_VIDEO      : [ userRoles.NORMAL ],
+		[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
 		// The role(s) have permission to share files
-		SHARE_FILE       : [ userRoles.NORMAL ],
+		[SHARE_FILE]       : [ userRoles.NORMAL ],
 		// The role(s) have permission to moderate files
-		MODERATE_FILES   : [ userRoles.MODERATOR ],
+		[MODERATE_FILES]   : [ userRoles.MODERATOR ],
 		// The role(s) have permission to moderate room (e.g. kick user)
-		MODERATE_ROOM    : [ userRoles.MODERATOR ]
+		[MODERATE_ROOM]    : [ userRoles.MODERATOR ]
 	},
+	// Array of permissions. If no peer with the permission in question
+	// is in the room, all peers are permitted to do the action. The peers
+	// that are allowed because of this rule will not be able to do this 
+	// action as soon as a peer with the permission joins. In this example
+	// everyone will be able to lock/unlock room until a MODERATOR joins.
+	allowWhenRoleMissing : [ CHANGE_ROOM_LOCK ],
 	// When truthy, the room will be open to all users when as long as there
 	// are allready users in the room
-	activateOnHostJoin : true,
+	activateOnHostJoin   : true,
+	// When set, maxUsersPerRoom defines how many users can join
+	// a single room. If not set, there is no limit.
+	// maxUsersPerRoom    : 20,
+	// Room size before spreading to new router
+	routerScaleSize      : 40,
 	// Mediasoup settings
-	mediasoup          :
+	mediasoup            :
 	{
 		numWorkers : Object.keys(os.cpus()).length,
 		// mediasoup Worker settings.

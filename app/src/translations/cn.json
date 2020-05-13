@@ -59,7 +59,11 @@
 	"room.raisedHand": null,
 	"room.loweredHand": null,
 	"room.extraVideo": null,
-
+	"room.overRoomLimit": null,
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
+	
 	"me.mutedPTT": null,
 
 	"roles.gotRole": null,
@@ -79,6 +83,10 @@
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
+	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",
@@ -92,6 +100,7 @@
 	"label.filesharing": "文件共享",
 	"label.participants": "参与者",
 	"label.shareFile": "共享文件",
+	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "不支持文件共享",
 	"label.unknown": "未知",
 	"label.democratic": "民主视图",
@@ -103,10 +112,11 @@
 	"label.ultra": "超高 (UHD)",
 	"label.close": "关闭",
 	"label.media": null,
-	"label.appearence": null,
+	"label.appearance": null,
 	"label.advanced": null,
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
+	"label.moreActions": null,
 
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",
@@ -126,6 +136,12 @@
 	"settings.lastn": "可见视频数量",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "无法保存文件",
 	"filesharing.startingFileShare": "正在尝试共享文件",

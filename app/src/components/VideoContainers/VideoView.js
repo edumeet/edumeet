@@ -4,13 +4,12 @@ import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import EditableInput from '../Controls/EditableInput';
 import Logger from '../../Logger';
-import { green, yellow, orange, red } from '@material-ui/core/colors';
+import { yellow, orange, red } from '@material-ui/core/colors';
 import SignalCellularOffIcon from '@material-ui/icons/SignalCellularOff';
 import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';
 import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
-import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
 
 const logger = new Logger('VideoView');
 
@@ -153,6 +152,7 @@ class VideoView extends React.PureComponent
 	{
 		const {
 			isMe,
+			showQuality,
 			isScreen,
 			displayName,
 			showPeerInfo,
@@ -162,8 +162,6 @@ class VideoView extends React.PureComponent
 			videoMultiLayer,
 			audioScore,
 			videoScore,
-			// consumerSpatialLayers,
-			// consumerTemporalLayers,
 			consumerCurrentSpatialLayer,
 			consumerCurrentTemporalLayer,
 			consumerPreferredSpatialLayer,
@@ -180,58 +178,63 @@ class VideoView extends React.PureComponent
 			videoHeight
 		} = this.state;
 
-		let quality = <SignalCellularOffIcon style={{ color: red[500] }}/>;
+		let quality = null;
 
-		if (videoScore || audioScore)
+		if (showQuality)
 		{
-			const score = videoScore ? videoScore : audioScore;
+			quality = <SignalCellularOffIcon style={{ color: red[500] }}/>;
 
-			switch (score.producerScore)
+			if (videoScore || audioScore)
 			{
-				case 0:
-				case 1:
+				const score = videoScore ? videoScore : audioScore;
+	
+				switch (isMe ? score.score : score.producerScore)
 				{
-					quality = <SignalCellular0BarIcon style={{ color: red[500] }}/>;
-
-					break;
-				}
-
-				case 2:
-				case 3:
-				{
-					quality = <SignalCellular1BarIcon style={{ color: red[500] }}/>;
-
-					break;
-				}
-
-				case 4:
-				case 5:
-				case 6:
-				{
-					quality = <SignalCellular2BarIcon style={{ color: orange[500] }}/>;
-
-					break;
-				}
-
-				case 7:
-				case 8:
-				{
-					quality = <SignalCellular3BarIcon style={{ color: yellow[500] }}/>;
-
-					break;
-				}
-
-				case 9:
-				case 10:
-				{
-					quality = <SignalCellularAltIcon style={{ color: green[500] }}/>;
-
-					break;
-				}
-
-				default:
-				{
-					break;
+					case 0:
+					case 1:
+					{
+						quality = <SignalCellular0BarIcon style={{ color: red[500] }}/>;
+	
+						break;
+					}
+	
+					case 2:
+					case 3:
+					{
+						quality = <SignalCellular1BarIcon style={{ color: red[500] }}/>;
+	
+						break;
+					}
+	
+					case 4:
+					case 5:
+					case 6:
+					{
+						quality = <SignalCellular2BarIcon style={{ color: orange[500] }}/>;
+	
+						break;
+					}
+	
+					case 7:
+					case 8:
+					case 9:
+					{
+						quality = <SignalCellular3BarIcon style={{ color: yellow[500] }}/>;
+	
+						break;
+					}
+	
+					case 10:
+					{
+						quality = null;
+	
+						break;
+					}
+	
+					default:
+					{
+						break;
+					}
 				}
 			}
 		}
@@ -261,7 +264,7 @@ class VideoView extends React.PureComponent
 								<p>{videoWidth}x{videoHeight}</p>
 							}
 						</div>
-						{ !isMe &&
+						{ showQuality &&
 							<div className={classnames(classes.box, 'right')}>
 								{ 
 									quality
@@ -441,6 +444,7 @@ class VideoView extends React.PureComponent
 VideoView.propTypes =
 {
 	isMe                           : PropTypes.bool,
+	showQuality                    : PropTypes.bool,
 	isScreen                       : PropTypes.bool,
 	displayName                    : PropTypes.string,
 	showPeerInfo                   : PropTypes.bool,

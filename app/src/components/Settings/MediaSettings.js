@@ -3,12 +3,15 @@ import { connect } from 'react-redux';
 import * as appPropTypes from '../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../RoomContext';
+import * as settingsActions from '../../actions/settingsActions';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = (theme) =>
 	({
@@ -23,6 +26,9 @@ const styles = (theme) =>
 	});
 
 const MediaSettings = ({
+	setEchoCancellation,
+	setAutoGainControl,
+	setNoiseSuppression,
 	roomClient,
 	me,
 	settings,
@@ -247,6 +253,51 @@ const MediaSettings = ({
 						/>
 					</FormHelperText>
 				</FormControl>
+				<FormControlLabel
+					className={classes.setting}
+					control={
+						<Checkbox checked={settings.echoCancellation} onChange={
+							(event) => 
+							{
+								setEchoCancellation(event.target.checked);
+								roomClient.changeAudioDevice(settings.selectedAudioDevice);
+							}}
+						/>}
+					label={intl.formatMessage({
+						id             : 'settings.echoCancellation',
+						defaultMessage : 'Echo cancellation'
+					})}
+				/>
+				<FormControlLabel
+					className={classes.setting}
+					control={
+						<Checkbox checked={settings.autoGainControl} onChange={
+							(event) => 
+							{
+								setAutoGainControl(event.target.checked);
+								roomClient.changeAudioDevice(settings.selectedAudioDevice);
+							}}
+						/>}
+					label={intl.formatMessage({
+						id             : 'settings.autoGainControl',
+						defaultMessage : 'Auto gain control'
+					})}
+				/>
+				<FormControlLabel
+					className={classes.setting}
+					control={
+						<Checkbox checked={settings.noiseSuppression} onChange={
+							(event) => 
+							{
+								setNoiseSuppression(event.target.checked);
+								roomClient.changeAudioDevice(settings.selectedAudioDevice);
+							}}
+						/>}
+					label={intl.formatMessage({
+						id             : 'settings.noiseSuppression',
+						defaultMessage : 'Noise suppression'
+					})}
+				/>
 			</form>
 		</React.Fragment>
 	);
@@ -254,10 +305,13 @@ const MediaSettings = ({
 
 MediaSettings.propTypes =
 {
-	roomClient : PropTypes.any.isRequired,
-	me         : appPropTypes.Me.isRequired,
-	settings   : PropTypes.object.isRequired,
-	classes    : PropTypes.object.isRequired
+	roomClient          : PropTypes.any.isRequired,
+	setEchoCancellation : PropTypes.func.isRequired,
+	setAutoGainControl  : PropTypes.func.isRequired,
+	setNoiseSuppression : PropTypes.func.isRequired,
+	me                  : appPropTypes.Me.isRequired,
+	settings            : PropTypes.object.isRequired,
+	classes             : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -268,9 +322,15 @@ const mapStateToProps = (state) =>
 	};
 };
 
+const mapDispatchToProps = {
+	setEchoCancellation : settingsActions.setEchoCancellation,
+	setAutoGainControl  : settingsActions.toggleAutoGainControl,
+	setNoiseSuppression : settingsActions.toggleNoiseSuppression
+};
+
 export default withRoomContext(connect(
 	mapStateToProps,
-	null,
+	mapDispatchToProps,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
