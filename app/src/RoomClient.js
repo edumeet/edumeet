@@ -2960,7 +2960,9 @@ export default class RoomClient
 					if (!this._muted)
 					{
 						await this.enableMic();
-						if (peers.length > 4) 
+						const { autoMuteThreshold } = store.getState().settings;
+
+						if (autoMuteThreshold && peers.length > autoMuteThreshold) 
 							this.muteMic();
 					}
 
