@@ -51,6 +51,7 @@
 	"room.videoPaused": "Šis video ir pauzēts",
 	"room.muteAll": "Noklusināt visus dalībnieku mikrofonus",
 	"room.stopAllVideo": "Izslēgt visu dalībnieku kameras",
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": "Beigt sapulci",
 	"room.clearChat": "Nodzēst visus tērziņus",
 	"room.clearFileSharing": "Notīrīt visus kopīgotos failus",

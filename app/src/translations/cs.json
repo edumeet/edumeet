@@ -50,6 +50,7 @@
 	"room.videoPaused": "Toto video bylo pozastaveno",
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": null,
 	"room.clearChat": null,
 	"room.clearFileSharing": null,

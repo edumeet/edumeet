@@ -51,6 +51,7 @@
 	"room.videoPaused": "该视频已暂停",
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": null,
 	"room.clearChat": null,
 	"room.clearFileSharing": null,

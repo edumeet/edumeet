@@ -51,6 +51,7 @@
 	"room.videoPaused": "Ez a videóstream szünetel",
 	"room.muteAll": "Mindenki némítása",
 	"room.stopAllVideo": "Mindenki video némítása",
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": "Konferencia lebontása",
 	"room.clearChat": "Chat történelem kiürítése",
 	"room.clearFileSharing": "File megosztás kiürítése",

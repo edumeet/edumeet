@@ -51,6 +51,7 @@
 	"room.videoPaused": "This video is paused",
 	"room.muteAll": "Mute all",
 	"room.stopAllVideo": "Stop all video",
+	"room.stopAllScreenSharing": "Stop all screen sharing",
 	"room.closeMeeting": "Close meeting",
 	"room.clearChat": "Clear chat",
 	"room.clearFileSharing": "Clear files",

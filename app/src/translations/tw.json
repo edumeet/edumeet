@@ -51,6 +51,7 @@
 	"room.videoPaused": "視訊已關閉",
 	"room.muteAll": "全部靜音",
 	"room.stopAllVideo": "關閉全部視訊",
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": "關閉會議",
 	"room.clearChat": "清除聊天",
 	"room.clearFileSharing": "清除檔案",

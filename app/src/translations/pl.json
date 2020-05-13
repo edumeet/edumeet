@@ -51,6 +51,7 @@
 	"room.videoPaused": "To wideo jest wstrzymane.",
 	"room.muteAll": "Wycisz wszystkich",
 	"room.stopAllVideo": "Zatrzymaj wszystkie Video",
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": "Zamknij spotkanie",
 	"room.clearChat": "Wyczyść Chat",
 	"room.clearFileSharing": "Wyczyść pliki",

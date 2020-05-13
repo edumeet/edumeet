@@ -51,6 +51,7 @@
 	"room.videoPaused":  "Video pauziran",
 	"room.muteAll": "Utišaj sve",
 	"room.stopAllVideo": "Ugasi sve kamere",
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": "Završi sastanak",
 	"room.clearChat": "Izbriši razgovor",
 	"room.clearFileSharing": "Izbriši dijeljene datoteke",

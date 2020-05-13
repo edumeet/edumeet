@@ -51,6 +51,7 @@
 	"room.videoPaused": "Video duraklatıldı",
 	"room.muteAll": null,
 	"room.stopAllVideo": null,
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": null,
 	"room.clearChat": null,
 	"room.clearFileSharing": null,

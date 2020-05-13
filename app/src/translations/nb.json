@@ -51,6 +51,7 @@
 	"room.videoPaused": "Denne videoen er inaktiv",
 	"room.muteAll": "Demp alle",
 	"room.stopAllVideo": "Stopp all video",
+	"room.stopAllScreenSharing": null,
 	"room.closeMeeting": "Avslutt møte",
 	"room.clearChat": "Tøm chat",
 	"room.clearFileSharing": "Fjern filer",
