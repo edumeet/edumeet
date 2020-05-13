@@ -12,6 +12,7 @@ export default class Spotlights extends EventEmitter
 		this._signalingSocket = signalingSocket;
 		this._maxSpotlights = maxSpotlights;
 		this._peerList = [];
+		this._unmutablePeerList = [];
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
 		this._started = false;
@@ -42,6 +43,66 @@ export default class Spotlights extends EventEmitter
 		else
 		{
 			return false;
+		}
+	}
+
+	setNextAsSelected()
+	{
+		let peerId = null;
+		if (this._selectedSpotlights.length > 0) {
+			peerId = this._selectedSpotlights[0];
+		} else if (this._unmutablePeerList.length > 0) {
+			peerId = this._unmutablePeerList[0];
+		}
+
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) {
+			let oldIndex = this._unmutablePeerList.indexOf(peerId);
+			let index = oldIndex;
+			index++;
+			do {
+				if (index >= this._unmutablePeerList.length) {
+					index = 0;
+				}
+				let newSelectedPeer = this._unmutablePeerList[index];
+				if (!this._currentSpotlights.includes(newSelectedPeer)) {
+					this.setPeerSpotlight(newSelectedPeer);
+					break;
+				}
+				index++;
+				if (index === oldIndex) {
+					break;
+				}
+			} while (true);
+		}
+	}
+
+	setPrevAsSelected()
+	{
+		let peerId = null;
+		if (this._selectedSpotlights.length > 0) {
+			peerId = this._selectedSpotlights[0];
+		} else if (this._unmutablePeerList.length > 0) {
+			peerId = this._unmutablePeerList[0];
+		}
+
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) {
+			let oldIndex = this._unmutablePeerList.indexOf(peerId);
+			let index = oldIndex;
+			index--;
+			do {
+				if (index < 0) {
+					index = this._unmutablePeerList.length - 1;
+				}
+				let newSelectedPeer = this._unmutablePeerList[index];
+				if (!this._currentSpotlights.includes(newSelectedPeer)) {
+					this.setPeerSpotlight(newSelectedPeer);
+					break;
+				}
+				index--;
+				if (index === oldIndex) {
+					break;
+				}
+			} while (true);
 		}
 	}
 
@@ -114,6 +175,7 @@ export default class Spotlights extends EventEmitter
 			logger.debug('_handlePeer() | adding peer [peerId: "%s"]', id);
 
 			this._peerList.push(id);
+			this._unmutablePeerList.push(id);
 
 			if (this._started)
 				this._spotlightsUpdated();
@@ -126,6 +188,7 @@ export default class Spotlights extends EventEmitter
 			'room "peerClosed" event [peerId:%o]', id);
 
 		this._peerList = this._peerList.filter((peer) => peer !== id);
+		this._unmutablePeerList = this._unmutablePeerList.filter((peer) => peer !== id);
 
 		this._selectedSpotlights = this._selectedSpotlights.filter((peer) => peer !== id);
 
