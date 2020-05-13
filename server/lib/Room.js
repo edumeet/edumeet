@@ -1441,6 +1441,19 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'moderator:stopAllScreenSharing':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:stopScreenSharing', null, true);
+
+				cb();
+
+				break;
+			}
+
 			case 'moderator:stopScreenSharing':
 			{
 				if (!this._hasPermission(peer, MODERATE_ROOM))
