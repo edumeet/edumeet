@@ -31,7 +31,8 @@ import messagesFrench from './translations/fr';
 import messagesGreek from './translations/el';
 import messagesRomanian from './translations/ro';
 import messagesPortuguese from './translations/pt';
-import messagesChinese from './translations/cn';
+import messagesChineseSimplified from './translations/cn';
+import messagesChineseTraditional from './translations/tw';
 import messagesSpanish from './translations/es';
 import messagesCroatian from './translations/hr';
 import messagesCzech from './translations/cs';
@@ -58,7 +59,8 @@ const messages =
 	'el' : messagesGreek,
 	'ro' : messagesRomanian,
 	'pt' : messagesPortuguese,
-	'zh' : messagesChinese,
+	'zh-hans' : messagesChineseSimplified,
+	'zh-hant' : messagesChineseTraditional,
 	'es' : messagesSpanish,
 	'hr' : messagesCroatian,
 	'cs' : messagesCzech,
@@ -68,7 +70,15 @@ const messages =
 	'lv' : messagesLatvian
 };
 
-const locale = navigator.language.split(/[-_]/)[0]; // language without region code
+let browserLanguage = (navigator.language || navigator.browserLanguage).toLowerCase()
+let locale = browserLanguage.split(/[-_]/)[0]; // language without region code
+if (locale === 'zh')
+{
+	if (browserLanguage === 'zh-cn')
+		locale = 'zh-hans'
+	else
+		locale = 'zh-hant'
+}
 
 const intl = createIntl({
 	locale,
