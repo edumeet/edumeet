@@ -84,6 +84,9 @@
 	"tooltip.muteParticipantVideo": "Résztvevő videóstreamének némítása",
 	"tooltip.raisedHand": "Jelentkezés",
 	"tooltip.muteScreenSharing": "Képernyőmegosztás szüneteltetése",
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",

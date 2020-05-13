@@ -83,6 +83,9 @@
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Jméno místnosti",
 	"label.chooseRoomButton": "Pokračovat",

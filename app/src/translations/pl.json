@@ -84,6 +84,9 @@
 	"tooltip.muteParticipantVideo": "Wyłącz wideo użytkownika",
 	"tooltip.raisedHand": "Podnieś rękę",
 	"tooltip.muteScreenSharing": "Anuluj udostępniania pulpitu przez użytkownika",
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Nazwa konferencji",
 	"label.chooseRoomButton": "Kontynuuj",
