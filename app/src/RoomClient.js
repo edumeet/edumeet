@@ -1508,6 +1508,26 @@ export default class RoomClient
 			roomActions.setStopAllVideoInProgress(false));
 	}
 
+	async stopAllPeerScreenSharing()
+	{
+		logger.debug('stopAllPeerScreenSharing()');
+
+		store.dispatch(
+			roomActions.setStopAllScreenSharingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopAllScreenSharing');
+		}
+		catch (error)
+		{
+			logger.error('stopAllPeerScreenSharing() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setStopAllScreenSharingInProgress(false));
+	}
+
 	async closeMeeting()
 	{
 		logger.debug('closeMeeting()');

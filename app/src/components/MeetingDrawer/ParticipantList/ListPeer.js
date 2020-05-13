@@ -309,7 +309,7 @@ const ListPeer = (props) =>
 			{ isModerator && screenConsumer && 
 				<Tooltip
 					title={intl.formatMessage({
-						id             : 'tooltip.muteScreenSharing',
+						id             : 'tooltip.muteScreenSharingModerator',
 						defaultMessage : 'Mute participant screen share globally'
 					})}
 					placement='bottom'
