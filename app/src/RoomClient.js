@@ -304,12 +304,18 @@ export default class RoomClient
 				{
 					case String.fromCharCode(37):
 					{
-						this._spotlights.setPrevAsSelected();
+						const newPeerId = this._spotlights.getPrevAsSelected(
+							store.getState().room.selectedPeerId);
+
+						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
 					case String.fromCharCode(39):
 					{
-						this._spotlights.setNextAsSelected();
+						const newPeerId = this._spotlights.getNextAsSelected(
+							store.getState().room.selectedPeerId);
+							
+						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
 					case 'A': // Activate advanced mode
