@@ -46,90 +46,54 @@ export default class Spotlights extends EventEmitter
 		}
 	}
 
-	setNextAsSelected()
+	getNextAsSelected(peerId)
 	{
-		let peerId = null;
-
-		if (this._selectedSpotlights.length > 0) 
-		{
-			peerId = this._selectedSpotlights[0];
-		}
-		else if (this._unmutablePeerList.length > 0) 
-		{
+		let newSelectedPeer;
+		if (peerId == null && this._unmutablePeerList.length > 0) {
 			peerId = this._unmutablePeerList[0];
 		}
 
-		if (peerId != null && 
-			this._currentSpotlights.length < this._unmutablePeerList.length) 
-		{
-			const oldIndex = this._unmutablePeerList.indexOf(peerId);
-
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) {
+			let oldIndex = this._unmutablePeerList.indexOf(peerId);
 			let index = oldIndex;
-
 			index++;
-			do 
-			{
-				if (index >= this._unmutablePeerList.length) 
-				{
+			for (let i = 0; i < this._unmutablePeerList.length; i++) {
+				if (index >= this._unmutablePeerList.length) {
 					index = 0;
 				}
-				const newSelectedPeer = this._unmutablePeerList[index];
-
-				if (!this._currentSpotlights.includes(newSelectedPeer)) 
-				{
-					this.setPeerSpotlight(newSelectedPeer);
+				newSelectedPeer = this._unmutablePeerList[index];
+				if (!this._currentSpotlights.includes(newSelectedPeer)) {
 					break;
 				}
 				index++;
-				if (index === oldIndex) 
-				{
-					break;
-				}
-			} while (true);
+			}
 		}
+		return newSelectedPeer;
 	}
 
-	setPrevAsSelected()
+	getPrevAsSelected(peerId)
 	{
-		let peerId = null;
-
-		if (this._selectedSpotlights.length > 0) 
-		{
-			peerId = this._selectedSpotlights[0];
-		}
-		else if (this._unmutablePeerList.length > 0) 
-		{
+		let newSelectedPeer;
+		if (peerId == null && this._unmutablePeerList.length > 0) {
 			peerId = this._unmutablePeerList[0];
 		}
 
-		if (peerId != null && 
-			this._currentSpotlights.length < this._unmutablePeerList.length) 
-		{
-			const oldIndex = this._unmutablePeerList.indexOf(peerId);
-
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) {
+			let oldIndex = this._unmutablePeerList.indexOf(peerId);
 			let index = oldIndex;
-
 			index--;
-			do 
-			{
-				if (index < 0) 
-				{
+			for (let i = 0; i < this._unmutablePeerList.length; i++) {
+				if (index < 0) {
 					index = this._unmutablePeerList.length - 1;
 				}
-				const newSelectedPeer = this._unmutablePeerList[index];
-
-				if (!this._currentSpotlights.includes(newSelectedPeer)) 
-				{
-					this.setPeerSpotlight(newSelectedPeer);
+				newSelectedPeer = this._unmutablePeerList[index];
+				if (!this._currentSpotlights.includes(newSelectedPeer)) {
 					break;
 				}
 				index--;
-				if (index === oldIndex) 
-				{
-					break;
-				}
-			} while (true);
+			}
 		}
+		return newSelectedPeer;
 	}
 
 	setPeerSpotlight(peerId)
