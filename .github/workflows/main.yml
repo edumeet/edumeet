@@ -1,0 +1,80 @@
+name: Deployer
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          path: multiparty-meeting
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: |
+        sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install jq npm build-essential || true
+        cd multiparty-meeting
+        cp server/config/config.example.js server/config/config.js
+        cp app/public/config/config.example.js app/public/config/config.js
+        cd app
+        npm install
+        npm run build
+        cd ../server
+        cat <<< $(jq '.bundleDependencies += .dependencies' package.json) > package.json
+        npm install
+        npm pack
+        VERSION=$(cat package.json | jq -r '.version')
+        DATE=$(date)
+        mkdir -p /home/runner/package
+        cd /home/runner/package
+        mkdir DEBIAN
+        mkdir -p usr/local/src/multiparty-meeting/server
+        mkdir -p etc/systemd/system/
+        tar -xf /home/runner/work/***/***/***/server/***-server-$VERSION.tgz package/ 1>/dev/null 2>/dev/null || true
+        mv package/* usr/local/src/multiparty-meeting/server/
+        mv /home/runner/work/***/***/***/*.service etc/systemd/system/
+        rm -rf package
+        touch DEBIAN/md5sums
+        touch DEBIAN/md5sums
+        touch DEBIAN/control
+        find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum  1>/dev/null 2>/dev/null || true
+        echo """Package: multiparty-meeting
+        Version: $VERSION
+        Maintainer: Mert CELEN <mcelen94@gmail.com>
+        Section: admin
+        Date : $DATE
+        Architecture: amd64
+        Priority: important
+        Description: Multiparty web-meetings using mediasoup and WebRTC
+        Depends: nodejs (>= 12), redis
+        """ > DEBIAN/control
+        echo """#!/bin/bash
+        mkdir -p /etc/meeting/
+        ln -s /usr/local/src/multiparty-meeting/server/config/config.js /etc/meeting/server-config.js || true
+        ln -s /usr/local/src/multiparty-meeting/server/public/config/config.js /etc/meeting/client-config.js || true
+        systemctl daemon-reload
+        systemctl enable multiparty-meeting
+        echo "Multiparty Meeting is installed, but you need the configure the server and client with your ip adresses in configuration files under /etc/meeting/ \n"
+        echo "\n\nAfter the configuration, you can start service with 'sudo systemctl start multiparty-meeting' command.\n\n"
+        """ > DEBIAN/postinst
+        chmod 775 DEBIAN/postinst
+        cd ../
+        dpkg-deb -Zgzip --build package
+        mv /home/runner/package.deb /home/runner/multiparty-meeting.deb
+    - name : Release Package
+      uses: actions/upload-artifact@v1
+      with:
+        name: multiparty-meeting
+        path: "/home/runner/multiparty-meeting.deb"

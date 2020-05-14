@@ -85,18 +85,6 @@ const styles = (theme) =>
 		{
 			margin  : theme.spacing(1, 0),
 			padding : theme.spacing(0, 1)
-		},
-		disabledButton :
-		{
-			margin : theme.spacing(1, 0)
-		},
-		green :
-		{
-			color : 'rgba(0, 153, 0, 1)'
-		},
-		moreAction :
-		{
-			margin : theme.spacing(0, 0, 0, 1)
 		}
 	});
 

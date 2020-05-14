@@ -62,6 +62,14 @@ OR
 
 ## Configure multiparty-meeting servers
 
+### App config
+
+mm/configs/app/config.js
+
+``` js
+multipartyServer : 'meet.example.com',
+```
+
 ### Server config
 
 mm/configs/server/config.js

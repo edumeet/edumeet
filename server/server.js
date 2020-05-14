@@ -18,7 +18,6 @@ const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
 
-const userRoles = require('./userRoles');
 const {
 	loginHelper,
 	logoutHelper
@@ -34,23 +33,16 @@ const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
 const interactiveServer = require('./lib/interactiveServer');
-const promExporter = require('./lib/promExporter');
-const { v4: uuidv4 } = require('uuid');
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
-console.log('- config.mediasoup.worker.logLevel:', config.mediasoup.worker.logLevel);
-console.log('- config.mediasoup.worker.logTags:', config.mediasoup.worker.logTags);
+console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
+console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
 /* eslint-enable no-console */
 
 const logger = new Logger();
 
 const queue = new AwaitQueue();
-
-let statusLogger = null;
-
-if ('StatusLogger' in config)
-	statusLogger = new config.StatusLogger();
 
 // mediasoup Workers.
 // @type {Array<mediasoup.Worker>}
@@ -107,8 +99,7 @@ const session = expressSession({
 	}
 });
 
-if (config.trustProxy)
-{
+if (config.trustProxy) {
 	app.set('trust proxy', config.trustProxy);
 }
 
@@ -134,12 +125,6 @@ async function run()
 	// Open the interactive server.
 	await interactiveServer(rooms, peers);
 
-	// start Prometheus exporter
-	if (config.prometheus)
-	{
-		await promExporter(rooms, peers, config.prometheus);
-	}
-
 	if (typeof(config.auth) === 'undefined')
 	{
 		logger.warn('Auth is not configured properly!');
@@ -158,25 +143,6 @@ async function run()
 	// Run WebSocketServer.
 	await runWebSocketServer();
 
-	// eslint-disable-next-line no-unused-vars
-	function errorHandler(err, req, res, next) 
-	{
-		const trackingId = uuidv4();
-
-		res.status(500).send(
-			`<h1>Internal Server Error</h1>
-			<p>If you report this error, please also report this 
-			<i>tracking ID</i> which makes it possible to locate your session
-			in the logs which are available to the system administrator: 
-			<b>${trackingId}</b></p>`
-		);
-		logger.error(
-			'Express error handler dump with tracking ID: %s, error dump: %o', 
-			trackingId, err);
-	}
-
-	app.use(errorHandler);
-
 	// Log rooms status every 30 seconds.
 	setInterval(() =>
 	{
@@ -194,17 +160,6 @@ async function run()
 			room.checkEmpty();
 		}
 	}, 10000);
-}
-
-function statusLog()
-{
-	if (statusLogger)
-	{
-		statusLogger.log({
-			rooms : rooms.size,
-			peers : peers.size
-		});
-	}
 }
 
 function setupLTI(ltiConfig)
@@ -226,7 +181,7 @@ function setupLTI(ltiConfig)
 				if (lti.user_id && lti.custom_room)
 				{
 					user.id = lti.user_id;
-					user._userinfo = { 'lti': lti };
+					user._lti = lti;
 				}
 
 				if (lti.custom_room)
@@ -239,7 +194,7 @@ function setupLTI(ltiConfig)
 				}
 				if (lti.lis_person_name_full)
 				{
-					user.displayName = lti.lis_person_name_full;
+					user.displayName=lti.lis_person_name_full;
 				}
 
 				// Perform local authentication if necessary
@@ -267,18 +222,7 @@ function setupOIDC(oidcIssuer)
 	// redirect_uri defaults to client.redirect_uris[0]
 	// response type defaults to client.response_types[0], then 'code'
 	// scope defaults to 'openid'
-
-	/* eslint-disable camelcase */
-	const params = (({
-		client_id,
-		redirect_uri,
-		scope
-	}) => ({
-		client_id,
-		redirect_uri,
-		scope
-	}))(config.auth.oidc.clientOptions);
-	/* eslint-enable camelcase */
+	const params = config.auth.oidc.clientOptions;
 
 	// optional, defaults to false, when true req is passed as a first
 	// argument to verify fn
@@ -293,18 +237,58 @@ function setupOIDC(oidcIssuer)
 		{ client: oidcClient, params, passReqToCallback, usePKCE },
 		(tokenset, userinfo, done) =>
 		{
-			if (userinfo && tokenset)
-			{
-				// eslint-disable-next-line camelcase
-				userinfo._tokenset_claims = tokenset.claims();
-			}
-
 			const user =
 			{
 				id        : tokenset.claims.sub,
 				provider  : tokenset.claims.iss,
-				_userinfo : userinfo
+				_userinfo : userinfo,
+				_claims   : tokenset.claims
 			};
+
+			if (userinfo.picture != null)
+			{
+				if (!userinfo.picture.match(/^http/g))
+				{
+					user.picture = `data:image/jpeg;base64, ${userinfo.picture}`;
+				}
+				else
+				{
+					user.picture = userinfo.picture;
+				}
+			}
+
+			if (userinfo.nickname != null)
+			{
+				user.displayName = userinfo.nickname;
+			}
+
+			if (userinfo.name != null)
+			{
+				user.displayName = userinfo.name;
+			}
+
+			if (userinfo.email != null)
+			{
+				user.email = userinfo.email;
+			}
+
+			if (userinfo.given_name != null)
+			{
+				user.name={};
+				user.name.givenName = userinfo.given_name;
+			}
+
+			if (userinfo.family_name != null)
+			{
+				if (user.name == null) user.name={};
+				user.name.familyName = userinfo.family_name;
+			}
+
+			if (userinfo.middle_name != null)
+			{
+				if (user.name == null) user.name={};
+				user.name.middleName = userinfo.middle_name;
+			}
 
 			return done(null, user);
 		}
@@ -344,8 +328,7 @@ async function setupAuth()
 	{
 		passport.authenticate('oidc', {
 			state : base64.encode(JSON.stringify({
-				peerId : req.query.peerId,
-				roomId : req.query.roomId
+				id : req.query.id
 			}))
 		})(req, res, next);
 	});
@@ -362,19 +345,6 @@ async function setupAuth()
 	// logout
 	app.get('/auth/logout', (req, res) =>
 	{
-		const { peerId } = req.session;
-
-		const peer = peers.get(peerId);
-
-		if (peer)
-		{
-			for (const role of peer.roles)
-			{
-				if (role !== userRoles.NORMAL)
-					peer.removeRole(role);
-			}
-		}
-
 		req.logout();
 		req.session.destroy(() => res.send(logoutHelper()));
 	});
@@ -383,37 +353,35 @@ async function setupAuth()
 	app.get(
 		'/auth/callback',
 		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
-		async (req, res) =>
+		(req, res) =>
 		{
 			const state = JSON.parse(base64.decode(req.query.state));
 
-			const { peerId, roomId } = state;
+			let displayName;
+			let picture;
 
-			req.session.peerId = peerId;
-			req.session.roomId = roomId;
-
-			let peer = peers.get(peerId);
-
-			if (!peer) // User has no socket session yet, make temporary
-				peer = new Peer({ id: peerId, roomId });
-
-			if (peer.roomId !== roomId) // The peer is mischievous
-				throw new Error('peer authenticated with wrong room');
-
-			if (typeof config.userMapping === 'function')
+			if (req.user != null)
 			{
-				await config.userMapping({
-					peer,
-					roomId,
-					userinfo : req.user._userinfo
-				});
+				if (req.user.displayName != null)
+					displayName = req.user.displayName;
+				else
+					displayName = '';
+
+				if (req.user.picture != null)
+					picture = req.user.picture;
+				else
+					picture = '/static/media/buddy.403cb9f6.svg';
 			}
 
-			peer.authenticated = true;
+			const peer = peers.get(state.id);
+
+			peer && (peer.displayName = displayName);
+			peer && (peer.picture = picture);
+			peer && (peer.authenticated = true);
 
 			res.send(loginHelper({
-				displayName : peer.displayName,
-				picture     : peer.picture
+				displayName,
+				picture
 			}));
 		}
 	);
@@ -427,7 +395,7 @@ async function runHttpsServer()
 
 	app.all('*', async (req, res, next) =>
 	{
-		if (req.secure || config.httpOnly)
+		if (req.secure || config.httpOnly )
 		{
 			const ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
 
@@ -470,14 +438,14 @@ async function runHttpsServer()
 		// http
 		const redirectListener = http.createServer(app);
 
-		if (config.listeningHost)
+		if(config.listeningHost)
 			redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
 		else
 			redirectListener.listen(config.listeningRedirectPort);
 	}
 
 	// https or http
-	if (config.listeningHost)
+	if(config.listeningHost)	
 		mainListener.listen(config.listeningPort, config.listeningHost);
 	else
 		mainListener.listen(config.listeningPort);
@@ -536,66 +504,14 @@ async function runWebSocketServer()
 
 		queue.push(async () =>
 		{
-			const { token } = socket.handshake.session;
-
 			const room = await getOrCreateRoom({ roomId });
-
-			let peer = peers.get(peerId);
-			let returning = false;
-
-			if (peer && !token)
-			{ // Don't allow hijacking sessions
-				socket.disconnect(true);
-
-				return;
-			}
-			else if (token && room.verifyPeer({ id: peerId, token }))
-			{ // Returning user, remove if old peer exists
-				if (peer)
-					peer.close();
-
-				returning = true;
-			}
-
-			peer = new Peer({ id: peerId, roomId, socket });
+			const peer = new Peer({ id: peerId, socket });
 
 			peers.set(peerId, peer);
 
-			peer.on('close', () =>
-			{
-				peers.delete(peerId);
+			peer.on('close', () => peers.delete(peerId));
 
-				statusLog();
-			});
-
-			if (
-				Boolean(socket.handshake.session.passport) &&
-				Boolean(socket.handshake.session.passport.user)
-			)
-			{
-				const {
-					id,
-					displayName,
-					picture,
-					email,
-					_userinfo
-				} = socket.handshake.session.passport.user;
-		
-				peer.authId = id;
-				peer.displayName = displayName;
-				peer.picture = picture;
-				peer.email = email;
-				peer.authenticated = true;
-		
-				if (typeof config.userMapping === 'function')
-				{
-					await config.userMapping({ peer, roomId, userinfo: _userinfo });
-				}
-			}
-
-			room.handlePeer({ peer, returning });
-
-			statusLog();
+			room.handlePeer(peer);
 		})
 			.catch((error) =>
 			{
@@ -664,20 +580,13 @@ async function getOrCreateRoom({ roomId })
 	{
 		logger.info('creating a new Room [roomId:"%s"]', roomId);
 
-		// const mediasoupWorker = getMediasoupWorker();
+		const mediasoupWorker = getMediasoupWorker();
 
-		room = await Room.create({ mediasoupWorkers, roomId });
+		room = await Room.create({ mediasoupWorker, roomId });
 
 		rooms.set(roomId, room);
 
-		statusLog();
-
-		room.on('close', () =>
-		{
-			rooms.delete(roomId);
-
-			statusLog();
-		});
+		room.on('close', () => rooms.delete(roomId));
 	}
 
 	return room;

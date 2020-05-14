@@ -282,8 +282,8 @@ export default class RoomClient
 
 	_startKeyListener()
 	{
-		// Add keydown event listener on document
-		document.addEventListener('keydown', (event) =>
+		// Add keypress event listener on document
+		document.addEventListener('keypress', (event) =>
 		{
 			if (event.repeat) return;
 			const key = String.fromCharCode(event.which);
@@ -771,7 +771,7 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				store.dispatch(requestActions.notify(
+				return store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
@@ -779,35 +779,18 @@ export default class RoomClient
 							defaultMessage : 'Unable to share file'
 						})
 					}));
-
-				return;
 			}
 
 			const existingTorrent = this._webTorrent.get(torrent);
 
 			if (existingTorrent)
 			{
-				store.dispatch(requestActions.notify(
-					{
-						text : intl.formatMessage({
-							id             : 'filesharing.successfulFileShare',
-							defaultMessage : 'File successfully shared'
-						})
-					}));
-
-				store.dispatch(fileActions.addFile(
-					this._peerId,
-					existingTorrent.magnetURI
-				));
-
-				this._sendFile(existingTorrent.magnetURI);
-
-				return;
+				return this._sendFile(existingTorrent.magnetURI);
 			}
 
 			this._webTorrent.seed(
 				files,
-				{ announceList: [ [ this._tracker ] ] },
+				{ announceList: [ [ 'wss://tracker.lab.vvc.niif.hu:443' ] ] },
 				(newTorrent) =>
 				{
 					store.dispatch(requestActions.notify(
@@ -1214,43 +1197,21 @@ export default class RoomClient
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
-
-			if (stream)
-			{
+			if (stream){
 				const track = stream.getVideoTracks()[0];
-
-				if (track)
-				{
-					if (this._webcamProducer)
-					{
-						await this._webcamProducer.replaceTrack({ track });
-					}
-					else 
-					{
-						this._webcamProducer = await this._sendTransport.produce({
-							track,
-							appData : 
-							{
-								source : 'webcam'
-							}
-						});	
-					}
-		
+				if (track) {
+					await this._webcamProducer.replaceTrack({ track });
+	
 					store.dispatch(
 						producerActions.setProducerTrack(this._webcamProducer.id, track));
-
-				}
-				else
-				{
-					logger.warn('getVideoTracks Error: First Video Track is null');
+							
+				} else {
+					logger.warn('getVideoTracks Error: First Video Track is null')
 				}
 	
+			} else {
+				logger.warn ('getUserMedia Error: Stream is null!') 
 			}
-			else
-			{
-				logger.warn('getUserMedia Error: Stream is null!');
-			}
-
 			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
 
 			await this._updateWebcams();
@@ -2764,20 +2725,7 @@ export default class RoomClient
 					canShareFiles : this._torrentSupport
 				}));
 
-			const {
-				authenticated,
-				roles,
-				peers,
-				tracker,
-				permissionsFromRoles,
-				userRoles,
-				chatHistory,
-				fileHistory,
-				lastNHistory,
-				locked,
-				lobbyPeers,
-				accessCode
-			} = await this.sendRequest(
+			const { peers, authenticated } = await this.sendRequest(
 				'join',
 				{
 					displayName     : displayName,
@@ -2785,12 +2733,9 @@ export default class RoomClient
 					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
 
-			logger.debug(
-				'_joinRoom() joined [authenticated:"%s", peers:"%o", roles:"%o"]',
-				authenticated,
-				peers,
-				roles
-			);
+			store.dispatch(meActions.loggedIn(authenticated));
+
+			logger.debug('_joinRoom() joined, got peers [peers:"%o"]', peers);
 
 			tracker && (this._tracker = tracker);
 
@@ -2830,38 +2775,6 @@ export default class RoomClient
 				store.dispatch(roomActions.setSpotlights(spotlights));
 				this.updateSpotlights(spotlights);
 			});
-
-			(chatHistory.length > 0) && store.dispatch(
-				chatActions.addChatHistory(chatHistory));
-
-			(fileHistory.length > 0) && store.dispatch(
-				fileActions.addFileHistory(fileHistory));
-
-			if (lastNHistory.length > 0)
-			{
-				logger.debug('_joinRoom() | got lastN history');
-
-				this._spotlights.addSpeakerList(
-					lastNHistory.filter((peerId) => peerId !== this._peerId)
-				);
-			}
-
-			locked ? 
-				store.dispatch(roomActions.setRoomLocked()) :
-				store.dispatch(roomActions.setRoomUnLocked());
-
-			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
-			{
-				store.dispatch(
-					lobbyPeerActions.addLobbyPeer(peer.peerId));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.peerId));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
-			});
-
-			(accessCode != null) && store.dispatch(
-				roomActions.setAccessCode(accessCode));
 
 			// Don't produce if explicitly requested to not to do it.
 			if (this._produce)

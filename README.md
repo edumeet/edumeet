@@ -27,7 +27,7 @@ Currently multiparty-meeting will only run on nodejs v13.x
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
-$ sudo apt install git npm build-essential redis
+$ sudo apt install npm build-essential redis
 ```
 
 * Clone the project:
@@ -113,7 +113,7 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 
 ## TURN configuration
 
-* You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `app/config.js`
+* You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `app/public/config/config.js`
 
 ## Community-driven support
 

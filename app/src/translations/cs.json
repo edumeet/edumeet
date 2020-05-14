@@ -48,22 +48,6 @@
 	"room.spotlights": "Aktivní Účastníci",
 	"room.passive": "Pasivní Účastníci",
 	"room.videoPaused": "Toto video bylo pozastaveno",
-	"room.muteAll": null,
-	"room.stopAllVideo": null,
-	"room.closeMeeting": null,
-	"room.clearChat": null,
-	"room.clearFileSharing": null,
-	"room.speechUnsupported": null,
-	"room.moderatoractions": null,
-	"room.raisedHand": null,
-	"room.loweredHand": null,
-	"room.extraVideo": null,
-	"room.overRoomLimit": null,
-
-	"me.mutedPTT": null,
-
-	"roles.gotRole": null,
-	"roles.lostRole": null,
 
 	"tooltip.login": "Přihlášení",
 	"tooltip.logout": "Odhlášení",
@@ -74,11 +58,6 @@
 	"tooltip.leaveFullscreen": "Vypnout režim celé obrazovky (fullscreen)",
 	"tooltip.lobby": "Ukázat Přijímací místnost",
 	"tooltip.settings": "Zobrazit nastavení",
-	"tooltip.participants": null,
-	"tooltip.kickParticipant": null,
-	"tooltip.muteParticipant": null,
-	"tooltip.muteParticipantVideo": null,
-	"tooltip.raisedHand": null,
 
 	"label.roomName": "Jméno místnosti",
 	"label.chooseRoomButton": "Pokračovat",
@@ -92,7 +71,6 @@
 	"label.filesharing": "Sdílení souborů",
 	"label.participants": "Účastníci",
 	"label.shareFile": "Sdílet soubor",
-	"label.shareGalleryFile": null,
 	"label.fileSharingUnsupported": "Sdílení souborů není podporováno",
 	"label.unknown": "Neznámý",
 	"label.democratic": "Rozvržení: Demokratické",
@@ -103,11 +81,6 @@
 	"label.veryHigh": "Velmi vysoké (FHD)",
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Zavřít",
-	"label.media": null,
-	"label.appearence": null,
-	"label.advanced": null,
-	"label.addVideo": null,
-	"label.promoteAllPeers": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",
@@ -116,17 +89,10 @@
 	"settings.audio": "Audio zařízení",
 	"settings.selectAudio": "Vyberte audio zařízení",
 	"settings.cantSelectAudio": "Není možno vybrat audio zařízení",
-	"settings.audioOutput": "Audio output zařízení",
-	"settings.selectAudioOutput": "Vyberte audio output zařízení",
-	"settings.cantSelectAudioOutput": "Není možno vybrat audio output zařízení",
 	"settings.resolution": "Vyberte rozlišení vašeho videa",
 	"settings.layout": "Rozvržení místnosti",
 	"settings.selectRoomLayout": "Vyberte rozvržení místnosti",
 	"settings.advancedMode": "Pokočilý mód",
-	"settings.permanentTopBar": null,
-	"settings.lastn": null,
-	"settings.hiddenControls": null,
-	"settings.notificationSounds": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",
@@ -156,8 +122,8 @@
 
 	"devices.microphoneDisconnected": "Mikrofon odpojen",
 	"devices.microphoneError": "Při přístupu k vašemu mikrofonu se vyskytla chyba",
-	"devices.microphoneMute": "Mikrofon ztišen",
-	"devices.microphoneUnMute": "Ztišení mikrofonu zrušeno",
+	"devices.microPhoneMute": "Mikrofon ztišen",
+	"devices.micophoneUnMute": "Ztišení mikrofonu zrušeno",
 	"devices.microphoneEnable": "Mikrofon povolen",
 	"devices.microphoneMuteError": "Není možné ztišit váš mikrofon",
 	"devices.microphoneUnMuteError": "Není možné zrušit ztišení vašeho mikrofonu",
@@ -166,10 +132,5 @@
 	"devices.screenSharingError": "Při přístupu k vaší obrazovce se vyskytla chyba",
 
 	"devices.cameraDisconnected": "Kamera odpojena",
-	"devices.cameraError": "Při přístupu k vaší kameře se vyskytla chyba",
-
-	"moderator.clearChat": null,
-	"moderator.clearFiles": null,
-	"moderator.muteAudio": null,
-	"moderator.muteVideo": null
+	"devices.cameraError": "Při přístupu k vaší kameře se vyskytla chyba"
 }

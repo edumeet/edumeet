@@ -4,12 +4,9 @@ const initialState =
 	selectedWebcam      : null,
 	selectedAudioDevice : null,
 	advancedMode        : false,
-	// low, medium, high, veryhigh, ultra
-	resolution          : window.config.defaultResolution || 'medium',
+	resolution          : 'medium', // low, medium, high, veryhigh, ultra
 	lastN               : 4,
-	permanentTopBar     : true,
-	hiddenControls      : false,
-	notificationSounds  : true
+	permanentTopBar		: true
 };
 
 const settings = (state = initialState, action) =>
@@ -26,11 +23,6 @@ const settings = (state = initialState, action) =>
 			return { ...state, selectedAudioDevice: action.payload.deviceId };
 		}
 
-		case 'CHANGE_AUDIO_OUTPUT_DEVICE':
-		{
-			return { ...state, selectedAudioOutputDevice: action.payload.deviceId };
-		}
-	
 		case 'SET_DISPLAY_NAME':
 		{
 			const { displayName } = action.payload;
@@ -57,20 +49,6 @@ const settings = (state = initialState, action) =>
 			const permanentTopBar = !state.permanentTopBar;
 
 			return { ...state, permanentTopBar };
-		}
-
-		case 'TOGGLE_HIDDEN_CONTROLS':
-		{
-			const hiddenControls = !state.hiddenControls;
-
-			return { ...state, hiddenControls };
-		}
-
-		case 'TOGGLE_NOTIFICATION_SOUNDS':
-		{
-			const notificationSounds = !state.notificationSounds;
-
-			return { ...state, notificationSounds };
 		}
 
 		case 'SET_VIDEO_RESOLUTION':
