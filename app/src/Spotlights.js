@@ -48,21 +48,28 @@ export default class Spotlights extends EventEmitter
 
 	getNextAsSelected(peerId)
 	{
-		let newSelectedPeer;
-		if (peerId == null && this._unmutablePeerList.length > 0) {
+		let newSelectedPeer = null;
+
+		if (peerId == null && this._unmutablePeerList.length > 0)
+		{
 			peerId = this._unmutablePeerList[0];
 		}
 
-		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) {
-			let oldIndex = this._unmutablePeerList.indexOf(peerId);
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length)
+		{
+			const oldIndex = this._unmutablePeerList.indexOf(peerId);
+
 			let index = oldIndex;
+			
 			index++;
-			for (let i = 0; i < this._unmutablePeerList.length; i++) {
+			for (let i = 0; i < this._unmutablePeerList.length; i++)
+			{
 				if (index >= this._unmutablePeerList.length) {
 					index = 0;
 				}
 				newSelectedPeer = this._unmutablePeerList[index];
-				if (!this._currentSpotlights.includes(newSelectedPeer)) {
+				if (!this._currentSpotlights.includes(newSelectedPeer))
+				{
 					break;
 				}
 				index++;
@@ -73,21 +80,28 @@ export default class Spotlights extends EventEmitter
 
 	getPrevAsSelected(peerId)
 	{
-		let newSelectedPeer;
-		if (peerId == null && this._unmutablePeerList.length > 0) {
+		let newSelectedPeer = null;
+
+		if (peerId == null && this._unmutablePeerList.length > 0)
+		{
 			peerId = this._unmutablePeerList[0];
 		}
 
-		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) {
-			let oldIndex = this._unmutablePeerList.indexOf(peerId);
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length)
+		{
+			const oldIndex = this._unmutablePeerList.indexOf(peerId);
+
 			let index = oldIndex;
+			
 			index--;
-			for (let i = 0; i < this._unmutablePeerList.length; i++) {
+			for (let i = 0; i < this._unmutablePeerList.length; i++)
+			{
 				if (index < 0) {
 					index = this._unmutablePeerList.length - 1;
 				}
 				newSelectedPeer = this._unmutablePeerList[index];
-				if (!this._currentSpotlights.includes(newSelectedPeer)) {
+				if (!this._currentSpotlights.includes(newSelectedPeer))
+				{
 					break;
 				}
 				index--;
