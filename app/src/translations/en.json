@@ -60,6 +60,10 @@
 	"room.loweredHand": "{displayName} put their hand down",
 	"room.extraVideo": "Extra video",
 	"room.overRoomLimit": "The room is full, retry after some time.",
+	"room.help": "Help",
+	"room.about": "About",
+	"room.shortcutKeys": "Shortcut Keys",
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -81,6 +85,9 @@
 	"tooltip.muteParticipantVideo": "Mute participant video",
 	"tooltip.raisedHand": "Raise hand",
 	"tooltip.muteScreenSharing": "Mute participant share",
+	"tooltip.muteParticipantAudioModerator": "Mute participant audio globally",
+	"tooltip.muteParticipantVideoModerator": "Mute participant video globally",
+	"tooltip.muteScreenSharingModerator": "Mute participant screen share globally",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -106,7 +113,7 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Close",
 	"label.media": "Media",
-	"label.appearence": "Appearence",
+	"label.appearance": "Appearence",
 	"label.advanced": "Advanced",
 	"label.addVideo": "Add video",
 	"label.promoteAllPeers": "Promote all",
@@ -131,6 +138,11 @@
 	"settings.hiddenControls": "Hidden media controls",
 	"settings.notificationSounds": "Notification sounds",
 	"settings.showNotifications": "Show notifications",
+	"settings.buttonControlBar": "Separate media controls",
+	"settings.echoCancellation": "Echo cancellation",
+	"settings.autoGainControl": "Auto gain control",
+	"settings.noiseSuppression": "Noise suppression",
+	"settings.drawerOverlayed": "Side drawer over content",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

@@ -60,6 +60,10 @@
 	"room.loweredHand": "{displayName} leeresztette a kezét",
 	"room.extraVideo": "Kiegészítő videó",
 	"room.overRoomLimit": "A konferenciaszoba betelt..",
+	"room.help": "Segítség",
+	"room.about": "Névjegy",
+	"room.shortcutKeys": "Billentyűparancsok",
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a szóköz billentyűt",
 
@@ -81,6 +85,9 @@
 	"tooltip.muteParticipantVideo": "Résztvevő videóstreamének némítása",
 	"tooltip.raisedHand": "Jelentkezés",
 	"tooltip.muteScreenSharing": "Képernyőmegosztás szüneteltetése",
+	"tooltip.muteParticipantAudioModerator": "Résztvevő hangjának általános némítása",
+	"tooltip.muteParticipantVideoModerator": "Résztvevő videójának általános némítása",
+	"tooltip.muteScreenSharingModerator": "Résztvevő képernyőmegosztásának általános némítása",
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
@@ -106,7 +113,7 @@
 	"label.ultra": "Ultra magas (UHD)",
 	"label.close": "Bezár",
 	"label.media": "Média",
-	"label.appearence": "Megjelenés",
+	"label.appearance": "Megjelenés",
 	"label.advanced": "Részletek",
 	"label.addVideo": "Videó hozzáadása",
 	"label.promoteAllPeers": "Mindenkit beengedek",
@@ -130,7 +137,12 @@
 	"settings.lastn": "A látható videók száma",
 	"settings.hiddenControls": "Média Gombok automatikus elrejtése",
 	"settings.notificationSounds": "Értesítések hangjelzéssel",
-	"settings.showNotifications": null,
+	"settings.showNotifications": "Értesítések megjelenítése",
+	"settings.buttonControlBar": "Médiavezérlő gombok leválasztása",
+	"settings.echoCancellation": "Visszhangelnyomás",
+	"settings.autoGainControl": "Automatikus hangerő",
+	"settings.noiseSuppression": "Zajelnyomás",
+	"settings.drawerOverlayed": "Oldalsáv a tartalom felett",
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

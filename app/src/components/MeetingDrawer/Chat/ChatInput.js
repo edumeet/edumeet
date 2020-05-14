@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
+import { permissions } from '../../../permissions';
+import { makePermissionSelector } from '../../Selectors';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
@@ -119,26 +121,32 @@ ChatInput.propTypes =
 	classes     : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
-	({
-		displayName : state.settings.displayName,
-		picture     : state.me.picture,
-		canChat     :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.SEND_CHAT.includes(role))
-	});
+const makeMapStateToProps = () =>
+{
+	const hasPermission = makePermissionSelector(permissions.SEND_CHAT);
+
+	const mapStateToProps = (state) =>
+		({
+			displayName : state.settings.displayName,
+			picture     : state.me.picture,
+			canChat     : hasPermission(state)
+		});
+
+	return mapStateToProps;
+};
 
 export default withRoomContext(
 	connect(
-		mapStateToProps,
+		makeMapStateToProps,
 		null,
 		null,
 		{
 			areStatesEqual : (next, prev) =>
 			{
 				return (
-					prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
+					prev.room === next.room &&
 					prev.me.roles === next.me.roles &&
+					prev.peers === next.peers &&
 					prev.settings.displayName === next.settings.displayName &&
 					prev.me.picture === next.me.picture
 				);

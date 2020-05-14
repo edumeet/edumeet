@@ -4,14 +4,17 @@ import PropTypes from 'prop-types';
 import {
 	lobbyPeersKeySelector,
 	peersLengthSelector,
-	raisedHandsSelector
+	raisedHandsSelector,
+	makePermissionSelector
 } from '../Selectors';
+import { permissions } from '../../permissions';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../actions/roomActions';
 import * as toolareaActions from '../../actions/toolareaActions';
 import { useIntl, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -36,9 +39,36 @@ import VideoCallIcon from '@material-ui/icons/VideoCall';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import HelpIcon from '@material-ui/icons/Help';
+import InfoIcon from '@material-ui/icons/Info';
 
 const styles = (theme) =>
 	({
+		persistentDrawerOpen :
+		{
+			width                          : 'calc(100% - 30vw)',
+			marginLeft                     : '30vw',
+			[theme.breakpoints.down('lg')] :
+			{
+				width      : 'calc(100% - 40vw)',
+				marginLeft : '40vw'
+			},
+			[theme.breakpoints.down('md')] :
+			{
+				width      : 'calc(100% - 50vw)',
+				marginLeft : '50vw'
+			},
+			[theme.breakpoints.down('sm')] :
+			{
+				width      : 'calc(100% - 70vw)',
+				marginLeft : '70vw'
+			},
+			[theme.breakpoints.down('xs')] :
+			{
+				width      : 'calc(100% - 90vw)',
+				marginLeft : '90vw'
+			}
+		},
 		menuButton :
 		{
 			margin  : 0,
@@ -184,6 +214,9 @@ const TopBar = (props) =>
 		peersLength,
 		lobbyPeers,
 		permanentTopBar,
+		drawerOverlayed,
+		toolAreaOpen,
+		isMobile,
 		myPicture,
 		loggedIn,
 		loginEnabled,
@@ -192,6 +225,8 @@ const TopBar = (props) =>
 		onFullscreen,
 		setSettingsOpen,
 		setExtraVideoOpen,
+		setHelpOpen,
+		setAboutOpen,
 		setLockDialogOpen,
 		toggleToolArea,
 		openUsersTab,
@@ -242,7 +277,12 @@ const TopBar = (props) =>
 		<React.Fragment>
 			<AppBar
 				position='fixed'
-				className={room.toolbarsVisible || permanentTopBar ? classes.show : classes.hide}
+				className={classnames(
+					room.toolbarsVisible || permanentTopBar ?
+						classes.show : classes.hide,
+					!(isMobile || drawerOverlayed) && toolAreaOpen ?
+						classes.persistentDrawerOpen : null
+				)}
 			>
 				<Toolbar>
 					<PulsingBadge
@@ -272,18 +312,25 @@ const TopBar = (props) =>
 					</Typography>
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						<IconButton
-							aria-owns={
-								isMenuOpen &&
-								currentMenu === 'moreActions' ?
-									'material-appbar' : undefined
-							}
-							aria-haspopup='true'
-							onClick={(event) => handleMenuOpen(event, 'moreActions')}
-							color='inherit'
+						<Tooltip 
+							title={intl.formatMessage({
+								id             : 'label.moreActions',
+								defaultMessage : 'More actions'
+							})}
 						>
-							<ExtensionIcon />
-						</IconButton>
+							<IconButton
+								aria-owns={
+									isMenuOpen &&
+									currentMenu === 'moreActions' ?
+										'material-appbar' : undefined
+								}
+								aria-haspopup='true'
+								onClick={(event) => handleMenuOpen(event, 'moreActions')}
+								color='inherit'
+							>
+								<ExtensionIcon />
+							</IconButton>
+						</Tooltip>
 						{ fullscreenEnabled &&
 							<Tooltip title={fullscreenTooltip}>
 								<IconButton
@@ -480,6 +527,46 @@ const TopBar = (props) =>
 								<FormattedMessage
 									id='label.addVideo'
 									defaultMessage='Add video'
+								/>
+							</p>
+						</MenuItem>
+						<MenuItem 
+							onClick={() => 
+							{
+								handleMenuClose();
+								setHelpOpen(!room.helpOpen);
+							}}
+						>
+							<HelpIcon
+								aria-label={intl.formatMessage({
+									id             : 'room.help',
+									defaultMessage : 'Help'
+								})}
+							/>
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='room.help'
+									defaultMessage='Help'
+								/>
+							</p>
+						</MenuItem>
+						<MenuItem 
+							onClick={() => 
+							{
+								handleMenuClose();
+								setAboutOpen(!room.aboutOpen);
+							}}
+						>
+							<InfoIcon
+								aria-label={intl.formatMessage({
+									id             : 'room.about',
+									defaultMessage : 'About'
+								})}
+							/>
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='room.about'
+									defaultMessage='About'
 								/>
 							</p>
 						</MenuItem>
@@ -682,9 +769,12 @@ TopBar.propTypes =
 {
 	roomClient           : PropTypes.object.isRequired,
 	room                 : appPropTypes.Room.isRequired,
+	isMobile             : PropTypes.bool.isRequired,
 	peersLength          : PropTypes.number,
 	lobbyPeers           : PropTypes.array,
-	permanentTopBar      : PropTypes.bool,
+	permanentTopBar      : PropTypes.bool.isRequired,
+	drawerOverlayed      : PropTypes.bool.isRequired,
+	toolAreaOpen         : PropTypes.bool.isRequired,
 	myPicture            : PropTypes.string,
 	loggedIn             : PropTypes.bool.isRequired,
 	loginEnabled         : PropTypes.bool.isRequired,
@@ -694,6 +784,8 @@ TopBar.propTypes =
 	setToolbarsVisible   : PropTypes.func.isRequired,
 	setSettingsOpen      : PropTypes.func.isRequired,
 	setExtraVideoOpen    : PropTypes.func.isRequired,
+	setHelpOpen          : PropTypes.func.isRequired,
+	setAboutOpen         : PropTypes.func.isRequired,
 	setLockDialogOpen    : PropTypes.func.isRequired,
 	toggleToolArea       : PropTypes.func.isRequired,
 	openUsersTab         : PropTypes.func.isRequired,
@@ -705,27 +797,38 @@ TopBar.propTypes =
 	theme                : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
-	({
-		room            : state.room,
-		peersLength     : peersLengthSelector(state),
-		lobbyPeers      : lobbyPeersKeySelector(state),
-		permanentTopBar : state.settings.permanentTopBar,
-		loggedIn        : state.me.loggedIn,
-		loginEnabled    : state.me.loginEnabled,
-		myPicture       : state.me.picture,
-		unread          : state.toolarea.unreadMessages +
-			state.toolarea.unreadFiles + raisedHandsSelector(state),
-		canProduceExtraVideo :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.EXTRA_VIDEO.includes(role)),
-		canLock :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.CHANGE_ROOM_LOCK.includes(role)),
-		canPromote :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.PROMOTE_PEER.includes(role))
-	});
+const makeMapStateToProps = () =>
+{
+	const hasExtraVideoPermission =
+		makePermissionSelector(permissions.EXTRA_VIDEO);
+
+	const hasLockPermission =
+		makePermissionSelector(permissions.CHANGE_ROOM_LOCK);
+
+	const hasPromotionPermission =
+		makePermissionSelector(permissions.PROMOTE_PEER);
+
+	const mapStateToProps = (state) =>
+		({
+			room            : state.room,
+			isMobile        : state.me.browser.platform === 'mobile',
+			peersLength     : peersLengthSelector(state),
+			lobbyPeers      : lobbyPeersKeySelector(state),
+			permanentTopBar : state.settings.permanentTopBar,
+			drawerOverlayed : state.settings.drawerOverlayed,
+			toolAreaOpen    : state.toolarea.toolAreaOpen,
+			loggedIn        : state.me.loggedIn,
+			loginEnabled    : state.me.loginEnabled,
+			myPicture       : state.me.picture,
+			unread          : state.toolarea.unreadMessages +
+				state.toolarea.unreadFiles + raisedHandsSelector(state),
+			canProduceExtraVideo : hasExtraVideoPermission(state),
+			canLock              : hasLockPermission(state),
+			canPromote           : hasPromotionPermission(state)
+		});
+
+	return mapStateToProps;
+};
 
 const mapDispatchToProps = (dispatch) =>
 	({
@@ -740,6 +843,14 @@ const mapDispatchToProps = (dispatch) =>
 		setExtraVideoOpen : (extraVideoOpen) =>
 		{
 			dispatch(roomActions.setExtraVideoOpen(extraVideoOpen));
+		},
+		setHelpOpen : (helpOpen) =>
+		{
+			dispatch(roomActions.setHelpOpen(helpOpen));
+		},
+		setAboutOpen : (aboutOpen) =>
+		{
+			dispatch(roomActions.setAboutOpen(aboutOpen));
 		},
 		setLockDialogOpen : (lockDialogOpen) =>
 		{
@@ -757,7 +868,7 @@ const mapDispatchToProps = (dispatch) =>
 	});
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	mapDispatchToProps,
 	null,
 	{
@@ -768,12 +879,15 @@ export default withRoomContext(connect(
 				prev.peers === next.peers &&
 				prev.lobbyPeers === next.lobbyPeers &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
+				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
 				prev.me.loggedIn === next.me.loggedIn &&
+				prev.me.browser === next.me.browser &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&
 				prev.me.roles === next.me.roles &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
-				prev.toolarea.unreadFiles === next.toolarea.unreadFiles
+				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}
 	}

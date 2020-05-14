@@ -60,6 +60,10 @@
 	"room.loweredHand": "{displayName} je spustio ruku",
 	"room.extraVideo": "Dodatni video",
 	"room.overRoomLimit": "Soba je popunjena, pokušajte ponovno kasnije.",
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 
@@ -81,6 +85,9 @@
 	"tooltip.muteParticipantVideo": "Ne primaj video sudionika",
 	"tooltip.raisedHand": "Podigni ruku",
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Naziv sobe",
 	"label.chooseRoomButton": "Nastavi",
@@ -106,7 +113,7 @@
 	"label.ultra": "Ultra visoka (UHD)",
 	"label.close": "Zatvori",
 	"label.media": "Medij",
-	"label.appearence": "Prikaz",
+	"label.appearance": "Prikaz",
 	"label.advanced": "Napredno",
 	"label.addVideo": "Dodaj video",
 	"label.promoteAllPeers": "Promoviraj sve",
@@ -131,6 +138,11 @@
 	"settings.hiddenControls": "Skrivene kontrole medija",
 	"settings.notificationSounds": "Zvuk obavijesti",
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",

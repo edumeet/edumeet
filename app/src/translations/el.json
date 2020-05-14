@@ -60,6 +60,10 @@
 	"room.loweredHand": null,
 	"room.extraVideo": null,
 	"room.overRoomLimit": null,
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": null,
 
@@ -81,6 +85,9 @@
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Όνομα δωματίου",
 	"label.chooseRoomButton": "Συνέχεια",
@@ -106,7 +113,7 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Κλείσιμο",
 	"label.media": null,
-	"label.appearence": null,
+	"label.appearance": null,
 	"label.advanced": null,
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
@@ -131,6 +138,11 @@
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
 	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Αδυναμία αποθήκευσης του αρχείου",
 	"filesharing.startingFileShare": "Προσπάθεια διαμοιρασμού αρχείου",
