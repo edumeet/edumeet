@@ -304,13 +304,17 @@ export default class RoomClient
 				{
 					case String.fromCharCode(37):
 					{
-						const newPeerId = this._spotlights.getPrevAsSelected(store.getState().room.selectedPeerId);
+						const newPeerId = this._spotlights.getPrevAsSelected(
+							store.getState().room.selectedPeerId);
+
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
 					case String.fromCharCode(39):
 					{
-						const newPeerId = this._spotlights.getNextAsSelected(store.getState().room.selectedPeerId);
+						const newPeerId = this._spotlights.getNextAsSelected(
+							store.getState().room.selectedPeerId);
+							
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}

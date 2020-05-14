@@ -64,7 +64,8 @@ export default class Spotlights extends EventEmitter
 			index++;
 			for (let i = 0; i < this._unmutablePeerList.length; i++)
 			{
-				if (index >= this._unmutablePeerList.length) {
+				if (index >= this._unmutablePeerList.length)
+				{
 					index = 0;
 				}
 				newSelectedPeer = this._unmutablePeerList[index];
@@ -75,6 +76,7 @@ export default class Spotlights extends EventEmitter
 				index++;
 			}
 		}
+
 		return newSelectedPeer;
 	}
 
@@ -96,7 +98,8 @@ export default class Spotlights extends EventEmitter
 			index--;
 			for (let i = 0; i < this._unmutablePeerList.length; i++)
 			{
-				if (index < 0) {
+				if (index < 0)
+				{
 					index = this._unmutablePeerList.length - 1;
 				}
 				newSelectedPeer = this._unmutablePeerList[index];
@@ -107,6 +110,7 @@ export default class Spotlights extends EventEmitter
 				index--;
 			}
 		}
+
 		return newSelectedPeer;
 	}
 
