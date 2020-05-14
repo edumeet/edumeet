@@ -63,6 +63,7 @@
 	"room.help": "Pomoc",
 	"room.about": "O pogramie",
 	"room.shortcutKeys": "Skróty klawiaturowe",
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj spację aby mówić",
 
@@ -84,6 +85,9 @@
 	"tooltip.muteParticipantVideo": "Wyłącz wideo użytkownika",
 	"tooltip.raisedHand": "Podnieś rękę",
 	"tooltip.muteScreenSharing": "Anuluj udostępniania pulpitu przez użytkownika",
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Nazwa konferencji",
 	"label.chooseRoomButton": "Kontynuuj",
@@ -109,7 +113,7 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Zamknij",
 	"label.media": "Media",
-	"label.appearence": "Wygląd",
+	"label.appearance": "Wygląd",
 	"label.advanced": "Zaawansowane",
 	"label.addVideo": "Dodaj wideo",
 	"label.promoteAllPeers": "Wpuść wszystkich",

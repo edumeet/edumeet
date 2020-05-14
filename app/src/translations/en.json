@@ -63,6 +63,7 @@
 	"room.help": "Help",
 	"room.about": "About",
 	"room.shortcutKeys": "Shortcut Keys",
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -84,6 +85,9 @@
 	"tooltip.muteParticipantVideo": "Mute participant video",
 	"tooltip.raisedHand": "Raise hand",
 	"tooltip.muteScreenSharing": "Mute participant share",
+	"tooltip.muteParticipantAudioModerator": "Mute participant audio globally",
+	"tooltip.muteParticipantVideoModerator": "Mute participant video globally",
+	"tooltip.muteScreenSharingModerator": "Mute participant screen share globally",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -109,7 +113,7 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Close",
 	"label.media": "Media",
-	"label.appearence": "Appearence",
+	"label.appearance": "Appearence",
 	"label.advanced": "Advanced",
 	"label.addVideo": "Add video",
 	"label.promoteAllPeers": "Promote all",

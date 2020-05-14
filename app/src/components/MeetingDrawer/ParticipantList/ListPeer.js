@@ -254,57 +254,57 @@ const ListPeer = (props) =>
 			}
 			{ isModerator && micConsumer &&
 				<Tooltip
-				title={intl.formatMessage({
-					id             : 'tooltip.muteParticipant',
-					defaultMessage : 'Mute globally participant mic'
-				})}
-				placement='bottom'
-			>
-				<IconButton
-					className={classes.buttons}
-					style={{ color: green[500] }}
-					disabled={!isModerator || peer.stopPeerAudioInProgress}
-					onClick={(e) =>
-					{
-						e.stopPropagation();
-
-						roomClient.mutePeer(peer.id);
-					}}
+					title={intl.formatMessage({
+						id             : 'tooltip.muteParticipantAudioModerator',
+						defaultMessage : 'Mute participant audio globally'
+					})}
+					placement='bottom'
 				>
-					{ !micConsumer.remotelyPaused ?
-						<MicIcon />
-						:
-						<MicOffIcon />
-					}
-				</IconButton>
-			</Tooltip>
+					<IconButton
+						className={classes.buttons}
+						style={{ color: green[500] }}
+						disabled={!isModerator || peer.stopPeerAudioInProgress}
+						onClick={(e) =>
+						{
+							e.stopPropagation();
+
+							roomClient.mutePeer(peer.id);
+						}}
+					>
+						{ !micConsumer.remotelyPaused ?
+							<MicIcon />
+							:
+							<MicOffIcon />
+						}
+					</IconButton>
+				</Tooltip>
 			}
 			{ isModerator && webcamConsumer && 
 				<Tooltip
-				title={intl.formatMessage({
-					id             : 'tooltip.muteParticipantVideo',
-					defaultMessage : 'Mute globally participant video'
-				})}
-				placement='bottom'
-			>
-				<IconButton
-					className={classes.buttons}
-					style={{ color: green[500] }}
-					disabled={!isModerator || peer.stopPeerVideoInProgress}
-					onClick={(e) =>
-					{
-						e.stopPropagation();
-
-						roomClient.stopPeerVideo(peer.id);
-					}}
+					title={intl.formatMessage({
+						id             : 'tooltip.muteParticipantVideoModerator',
+						defaultMessage : 'Mute participant video globally'
+					})}
+					placement='bottom'
 				>
-					{ !webcamConsumer.remotelyPaused ?
-						<VideocamIcon />
-						:
-						<VideocamOffIcon />
-					}
-				</IconButton>
-			</Tooltip>
+					<IconButton
+						className={classes.buttons}
+						style={{ color: green[500] }}
+						disabled={!isModerator || peer.stopPeerVideoInProgress}
+						onClick={(e) =>
+						{
+							e.stopPropagation();
+
+							roomClient.stopPeerVideo(peer.id);
+						}}
+					>
+						{ !webcamConsumer.remotelyPaused ?
+							<VideocamIcon />
+							:
+							<VideocamOffIcon />
+						}
+					</IconButton>
+				</Tooltip>
 			}
 			{children}
 		</div>

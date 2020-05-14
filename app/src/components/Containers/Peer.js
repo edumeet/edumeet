@@ -394,6 +394,7 @@ const Peer = (props) =>
 					</div>
 
 					<VideoView
+						showQuality
 						advancedMode={advancedMode}
 						peer={peer}
 						displayName={peer.displayName}
@@ -589,6 +590,7 @@ const Peer = (props) =>
 							</div>
 		
 							<VideoView
+								showQuality
 								advancedMode={advancedMode}
 								peer={peer}
 								displayName={peer.displayName}
@@ -730,6 +732,7 @@ const Peer = (props) =>
 							</Tooltip>
 						</div>
 						<VideoView
+							showQuality
 							advancedMode={advancedMode}
 							videoContain
 							consumerSpatialLayers={

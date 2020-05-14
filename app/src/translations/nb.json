@@ -63,6 +63,7 @@
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -84,6 +85,9 @@
 	"tooltip.muteParticipantVideo": "Demp deltakervideo",
 	"tooltip.raisedHand": "Rekk opp hånden",
 	"tooltip.muteScreenSharing": "Demp deltaker skjermdeling",
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",
@@ -109,7 +113,7 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Lukk",
 	"label.media": "Media",
-	"label.appearence": "Utseende",
+	"label.appearance": "Utseende",
 	"label.advanced": "Avansert",
 	"label.addVideo": "Legg til video",
 	"label.promoteAllPeers": "Slipp inn alle",

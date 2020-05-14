@@ -63,6 +63,7 @@
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": null,
 
@@ -84,6 +85,9 @@
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Numele camerei",
 	"label.chooseRoomButton": "Continuare",
@@ -109,7 +113,7 @@
 	"label.ultra": "Rezoluție ultra înaltă (UHD)",
 	"label.close": "Închide",
 	"label.media": null,
-	"label.appearence": null,
+	"label.appearance": null,
 	"label.advanced": null,
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
