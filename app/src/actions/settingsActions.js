@@ -61,6 +61,18 @@ export const setNoiseSuppression = (noiseSuppression) =>
 		payload : { noiseSuppression }
 	});
 
+export const setVoiceActivatedUnmute = (voiceActivatedUnmute) =>
+	({
+		type: 'SET_VOICE_ACTIVATED_UNMUTE',
+		payload: { voiceActivatedUnmute }
+	});
+
+export const setNoiseThreshold = (noiseThreshold) =>
+	({
+		type: 'SET_NOISE_THRESHOLD',
+		payload: { noiseThreshold }
+	});
+
 export const setDefaultAudio = (audio) =>
 	({
 		type    : 'SET_DEFAULT_AUDIO',

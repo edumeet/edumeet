@@ -149,9 +149,16 @@ const makeMapStateToProps = (initialState, props) =>
 {
 	const mapStateToProps = (state) =>
 	{
+		if (state.peerVolumes[props.id]>state.settings.noiseThreshold)
+		{
 		return {
-			volume : state.peerVolumes[props.id]
+				volume : Math.round((state.peerVolumes[props.id]+100) / 10)
 		};
+		}
+		else
+		{
+			return { volume: 0 };
+		}
 	};
 
 	return mapStateToProps;

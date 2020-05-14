@@ -980,21 +980,11 @@ export default class RoomClient
 		if (!this._harkStream.getAudioTracks()[0])
 			throw new Error('getMicStream():something went wrong with hark');
 
-		this._hark = hark(this._harkStream, { play: false });
+		this._hark = hark(this._harkStream, { play: false, interval: 5 });
 
 		// eslint-disable-next-line no-unused-vars
-		this._hark.on('volume_change', (dBs, threshold) => 
+		this._hark.on('volume_change', (volume, threshold) => 
 		{
-			// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-			//   Math.pow(10, dBs / 20)
-			// However it does not produce a visually useful output, so let exagerate
-			// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-			// minimize component renderings.
-			let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-			if (volume === 1)
-				volume = 0;
-
 			volume = Math.round(volume);
 
 			if (this._micProducer && volume !== this._micProducer.volume) 
@@ -1004,13 +994,23 @@ export default class RoomClient
 				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
 			}
 		});
-		this._hark.on('speaking', function() 
+		this._hark.on('speaking', () =>
 		{
+			this._hark.setInterval(300);
 			store.dispatch(meActions.setIsSpeaking(true));
+			if (store.getState().settings.voiceActivatedUnmute && this._micProducer.paused)
+			{
+				this.unmuteMic();
+			}
 		});
-		this._hark.on('stopped_speaking', function()
+		this._hark.on('stopped_speaking', () =>
 		{
 			store.dispatch(meActions.setIsSpeaking(false));
+			if (store.getState().settings.voiceActivatedUnmute && !this._micProducer.paused) 
+			{
+				this.muteMic();
+			}
+			this._hark.setInterval(5);
 		});
 	}
 
@@ -1856,23 +1856,12 @@ export default class RoomClient
 						producerPaused
 					} = request.data;
 
-					let codecOptions;
-
-					if (kind === 'audio')
-					{
-						codecOptions =
-						{
-							opusStereo : 1
-						};
-					}
-
 					const consumer = await this._recvTransport.consume(
 						{
 							id,
 							producerId,
 							kind,
 							rtpParameters,
-							codecOptions,
 							appData : { ...appData, peerId } // Trick.
 						});
 
@@ -3758,6 +3747,14 @@ export default class RoomClient
 		this._webcamProducer = null;
 
 		store.dispatch(meActions.setWebcamInProgress(false));
+	}
+
+	async _setNoiseThreshold(threshold)
+	{
+		logger.debug('_setNoiseThreshold:%s', threshold);
+		this._hark.setThreshold(threshold);
+		store.dispatch(
+			settingsActions.setNoiseThreshold(threshold));
 	}
 
 	async _updateAudioDevices()

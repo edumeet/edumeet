@@ -1,23 +1,25 @@
 const initialState =
 {
-	displayName         : 'Guest',
-	selectedWebcam      : null,
-	selectedAudioDevice : null,
-	advancedMode        : false,
-	sampleRate          : 48000,
-	channelCount        : 1,
-	volume              : 1.0,
-	autoGainControl     : true,
-	echoCancellation    : true,
-	noiseSuppression    : true,
-	sampleSize          : 16,
+	displayName          : 'Guest',
+	selectedWebcam       : null,
+	selectedAudioDevice  : null,
+	advancedMode         : false,
+	sampleRate           : 48000,
+	channelCount         : 1,
+	volume               : 1.0,
+	autoGainControl      : false,
+	echoCancellation     : true,
+	noiseSuppression     : true,
+	voiceActivatedUnmute : false,
+	noiseThreshold       : -50,
+	sampleSize           : 16,
 	// low, medium, high, veryhigh, ultra
-	resolution          : window.config.defaultResolution || 'medium',
-	lastN               : 4,
-	permanentTopBar     : true,
-	hiddenControls      : false,
-	showNotifications   : true,
-	notificationSounds  : true,
+	resolution           : window.config.defaultResolution || 'medium',
+	lastN                : 4,
+	permanentTopBar      : true,
+	hiddenControls       : false,
+	showNotifications    : true,
+	notificationSounds   : true,
 	...window.config.defaultAudio
 };
 
@@ -94,6 +96,20 @@ const settings = (state = initialState, action) =>
 			const { noiseSuppression } = action.payload;
 
 			return { ...state, noiseSuppression };
+		}
+
+		case 'SET_VOICE_ACTIVATED_UNMUTE':
+		{
+			const { voiceActivatedUnmute } = action.payload;
+
+			return { ...state, voiceActivatedUnmute };
+		}
+
+		case 'SET_NOISE_THRESHOLD':
+		{
+			const { noiseThreshold } = action.payload;
+
+			return { ...state, noiseThreshold };
 		}
 
 		case 'SET_DEFAULT_AUDIO':
