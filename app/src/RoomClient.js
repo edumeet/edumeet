@@ -3616,6 +3616,8 @@ export default class RoomClient
 
 		this._screenSharingProducer = null;
 
+		this._screenSharing.stop();
+
 		store.dispatch(meActions.setScreenShareInProgress(false));
 	}
 
