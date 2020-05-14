@@ -284,6 +284,25 @@ const Me = (props) =>
 			defaultMessage : 'Start screen sharing'
 		});
 	}
+	const [ 
+		screenShareTooltipOpen, 
+		screenShareTooltipSetOpen 
+	] = React.useState(false);
+
+	const screenShareTooltipHandleClose = () =>
+	{
+		screenShareTooltipSetOpen(false);
+	};
+
+	const screenShareTooltipHandleOpen = () =>
+	{
+		screenShareTooltipSetOpen(true);
+	};
+
+	if (screenState === 'off' && me.screenShareInProgress && screenShareTooltipOpen)
+	{
+		screenShareTooltipHandleClose();
+	}
 
 	const spacingStyle =
 	{
@@ -511,7 +530,11 @@ const Me = (props) =>
 									}
 								</Tooltip>
 								{ me.browser.platform !== 'mobile' &&
-									<Tooltip title={screenTip} placement='left'>
+									<Tooltip open={screenShareTooltipOpen} 
+										onClose={screenShareTooltipHandleClose} 
+										onOpen={screenShareTooltipHandleOpen} 
+										title={screenTip} placement='left'
+									>
 										{ smallContainer ?
 											<div>
 												<IconButton
