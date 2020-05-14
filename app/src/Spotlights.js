@@ -49,27 +49,39 @@ export default class Spotlights extends EventEmitter
 	setNextAsSelected()
 	{
 		let peerId = null;
-		if (this._selectedSpotlights.length > 0) {
+
+		if (this._selectedSpotlights.length > 0) 
+		{
 			peerId = this._selectedSpotlights[0];
-		} else if (this._unmutablePeerList.length > 0) {
+		}
+		else if (this._unmutablePeerList.length > 0) 
+		{
 			peerId = this._unmutablePeerList[0];
 		}
 
-		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) {
-			let oldIndex = this._unmutablePeerList.indexOf(peerId);
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) 
+		{
+			const oldIndex = this._unmutablePeerList.indexOf(peerId);
+
 			let index = oldIndex;
+
 			index++;
-			do {
-				if (index >= this._unmutablePeerList.length) {
+			do 
+			{
+				if (index >= this._unmutablePeerList.length) 
+				{
 					index = 0;
 				}
-				let newSelectedPeer = this._unmutablePeerList[index];
-				if (!this._currentSpotlights.includes(newSelectedPeer)) {
+				const newSelectedPeer = this._unmutablePeerList[index];
+
+				if (!this._currentSpotlights.includes(newSelectedPeer)) 
+				{
 					this.setPeerSpotlight(newSelectedPeer);
 					break;
 				}
 				index++;
-				if (index === oldIndex) {
+				if (index === oldIndex) 
+				{
 					break;
 				}
 			} while (true);
@@ -79,27 +91,39 @@ export default class Spotlights extends EventEmitter
 	setPrevAsSelected()
 	{
 		let peerId = null;
-		if (this._selectedSpotlights.length > 0) {
+
+		if (this._selectedSpotlights.length > 0) 
+		{
 			peerId = this._selectedSpotlights[0];
-		} else if (this._unmutablePeerList.length > 0) {
+		}
+		else if (this._unmutablePeerList.length > 0) 
+		{
 			peerId = this._unmutablePeerList[0];
 		}
 
-		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) {
-			let oldIndex = this._unmutablePeerList.indexOf(peerId);
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) 
+		{
+			const oldIndex = this._unmutablePeerList.indexOf(peerId);
+
 			let index = oldIndex;
+
 			index--;
-			do {
-				if (index < 0) {
+			do 
+			{
+				if (index < 0) 
+				{
 					index = this._unmutablePeerList.length - 1;
 				}
-				let newSelectedPeer = this._unmutablePeerList[index];
-				if (!this._currentSpotlights.includes(newSelectedPeer)) {
+				const newSelectedPeer = this._unmutablePeerList[index];
+
+				if (!this._currentSpotlights.includes(newSelectedPeer)) 
+				{
 					this.setPeerSpotlight(newSelectedPeer);
 					break;
 				}
 				index--;
-				if (index === oldIndex) {
+				if (index === oldIndex) 
+				{
 					break;
 				}
 			} while (true);

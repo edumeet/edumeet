@@ -50,34 +50,36 @@ const cache = createIntlCache();
 const messages =
 {
 	// 'en' : messagesEnglish,
-	'nb' : messagesNorwegian,
-	'de' : messagesGerman,
-	'hu' : messagesHungarian,
-	'pl' : messagesPolish,
-	'dk' : messagesDanish,
-	'fr' : messagesFrench,
-	'el' : messagesGreek,
-	'ro' : messagesRomanian,
-	'pt' : messagesPortuguese,
+	'nb'      : messagesNorwegian,
+	'de'      : messagesGerman,
+	'hu'      : messagesHungarian,
+	'pl'      : messagesPolish,
+	'dk'      : messagesDanish,
+	'fr'      : messagesFrench,
+	'el'      : messagesGreek,
+	'ro'      : messagesRomanian,
+	'pt'      : messagesPortuguese,
 	'zh-hans' : messagesChineseSimplified,
 	'zh-hant' : messagesChineseTraditional,
-	'es' : messagesSpanish,
-	'hr' : messagesCroatian,
-	'cs' : messagesCzech,
-	'it' : messagesItalian,
-	'uk' : messagesUkrainian,
-	'tr' : messagesTurkish,
-	'lv' : messagesLatvian
+	'es'      : messagesSpanish,
+	'hr'      : messagesCroatian,
+	'cs'      : messagesCzech,
+	'it'      : messagesItalian,
+	'uk'      : messagesUkrainian,
+	'tr'      : messagesTurkish,
+	'lv'      : messagesLatvian
 };
 
-let browserLanguage = (navigator.language || navigator.browserLanguage).toLowerCase()
+const browserLanguage = (navigator.language || navigator.browserLanguage).toLowerCase();
+
 let locale = browserLanguage.split(/[-_]/)[0]; // language without region code
+
 if (locale === 'zh')
 {
 	if (browserLanguage === 'zh-cn')
-		locale = 'zh-hans'
+		locale = 'zh-hans';
 	else
-		locale = 'zh-hant'
+		locale = 'zh-hant';
 }
 
 const intl = createIntl({
