@@ -59,7 +59,8 @@ export default class Spotlights extends EventEmitter
 			peerId = this._unmutablePeerList[0];
 		}
 
-		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) 
+		if (peerId != null && 
+			this._currentSpotlights.length < this._unmutablePeerList.length) 
 		{
 			const oldIndex = this._unmutablePeerList.indexOf(peerId);
 
@@ -101,7 +102,8 @@ export default class Spotlights extends EventEmitter
 			peerId = this._unmutablePeerList[0];
 		}
 
-		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length) 
+		if (peerId != null && 
+			this._currentSpotlights.length < this._unmutablePeerList.length) 
 		{
 			const oldIndex = this._unmutablePeerList.indexOf(peerId);
 
