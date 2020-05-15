@@ -63,7 +63,7 @@
 	"room.help": "Help",
 	"room.about": "About",
 	"room.shortcutKeys": "Shortcut Keys",
-	"room.browsePeersSpotlight": null,
+	"room.browsePeersSpotlight": "Browse participants into Spotlight",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
