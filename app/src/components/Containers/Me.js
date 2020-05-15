@@ -148,7 +148,12 @@ const styles = (theme) =>
 			'&.enabled'     :
 			{
 				transition : 'opacity 0.1s',
-				opacity    : 1
+				opacity    : 1,
+				visibility : 'visible' 
+			},
+			'&.disabled' :
+			{
+				visibility : 'hidden'
 			}
 		}
 	});
@@ -367,7 +372,7 @@ const Me = (props) =>
 				{ me.browser.platform !== 'mobile' &&
 				<div className={classnames(
 					classes.ptt,
-					(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
+					(micState === 'muted' && me.isSpeaking) ? 'enabled' : 'disabled'
 				)}
 				>
 					<FormattedMessage
