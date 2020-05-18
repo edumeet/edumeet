@@ -49,8 +49,8 @@
 	"room.spotlights": "Látható résztvevők",
 	"room.passive": "Passzív résztvevők",
 	"room.videoPaused": "Ez a videóstream szünetel",
-	"room.muteAll": "Mindenki némítása",
-	"room.stopAllVideo": "Mindenki video némítása",
+	"room.muteAll": "Összes némítása",
+	"room.stopAllVideo": "Összes video némítása",
 	"room.closeMeeting": "Konferencia lebontása",
 	"room.clearChat": "Chat történelem kiürítése",
 	"room.clearFileSharing": "File megosztás kiürítése",
@@ -64,7 +64,7 @@
 	"room.about": "Névjegy",
 	"room.shortcutKeys": "Billentyűparancsok",
 	"room.browsePeersSpotlight": "Résztvevők böngészése",
-	"room.stopAllScreenSharing": "Minden képernyőmegosztás leállítása",
+	"room.stopAllScreenSharing": "Összes képernyőmegosztás leállítása",
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a szóköz billentyűt",
 
