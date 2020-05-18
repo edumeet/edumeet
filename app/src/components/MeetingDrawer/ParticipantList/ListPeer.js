@@ -306,7 +306,7 @@ const ListPeer = (props) =>
 					</IconButton>
 				</Tooltip>
 			}
-			{ isModerator && screenConsumer && 
+			{ isModerator && screenConsumer &&
 				<Tooltip
 					title={intl.formatMessage({
 						id             : 'tooltip.muteScreenSharingModerator',
