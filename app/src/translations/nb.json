@@ -64,6 +64,7 @@
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
+	"room.stopAllScreenSharing": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -187,5 +188,6 @@
 	"moderator.clearChat": "Moderator tømte chatten",
 	"moderator.clearFiles": "Moderator fjernet filer",
 	"moderator.muteAudio": "Moderator mutet lyden din",
-	"moderator.muteVideo": "Moderator mutet videoen din"
+	"moderator.muteVideo": "Moderator mutet videoen din",
+	"moderator.muteScreenSharing": null	
 }

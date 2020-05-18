@@ -64,6 +64,7 @@
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
+	"room.stopAllScreenSharing": null,
 
 	"me.mutedPTT": null,
 
@@ -187,5 +188,6 @@
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
-	"moderator.muteVideo": null
-} 
+	"moderator.muteVideo": null,
+	"moderator.muteScreenSharing": null
+}

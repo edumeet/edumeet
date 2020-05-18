@@ -88,6 +88,7 @@
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
+	"room.stopAllScreenSharing": null,
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",
@@ -187,5 +188,6 @@
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
-	"moderator.muteVideo": null
+	"moderator.muteVideo": null,
+	"moderator.muteScreenSharing": null
 }

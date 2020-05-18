@@ -64,6 +64,7 @@
 	"room.about": "O pogramie",
 	"room.shortcutKeys": "Skróty klawiaturowe",
 	"room.browsePeersSpotlight": null,
+	"room.stopAllScreenSharing": null,
 
 	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj spację aby mówić",
 
@@ -187,5 +188,6 @@
 	"moderator.clearChat": "Moderator wyczyścił chat",
 	"moderator.clearFiles": "Moderator wyczyścił pliki",
 	"moderator.muteAudio": "Moderator wyciszył audio",
-	"moderator.muteVideo": "Moderator wyciszył twoje video"
+	"moderator.muteVideo": "Moderator wyciszył twoje video",
+	"moderator.muteScreenSharing": null
 }

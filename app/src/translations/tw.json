@@ -63,7 +63,8 @@
 	"room.help": "幫助",
 	"room.about": "關於",
 	"room.shortcutKeys": "鍵盤快速鍵",
-	
+	"room.stopAllScreenSharing": null,
+
 	"me.mutedPTT": "您已靜音，請按下 空白鍵 來說話",
 
 	"roles.gotRole": "您已取得身份: {role}",
@@ -186,5 +187,6 @@
 	"moderator.clearChat": "管理員清除了聊天",
 	"moderator.clearFiles": "管理員清除了所有檔案",
 	"moderator.muteAudio": "您已被管理員靜音",
-	"moderator.muteVideo": "您的視訊已被管理員關閉"
+	"moderator.muteVideo": "您的視訊已被管理員關閉",
+	"moderator.muteScreenSharing": null
 }
