@@ -31,9 +31,10 @@ const peerVolumes = (state = initialState, action) =>
 
 		case 'SET_PEER_VOLUME':
 		{
-			const { peerId, volume } = action.payload;
+			const { peerId } = action.payload;
+			const dBs = action.payload.volume < -100 ? -100 : action.payload.volume;
 
-			return { ...state, [peerId]: volume };
+			return { ...state, [peerId]: Math.round(dBs) };
 		}
 
 		default:

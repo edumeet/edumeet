@@ -110,3 +110,9 @@ export const setIsSpeaking = (flag) =>
 		type    : 'SET_IS_SPEAKING',
 		payload : { flag }
 	});
+
+export const setAutoMuted = (flag) =>
+	({
+		type    : 'SET_AUTO_MUTED',
+		payload : { flag }
+	});

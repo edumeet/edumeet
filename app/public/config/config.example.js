@@ -44,13 +44,14 @@ var config =
 	},
 	defaultAudio : 
 	{
-		sampleRate       : 48000,
-		channelCount     : 1,
-		volume           : 1.0,
-		autoGainControl  : true,
-		echoCancellation : true,
-		noiseSuppression : true,
-		sampleSize       : 16
+		sampleRate        : 48000,
+		channelCount      : 1,
+		volume            : 1.0,
+		autoGainControl   : true,
+		echoCancellation  : true,
+		noiseSuppression  : true,
+		voiceActivityMute : false,
+		sampleSize        : 16
 	},
 
 	/**
