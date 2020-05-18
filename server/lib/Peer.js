@@ -64,10 +64,10 @@ class Peer extends EventEmitter
 
 		// Iterate and close all mediasoup Transport associated to this Peer, so all
 		// its Producers and Consumers will also be closed.
-		this.transports.forEach((transport) =>
+		for (const transport of this.transports.values())
 		{
 			transport.close();
-		});
+		}
 
 		if (this.socket)
 			this.socket.disconnect(true);

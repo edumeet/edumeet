@@ -50,6 +50,27 @@
 	"room.passive": "Passive Participants",
 	"room.videoPaused": "This video is paused",
 
+	"room.muteAll": "Mute all",
+	"room.stopAllVideo": "Stop all video",
+	"room.closeMeeting": "Close meeting",
+	"room.clearChat": "Clear chat",
+	"room.clearFileSharing": "Clear files",
+	"room.speechUnsupported": "Your browser does not support speech recognition",
+	"room.moderatoractions": "Moderator actions",
+	"room.raisedHand": "{displayName} raised their hand",
+	"room.loweredHand": "{displayName} put their hand down",
+	"room.extraVideo": "Extra video",
+	"room.overRoomLimit": "The room is full, retry after some time.",
+	"room.help": "Help",
+	"room.about": "About",
+	"room.shortcutKeys": "Shortcut Keys",
+	"room.browsePeersSpotlight": "Browse participants into Spotlight",
+
+	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
+
+	"roles.gotRole": "You got the role: {role}",
+	"roles.lostRole": "You lost the role: {role}",
+
 	"tooltip.login": "Log in",
 	"tooltip.logout": "Log out",
 	"tooltip.admitFromLobby": "Admit from lobby",
@@ -61,6 +82,15 @@
 	"tooltip.settings": "Show settings",
 	"tooltip.participants": "Show participants",
 
+	"tooltip.kickParticipant": "Kick out participant",
+	"tooltip.muteParticipant": "Mute participant",
+	"tooltip.muteParticipantVideo": "Mute participant video",
+	"tooltip.raisedHand": "Raise hand",
+	"tooltip.muteScreenSharing": "Mute participant share",
+	"tooltip.muteParticipantAudioModerator": "Mute participant audio globally",
+	"tooltip.muteParticipantVideoModerator": "Mute participant video globally",
+	"tooltip.muteScreenSharingModerator": "Mute participant screen share globally",
+  
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
 	"label.yourName": "Your name",
@@ -73,6 +103,9 @@
 	"label.filesharing": "File sharing",
 	"label.participants": "Participants",
 	"label.shareFile": "Share file",
+
+	"label.shareGalleryFile": "Share image",
+
 	"label.fileSharingUnsupported": "File sharing not supported",
 	"label.unknown": "Unknown",
 	"label.democratic": "Democratic view",
@@ -84,6 +117,13 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Close",
 
+	"label.media": "Media",
+	"label.appearance": "Appearence",
+	"label.advanced": "Advanced",
+	"label.addVideo": "Add video",
+	"label.promoteAllPeers": "Promote all",
+	"label.moreActions": "More actions",
+  
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
 	"settings.selectCamera": "Select video device",
@@ -97,6 +137,15 @@
 	"settings.advancedMode": "Advanced mode",
 	"settings.permanentTopBar": "Permanent top bar",
 	"settings.lastn": "Number of visible videos",
+
+	"settings.hiddenControls": "Hidden media controls",
+	"settings.notificationSounds": "Notification sounds",
+	"settings.showNotifications": "Show notifications",
+	"settings.buttonControlBar": "Separate media controls",
+	"settings.echoCancellation": "Echo cancellation",
+	"settings.autoGainControl": "Auto gain control",
+	"settings.noiseSuppression": "Noise suppression",
+	"settings.drawerOverlayed": "Side drawer over content",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",
@@ -136,5 +185,10 @@
 	"devices.screenSharingError": "An error occurred while accessing your screen",
 
 	"devices.cameraDisconnected": "Camera disconnected",
-	"devices.cameraError": "An error occurred while accessing your camera"
+	"devices.cameraError": "An error occured while accessing your camera",
+
+	"moderator.clearChat": "Moderator cleared the chat",
+	"moderator.clearFiles": "Moderator cleared the files",
+	"moderator.muteAudio": "Moderator muted your audio",
+	"moderator.muteVideo": "Moderator muted your video"
 }

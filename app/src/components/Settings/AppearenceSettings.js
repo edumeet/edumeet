@@ -26,10 +26,14 @@ const styles = (theme) =>
 	});
 
 const AppearenceSettings = ({
+	isMobile,
 	room,
 	settings,
 	onTogglePermanentTopBar,
 	onToggleHiddenControls,
+	onToggleButtonControlBar,
+	onToggleShowNotifications,
+	onToggleDrawerOverlayed,
 	handleChangeMode,
 	classes
 }) =>
@@ -101,30 +105,64 @@ const AppearenceSettings = ({
 					defaultMessage : 'Hidden media controls'
 				})}
 			/>
+			<FormControlLabel
+				className={classes.setting}
+				control={<Checkbox checked={settings.buttonControlBar} onChange={onToggleButtonControlBar} value='buttonControlBar' />}
+				label={intl.formatMessage({
+					id             : 'settings.buttonControlBar',
+					defaultMessage : 'Separate media controls'
+				})}
+			/>
+			{ !isMobile &&
+				<FormControlLabel
+					className={classes.setting}
+					control={<Checkbox checked={settings.drawerOverlayed} onChange={onToggleDrawerOverlayed} value='drawerOverlayed' />}
+					label={intl.formatMessage({
+						id             : 'settings.drawerOverlayed',
+						defaultMessage : 'Side drawer over content'
+					})}
+				/>
+			}
+			<FormControlLabel
+				className={classes.setting}
+				control={<Checkbox checked={settings.showNotifications} onChange={onToggleShowNotifications} value='showNotifications' />}
+				label={intl.formatMessage({
+					id             : 'settings.showNotifications',
+					defaultMessage : 'Show notifications'
+				})}
+			/>
 		</React.Fragment>
 	);
 };
 
 AppearenceSettings.propTypes =
 {
-	room                    : appPropTypes.Room.isRequired,
-	settings                : PropTypes.object.isRequired,
-	onTogglePermanentTopBar : PropTypes.func.isRequired,
-	onToggleHiddenControls  : PropTypes.func.isRequired,
-	handleChangeMode        : PropTypes.func.isRequired,
-	classes                 : PropTypes.object.isRequired
+	isMobile                  : PropTypes.bool.isRequired,
+	room                      : appPropTypes.Room.isRequired,
+	settings                  : PropTypes.object.isRequired,
+	onTogglePermanentTopBar   : PropTypes.func.isRequired,
+	onToggleHiddenControls    : PropTypes.func.isRequired,
+	onToggleButtonControlBar  : PropTypes.func.isRequired,
+	onToggleShowNotifications : PropTypes.func.isRequired,
+	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
+	handleChangeMode          : PropTypes.func.isRequired,
+	classes                   : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
+		isMobile : state.me.browser.platform === 'mobile',
 		room     : state.room,
 		settings : state.settings
 	});
 
 const mapDispatchToProps = {
-	onTogglePermanentTopBar : settingsActions.togglePermanentTopBar,
-	onToggleHiddenControls  : settingsActions.toggleHiddenControls,
-	handleChangeMode        : roomActions.setDisplayMode
+	onTogglePermanentTopBar   : settingsActions.togglePermanentTopBar,
+	onToggleHiddenControls    : settingsActions.toggleHiddenControls,
+	onToggleShowNotifications : settingsActions.toggleShowNotifications,
+	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
+	onToggleDrawerOverlayed   : settingsActions.toggleDrawerOverlayed,
+	handleChangeMode          : roomActions.setDisplayMode
 };
 
 export default connect(
@@ -135,6 +173,7 @@ export default connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				prev.me.browser === next.me.browser &&
 				prev.room === next.room &&
 				prev.settings === next.settings
 			);

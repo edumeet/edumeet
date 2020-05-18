@@ -59,6 +59,10 @@
 	"room.raisedHand": "{displayName} pacēla roku",
 	"room.loweredHand": "{displayName} nolaida roku",
 	"room.extraVideo": "Papildus video",
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
+	"room.browsePeersSpotlight": null,
 
 	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
 
@@ -79,6 +83,10 @@
 	"tooltip.muteParticipant": "Noklusināt dalībnieku",
 	"tooltip.muteParticipantVideo": "Atslēgt dalībnieka video",
 	"tooltip.raisedHand": "Pacelt roku",
+	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Sapulces telpas nosaukums (ID)",
 	"label.chooseRoomButton": "Turpināt",
@@ -103,9 +111,10 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Aizvērt",
 	"label.media": "Mediji",
-	"label.appearence": "Izskats",
+	"label.appearance": "Izskats",
 	"label.advanced": "Advancēts",
 	"label.addVideo": "Pievienot video",
+	"label.moreActions": null,
 
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",
@@ -122,6 +131,12 @@
 	"settings.lastn": "Jums redzamo video/kameru skaits",
 	"settings.hiddenControls": "Slēpto mediju vadība",
 	"settings.notificationSounds": "Paziņojumu skaņas",
+	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",

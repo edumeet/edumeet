@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
+import { permissions } from '../../../permissions';
+import { makePermissionSelector } from '../../Selectors';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
@@ -61,6 +63,7 @@ const ListLobbyPeer = (props) =>
 						peer.promotionInProgress ||
 						promotionInProgress
 					}
+					color='primary'
 					onClick={(e) =>
 					{
 						e.stopPropagation();
@@ -84,28 +87,32 @@ ListLobbyPeer.propTypes =
 	classes             : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state, { id }) =>
+const makeMapStateToProps = (initialState, { id }) =>
 {
-	return {
-		peer                : state.lobbyPeers[id],
-		promotionInProgress : state.room.lobbyPeersPromotionInProgress,
-		canPromote          :
-			state.me.roles.some((role) =>
-				state.room.permissionsFromRoles.PROMOTE_PEER.includes(role))
+	const hasPermission = makePermissionSelector(permissions.PROMOTE_PEER);
+
+	const mapStateToProps = (state) =>
+	{
+		return {
+			peer                : state.lobbyPeers[id],
+			promotionInProgress : state.room.lobbyPeersPromotionInProgress,
+			canPromote          : hasPermission(state)
+		};
 	};
+
+	return mapStateToProps;
 };
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	null,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room.permissionsFromRoles === next.room.permissionsFromRoles &&
-				prev.room.lobbyPeersPromotionInProgress ===
-					next.room.lobbyPeersPromotionInProgress &&
+				prev.room === next.room &&
+				prev.peers === next.peers && // For checking permissions
 				prev.me.roles === next.me.roles &&
 				prev.lobbyPeers === next.lobbyPeers
 			);

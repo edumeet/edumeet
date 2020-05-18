@@ -31,7 +31,8 @@ import messagesFrench from './translations/fr';
 import messagesGreek from './translations/el';
 import messagesRomanian from './translations/ro';
 import messagesPortuguese from './translations/pt';
-import messagesChinese from './translations/cn';
+import messagesChineseSimplified from './translations/cn';
+import messagesChineseTraditional from './translations/tw';
 import messagesSpanish from './translations/es';
 import messagesCroatian from './translations/hr';
 import messagesCzech from './translations/cs';
@@ -48,25 +49,37 @@ const cache = createIntlCache();
 const messages =
 {
 	// 'en' : messagesEnglish,
-	'nb' : messagesNorwegian,
-	'de' : messagesGerman,
-	'hu' : messagesHungarian,
-	'pl' : messagesPolish,
-	'dk' : messagesDanish,
-	'fr' : messagesFrench,
-	'el' : messagesGreek,
-	'ro' : messagesRomanian,
-	'pt' : messagesPortuguese,
-	'zh' : messagesChinese,
-	'es' : messagesSpanish,
-	'hr' : messagesCroatian,
-	'cs' : messagesCzech,
-	'it' : messagesItalian,
-	'uk' : messagesUkrainian,
-	'tr' : messagesTurkish
+	'nb'      : messagesNorwegian,
+	'de'      : messagesGerman,
+	'hu'      : messagesHungarian,
+	'pl'      : messagesPolish,
+	'dk'      : messagesDanish,
+	'fr'      : messagesFrench,
+	'el'      : messagesGreek,
+	'ro'      : messagesRomanian,
+	'pt'      : messagesPortuguese,
+	'zh-hans' : messagesChineseSimplified,
+	'zh-hant' : messagesChineseTraditional,
+	'es'      : messagesSpanish,
+	'hr'      : messagesCroatian,
+	'cs'      : messagesCzech,
+	'it'      : messagesItalian,
+	'uk'      : messagesUkrainian,
+	'tr'      : messagesTurkish,
+	'lv'      : messagesLatvian
 };
 
-const locale = navigator.language.split(/[-_]/)[0]; // language without region code
+const browserLanguage = (navigator.language || navigator.browserLanguage).toLowerCase();
+
+let locale = browserLanguage.split(/[-_]/)[0]; // language without region code
+
+if (locale === 'zh')
+{
+	if (browserLanguage === 'zh-cn')
+		locale = 'zh-hans';
+	else
+		locale = 'zh-hant';
+}
 
 const intl = createIntl({
 	locale,
@@ -113,6 +126,13 @@ function run()
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
+
+	const { pathname } = window.location;
+
+	let basePath = pathname.substring(0, pathname.lastIndexOf('/'));
+
+	if (!basePath)
+		basePath = '/';
 	
 	// Get current device.
 	const device = deviceInfo();
@@ -132,7 +152,8 @@ function run()
 			produce,
 			forceTcp,
 			displayName,
-			muted
+			muted,
+			basePath
 		});
 
 	global.CLIENT = roomClient;
@@ -144,7 +165,7 @@ function run()
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
 						<RoomContext.Provider value={roomClient}>
 							<SnackbarProvider>
-								<Router>
+								<Router basename={basePath}>
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
 											<Route exact path='/' component={ChooseRoom} />

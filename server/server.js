@@ -48,10 +48,6 @@ const queue = new AwaitQueue();
 // @type {Array<mediasoup.Worker>}
 const mediasoupWorkers = [];
 
-// Index of next mediasoup Worker to use.
-// @type {Number}
-let nextMediasoupWorkerIdx = 0;
-
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
 
@@ -122,44 +118,69 @@ let oidcStrategy;
 
 async function run()
 {
-	// Open the interactive server.
-	await interactiveServer(rooms, peers);
-
-	if (typeof(config.auth) === 'undefined')
+	try
 	{
-		logger.warn('Auth is not configured properly!');
-	}
-	else
-	{
-		await setupAuth();
-	}
+		// Open the interactive server.
+		await interactiveServer(rooms, peers);
 
-	// Run a mediasoup Worker.
-	await runMediasoupWorkers();
-
-	// Run HTTPS server.
-	await runHttpsServer();
-
-	// Run WebSocketServer.
-	await runWebSocketServer();
-
-	// Log rooms status every 30 seconds.
-	setInterval(() =>
-	{
-		for (const room of rooms.values())
+		// start Prometheus exporter
+		if (config.prometheus)
 		{
-			room.logStatus();
+			await promExporter(rooms, peers, config.prometheus);
 		}
-	}, 120000);
 
-	// check for deserted rooms
-	setInterval(() =>
-	{
-		for (const room of rooms.values())
+		if (typeof(config.auth) === 'undefined')
 		{
-			room.checkEmpty();
+			logger.warn('Auth is not configured properly!');
 		}
-	}, 10000);
+		else
+		{
+			await setupAuth();
+		}
+
+		// Run a mediasoup Worker.
+		await runMediasoupWorkers();
+
+		// Run HTTPS server.
+		await runHttpsServer();
+
+		// Run WebSocketServer.
+		await runWebSocketServer();
+
+		const errorHandler = (err, req, res, next) =>
+		{
+			const trackingId = uuidv4();
+	
+			res.status(500).send(
+				`<h1>Internal Server Error</h1>
+				<p>If you report this error, please also report this 
+				<i>tracking ID</i> which makes it possible to locate your session
+				in the logs which are available to the system administrator: 
+				<b>${trackingId}</b></p>`
+			);
+			logger.error(
+				'Express error handler dump with tracking ID: %s, error dump: %o', 
+				trackingId, err);
+		};
+
+		// eslint-disable-next-line no-unused-vars
+		app.use(errorHandler);
+	}
+	catch (error)
+	{
+		logger.error('run() [error:"%o"]', error);
+	}
+}
+
+function statusLog()
+{
+	if (statusLogger)
+	{
+		statusLogger.log({
+			rooms : rooms,
+			peers : peers
+		});
+	}
 }
 
 function setupLTI(ltiConfig)
@@ -353,36 +374,45 @@ async function setupAuth()
 	app.get(
 		'/auth/callback',
 		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
-		(req, res) =>
+		async (req, res, next) =>
 		{
-			const state = JSON.parse(base64.decode(req.query.state));
-
-			let displayName;
-			let picture;
-
-			if (req.user != null)
+			try
 			{
-				if (req.user.displayName != null)
-					displayName = req.user.displayName;
-				else
-					displayName = '';
+				const state = JSON.parse(base64.decode(req.query.state));
 
-				if (req.user.picture != null)
-					picture = req.user.picture;
-				else
-					picture = '/static/media/buddy.403cb9f6.svg';
+				const { peerId, roomId } = state;
+	
+				req.session.peerId = peerId;
+				req.session.roomId = roomId;
+	
+				let peer = peers.get(peerId);
+	
+				if (!peer) // User has no socket session yet, make temporary
+					peer = new Peer({ id: peerId, roomId });
+	
+				if (peer.roomId !== roomId) // The peer is mischievous
+					throw new Error('peer authenticated with wrong room');
+	
+				if (typeof config.userMapping === 'function')
+				{
+					await config.userMapping({
+						peer,
+						roomId,
+						userinfo : req.user._userinfo
+					});
+				}
+	
+				peer.authenticated = true;
+	
+				res.send(loginHelper({
+					displayName : peer.displayName,
+					picture     : peer.picture
+				}));
 			}
-
-			const peer = peers.get(state.id);
-
-			peer && (peer.displayName = displayName);
-			peer && (peer.picture = picture);
-			peer && (peer.authenticated = true);
-
-			res.send(loginHelper({
-				displayName,
-				picture
-			}));
+			catch (error)
+			{
+				return next(error);
+			}
 		}
 	);
 }
@@ -517,7 +547,8 @@ async function runWebSocketServer()
 			{
 				logger.error('room creation or room joining failed [error:"%o"]', error);
 
-				socket.disconnect(true);
+				if (socket)
+					socket.disconnect(true);
 
 				return;
 			});
@@ -553,19 +584,6 @@ async function runMediasoupWorkers()
 
 		mediasoupWorkers.push(worker);
 	}
-}
-
-/**
- * Get next mediasoup Worker.
- */
-function getMediasoupWorker()
-{
-	const worker = mediasoupWorkers[nextMediasoupWorkerIdx];
-
-	if (++nextMediasoupWorkerIdx === mediasoupWorkers.length)
-		nextMediasoupWorkerIdx = 0;
-
-	return worker;
 }
 
 /**

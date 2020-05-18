@@ -46,7 +46,7 @@ class Lobby extends EventEmitter
 
 		return Object.values(this._peers).map((peer) =>
 			({
-				peerId      : peer.id,
+				id          : peer.id,
 				displayName : peer.displayName,
 				picture     : peer.picture
 			}));
@@ -154,8 +154,6 @@ class Lobby extends EventEmitter
 				this.emit('lobbyEmpty');
 		};
 
-		this._notification(peer.socket, 'enteredLobby');
-
 		this._peers[peer.id] = peer;
 
 		peer.on('gotRole', peer.gotRoleHandler);
@@ -165,6 +163,8 @@ class Lobby extends EventEmitter
 		peer.socket.on('request', peer.socketRequestHandler);
 
 		peer.on('close', peer.closeHandler);
+
+		this._notification(peer.socket, 'enteredLobby');
 	}
 
 	async _handleSocketRequest(peer, request, cb)
@@ -189,7 +189,8 @@ class Lobby extends EventEmitter
 				cb();
 
 				break;
-			}			
+			}
+
 			case 'changePicture':
 			{
 				const { picture } = request.data;

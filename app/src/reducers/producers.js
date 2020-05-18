@@ -60,6 +60,17 @@ const producers = (state = initialState, action) =>
 			return { ...state, [producerId]: newProducer };
 		}
 
+		case 'SET_PRODUCER_SCORE':
+		{
+			const { producerId, score } = action.payload;
+
+			const producer = state[producerId];
+
+			const newProducer = { ...producer, score };
+
+			return { ...state, [producerId]: newProducer };
+		}
+
 		default:
 			return state;
 	}

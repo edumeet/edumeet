@@ -42,18 +42,48 @@ var config =
 	{
 		tcp : true
 	},
-	defaultLayout : 'democratic', // democratic, filmstrip
-	lastN         : 4,
-	mobileLastN   : 1,
+	defaultAudio : 
+	{
+		sampleRate       : 48000,
+		channelCount     : 1,
+		volume           : 1.0,
+		autoGainControl  : true,
+		echoCancellation : true,
+		noiseSuppression : true,
+		sampleSize       : 16
+	},
+
+	/**
+	 * Set the auto mute / Push To Talk threshold
+	 * default value is 4
+	 * 
+	 * Set it to 0 to disable auto mute functionality, 
+	 * but use it with caution
+	 * full mesh audio strongly decrease room capacity! 
+	 */
+	autoMuteThreshold    : 4, 
+	background           : 'images/background.jpg',
+	defaultLayout        : 'democratic', // democratic, filmstrip
+	// If true, will show media control buttons in separate
+	// control bar, not in the ME container.
+	buttonControlBar     : false,
+	// If false, will push videos away to make room for side
+	// drawer. If true, will overlay side drawer over videos
+	drawerOverlayed      : true,
+	// Position of notifications
+	notificationPosition : 'right',
+	// Timeout for autohiding topbar and button control bar
+	hideTimeout          : 3000,
+	lastN                : 4,
+	mobileLastN          : 1,
 	// Highest number of speakers user can select
-	maxLastN      : 5,
+	maxLastN             : 5,
 	// If truthy, users can NOT change number of speakers visible
-	lockLastN     : false,
-	background    : 'images/background.jpg',
+	lockLastN            : false,
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
-	title         : 'Multiparty meeting',
-	theme         :
+	title                : 'Multiparty meeting',
+	theme                :
 	{
 		palette :
 		{

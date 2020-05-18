@@ -50,6 +50,28 @@
 	"room.passive": "Pasif Katılımcılar",
 	"room.videoPaused": "Video duraklatıldı",
 
+	"room.muteAll": null,
+	"room.stopAllVideo": null,
+	"room.closeMeeting": null,
+	"room.clearChat": null,
+	"room.clearFileSharing": null,
+	"room.speechUnsupported": null,
+	"room.moderatoractions": null,
+	"room.raisedHand": null,
+	"room.loweredHand": null,
+	"room.extraVideo": null,
+	"room.overRoomLimit": null,
+	"room.help": null,
+	"room.about": null,
+	"room.shortcutKeys": null,
+	"room.browsePeersSpotlight": null,
+
+	"me.mutedPTT": null,
+
+	"roles.gotRole": null,
+	"roles.lostRole": null,
+
+
 	"tooltip.login": "Giriş",
 	"tooltip.logout": "Çıkış",
 	"tooltip.admitFromLobby": "Lobiden içeri al",
@@ -60,6 +82,15 @@
 	"tooltip.lobby": "Lobiyi göster",
 	"tooltip.settings": "Ayarları göster",
 	"tooltip.participants": "Katılımcıları göster",
+
+	"tooltip.kickParticipant": null,
+	"tooltip.muteParticipant": null,
+	"tooltip.muteParticipantVideo": null,
+	"tooltip.raisedHand": null,
+	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Oda adı",
 	"label.chooseRoomButton": "Devam",
@@ -84,6 +115,13 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Kapat",
 
+	"label.media": null,
+	"label.appearance": null,
+	"label.advanced": null,
+	"label.addVideo": null,
+	"label.promoteAllPeers": null,
+	"label.moreActions": null,
+
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Video aygıtını seç",
@@ -97,6 +135,15 @@
 	"settings.advancedMode": "Detaylı mod",
 	"settings.permanentTopBar": "Üst barı kalıcı yap",
 	"settings.lastn": "İzlenebilir video sayısı",
+
+	"settings.hiddenControls": null,
+	"settings.notificationSounds": null,
+	"settings.showNotifications": null,
+	"settings.buttonControlBar": null,
+	"settings.echoCancellation": null,
+	"settings.autoGainControl": null,
+	"settings.noiseSuppression": null,
+	"settings.drawerOverlayed": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",

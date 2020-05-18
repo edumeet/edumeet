@@ -7,8 +7,9 @@
 	"license": "MIT",
 	"main": "lib/index.js",
 	"scripts": {
-		"start": "DEBUG=${DEBUG:='*mediasoup* *INFO* *WARN* *ERROR*'} INTERACTIVE=${INTERACTIVE:='true'} node server.js",
-		"connect": "node connect.js"
+		"start": "node server.js",
+		"connect": "node connect.js",
+		"lint": "eslint -c .eslintrc.json --ext .js *.js lib/"
 	},
 	"dependencies": {
 		"awaitqueue": "^1.0.0",
