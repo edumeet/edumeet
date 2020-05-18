@@ -119,6 +119,7 @@
 	"label.addVideo": "Video hinzufügen",
 	"label.promoteAllPeers": "Alle Teilnehmer reinlassen",
 	"label.moreActions": "Weitere Aktionen",
+	"label.version": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",
