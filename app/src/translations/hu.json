@@ -63,7 +63,8 @@
 	"room.help": "Segítség",
 	"room.about": "Névjegy",
 	"room.shortcutKeys": "Billentyűparancsok",
-	"room.browsePeersSpotlight": null,
+	"room.browsePeersSpotlight": "Résztvevők böngészése",
+	"room.stopAllScreenSharing": "Minden képernyőmegosztás leállítása",
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a szóköz billentyűt",
 
@@ -187,5 +188,6 @@
 	"moderator.clearChat": "A moderátor kiürítette a chat történelmet",
 	"moderator.clearFiles": "A moderátor kiürítette a file megosztás történelmet",
 	"moderator.muteAudio": "A moderátor elnémította a hangod",
-	"moderator.muteVideo": "A moderátor elnémította a videód"
+	"moderator.muteVideo": "A moderátor elnémította a videód",
+	"moderator.muteScreenSharing": "A moderátor leállította képernyőmegosztásod"
 }

@@ -64,6 +64,7 @@
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
+	"room.stopAllScreenSharing": null,
 
 	"me.mutedPTT": null,
 
@@ -179,5 +180,6 @@
 	"devices.screenSharingError": "Ekranınıza erişilirken bir hata oluştu",
 
 	"devices.cameraDisconnected": "Kamera bağlı değil",
-	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu"
+	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu",
+	"moderator.muteScreenSharing": null
 }

@@ -64,6 +64,7 @@
 	"room.about": "Über",
 	"room.shortcutKeys": "Tastaturkürzel",
 	"room.browsePeersSpotlight": null,
+	"room.stopAllScreenSharing": null,
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die SPACE-Taste um zu sprechen",
 
@@ -187,5 +188,6 @@
 	"moderator.clearChat": "Moderator hat Chat gelöscht",
 	"moderator.clearFiles": "Moderator hat geteilte Dateiliste gelöscht",
 	"moderator.muteAudio": "Moderator hat dich stummgeschaltet",
-	"moderator.muteVideo": "Moderator hat dein Video gestoppt"
+	"moderator.muteVideo": "Moderator hat dein Video gestoppt",
+	"moderator.muteScreenSharing": null
 }

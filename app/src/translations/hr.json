@@ -64,6 +64,7 @@
 	"room.about": "O programu",
 	"room.shortcutKeys": "Prečaci",
 	"room.browsePeersSpotlight": "Pretražite sudionike u središtu pažnje",
+	"room.stopAllScreenSharing": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 
@@ -187,5 +188,6 @@
 	"moderator.clearChat": "Moderator je izbrisao razgovor",
 	"moderator.clearFiles": "Moderator je izbrisao datoteke",
 	"moderator.muteAudio": "Moderator je utišao tvoj zvuk",
-	"moderator.muteVideo": "Moderator je zaustavio tvoj video"
+	"moderator.muteVideo": "Moderator je zaustavio tvoj video",
+	"moderator.muteScreenSharing": null
 }

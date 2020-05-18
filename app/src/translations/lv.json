@@ -63,6 +63,7 @@
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
+	"room.stopAllScreenSharing": null,
 
 	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
 
@@ -181,5 +182,6 @@
 	"moderator.clearChat": "Moderators nodzēsa tērziņus",
 	"moderator.clearFiles": "Moderators notīrīja failus",
 	"moderator.muteAudio": "Moderators noklusināja jūsu mikrofonu",
-	"moderator.muteVideo": "Moderators atslēdza jūsu kameru"
+	"moderator.muteVideo": "Moderators atslēdza jūsu kameru",
+	"moderator.muteScreenSharing": null
 }

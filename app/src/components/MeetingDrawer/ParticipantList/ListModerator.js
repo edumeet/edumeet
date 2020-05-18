@@ -65,6 +65,22 @@ const ListModerator = (props) =>
 			<div className={classes.divider} />
 			<Button
 				aria-label={intl.formatMessage({
+					id             : 'room.stopAllScreenSharing',
+					defaultMessage : 'Stop all screen sharing'
+				})}
+				variant='contained'
+				color='secondary'
+				disabled={room.stopAllScreenSharingInProgress}
+				onClick={() => roomClient.stopAllPeerScreenSharing()}
+			>
+				<FormattedMessage
+					id='room.stopAllScreenSharing'
+					defaultMessage='Stop all screen sharing'
+				/>
+			</Button>
+			<div className={classes.divider} />
+			<Button
+				aria-label={intl.formatMessage({
 					id             : 'room.closeMeeting',
 					defaultMessage : 'Close meeting'
 				})}

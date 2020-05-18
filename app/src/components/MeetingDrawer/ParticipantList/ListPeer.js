@@ -306,6 +306,33 @@ const ListPeer = (props) =>
 					</IconButton>
 				</Tooltip>
 			}
+			{ isModerator && screenConsumer &&
+				<Tooltip
+					title={intl.formatMessage({
+						id             : 'tooltip.muteScreenSharingModerator',
+						defaultMessage : 'Mute participant screen share globally'
+					})}
+					placement='bottom'
+				>
+					<IconButton
+						className={classes.buttons}
+						style={{ color: green[500] }}
+						disabled={!isModerator || peer.stopPeerScreenSharingInProgress}
+						onClick={(e) =>
+						{
+							e.stopPropagation();
+
+							roomClient.stopPeerScreenSharing(peer.id);
+						}}
+					>
+						{ !screenConsumer.remotelyPaused ?
+							<ScreenIcon />
+							:
+							<ScreenOffIcon />
+						}
+					</IconButton>
+				</Tooltip>
+			}
 			{children}
 		</div>
 	);

@@ -1448,6 +1448,26 @@ export default class RoomClient
 			peerActions.setStopPeerVideoInProgress(peerId, false));
 	}
 
+	async stopPeerScreenSharing(peerId)
+	{
+		logger.debug('stopPeerScreenSharing() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setStopPeerScreenSharingInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopScreenSharing', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('stopPeerScreenSharing() failed: %o', error);
+		}
+
+		store.dispatch(
+			peerActions.setStopPeerScreenSharingInProgress(peerId, false));
+	}
+
 	async muteAllPeers()
 	{
 		logger.debug('muteAllPeers()');
@@ -1486,6 +1506,26 @@ export default class RoomClient
 
 		store.dispatch(
 			roomActions.setStopAllVideoInProgress(false));
+	}
+
+	async stopAllPeerScreenSharing()
+	{
+		logger.debug('stopAllPeerScreenSharing()');
+
+		store.dispatch(
+			roomActions.setStopAllScreenSharingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopAllScreenSharing');
+		}
+		catch (error)
+		{
+			logger.error('stopAllPeerScreenSharing() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setStopAllScreenSharingInProgress(false));
 	}
 
 	async closeMeeting()
@@ -2608,13 +2648,27 @@ export default class RoomClient
 					case 'moderator:stopVideo':
 					{
 						this.disableWebcam();
-						this.disableScreenSharing();
 
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
 									id             : 'moderator.muteVideo',
 									defaultMessage : 'Moderator stopped your video'
+								})
+							}));
+
+						break;
+					}
+
+					case 'moderator:stopScreenSharing':
+					{
+						this.disableScreenSharing();
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.muteScreenSharingModerator',
+									defaultMessage : 'Moderator stopped your screen sharing'
 								})
 							}));
 

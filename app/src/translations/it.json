@@ -64,7 +64,8 @@
 	"room.about": "Informazioni su",
 	"room.shortcutKeys": "Scorciatoie da tastiera",
 	"room.browsePeersSpotlight": null,
-
+	"room.stopAllScreenSharing": null,
+	
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
 	"roles.gotRole": "Hai ottenuto il ruolo: {role}",
@@ -187,5 +188,6 @@
 	"moderator.clearChat": "Il moderatore ha pulito la chat",
 	"moderator.clearFiles": "Il moderatore ha pulito i file",
 	"moderator.muteAudio": "Il moderatore ha mutato il tuo audio",
-	"moderator.muteVideo": "Il moderatore ha fermato il tuo video"
+	"moderator.muteVideo": "Il moderatore ha fermato il tuo video",
+	"moderator.muteScreenSharing": null
 }
