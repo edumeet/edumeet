@@ -1008,7 +1008,7 @@ export default class RoomClient
 
 		this._hark.on('volume_change', (volume) => 
 		{
-			volume = Math.round(volume)
+			volume = Math.round(volume);
 			if (this._micProducer && volume !== Math.round(this._hark.lastVolume))
 			{
 				if (volume < this._hark.lastVolume * 1.02) 
