@@ -175,6 +175,7 @@ const Me = (props) =>
 		screenProducer,
 		extraVideoProducers,
 		canShareScreen,
+		noiseVolume,
 		classes
 	} = props;
 
@@ -408,7 +409,12 @@ const Me = (props) =>
 												})}
 												className={classes.smallContainer}
 												disabled={!me.canSendMic || me.audioInProgress}
-												color={micState === 'on' ? 'primary' : 'secondary'}
+												color={
+													micState === 'on' ? 
+														settings.voiceActivatedUnmute && !me.isAutoMuted ? 
+															'primary'
+															: 'default'
+														: 'secondary'}
 												size='small'
 												onClick={() =>
 												{
@@ -421,7 +427,10 @@ const Me = (props) =>
 												}}
 											>
 												{ micState === 'on' ?
-													<MicIcon />
+													<MicIcon 
+														color={me.isAutoMuted ? 'secondary' : 'primary'}
+														style={{ opacity: noiseVolume }}
+													/>
 													:
 													<MicOffIcon />
 												}
@@ -436,7 +445,10 @@ const Me = (props) =>
 												})}
 												className={classes.fab}
 												disabled={!me.canSendMic || me.audioInProgress}
-												color={micState === 'on' ? 'default' : 'secondary'}
+												color={micState === 'on' ? 
+													settings.voiceActivatedUnmute && !me.isAutoMuted? 'primary'
+														: 'default' 
+													: 'secondary'}
 												size='large'
 												onClick={() =>
 												{
@@ -449,7 +461,11 @@ const Me = (props) =>
 												}}
 											>
 												{ micState === 'on' ?
-													<MicIcon />
+													<MicIcon
+														color={me.isAutoMuted ? 'secondary' : 'primary'}
+														style={me.isAutoMuted ? { opacity: noiseVolume }  
+															: { opacity: 1 }}
+													/>
 													:
 													<MicOffIcon />
 												}
@@ -832,6 +848,7 @@ Me.propTypes =
 	style               : PropTypes.object,
 	smallContainer      : PropTypes.bool,
 	canShareScreen      : PropTypes.bool.isRequired,
+	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired
 };
@@ -842,12 +859,26 @@ const makeMapStateToProps = () =>
 
 	const mapStateToProps = (state) =>
 	{
+		let volume;
+		
+		// noiseVolume under threshold
+		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold) 
+		{
+			// noiseVolume mapped to range 0.5 ... 1 (threshold switch)
+			volume = 1 + (Math.abs(state.peerVolumes[state.me.id] - 
+				state.settings.noiseThreshold) / 
+				state.settings.noiseThreshold) / 2;
+		} 
+		// noiseVolume over threshold: no noise but voice
+		else { volume = 0; }
+
 		return {
 			me             : state.me,
 			...meProducersSelector(state),
 			settings       : state.settings,
 			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
-			canShareScreen : hasPermission(state)
+			canShareScreen : hasPermission(state),
+			noiseVolume    : volume
 		};
 	};
 
@@ -864,6 +895,8 @@ export default withRoomContext(connect(
 			return (
 				prev.room === next.room &&
 				prev.me === next.me &&
+				Math.round(prev.peerVolumes[prev.me.id]) === 
+					Math.round(next.peerVolumes[next.me.id]) &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings

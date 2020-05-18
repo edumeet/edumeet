@@ -997,7 +997,11 @@ export default class RoomClient
 		if (!this._harkStream.getAudioTracks()[0])
 			throw new Error('getMicStream():something went wrong with hark');
 
-		this._hark = hark(this._harkStream, { play: false, interval: 5 });
+		this._hark = hark(this._harkStream, 
+			{ 
+				play      : false, 
+				interval  : 5, 
+				threshold : store.getState().settings.noiseThreshold });
 
 		// eslint-disable-next-line no-unused-vars
 		this._hark.on('volume_change', (volume, threshold) => 
@@ -1013,19 +1017,25 @@ export default class RoomClient
 		});
 		this._hark.on('speaking', () =>
 		{
-			this._hark.setInterval(300);
+			this._hark.setInterval(5);
 			store.dispatch(meActions.setIsSpeaking(true));
-			if (store.getState().settings.voiceActivatedUnmute && this._micProducer.paused)
+			if (store.getState().settings.voiceActivatedUnmute && 
+				this._micProducer &&
+				this._micProducer.paused)
 			{
-				this.unmuteMic();
+				this._micProducer.resume();
+				store.dispatch(meActions.setAutoMuted(false));
 			}
 		});
 		this._hark.on('stopped_speaking', () =>
 		{
 			store.dispatch(meActions.setIsSpeaking(false));
-			if (store.getState().settings.voiceActivatedUnmute && !this._micProducer.paused) 
+			if (store.getState().settings.voiceActivatedUnmute && 
+				this._micProducer &&
+				!this._micProducer.paused) 
 			{
-				this.muteMic();
+				this._micProducer.pause();
+				store.dispatch(meActions.setAutoMuted(true));
 			}
 			this._hark.setInterval(5);
 		});
