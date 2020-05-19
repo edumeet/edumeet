@@ -3,13 +3,13 @@
  * after the given amount of milliseconds has passed since
  * the last time the callback function was called.
  */
-export const idle = (callback, delay) => 
+export const idle = (callback, delay) =>
 {
 	let handle;
 
-	return () => 
+	return () =>
 	{
-		if (handle) 
+		if (handle)
 		{
 			clearTimeout(handle);
 		}

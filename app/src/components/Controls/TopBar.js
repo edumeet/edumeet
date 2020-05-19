@@ -312,7 +312,7 @@ const TopBar = (props) =>
 					</Typography>
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						<Tooltip 
+						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
 								defaultMessage : 'More actions'
@@ -350,7 +350,7 @@ const TopBar = (props) =>
 								</IconButton>
 							</Tooltip>
 						}
-						<Tooltip 
+						<Tooltip
 							title={intl.formatMessage({
 								id             : 'tooltip.participants',
 								defaultMessage : 'Show participants'
@@ -421,7 +421,7 @@ const TopBar = (props) =>
 							</span>
 						</Tooltip>
 						{ lobbyPeers.length > 0 &&
-							<Tooltip 
+							<Tooltip
 								title={intl.formatMessage({
 									id             : 'tooltip.lobby',
 									defaultMessage : 'Show lobby'
@@ -457,7 +457,7 @@ const TopBar = (props) =>
 									})}
 									className={classes.actionButton}
 									color='inherit'
-									onClick={() => 
+									onClick={() =>
 									{
 										loggedIn ? roomClient.logout() : roomClient.login();
 									}}
@@ -480,7 +480,7 @@ const TopBar = (props) =>
 							<MoreIcon />
 						</IconButton>
 						{ lobbyPeers.length > 0 &&
-						<Tooltip 
+						<Tooltip
 							title={intl.formatMessage({
 								id             : 'tooltip.lobby',
 								defaultMessage : 'Show lobby'
@@ -506,7 +506,7 @@ const TopBar = (props) =>
 								</IconButton>
 							</span>
 						</Tooltip>
-						}					
+						}
 
 					</div>
 					<div className={classes.divider} />
@@ -559,8 +559,8 @@ const TopBar = (props) =>
 								/>
 							</p>
 						</MenuItem>
-						<MenuItem 
-							onClick={() => 
+						<MenuItem
+							onClick={() =>
 							{
 								handleMenuClose();
 								setHelpOpen(!room.helpOpen);
@@ -579,8 +579,8 @@ const TopBar = (props) =>
 								/>
 							</p>
 						</MenuItem>
-						<MenuItem 
-							onClick={() => 
+						<MenuItem
+							onClick={() =>
 							{
 								handleMenuClose();
 								setAboutOpen(!room.aboutOpen);
@@ -613,7 +613,7 @@ const TopBar = (props) =>
 				{ loginEnabled &&
 					<MenuItem
 						aria-label={loginTooltip}
-						onClick={() => 
+						onClick={() =>
 						{
 							handleMenuClose();
 							loggedIn ? roomClient.logout() : roomClient.login();
@@ -699,7 +699,7 @@ const TopBar = (props) =>
 					</p>
 				</MenuItem>
 				{ lobbyPeers.length > 0 &&
-					<MenuItem 
+					<MenuItem
 						aria-label={intl.formatMessage({
 							id             : 'tooltip.lobby',
 							defaultMessage : 'Show lobby'
