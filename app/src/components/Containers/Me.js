@@ -494,8 +494,8 @@ const Me = (props) =>
 											>
 												{ micState === 'on' ?
 													<MicIcon
-														color={me.isAutoMuted ? 'secondary' : 'primary'}
-														style={me.isAutoMuted ? { opacity: noiseVolume }  
+														color={me.isAutoMuted && settings.voiceActivatedUnmute ? 'secondary' : 'primary'}
+														style={me.isAutoMuted && settings.voiceActivatedUnmute ? { opacity: noiseVolume }  
 															: { opacity: 1 }}
 													/>
 													:
