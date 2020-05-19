@@ -306,6 +306,22 @@ export default class RoomClient
 
 				switch (key)
 				{
+					case String.fromCharCode(37):
+					{
+						const newPeerId = this._spotlights.getPrevAsSelected(
+							store.getState().room.selectedPeerId);
+
+						if (newPeerId) this.setSelectedPeer(newPeerId);
+						break;
+					}
+					case String.fromCharCode(39):
+					{
+						const newPeerId = this._spotlights.getNextAsSelected(
+							store.getState().room.selectedPeerId);
+							
+						if (newPeerId) this.setSelectedPeer(newPeerId);
+						break;
+					}
 					case 'A': // Activate advanced mode
 					{
 						store.dispatch(settingsActions.toggleAdvancedMode());
@@ -1025,37 +1041,50 @@ export default class RoomClient
 		if (!this._harkStream.getAudioTracks()[0])
 			throw new Error('getMicStream():something went wrong with hark');
 
-		this._hark = hark(this._harkStream, { play: false });
+		this._hark = hark(this._harkStream, 
+			{ 
+				play      : false, 
+				interval  : 5, 
+				threshold : store.getState().settings.noiseThreshold,
+				history   : 30
+			});
+		this._hark.lastVolume = -100;
 
-		// eslint-disable-next-line no-unused-vars
-		this._hark.on('volume_change', (dBs, threshold) => 
+		this._hark.on('volume_change', (volume) => 
 		{
-			// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-			//   Math.pow(10, dBs / 20)
-			// However it does not produce a visually useful output, so let exagerate
-			// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-			// minimize component renderings.
-			let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-			if (volume === 1)
-				volume = 0;
-
 			volume = Math.round(volume);
-
-			if (this._micProducer && volume !== this._micProducer.volume) 
+			if (this._micProducer && volume !== Math.round(this._hark.lastVolume))
 			{
-				this._micProducer.volume = volume;
-
+				if (volume < this._hark.lastVolume * 1.02) 
+				{
+					volume = this._hark.lastVolume * 1.02;
+				}
+				this._hark.lastVolume = volume;
 				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
 			}
 		});
-		this._hark.on('speaking', function() 
+		this._hark.on('speaking', () =>
 		{
 			store.dispatch(meActions.setIsSpeaking(true));
+			if ((store.getState().settings.voiceActivatedUnmute || 
+				store.getState().me.isAutoMuted) &&
+				this._micProducer &&
+				this._micProducer.paused)
+			{
+				this._micProducer.resume();
+			}
+			store.dispatch(meActions.setAutoMuted(false)); // sanity action
 		});
-		this._hark.on('stopped_speaking', function()
+		this._hark.on('stopped_speaking', () =>
 		{
 			store.dispatch(meActions.setIsSpeaking(false));
+			if (store.getState().settings.voiceActivatedUnmute && 
+				this._micProducer &&
+				!this._micProducer.paused) 
+			{
+				this._micProducer.pause();
+				store.dispatch(meActions.setAutoMuted(true));
+			}
 		});
 	}
 
@@ -1470,6 +1499,26 @@ export default class RoomClient
 			peerActions.setStopPeerVideoInProgress(peerId, false));
 	}
 
+	async stopPeerScreenSharing(peerId)
+	{
+		logger.debug('stopPeerScreenSharing() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setStopPeerScreenSharingInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopScreenSharing', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('stopPeerScreenSharing() failed: %o', error);
+		}
+
+		store.dispatch(
+			peerActions.setStopPeerScreenSharingInProgress(peerId, false));
+	}
+
 	async muteAllPeers()
 	{
 		logger.debug('muteAllPeers()');
@@ -1508,6 +1557,26 @@ export default class RoomClient
 
 		store.dispatch(
 			roomActions.setStopAllVideoInProgress(false));
+	}
+
+	async stopAllPeerScreenSharing()
+	{
+		logger.debug('stopAllPeerScreenSharing()');
+
+		store.dispatch(
+			roomActions.setStopAllScreenSharingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopAllScreenSharing');
+		}
+		catch (error)
+		{
+			logger.error('stopAllPeerScreenSharing() failed: %o', error);
+		}
+
+		store.dispatch(
+			roomActions.setStopAllScreenSharingInProgress(false));
 	}
 
 	async closeMeeting()
@@ -1944,23 +2013,12 @@ export default class RoomClient
 						producerPaused
 					} = request.data;
 
-					let codecOptions;
-
-					if (kind === 'audio')
-					{
-						codecOptions =
-						{
-							opusStereo : 1
-						};
-					}
-
 					const consumer = await this._recvTransport.consume(
 						{
 							id,
 							producerId,
 							kind,
 							rtpParameters,
-							codecOptions,
 							appData : { ...appData, peerId } // Trick.
 						});
 
@@ -2013,19 +2071,8 @@ export default class RoomClient
 
 						consumer.hark = hark(stream, { play: false });
 
-						// eslint-disable-next-line no-unused-vars
-						consumer.hark.on('volume_change', (dBs, threshold) =>
+						consumer.hark.on('volume_change', (volume) =>
 						{
-							// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-							//   Math.pow(10, dBs / 20)
-							// However it does not produce a visually useful output, so let exaggerate
-							// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-							// minimize component renderings.
-							let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-							if (volume === 1)
-								volume = 0;
-
 							volume = Math.round(volume);
 
 							if (consumer && volume !== consumer.volume)
@@ -2631,13 +2678,27 @@ export default class RoomClient
 					case 'moderator:stopVideo':
 					{
 						this.disableWebcam();
-						this.disableScreenSharing();
 
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
 									id             : 'moderator.muteVideo',
 									defaultMessage : 'Moderator stopped your video'
+								})
+							}));
+
+						break;
+					}
+
+					case 'moderator:stopScreenSharing':
+					{
+						this.disableScreenSharing();
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.muteScreenSharingModerator',
+									defaultMessage : 'Moderator stopped your screen sharing'
 								})
 							}));
 
@@ -2999,7 +3060,9 @@ export default class RoomClient
 					if (!this._muted)
 					{
 						await this.enableMic();
-						if (peers.length > 4) 
+						const { autoMuteThreshold } = store.getState().settings;
+
+						if (autoMuteThreshold && peers.length > autoMuteThreshold) 
 							this.muteMic();
 					}
 
@@ -3645,6 +3708,8 @@ export default class RoomClient
 
 		this._screenSharingProducer = null;
 
+		this._screenSharing.stop();
+
 		store.dispatch(meActions.setScreenShareInProgress(false));
 	}
 
@@ -3851,6 +3916,14 @@ export default class RoomClient
 		this._webcamProducer = null;
 
 		store.dispatch(meActions.setWebcamInProgress(false));
+	}
+
+	async _setNoiseThreshold(threshold)
+	{
+		logger.debug('_setNoiseThreshold:%s', threshold);
+		this._hark.setThreshold(threshold);
+		store.dispatch(
+			settingsActions.setNoiseThreshold(threshold));
 	}
 
 	async _updateAudioDevices()

@@ -164,6 +164,12 @@ export const setStopAllVideoInProgress = (flag) =>
 		payload : { flag }
 	});
 
+export const setStopAllScreenSharingInProgress = (flag) =>
+	({
+		type    : 'STOP_ALL_SCREEN_SHARING_IN_PROGRESS',
+		payload : { flag }
+	});
+
 export const setCloseMeetingInProgress = (flag) =>
 	({
 		type    : 'CLOSE_MEETING_IN_PROGRESS',

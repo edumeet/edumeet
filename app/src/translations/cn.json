@@ -63,6 +63,7 @@
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
+	"room.browsePeersSpotlight": null,
 	
 	"me.mutedPTT": null,
 
@@ -84,6 +85,10 @@
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
+	"room.stopAllScreenSharing": null,
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",
@@ -109,7 +114,7 @@
 	"label.ultra": "超高 (UHD)",
 	"label.close": "关闭",
 	"label.media": null,
-	"label.appearence": null,
+	"label.appearance": null,
 	"label.advanced": null,
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
@@ -183,5 +188,6 @@
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
-	"moderator.muteVideo": null
+	"moderator.muteVideo": null,
+	"moderator.muteScreenSharing": null
 }

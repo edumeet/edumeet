@@ -82,6 +82,11 @@ const peer = (state = initialState, action) =>
 				stopPeerVideoInProgress : action.payload.flag
 			};
 
+		case 'STOP_PEER_SCREEN_SHARING_IN_PROGRESS':
+			return {
+				...state,
+				stopPeerScreenSharingInProgress : action.payload.flag
+			};
 		default:
 			return state;
 	}
@@ -118,6 +123,7 @@ const peers = (state = initialState, action) =>
 		case 'REMOVE_PEER_ROLE':
 		case 'STOP_PEER_AUDIO_IN_PROGRESS':
 		case 'STOP_PEER_VIDEO_IN_PROGRESS':
+		case 'STOP_PEER_SCREEN_SHARING_IN_PROGRESS':
 		{
 			const oldPeer = state[action.payload.peerId];
 

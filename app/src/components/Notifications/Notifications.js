@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { withSnackbar } from 'notistack';
 import * as notificationActions from '../../actions/notificationActions';
 
+const notificationPosition = window.config.notificationPosition || 'right';
+
 class Notifications extends Component
 {
 	displayed = [];
@@ -45,7 +47,7 @@ class Notifications extends Component
 					autoHideDuration : notification.timeout,
 					anchorOrigin     : {
 						vertical   : 'bottom',
-						horizontal : 'left'
+						horizontal : notificationPosition
 					}
 				}
 			);

@@ -137,14 +137,15 @@ const styles = (theme) =>
 			transform       : 'translate(-50%, 0%)',
 			color           : 'rgba(255, 255, 255, 0.7)',
 			fontSize        : '1.3em',
-			backgroundColor : 'rgba(255, 0, 0, 0.9)',
+			backgroundColor : 'rgba(245, 0, 87, 0.70)',
 			margin          : '4px',
 			padding         : theme.spacing(2),
-			zIndex          : 31,
+			zIndex          : 1200,
 			borderRadius    : '20px',
 			textAlign       : 'center',
 			opacity         : 0,
 			transition      : 'opacity 1s ease',
+			pointerEvents   : 'none',
 			'&.enabled'     :
 			{
 				transition : 'opacity 0.1s',
@@ -176,7 +177,9 @@ const Me = (props) =>
 		extraVideoProducers,
 		canShareScreen,
 		classes,
-		transports
+		transports,
+		noiseVolume,
+		classes
 	} = props;
 
 	const videoVisible = (
@@ -285,6 +288,25 @@ const Me = (props) =>
 			defaultMessage : 'Start screen sharing'
 		});
 	}
+	const [ 
+		screenShareTooltipOpen, 
+		screenShareTooltipSetOpen 
+	] = React.useState(false);
+
+	const screenShareTooltipHandleClose = () =>
+	{
+		screenShareTooltipSetOpen(false);
+	};
+
+	const screenShareTooltipHandleOpen = () =>
+	{
+		screenShareTooltipSetOpen(true);
+	};
+
+	if (screenState === 'off' && me.screenShareInProgress && screenShareTooltipOpen)
+	{
+		screenShareTooltipHandleClose();
+	}
 
 	const spacingStyle =
 	{
@@ -346,7 +368,7 @@ const Me = (props) =>
 				style={spacingStyle}
 			>
 				
-				{ me.browser.platform !== 'mobile' &&
+				{ me.browser.platform !== 'mobile' && smallContainer &&
 				<div className={classnames(
 					classes.ptt,
 					(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
@@ -355,10 +377,22 @@ const Me = (props) =>
 					<FormattedMessage
 						id='me.mutedPTT'
 						defaultMessage='You are muted, hold down SPACE-BAR to talk'
-					/>	
+					/>
 				</div>
 				}
 				<div className={classes.viewContainer} style={style}>
+					{ me.browser.platform !== 'mobile' && !smallContainer &&
+						<div className={classnames(
+							classes.ptt,
+							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
+						)}
+						>
+							<FormattedMessage
+								id='me.mutedPTT'
+								defaultMessage='You are muted, hold down SPACE-BAR to talk'
+							/>
+						</div>
+					}
 					<p className={
 						classnames(
 							classes.meTag,
@@ -409,7 +443,12 @@ const Me = (props) =>
 												})}
 												className={classes.smallContainer}
 												disabled={!me.canSendMic || me.audioInProgress}
-												color={micState === 'on' ? 'primary' : 'secondary'}
+												color={
+													micState === 'on' ? 
+														settings.voiceActivatedUnmute && !me.isAutoMuted ? 
+															'primary'
+															: 'default'
+														: 'secondary'}
 												size='small'
 												onClick={() =>
 												{
@@ -422,7 +461,10 @@ const Me = (props) =>
 												}}
 											>
 												{ micState === 'on' ?
-													<MicIcon />
+													<MicIcon 
+														color={me.isAutoMuted ? 'secondary' : 'primary'}
+														style={{ opacity: noiseVolume }}
+													/>
 													:
 													<MicOffIcon />
 												}
@@ -437,7 +479,10 @@ const Me = (props) =>
 												})}
 												className={classes.fab}
 												disabled={!me.canSendMic || me.audioInProgress}
-												color={micState === 'on' ? 'default' : 'secondary'}
+												color={micState === 'on' ? 
+													settings.voiceActivatedUnmute && !me.isAutoMuted? 'primary'
+														: 'default' 
+													: 'secondary'}
 												size='large'
 												onClick={() =>
 												{
@@ -450,7 +495,11 @@ const Me = (props) =>
 												}}
 											>
 												{ micState === 'on' ?
-													<MicIcon />
+													<MicIcon
+														color={me.isAutoMuted ? 'secondary' : 'primary'}
+														style={me.isAutoMuted ? { opacity: noiseVolume }  
+															: { opacity: 1 }}
+													/>
 													:
 													<MicOffIcon />
 												}
@@ -512,7 +561,11 @@ const Me = (props) =>
 									}
 								</Tooltip>
 								{ me.browser.platform !== 'mobile' &&
-									<Tooltip title={screenTip} placement='left'>
+									<Tooltip open={screenShareTooltipOpen} 
+										onClose={screenShareTooltipHandleClose} 
+										onOpen={screenShareTooltipHandleOpen} 
+										title={screenTip} placement='left'
+									>
 										{ smallContainer ?
 											<div>
 												<IconButton
@@ -834,6 +887,7 @@ Me.propTypes =
 	style               : PropTypes.object,
 	smallContainer      : PropTypes.bool,
 	canShareScreen      : PropTypes.bool.isRequired,
+	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired,
 	transports     : PropTypes.object.isRequired
@@ -845,13 +899,27 @@ const makeMapStateToProps = () =>
 
 	const mapStateToProps = (state) =>
 	{
+		let volume;
+		
+		// noiseVolume under threshold
+		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold) 
+		{
+			// noiseVolume mapped to range 0.5 ... 1 (threshold switch)
+			volume = 1 + ((Math.abs(state.peerVolumes[state.me.id] - 
+				state.settings.noiseThreshold) / (-120 -
+				state.settings.noiseThreshold)));
+		} 
+		// noiseVolume over threshold: no noise but voice
+		else { volume = 0; }
+
 		return {
 			me             : state.me,
 			...meProducersSelector(state),
 			settings       : state.settings,
 			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
 			canShareScreen : hasPermission(state),
-			transports : state.transports
+			transports     : state.transports,
+			noiseVolume    : volume
 		};
 	};
 
@@ -868,6 +936,8 @@ export default withRoomContext(connect(
 			return (
 				prev.room === next.room &&
 				prev.me === next.me &&
+				Math.round(prev.peerVolumes[prev.me.id]) === 
+					Math.round(next.peerVolumes[next.me.id]) &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings,

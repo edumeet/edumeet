@@ -63,6 +63,8 @@
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
+	"room.browsePeersSpotlight": null,
+	"room.stopAllScreenSharing": null,
 
 	"me.mutedPTT": null,
 
@@ -84,6 +86,9 @@
 	"tooltip.muteParticipantVideo": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.muteParticipantAudioModerator": null,
+	"tooltip.muteParticipantVideoModerator": null,
+	"tooltip.muteScreenSharingModerator": null,
 
 	"label.roomName": "Oda adı",
 	"label.chooseRoomButton": "Devam",
@@ -109,7 +114,7 @@
 	"label.ultra": "Ultra (UHD)",
 	"label.close": "Kapat",
 	"label.media": null,
-	"label.appearence": null,
+	"label.appearance": null,
 	"label.advanced": null,
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
@@ -175,5 +180,6 @@
 	"devices.screenSharingError": "Ekranınıza erişilirken bir hata oluştu",
 
 	"devices.cameraDisconnected": "Kamera bağlı değil",
-	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu"
+	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu",
+	"moderator.muteScreenSharing": null
 }

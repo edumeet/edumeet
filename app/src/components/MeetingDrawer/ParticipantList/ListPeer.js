@@ -255,8 +255,8 @@ const ListPeer = (props) =>
 			{ isModerator && micConsumer &&
 				<Tooltip
 					title={intl.formatMessage({
-						id             : 'tooltip.muteParticipant',
-						defaultMessage : 'Mute globally participant mic'
+						id             : 'tooltip.muteParticipantAudioModerator',
+						defaultMessage : 'Mute participant audio globally'
 					})}
 					placement='bottom'
 				>
@@ -282,8 +282,8 @@ const ListPeer = (props) =>
 			{ isModerator && webcamConsumer && 
 				<Tooltip
 					title={intl.formatMessage({
-						id             : 'tooltip.muteParticipantVideo',
-						defaultMessage : 'Mute globally participant video'
+						id             : 'tooltip.muteParticipantVideoModerator',
+						defaultMessage : 'Mute participant video globally'
 					})}
 					placement='bottom'
 				>
@@ -302,6 +302,33 @@ const ListPeer = (props) =>
 							<VideocamIcon />
 							:
 							<VideocamOffIcon />
+						}
+					</IconButton>
+				</Tooltip>
+			}
+			{ isModerator && screenConsumer &&
+				<Tooltip
+					title={intl.formatMessage({
+						id             : 'tooltip.muteScreenSharingModerator',
+						defaultMessage : 'Mute participant screen share globally'
+					})}
+					placement='bottom'
+				>
+					<IconButton
+						className={classes.buttons}
+						style={{ color: green[500] }}
+						disabled={!isModerator || peer.stopPeerScreenSharingInProgress}
+						onClick={(e) =>
+						{
+							e.stopPropagation();
+
+							roomClient.stopPeerScreenSharing(peer.id);
+						}}
+					>
+						{ !screenConsumer.remotelyPaused ?
+							<ScreenIcon />
+							:
+							<ScreenOffIcon />
 						}
 					</IconButton>
 				</Tooltip>

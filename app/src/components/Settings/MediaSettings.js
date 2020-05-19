@@ -6,31 +6,66 @@ import { withRoomContext } from '../../RoomContext';
 import * as settingsActions from '../../actions/settingsActions';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
+import Slider from '@material-ui/core/Slider';
+import Typography from '@material-ui/core/Typography';
 
-const styles = (theme) =>
-	({
-		setting :
+const NoiseSlider = withStyles(
+	{
+		root : 
 		{
-			padding : theme.spacing(2)
+			color   : '#3880ff',
+			height  : 2,
+			padding : '15px 0'
 		},
-		formControl :
-		{
-			display : 'flex'
+		track : {
+			height : 2
+		},
+		rail : {
+			height  : 2,
+			opacity : 0.2
+		},
+		mark : {
+			backgroundColor : '#bfbfbf',
+			height          : 10,
+			width           : 3,
+			marginTop       : -3
+		},
+		markActive : {
+			opacity         : 1,
+			backgroundColor : 'currentColor'
 		}
-	});
+	})(Slider);
+
+const styles = (theme) => ({
+	setting :
+	{
+		padding : theme.spacing(2)
+	},
+	margin : 
+	{
+		height : theme.spacing(3)
+	},
+	formControl :
+	{
+		display : 'flex'
+	}
+});
 
 const MediaSettings = ({
 	setEchoCancellation,
 	setAutoGainControl,
 	setNoiseSuppression,
+	setVoiceActivatedUnmute,
 	roomClient,
 	me,
+	volume,
 	settings,
 	classes
 }) =>
@@ -135,6 +170,34 @@ const MediaSettings = ({
 						}
 					</FormHelperText>
 				</FormControl>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={settings.resolution || ''}
+						onChange={(event) => 
+						{
+							if (event.target.value)
+								roomClient.changeVideoResolution(event.target.value);
+						}}
+						name='Video resolution'
+						autoWidth
+						className={classes.selectEmpty}
+					>
+						{resolutions.map((resolution, index) => 
+						{
+							return (
+								<MenuItem key={index} value={resolution.value}>
+									{resolution.label}
+								</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						<FormattedMessage
+							id='settings.resolution'
+							defaultMessage='Select your video resolution'
+						/>
+					</FormHelperText>
+				</FormControl>
 			</form>
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
@@ -148,7 +211,7 @@ const MediaSettings = ({
 						displayEmpty
 						name={intl.formatMessage({
 							id             : 'settings.audio',
-							defaultMessage : 'Audio device'
+							defaultMessage : 'Audio input device'
 						})}
 						autoWidth
 						className={classes.selectEmpty}
@@ -165,12 +228,12 @@ const MediaSettings = ({
 						{ audioDevices.length > 0 ?
 							intl.formatMessage({
 								id             : 'settings.selectAudio',
-								defaultMessage : 'Select audio device'
+								defaultMessage : 'Select audio input device'
 							})
 							:
 							intl.formatMessage({
 								id             : 'settings.cantSelectAudio',
-								defaultMessage : 'Unable to select audio device'
+								defaultMessage : 'Unable to select audio input device'
 							})
 						}
 					</FormHelperText>
@@ -225,34 +288,6 @@ const MediaSettings = ({
 				</form>
 			}
 			<form className={classes.setting} autoComplete='off'>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={settings.resolution || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								roomClient.changeVideoResolution(event.target.value);
-						}}
-						name='Video resolution'
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{ resolutions.map((resolution, index) =>
-						{
-							return (
-								<MenuItem key={index} value={resolution.value}>
-									{resolution.label}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.resolution'
-							defaultMessage='Select your video resolution'
-						/>
-					</FormHelperText>
-				</FormControl>
 				<FormControlLabel
 					className={classes.setting}
 					control={
@@ -298,6 +333,43 @@ const MediaSettings = ({
 						defaultMessage : 'Noise suppression'
 					})}
 				/>
+				<FormControlLabel
+					className={classes.setting}
+					control={
+						<Checkbox checked={settings.voiceActivatedUnmute} onChange={
+							(event) => 
+							{
+								setVoiceActivatedUnmute(event.target.checked);
+							}}
+						/>}
+					label={intl.formatMessage({
+						id             : 'settings.voiceActivatedUnmute',
+						defaultMessage : 'Voice activated unmute'
+					})}
+				/>
+				<div className={classes.margin} />
+				<Typography gutterBottom>
+					{
+						intl.formatMessage({
+							id             : 'settings.noiseThreshold',
+							defaultMessage : 'Noise threshold:'
+						})
+					}
+				</Typography>
+				<NoiseSlider className={classnames(classes.slider, classnames.setting)} 
+					key={'noise-threshold-slider'}
+					min={-100}
+					value={settings.noiseThreshold}
+					max={0} 
+					valueLabelDisplay={'off'}
+					onChange={
+						(event, value) =>
+						{
+							roomClient._setNoiseThreshold(value);
+						}}
+					marks={[ { value: volume, label: 'level' } ]}  
+				/>
+				<div className={classes.margin} />
 			</form>
 		</React.Fragment>
 	);
@@ -305,27 +377,31 @@ const MediaSettings = ({
 
 MediaSettings.propTypes =
 {
-	roomClient          : PropTypes.any.isRequired,
-	setEchoCancellation : PropTypes.func.isRequired,
-	setAutoGainControl  : PropTypes.func.isRequired,
-	setNoiseSuppression : PropTypes.func.isRequired,
-	me                  : appPropTypes.Me.isRequired,
-	settings            : PropTypes.object.isRequired,
-	classes             : PropTypes.object.isRequired
+	roomClient              : PropTypes.any.isRequired,
+	setEchoCancellation     : PropTypes.func.isRequired,
+	setAutoGainControl      : PropTypes.func.isRequired,
+	setNoiseSuppression     : PropTypes.func.isRequired,
+	setVoiceActivatedUnmute : PropTypes.func.isRequired,
+	me                      : appPropTypes.Me.isRequired,
+	volume                  : PropTypes.number,
+	settings                : PropTypes.object.isRequired,
+	classes                 : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
 		me       : state.me,
+		volume   : state.peerVolumes[state.me.id],
 		settings : state.settings
 	};
 };
 
 const mapDispatchToProps = {
-	setEchoCancellation : settingsActions.setEchoCancellation,
-	setAutoGainControl  : settingsActions.toggleAutoGainControl,
-	setNoiseSuppression : settingsActions.toggleNoiseSuppression
+	setEchoCancellation     : settingsActions.setEchoCancellation,
+	setAutoGainControl      : settingsActions.toggleAutoGainControl,
+	setNoiseSuppression     : settingsActions.toggleNoiseSuppression,
+	setVoiceActivatedUnmute : settingsActions.setVoiceActivatedUnmute
 };
 
 export default withRoomContext(connect(
@@ -337,7 +413,8 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.me === next.me &&
-				prev.settings === next.settings
+				prev.settings === next.settings &&
+				prev.peerVolumes[prev.me.id] === next[next.me.id]
 			);
 		}
 	}

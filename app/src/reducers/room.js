@@ -226,6 +226,9 @@ const room = (state = initialState, action) =>
 		case 'STOP_ALL_VIDEO_IN_PROGRESS':
 			return { ...state, stopAllVideoInProgress: action.payload.flag };
 
+		case 'STOP_ALL_SCREEN_SHARING_IN_PROGRESS':
+			return { ...state, stopAllScreenSharingInProgress: action.payload.flag };
+
 		case 'CLOSE_MEETING_IN_PROGRESS':
 			return { ...state, closeMeetingInProgress: action.payload.flag };
 
