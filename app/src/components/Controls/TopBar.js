@@ -698,33 +698,6 @@ const TopBar = (props) =>
 						/>
 					</p>
 				</MenuItem>
-				{ lobbyPeers.length > 0 &&
-					<MenuItem
-						aria-label={intl.formatMessage({
-							id             : 'tooltip.lobby',
-							defaultMessage : 'Show lobby'
-						})}
-						disabled={!canPromote}
-						onClick={() =>
-						{
-							handleMenuClose();
-							setLockDialogOpen(!room.lockDialogOpen);
-						}}
-					>
-						<PulsingBadge
-							color='secondary'
-							badgeContent={lobbyPeers.length}
-						>
-							<SecurityIcon />
-						</PulsingBadge>
-						<p className={classes.moreAction}>
-							<FormattedMessage
-								id='tooltip.lobby'
-								defaultMessage='Show lobby'
-							/>
-						</p>
-					</MenuItem>
-				}
 				<MenuItem
 					aria-label={intl.formatMessage({
 						id             : 'tooltip.participants',
