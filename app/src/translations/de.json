@@ -190,7 +190,6 @@
 	"moderator.clearFiles": "Moderator hat geteilte Dateiliste gelöscht",
 	"moderator.muteAudio": "Moderator hat dich stummgeschaltet",
 	"moderator.muteVideo": "Moderator hat dein Video gestoppt",
-	"moderator.muteScreenSharing": null,
 	"moderator.stopScreenSharing": null,
 
 	"unsupportedBrowser.titleUnsupportedBrowser": null,
