@@ -12,6 +12,7 @@ import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
+import UnsupportedBrowser from './components/UnsupportedBrowser';
 import ChooseRoom from './components/ChooseRoom';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
@@ -20,7 +21,7 @@ import { persistor, store } from './store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 import { ReactLazyPreload } from './components/ReactLazyPreload';
-
+import { detectDevice } from 'mediasoup-client';
 // import messagesEnglish from './translations/en';
 import messagesNorwegian from './translations/nb';
 import messagesGerman from './translations/de';
@@ -137,6 +138,52 @@ function run()
 	
 	// Get current device.
 	const device = deviceInfo();
+
+	let unsupportedBrowser=false;
+
+	let webrtcUnavailable=false;
+	
+	if (detectDevice() === undefined)
+	{
+		logger.error('Unsupported browser detected by mediasoup client detectDevice! deviceInfo: %o', device);		
+		unsupportedBrowser=true;
+	}
+	else 
+	if (
+		navigator.mediaDevices === undefined ||
+		navigator.mediaDevices.getUserMedia === undefined ||
+		window.RTCPeerConnection === undefined
+	)
+	{
+		logger.error('WebRTC is unavialable in your browser! deviceInfo: %o', device);
+		webrtcUnavailable=true;
+	} 
+	else 
+	if (device.name === 'safari' && !isNaN(device.version) && parseFloat(device.version) < 12)
+	{
+		unsupportedBrowser=true;
+	}
+	else 
+	{
+		logger.debug('Supported Browser! deviceInfo: %o', device);
+	}
+
+	if (unsupportedBrowser || webrtcUnavailable)
+	{
+		render(
+			<MuiThemeProvider theme={theme}>
+				<RawIntlProvider value={intl}>
+					<UnsupportedBrowser 
+						webrtcUnavailable={webrtcUnavailable} 
+						platform={device.platform}
+					/>
+				</RawIntlProvider>
+			</MuiThemeProvider>,
+			document.getElementById('multiparty-meeting')
+		);
+		
+		return;
+	}
 
 	store.dispatch(
 		meActions.setMe({

@@ -191,5 +191,9 @@
 	"moderator.muteAudio": "Moderator je utišao tvoj zvuk",
 	"moderator.muteVideo": "Moderator je zaustavio tvoj video",
 	"moderator.muteScreenSharing": null,
-	"moderator.stopScreenSharing": null
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

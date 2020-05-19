@@ -191,5 +191,9 @@
 	"moderator.muteAudio": "Moderator hat dich stummgeschaltet",
 	"moderator.muteVideo": "Moderator hat dein Video gestoppt",
 	"moderator.muteScreenSharing": null,
-	"moderator.stopScreenSharing": null
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

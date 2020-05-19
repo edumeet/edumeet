@@ -182,6 +182,15 @@
 
 	"devices.cameraDisconnected": "Kamera bağlı değil",
 	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu",
+	
+	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null,
 	"moderator.muteScreenSharing": null,
-	"moderator.stopScreenSharing": null
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }
