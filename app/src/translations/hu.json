@@ -86,9 +86,9 @@
 	"tooltip.muteParticipantVideo": "Résztvevő videóstreamének némítása",
 	"tooltip.raisedHand": "Jelentkezés",
 	"tooltip.muteScreenSharing": "Képernyőmegosztás szüneteltetése",
-	"tooltip.muteParticipantAudioModerator": "Résztvevő hangjának általános némítása",
-	"tooltip.muteParticipantVideoModerator": "Résztvevő videójának általános némítása",
-	"tooltip.muteScreenSharingModerator": "Résztvevő képernyőmegosztásának általános némítása",
+	"tooltip.muteParticipantAudioModerator": "Résztvevő hangjának némítása mindenkinél",
+	"tooltip.muteParticipantVideoModerator": "Résztvevő videójának némítása mindenkinél",
+	"tooltip.muteScreenSharingModerator": "Résztvevő képernyőmegosztásának leállítása mindenkinél",
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
