@@ -939,7 +939,7 @@ export default withRoomContext(connect(
 					Math.round(next.peerVolumes[next.me.id]) &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
-				prev.settings === next.settings,
+				prev.settings === next.settings &&
 				prev.transports === next.transports
 			);
 		}

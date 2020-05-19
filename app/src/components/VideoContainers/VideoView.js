@@ -305,7 +305,7 @@ class VideoView extends React.PureComponent
 								</React.Fragment>
 							}
 
-							{ isMe && 
+							{ isMe && !isScreen &&
 									(netInfo.recv && netInfo.send && netInfo.send.iceSelectedTuple) &&
 									<React.Fragment>
 										<span className={'RecvL'}>Recv: </span>
