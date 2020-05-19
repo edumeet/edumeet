@@ -901,9 +901,9 @@ const makeMapStateToProps = () =>
 		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold) 
 		{
 			// noiseVolume mapped to range 0.5 ... 1 (threshold switch)
-			volume = 1 + (Math.abs(state.peerVolumes[state.me.id] - 
-				state.settings.noiseThreshold) / 
-				state.settings.noiseThreshold) / 2;
+			volume = 1 + ((Math.abs(state.peerVolumes[state.me.id] - 
+				state.settings.noiseThreshold) / (-120 -
+				state.settings.noiseThreshold)));
 		} 
 		// noiseVolume over threshold: no noise but voice
 		else { volume = 0; }

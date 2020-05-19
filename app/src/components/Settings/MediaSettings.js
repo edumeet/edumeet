@@ -29,7 +29,7 @@ const NoiseSlider = withStyles(
 		},
 		rail : {
 			height  : 2,
-			opacity : 0.2,
+			opacity : 0.2
 		},
 		mark : {
 			backgroundColor : '#bfbfbf',
@@ -50,7 +50,7 @@ const styles = (theme) => ({
 	},
 	margin : 
 	{
-		height : theme.spacing(3),
+		height : theme.spacing(3)
 	},
 	formControl :
 	{
@@ -173,7 +173,8 @@ const MediaSettings = ({
 				<FormControl className={classes.formControl}>
 					<Select
 						value={settings.resolution || ''}
-						onChange={(event) => {
+						onChange={(event) => 
+						{
 							if (event.target.value)
 								roomClient.changeVideoResolution(event.target.value);
 						}}
@@ -181,7 +182,8 @@ const MediaSettings = ({
 						autoWidth
 						className={classes.selectEmpty}
 					>
-						{resolutions.map((resolution, index) => {
+						{resolutions.map((resolution, index) => 
+						{
 							return (
 								<MenuItem key={index} value={resolution.value}>
 									{resolution.label}
@@ -350,7 +352,7 @@ const MediaSettings = ({
 					{
 						intl.formatMessage({
 							id             : 'settings.noiseThreshold',
-							defaultMessage : 'Noise threshold'
+							defaultMessage : 'Noise threshold:'
 						})
 					}
 				</Typography>
@@ -359,11 +361,13 @@ const MediaSettings = ({
 					min={-100}
 					value={settings.noiseThreshold}
 					max={0} 
+					valueLabelDisplay={'off'}
 					onChange={
-						(event, value) => {
+						(event, value) =>
+						{
 							roomClient._setNoiseThreshold(value);
 						}}
-					marks={[{ value: volume, label: 'level' }]} valueLabelDisplay='on' 
+					marks={[ { value: volume, label: 'level' } ]}  
 				/>
 				<div className={classes.margin} />
 			</form>
