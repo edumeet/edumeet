@@ -1008,7 +1008,7 @@ export default class RoomClient
 				play      : false, 
 				interval  : 5, 
 				threshold : store.getState().settings.noiseThreshold,
-				history   : 30
+				history   : 300
 			});
 		this._hark.lastVolume = -100;
 
