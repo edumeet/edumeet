@@ -75,7 +75,7 @@ const UnsupportedBrowser = ({
 	{
 		dense=true;
 	}
-	
+
 	return (
 		<Dialog
 			open={open}
@@ -85,7 +85,7 @@ const UnsupportedBrowser = ({
 			}}
 		>
 			<DialogTitle id='form-dialog-title'>
-				{!webrtcUnavailable && 
+				{!webrtcUnavailable &&
 				<FormattedMessage
 					id='unsupportedBrowser.titleUnsupportedBrowser'
 					defaultMessage='Detected unsupported browser!'
@@ -98,20 +98,20 @@ const UnsupportedBrowser = ({
 				/>
 				}
 			</DialogTitle>
-			<DialogContent dividers={dividers} >				
+			<DialogContent dividers={dividers} >
 				<FormattedMessage
 					id='unsupportedBrowser.bodyText'
 					defaultMessage='This meeting service requires a
 						functionality that is not supported by your browser.
-						Please upgrade, or switch to a different browser, or 
-						check your settings. Supported browsers:'					
+						Please upgrade, or switch to a different browser, or
+						check your settings. Supported browsers:'
 				/>
 				<Grid container spacing={2} justify='center' alignItems='center'>
 					<Grid item xs={12} md={7}>
 
 						<div className={classes.list}>
 							<List dense={dense}>
-								{supportedBrowsers.map((browser, index) => 
+								{supportedBrowsers.map((browser, index) =>
 								{
 									const supportedBrowser = `${browser.vendor} ${browser.name}`;
 									const supportedVersion = `${browser.version}+`;
@@ -119,12 +119,12 @@ const UnsupportedBrowser = ({
 									return (
 										<ListItem key={index}>
 											<ListItemAvatar>
-												<Avatar>												
+												<Avatar>
 													<WebAssetIcon />
 												</Avatar>
 											</ListItemAvatar>
 											<ListItemText
-												primary={supportedBrowser} 
+												primary={supportedBrowser}
 												secondary={supportedVersion}
 											/>
 										</ListItem>
@@ -140,7 +140,7 @@ const UnsupportedBrowser = ({
 					</Grid>
 				</Grid>
 			</DialogContent>
-		</Dialog>		
+		</Dialog>
 	);
 };
 
