@@ -118,6 +118,7 @@
 	"label.addVideo": "新增視訊",
 	"label.promoteAllPeers": "提升全部",
 	"label.moreActions": "更多",
+	"label.version": null,
 
 	"settings.settings": "設置",
 	"settings.camera": "視訊來源",
