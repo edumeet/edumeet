@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	meProducersSelector,
@@ -333,6 +333,20 @@ const Me = (props) =>
 					(prev.score < curr.score ? prev : curr)
 			);
 	}
+
+	useEffect(() => 
+	{
+		let poll;
+
+		const interval = 1000;
+
+		if (advancedMode)
+		{
+			poll = setInterval(() => roomClient._getTransportStats(), interval);
+		}
+		
+		return () => clearInterval(poll);
+	}, [ roomClient, advancedMode ]);
 
 	return (
 		<React.Fragment>
@@ -889,7 +903,7 @@ Me.propTypes =
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired,
-	transports     : PropTypes.object.isRequired
+	transports          : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>

@@ -260,9 +260,6 @@ export default class RoomClient
 		this._startKeyListener();
 
 		this._startDevicesListener();
-
-		this._getTransportStats();
-
 	}
 
 	close()
@@ -627,29 +624,25 @@ export default class RoomClient
 	{
 		try
 		{
-			setInterval(async () => 
+			if (this._recvTransport)
 			{
-				if (this._recvTransport)
-				{
-					logger.debug('getTransportStats() - recv [transportId: "%s"]', this._recvTransport.id);
+				logger.debug('getTransportStats() - recv [transportId: "%s"]', this._recvTransport.id);
 
-					const recv = await this.sendRequest('getTransportStats', { transportId: this._recvTransport.id });
+				const recv = await this.sendRequest('getTransportStats', { transportId: this._recvTransport.id });
 
-					store.dispatch(
-						transportActions.addTransportStats(recv, 'recv'));
-				}
+				store.dispatch(
+					transportActions.addTransportStats(recv, 'recv'));
+			}
 
-				if (this._sendTransport)
-				{
-					logger.debug('getTransportStats() - send [transportId: "%s"]', this._sendTransport.id);
+			if (this._sendTransport)
+			{
+				logger.debug('getTransportStats() - send [transportId: "%s"]', this._sendTransport.id);
 
-					const send = await this.sendRequest('getTransportStats', { transportId: this._sendTransport.id });
+				const send = await this.sendRequest('getTransportStats', { transportId: this._sendTransport.id });
 
-					store.dispatch(
-						transportActions.addTransportStats(send, 'send'));
-				}
-
-			}, 1000);
+				store.dispatch(
+					transportActions.addTransportStats(send, 'send'));
+			}
 		}
 		catch (error)
 		{ 
