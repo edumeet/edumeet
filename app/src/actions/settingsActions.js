@@ -53,6 +53,12 @@ export const toggleShowNotifications = () =>
 		type : 'TOGGLE_SHOW_NOTIFICATIONS'
 	});
 
+export const setShowAdvancedAudio = (showAdvancedAudio) =>
+	({
+		type    : 'SET_SHOW_ADVANCED_AUDIO',
+		payload : { showAdvancedAudio }
+	});
+
 export const setEchoCancellation = (echoCancellation) =>
 	({
 		type    : 'SET_ECHO_CANCELLATION',
@@ -73,35 +79,20 @@ export const setNoiseSuppression = (noiseSuppression) =>
 
 export const setVoiceActivatedUnmute = (voiceActivatedUnmute) =>
 	({
-		type: 'SET_VOICE_ACTIVATED_UNMUTE',
-		payload: { voiceActivatedUnmute }
+		type    : 'SET_VOICE_ACTIVATED_UNMUTE',
+		payload : { voiceActivatedUnmute }
 	});
 
 export const setNoiseThreshold = (noiseThreshold) =>
 	({
-		type: 'SET_NOISE_THRESHOLD',
-		payload: { noiseThreshold }
+		type    : 'SET_NOISE_THRESHOLD',
+		payload : { noiseThreshold }
 	});
 
 export const setDefaultAudio = (audio) =>
 	({
 		type    : 'SET_DEFAULT_AUDIO',
 		payload : { audio }
-	});
-
-export const toggleEchoCancellation = () =>
-	({
-		type : 'TOGGLE_ECHO_CANCELLATION'
-	});
-
-export const toggleAutoGainControl = () =>
-	({
-		type : 'TOGGLE_AUTO_GAIN_CONTROL'
-	});
-
-export const toggleNoiseSuppression = () =>
-	({
-		type : 'TOGGLE_NOISE_SUPPRESSION'
 	});
 
 export const toggleHiddenControls = () =>

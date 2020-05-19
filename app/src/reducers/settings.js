@@ -7,6 +7,7 @@ const initialState =
 	sampleRate           : 48000,
 	channelCount         : 1,
 	volume               : 1.0,
+	showAdvancedAudio    : false,
 	autoGainControl      : false,
 	echoCancellation     : true,
 	noiseSuppression     : true,
@@ -44,7 +45,7 @@ const settings = (state = initialState, action) =>
 		{
 			return { ...state, selectedAudioOutputDevice: action.payload.deviceId };
 		}
-	
+
 		case 'SET_DISPLAY_NAME':
 		{
 			const { displayName } = action.payload;
@@ -78,6 +79,12 @@ const settings = (state = initialState, action) =>
 			const { volume } = action.payload;
 
 			return { ...state, volume };
+		}
+		case 'SET_SHOW_ADVANCED_AUDIO':
+		{
+			const { showAdvancedAudio } = action.payload;
+
+			return { ...state, showAdvancedAudio };
 		}
 
 		case 'SET_AUTO_GAIN_CONTROL':
@@ -120,27 +127,6 @@ const settings = (state = initialState, action) =>
 			const { audio } = action.payload;
 
 			return { ...state, audio };
-		}
-
-		case 'TOGGLE_AUTO_GAIN_CONTROL':
-		{
-			const autoGainControl = !state.autoGainControl;
-
-			return { ...state, autoGainControl };
-		}
-
-		case 'TOGGLE_ECHO_CANCELLATION':
-		{
-			const echoCancellation = !state.echoCancellation;
-
-			return { ...state, echoCancellation };
-		}
-
-		case 'TOGGLE_NOISE_SUPPRESSION':
-		{
-			const noiseSuppression = !state.noiseSuppression;
-
-			return { ...state, noiseSuppression };
 		}
 
 		case 'SET_SAMPLE_SIZE':

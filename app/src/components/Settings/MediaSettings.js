@@ -59,6 +59,7 @@ const styles = (theme) => ({
 });
 
 const MediaSettings = ({
+	setShowAdvancedAudio,
 	setEchoCancellation,
 	setAutoGainControl,
 	setNoiseSuppression,
@@ -291,86 +292,105 @@ const MediaSettings = ({
 				<FormControlLabel
 					className={classes.setting}
 					control={
-						<Checkbox checked={settings.echoCancellation} onChange={
+						<Checkbox checked={settings.showAdvancedAudio} onChange={
 							(event) => 
 							{
-								setEchoCancellation(event.target.checked);
-								roomClient.changeAudioDevice(settings.selectedAudioDevice);
+								setShowAdvancedAudio(event.target.checked);
 							}}
 						/>}
 					label={intl.formatMessage({
-						id             : 'settings.echoCancellation',
-						defaultMessage : 'Echo cancellation'
+						id             : 'settings.showAdvancedAudio',
+						defaultMessage : 'Show advanced audio settings'
 					})}
 				/>
-				<FormControlLabel
-					className={classes.setting}
-					control={
-						<Checkbox checked={settings.autoGainControl} onChange={
-							(event) => 
-							{
-								setAutoGainControl(event.target.checked);
-								roomClient.changeAudioDevice(settings.selectedAudioDevice);
-							}}
-						/>}
-					label={intl.formatMessage({
-						id             : 'settings.autoGainControl',
-						defaultMessage : 'Auto gain control'
-					})}
-				/>
-				<FormControlLabel
-					className={classes.setting}
-					control={
-						<Checkbox checked={settings.noiseSuppression} onChange={
-							(event) => 
-							{
-								setNoiseSuppression(event.target.checked);
-								roomClient.changeAudioDevice(settings.selectedAudioDevice);
-							}}
-						/>}
-					label={intl.formatMessage({
-						id             : 'settings.noiseSuppression',
-						defaultMessage : 'Noise suppression'
-					})}
-				/>
-				<FormControlLabel
-					className={classes.setting}
-					control={
-						<Checkbox checked={settings.voiceActivatedUnmute} onChange={
-							(event) => 
-							{
-								setVoiceActivatedUnmute(event.target.checked);
-							}}
-						/>}
-					label={intl.formatMessage({
-						id             : 'settings.voiceActivatedUnmute',
-						defaultMessage : 'Voice activated unmute'
-					})}
-				/>
-				<div className={classes.margin} />
-				<Typography gutterBottom>
-					{
-						intl.formatMessage({
-							id             : 'settings.noiseThreshold',
-							defaultMessage : 'Noise threshold:'
-						})
-					}
-				</Typography>
-				<NoiseSlider className={classnames(classes.slider, classnames.setting)} 
-					key={'noise-threshold-slider'}
-					min={-100}
-					value={settings.noiseThreshold}
-					max={0} 
-					valueLabelDisplay={'off'}
-					onChange={
-						(event, value) =>
-						{
-							roomClient._setNoiseThreshold(value);
-						}}
-					marks={[ { value: volume, label: 'level' } ]}  
-				/>
-				<div className={classes.margin} />
 			</form>
+			{settings.showAdvancedAudio ?
+				<form className={classes.setting} autoComplete='off'>
+					<FormControlLabel
+						className={classes.setting}
+						control={
+							<Checkbox checked={settings.echoCancellation} onChange={
+								(event) => 
+								{
+									setEchoCancellation(event.target.checked);
+									roomClient.changeAudioDevice(settings.selectedAudioDevice);
+								}}
+							/>}
+						label={intl.formatMessage({
+							id             : 'settings.echoCancellation',
+							defaultMessage : 'Echo cancellation'
+						})}
+					/>
+					<FormControlLabel
+						className={classes.setting}
+						control={
+							<Checkbox checked={settings.autoGainControl} onChange={
+								(event) => 
+								{
+									setAutoGainControl(event.target.checked);
+									roomClient.changeAudioDevice(settings.selectedAudioDevice);
+								}}
+							/>}
+						label={intl.formatMessage({
+							id             : 'settings.autoGainControl',
+							defaultMessage : 'Auto gain control'
+						})}
+					/>
+					<FormControlLabel
+						className={classes.setting}
+						control={
+							<Checkbox checked={settings.noiseSuppression} onChange={
+								(event) => 
+								{
+									setNoiseSuppression(event.target.checked);
+									roomClient.changeAudioDevice(settings.selectedAudioDevice);
+								}}
+							/>}
+						label={intl.formatMessage({
+							id             : 'settings.noiseSuppression',
+							defaultMessage : 'Noise suppression'
+						})}
+					/>
+					<FormControlLabel
+						className={classes.setting}
+						control={
+							<Checkbox checked={settings.voiceActivatedUnmute} onChange={
+								(event) => 
+								{
+									setVoiceActivatedUnmute(event.target.checked);
+								}}
+							/>}
+						label={intl.formatMessage({
+							id             : 'settings.voiceActivatedUnmute',
+							defaultMessage : 'Voice activated unmute'
+						})}
+					/>
+					<div className={classes.margin} />
+					<Typography gutterBottom>
+						{
+							intl.formatMessage({
+								id             : 'settings.noiseThreshold',
+								defaultMessage : 'Noise threshold:'
+							})
+						}
+					</Typography>
+					<NoiseSlider className={classnames(classes.slider, classnames.setting)} 
+						key={'noise-threshold-slider'}
+						min={-100}
+						value={settings.noiseThreshold}
+						max={0} 
+						valueLabelDisplay={'off'}
+						onChange={
+							(event, value) =>
+							{
+								roomClient._setNoiseThreshold(value);
+							}}
+						marks={[ { value: volume, label: 'level' } ]}  
+					/>
+					<div className={classes.margin} />
+				</form>
+				: null
+			}
 		</React.Fragment>
 	);
 };
@@ -378,6 +398,7 @@ const MediaSettings = ({
 MediaSettings.propTypes =
 {
 	roomClient              : PropTypes.any.isRequired,
+	setShowAdvancedAudio    : PropTypes.func.isRequired,
 	setEchoCancellation     : PropTypes.func.isRequired,
 	setAutoGainControl      : PropTypes.func.isRequired,
 	setNoiseSuppression     : PropTypes.func.isRequired,
@@ -398,9 +419,10 @@ const mapStateToProps = (state) =>
 };
 
 const mapDispatchToProps = {
+	setShowAdvancedAudio    : settingsActions.setShowAdvancedAudio,
 	setEchoCancellation     : settingsActions.setEchoCancellation,
-	setAutoGainControl      : settingsActions.toggleAutoGainControl,
-	setNoiseSuppression     : settingsActions.toggleNoiseSuppression,
+	setAutoGainControl      : settingsActions.setAutoGainControl,
+	setNoiseSuppression     : settingsActions.setNoiseSuppression,
 	setVoiceActivatedUnmute : settingsActions.setVoiceActivatedUnmute
 };
 
