@@ -190,5 +190,6 @@
 	"moderator.clearFiles": "Moderator je izbrisao datoteke",
 	"moderator.muteAudio": "Moderator je utišao tvoj zvuk",
 	"moderator.muteVideo": "Moderator je zaustavio tvoj video",
-	"moderator.muteScreenSharing": null
+	"moderator.muteScreenSharing": null,
+	"moderator.stopScreenSharing": null
 }

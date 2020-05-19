@@ -190,5 +190,6 @@
 	"moderator.clearFiles": "Moderator fjernet filer",
 	"moderator.muteAudio": "Moderator mutet lyden din",
 	"moderator.muteVideo": "Moderator mutet videoen din",
-	"moderator.muteScreenSharing": null	
+	"moderator.muteScreenSharing": null	,
+	"moderator.stopScreenSharing": null
 }

@@ -182,5 +182,6 @@
 
 	"devices.cameraDisconnected": "Kamera bağlı değil",
 	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu",
-	"moderator.muteScreenSharing": null
+	"moderator.muteScreenSharing": null,
+	"moderator.stopScreenSharing": null
 }

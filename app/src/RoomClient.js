@@ -2682,7 +2682,7 @@ export default class RoomClient
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
-									id             : 'moderator.muteScreenSharingModerator',
+									id             : 'moderator.stopScreenSharing',
 									defaultMessage : 'Moderator stopped your screen sharing'
 								})
 							}));
