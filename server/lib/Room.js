@@ -3,6 +3,7 @@ const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
+const { SocketTimeoutError } = require('./errors');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
@@ -1759,9 +1760,9 @@ class Room extends EventEmitter
 				if (called)
 					return;
 				called = true;
-				callback(new Error('Request timeout.'));
+				callback(new SocketTimeoutError('Request timed out'));
 			},
-			10000
+			config.requestTimeout || 20000
 		);
 
 		return (...args) =>
@@ -1775,7 +1776,7 @@ class Room extends EventEmitter
 		};
 	}
 
-	_request(socket, method, data = {})
+	_sendRequest(socket, method, data = {})
 	{
 		return new Promise((resolve, reject) =>
 		{
@@ -1795,6 +1796,33 @@ class Room extends EventEmitter
 				})
 			);
 		});
+	}
+
+	async _request(socket, method, data)
+	{
+		logger.debug('_request() [method:"%s", data:"%o"]', method, data);
+
+		const {
+			requestRetries = 3
+		} = config;
+
+		for (let tries = 0; tries < requestRetries; tries++)
+		{
+			try
+			{
+				return await this._sendRequest(socket, method, data);
+			}
+			catch (error)
+			{
+				if (
+					error instanceof SocketTimeoutError &&
+					tries < requestRetries
+				)
+					logger.warn('_request() | timeout, retrying [attempt:"%s"]', tries);
+				else
+					throw error;
+			}
+		}
 	}
 
 	_notification(socket, method, data = {}, broadcast = false, includeSender = false)

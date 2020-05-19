@@ -479,35 +479,36 @@ const TopBar = (props) =>
 						>
 							<MoreIcon />
 						</IconButton>
-					</div>
-					{ lobbyPeers.length > 0 &&
-					<Tooltip 
-						title={intl.formatMessage({
-							id             : 'tooltip.lobby',
-							defaultMessage : 'Show lobby'
-						})}
-					>
-						<span className={classes.disabledButton}>
-							<IconButton
-								aria-label={intl.formatMessage({
-									id             : 'tooltip.lobby',
-									defaultMessage : 'Show lobby'
-								})}
-								className={classes.actionButton}
-								color='inherit'
-								disabled={!canPromote}
-								onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
-							>
-								<PulsingBadge
-									color='secondary'
-									badgeContent={lobbyPeers.length}
+						{ lobbyPeers.length > 0 &&
+						<Tooltip 
+							title={intl.formatMessage({
+								id             : 'tooltip.lobby',
+								defaultMessage : 'Show lobby'
+							})}
+						>
+							<span className={classes.disabledButton}>
+								<IconButton
+									aria-label={intl.formatMessage({
+										id             : 'tooltip.lobby',
+										defaultMessage : 'Show lobby'
+									})}
+									className={classes.actionButton}
+									color='inherit'
+									disabled={!canPromote}
+									onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
 								>
-									<SecurityIcon />
-								</PulsingBadge>
-							</IconButton>
-						</span>
-					</Tooltip>
-					}					
+									<PulsingBadge
+										color='secondary'
+										badgeContent={lobbyPeers.length}
+									>
+										<SecurityIcon />
+									</PulsingBadge>
+								</IconButton>
+							</span>
+						</Tooltip>
+						}					
+
+					</div>
 					<div className={classes.divider} />
 					<Button
 						aria-label={intl.formatMessage({
