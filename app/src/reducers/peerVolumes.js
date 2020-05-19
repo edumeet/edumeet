@@ -10,13 +10,13 @@ const peerVolumes = (state = initialState, action) =>
 				peerId
 			} = action.payload;
 
-			return { ...state, [peerId]: 0 };
+			return { ...state, [peerId]: -100 };
 		}
 		case 'ADD_PEER':
 		{
 			const { peer } = action.payload;
 
-			return { ...state, [peer.id]: 0 };
+			return { ...state, [peer.id]: -100 };
 		}
 
 		case 'REMOVE_PEER':
