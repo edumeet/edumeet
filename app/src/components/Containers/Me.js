@@ -176,7 +176,6 @@ const Me = (props) =>
 		screenProducer,
 		extraVideoProducers,
 		canShareScreen,
-		classes,
 		transports,
 		noiseVolume,
 		classes
