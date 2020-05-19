@@ -1,6 +1,7 @@
 import Logger from './Logger';
 import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
+import { SocketTimeoutError } from './utils';
 import * as requestActions from './actions/requestActions';
 import * as meActions from './actions/meActions';
 import * as roomActions from './actions/roomActions';
@@ -574,7 +575,7 @@ export default class RoomClient
 				if (called)
 					return;
 				called = true;
-				callback(new Error('Request timeout.'));
+				callback(new SocketTimeoutError('Request timed out'));
 			},
 			ROOM_OPTIONS.requestTimeout
 		);
@@ -590,13 +591,13 @@ export default class RoomClient
 		};
 	}
 
-	sendRequest(method, data)
+	_sendRequest(method, data)
 	{
 		return new Promise((resolve, reject) =>
 		{
 			if (!this._signalingSocket)
 			{
-				reject('No socket connection.');
+				reject('No socket connection');
 			}
 			else
 			{
@@ -606,17 +607,40 @@ export default class RoomClient
 					this.timeoutCallback((err, response) =>
 					{
 						if (err)
-						{
 							reject(err);
-						}
 						else
-						{
 							resolve(response);
-						}
 					})
 				);
 			}
 		});
+	}
+
+	async sendRequest(method, data)
+	{
+		logger.debug('sendRequest() [method:"%s", data:"%o"]', method, data);
+
+		const {
+			requestRetries = 3
+		} = window.config;
+
+		for (let tries = 0; tries < requestRetries; tries++)
+		{
+			try
+			{
+				return await this._sendRequest(method, data);
+			}
+			catch (error)
+			{
+				if (
+					error instanceof SocketTimeoutError &&
+					tries < requestRetries
+				)
+					logger.warn('sendRequest() | timeout, retrying [attempt:"%s"]', tries);
+				else
+					throw error;
+			}
+		}
 	}
 
 	async changeDisplayName(displayName)

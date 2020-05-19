@@ -37,7 +37,8 @@ var config =
 		'opera'
 	],
 	// Socket.io request timeout
-	requestTimeout   : 10000,
+	requestTimeout   : 20000,
+	requestRetries   : 3,
 	transportOptions :
 	{
 		tcp : true
