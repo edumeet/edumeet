@@ -83,9 +83,9 @@ class Peer extends EventEmitter
 			{
 				if (this.closed)
 					return;
-	
+
 				logger.debug('"disconnect" event [id:%s]', this.id);
-	
+
 				this.close();
 			});
 		}
@@ -208,7 +208,7 @@ class Peer extends EventEmitter
 			const oldDisplayName = this._displayName;
 
 			this._displayName = displayName;
-			
+
 			this.emit('displayNameChanged', { oldDisplayName });
 		}
 	}
@@ -225,7 +225,7 @@ class Peer extends EventEmitter
 			const oldPicture = this._picture;
 
 			this._picture = picture;
-			
+
 			this.emit('pictureChanged', { oldPicture });
 		}
 	}

@@ -493,7 +493,7 @@ class Room extends EventEmitter
 				peer.socket.handshake.session.save();
 
 				let turnServers;
-		
+
 				if ('turnAPIURI' in config)
 				{
 					try
@@ -507,7 +507,7 @@ class Room extends EventEmitter
 									'ip'      : peer.socket.request.connection.remoteAddress
 								}
 							});
-			
+
 						turnServers = [ {
 							urls       : data.uris,
 							username   : data.username,
@@ -518,7 +518,7 @@ class Room extends EventEmitter
 					{
 						if ('backupTurnServers' in config)
 							turnServers = config.backupTurnServers;
-			
+
 						logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
 					}
 				}
@@ -526,7 +526,7 @@ class Room extends EventEmitter
 				{
 					turnServers = config.backupTurnServers;
 				}
-		
+
 				this._notification(peer.socket, 'roomReady', { turnServers });
 			}
 		})
@@ -779,7 +779,7 @@ class Room extends EventEmitter
 				// initiate mediasoup Transports and be ready when he later joins.
 
 				const { forceTcp, producing, consuming } = request.data;
-				
+
 				const webRtcTransportOptions =
 				{
 					...config.mediasoup.webRtcTransport,
@@ -1187,7 +1187,7 @@ class Room extends EventEmitter
 					throw new Error('peer not authorized');
 
 				const { chatMessage } = request.data;
-	
+
 				this._chatHistory.push(chatMessage);
 
 				// Spread to others
@@ -1206,7 +1206,7 @@ class Room extends EventEmitter
 			{
 				if (!this._hasPermission(peer, MODERATE_CHAT))
 					throw new Error('peer not authorized');
-	
+
 				this._chatHistory = [];
 
 				// Spread to others
@@ -1259,7 +1259,7 @@ class Room extends EventEmitter
 			case 'setAccessCode':
 			{
 				const { accessCode } = request.data;
-	
+
 				this._accessCode = accessCode;
 
 				// Spread to others
@@ -1279,7 +1279,7 @@ class Room extends EventEmitter
 			case 'setJoinByAccessCode':
 			{
 				const { joinByAccessCode } = request.data;
-	
+
 				this._joinByAccessCode = joinByAccessCode;
 
 				// Spread to others
@@ -1328,7 +1328,7 @@ class Room extends EventEmitter
 					throw new Error('peer not authorized');
 
 				const { magnetUri } = request.data;
-	
+
 				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
 
 				// Spread to others
@@ -1347,7 +1347,7 @@ class Room extends EventEmitter
 			{
 				if (!this._hasPermission(peer, MODERATE_FILES))
 					throw new Error('peer not authorized');
-	
+
 				this._fileHistory = [];
 
 				// Spread to others
@@ -1907,7 +1907,7 @@ class Room extends EventEmitter
 
 		for (const routerId of this._mediasoupRouters.keys())
 		{
-			const routerLoad = 
+			const routerLoad =
 				Object.values(this._peers).filter((peer) => peer.routerId === routerId).length;
 
 			if (routerLoad < load)
