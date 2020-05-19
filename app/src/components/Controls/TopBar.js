@@ -472,13 +472,6 @@ const TopBar = (props) =>
 						}
 					</div>
 					<div className={classes.sectionMobile}>
-						<IconButton
-							aria-haspopup='true'
-							onClick={handleMobileMenuOpen}
-							color='inherit'
-						>
-							<MoreIcon />
-						</IconButton>
 						{ lobbyPeers.length > 0 &&
 						<Tooltip
 							title={intl.formatMessage({
@@ -507,7 +500,13 @@ const TopBar = (props) =>
 							</span>
 						</Tooltip>
 						}
-
+						<IconButton
+							aria-haspopup='true'
+							onClick={handleMobileMenuOpen}
+							color='inherit'
+						>
+							<MoreIcon />
+						</IconButton>
 					</div>
 					<div className={classes.divider} />
 					<Button
