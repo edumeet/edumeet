@@ -119,6 +119,7 @@
 	"label.addVideo": "Legg til video",
 	"label.promoteAllPeers": "Slipp inn alle",
 	"label.moreActions": "Flere handlinger",
+	"label.version": null,
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
@@ -190,6 +191,7 @@
 	"moderator.muteAudio": "Moderator mutet lyden din",
 	"moderator.muteVideo": "Moderator mutet videoen din",
 	"moderator.muteScreenSharing": null,
+	"moderator.stopScreenSharing": null,
 	
 	"unsupportedBrowser.titleUnsupportedBrowser": null,
 	"unsupportedBrowser.titlewebrtcUnavailable": null,

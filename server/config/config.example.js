@@ -276,6 +276,10 @@ module.exports =
 	// maxUsersPerRoom    : 20,
 	// Room size before spreading to new router
 	routerScaleSize      : 40,
+	// Socket timout value
+	requestTimeout       : 20000,
+	// Socket retries when timeout
+	requestRetries       : 3,
 	// Mediasoup settings
 	mediasoup            :
 	{

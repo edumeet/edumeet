@@ -118,6 +118,7 @@
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
+	"label.version": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",
@@ -189,6 +190,7 @@
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null,
 	"moderator.muteScreenSharing": null,
+	"moderator.stopScreenSharing": null,
 
 	"unsupportedBrowser.titleUnsupportedBrowser": null,
 	"unsupportedBrowser.titlewebrtcUnavailable": null,

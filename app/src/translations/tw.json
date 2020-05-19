@@ -118,6 +118,7 @@
 	"label.addVideo": "新增視訊",
 	"label.promoteAllPeers": "提升全部",
 	"label.moreActions": "更多",
+	"label.version": null,
 
 	"settings.settings": "設置",
 	"settings.camera": "視訊來源",
@@ -189,6 +190,7 @@
 	"moderator.muteAudio": "您已被管理員靜音",
 	"moderator.muteVideo": "您的視訊已被管理員關閉",
 	"moderator.muteScreenSharing": null,
+	"moderator.stopScreenSharing": null,
 
 	"unsupportedBrowser.titleUnsupportedBrowser": null,
 	"unsupportedBrowser.titlewebrtcUnavailable": null,

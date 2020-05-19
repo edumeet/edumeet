@@ -312,7 +312,7 @@ const TopBar = (props) =>
 					</Typography>
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						<Tooltip 
+						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
 								defaultMessage : 'More actions'
@@ -350,7 +350,7 @@ const TopBar = (props) =>
 								</IconButton>
 							</Tooltip>
 						}
-						<Tooltip 
+						<Tooltip
 							title={intl.formatMessage({
 								id             : 'tooltip.participants',
 								defaultMessage : 'Show participants'
@@ -421,7 +421,7 @@ const TopBar = (props) =>
 							</span>
 						</Tooltip>
 						{ lobbyPeers.length > 0 &&
-							<Tooltip 
+							<Tooltip
 								title={intl.formatMessage({
 									id             : 'tooltip.lobby',
 									defaultMessage : 'Show lobby'
@@ -457,7 +457,7 @@ const TopBar = (props) =>
 									})}
 									className={classes.actionButton}
 									color='inherit'
-									onClick={() => 
+									onClick={() =>
 									{
 										loggedIn ? roomClient.logout() : roomClient.login();
 									}}
@@ -472,6 +472,34 @@ const TopBar = (props) =>
 						}
 					</div>
 					<div className={classes.sectionMobile}>
+						{ lobbyPeers.length > 0 &&
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'tooltip.lobby',
+								defaultMessage : 'Show lobby'
+							})}
+						>
+							<span className={classes.disabledButton}>
+								<IconButton
+									aria-label={intl.formatMessage({
+										id             : 'tooltip.lobby',
+										defaultMessage : 'Show lobby'
+									})}
+									className={classes.actionButton}
+									color='inherit'
+									disabled={!canPromote}
+									onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
+								>
+									<PulsingBadge
+										color='secondary'
+										badgeContent={lobbyPeers.length}
+									>
+										<SecurityIcon />
+									</PulsingBadge>
+								</IconButton>
+							</span>
+						</Tooltip>
+						}
 						<IconButton
 							aria-haspopup='true'
 							onClick={handleMobileMenuOpen}
@@ -480,34 +508,6 @@ const TopBar = (props) =>
 							<MoreIcon />
 						</IconButton>
 					</div>
-					{ lobbyPeers.length > 0 &&
-					<Tooltip 
-						title={intl.formatMessage({
-							id             : 'tooltip.lobby',
-							defaultMessage : 'Show lobby'
-						})}
-					>
-						<span className={classes.disabledButton}>
-							<IconButton
-								aria-label={intl.formatMessage({
-									id             : 'tooltip.lobby',
-									defaultMessage : 'Show lobby'
-								})}
-								className={classes.actionButton}
-								color='inherit'
-								disabled={!canPromote}
-								onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
-							>
-								<PulsingBadge
-									color='secondary'
-									badgeContent={lobbyPeers.length}
-								>
-									<SecurityIcon />
-								</PulsingBadge>
-							</IconButton>
-						</span>
-					</Tooltip>
-					}					
 					<div className={classes.divider} />
 					<Button
 						aria-label={intl.formatMessage({
@@ -558,8 +558,8 @@ const TopBar = (props) =>
 								/>
 							</p>
 						</MenuItem>
-						<MenuItem 
-							onClick={() => 
+						<MenuItem
+							onClick={() =>
 							{
 								handleMenuClose();
 								setHelpOpen(!room.helpOpen);
@@ -578,8 +578,8 @@ const TopBar = (props) =>
 								/>
 							</p>
 						</MenuItem>
-						<MenuItem 
-							onClick={() => 
+						<MenuItem
+							onClick={() =>
 							{
 								handleMenuClose();
 								setAboutOpen(!room.aboutOpen);
@@ -612,7 +612,7 @@ const TopBar = (props) =>
 				{ loginEnabled &&
 					<MenuItem
 						aria-label={loginTooltip}
-						onClick={() => 
+						onClick={() =>
 						{
 							handleMenuClose();
 							loggedIn ? roomClient.logout() : roomClient.login();
@@ -697,33 +697,6 @@ const TopBar = (props) =>
 						/>
 					</p>
 				</MenuItem>
-				{ lobbyPeers.length > 0 &&
-					<MenuItem 
-						aria-label={intl.formatMessage({
-							id             : 'tooltip.lobby',
-							defaultMessage : 'Show lobby'
-						})}
-						disabled={!canPromote}
-						onClick={() =>
-						{
-							handleMenuClose();
-							setLockDialogOpen(!room.lockDialogOpen);
-						}}
-					>
-						<PulsingBadge
-							color='secondary'
-							badgeContent={lobbyPeers.length}
-						>
-							<SecurityIcon />
-						</PulsingBadge>
-						<p className={classes.moreAction}>
-							<FormattedMessage
-								id='tooltip.lobby'
-								defaultMessage='Show lobby'
-							/>
-						</p>
-					</MenuItem>
-				}
 				<MenuItem
 					aria-label={intl.formatMessage({
 						id             : 'tooltip.participants',

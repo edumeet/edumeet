@@ -18,7 +18,8 @@ const initialState =
 	raisedHand            : false,
 	raisedHandInProgress  : false,
 	loggedIn              : false,
-	isSpeaking            : false
+	isSpeaking            : false,
+	isAutoMuted           : true
 };
 
 const me = (state = initialState, action) =>
@@ -160,6 +161,13 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, isSpeaking: flag };
+		}
+
+		case 'SET_AUTO_MUTED':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, isAutoMuted: flag };
 		}
 
 		default:

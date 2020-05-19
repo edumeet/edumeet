@@ -37,20 +37,22 @@ var config =
 		'opera'
 	],
 	// Socket.io request timeout
-	requestTimeout   : 10000,
+	requestTimeout   : 20000,
+	requestRetries   : 3,
 	transportOptions :
 	{
 		tcp : true
 	},
 	defaultAudio : 
 	{
-		sampleRate       : 48000,
-		channelCount     : 1,
-		volume           : 1.0,
-		autoGainControl  : true,
-		echoCancellation : true,
-		noiseSuppression : true,
-		sampleSize       : 16
+		sampleRate        : 48000,
+		channelCount      : 1,
+		volume            : 1.0,
+		autoGainControl   : true,
+		echoCancellation  : true,
+		noiseSuppression  : true,
+		voiceActivityMute : false,
+		sampleSize        : 16
 	},
 
 	/**

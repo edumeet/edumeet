@@ -94,17 +94,17 @@ const styles = () =>
 		smallBar :
 		{
 			flex               : '0 0 auto',
-			margin             : '0.3rem',
 			backgroundSize     : '75%',
 			backgroundRepeat   : 'no-repeat',
 			backgroundColor    : 'rgba(0, 0, 0, 1)',
 			cursor             : 'pointer',
 			transitionProperty : 'opacity, background-color',
 			width              : 3,
-			borderRadius       : 6,
+			borderRadius       : 2,
 			transitionDuration : '0.25s',
 			position           : 'absolute',
-			bottom             : 0,
+			top                : '50%',
+			transform          : 'translateY(-50%)',
 			'&.level0'         : { height: 0 },
 			'&.level1'         : { height: '0.2vh' },
 			'&.level2'         : { height: '0.4vh' },
@@ -149,9 +149,16 @@ const makeMapStateToProps = (initialState, props) =>
 {
 	const mapStateToProps = (state) =>
 	{
-		return {
-			volume : state.peerVolumes[props.id]
-		};
+		if (state.peerVolumes[props.id]>state.settings.noiseThreshold)
+		{
+			return {
+				volume : Math.round((state.peerVolumes[props.id]+100) / 10)
+			};
+		}
+		else
+		{
+			return { volume: 0 };
+		}
 	};
 
 	return mapStateToProps;

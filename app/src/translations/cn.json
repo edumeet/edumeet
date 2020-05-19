@@ -119,6 +119,7 @@
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
+	"label.version": null,
 
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",
@@ -190,6 +191,7 @@
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null,
 	"moderator.muteScreenSharing": null,
+	"moderator.stopScreenSharing": null,
 
 	"unsupportedBrowser.titleUnsupportedBrowser": null,
 	"unsupportedBrowser.titlewebrtcUnavailable": null,

@@ -1,6 +1,7 @@
 import Logger from './Logger';
 import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
+import { SocketTimeoutError } from './utils';
 import * as requestActions from './actions/requestActions';
 import * as meActions from './actions/meActions';
 import * as roomActions from './actions/roomActions';
@@ -314,7 +315,7 @@ export default class RoomClient
 					{
 						const newPeerId = this._spotlights.getNextAsSelected(
 							store.getState().room.selectedPeerId);
-							
+
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
@@ -574,7 +575,7 @@ export default class RoomClient
 				if (called)
 					return;
 				called = true;
-				callback(new Error('Request timeout.'));
+				callback(new SocketTimeoutError('Request timed out'));
 			},
 			ROOM_OPTIONS.requestTimeout
 		);
@@ -590,13 +591,13 @@ export default class RoomClient
 		};
 	}
 
-	sendRequest(method, data)
+	_sendRequest(method, data)
 	{
 		return new Promise((resolve, reject) =>
 		{
 			if (!this._signalingSocket)
 			{
-				reject('No socket connection.');
+				reject('No socket connection');
 			}
 			else
 			{
@@ -606,17 +607,40 @@ export default class RoomClient
 					this.timeoutCallback((err, response) =>
 					{
 						if (err)
-						{
 							reject(err);
-						}
 						else
-						{
 							resolve(response);
-						}
 					})
 				);
 			}
 		});
+	}
+
+	async sendRequest(method, data)
+	{
+		logger.debug('sendRequest() [method:"%s", data:"%o"]', method, data);
+
+		const {
+			requestRetries = 3
+		} = window.config;
+
+		for (let tries = 0; tries < requestRetries; tries++)
+		{
+			try
+			{
+				return await this._sendRequest(method, data);
+			}
+			catch (error)
+			{
+				if (
+					error instanceof SocketTimeoutError &&
+					tries < requestRetries
+				)
+					logger.warn('sendRequest() | timeout, retrying [attempt:"%s"]', tries);
+				else
+					throw error;
+			}
+		}
 	}
 
 	async changeDisplayName(displayName)
@@ -774,7 +798,7 @@ export default class RoomClient
 			}
 		});
 
-		torrent.on('done', () => 
+		torrent.on('done', () =>
 		{
 			store.dispatch(
 				fileActions.setFileDone(
@@ -924,7 +948,7 @@ export default class RoomClient
 			{
 				await this.sendRequest(
 					'resumeProducer', { producerId: this._micProducer.id });
-	
+
 				store.dispatch(
 					producerActions.setProducerResumed(this._micProducer.id));
 			}
@@ -976,23 +1000,23 @@ export default class RoomClient
 		}
 	}
 
-	disconnectLocalHark() 
+	disconnectLocalHark()
 	{
 		logger.debug('disconnectLocalHark() | Stopping harkStream.');
-		if (this._harkStream != null) 
+		if (this._harkStream != null)
 		{
 			this._harkStream.getAudioTracks()[0].stop();
 			this._harkStream = null;
 		}
 
-		if (this._hark != null) 
+		if (this._hark != null)
 		{
 			logger.debug('disconnectLocalHark() Stopping hark.');
 			this._hark.stop();
 		}
 	}
 
-	connectLocalHark(track) 
+	connectLocalHark(track)
 	{
 		logger.debug('connectLocalHark() | Track:%o', track);
 		this._harkStream = new MediaStream();
@@ -1003,37 +1027,50 @@ export default class RoomClient
 		if (!this._harkStream.getAudioTracks()[0])
 			throw new Error('getMicStream():something went wrong with hark');
 
-		this._hark = hark(this._harkStream, { play: false });
-
-		// eslint-disable-next-line no-unused-vars
-		this._hark.on('volume_change', (dBs, threshold) => 
-		{
-			// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-			//   Math.pow(10, dBs / 20)
-			// However it does not produce a visually useful output, so let exagerate
-			// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-			// minimize component renderings.
-			let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-			if (volume === 1)
-				volume = 0;
-
-			volume = Math.round(volume);
-
-			if (this._micProducer && volume !== this._micProducer.volume) 
+		this._hark = hark(this._harkStream,
 			{
-				this._micProducer.volume = volume;
+				play      : false,
+				interval  : 5,
+				threshold : store.getState().settings.noiseThreshold,
+				history   : 300
+			});
+		this._hark.lastVolume = -100;
 
+		this._hark.on('volume_change', (volume) =>
+		{
+			volume = Math.round(volume);
+			if (this._micProducer && volume !== Math.round(this._hark.lastVolume))
+			{
+				if (volume < this._hark.lastVolume * 1.02)
+				{
+					volume = this._hark.lastVolume * 1.02;
+				}
+				this._hark.lastVolume = volume;
 				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
 			}
 		});
-		this._hark.on('speaking', function() 
+		this._hark.on('speaking', () =>
 		{
 			store.dispatch(meActions.setIsSpeaking(true));
+			if ((store.getState().settings.voiceActivatedUnmute ||
+				store.getState().me.isAutoMuted) &&
+				this._micProducer &&
+				this._micProducer.paused)
+			{
+				this._micProducer.resume();
+			}
+			store.dispatch(meActions.setAutoMuted(false)); // sanity action
 		});
-		this._hark.on('stopped_speaking', function()
+		this._hark.on('stopped_speaking', () =>
 		{
 			store.dispatch(meActions.setIsSpeaking(false));
+			if (store.getState().settings.voiceActivatedUnmute &&
+				this._micProducer &&
+				!this._micProducer.paused)
+			{
+				this._micProducer.pause();
+				store.dispatch(meActions.setAutoMuted(true));
+			}
 		});
 	}
 
@@ -1045,7 +1082,7 @@ export default class RoomClient
 			meActions.setAudioInProgress(true));
 
 		try
-		{								
+		{
 			const device = this._audioDevices[deviceId];
 
 			if (!device)
@@ -1164,7 +1201,7 @@ export default class RoomClient
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
-				
+
 			if (stream)
 			{
 				const track = stream.getVideoTracks()[0];
@@ -1175,15 +1212,15 @@ export default class RoomClient
 					{
 						await this._webcamProducer.replaceTrack({ track });
 					}
-					else 
+					else
 					{
 						this._webcamProducer = await this._sendTransport.produce({
 							track,
-							appData : 
+							appData :
 							{
 								source : 'webcam'
 							}
-						});	
+						});
 					}
 
 					store.dispatch(
@@ -1193,7 +1230,7 @@ export default class RoomClient
 				{
 					logger.warn('getVideoTracks Error: First Video Track is null');
 				}
-	
+
 			}
 			else
 			{
@@ -1227,7 +1264,7 @@ export default class RoomClient
 
 			if (!device)
 				throw new Error('no webcam devices');
-			
+
 			logger.debug(
 				'changeWebcam() | new selected webcam [device:%o]',
 				device);
@@ -1255,17 +1292,17 @@ export default class RoomClient
 					{
 						await this._webcamProducer.replaceTrack({ track });
 					}
-					else 
+					else
 					{
 						this._webcamProducer = await this._sendTransport.produce({
 							track,
-							appData : 
+							appData :
 							{
 								source : 'webcam'
 							}
-						});	
+						});
 					}
-		
+
 					store.dispatch(
 						producerActions.setProducerTrack(this._webcamProducer.id, track));
 
@@ -1274,7 +1311,7 @@ export default class RoomClient
 				{
 					logger.warn('getVideoTracks Error: First Video Track is null');
 				}
-	
+
 			}
 			else
 			{
@@ -1962,23 +1999,12 @@ export default class RoomClient
 						producerPaused
 					} = request.data;
 
-					let codecOptions;
-
-					if (kind === 'audio')
-					{
-						codecOptions =
-						{
-							opusStereo : 1
-						};
-					}
-
 					const consumer = await this._recvTransport.consume(
 						{
 							id,
 							producerId,
 							kind,
 							rtpParameters,
-							codecOptions,
 							appData : { ...appData, peerId } // Trick.
 						});
 
@@ -2031,19 +2057,8 @@ export default class RoomClient
 
 						consumer.hark = hark(stream, { play: false });
 
-						// eslint-disable-next-line no-unused-vars
-						consumer.hark.on('volume_change', (dBs, threshold) =>
+						consumer.hark.on('volume_change', (volume) =>
 						{
-							// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-							//   Math.pow(10, dBs / 20)
-							// However it does not produce a visually useful output, so let exaggerate
-							// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-							// minimize component renderings.
-							let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-							if (volume === 1)
-								volume = 0;
-
 							volume = Math.round(volume);
 
 							if (consumer && volume !== consumer.volume)
@@ -2083,7 +2098,7 @@ export default class RoomClient
 
 						const { displayName } = store.getState().settings;
 						const { picture } = store.getState().me;
-	
+
 						await this.sendRequest('changeDisplayName', { displayName });
 						await this.sendRequest('changePicture', { picture });
 						break;
@@ -2092,10 +2107,10 @@ export default class RoomClient
 					case 'signInRequired':
 					{
 						store.dispatch(roomActions.setSignInRequired(true));
-	
+
 						break;
 					}
-						
+
 					case 'overRoomLimit':
 					{
 						store.dispatch(roomActions.setOverRoomLimit(true));
@@ -2111,24 +2126,24 @@ export default class RoomClient
 
 						store.dispatch(roomActions.toggleJoined());
 						store.dispatch(roomActions.setInLobby(false));
-	
+
 						await this._joinRoom({ joinVideo });
-	
+
 						break;
 					}
 
 					case 'roomBack':
 					{
 						await this._joinRoom({ joinVideo });
-	
+
 						break;
 					}
-	
+
 					case 'lockRoom':
 					{
 						store.dispatch(
 							roomActions.setRoomLocked());
-	
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -2136,15 +2151,15 @@ export default class RoomClient
 									defaultMessage : 'Room is now locked'
 								})
 							}));
-	
+
 						break;
 					}
-	
+
 					case 'unlockRoom':
 					{
 						store.dispatch(
 							roomActions.setRoomUnLocked());
-						
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -2152,21 +2167,21 @@ export default class RoomClient
 									defaultMessage : 'Room is now unlocked'
 								})
 							}));
-	
+
 						break;
 					}
-	
+
 					case 'parkedPeer':
 					{
 						const { peerId } = notification.data;
-	
+
 						store.dispatch(
 							lobbyPeerActions.addLobbyPeer(peerId));
 						store.dispatch(
 							roomActions.setToolbarsVisible(true));
 
 						this._soundNotification();
-	
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -2174,7 +2189,7 @@ export default class RoomClient
 									defaultMessage : 'New participant entered the lobby'
 								})
 							}));
-	
+
 						break;
 					}
 
@@ -2203,7 +2218,7 @@ export default class RoomClient
 									)
 								);
 							});
-	
+
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
 
@@ -2220,14 +2235,14 @@ export default class RoomClient
 
 						break;
 					}
-	
+
 					case 'lobby:peerClosed':
 					{
 						const { peerId } = notification.data;
-	
+
 						store.dispatch(
 							lobbyPeerActions.removeLobbyPeer(peerId));
-	
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -2235,10 +2250,10 @@ export default class RoomClient
 									defaultMessage : 'Participant in lobby left'
 								})
 							}));
-	
+
 						break;
 					}
-	
+
 					case 'lobby:promotedPeer':
 					{
 						const { peerId } = notification.data;
@@ -2248,7 +2263,7 @@ export default class RoomClient
 
 						break;
 					}
-	
+
 					case 'lobby:changeDisplayName':
 					{
 						const { peerId, displayName } = notification.data;
@@ -2268,11 +2283,11 @@ export default class RoomClient
 
 						break;
 					}
-					
+
 					case 'lobby:changePicture':
 					{
 						const { peerId, picture } = notification.data;
-	
+
 						store.dispatch(
 							lobbyPeerActions.setLobbyPeerPicture(picture, peerId));
 
@@ -2290,7 +2305,7 @@ export default class RoomClient
 					case 'setAccessCode':
 					{
 						const { accessCode } = notification.data;
-	
+
 						store.dispatch(
 							roomActions.setAccessCode(accessCode));
 
@@ -2304,14 +2319,14 @@ export default class RoomClient
 
 						break;
 					}
-	
+
 					case 'setJoinByAccessCode':
 					{
 						const { joinByAccessCode } = notification.data;
-						
+
 						store.dispatch(
 							roomActions.setJoinByAccessCode(joinByAccessCode));
-						
+
 						if (joinByAccessCode)
 						{
 							store.dispatch(requestActions.notify(
@@ -2322,7 +2337,7 @@ export default class RoomClient
 									})
 								}));
 						}
-						else 
+						else
 						{
 							store.dispatch(requestActions.notify(
 								{
@@ -2335,20 +2350,20 @@ export default class RoomClient
 
 						break;
 					}
-	
+
 					case 'activeSpeaker':
 					{
 						const { peerId } = notification.data;
-	
+
 						store.dispatch(
 							roomActions.setRoomActiveSpeaker(peerId));
 
 						if (peerId && peerId !== this._peerId)
 							this._spotlights.handleActiveSpeaker(peerId);
-	
+
 						break;
 					}
-	
+
 					case 'changeDisplayName':
 					{
 						const { peerId, displayName, oldDisplayName } = notification.data;
@@ -2556,74 +2571,74 @@ export default class RoomClient
 					{
 						const { consumerId } = notification.data;
 						const consumer = this._consumers.get(consumerId);
-	
+
 						if (!consumer)
 							break;
-	
+
 						consumer.close();
-	
+
 						if (consumer.hark != null)
 							consumer.hark.stop();
-	
+
 						this._consumers.delete(consumerId);
-	
+
 						const { peerId } = consumer.appData;
-	
+
 						store.dispatch(
 							consumerActions.removeConsumer(consumerId, peerId));
-	
+
 						break;
 					}
-	
+
 					case 'consumerPaused':
 					{
 						const { consumerId } = notification.data;
 						const consumer = this._consumers.get(consumerId);
-	
+
 						if (!consumer)
 							break;
-	
+
 						store.dispatch(
 							consumerActions.setConsumerPaused(consumerId, 'remote'));
 
 						break;
 					}
-	
+
 					case 'consumerResumed':
 					{
 						const { consumerId } = notification.data;
 						const consumer = this._consumers.get(consumerId);
-	
+
 						if (!consumer)
 							break;
-	
+
 						store.dispatch(
 							consumerActions.setConsumerResumed(consumerId, 'remote'));
-	
+
 						break;
 					}
-	
+
 					case 'consumerLayersChanged':
 					{
 						const { consumerId, spatialLayer, temporalLayer } = notification.data;
 						const consumer = this._consumers.get(consumerId);
-	
+
 						if (!consumer)
 							break;
-	
+
 						store.dispatch(consumerActions.setConsumerCurrentLayers(
 							consumerId, spatialLayer, temporalLayer));
-	
+
 						break;
 					}
-	
+
 					case 'consumerScore':
 					{
 						const { consumerId, score } = notification.data;
-	
+
 						store.dispatch(
 							consumerActions.setConsumerScore(consumerId, score));
-	
+
 						break;
 					}
 
@@ -2667,7 +2682,7 @@ export default class RoomClient
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
-									id             : 'moderator.muteScreenSharingModerator',
+									id             : 'moderator.stopScreenSharing',
 									defaultMessage : 'Moderator stopped your screen sharing'
 								})
 							}));
@@ -2737,7 +2752,7 @@ export default class RoomClient
 
 						break;
 					}
-	
+
 					default:
 					{
 						logger.error(
@@ -2784,7 +2799,7 @@ export default class RoomClient
 			this._webTorrent.on('error', (error) =>
 			{
 				logger.error('Filesharing [error:"%o"]', error);
-	
+
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
@@ -3006,7 +3021,7 @@ export default class RoomClient
 				);
 			}
 
-			locked ? 
+			locked ?
 				store.dispatch(roomActions.setRoomLocked()) :
 				store.dispatch(roomActions.setRoomUnLocked());
 
@@ -3032,14 +3047,14 @@ export default class RoomClient
 						await this.enableMic();
 						const { autoMuteThreshold } = store.getState().settings;
 
-						if (autoMuteThreshold && peers.length > autoMuteThreshold) 
+						if (autoMuteThreshold && peers.length > autoMuteThreshold)
 							this.muteMic();
 					}
 
 				if (joinVideo && this._mediasoupDevice.canProduce('video'))
 					this.enableWebcam();
 			}
-			
+
 			await this._updateAudioOutputDevices();
 
 			const { selectedAudioOutputDevice } = store.getState().settings;
@@ -3052,7 +3067,7 @@ export default class RoomClient
 					)
 				);
 			}
-		
+
 			store.dispatch(roomActions.setRoomState('connected'));
 
 			// Clean all the existing notifications.
@@ -3236,7 +3251,7 @@ export default class RoomClient
 
 			if (!device)
 				throw new Error('no webcam devices');
-			
+
 			logger.debug(
 				'addExtraVideo() | new selected webcam [device:%o]',
 				device);
@@ -3281,7 +3296,7 @@ export default class RoomClient
 						{
 							videoGoogleStartBitrate : 1000
 						},
-						appData : 
+						appData :
 						{
 							source : 'extravideo'
 						}
@@ -3291,7 +3306,7 @@ export default class RoomClient
 			{
 				producer = await this._sendTransport.produce({
 					track,
-					appData : 
+					appData :
 					{
 						source : 'extravideo'
 					}
@@ -3385,7 +3400,7 @@ export default class RoomClient
 
 			if (!device)
 				throw new Error('no audio devices');
-			
+
 			logger.debug(
 				'enableMic() | new selected audio device [device:%o]',
 				device);
@@ -3422,7 +3437,7 @@ export default class RoomClient
 						opusPtime           : '3',
 						opusMaxPlaybackRate	: 48000
 					},
-					appData : 
+					appData :
 					{ source: 'mic' }
 				});
 
@@ -3582,7 +3597,7 @@ export default class RoomClient
 						{
 							videoGoogleStartBitrate : 1000
 						},
-						appData : 
+						appData :
 						{
 							source : 'screen'
 						}
@@ -3592,7 +3607,7 @@ export default class RoomClient
 			{
 				this._screenSharingProducer = await this._sendTransport.produce({
 					track,
-					appData : 
+					appData :
 					{
 						source : 'screen'
 					}
@@ -3710,7 +3725,7 @@ export default class RoomClient
 
 			if (!device)
 				throw new Error('no webcam devices');
-			
+
 			logger.debug(
 				'_setWebcamProducer() | new selected webcam [device:%o]',
 				device);
@@ -3753,7 +3768,7 @@ export default class RoomClient
 						{
 							videoGoogleStartBitrate : 1000
 						},
-						appData : 
+						appData :
 						{
 							source : 'webcam'
 						}
@@ -3763,7 +3778,7 @@ export default class RoomClient
 			{
 				this._webcamProducer = await this._sendTransport.produce({
 					track,
-					appData : 
+					appData :
 					{
 						source : 'webcam'
 					}
@@ -3886,6 +3901,14 @@ export default class RoomClient
 		this._webcamProducer = null;
 
 		store.dispatch(meActions.setWebcamInProgress(false));
+	}
+
+	async _setNoiseThreshold(threshold)
+	{
+		logger.debug('_setNoiseThreshold:%s', threshold);
+		this._hark.setThreshold(threshold);
+		store.dispatch(
+			settingsActions.setNoiseThreshold(threshold));
 	}
 
 	async _updateAudioDevices()

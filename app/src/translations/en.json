@@ -119,6 +119,7 @@
 	"label.addVideo": "Add video",
 	"label.promoteAllPeers": "Promote all",
 	"label.moreActions": "More actions",
+	"label.version": "Version",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
@@ -190,6 +191,7 @@
 	"moderator.muteAudio": "Moderator muted your audio",
 	"moderator.muteVideo": "Moderator muted your video",
 	"moderator.muteScreenSharing": "Moderator muted your screen sharing",
+	"moderator.stopScreenSharing": "Moderator stopped your screen sharing",
 
 	"unsupportedBrowser.titleUsnsupportedBrowser": "Detected unsupported browser!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Required functionality not available in your browser!",

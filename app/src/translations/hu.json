@@ -66,7 +66,7 @@
 	"room.browsePeersSpotlight": "Résztvevők böngészése",
 	"room.stopAllScreenSharing": "Összes képernyőmegosztás leállítása",
 
-	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a szóköz billentyűt",
+	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 
 	"roles.gotRole": "{role} szerepet kaptál",
 	"roles.lostRole": "Elvesztetted a {role} szerepet",
@@ -119,6 +119,7 @@
 	"label.addVideo": "Videó hozzáadása",
 	"label.promoteAllPeers": "Mindenkit beengedek",
 	"label.moreActions": "További műveletek",
+	"label.version": "Verzió",
 
 	"settings.settings": "Beállítások",
 	"settings.camera": "Kamera",
@@ -189,10 +190,10 @@
 	"moderator.clearFiles": "A moderátor kiürítette a file megosztás történelmet",
 	"moderator.muteAudio": "A moderátor elnémította a hangod",
 	"moderator.muteVideo": "A moderátor elnémította a videód",
-	"moderator.muteScreenSharing": "A moderátor leállította képernyőmegosztásod",
+	"moderator.muteScreenSharing": "A moderátor szünetelteti képernyőmegosztásod",
+	"moderator.stopScreenSharing": "A moderátor leállította a képernyőmegosztásod",
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "A bőngésző verziód sajnos nem támogatott! :-(",
 	"unsupportedBrowser.titlewebrtcUnavailable": "A böngésződ egy szükséges funkciója nem elérhető!",
 	"unsupportedBrowser.bodyText": "Kérlek frissítsd a böngésződ, válts másik böngészőre, vagy ellenőrizd a böngésződ beállításait! Támogatott böngészők:"
-
 }

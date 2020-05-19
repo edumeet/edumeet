@@ -119,6 +119,7 @@
 	"label.addVideo": "Video hinzufügen",
 	"label.promoteAllPeers": "Alle Teilnehmer reinlassen",
 	"label.moreActions": "Weitere Aktionen",
+	"label.version": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",
@@ -190,6 +191,7 @@
 	"moderator.muteAudio": "Moderator hat dich stummgeschaltet",
 	"moderator.muteVideo": "Moderator hat dein Video gestoppt",
 	"moderator.muteScreenSharing": null,
+	"moderator.stopScreenSharing": null,
 
 	"unsupportedBrowser.titleUnsupportedBrowser": null,
 	"unsupportedBrowser.titlewebrtcUnavailable": null,
