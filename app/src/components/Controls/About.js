@@ -44,7 +44,7 @@ const styles = (theme) =>
 		{
 			display      : 'block',
 			textAlign    : 'center',
-			marginBottom : '1em'
+			marginBottom : theme.spacing(1)
 		}
 	});
 
