@@ -143,13 +143,13 @@ class Filmstrip extends React.PureComponent
 			let speakerWidth = (availableWidth - PADDING_H);
 
 			let speakerHeight = speakerWidth / RATIO;
-	
+
 			if (this.isSharingCamera(this.getActivePeerId()))
 			{
 				speakerWidth /= 2;
 				speakerHeight = speakerWidth / RATIO;
 			}
-	
+
 			if (speakerHeight > (availableSpeakerHeight - PADDING_V))
 			{
 				speakerHeight = (availableSpeakerHeight - PADDING_V);
@@ -167,7 +167,7 @@ class Filmstrip extends React.PureComponent
 			let filmStripHeight = availableFilmstripHeight - FILMSTRING_PADDING_V;
 
 			let filmStripWidth = filmStripHeight * RATIO;
-	
+
 			if (
 				(filmStripWidth * this.props.boxes) >
 				(availableWidth - FILMSTRING_PADDING_H)
@@ -254,7 +254,7 @@ class Filmstrip extends React.PureComponent
 		};
 
 		return (
-			<div 
+			<div
 				className={classnames(
 					classes.root,
 					toolbarsVisible || permanentTopBar ?

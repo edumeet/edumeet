@@ -1,6 +1,6 @@
 const lobbyPeer = (state = {}, action) =>
 {
-	switch (action.type) 
+	switch (action.type)
 	{
 		case 'ADD_LOBBY_PEER':
 			return { id: action.payload.peerId };
@@ -42,7 +42,7 @@ const lobbyPeers = (state = {}, action) =>
 		{
 			const oldLobbyPeer = state[action.payload.peerId];
 
-			if (!oldLobbyPeer) 
+			if (!oldLobbyPeer)
 			{
 				// Tried to update non-existent lobbyPeer. Has probably been promoted, or left.
 				return state;

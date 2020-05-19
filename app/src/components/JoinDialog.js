@@ -327,7 +327,7 @@ const JoinDialog = ({
 							/>
 						</Button>
 					</DialogActions>
-					: 
+					:
 					<DialogContent>
 						<DialogContentText
 							className={classes.green}

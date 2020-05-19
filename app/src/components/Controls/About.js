@@ -69,16 +69,16 @@ const About = ({
 				/>
 			</DialogTitle>
 			<DialogContent dividers='true'>
-				<DialogContentText paragraph> 
+				<DialogContentText paragraph>
 					Contributions to this work were made on behalf of the GÉANT
 					project, a project that has received funding from the
-					European Union’s Horizon 2020 research and innovation 
-					programme under Grant Agreement No. 731122 (GN4-2). 
+					European Union’s Horizon 2020 research and innovation
+					programme under Grant Agreement No. 731122 (GN4-2).
 					On behalf of GÉANT project, GÉANT Association is the sole
-					owner of the copyright in all material which was developed 
+					owner of the copyright in all material which was developed
 					by a member of the GÉANT project.
 				</DialogContentText>
-				<DialogContentText paragraph> 
+				<DialogContentText paragraph>
 					GÉANT Vereniging (Association) is registered with the
 					Chamber of Commerce in Amsterdam with registration number
 					40535155 and operates in the UK as a branch of GÉANT
@@ -106,7 +106,7 @@ const About = ({
 					/>
 				</Button>
 			</DialogActions>
-		</Dialog>		
+		</Dialog>
 	);
 };
 
@@ -114,7 +114,7 @@ About.propTypes =
 {
 	roomClient       : PropTypes.object.isRequired,
 	aboutOpen        : PropTypes.bool.isRequired,
-	handleCloseAbout : PropTypes.func.isRequired, 
+	handleCloseAbout : PropTypes.func.isRequired,
 	classes          : PropTypes.object.isRequired
 };
 

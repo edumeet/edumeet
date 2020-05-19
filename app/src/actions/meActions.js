@@ -80,13 +80,13 @@ export const setAudioOutputInProgress = (flag) =>
 		type    : 'SET_AUDIO_OUTPUT_IN_PROGRESS',
 		payload : { flag }
 	});
-	
+
 export const setWebcamInProgress = (flag) =>
 	({
 		type    : 'SET_WEBCAM_IN_PROGRESS',
 		payload : { flag }
 	});
-	
+
 export const setScreenShareInProgress = (flag) =>
 	({
 		type    : 'SET_SCREEN_SHARE_IN_PROGRESS',

@@ -18,7 +18,7 @@ import Typography from '@material-ui/core/Typography';
 
 const NoiseSlider = withStyles(
 	{
-		root : 
+		root :
 		{
 			color   : '#3880ff',
 			height  : 2,
@@ -48,7 +48,7 @@ const styles = (theme) => ({
 	{
 		padding : theme.spacing(2)
 	},
-	margin : 
+	margin :
 	{
 		height : theme.spacing(3)
 	},
@@ -72,7 +72,7 @@ const MediaSettings = ({
 }) =>
 {
 	const intl = useIntl();
-	
+
 	const resolutions = [ {
 		value : 'low',
 		label : intl.formatMessage({
@@ -122,7 +122,7 @@ const MediaSettings = ({
 		audioDevices = Object.values(me.audioDevices);
 	else
 		audioDevices = [];
-		
+
 	let audioOutputDevices;
 
 	if (me.audioOutputDevices)
@@ -174,7 +174,7 @@ const MediaSettings = ({
 				<FormControl className={classes.formControl}>
 					<Select
 						value={settings.resolution || ''}
-						onChange={(event) => 
+						onChange={(event) =>
 						{
 							if (event.target.value)
 								roomClient.changeVideoResolution(event.target.value);
@@ -183,7 +183,7 @@ const MediaSettings = ({
 						autoWidth
 						className={classes.selectEmpty}
 					>
-						{resolutions.map((resolution, index) => 
+						{resolutions.map((resolution, index) =>
 						{
 							return (
 								<MenuItem key={index} value={resolution.value}>
@@ -293,7 +293,7 @@ const MediaSettings = ({
 					className={classes.setting}
 					control={
 						<Checkbox checked={settings.showAdvancedAudio} onChange={
-							(event) => 
+							(event) =>
 							{
 								setShowAdvancedAudio(event.target.checked);
 							}}
@@ -310,7 +310,7 @@ const MediaSettings = ({
 						className={classes.setting}
 						control={
 							<Checkbox checked={settings.echoCancellation} onChange={
-								(event) => 
+								(event) =>
 								{
 									setEchoCancellation(event.target.checked);
 									roomClient.changeAudioDevice(settings.selectedAudioDevice);
@@ -325,7 +325,7 @@ const MediaSettings = ({
 						className={classes.setting}
 						control={
 							<Checkbox checked={settings.autoGainControl} onChange={
-								(event) => 
+								(event) =>
 								{
 									setAutoGainControl(event.target.checked);
 									roomClient.changeAudioDevice(settings.selectedAudioDevice);
@@ -340,7 +340,7 @@ const MediaSettings = ({
 						className={classes.setting}
 						control={
 							<Checkbox checked={settings.noiseSuppression} onChange={
-								(event) => 
+								(event) =>
 								{
 									setNoiseSuppression(event.target.checked);
 									roomClient.changeAudioDevice(settings.selectedAudioDevice);
@@ -355,7 +355,7 @@ const MediaSettings = ({
 						className={classes.setting}
 						control={
 							<Checkbox checked={settings.voiceActivatedUnmute} onChange={
-								(event) => 
+								(event) =>
 								{
 									setVoiceActivatedUnmute(event.target.checked);
 								}}
@@ -374,18 +374,18 @@ const MediaSettings = ({
 							})
 						}
 					</Typography>
-					<NoiseSlider className={classnames(classes.slider, classnames.setting)} 
+					<NoiseSlider className={classnames(classes.slider, classnames.setting)}
 						key={'noise-threshold-slider'}
 						min={-100}
 						value={settings.noiseThreshold}
-						max={0} 
+						max={0}
 						valueLabelDisplay={'off'}
 						onChange={
 							(event, value) =>
 							{
 								roomClient._setNoiseThreshold(value);
 							}}
-						marks={[ { value: volume, label: 'level' } ]}  
+						marks={[ { value: volume, label: 'level' } ]}
 					/>
 					<div className={classes.margin} />
 				</form>

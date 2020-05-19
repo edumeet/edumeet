@@ -60,7 +60,7 @@ export default class Spotlights extends EventEmitter
 			const oldIndex = this._unmutablePeerList.indexOf(peerId);
 
 			let index = oldIndex;
-			
+
 			index++;
 			for (let i = 0; i < this._unmutablePeerList.length; i++)
 			{
@@ -94,7 +94,7 @@ export default class Spotlights extends EventEmitter
 			const oldIndex = this._unmutablePeerList.indexOf(peerId);
 
 			let index = oldIndex;
-			
+
 			index--;
 			for (let i = 0; i < this._unmutablePeerList.length; i++)
 			{
@@ -119,7 +119,7 @@ export default class Spotlights extends EventEmitter
 		logger.debug('setPeerSpotlight() [peerId:"%s"]', peerId);
 
 		const index = this._selectedSpotlights.indexOf(peerId);
-		
+
 		if (index !== -1)
 		{
 			this._selectedSpotlights = [];
@@ -177,7 +177,7 @@ export default class Spotlights extends EventEmitter
 	{
 		logger.debug(
 			'room "newpeer" event [id: "%s"]', id);
-		
+
 		if (this._peerList.indexOf(id) === -1) // We don't have this peer in the list
 		{
 			logger.debug('_handlePeer() | adding peer [peerId: "%s"]', id);

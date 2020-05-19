@@ -135,20 +135,20 @@ function run()
 
 	if (!basePath)
 		basePath = '/';
-	
+
 	// Get current device.
 	const device = deviceInfo();
 
 	let unsupportedBrowser=false;
 
 	let webrtcUnavailable=false;
-	
+
 	if (detectDevice() === undefined)
 	{
-		logger.error('Unsupported browser detected by mediasoup client detectDevice! deviceInfo: %o', device);		
+		logger.error('Unsupported browser detected by mediasoup client detectDevice! deviceInfo: %o', device);
 		unsupportedBrowser=true;
 	}
-	else 
+	else
 	if (
 		navigator.mediaDevices === undefined ||
 		navigator.mediaDevices.getUserMedia === undefined ||
@@ -157,13 +157,13 @@ function run()
 	{
 		logger.error('WebRTC is unavialable in your browser! deviceInfo: %o', device);
 		webrtcUnavailable=true;
-	} 
-	else 
+	}
+	else
 	if (device.name === 'safari' && !isNaN(device.version) && parseFloat(device.version) < 12)
 	{
 		unsupportedBrowser=true;
 	}
-	else 
+	else
 	{
 		logger.debug('Supported Browser! deviceInfo: %o', device);
 	}
@@ -173,15 +173,15 @@ function run()
 		render(
 			<MuiThemeProvider theme={theme}>
 				<RawIntlProvider value={intl}>
-					<UnsupportedBrowser 
-						webrtcUnavailable={webrtcUnavailable} 
+					<UnsupportedBrowser
+						webrtcUnavailable={webrtcUnavailable}
 						platform={device.platform}
 					/>
 				</RawIntlProvider>
 			</MuiThemeProvider>,
 			document.getElementById('multiparty-meeting')
 		);
-		
+
 		return;
 	}
 

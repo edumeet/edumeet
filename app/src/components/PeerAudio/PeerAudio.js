@@ -36,7 +36,7 @@ export default class PeerAudio extends React.PureComponent
 		if (prevProps !== this.props)
 		{
 			const { audioTrack, audioOutputDevice } = this.props;
-	
+
 			this._setTrack(audioTrack);
 			this._setOutputDevice(audioOutputDevice);
 		}
@@ -70,7 +70,7 @@ export default class PeerAudio extends React.PureComponent
 	{
 		if (this._audioOutputDevice === audioOutputDevice)
 			return;
-		
+
 		this._audioOutputDevice = audioOutputDevice;
 
 		const { audio } = this.refs;
