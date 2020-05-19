@@ -480,7 +480,7 @@ const TopBar = (props) =>
 							<MoreIcon />
 						</IconButton>
 					</div>
-					{ lobbyPeers.length > 0 &&
+					{ isMobile && lobbyPeers.length > 0 &&
 					<Tooltip 
 						title={intl.formatMessage({
 							id             : 'tooltip.lobby',
