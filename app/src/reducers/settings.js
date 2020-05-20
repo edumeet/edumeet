@@ -7,7 +7,6 @@ const initialState =
 	sampleRate           : 48000,
 	channelCount         : 1,
 	volume               : 1.0,
-	showAdvancedAudio    : false,
 	autoGainControl      : false,
 	echoCancellation     : true,
 	noiseSuppression     : true,
@@ -79,12 +78,6 @@ const settings = (state = initialState, action) =>
 			const { volume } = action.payload;
 
 			return { ...state, volume };
-		}
-		case 'SET_SHOW_ADVANCED_AUDIO':
-		{
-			const { showAdvancedAudio } = action.payload;
-
-			return { ...state, showAdvancedAudio };
 		}
 
 		case 'SET_AUTO_GAIN_CONTROL':

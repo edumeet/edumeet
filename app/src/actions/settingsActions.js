@@ -53,12 +53,6 @@ export const toggleShowNotifications = () =>
 		type : 'TOGGLE_SHOW_NOTIFICATIONS'
 	});
 
-export const setShowAdvancedAudio = (showAdvancedAudio) =>
-	({
-		type    : 'SET_SHOW_ADVANCED_AUDIO',
-		payload : { showAdvancedAudio }
-	});
-
 export const setEchoCancellation = (echoCancellation) =>
 	({
 		type    : 'SET_ECHO_CANCELLATION',
