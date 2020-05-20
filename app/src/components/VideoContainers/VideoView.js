@@ -556,7 +556,7 @@ VideoView.propTypes =
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
 	classes                        : PropTypes.object.isRequired,
-	netInfo               						   : PropTypes.object.isRequired
+	netInfo               						   : PropTypes.object
 };
 
 export default withStyles(styles)(VideoView);
