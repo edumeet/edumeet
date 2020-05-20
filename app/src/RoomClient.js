@@ -1128,66 +1128,85 @@ export default class RoomClient
 
 	async changeAudioDevice(deviceId)
 	{
-		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
+		logger.debug('changeAudioDevice() [deviceId:"%s"]', deviceId);
 
 		store.dispatch(
 			meActions.setAudioInProgress(true));
 
+		store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
+
+		if (!this._micProducer)
+		{ // If mic disabled, enable it, device is correct from settings
+			this.enableMic();
+
+			return;
+		}
+
+		let track;
+
 		try
 		{
-			const device = this._audioDevices[deviceId];
+			const device = await this._getAudioDeviceId();
 
 			if (!device)
 				throw new Error('no audio devices');
 
-			logger.debug(
-				'changeAudioDevice() | new selected webcam [device:%o]',
-				device);
-
 			this.disconnectLocalHark();
 
-			if (this._micProducer && this._micProducer.track)
-				this._micProducer.track.stop();
-
-			logger.debug('changeAudioDevice() | calling getUserMedia() %o', store.getState().settings);
+			const {
+				sampleRate,
+				channelCount,
+				volume,
+				autoGainControl,
+				echoCancellation,
+				noiseSuppression,
+				sampleSize
+			} = store.getState().settings;
 
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					audio :
 					{
-						deviceId         : { ideal: device.deviceId },
-						sampleRate       : store.getState().settings.sampleRate,
-						channelCount     : store.getState().settings.channelCount,
-						volume           : store.getState().settings.volume,
-						autoGainControl  : store.getState().settings.autoGainControl,
-						echoCancellation : store.getState().settings.echoCancellation,
-						noiseSuppression : store.getState().settings.noiseSuppression,
-						sampleSize       : store.getState().settings.sampleSize
+						deviceId : { ideal: device },
+						sampleRate,
+						channelCount,
+						volume,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
 					}
 				}
 			);
 
-			logger.debug('Constraints: %o', stream.getAudioTracks()[0].getConstraints());
-			const track = stream.getAudioTracks()[0];
+			([ track ] = stream.getAudioTracks());
 
-			if (this._micProducer)
-				await this._micProducer.replaceTrack({ track });
+			await this._micProducer.replaceTrack({ track });
 
-			if (this._micProducer)
-				this._micProducer.volume = 0;
-			this.connectLocalHark(track);
-
-			if (this._micProducer && this._micProducer.id)
-				store.dispatch(
-					producerActions.setProducerTrack(this._micProducer.id, track));
-
-			store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
+			store.dispatch(
+				producerActions.setProducerTrack(this._micProducer.id, track));
 
 			await this._updateAudioDevices();
+
+			this._micProducer.volume = 0;
+
+			this.connectLocalHark(track);
 		}
 		catch (error)
 		{
-			logger.error('changeAudioDevice() failed: %o', error);
+			logger.error('changeAudioDevice() [error:"%o"]', error);
+
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'devices.microphoneError',
+						defaultMessage : 'An error occurred while accessing your microphone'
+					})
+				}));
+
+			if (track)
+				track.stop();
 		}
 
 		store.dispatch(
@@ -1196,7 +1215,7 @@ export default class RoomClient
 
 	async changeAudioOutputDevice(deviceId)
 	{
-		logger.debug('changeAudioOutputDevice() [deviceId: %s]', deviceId);
+		logger.debug('changeAudioOutputDevice() [deviceId:"%s"]', deviceId);
 
 		store.dispatch(
 			meActions.setAudioOutputInProgress(true));
@@ -1206,11 +1225,7 @@ export default class RoomClient
 			const device = this._audioOutputDevices[deviceId];
 
 			if (!device)
-				throw new Error('Selected audio output device no longer avaibale');
-
-			logger.debug(
-				'changeAudioOutputDevice() | new selected [audio output device:%o]',
-				device);
+				throw new Error('Selected audio output device no longer available');
 
 			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
 
@@ -1218,7 +1233,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('changeAudioOutputDevice() failed: %o', error);
+			logger.error('changeAudioOutputDevice() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1304,79 +1319,64 @@ export default class RoomClient
 
 	async changeWebcam(deviceId)
 	{
-		logger.debug('changeWebcam() [deviceId: %s]', deviceId);
+		logger.debug('changeWebcam() [deviceId:"%s"]', deviceId);
 
 		store.dispatch(
 			meActions.setWebcamInProgress(true));
 
+		store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
+
+		if (!this._webcamProducer)
+		{ // If webcam disabled, enable it, device is correct
+			this.enableWebcam();
+
+			return;
+		}
+
+		let track;
+
 		try
 		{
-			const device = this._webcams[deviceId];
+			const device = await this._getWebcamDeviceId();
 			const resolution = store.getState().settings.resolution;
 
 			if (!device)
 				throw new Error('no webcam devices');
 
-			logger.debug(
-				'changeWebcam() | new selected webcam [device:%o]',
-				device);
-			if (this._webcamProducer && this._webcamProducer.track)
-				this._webcamProducer.track.stop();
-
-			logger.debug('changeWebcam() | calling getUserMedia()');
-
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					video :
 					{
-						deviceId : { exact: device.deviceId },
+						deviceId : { exact: device },
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				});
 
-			if (stream)
-			{
-				const track = stream.getVideoTracks()[0];
+			([ track ] = stream.getVideoTracks());
 
-				if (track)
-				{
-					if (this._webcamProducer)
-					{
-						await this._webcamProducer.replaceTrack({ track });
-					}
-					else
-					{
-						this._webcamProducer = await this._sendTransport.produce({
-							track,
-							appData :
-							{
-								source : 'webcam'
-							}
-						});
-					}
+			if (this._webcamProducer)
+				await this._webcamProducer.replaceTrack({ track });
 
-					store.dispatch(
-						producerActions.setProducerTrack(this._webcamProducer.id, track));
-
-				}
-				else
-				{
-					logger.warn('getVideoTracks Error: First Video Track is null');
-				}
-
-			}
-			else
-			{
-				logger.warn('getUserMedia Error: Stream is null!');
-			}
-
-			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
+			store.dispatch(
+				producerActions.setProducerTrack(this._webcamProducer.id, track));
 
 			await this._updateWebcams();
 		}
 		catch (error)
 		{
-			logger.error('changeWebcam() failed: %o', error);
+			logger.error('changeWebcam() [error:"%o"]', error);
+
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'devices.cameraError',
+						defaultMessage : 'An error occurred while accessing your camera'
+					})
+				}));
+
+			if (track)
+				track.stop();
 		}
 
 		store.dispatch(
@@ -3309,12 +3309,6 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no webcam devices');
 
-			logger.debug(
-				'addExtraVideo() | new selected webcam [device:%o]',
-				device);
-
-			logger.debug('_setWebcamProducer() | calling getUserMedia()');
-
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					video :
@@ -3324,7 +3318,7 @@ export default class RoomClient
 					}
 				});
 
-			track = stream.getVideoTracks()[0];
+			([ track ] = stream.getVideoTracks());
 
 			let producer;
 
@@ -3434,6 +3428,8 @@ export default class RoomClient
 
 	async enableMic()
 	{
+		logger.debug('enableMic()');
+
 		if (this._micProducer)
 			return;
 
@@ -3458,30 +3454,32 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no audio devices');
 
-			logger.debug(
-				'enableMic() | new selected audio device [device:%o]',
-				device);
-
-			logger.debug('enableMic() | calling getUserMedia()');
+			const {
+				sampleRate,
+				channelCount,
+				volume,
+				autoGainControl,
+				echoCancellation,
+				noiseSuppression,
+				sampleSize
+			} = store.getState().settings;
 
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					audio : {
-						deviceId         : { ideal: device.deviceId },
-						sampleRate       : store.getState().settings.sampleRate,
-						channelCount     : store.getState().settings.channelCount,
-						volume           : store.getState().settings.volume,
-						autoGainControl  : store.getState().settings.autoGainControl,
-						echoCancellation : store.getState().settings.echoCancellation,
-						noiseSuppression : store.getState().settings.noiseSuppression,
-						sampleSize       : store.getState().settings.sampleSize
+						deviceId : { ideal: device.deviceId },
+						sampleRate,
+						channelCount,
+						volume,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
 					}
 				}
 			);
 
-			logger.debug('Constraints: %o', stream.getAudioTracks()[0].getConstraints());
-
-			track = stream.getAudioTracks()[0];
+			([ track ] = stream.getAudioTracks());
 
 			this._micProducer = await this._sendTransport.produce(
 				{
@@ -3535,11 +3533,10 @@ export default class RoomClient
 			this._micProducer.volume = 0;
 
 			this.connectLocalHark(track);
-
 		}
 		catch (error)
 		{
-			logger.error('enableMic() failed:%o', error);
+			logger.error('enableMic() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3590,6 +3587,8 @@ export default class RoomClient
 
 	async enableScreenSharing()
 	{
+		logger.debug('enableScreenSharing()');
+
 		if (this._screenSharingProducer)
 			return;
 
@@ -3611,15 +3610,13 @@ export default class RoomClient
 			if (!available)
 				throw new Error('screen sharing not available');
 
-			logger.debug('enableScreenSharing() | calling getUserMedia()');
-
 			const stream = await this._screenSharing.start({
 				width     : 1920,
 				height    : 1080,
 				frameRate : 5
 			});
 
-			track = stream.getVideoTracks()[0];
+			([ track ] = stream.getVideoTracks());
 
 			if (this._useSharingSimulcast)
 			{
@@ -3757,6 +3754,7 @@ export default class RoomClient
 
 	async enableWebcam()
 	{
+		logger.debug('enableWebcam()');
 
 		if (this._webcamProducer)
 			return;
@@ -3783,12 +3781,6 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no webcam devices');
 
-			logger.debug(
-				'_setWebcamProducer() | new selected webcam [device:%o]',
-				device);
-
-			logger.debug('_setWebcamProducer() | calling getUserMedia()');
-
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					video :
@@ -3798,7 +3790,7 @@ export default class RoomClient
 					}
 				});
 
-			track = stream.getVideoTracks()[0];
+			([ track ] = stream.getVideoTracks());
 
 			if (this._useSimulcast)
 			{
@@ -3876,8 +3868,6 @@ export default class RoomClient
 				this.disableWebcam()
 					.catch(() => {});
 			});
-
-			logger.debug('_setWebcamProducer() succeeded');
 		}
 		catch (error)
 		{
@@ -3962,8 +3952,10 @@ export default class RoomClient
 
 	async _setNoiseThreshold(threshold)
 	{
-		logger.debug('_setNoiseThreshold:%s', threshold);
+		logger.debug('_setNoiseThreshold() [threshold:"%s"]', threshold);
+
 		this._hark.setThreshold(threshold);
+
 		store.dispatch(
 			settingsActions.setNoiseThreshold(threshold));
 	}
