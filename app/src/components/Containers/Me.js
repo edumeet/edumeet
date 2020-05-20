@@ -334,7 +334,7 @@ const Me = (props) =>
 			);
 	}
 
-	useEffect(() => 
+	useEffect(() =>
 	{
 		let poll;
 
@@ -344,7 +344,7 @@ const Me = (props) =>
 		{
 			poll = setInterval(() => roomClient._getTransportStats(), interval);
 		}
-		
+
 		return () => clearInterval(poll);
 	}, [ roomClient, advancedMode ]);
 

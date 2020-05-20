@@ -280,12 +280,12 @@ class VideoView extends React.PureComponent
 				<div className={classes.info}>
 					<div className={classes.media}>
 						<div className={classnames(classes.box, 'left', { hidden: !advancedMode })}>
-							{ audioCodec && 
+							{ audioCodec &&
 								<React.Fragment>
 									<span className={'AcodL'}>Acod: </span>
 									<span className={'Acod'}>
 										{audioCodec}
-									</span> 
+									</span>
 								</React.Fragment>
 							}
 
@@ -313,7 +313,7 @@ class VideoView extends React.PureComponent
 										<span className={'RecvL'}>Recv: </span>
 										<span className={'RecvBps'}>
 											{(netInfo.recv.sendBitrate/1024/1024).toFixed(2)}Mb/s
-										</span> 
+										</span>
 										<span className={'RecvSum'}>
 											{(netInfo.recv.bytesSent/1024/1024).toFixed(2)}MB
 										</span>
@@ -325,24 +325,24 @@ class VideoView extends React.PureComponent
 										<span className={'SendSum'}>
 											{(netInfo.send.bytesReceived/1024/1024).toFixed(2)}MB
 										</span>
-									
+
 										<span className={'IPlocL'}>IPloc: </span>
 										<span className={'IPloc'}>
 											{netInfo.send.iceSelectedTuple.remoteIp}
 										</span>
-									
+
 										<span className={'IPsrvL'}>IPsrv: </span>
 										<span className={'IPsrv'}>
 											{netInfo.send.iceSelectedTuple.localIp}
 										</span>
 									</React.Fragment>
 							}
-							
+
 							{ videoMultiLayer &&
 								<React.Fragment>
 									<span className={'STLcurrL'}>STLcurr: </span>
 									<span className={'STLcurr'}>{consumerCurrentSpatialLayer} {consumerCurrentTemporalLayer}</span>
-									
+
 									<span className={'STLprefL'}>STLpref: </span>
 									<span className={'STLpref'}>{consumerPreferredSpatialLayer} {consumerPreferredTemporalLayer}</span>
 								</React.Fragment>
@@ -376,7 +376,7 @@ class VideoView extends React.PureComponent
 												spellCheck  : false
 											}}
 											onChange={
-												({ newDisplayName }) => 
+												({ newDisplayName }) =>
 													onChangeDisplayName(newDisplayName)}
 										/>
 									</React.Fragment>

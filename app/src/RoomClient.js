@@ -642,9 +642,9 @@ export default class RoomClient
 			}
 		}
 		catch (error)
-		{ 
+		{
 			logger.error('getTransportStats() | failed: %o', error);
-		} 
+		}
 	}
 
 	async sendRequest(method, data)
@@ -1074,7 +1074,7 @@ export default class RoomClient
 			{
 				if (volume < this._hark.lastVolume)
 				{
-					volume = this._hark.lastVolume - Math.pow((volume - this._hark.lastVolume)/(100 + this._hark.lastVolume),4)*2;
+					volume = this._hark.lastVolume - Math.pow((volume - this._hark.lastVolume)/(100 + this._hark.lastVolume), 4)*2;
 				}
 				this._hark.lastVolume = volume;
 				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
@@ -3078,7 +3078,7 @@ export default class RoomClient
 					{
 						await this.enableMic();
 						let autoMuteThreshold = 4;
-						
+
 						if ('autoMuteThreshold' in window.config)
 						{
 							autoMuteThreshold = window.config.autoMuteThreshold;
