@@ -419,7 +419,7 @@ const MediaSettings = ({
 								min={-100}
 								value={settings.noiseThreshold}
 								max={0}
-								valueLabelDisplay={'off'}
+								valueLabelDisplay={'auto'}
 								onChange={
 									(event, value) =>
 									{
