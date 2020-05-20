@@ -68,7 +68,7 @@ const About = ({
 					defaultMessage='About'
 				/>
 			</DialogTitle>
-			<DialogContent dividers='true'>
+			<DialogContent dividers>
 				<DialogContentText paragraph>
 					Contributions to this work were made on behalf of the GÉANT
 					project, a project that has received funding from the
@@ -89,7 +89,7 @@ const About = ({
 				<Link href='https://edumeet.org' target='_blank' rel='noreferrer' color='secondary' variant='h6' className={classes.link}>
 					https://edumeet.org
 				</Link>
-				<DialogContentText align='center' variant='h7'>
+				<DialogContentText align='center' variant='body2'>
 					<FormattedMessage
 						id='label.version'
 						defaultMessage='Version'

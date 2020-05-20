@@ -324,7 +324,7 @@ const TopBar = (props) =>
 									currentMenu === 'moreActions' ?
 										'material-appbar' : undefined
 								}
-								aria-haspopup='true'
+								aria-haspopup
 								onClick={(event) => handleMenuOpen(event, 'moreActions')}
 								color='inherit'
 							>
@@ -501,7 +501,7 @@ const TopBar = (props) =>
 						</Tooltip>
 						}
 						<IconButton
-							aria-haspopup='true'
+							aria-haspopup
 							onClick={handleMobileMenuOpen}
 							color='inherit'
 						>
