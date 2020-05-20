@@ -145,7 +145,7 @@
 	"settings.autoGainControl": "Auto gain kontroll",
 	"settings.noiseSuppression": "Støy reduksjon",
 	"settings.drawerOverlayed": "Sidemeny over innhold",
-	"Voice activated unmute": null,
+	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",

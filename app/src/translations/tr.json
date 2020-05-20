@@ -142,7 +142,7 @@
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
 	"settings.drawerOverlayed": null,
-	"Voice activated unmute": null,
+	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",

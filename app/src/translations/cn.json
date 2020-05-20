@@ -145,7 +145,7 @@
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
 	"settings.drawerOverlayed": null,
-	"Voice activated unmute": null,
+	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "无法保存文件",

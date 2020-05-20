@@ -145,7 +145,7 @@
 	"settings.autoGainControl": "Automatsko upravljanje jačinom zvuka",
 	"settings.noiseSuppression": "Poništavanje šuma",
 	"settings.drawerOverlayed": "Bočni izbornik iznad sadržaja",
-	"Voice activated unmute": null,
+	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",

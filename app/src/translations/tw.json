@@ -144,7 +144,7 @@
 	"settings.autoGainControl": "自動增益控制",
 	"settings.noiseSuppression": "噪音消除",
 	"settings.drawerOverlayed": "側邊欄覆蓋畫面",
-	"Voice activated unmute": null,
+	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "無法保存文件",
