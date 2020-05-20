@@ -100,6 +100,8 @@ const intl = createIntl({
 	messages : messages[locale]
 }, cache);
 
+document.documentElement.lang = locale;
+
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
 	debug.enable('* -engine* -socket* -RIE* *WARN* *ERROR*');
