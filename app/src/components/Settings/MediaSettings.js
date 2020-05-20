@@ -69,10 +69,11 @@ const styles = (theme) => ({
 		padding        : theme.spacing(1)
 	},
 	nested : {
-		paddingLeft   : theme.spacing(2),
 		display       : 'block',
 		paddingTop    : 0,
-		paddingBottom : 0
+		paddingBottom : 0,
+		paddingLeft   : '25px',
+		paddingRight  : '25px'
 	},
 	formControl :
 	{
@@ -426,7 +427,6 @@ const MediaSettings = ({
 									}}
 								marks={[ { value: volume, label: volume+'dB' } ]}
 							/>
-							<div className={classes.margin} />
 						</ListItem>
 					</List>
 				</Collapse>
