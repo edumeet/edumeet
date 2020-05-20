@@ -60,11 +60,11 @@
 	"room.loweredHand": "{displayName} tok ned hånden",
 	"room.extraVideo": "Ekstra video",
 	"room.overRoomLimit": "Rommet er fullt, prøv igjen om litt.",
-	"room.help": null,
-	"room.about": null,
-	"room.shortcutKeys": null,
-	"room.browsePeersSpotlight": null,
-	"room.stopAllScreenSharing": null,
+	"room.help": "Hjelp",
+	"room.about": "Om",
+	"room.shortcutKeys": "Hurtigtaster",
+	"room.browsePeersSpotlight": "Bytt mellom synlig deltaker",
+	"room.stopAllScreenSharing": "Stopp all skjermdeling",
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -86,9 +86,9 @@
 	"tooltip.muteParticipantVideo": "Demp deltakervideo",
 	"tooltip.raisedHand": "Rekk opp hånden",
 	"tooltip.muteScreenSharing": "Demp deltaker skjermdeling",
-	"tooltip.muteParticipantAudioModerator": null,
-	"tooltip.muteParticipantVideoModerator": null,
-	"tooltip.muteScreenSharingModerator": null,
+	"tooltip.muteParticipantAudioModerator": "Demp deltaker globalt",
+	"tooltip.muteParticipantVideoModerator": "Demp deltakervideo globalt",
+	"tooltip.muteScreenSharingModerator": "Demp deltakerskjermdeling globalt",
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",
@@ -119,7 +119,7 @@
 	"label.addVideo": "Legg til video",
 	"label.promoteAllPeers": "Slipp inn alle",
 	"label.moreActions": "Flere handlinger",
-	"label.version": null,
+	"label.version": "Versjon",
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
@@ -137,17 +137,17 @@
 	"settings.advancedMode": "Avansert modus",
 	"settings.permanentTopBar": "Permanent topplinje",
 	"settings.lastn": "Antall videoer synlig",
+	"settings.showAdvancedAudio": "Avanserte audioinnstillinger",
 	"settings.hiddenControls": "Skjul media knapper",
 	"settings.notificationSounds": "Varslingslyder",
 	"settings.showNotifications": "Vis varslinger",
 	"settings.buttonControlBar": "Separate media knapper",
-	"settings.showAdvancedAudio": null,
 	"settings.echoCancellation": "Echokansellering",
 	"settings.autoGainControl": "Auto gain kontroll",
 	"settings.noiseSuppression": "Støy reduksjon",
 	"settings.drawerOverlayed": "Sidemeny over innhold",
-	"settings.voiceActivatedUnmute": null,
-	"settings.noiseThreshold": null,
+	"settings.voiceActivatedUnmute": "Stemmeaktivert autodemping",
+	"settings.noiseThreshold": "Støyterskel",
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",
@@ -193,9 +193,9 @@
 	"moderator.clearFiles": "Moderator fjernet filer",
 	"moderator.muteAudio": "Moderator mutet lyden din",
 	"moderator.muteVideo": "Moderator mutet videoen din",
-	"moderator.stopScreenSharing": null,
+	"moderator.stopScreenSharing": "Moderator mutet skjermdelingen din",
 	
-	"unsupportedBrowser.titleUnsupportedBrowser": null,
-	"unsupportedBrowser.titlewebrtcUnavailable": null,
-	"unsupportedBrowser.bodyText": null
+	"unsupportedBrowser.titleUnsupportedBrowser": "Nettleser ikke støttet",
+	"unsupportedBrowser.titlewebrtcUnavailable": "Funksjonalitet som kreves er ikke tilgjengelig i denne nettleseren",
+	"unsupportedBrowser.bodyText": "Denne møtetjenesten krever funksjonalitet som ikke er støttet i denne nettleseren. Vennligst oppgrader, bytt til en annen nettleser, eller sjekk innstillinger. Støttede nettlesere:"
 }
