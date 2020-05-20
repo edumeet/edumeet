@@ -817,6 +817,7 @@ const Me = (props) =>
 
 							<VideoView
 								isMe
+								isExtraVideo
 								advancedMode={advancedMode}
 								peer={me}
 								displayName={settings.displayName}
