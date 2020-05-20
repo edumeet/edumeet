@@ -287,9 +287,9 @@ const Me = (props) =>
 			defaultMessage : 'Start screen sharing'
 		});
 	}
-	const [ 
-		screenShareTooltipOpen, 
-		screenShareTooltipSetOpen 
+	const [
+		screenShareTooltipOpen,
+		screenShareTooltipSetOpen
 	] = React.useState(false);
 
 	const screenShareTooltipHandleClose = () =>
@@ -380,7 +380,7 @@ const Me = (props) =>
 				}}
 				style={spacingStyle}
 			>
-				
+
 				{ me.browser.platform !== 'mobile' && smallContainer &&
 				<div className={classnames(
 					classes.ptt,
@@ -457,8 +457,8 @@ const Me = (props) =>
 												className={classes.smallContainer}
 												disabled={!me.canSendMic || me.audioInProgress}
 												color={
-													micState === 'on' ? 
-														settings.voiceActivatedUnmute && !me.isAutoMuted ? 
+													micState === 'on' ?
+														settings.voiceActivatedUnmute && !me.isAutoMuted ?
 															'primary'
 															: 'default'
 														: 'secondary'}
@@ -474,7 +474,7 @@ const Me = (props) =>
 												}}
 											>
 												{ micState === 'on' ?
-													<MicIcon 
+													<MicIcon
 														color={me.isAutoMuted ? 'secondary' : 'primary'}
 														style={{ opacity: noiseVolume }}
 													/>
@@ -492,9 +492,9 @@ const Me = (props) =>
 												})}
 												className={classes.fab}
 												disabled={!me.canSendMic || me.audioInProgress}
-												color={micState === 'on' ? 
+												color={micState === 'on' ?
 													settings.voiceActivatedUnmute && !me.isAutoMuted? 'primary'
-														: 'default' 
+														: 'default'
 													: 'secondary'}
 												size='large'
 												onClick={() =>
@@ -509,8 +509,10 @@ const Me = (props) =>
 											>
 												{ micState === 'on' ?
 													<MicIcon
-														color={me.isAutoMuted ? 'secondary' : 'primary'}
-														style={me.isAutoMuted ? { opacity: noiseVolume }  
+														color={me.isAutoMuted && settings.voiceActivatedUnmute ?
+															'secondary' : 'primary'}
+														style={me.isAutoMuted && settings.voiceActivatedUnmute ?
+															{ opacity: noiseVolume }
 															: { opacity: 1 }}
 													/>
 													:
@@ -574,9 +576,9 @@ const Me = (props) =>
 									}
 								</Tooltip>
 								{ me.browser.platform !== 'mobile' &&
-									<Tooltip open={screenShareTooltipOpen} 
-										onClose={screenShareTooltipHandleClose} 
-										onOpen={screenShareTooltipHandleOpen} 
+									<Tooltip open={screenShareTooltipOpen}
+										onClose={screenShareTooltipHandleClose}
+										onOpen={screenShareTooltipHandleOpen}
 										title={screenTip} placement='left'
 									>
 										{ smallContainer ?
@@ -868,7 +870,7 @@ const Me = (props) =>
 								defaultMessage='ME'
 							/>
 						</p>
-						
+
 						<VideoView
 							isMe
 							isScreen
@@ -913,15 +915,15 @@ const makeMapStateToProps = () =>
 	const mapStateToProps = (state) =>
 	{
 		let volume;
-		
+
 		// noiseVolume under threshold
-		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold) 
+		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold)
 		{
 			// noiseVolume mapped to range 0.5 ... 1 (threshold switch)
-			volume = 1 + ((Math.abs(state.peerVolumes[state.me.id] - 
+			volume = 1 + ((Math.abs(state.peerVolumes[state.me.id] -
 				state.settings.noiseThreshold) / (-120 -
 				state.settings.noiseThreshold)));
-		} 
+		}
 		// noiseVolume over threshold: no noise but voice
 		else { volume = 0; }
 
@@ -949,7 +951,7 @@ export default withRoomContext(connect(
 			return (
 				prev.room === next.room &&
 				prev.me === next.me &&
-				Math.round(prev.peerVolumes[prev.me.id]) === 
+				Math.round(prev.peerVolumes[prev.me.id]) ===
 					Math.round(next.peerVolumes[next.me.id]) &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&

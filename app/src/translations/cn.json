@@ -119,6 +119,7 @@
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
+	"label.version": null,
 
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",
@@ -144,6 +145,8 @@
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
 	"settings.drawerOverlayed": null,
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "无法保存文件",
 	"filesharing.startingFileShare": "正在尝试共享文件",
@@ -189,5 +192,9 @@
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null,
-	"moderator.muteScreenSharing": null
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

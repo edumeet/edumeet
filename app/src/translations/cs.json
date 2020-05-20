@@ -118,6 +118,7 @@
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
+	"label.version": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",
@@ -143,6 +144,8 @@
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
 	"settings.drawerOverlayed": null,
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",
@@ -188,5 +191,9 @@
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null,
-	"moderator.muteScreenSharing": null
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

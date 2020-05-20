@@ -16,6 +16,44 @@
 		<title>Multiparty Meeting</title>
 
 		<script src='%PUBLIC_URL%/config/config.js' type='text/javascript'></script>
+
+		<!-- Show an error page to IE browsers -->
+		<script type='text/javascript'>
+			var fallback = '<style type="text/css">body{margin:40px auto;max-width:650px;line-height:1.6;font-size:18px;color:#444;padding:0 10px}h1,h2,h3{line-height:1.2}</style><header><h1>Your browser is not supported</h1><aside>You need to change to a different browser.</aside></header><h3>Supported browsers</h3><ul><li>Google Chrome/Chromium 55 +</li><li>Microsoft Edge 18 +</li><li>Mozilla Firefox 60 +</li><li>Apple Safari 12 +</li><li>Opera 62 +</li><li>Samsung Internet 11.1.1.52 +</li></ul>';
+
+			var fallbackCall = function() {
+				document.body.innerHTML = fallback;
+			};
+
+			if(navigator.userAgent.indexOf('MSIE') !== -1)
+			{
+				document.attachEvent('onreadystatechange', function() {
+					if (document.readyState === 'complete')
+					{
+						document.detachEvent('onreadystatechange', arguments.callee);
+
+						fallbackCall();
+					}
+				});
+			}
+
+			if (navigator.appVersion.indexOf('Trident/') > -1)
+			{
+				if (
+					document.readyState === 'complete' ||
+					(document.readyState !== 'loading' && !document.documentElement.doScroll)
+				)
+				{
+					document.removeEventListener('DOMContentLoaded', fallbackCall);
+
+					fallbackCall();
+				}
+				else
+				{
+					document.addEventListener('DOMContentLoaded', fallbackCall);
+				}
+			}
+		</script>
 	</head>
 	<body>
 		<noscript>You need to enable JavaScript to run this app.</noscript>

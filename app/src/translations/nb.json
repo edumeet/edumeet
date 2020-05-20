@@ -119,6 +119,7 @@
 	"label.addVideo": "Legg til video",
 	"label.promoteAllPeers": "Slipp inn alle",
 	"label.moreActions": "Flere handlinger",
+	"label.version": null,
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
@@ -144,6 +145,8 @@
 	"settings.autoGainControl": "Auto gain kontroll",
 	"settings.noiseSuppression": "Støy reduksjon",
 	"settings.drawerOverlayed": "Sidemeny over innhold",
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",
@@ -189,5 +192,9 @@
 	"moderator.clearFiles": "Moderator fjernet filer",
 	"moderator.muteAudio": "Moderator mutet lyden din",
 	"moderator.muteVideo": "Moderator mutet videoen din",
-	"moderator.muteScreenSharing": null	
+	"moderator.stopScreenSharing": null,
+	
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

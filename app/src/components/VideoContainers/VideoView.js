@@ -223,50 +223,50 @@ class VideoView extends React.PureComponent
 			if (videoScore || audioScore)
 			{
 				const score = videoScore ? videoScore : audioScore;
-	
+
 				switch (isMe ? score.score : score.producerScore)
 				{
 					case 0:
 					case 1:
 					{
 						quality = <SignalCellular0BarIcon style={{ color: red[500] }}/>;
-	
+
 						break;
 					}
-	
+
 					case 2:
 					case 3:
 					{
 						quality = <SignalCellular1BarIcon style={{ color: red[500] }}/>;
-	
+
 						break;
 					}
-	
+
 					case 4:
 					case 5:
 					case 6:
 					{
 						quality = <SignalCellular2BarIcon style={{ color: orange[500] }}/>;
-	
+
 						break;
 					}
-	
+
 					case 7:
 					case 8:
 					case 9:
 					{
 						quality = <SignalCellular3BarIcon style={{ color: yellow[500] }}/>;
-	
+
 						break;
 					}
-	
+
 					case 10:
 					{
 						quality = null;
-	
+
 						break;
 					}
-	
+
 					default:
 					{
 						break;
@@ -351,7 +351,7 @@ class VideoView extends React.PureComponent
 						</div>
 						{ showQuality &&
 							<div className={classnames(classes.box, 'right')}>
-								{ 
+								{
 									quality
 								}
 							</div>

@@ -116,6 +116,7 @@
 	"label.advanced": "Advancēts",
 	"label.addVideo": "Pievienot video",
 	"label.moreActions": null,
+	"label.version": null,
 
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",
@@ -138,6 +139,8 @@
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
 	"settings.drawerOverlayed": null,
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",
@@ -183,5 +186,9 @@
 	"moderator.clearFiles": "Moderators notīrīja failus",
 	"moderator.muteAudio": "Moderators noklusināja jūsu mikrofonu",
 	"moderator.muteVideo": "Moderators atslēdza jūsu kameru",
-	"moderator.muteScreenSharing": null
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

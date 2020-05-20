@@ -77,7 +77,7 @@ const LockDialog = ({
 				/>
 			</DialogTitle>
 			{ lobbyPeers.length > 0 ?
-				<List 
+				<List
 					dense
 					subheader={
 						<ListSubheader component='div'>

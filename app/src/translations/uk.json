@@ -119,6 +119,7 @@
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
+	"label.version": null,
 
 	"settings.settings": "Налаштування",
 	"settings.camera": "Камера",
@@ -144,6 +145,8 @@
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
 	"settings.drawerOverlayed": null,
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",
@@ -189,5 +192,9 @@
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null,
-	"moderator.muteScreenSharing": null
+	"moderator.stopScreenSharing": null,
+	
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

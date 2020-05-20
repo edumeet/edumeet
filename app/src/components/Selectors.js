@@ -248,7 +248,7 @@ export const makePermissionSelector = (permission) =>
 			const permitted = roles.some((role) =>
 				roomPermissions[permission].includes(role)
 			);
-		
+
 			if (permitted)
 				return true;
 
@@ -265,7 +265,7 @@ export const makePermissionSelector = (permission) =>
 				).length === 0
 			)
 				return true;
-		
+
 			return false;
 		}
 	);

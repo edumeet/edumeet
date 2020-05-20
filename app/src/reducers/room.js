@@ -10,7 +10,7 @@ const initialState =
 	// access code to the room if locked and joinByAccessCode == true
 	accessCode                    : '',
 	// if true: accessCode is a possibility to open the room
-	joinByAccessCode              : true, 
+	joinByAccessCode              : true,
 	activeSpeakerId               : null,
 	torrentSupport                : false,
 	showSettings                  : false,
@@ -107,7 +107,7 @@ const room = (state = initialState, action) =>
 
 			return { ...state, lockDialogOpen };
 		}
-	
+
 		case 'SET_SETTINGS_OPEN':
 		{
 			const { settingsOpen } = action.payload;
@@ -135,7 +135,7 @@ const room = (state = initialState, action) =>
 
 			return { ...state, aboutOpen };
 		}
-			
+
 		case 'SET_SETTINGS_TAB':
 		{
 			const { tab } = action.payload;

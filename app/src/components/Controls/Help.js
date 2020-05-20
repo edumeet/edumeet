@@ -107,13 +107,13 @@ const Help = ({
 					}
 				/>
 			</Tabs>
-			<DialogContent dividers='true'>				
+			<DialogContent dividers='true'>
 				<DialogContentText>
-					{shortcuts.map((value, index) => 
+					{shortcuts.map((value, index) =>
 					{
 						return (
 							<div key={index} className={classes.shortcuts}>
-								<Paper className={classes.paper}>									
+								<Paper className={classes.paper}>
 									{value.key}
 								</Paper>
 								<FormattedMessage
@@ -134,7 +134,7 @@ const Help = ({
 					/>
 				</Button>
 			</DialogActions>
-		</Dialog>		
+		</Dialog>
 	);
 };
 
@@ -142,7 +142,7 @@ Help.propTypes =
 {
 	roomClient      : PropTypes.object.isRequired,
 	helpOpen        : PropTypes.bool.isRequired,
-	handleCloseHelp : PropTypes.func.isRequired, 
+	handleCloseHelp : PropTypes.func.isRequired,
 	classes         : PropTypes.object.isRequired
 };
 

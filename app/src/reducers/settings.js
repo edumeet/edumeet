@@ -22,7 +22,6 @@ const initialState =
 	notificationSounds   : true,
 	buttonControlBar     : window.config.buttonControlBar || false,
 	drawerOverlayed      : window.config.drawerOverlayed || true,
-	autoMuteThreshold    : window.config.autoMuteThreshold || 4,
 	...window.config.defaultAudio
 };
 
@@ -44,7 +43,7 @@ const settings = (state = initialState, action) =>
 		{
 			return { ...state, selectedAudioOutputDevice: action.payload.deviceId };
 		}
-	
+
 		case 'SET_DISPLAY_NAME':
 		{
 			const { displayName } = action.payload;
@@ -120,27 +119,6 @@ const settings = (state = initialState, action) =>
 			const { audio } = action.payload;
 
 			return { ...state, audio };
-		}
-
-		case 'TOGGLE_AUTO_GAIN_CONTROL':
-		{
-			const autoGainControl = !state.autoGainControl;
-
-			return { ...state, autoGainControl };
-		}
-
-		case 'TOGGLE_ECHO_CANCELLATION':
-		{
-			const echoCancellation = !state.echoCancellation;
-
-			return { ...state, echoCancellation };
-		}
-
-		case 'TOGGLE_NOISE_SUPPRESSION':
-		{
-			const noiseSuppression = !state.noiseSuppression;
-
-			return { ...state, noiseSuppression };
 		}
 
 		case 'SET_SAMPLE_SIZE':

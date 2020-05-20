@@ -119,6 +119,7 @@
 	"label.addVideo": "Aggiungi video",
 	"label.promoteAllPeers": "Promuovi tutti",
 	"label.moreActions": "Altre azioni",
+	"label.version": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",
@@ -144,6 +145,8 @@
 	"settings.autoGainControl": "Controllo guadagno automatico",
 	"settings.noiseSuppression": "Riduzione del rumore",
 	"settings.drawerOverlayed": "Barra laterale sovrapposta",
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",
@@ -189,5 +192,9 @@
 	"moderator.clearFiles": "Il moderatore ha pulito i file",
 	"moderator.muteAudio": "Il moderatore ha mutato il tuo audio",
 	"moderator.muteVideo": "Il moderatore ha fermato il tuo video",
-	"moderator.muteScreenSharing": null
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

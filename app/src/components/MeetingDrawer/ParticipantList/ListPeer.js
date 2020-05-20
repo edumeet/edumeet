@@ -279,7 +279,7 @@ const ListPeer = (props) =>
 					</IconButton>
 				</Tooltip>
 			}
-			{ isModerator && webcamConsumer && 
+			{ isModerator && webcamConsumer &&
 				<Tooltip
 					title={intl.formatMessage({
 						id             : 'tooltip.muteParticipantVideoModerator',

@@ -119,6 +119,7 @@
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
+	"label.version": null,
 
 	"settings.settings": "Ajustes",
 	"settings.camera": "Cámara",
@@ -144,6 +145,8 @@
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
 	"settings.drawerOverlayed": null,
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "No ha sido posible guardar el fichero",
 	"filesharing.startingFileShare": "Intentando compartir el fichero",
@@ -189,5 +192,9 @@
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
 	"moderator.muteVideo": null,
-	"moderator.muteScreenSharing": null
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

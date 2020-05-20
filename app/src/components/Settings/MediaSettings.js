@@ -12,13 +12,19 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
-import Checkbox from '@material-ui/core/Checkbox';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
+import Collapse from '@material-ui/core/Collapse';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import Switch from '@material-ui/core/Switch';
 
 const NoiseSlider = withStyles(
 	{
-		root : 
+		root :
 		{
 			color   : '#3880ff',
 			height  : 2,
@@ -48,9 +54,26 @@ const styles = (theme) => ({
 	{
 		padding : theme.spacing(2)
 	},
-	margin : 
+	margin :
 	{
 		height : theme.spacing(3)
+	},
+	root : {
+		width           : '100%',
+		backgroundColor : theme.palette.background.paper
+	},
+	switchLabel : {
+		justifyContent : 'space-between',
+		flex           : 'auto',
+		display        : 'flex',
+		padding        : theme.spacing(1)
+	},
+	nested : {
+		display       : 'block',
+		paddingTop    : 0,
+		paddingBottom : 0,
+		paddingLeft   : '25px',
+		paddingRight  : '25px'
 	},
 	formControl :
 	{
@@ -71,7 +94,7 @@ const MediaSettings = ({
 }) =>
 {
 	const intl = useIntl();
-	
+
 	const resolutions = [ {
 		value : 'low',
 		label : intl.formatMessage({
@@ -121,13 +144,20 @@ const MediaSettings = ({
 		audioDevices = Object.values(me.audioDevices);
 	else
 		audioDevices = [];
-		
+
 	let audioOutputDevices;
 
 	if (me.audioOutputDevices)
 		audioOutputDevices = Object.values(me.audioOutputDevices);
 	else
 		audioOutputDevices = [];
+
+	const [ open, setOpen ] = React.useState(true);
+
+	const advancedAudioSettings = () =>
+	{
+		setOpen(!open);
+	};
 
 	return (
 		<React.Fragment>
@@ -173,7 +203,7 @@ const MediaSettings = ({
 				<FormControl className={classes.formControl}>
 					<Select
 						value={settings.resolution || ''}
-						onChange={(event) => 
+						onChange={(event) =>
 						{
 							if (event.target.value)
 								roomClient.changeVideoResolution(event.target.value);
@@ -182,7 +212,7 @@ const MediaSettings = ({
 						autoWidth
 						className={classes.selectEmpty}
 					>
-						{resolutions.map((resolution, index) => 
+						{resolutions.map((resolution, index) =>
 						{
 							return (
 								<MenuItem key={index} value={resolution.value}>
@@ -287,90 +317,120 @@ const MediaSettings = ({
 					</FormControl>
 				</form>
 			}
-			<form className={classes.setting} autoComplete='off'>
-				<FormControlLabel
-					className={classes.setting}
-					control={
-						<Checkbox checked={settings.echoCancellation} onChange={
-							(event) => 
-							{
-								setEchoCancellation(event.target.checked);
-								roomClient.changeAudioDevice(settings.selectedAudioDevice);
-							}}
-						/>}
-					label={intl.formatMessage({
-						id             : 'settings.echoCancellation',
-						defaultMessage : 'Echo cancellation'
+			<List className={classes.root} component='nav'>
+				<ListItem button onClick={advancedAudioSettings}>
+					<ListItemText primary={intl.formatMessage({
+						id             : 'settings.showAdvancedAudio',
+						defaultMessage : 'Show advanced audio settings'
 					})}
-				/>
-				<FormControlLabel
-					className={classes.setting}
-					control={
-						<Checkbox checked={settings.autoGainControl} onChange={
-							(event) => 
-							{
-								setAutoGainControl(event.target.checked);
-								roomClient.changeAudioDevice(settings.selectedAudioDevice);
-							}}
-						/>}
-					label={intl.formatMessage({
-						id             : 'settings.autoGainControl',
-						defaultMessage : 'Auto gain control'
-					})}
-				/>
-				<FormControlLabel
-					className={classes.setting}
-					control={
-						<Checkbox checked={settings.noiseSuppression} onChange={
-							(event) => 
-							{
-								setNoiseSuppression(event.target.checked);
-								roomClient.changeAudioDevice(settings.selectedAudioDevice);
-							}}
-						/>}
-					label={intl.formatMessage({
-						id             : 'settings.noiseSuppression',
-						defaultMessage : 'Noise suppression'
-					})}
-				/>
-				<FormControlLabel
-					className={classes.setting}
-					control={
-						<Checkbox checked={settings.voiceActivatedUnmute} onChange={
-							(event) => 
-							{
-								setVoiceActivatedUnmute(event.target.checked);
-							}}
-						/>}
-					label={intl.formatMessage({
-						id             : 'settings.voiceActivatedUnmute',
-						defaultMessage : 'Voice activated unmute'
-					})}
-				/>
-				<div className={classes.margin} />
-				<Typography gutterBottom>
-					{
-						intl.formatMessage({
-							id             : 'settings.noiseThreshold',
-							defaultMessage : 'Noise threshold:'
-						})
-					}
-				</Typography>
-				<NoiseSlider className={classnames(classes.slider, classnames.setting)} 
-					key={'noise-threshold-slider'}
-					min={-100}
-					value={settings.noiseThreshold}
-					max={0} 
-					valueLabelDisplay={'off'}
-					onChange={
-						(event, value) =>
-						{
-							roomClient._setNoiseThreshold(value);
-						}}
-					marks={[ { value: volume, label: 'level' } ]}  
-				/>
-				<div className={classes.margin} />
-			</form>
+					/>
+					{open ? <ExpandLess /> : <ExpandMore />}
+				</ListItem>
+				<Collapse in={!open} timeout='auto'>
+					<List component='div'>
+						<ListItem className={classes.nested}>
+							<FormControlLabel
+								className={classnames(classes.setting, classes.switchLabel)}
+								control={
+									<Switch color='secondary'
+										checked={settings.echoCancellation}
+										onChange={
+											(event) =>
+											{
+												setEchoCancellation(event.target.checked);
+												roomClient.changeAudioDevice(settings.selectedAudioDevice);
+											}}
+									/>}
+								labelPlacement='start'
+								label={intl.formatMessage({
+									id             : 'settings.echoCancellation',
+									defaultMessage : 'Echo cancellation'
+								})}
+							/>
+						</ListItem>
+						<ListItem className={classes.nested}>
+							<FormControlLabel
+								className={classnames(classes.setting, classes.switchLabel)}
+								control={
+									<Switch color='secondary'
+										checked={settings.autoGainControl} onChange={
+											(event) =>
+											{
+												setAutoGainControl(event.target.checked);
+												roomClient.changeAudioDevice(settings.selectedAudioDevice);
+											}}
+									/>}
+								labelPlacement='start'
+								label={intl.formatMessage({
+									id             : 'settings.autoGainControl',
+									defaultMessage : 'Auto gain control'
+								})}
+							/>
+						</ListItem>
+						<ListItem className={classes.nested}>
+							<FormControlLabel
+								className={classnames(classes.setting, classes.switchLabel)}
+								control={
+									<Switch color='secondary'
+										checked={settings.noiseSuppression} onChange={
+											(event) =>
+											{
+												setNoiseSuppression(event.target.checked);
+												roomClient.changeAudioDevice(settings.selectedAudioDevice);
+											}}
+									/>}
+								labelPlacement='start'
+								label={intl.formatMessage({
+									id             : 'settings.noiseSuppression',
+									defaultMessage : 'Noise suppression'
+								})}
+							/>
+						</ListItem>
+						<ListItem className={classes.nested}>
+							<FormControlLabel
+								className={classnames(classes.setting, classes.switchLabel)}
+								control={
+									<Switch color='secondary'
+										checked={settings.voiceActivatedUnmute} onChange={
+											(event) =>
+											{
+												setVoiceActivatedUnmute(event.target.checked);
+											}}
+									/>}
+								labelPlacement='start'
+								label={intl.formatMessage({
+									id             : 'settings.voiceActivatedUnmute',
+									defaultMessage : 'Voice activated unmute'
+								})}
+							/>
+						</ListItem>
+						<ListItem className={classes.nested}>
+							<div className={classes.margin} />
+							<Typography gutterBottom>
+								{
+									intl.formatMessage({
+										id             : 'settings.noiseThreshold',
+										defaultMessage : 'Noise threshold'
+									})
+								}:
+							</Typography>
+							<NoiseSlider className={classnames(classes.slider, classnames.setting)}
+								key={'noise-threshold-slider'}
+								min={-100}
+								value={settings.noiseThreshold}
+								max={0}
+								valueLabelDisplay={'auto'}
+								onChange={
+									(event, value) =>
+									{
+										roomClient._setNoiseThreshold(value);
+									}}
+								marks={[ { value: volume, label: `${volume} dB` } ]}
+							/>
+						</ListItem>
+					</List>
+				</Collapse>
+			</List>
 		</React.Fragment>
 	);
 };
@@ -399,8 +459,8 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = {
 	setEchoCancellation     : settingsActions.setEchoCancellation,
-	setAutoGainControl      : settingsActions.toggleAutoGainControl,
-	setNoiseSuppression     : settingsActions.toggleNoiseSuppression,
+	setAutoGainControl      : settingsActions.setAutoGainControl,
+	setNoiseSuppression     : settingsActions.setNoiseSuppression,
 	setVoiceActivatedUnmute : settingsActions.setVoiceActivatedUnmute
 };
 

@@ -119,6 +119,7 @@
 	"label.addVideo": null,
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
+	"label.version": null,
 
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",
@@ -141,6 +142,8 @@
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,
 	"settings.drawerOverlayed": null,
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",
@@ -181,5 +184,14 @@
 
 	"devices.cameraDisconnected": "Kamera bağlı değil",
 	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu",
-	"moderator.muteScreenSharing": null
+	
+	"moderator.clearChat": null,
+	"moderator.clearFiles": null,
+	"moderator.muteAudio": null,
+	"moderator.muteVideo": null,
+	"moderator.stopScreenSharing": null,
+
+	"unsupportedBrowser.titleUnsupportedBrowser": null,
+	"unsupportedBrowser.titlewebrtcUnavailable": null,
+	"unsupportedBrowser.bodyText": null
 }

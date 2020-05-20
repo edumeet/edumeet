@@ -39,7 +39,7 @@ const ListLobbyPeer = (props) =>
 	const picture = peer.picture || EmptyAvatar;
 
 	return (
-		<ListItem 
+		<ListItem
 			className={classnames(classes.root)}
 			key={peer.peerId}
 			button

@@ -26,13 +26,13 @@ export const setPeerVideoInProgress = (peerId, flag) =>
 		type    : 'SET_PEER_VIDEO_IN_PROGRESS',
 		payload : { peerId, flag }
 	});
-	
+
 export const setPeerAudioInProgress = (peerId, flag) =>
 	({
 		type    : 'SET_PEER_AUDIO_IN_PROGRESS',
 		payload : { peerId, flag }
 	});
-	
+
 export const setPeerScreenInProgress = (peerId, flag) =>
 	({
 		type    : 'SET_PEER_SCREEN_IN_PROGRESS',

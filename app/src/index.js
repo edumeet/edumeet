@@ -12,6 +12,7 @@ import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
+import UnsupportedBrowser from './components/UnsupportedBrowser';
 import ChooseRoom from './components/ChooseRoom';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
@@ -20,7 +21,7 @@ import { persistor, store } from './store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 import { ReactLazyPreload } from './components/ReactLazyPreload';
-
+import { detectDevice } from 'mediasoup-client';
 // import messagesEnglish from './translations/en';
 import messagesNorwegian from './translations/nb';
 import messagesGerman from './translations/de';
@@ -68,6 +69,18 @@ const messages =
 	'uk'      : messagesUkrainian,
 	'tr'      : messagesTurkish,
 	'lv'      : messagesLatvian
+};
+
+const supportedBrowsers={
+	'windows' : {
+		'internet explorer' : '>12',
+		'microsoft edge'    : '>18'
+	},
+	'safari'                       : '>12',
+	'firefox'                      : '>=60',
+	'chrome'                       : '>=74',
+	'opera'                        : '>=62',
+	'samsung internet for android' : '>=11.1.1.52'
 };
 
 const browserLanguage = (navigator.language || navigator.browserLanguage).toLowerCase();
@@ -134,9 +147,61 @@ function run()
 
 	if (!basePath)
 		basePath = '/';
-	
+
 	// Get current device.
 	const device = deviceInfo();
+
+	let unsupportedBrowser=false;
+
+	let webrtcUnavailable=false;
+
+	if (detectDevice() === undefined)
+	{
+		logger.error('Unsupported browser detected by mediasoup client detectDevice! deviceInfo: %o', device);
+		unsupportedBrowser=true;
+	}
+	else
+	if (
+		navigator.mediaDevices === undefined ||
+		navigator.mediaDevices.getUserMedia === undefined ||
+		window.RTCPeerConnection === undefined
+	)
+	{
+		logger.error('WebRTC is unavialable in your browser! deviceInfo: %o', device);
+		webrtcUnavailable=true;
+	}
+	else
+	if (!device.bowser.satisfies(
+		window.config.supportedBrowsers ? window.config.supportedBrowsers : supportedBrowsers)
+	)
+	{
+		logger.error(
+			'Your browser is not on the supported list! Ask your server admin to add your browser to the supported list, if you think that your browser should be supported! deviceInfo: %o',
+			device
+		);
+		unsupportedBrowser=true;
+	}
+	else
+	{
+		logger.debug('Supported Browser! deviceInfo: %o', device);
+	}
+
+	if (unsupportedBrowser || webrtcUnavailable)
+	{
+		render(
+			<MuiThemeProvider theme={theme}>
+				<RawIntlProvider value={intl}>
+					<UnsupportedBrowser
+						webrtcUnavailable={webrtcUnavailable}
+						platform={device.platform}
+					/>
+				</RawIntlProvider>
+			</MuiThemeProvider>,
+			document.getElementById('multiparty-meeting')
+		);
+
+		return;
+	}
 
 	store.dispatch(
 		meActions.setMe({

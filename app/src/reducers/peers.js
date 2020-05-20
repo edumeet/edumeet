@@ -2,7 +2,7 @@ const initialState = {};
 
 const peer = (state = initialState, action) =>
 {
-	switch (action.type) 
+	switch (action.type)
 	{
 		case 'ADD_PEER':
 			return action.payload.peer;
@@ -21,7 +21,7 @@ const peer = (state = initialState, action) =>
 
 		case 'SET_PEER_KICK_IN_PROGRESS':
 			return { ...state, peerKickInProgress: action.payload.flag };
-		
+
 		case 'SET_PEER_RAISED_HAND':
 			return {
 				...state,
@@ -34,7 +34,7 @@ const peer = (state = initialState, action) =>
 				...state,
 				raisedHandInProgress : action.payload.flag
 			};
-		
+
 		case 'ADD_CONSUMER':
 		{
 			const consumers = [ ...state.consumers, action.payload.consumer.id ];
@@ -127,14 +127,14 @@ const peers = (state = initialState, action) =>
 		{
 			const oldPeer = state[action.payload.peerId];
 
-			if (!oldPeer) 
+			if (!oldPeer)
 			{
 				throw new Error('no Peer found');
 			}
 
 			return { ...state, [oldPeer.id]: peer(oldPeer, action) };
 		}
-		
+
 		case 'SET_PEER_KICK_IN_PROGRESS':
 		case 'REMOVE_CONSUMER':
 		{
