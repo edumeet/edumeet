@@ -6,6 +6,26 @@ var config =
 	productionPort  : 443,
 
 	/**
+	 * Supported browsers version 
+	 * in bowser satisfy format.
+	 * See more:
+	 * https://www.npmjs.com/package/bowser#filtering-browsers
+	 * Otherwise you got a unsupported browser page
+	 */
+	supportedBrowsers :
+	{
+		'windows' : {
+			'internet explorer' : '>12',
+			'microsoft edge'    : '>18'
+		},
+		'safari'                       : '>12',
+		'firefox'                      : '>=60',
+		'chrome'                       : '>=74',
+		'opera'                        : '>=62',
+		'samsung internet for android' : '>=11.1.1.52'
+	},
+
+	/**
 	 * If defaultResolution is set, it will override user settings when joining:
 	 * low ~ 320x240
 	 * medium ~ 640x480
@@ -52,7 +72,7 @@ var config =
 	{
 		tcp : true
 	},
-	defaultAudio : 
+	defaultAudio :
 	{
 		sampleRate        : 48000,
 		channelCount      : 1,
@@ -73,7 +93,7 @@ var config =
 	 * but use it with caution
 	 * full mesh audio strongly decrease room capacity! 
 	 */
-	autoMuteThreshold    : 4, 
+	autoMuteThreshold    : 4,
 	background           : 'images/background.jpg',
 	defaultLayout        : 'democratic', // democratic, filmstrip
 	// If true, will show media control buttons in separate
