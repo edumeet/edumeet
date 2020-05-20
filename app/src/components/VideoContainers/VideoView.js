@@ -86,6 +86,8 @@ const styles = (theme) =>
 					backgroundColor   : 'rgba(0, 0, 0, 0.25)',
 					display           : 'grid',
 					gap               : '1px 5px',
+
+					// eslint-disable-next-line
 					gridTemplateAreas : '\
 				"AcodL		Acod	Acod	Acod	Acod" \
 					"VcodL		Vcod	Vcod	Vcod	Vcod" \
