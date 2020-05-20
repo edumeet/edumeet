@@ -71,6 +71,18 @@ const messages =
 	'lv'      : messagesLatvian
 };
 
+const supportedBrowsers={
+	'windows' : {
+		'internet explorer' : '>12',
+		'microsoft edge'    : '>18'
+	},
+	'safari'                       : '>12',
+	'firefox'                      : '>=60',
+	'chrome'                       : '>=74',
+	'opera'                        : '>=62',
+	'samsung internet for android' : '>=11.1.1.52'
+};
+
 const browserLanguage = (navigator.language || navigator.browserLanguage).toLowerCase();
 
 let locale = browserLanguage.split(/[-_]/)[0]; // language without region code
@@ -159,8 +171,14 @@ function run()
 		webrtcUnavailable=true;
 	}
 	else
-	if (device.name === 'safari' && !isNaN(device.version) && parseFloat(device.version) < 12)
+	if (!device.bowser.satisfies(
+		window.config.supportedBrowsers ? window.config.supportedBrowsers : supportedBrowsers)
+	)
 	{
+		logger.error(
+			'Your browser is not on the supported list! Ask your server admin to add your browser to the supported list, if you think that your browser should be supported! deviceInfo: %o',
+			device
+		);
 		unsupportedBrowser=true;
 	}
 	else
