@@ -63,10 +63,10 @@
 	"room.help": "Hilfe",
 	"room.about": "Über",
 	"room.shortcutKeys": "Tastaturkürzel",
-	"room.browsePeersSpotlight": null,
-	"room.stopAllScreenSharing": null,
+	"room.browsePeersSpotlight": "Teilnehmer durchgehen und anzeigen",
+	"room.stopAllScreenSharing": "Stoppe alle Bildschirmfreigaben",
 
-	"me.mutedPTT": "Du bist stummgeschaltet. Halte die SPACE-Taste um zu sprechen",
+	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 
 	"roles.gotRole": "Rolle erhalten: {role}",
 	"roles.lostRole": "Rolle entzogen: {role}",
@@ -86,9 +86,9 @@
 	"tooltip.muteParticipantVideo": "Video stoppen",
 	"tooltip.raisedHand": "Hand heben",
 	"tooltip.muteScreenSharing": "Stoppe Bildschirmfreigabe",
-	"tooltip.muteParticipantAudioModerator": null,
-	"tooltip.muteParticipantVideoModerator": null,
-	"tooltip.muteScreenSharingModerator": null,
+	"tooltip.muteParticipantAudioModerator": "Teilnehmer-Audio global stummschalten",
+	"tooltip.muteParticipantVideoModerator": "Teilnehmer-Video global stoppen",
+	"tooltip.muteScreenSharingModerator": "Teilnehmer-Bildschirmfreigabe global beenden",
 
 	"label.roomName": "Name des Raums",
 	"label.chooseRoomButton": "Weiter",
@@ -119,7 +119,7 @@
 	"label.addVideo": "Video hinzufügen",
 	"label.promoteAllPeers": "Alle Teilnehmer reinlassen",
 	"label.moreActions": "Weitere Aktionen",
-	"label.version": null,
+	"label.version": "Version",
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",
@@ -141,12 +141,13 @@
 	"settings.notificationSounds": "Audiosignal bei Benachrichtigungen",
 	"settings.showNotifications": "Zeige Benachrichtigungen",
 	"settings.buttonControlBar": "Separate seitliche Medienwerkzeugleiste",
+	"settings.showAdvancedAudio": "Erweiterte Audio-Einstellungen",
 	"settings.echoCancellation": "Echounterdrückung",
 	"settings.autoGainControl": "Automatische Pegelregelung (Audioeingang)",
 	"settings.noiseSuppression": "Rauschunterdrückung",
 	"settings.drawerOverlayed": "Seitenpanel verdeckt Hauptinhalt",
-	"settings.voiceActivatedUnmute": null,
-	"settings.noiseThreshold": null,
+	"settings.voiceActivatedUnmute": "Automatische Spracherkennung",
+	"settings.noiseThreshold": "Geräuschepegel",
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",
@@ -192,9 +193,9 @@
 	"moderator.clearFiles": "Moderator hat geteilte Dateiliste gelöscht",
 	"moderator.muteAudio": "Moderator hat dich stummgeschaltet",
 	"moderator.muteVideo": "Moderator hat dein Video gestoppt",
-	"moderator.stopScreenSharing": null,
+	"moderator.stopScreenSharing": "Moderator hat deine Bildschirmfreigabe gestoppt",
 
-	"unsupportedBrowser.titleUnsupportedBrowser": null,
-	"unsupportedBrowser.titlewebrtcUnavailable": null,
-	"unsupportedBrowser.bodyText": null
+	"unsupportedBrowser.titleUnsupportedBrowser": "Browser wird nicht unterstützt!",
+	"unsupportedBrowser.titlewebrtcUnavailable": "Benötigte Funktionen sind in deinem Browser nicht verfügbar!",
+	"unsupportedBrowser.bodyText": "Dieser Konferenz-Dienst benötigt Funktionen die von deinem Browser nicht unterstützt werden. Bitte aktualisiere deinen Browser, wechsle den Browser oder überprüfe die Browser-Einstellungen. Unterstützte Browser:"
 }

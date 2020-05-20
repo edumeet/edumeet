@@ -140,6 +140,7 @@
 	"settings.notificationSounds": "通知音效",
 	"settings.showNotifications": "顯示通知",
 	"settings.buttonControlBar": "獨立控制按鈕",
+	"settings.showAdvancedAudio": null,
 	"settings.echoCancellation": "回音消除",
 	"settings.autoGainControl": "自動增益控制",
 	"settings.noiseSuppression": "噪音消除",

@@ -141,6 +141,7 @@
 	"settings.notificationSounds": "Varslingslyder",
 	"settings.showNotifications": "Vis varslinger",
 	"settings.buttonControlBar": "Separate media knapper",
+	"settings.showAdvancedAudio": null,
 	"settings.echoCancellation": "Echokansellering",
 	"settings.autoGainControl": "Auto gain kontroll",
 	"settings.noiseSuppression": "Støy reduksjon",
