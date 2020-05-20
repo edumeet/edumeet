@@ -83,9 +83,9 @@ const styles = (theme) =>
 
 			'&.left' :
 				{
-					backgroundColor   : 'rgba(0, 0, 0, 0.25)',
-					display           : 'grid',
-					gap               : '1px 5px',
+					backgroundColor : 'rgba(0, 0, 0, 0.25)',
+					display         : 'grid',
+					gap             : '1px 5px',
 
 					// eslint-disable-next-line
 					gridTemplateAreas : '\
