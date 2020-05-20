@@ -27,6 +27,15 @@ var config =
 	],
 
 	/**
+	 * Alternative simulcast setting:
+	 * [
+	 *   { maxBitRate: 50000 }, 
+	 *	 { maxBitRate: 1000000 },
+	 *	 { maxBitRate: 4800000 }
+	 *],
+	 **/
+
+	/**
 	 * White listing browsers that support audio output device selection.
 	 * It is not yet fully implemented in Firefox.
 	 * See: https://bugzilla.mozilla.org/show_bug.cgi?id=1498512
@@ -56,8 +65,9 @@ var config =
 	},
 
 	/**
-	 * Set the auto mute / Push To Talk threshold
-	 * default value is 4
+	 * Set max number participants in one room that join 
+	 * unmuted. Next participant will join automatically muted
+	 * Default value is 4
 	 * 
 	 * Set it to 0 to disable auto mute functionality, 
 	 * but use it with caution
@@ -76,9 +86,12 @@ var config =
 	notificationPosition : 'right',
 	// Timeout for autohiding topbar and button control bar
 	hideTimeout          : 3000,
+	// max number of participant that will be visible in 
+	// as speaker
 	lastN                : 4,
 	mobileLastN          : 1,
-	// Highest number of speakers user can select
+	// Highest number of lastN the user can select manually in 
+	// userinteface
 	maxLastN             : 5,
 	// If truthy, users can NOT change number of speakers visible
 	lockLastN            : false,
