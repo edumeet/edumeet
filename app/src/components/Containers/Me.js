@@ -342,7 +342,7 @@ const Me = (props) =>
 
 		if (advancedMode)
 		{
-			poll = setInterval(() => roomClient._getTransportStats(), interval);
+			poll = setInterval(() => roomClient.getTransportStats(), interval);
 		}
 
 		return () => clearInterval(poll);

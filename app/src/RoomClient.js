@@ -617,7 +617,7 @@ export default class RoomClient
 		});
 	}
 
-	async _getTransportStats()
+	async getTransportStats()
 	{
 		try
 		{
