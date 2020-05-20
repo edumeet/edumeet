@@ -1033,30 +1033,33 @@ export default class RoomClient
 
 	disconnectLocalHark()
 	{
-		logger.debug('disconnectLocalHark() | Stopping harkStream.');
+		logger.debug('disconnectLocalHark()');
+
 		if (this._harkStream != null)
 		{
-			this._harkStream.getAudioTracks()[0].stop();
+			let [ track ] = this._harkStream.getAudioTracks();
+
+			track.stop();
+			track = null;
+
 			this._harkStream = null;
 		}
 
 		if (this._hark != null)
-		{
-			logger.debug('disconnectLocalHark() Stopping hark.');
 			this._hark.stop();
-		}
 	}
 
 	connectLocalHark(track)
 	{
-		logger.debug('connectLocalHark() | Track:%o', track);
+		logger.debug('connectLocalHark() [track:"%o"]', track);
+
 		this._harkStream = new MediaStream();
 
-		this._harkStream.addTrack(track.clone());
-		this._harkStream.getAudioTracks()[0].enabled = true;
+		const newTrack = track.clone();
 
-		if (!this._harkStream.getAudioTracks()[0])
-			throw new Error('getMicStream():something went wrong with hark');
+		this._harkStream.addTrack(newTrack);
+
+		newTrack.enabled = true;
 
 		this._hark = hark(this._harkStream,
 			{
@@ -1065,41 +1068,59 @@ export default class RoomClient
 				threshold : store.getState().settings.noiseThreshold,
 				history   : 100
 			});
+
 		this._hark.lastVolume = -100;
 
 		this._hark.on('volume_change', (volume) =>
 		{
 			volume = Math.round(volume);
+
 			if (this._micProducer && (volume !== Math.round(this._hark.lastVolume)))
 			{
 				if (volume < this._hark.lastVolume)
 				{
-					volume = this._hark.lastVolume - Math.pow((volume - this._hark.lastVolume)/(100 + this._hark.lastVolume), 4)*2;
+					volume =
+						this._hark.lastVolume -
+						Math.pow(
+							(volume - this._hark.lastVolume) /
+							(100 + this._hark.lastVolume)
+							, 4
+						) * 2;
 				}
+
 				this._hark.lastVolume = volume;
+
 				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
 			}
 		});
+
 		this._hark.on('speaking', () =>
 		{
 			store.dispatch(meActions.setIsSpeaking(true));
-			if ((store.getState().settings.voiceActivatedUnmute ||
+
+			if (
+				(store.getState().settings.voiceActivatedUnmute ||
 				store.getState().me.isAutoMuted) &&
 				this._micProducer &&
-				this._micProducer.paused)
-			{
+				this._micProducer.paused
+			)
 				this._micProducer.resume();
-			}
+
 			store.dispatch(meActions.setAutoMuted(false)); // sanity action
 		});
+
 		this._hark.on('stopped_speaking', () =>
 		{
 			store.dispatch(meActions.setIsSpeaking(false));
-			if (store.getState().settings.voiceActivatedUnmute &&
+
+			if (
+				store.getState().settings.voiceActivatedUnmute &&
 				this._micProducer &&
-				!this._micProducer.paused)
+				!this._micProducer.paused
+			)
 			{
 				this._micProducer.pause();
+
 				store.dispatch(meActions.setAutoMuted(true));
 			}
 		});
