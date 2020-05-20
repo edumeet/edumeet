@@ -22,7 +22,6 @@ const initialState =
 	notificationSounds   : true,
 	buttonControlBar     : window.config.buttonControlBar || false,
 	drawerOverlayed      : window.config.drawerOverlayed || true,
-	autoMuteThreshold    : window.config.autoMuteThreshold || 4,
 	...window.config.defaultAudio
 };
 

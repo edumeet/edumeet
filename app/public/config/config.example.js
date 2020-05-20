@@ -89,7 +89,8 @@ var config =
 	 * unmuted. Next participant will join automatically muted
 	 * Default value is 4
 	 * 
-	 * Set it to 0 to disable auto mute functionality, 
+	 * Set it to 0 to auto mute all, 
+	 * Set it to negative (-1) to never automatically auto mute
 	 * but use it with caution
 	 * full mesh audio strongly decrease room capacity! 
 	 */
