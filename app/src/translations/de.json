@@ -197,5 +197,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Browser wird nicht unterstützt!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Benötigte Funktionen sind in deinem Browser nicht verfügbar!",
-	"unsupportedBrowser.bodyText": "Dieser Konferenz-Dienst benötigt Funktionen die von deinem Browser nicht unterstützt werden. Bitte aktualisiere deinen Browser, wechsle den den Browser oder überprüfe die Browser-Einstellungen. Unterstützte Browser:"
+	"unsupportedBrowser.bodyText": "Dieser Konferenz-Dienst benötigt Funktionen die von deinem Browser nicht unterstützt werden. Bitte aktualisiere deinen Browser, wechsle den Browser oder überprüfe die Browser-Einstellungen. Unterstützte Browser:"
 }
