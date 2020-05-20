@@ -4,13 +4,14 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../RoomContext';
 import * as settingsActions from '../../actions/settingsActions';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import { useIntl, FormattedMessage } from 'react-intl';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
-import Checkbox from '@material-ui/core/Checkbox';
+import Switch from '@material-ui/core/Switch';
 
 const styles = (theme) =>
 	({
@@ -21,6 +22,13 @@ const styles = (theme) =>
 		formControl :
 		{
 			display : 'flex'
+		},
+		switchLabel : {
+			justifyContent : 'space-between',
+			flex           : 'auto',
+			display        : 'flex',
+			padding        : theme.spacing(1),
+			marginRight    : 0
 		}
 	});
 
@@ -37,16 +45,18 @@ const AdvancedSettings = ({
 	return (
 		<React.Fragment>
 			<FormControlLabel
-				className={classes.setting}
-				control={<Checkbox checked={settings.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={<Switch checked={settings.advancedMode} onChange={onToggleAdvancedMode} value='advancedMode' />}
+				labelPlacement='start'
 				label={intl.formatMessage({
 					id             : 'settings.advancedMode',
 					defaultMessage : 'Advanced mode'
 				})}
 			/>
 			<FormControlLabel
-				className={classes.setting}
-				control={<Checkbox checked={settings.notificationSounds} onChange={onToggleNotificationSounds} value='notificationSounds' />}
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={<Switch checked={settings.notificationSounds} onChange={onToggleNotificationSounds} value='notificationSounds' />}
+				labelPlacement='start'
 				label={intl.formatMessage({
 					id             : 'settings.notificationSounds',
 					defaultMessage : 'Notification sounds'
