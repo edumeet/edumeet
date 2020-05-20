@@ -145,6 +145,8 @@
 	"settings.autoGainControl": "Auto korekta wzmocnienia",
 	"settings.noiseSuppression": "Wyciszenie szumów",
 	"settings.drawerOverlayed": "Szuflada nad zawartością",
+	"Voice activated unmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",

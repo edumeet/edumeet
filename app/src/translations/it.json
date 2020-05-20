@@ -145,6 +145,8 @@
 	"settings.autoGainControl": "Controllo guadagno automatico",
 	"settings.noiseSuppression": "Riduzione del rumore",
 	"settings.drawerOverlayed": "Barra laterale sovrapposta",
+	"Voice activated unmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",

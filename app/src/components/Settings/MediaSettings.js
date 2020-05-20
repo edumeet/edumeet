@@ -410,9 +410,9 @@ const MediaSettings = ({
 								{
 									intl.formatMessage({
 										id             : 'settings.noiseThreshold',
-										defaultMessage : 'Noise threshold:'
+										defaultMessage : 'Noise threshold'
 									})
-								}
+								}:
 							</Typography>
 							<NoiseSlider className={classnames(classes.slider, classnames.setting)}
 								key={'noise-threshold-slider'}
