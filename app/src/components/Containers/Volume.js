@@ -58,27 +58,27 @@ const styles = () =>
 			'&.level6' :
 			{
 				height          : '60%',
-				backgroundColor : 'rgba(255, 0, 0, 0.65)'
+				backgroundColor : 'rgba(255, 165, 0, 0.65)'
 			},
 			'&.level7' :
 			{
 				height          : '70%',
-				backgroundColor : 'rgba(255, 0, 0, 0.65)'
+				backgroundColor : 'rgba(255, 100, 0, 0.65)'
 			},
 			'&.level8' :
 			{
 				height          : '80%',
-				backgroundColor : 'rgba(0, 0, 0, 0.65)'
+				backgroundColor : 'rgba(255, 60, 0, 0.65)'
 			},
 			'&.level9' :
 			{
 				height          : '90%',
-				backgroundColor : 'rgba(0, 0, 0, 0.65)'
+				backgroundColor : 'rgba(255, 30, 0, 0.65)'
 			},
 			'&.level10' :
 			{
 				height          : '100%',
-				backgroundColor : 'rgba(0, 0, 0, 0.65)'
+				backgroundColor : 'rgba(255, 0, 0, 0.65)'
 			}
 		},
 		volumeSmall :

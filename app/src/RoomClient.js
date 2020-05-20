@@ -1030,20 +1030,20 @@ export default class RoomClient
 		this._hark = hark(this._harkStream,
 			{
 				play      : false,
-				interval  : 5,
+				interval  : 10,
 				threshold : store.getState().settings.noiseThreshold,
-				history   : 300
+				history   : 100
 			});
 		this._hark.lastVolume = -100;
 
 		this._hark.on('volume_change', (volume) =>
 		{
 			volume = Math.round(volume);
-			if (this._micProducer && volume !== Math.round(this._hark.lastVolume))
+			if (this._micProducer && (volume !== Math.round(this._hark.lastVolume)))
 			{
-				if (volume < this._hark.lastVolume * 1.02)
+				if (volume < this._hark.lastVolume)
 				{
-					volume = this._hark.lastVolume * 1.02;
+					volume = this._hark.lastVolume - Math.pow((volume - this._hark.lastVolume)/(100 + this._hark.lastVolume),4)*2;
 				}
 				this._hark.lastVolume = volume;
 				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
