@@ -534,8 +534,9 @@ class VideoView extends React.PureComponent
 VideoView.propTypes =
 {
 	isMe                           : PropTypes.bool,
-	showQuality                    : PropTypes.bool,
 	isScreen                       : PropTypes.bool,
+	isExtraVideo   	               : PropTypes.bool,
+	showQuality                    : PropTypes.bool,
 	displayName                    : PropTypes.string,
 	showPeerInfo                   : PropTypes.bool,
 	videoContain                   : PropTypes.bool,
