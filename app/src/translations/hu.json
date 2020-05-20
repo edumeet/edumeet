@@ -145,6 +145,8 @@
 	"settings.autoGainControl": "Automatikus hangerő",
 	"settings.noiseSuppression": "Zajelnyomás",
 	"settings.drawerOverlayed": "Oldalsáv a tartalom felett",
+	"settings.voiceActivatedUnmute": "Beszéd aktivált mikrofon némítás",
+	"settings.noiseThreshold": "Zajszint",
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

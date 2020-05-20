@@ -145,6 +145,8 @@
 	"settings.autoGainControl": "Auto gain control",
 	"settings.noiseSuppression": "Noise suppression",
 	"settings.drawerOverlayed": "Side drawer over content",
+	"settings.voiceActivatedUnmute": "Voice activated unmute",
+	"settings.noiseThreshold": "Noise threshold",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

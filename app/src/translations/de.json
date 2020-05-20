@@ -145,6 +145,8 @@
 	"settings.autoGainControl": "Automatische Pegelregelung (Audioeingang)",
 	"settings.noiseSuppression": "Rauschunterdrückung",
 	"settings.drawerOverlayed": "Seitenpanel verdeckt Hauptinhalt",
+	"settings.voiceActivatedUnmute": null,
+	"settings.noiseThreshold": null,
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",
