@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	meProducersSelector,
@@ -176,6 +176,7 @@ const Me = (props) =>
 		screenProducer,
 		extraVideoProducers,
 		canShareScreen,
+		transports,
 		noiseVolume,
 		classes
 	} = props;
@@ -332,6 +333,20 @@ const Me = (props) =>
 					(prev.score < curr.score ? prev : curr)
 			);
 	}
+
+	useEffect(() =>
+	{
+		let poll;
+
+		const interval = 1000;
+
+		if (advancedMode)
+		{
+			poll = setInterval(() => roomClient.getTransportStats(), interval);
+		}
+
+		return () => clearInterval(poll);
+	}, [ roomClient, advancedMode ]);
 
 	return (
 		<React.Fragment>
@@ -673,6 +688,7 @@ const Me = (props) =>
 						videoVisible={videoVisible}
 						audioCodec={micProducer && micProducer.codec}
 						videoCodec={webcamProducer && webcamProducer.codec}
+						netInfo={transports && transports}
 						audioScore={audioScore}
 						videoScore={videoScore}
 						onChangeDisplayName={(displayName) =>
@@ -888,7 +904,8 @@ Me.propTypes =
 	canShareScreen      : PropTypes.bool.isRequired,
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
-	theme               : PropTypes.object.isRequired
+	theme               : PropTypes.object.isRequired,
+	transports          : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -916,6 +933,7 @@ const makeMapStateToProps = () =>
 			settings       : state.settings,
 			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
 			canShareScreen : hasPermission(state),
+			transports     : state.transports,
 			noiseVolume    : volume
 		};
 	};
@@ -937,7 +955,8 @@ export default withRoomContext(connect(
 					Math.round(next.peerVolumes[next.me.id]) &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
-				prev.settings === next.settings
+				prev.settings === next.settings &&
+				prev.transports === next.transports
 			);
 		}
 	}

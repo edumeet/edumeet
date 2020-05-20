@@ -1,7 +1,5 @@
-
-
 class AudioAnalyzer extends EventEmitter
- 
+
 {
 	constructor()
 	{

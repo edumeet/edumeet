@@ -14,6 +14,7 @@ import * as lobbyPeerActions from './actions/lobbyPeerActions';
 import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
+import * as transportActions from './actions/transportActions';
 
 let createTorrent;
 
@@ -616,6 +617,36 @@ export default class RoomClient
 		});
 	}
 
+	async getTransportStats()
+	{
+		try
+		{
+			if (this._recvTransport)
+			{
+				logger.debug('getTransportStats() - recv [transportId: "%s"]', this._recvTransport.id);
+
+				const recv = await this.sendRequest('getTransportStats', { transportId: this._recvTransport.id });
+
+				store.dispatch(
+					transportActions.addTransportStats(recv, 'recv'));
+			}
+
+			if (this._sendTransport)
+			{
+				logger.debug('getTransportStats() - send [transportId: "%s"]', this._sendTransport.id);
+
+				const send = await this.sendRequest('getTransportStats', { transportId: this._sendTransport.id });
+
+				store.dispatch(
+					transportActions.addTransportStats(send, 'send'));
+			}
+		}
+		catch (error)
+		{
+			logger.error('getTransportStats() | failed: %o', error);
+		}
+	}
+
 	async sendRequest(method, data)
 	{
 		logger.debug('sendRequest() [method:"%s", data:"%o"]', method, data);
@@ -1043,7 +1074,7 @@ export default class RoomClient
 			{
 				if (volume < this._hark.lastVolume)
 				{
-					volume = this._hark.lastVolume - Math.pow((volume - this._hark.lastVolume)/(100 + this._hark.lastVolume),4)*2;
+					volume = this._hark.lastVolume - Math.pow((volume - this._hark.lastVolume)/(100 + this._hark.lastVolume), 4)*2;
 				}
 				this._hark.lastVolume = volume;
 				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
@@ -2092,6 +2123,7 @@ export default class RoomClient
 			{
 				switch (notification.method)
 				{
+
 					case 'enteredLobby':
 					{
 						store.dispatch(roomActions.setInLobby(true));
@@ -3046,7 +3078,7 @@ export default class RoomClient
 					{
 						await this.enableMic();
 						let autoMuteThreshold = 4;
-						
+
 						if ('autoMuteThreshold' in window.config)
 						{
 							autoMuteThreshold = window.config.autoMuteThreshold;
