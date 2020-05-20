@@ -65,11 +65,14 @@ const styles = (theme) => ({
 	switchLabel : {
 		justifyContent : 'space-between',
 		flex           : 'auto',
-		display        : 'flex'
+		display        : 'flex',
+		padding        : theme.spacing(1)
 	},
 	nested : {
-		paddingLeft : theme.spacing(2),
-		display     : 'block'
+		paddingLeft   : theme.spacing(2),
+		display       : 'block',
+		paddingTop    : 0,
+		paddingBottom : 0
 	},
 	formControl :
 	{
