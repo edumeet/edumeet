@@ -691,6 +691,7 @@ const Me = (props) =>
 						netInfo={transports && transports}
 						audioScore={audioScore}
 						videoScore={videoScore}
+						showQuality
 						onChangeDisplayName={(displayName) =>
 						{
 							roomClient.changeDisplayName(displayName);
