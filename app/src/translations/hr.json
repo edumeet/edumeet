@@ -141,6 +141,7 @@
 	"settings.notificationSounds": "Zvuk obavijesti",
 	"settings.showNotifications": "Prikaži obavijesti",
 	"settings.buttonControlBar": "Razdvoji upravljanje medijima",
+	"settings.showAdvancedAudio": null,
 	"settings.echoCancellation": "Poništavanje jeke",
 	"settings.autoGainControl": "Automatsko upravljanje jačinom zvuka",
 	"settings.noiseSuppression": "Poništavanje šuma",

@@ -138,6 +138,7 @@
 	"settings.notificationSounds": null,
 	"settings.showNotifications": null,
 	"settings.buttonControlBar": null,
+	"settings.showAdvancedAudio": null,
 	"settings.echoCancellation": null,
 	"settings.autoGainControl": null,
 	"settings.noiseSuppression": null,

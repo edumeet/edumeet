@@ -141,6 +141,7 @@
 	"settings.notificationSounds": "Powiadomienia dźwiękiem",
 	"settings.showNotifications": "Pokaż powiadomienia",
 	"settings.buttonControlBar": "Rozdziel kontrolki mediów",
+	"settings.showAdvancedAudio": null,
 	"settings.echoCancellation": "Usuwanie echa",
 	"settings.autoGainControl": "Auto korekta wzmocnienia",
 	"settings.noiseSuppression": "Wyciszenie szumów",

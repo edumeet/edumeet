@@ -141,6 +141,7 @@
 	"settings.notificationSounds": "Notification sounds",
 	"settings.showNotifications": "Show notifications",
 	"settings.buttonControlBar": "Separate media controls",
+	"settings.showAdvancedAudio": "Show advanced audio settings",
 	"settings.echoCancellation": "Echo cancellation",
 	"settings.autoGainControl": "Auto gain control",
 	"settings.noiseSuppression": "Noise suppression",

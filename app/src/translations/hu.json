@@ -141,6 +141,7 @@
 	"settings.notificationSounds": "Értesítések hangjelzéssel",
 	"settings.showNotifications": "Értesítések megjelenítése",
 	"settings.buttonControlBar": "Médiavezérlő gombok leválasztása",
+	"settings.showAdvancedAudio": null,
 	"settings.echoCancellation": "Visszhangelnyomás",
 	"settings.autoGainControl": "Automatikus hangerő",
 	"settings.noiseSuppression": "Zajelnyomás",
