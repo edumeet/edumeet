@@ -560,7 +560,7 @@ export default class RoomClient
 					.then()
 					.catch((error) =>
 					{
-						logger.error('_soundAlert.play() | failed: %o', error);
+						logger.error('_soundAlert.play() [error:"%o"]', error);
 					});
 			}
 		}
@@ -643,7 +643,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('getTransportStats() | failed: %o', error);
+			logger.error('getTransportStats() [error:"%o"]', error);
 		}
 	}
 
@@ -702,7 +702,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('changeDisplayName() | failed: %o', error);
+			logger.error('changeDisplayName() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -728,7 +728,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('changePicture() | failed: %o', error);
+			logger.error('changePicture() [error:"%o"]', error);
 		}
 	}
 
@@ -745,7 +745,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('sendChatMessage() | failed: %o', error);
+			logger.error('sendChatMessage() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -913,7 +913,7 @@ export default class RoomClient
 	// { file, name, picture }
 	async _sendFile(magnetUri)
 	{
-		logger.debug('sendFile() [magnetUri: %o]', magnetUri);
+		logger.debug('sendFile() [magnetUri:"%o"]', magnetUri);
 
 		try
 		{
@@ -921,7 +921,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('sendFile() | failed: %o', error);
+			logger.error('sendFile() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -950,7 +950,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('muteMic() | failed: %o', error);
+			logger.error('muteMic() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -985,7 +985,7 @@ export default class RoomClient
 			}
 			catch (error)
 			{
-				logger.error('unmuteMic() | failed: %o', error);
+				logger.error('unmuteMic() [error:"%o"]', error);
 
 				store.dispatch(requestActions.notify(
 					{
@@ -1027,7 +1027,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('updateSpotlights() failed: %o', error);
+			logger.error('updateSpotlights() [error:"%o"]', error);
 		}
 	}
 
@@ -1242,7 +1242,7 @@ export default class RoomClient
 
 	async changeVideoResolution(resolution)
 	{
-		logger.debug('changeVideoResolution() [resolution: %s]', resolution);
+		logger.debug('changeVideoResolution() [resolution:"%s"]', resolution);
 
 		store.dispatch(
 			meActions.setWebcamInProgress(true));
@@ -1310,7 +1310,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('changeVideoResolution() failed: %o', error);
+			logger.error('changeVideoResolution() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1426,7 +1426,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('promoteLobbyPeer() failed: %o', error);
+			logger.error('promoteLobbyPeer() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1448,7 +1448,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('clearChat() failed: %o', error);
+			logger.error('clearChat() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1470,7 +1470,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('clearFileSharing() failed: %o', error);
+			logger.error('clearFileSharing() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1490,7 +1490,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('kickPeer() failed: %o', error);
+			logger.error('kickPeer() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1510,7 +1510,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('mutePeer() failed: %o', error);
+			logger.error('mutePeer() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1530,7 +1530,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('stopPeerVideo() failed: %o', error);
+			logger.error('stopPeerVideo() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1550,7 +1550,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('stopPeerScreenSharing() failed: %o', error);
+			logger.error('stopPeerScreenSharing() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1570,7 +1570,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('muteAllPeers() failed: %o', error);
+			logger.error('muteAllPeers() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1590,7 +1590,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('stopAllPeerVideo() failed: %o', error);
+			logger.error('stopAllPeerVideo() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1610,7 +1610,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('stopAllPeerScreenSharing() failed: %o', error);
+			logger.error('stopAllPeerScreenSharing() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1630,7 +1630,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('closeMeeting() failed: %o', error);
+			logger.error('closeMeeting() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1672,7 +1672,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('modifyPeerConsumer() failed: %o', error);
+			logger.error('modifyPeerConsumer() [error:"%o"]', error);
 		}
 
 		if (type === 'mic')
@@ -1688,7 +1688,7 @@ export default class RoomClient
 
 	async _pauseConsumer(consumer)
 	{
-		logger.debug('_pauseConsumer() [consumer: %o]', consumer);
+		logger.debug('_pauseConsumer() [consumer:"%o"]', consumer);
 
 		if (consumer.paused || consumer.closed)
 			return;
@@ -1704,13 +1704,13 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_pauseConsumer() | failed:%o', error);
+			logger.error('_pauseConsumer() [error:"%o"]', error);
 		}
 	}
 
 	async _resumeConsumer(consumer)
 	{
-		logger.debug('_resumeConsumer() [consumer: %o]', consumer);
+		logger.debug('_resumeConsumer() [consumer:"%o"]', consumer);
 
 		if (!consumer.paused || consumer.closed)
 			return;
@@ -1726,7 +1726,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_resumeConsumer() | failed:%o', error);
+			logger.error('_resumeConsumer() [error:"%o"]', error);
 		}
 	}
 
@@ -1743,7 +1743,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('lowerPeerHand() | [error:"%o"]', error);
+			logger.error('lowerPeerHand() [error:"%o"]', error);
 		}
 
 		store.dispatch(
@@ -1766,7 +1766,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setRaisedHand() | [error:"%o"]', error);
+			logger.error('setRaisedHand() [error:"%o"]', error);
 
 			// We need to refresh the component for it to render changed state
 			store.dispatch(meActions.setRaisedHand(!raisedHand));
@@ -1778,7 +1778,7 @@ export default class RoomClient
 
 	async setMaxSendingSpatialLayer(spatialLayer)
 	{
-		logger.debug('setMaxSendingSpatialLayer() [spatialLayer:%s]', spatialLayer);
+		logger.debug('setMaxSendingSpatialLayer() [spatialLayer:"%s"]', spatialLayer);
 
 		try
 		{
@@ -1789,14 +1789,14 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setMaxSendingSpatialLayer() | failed:"%o"', error);
+			logger.error('setMaxSendingSpatialLayer() [error:"%o"]', error);
 		}
 	}
 
 	async setConsumerPreferredLayers(consumerId, spatialLayer, temporalLayer)
 	{
 		logger.debug(
-			'setConsumerPreferredLayers() [consumerId:%s, spatialLayer:%s, temporalLayer:%s]',
+			'setConsumerPreferredLayers() [consumerId:"%s", spatialLayer:"%s", temporalLayer:"%s"]',
 			consumerId, spatialLayer, temporalLayer);
 
 		try
@@ -1809,14 +1809,14 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPreferredLayers() | failed:"%o"', error);
+			logger.error('setConsumerPreferredLayers() [error:"%o"]', error);
 		}
 	}
 
 	async setConsumerPriority(consumerId, priority)
 	{
 		logger.debug(
-			'setConsumerPriority() [consumerId:%s, priority:%d]',
+			'setConsumerPriority() [consumerId:"%s", priority:%d]',
 			consumerId, priority);
 
 		try
@@ -1827,13 +1827,13 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPriority() | failed:%o', error);
+			logger.error('setConsumerPriority() [error:"%o"]', error);
 		}
 	}
 
 	async requestConsumerKeyFrame(consumerId)
 	{
-		logger.debug('requestConsumerKeyFrame() [consumerId:%s]', consumerId);
+		logger.debug('requestConsumerKeyFrame() [consumerId:"%s"]', consumerId);
 
 		try
 		{
@@ -1841,7 +1841,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('requestConsumerKeyFrame() | failed:%o', error);
+			logger.error('requestConsumerKeyFrame() [error:"%o"]', error);
 		}
 	}
 
@@ -2033,7 +2033,7 @@ export default class RoomClient
 		this._signalingSocket.on('request', async (request, cb) =>
 		{
 			logger.debug(
-				'socket "request" event [method:%s, data:%o]',
+				'socket "request" event [method:"%s", data:"%o"]',
 				request.method, request.data);
 
 			switch (request.method)
@@ -2137,7 +2137,7 @@ export default class RoomClient
 		this._signalingSocket.on('notification', async (notification) =>
 		{
 			logger.debug(
-				'socket "notification" event [method:%s, data:%o]',
+				'socket "notification" event [method:"%s", data:"%o"]',
 				notification.method, notification.data);
 
 			try
@@ -2815,7 +2815,7 @@ export default class RoomClient
 			}
 			catch (error)
 			{
-				logger.error('error on socket "notification" event failed:"%o"', error);
+				logger.error('error on socket "notification" event [error:"%o"]', error);
 
 				store.dispatch(requestActions.notify(
 					{
@@ -3142,7 +3142,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_joinRoom() failed:"%o"', error);
+			logger.error('_joinRoom() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3187,7 +3187,7 @@ export default class RoomClient
 					})
 				}));
 
-			logger.error('lockRoom() | failed: %o', error);
+			logger.error('lockRoom() [error:"%o"]', error);
 		}
 	}
 
@@ -3221,7 +3221,7 @@ export default class RoomClient
 					})
 				}));
 
-			logger.error('unlockRoom() | failed: %o', error);
+			logger.error('unlockRoom() [error:"%o"]', error);
 		}
 	}
 
@@ -3243,7 +3243,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setAccessCode() | failed: %o', error);
+			logger.error('setAccessCode() [error:"%o"]', error);
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
@@ -3270,7 +3270,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setAccessCode() | failed: %o', error);
+			logger.error('setAccessCode() [error:"%o"]', error);
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
@@ -3291,7 +3291,7 @@ export default class RoomClient
 
 		if (!this._mediasoupDevice.canProduce('video'))
 		{
-			logger.error('enableWebcam() | cannot produce video');
+			logger.error('addExtraVideo() | cannot produce video');
 
 			return;
 		}
@@ -3407,7 +3407,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('addExtraVideo() failed:%o', error);
+			logger.error('addExtraVideo() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3703,7 +3703,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('enableScreenSharing() failed: %o', error);
+			logger.error('enableScreenSharing() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3871,7 +3871,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_setWebcamProducer() failed:%o', error);
+			logger.error('_setWebcamProducer() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3986,7 +3986,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_updateAudioDevices() failed:%o', error);
+			logger.error('_updateAudioDevices() [error:"%o"]', error);
 		}
 	}
 
@@ -4016,7 +4016,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_updateWebcams() failed:%o', error);
+			logger.error('_updateWebcams() [error:"%o"]', error);
 		}
 	}
 
@@ -4043,7 +4043,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_getAudioDeviceId() failed:%o', error);
+			logger.error('_getAudioDeviceId() [error:"%o"]', error);
 		}
 	}
 
@@ -4070,7 +4070,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_getWebcamDeviceId() failed:%o', error);
+			logger.error('_getWebcamDeviceId() [error:"%o"]', error);
 		}
 	}
 
@@ -4100,7 +4100,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_updateAudioOutputDevices() failed:%o', error);
+			logger.error('_updateAudioOutputDevices() [error:"%o"]', error);
 		}
 	}
 
