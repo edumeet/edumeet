@@ -233,6 +233,90 @@ const MediaSettings = ({
 						/>
 					</FormHelperText>
 				</FormControl>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={settings.frameRate || ''}
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								roomClient.updateWebcam({ newFrameRate: event.target.value });
+						}}
+						name='Frame rate'
+						autoWidth
+						className={classes.selectEmpty}
+					>
+						{ [ 1, 5, 10, 15, 20, 25, 30 ].map((frameRate) =>
+						{
+							return (
+								<MenuItem key={frameRate} value={frameRate}>
+									{frameRate}
+								</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						<FormattedMessage
+							id='settings.frameRate'
+							defaultMessage='Select your video frame rate'
+						/>
+					</FormHelperText>
+				</FormControl>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={settings.screenSharingResolution || ''}
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								roomClient.updateScreenSharing({ newResolution: event.target.value });
+						}}
+						name='Screen sharing resolution'
+						autoWidth
+						className={classes.selectEmpty}
+					>
+						{resolutions.map((resolution, index) =>
+						{
+							return (
+								<MenuItem key={index} value={resolution.value}>
+									{resolution.label}
+								</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						<FormattedMessage
+							id='settings.screenSharingResolution'
+							defaultMessage='Select your screen sharing resolution'
+						/>
+					</FormHelperText>
+				</FormControl>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={settings.screenSharingFrameRate || ''}
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								roomClient.updateScreenSharing({ newFrameRate: event.target.value });
+						}}
+						name='Frame rate'
+						autoWidth
+						className={classes.selectEmpty}
+					>
+						{ [ 1, 5, 10, 15, 20, 25, 30 ].map((screenSharingFrameRate) =>
+						{
+							return (
+								<MenuItem key={screenSharingFrameRate} value={screenSharingFrameRate}>
+									{screenSharingFrameRate}
+								</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						<FormattedMessage
+							id='settings.screenSharingFrameRate'
+							defaultMessage='Select your screen sharing frame rate'
+						/>
+					</FormHelperText>
+				</FormControl>
 			</form>
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>

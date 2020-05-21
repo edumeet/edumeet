@@ -27,20 +27,33 @@ var config =
 	},
 
 	/**
-	 * If defaultResolution is set, it will override user settings when joining:
+	 * Resolutions:
+	 * 
 	 * low ~ 320x240
 	 * medium ~ 640x480
 	 * high ~ 1280x720
 	 * veryhigh ~ 1920x1080
 	 * ultra ~ 3840x2560
+	 * 
 	 **/
-	defaultResolution  : 'medium',
+
+	/**
+	 * Frame rates:
+	 * 
+	 * 1, 5, 10, 15, 20, 25, 30
+	 * 
+	 **/
+
+	defaultResolution             : 'medium',
+	defaultFrameRate              : 15,
+	defaultScreenResolution       : 'veryhigh',
+	defaultScreenSharingFrameRate : 5,
 	// Enable or disable simulcast for webcam video
-	simulcast          : true,
+	simulcast                     : true,
 	// Enable or disable simulcast for screen sharing video
-	simulcastSharing   : false,
+	simulcastSharing              : false,
 	// Simulcast encoding layers and levels
-	simulcastEncodings :
+	simulcastEncodings            :
 	[
 		{ scaleResolutionDownBy: 4 },
 		{ scaleResolutionDownBy: 2 },

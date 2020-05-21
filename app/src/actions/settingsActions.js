@@ -22,6 +22,24 @@ export const setVideoResolution = (resolution) =>
 		payload : { resolution }
 	});
 
+export const setVideoFrameRate = (frameRate) =>
+	({
+		type    : 'SET_VIDEO_FRAME_RATE',
+		payload : { frameRate }
+	});
+
+export const setScreenSharingResolution = (screenSharingResolution) =>
+	({
+		type    : 'SET_SCREEN_SHARING_RESOLUTION',
+		payload : { screenSharingResolution }
+	});
+
+export const setScreenSharingFrameRate = (screenSharingFrameRate) =>
+	({
+		type    : 'SET_SCREEN_SHARING_FRAME_RATE',
+		payload : { screenSharingFrameRate }
+	});
+
 export const setDisplayName = (displayName) =>
 	({
 		type    : 'SET_DISPLAY_NAME',

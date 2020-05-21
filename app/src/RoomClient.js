@@ -1192,9 +1192,11 @@ export default class RoomClient
 				sampleSize
 			} = store.getState().settings;
 
-			if (restart || !this._micProducer)
+			if (restart)
 			{
 				this.disconnectLocalHark();
+
+				store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
 
 				if (this._micProducer)
 					await this.disableMic();
@@ -1202,7 +1204,7 @@ export default class RoomClient
 				const stream = await navigator.mediaDevices.getUserMedia(
 					{
 						audio : {
-							deviceId : { ideal: device.deviceId },
+							deviceId : { ideal: deviceId },
 							sampleRate,
 							channelCount,
 							volume,
@@ -1264,7 +1266,7 @@ export default class RoomClient
 
 				this.connectLocalHark(track);
 			}
-			else
+			else if (this._micProducer)
 			{
 				({ track } = this._micProducer);
 
@@ -1318,13 +1320,19 @@ export default class RoomClient
 		store.dispatch(meActions.setAudioInProgress(false));
 	}
 
-	async updateWebcam({ restart = false, newDeviceId = null, newResolution = null } = {})
+	async updateWebcam({
+		restart = false,
+		newDeviceId = null,
+		newResolution = null,
+		newFrameRate = null
+	} = {})
 	{
 		logger.debug(
-			'updateWebcam() [restart:"%s", newDeviceId:"%s", newResolution:"%s"]',
+			'updateWebcam() [restart:"%s", newDeviceId:"%s", newResolution:"%s", newFrameRate:"%s"]',
 			restart,
 			newDeviceId,
-			newResolution
+			newResolution,
+			newFrameRate
 		);
 
 		let track;
@@ -1343,6 +1351,9 @@ export default class RoomClient
 			if (newResolution)
 				store.dispatch(settingsActions.setVideoResolution(newResolution));
 
+			if (newFrameRate)
+				store.dispatch(settingsActions.setVideoFrameRate(newFrameRate));
+
 			store.dispatch(meActions.setWebcamInProgress(true));
 
 			const deviceId = await this._getWebcamDeviceId();
@@ -1351,10 +1362,15 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no webcam devices');
 
-			const { resolution } = store.getState().settings;
+			const {
+				resolution,
+				frameRate
+			} = store.getState().settings;
 
-			if (restart || !this._webcamProducer)
+			if (restart)
 			{
+				store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
+
 				if (this._webcamProducer)
 					await this.disableWebcam();
 
@@ -1362,8 +1378,9 @@ export default class RoomClient
 					{
 						video :
 						{
-							deviceId : { ideal: device.deviceId },
-							...VIDEO_CONSTRAINS[resolution]
+							deviceId : { ideal: deviceId },
+							...VIDEO_CONSTRAINS[resolution],
+							frameRate
 						}
 					});
 
@@ -1441,13 +1458,14 @@ export default class RoomClient
 					this.disableWebcam();
 				});
 			}
-			else
+			else if (this._webcamProducer)
 			{
 				({ track } = this._webcamProducer);
 
 				await track.applyConstraints(
 					{
-						...VIDEO_CONSTRAINS[resolution]
+						...VIDEO_CONSTRAINS[resolution],
+						frameRate
 					}
 				);
 
@@ -1458,13 +1476,12 @@ export default class RoomClient
 
 					await track.applyConstraints(
 						{
-							...VIDEO_CONSTRAINS[resolution]
+							...VIDEO_CONSTRAINS[resolution],
+							frameRate
 						}
 					);
 				}
 			}
-
-			await this._updateWebcams();
 		}
 		catch (error)
 		{
@@ -3559,23 +3576,15 @@ export default class RoomClient
 		store.dispatch(meActions.setAudioInProgress(false));
 	}
 
-	async enableScreenSharing()
+	async updateScreenSharing({
+		restart = false,
+		newResolution = null,
+		newFrameRate = null
+	} = {})
 	{
-		logger.debug('enableScreenSharing()');
-
-		if (this._screenSharingProducer)
-			return;
-
-		if (!this._mediasoupDevice.canProduce('video'))
-		{
-			logger.error('enableScreenSharing() | cannot produce video');
-
-			return;
-		}
+		logger.debug('updateScreenSharing() [restart:"%s"]', restart);
 
 		let track;
-
-		store.dispatch(meActions.setScreenShareInProgress(true));
 
 		try
 		{
@@ -3584,100 +3593,126 @@ export default class RoomClient
 			if (!available)
 				throw new Error('screen sharing not available');
 
-			const stream = await this._screenSharing.start({
-				width     : 1920,
-				height    : 1080,
-				frameRate : 5
-			});
+			if (!this._mediasoupDevice.canProduce('video'))
+				throw new Error('cannot produce video');
 
-			([ track ] = stream.getVideoTracks());
+			if (newResolution)
+				store.dispatch(settingsActions.setScreenSharingResolution(newResolution));
 
-			if (this._useSharingSimulcast)
+			if (newFrameRate)
+				store.dispatch(settingsActions.setScreenSharingFrameRate(newFrameRate));
+
+			store.dispatch(meActions.setScreenShareInProgress(true));
+
+			const {
+				screenSharingResolution,
+				screenSharingFrameRate
+			} = store.getState().settings;
+
+			if (restart)
 			{
-				// If VP9 is the only available video codec then use SVC.
-				const firstVideoCodec = this._mediasoupDevice
-					.rtpCapabilities
-					.codecs
-					.find((c) => c.kind === 'video');
+				const stream = await this._screenSharing.start({
+					...VIDEO_CONSTRAINS[screenSharingResolution],
+					frameRate : screenSharingFrameRate
+				});
 
-				let encodings;
+				([ track ] = stream.getVideoTracks());
 
-				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+				if (this._useSharingSimulcast)
 				{
-					encodings = VIDEO_SVC_ENCODINGS;
-				}
-				else if ('simulcastEncodings' in window.config)
-				{
-					encodings = window.config.simulcastEncodings
-						.map((encoding) => ({ ...encoding, dtx: true }));
+					// If VP9 is the only available video codec then use SVC.
+					const firstVideoCodec = this._mediasoupDevice
+						.rtpCapabilities
+						.codecs
+						.find((c) => c.kind === 'video');
+
+					let encodings;
+
+					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+					{
+						encodings = VIDEO_SVC_ENCODINGS;
+					}
+					else if ('simulcastEncodings' in window.config)
+					{
+						encodings = window.config.simulcastEncodings
+							.map((encoding) => ({ ...encoding, dtx: true }));
+					}
+					else
+					{
+						encodings = VIDEO_SIMULCAST_ENCODINGS
+							.map((encoding) => ({ ...encoding, dtx: true }));
+					}
+
+					this._screenSharingProducer = await this._sendTransport.produce(
+						{
+							track,
+							encodings,
+							codecOptions :
+							{
+								videoGoogleStartBitrate : 1000
+							},
+							appData :
+							{
+								source : 'screen'
+							}
+						});
 				}
 				else
 				{
-					encodings = VIDEO_SIMULCAST_ENCODINGS
-						.map((encoding) => ({ ...encoding, dtx: true }));
-				}
-
-				this._screenSharingProducer = await this._sendTransport.produce(
-					{
+					this._screenSharingProducer = await this._sendTransport.produce({
 						track,
-						encodings,
-						codecOptions :
-						{
-							videoGoogleStartBitrate : 1000
-						},
 						appData :
 						{
 							source : 'screen'
 						}
 					});
-			}
-			else
-			{
-				this._screenSharingProducer = await this._sendTransport.produce({
-					track,
-					appData :
+				}
+
+				store.dispatch(producerActions.addProducer(
 					{
-						source : 'screen'
-					}
-				});
-			}
-
-			store.dispatch(producerActions.addProducer(
-				{
-					id            : this._screenSharingProducer.id,
-					deviceLabel   : 'screen',
-					source        : 'screen',
-					paused        : this._screenSharingProducer.paused,
-					track         : this._screenSharingProducer.track,
-					rtpParameters : this._screenSharingProducer.rtpParameters,
-					codec         : this._screenSharingProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
-				}));
-
-			this._screenSharingProducer.on('transportclose', () =>
-			{
-				this._screenSharingProducer = null;
-			});
-
-			this._screenSharingProducer.on('trackended', () =>
-			{
-				store.dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : intl.formatMessage({
-							id             : 'devices.screenSharingDisconnected',
-							defaultMessage : 'Screen sharing disconnected'
-						})
+						id            : this._screenSharingProducer.id,
+						deviceLabel   : 'screen',
+						source        : 'screen',
+						paused        : this._screenSharingProducer.paused,
+						track         : this._screenSharingProducer.track,
+						rtpParameters : this._screenSharingProducer.rtpParameters,
+						codec         : this._screenSharingProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
 					}));
 
-				this.disableScreenSharing()
-					.catch(() => {});
-			});
+				this._screenSharingProducer.on('transportclose', () =>
+				{
+					this._screenSharingProducer = null;
+				});
 
-			logger.debug('enableScreenSharing() succeeded');
+				this._screenSharingProducer.on('trackended', () =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							type : 'error',
+							text : intl.formatMessage({
+								id             : 'devices.screenSharingDisconnected',
+								defaultMessage : 'Screen sharing disconnected'
+							})
+						}));
+
+					this.disableScreenSharing();
+				});
+			}
+			else if (this._screenSharingProducer)
+			{
+				({ track } = this._screenSharingProducer);
+
+				await track.applyConstraints(
+					{
+						...VIDEO_CONSTRAINS[screenSharingResolution],
+						frameRate : screenSharingFrameRate
+					}
+				);
+			}
 		}
 		catch (error)
 		{
-			logger.error('enableScreenSharing() [error:"%o"]', error);
+			logger.error('updateScreenSharing() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{

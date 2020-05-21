@@ -243,7 +243,7 @@ const ButtonControlBar = (props) =>
 					onClick={() =>
 					{
 						if (screenState === 'off')
-							roomClient.enableScreenSharing();
+							roomClient.updateScreenSharing({ restart: true });
 						else if (screenState === 'on')
 							roomClient.disableScreenSharing();
 					}}
