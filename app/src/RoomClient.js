@@ -1450,6 +1450,18 @@ export default class RoomClient
 						...VIDEO_CONSTRAINS[resolution]
 					}
 				);
+
+				// Also change resolution of extra video producers
+				for (const producer of this._extraVideoProducers.values())
+				{
+					({ track } = producer);
+
+					await track.applyConstraints(
+						{
+							...VIDEO_CONSTRAINS[resolution]
+						}
+					);
+				}
 			}
 
 			await this._updateWebcams();
