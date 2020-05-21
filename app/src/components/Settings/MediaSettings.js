@@ -168,7 +168,12 @@ const MediaSettings = ({
 						onChange={(event) =>
 						{
 							if (event.target.value)
-								roomClient.changeWebcam(event.target.value);
+							{
+								roomClient.updateWebcam({
+									restart     : true,
+									newDeviceId : event.target.value
+								});
+							}
 						}}
 						displayEmpty
 						name={intl.formatMessage({
@@ -206,7 +211,7 @@ const MediaSettings = ({
 						onChange={(event) =>
 						{
 							if (event.target.value)
-								roomClient.changeVideoResolution(event.target.value);
+								roomClient.updateWebcam({ newResolution: event.target.value });
 						}}
 						name='Video resolution'
 						autoWidth
@@ -236,7 +241,7 @@ const MediaSettings = ({
 						onChange={(event) =>
 						{
 							if (event.target.value)
-								roomClient.changeAudioDevice(event.target.value);
+								roomClient.updateMic({ restart: true, newDeviceId: event.target.value });
 						}}
 						displayEmpty
 						name={intl.formatMessage({
@@ -338,7 +343,7 @@ const MediaSettings = ({
 											(event) =>
 											{
 												setEchoCancellation(event.target.checked);
-												roomClient.changeAudioDevice(settings.selectedAudioDevice);
+												roomClient.updateMic();
 											}}
 									/>}
 								labelPlacement='start'
@@ -357,7 +362,7 @@ const MediaSettings = ({
 											(event) =>
 											{
 												setAutoGainControl(event.target.checked);
-												roomClient.changeAudioDevice(settings.selectedAudioDevice);
+												roomClient.updateMic();
 											}}
 									/>}
 								labelPlacement='start'
@@ -376,7 +381,7 @@ const MediaSettings = ({
 											(event) =>
 											{
 												setNoiseSuppression(event.target.checked);
-												roomClient.changeAudioDevice(settings.selectedAudioDevice);
+												roomClient.updateMic();
 											}}
 									/>}
 								labelPlacement='start'

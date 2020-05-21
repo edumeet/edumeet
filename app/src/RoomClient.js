@@ -402,7 +402,7 @@ export default class RoomClient
 						}
 						else
 						{
-							this.enableMic();
+							this.updateMic({ restart: true });
 
 							store.dispatch(requestActions.notify(
 								{
@@ -421,7 +421,7 @@ export default class RoomClient
 						if (this._webcamProducer)
 							this.disableWebcam();
 						else
-							this.enableWebcam();
+							this.updateWebcam({ restart: true });
 
 						break;
 					}
@@ -969,7 +969,7 @@ export default class RoomClient
 
 		if (!this._micProducer)
 		{
-			this.enableMic();
+			this.updateMic({ restart: true });
 		}
 		else
 		{
@@ -1126,93 +1126,6 @@ export default class RoomClient
 		});
 	}
 
-	async changeAudioDevice(deviceId)
-	{
-		logger.debug('changeAudioDevice() [deviceId:"%s"]', deviceId);
-
-		store.dispatch(
-			meActions.setAudioInProgress(true));
-
-		store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
-
-		if (!this._micProducer)
-		{ // If mic disabled, enable it, device is correct from settings
-			this.enableMic();
-
-			return;
-		}
-
-		let track;
-
-		try
-		{
-			const device = await this._getAudioDeviceId();
-
-			if (!device)
-				throw new Error('no audio devices');
-
-			this.disconnectLocalHark();
-
-			const {
-				sampleRate,
-				channelCount,
-				volume,
-				autoGainControl,
-				echoCancellation,
-				noiseSuppression,
-				sampleSize
-			} = store.getState().settings;
-
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					audio :
-					{
-						deviceId : { ideal: device },
-						sampleRate,
-						channelCount,
-						volume,
-						autoGainControl,
-						echoCancellation,
-						noiseSuppression,
-						sampleSize
-					}
-				}
-			);
-
-			([ track ] = stream.getAudioTracks());
-
-			await this._micProducer.replaceTrack({ track });
-
-			store.dispatch(
-				producerActions.setProducerTrack(this._micProducer.id, track));
-
-			await this._updateAudioDevices();
-
-			this._micProducer.volume = 0;
-
-			this.connectLocalHark(track);
-		}
-		catch (error)
-		{
-			logger.error('changeAudioDevice() [error:"%o"]', error);
-
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : intl.formatMessage({
-						id             : 'devices.microphoneError',
-						defaultMessage : 'An error occurred while accessing your microphone'
-					})
-				}));
-
-			if (track)
-				track.stop();
-		}
-
-		store.dispatch(
-			meActions.setAudioInProgress(false));
-	}
-
 	async changeAudioOutputDevice(deviceId)
 	{
 		logger.debug('changeAudioOutputDevice() [deviceId:"%s"]', deviceId);
@@ -1240,131 +1153,310 @@ export default class RoomClient
 			meActions.setAudioOutputInProgress(false));
 	}
 
-	async changeVideoResolution(resolution)
+	async updateMic({ restart = false, newDeviceId = null } = {})
 	{
-		logger.debug('changeVideoResolution() [resolution:"%s"]', resolution);
-
-		store.dispatch(
-			meActions.setWebcamInProgress(true));
-
-		try
-		{
-			const deviceId = await this._getWebcamDeviceId();
-
-			const device = this._webcams[deviceId];
-
-			if (!device)
-				throw new Error('no webcam devices');
-
-			this._webcamProducer.track.stop();
-
-			logger.debug('changeVideoResolution() | calling getUserMedia()');
-
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					video :
-					{
-						deviceId : { exact: device.deviceId },
-						...VIDEO_CONSTRAINS[resolution]
-					}
-				});
-
-			if (stream)
-			{
-				const track = stream.getVideoTracks()[0];
-
-				if (track)
-				{
-					if (this._webcamProducer)
-					{
-						await this._webcamProducer.replaceTrack({ track });
-					}
-					else
-					{
-						this._webcamProducer = await this._sendTransport.produce({
-							track,
-							appData :
-							{
-								source : 'webcam'
-							}
-						});
-					}
-
-					store.dispatch(
-						producerActions.setProducerTrack(this._webcamProducer.id, track));
-				}
-				else
-				{
-					logger.warn('getVideoTracks Error: First Video Track is null');
-				}
-
-			}
-			else
-			{
-				logger.warn('getUserMedia Error: Stream is null!');
-			}
-			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
-			store.dispatch(settingsActions.setVideoResolution(resolution));
-
-			await this._updateWebcams();
-		}
-		catch (error)
-		{
-			logger.error('changeVideoResolution() [error:"%o"]', error);
-		}
-
-		store.dispatch(
-			meActions.setWebcamInProgress(false));
-	}
-
-	async changeWebcam(deviceId)
-	{
-		logger.debug('changeWebcam() [deviceId:"%s"]', deviceId);
-
-		store.dispatch(
-			meActions.setWebcamInProgress(true));
-
-		store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
-
-		if (!this._webcamProducer)
-		{ // If webcam disabled, enable it, device is correct
-			this.enableWebcam();
-
-			return;
-		}
+		logger.debug(
+			'updateMic() [restart:"%s", newDeviceId:"%s"]',
+			restart,
+			newDeviceId
+		);
 
 		let track;
 
 		try
 		{
-			const device = await this._getWebcamDeviceId();
-			const resolution = store.getState().settings.resolution;
+			if (!this._mediasoupDevice.canProduce('audio'))
+				throw new Error('cannot produce audio');
+
+			if (newDeviceId && !restart)
+				throw new Error('changing device requires restart');
+
+			if (newDeviceId)
+				store.dispatch(settingsActions.setSelectedAudioDevice(newDeviceId));
+
+			store.dispatch(meActions.setAudioInProgress(true));
+
+			const deviceId = await this._getAudioDeviceId();
+			const device = this._audioDevices[deviceId];
+
+			if (!device)
+				throw new Error('no audio devices');
+
+			const {
+				sampleRate,
+				channelCount,
+				volume,
+				autoGainControl,
+				echoCancellation,
+				noiseSuppression,
+				sampleSize
+			} = store.getState().settings;
+
+			if (restart || !this._micProducer)
+			{
+				this.disconnectLocalHark();
+
+				if (this._micProducer)
+					await this.disableMic();
+
+				const stream = await navigator.mediaDevices.getUserMedia(
+					{
+						audio : {
+							deviceId : { ideal: device.deviceId },
+							sampleRate,
+							channelCount,
+							volume,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
+						}
+					}
+				);
+
+				([ track ] = stream.getAudioTracks());
+
+				this._micProducer = await this._sendTransport.produce(
+					{
+						track,
+						codecOptions :
+						{
+							opusStereo          : false,
+							opusDtx             : true,
+							opusFec             : true,
+							opusPtime           : '3',
+							opusMaxPlaybackRate	: 48000
+						},
+						appData :
+						{ source: 'mic' }
+					});
+
+				store.dispatch(producerActions.addProducer(
+					{
+						id            : this._micProducer.id,
+						source        : 'mic',
+						paused        : this._micProducer.paused,
+						track         : this._micProducer.track,
+						rtpParameters : this._micProducer.rtpParameters,
+						codec         : this._micProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
+					}));
+
+				this._micProducer.on('transportclose', () =>
+				{
+					this._micProducer = null;
+				});
+
+				this._micProducer.on('trackended', () =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							type : 'error',
+							text : intl.formatMessage({
+								id             : 'devices.microphoneDisconnected',
+								defaultMessage : 'Microphone disconnected'
+							})
+						}));
+
+					this.disableMic();
+				});
+
+				this._micProducer.volume = 0;
+
+				this.connectLocalHark(track);
+			}
+			else
+			{
+				({ track } = this._micProducer);
+
+				await track.applyConstraints(
+					{
+						sampleRate,
+						channelCount,
+						volume,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
+					}
+				);
+
+				if (this._harkStream != null)
+				{
+					const [ harkTrack ] = this._harkStream.getAudioTracks();
+
+					harkTrack && await harkTrack.applyConstraints(
+						{
+							sampleRate,
+							channelCount,
+							volume,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
+						}
+					);
+				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('updateMic() [error:"%o"]', error);
+
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'devices.microphoneError',
+						defaultMessage : 'An error occurred while accessing your microphone'
+					})
+				}));
+
+			if (track)
+				track.stop();
+		}
+
+		store.dispatch(meActions.setAudioInProgress(false));
+	}
+
+	async updateWebcam({ restart = false, newDeviceId = null, newResolution = null } = {})
+	{
+		logger.debug(
+			'updateWebcam() [restart:"%s", newDeviceId:"%s", newResolution:"%s"]',
+			restart,
+			newDeviceId,
+			newResolution
+		);
+
+		let track;
+
+		try
+		{
+			if (!this._mediasoupDevice.canProduce('video'))
+				throw new Error('cannot produce video');
+
+			if (newDeviceId && !restart)
+				throw new Error('changing device requires restart');
+
+			if (newDeviceId)
+				store.dispatch(settingsActions.setSelectedWebcamDevice(newDeviceId));
+
+			if (newResolution)
+				store.dispatch(settingsActions.setVideoResolution(newResolution));
+
+			store.dispatch(meActions.setWebcamInProgress(true));
+
+			const deviceId = await this._getWebcamDeviceId();
+			const device = this._webcams[deviceId];
 
 			if (!device)
 				throw new Error('no webcam devices');
 
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					video :
+			const { resolution } = store.getState().settings;
+
+			if (restart || !this._webcamProducer)
+			{
+				if (this._webcamProducer)
+					await this.disableWebcam();
+
+				const stream = await navigator.mediaDevices.getUserMedia(
 					{
-						deviceId : { exact: device },
-						...VIDEO_CONSTRAINS[resolution]
-					}
+						video :
+						{
+							deviceId : { ideal: device.deviceId },
+							...VIDEO_CONSTRAINS[resolution]
+						}
+					});
+
+				([ track ] = stream.getVideoTracks());
+
+				if (this._useSimulcast)
+				{
+					// If VP9 is the only available video codec then use SVC.
+					const firstVideoCodec = this._mediasoupDevice
+						.rtpCapabilities
+						.codecs
+						.find((c) => c.kind === 'video');
+
+					let encodings;
+
+					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+						encodings = VIDEO_KSVC_ENCODINGS;
+					else if ('simulcastEncodings' in window.config)
+						encodings = window.config.simulcastEncodings;
+					else
+						encodings = VIDEO_SIMULCAST_ENCODINGS;
+
+					this._webcamProducer = await this._sendTransport.produce(
+						{
+							track,
+							encodings,
+							codecOptions :
+							{
+								videoGoogleStartBitrate : 1000
+							},
+							appData :
+							{
+								source : 'webcam'
+							}
+						});
+				}
+				else
+				{
+					this._webcamProducer = await this._sendTransport.produce({
+						track,
+						appData :
+						{
+							source : 'webcam'
+						}
+					});
+				}
+
+				store.dispatch(producerActions.addProducer(
+					{
+						id            : this._webcamProducer.id,
+						deviceLabel   : device.label,
+						source        : 'webcam',
+						paused        : this._webcamProducer.paused,
+						track         : this._webcamProducer.track,
+						rtpParameters : this._webcamProducer.rtpParameters,
+						codec         : this._webcamProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
+					}));
+
+				this._webcamProducer.on('transportclose', () =>
+				{
+					this._webcamProducer = null;
 				});
 
-			([ track ] = stream.getVideoTracks());
+				this._webcamProducer.on('trackended', () =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							type : 'error',
+							text : intl.formatMessage({
+								id             : 'devices.cameraDisconnected',
+								defaultMessage : 'Camera disconnected'
+							})
+						}));
 
-			if (this._webcamProducer)
-				await this._webcamProducer.replaceTrack({ track });
+					this.disableWebcam();
+				});
+			}
+			else
+			{
+				({ track } = this._webcamProducer);
 
-			store.dispatch(
-				producerActions.setProducerTrack(this._webcamProducer.id, track));
+				await track.applyConstraints(
+					{
+						...VIDEO_CONSTRAINS[resolution]
+					}
+				);
+			}
 
 			await this._updateWebcams();
 		}
 		catch (error)
 		{
-			logger.error('changeWebcam() [error:"%o"]', error);
+			logger.error('updateWebcam() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3097,7 +3189,7 @@ export default class RoomClient
 				if (this._mediasoupDevice.canProduce('audio'))
 					if (!this._muted)
 					{
-						await this.enableMic();
+						await this.updateMic({ restart: true });
 						let autoMuteThreshold = 4;
 
 						if ('autoMuteThreshold' in window.config)
@@ -3108,8 +3200,8 @@ export default class RoomClient
 							this.muteMic();
 					}
 
-				if (joinVideo && this._mediasoupDevice.canProduce('video'))
-					this.enableWebcam();
+				if (joinVideo)
+					this.updateWebcam({ restart: true });
 			}
 
 			await this._updateAudioOutputDevices();
@@ -3426,136 +3518,6 @@ export default class RoomClient
 			meActions.setWebcamInProgress(false));
 	}
 
-	async enableMic()
-	{
-		logger.debug('enableMic()');
-
-		if (this._micProducer)
-			return;
-
-		if (this._mediasoupDevice && !this._mediasoupDevice.canProduce('audio'))
-		{
-			logger.error('enableMic() | cannot produce audio');
-
-			return;
-		}
-
-		let track;
-
-		store.dispatch(
-			meActions.setAudioInProgress(true));
-
-		try
-		{
-			const deviceId = await this._getAudioDeviceId();
-
-			const device = this._audioDevices[deviceId];
-
-			if (!device)
-				throw new Error('no audio devices');
-
-			const {
-				sampleRate,
-				channelCount,
-				volume,
-				autoGainControl,
-				echoCancellation,
-				noiseSuppression,
-				sampleSize
-			} = store.getState().settings;
-
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					audio : {
-						deviceId : { ideal: device.deviceId },
-						sampleRate,
-						channelCount,
-						volume,
-						autoGainControl,
-						echoCancellation,
-						noiseSuppression,
-						sampleSize
-					}
-				}
-			);
-
-			([ track ] = stream.getAudioTracks());
-
-			this._micProducer = await this._sendTransport.produce(
-				{
-					track,
-					codecOptions :
-					{
-						opusStereo          : false,
-						opusDtx             : true,
-						opusFec             : true,
-						opusPtime           : '3',
-						opusMaxPlaybackRate	: 48000
-					},
-					appData :
-					{ source: 'mic' }
-				});
-
-			store.dispatch(producerActions.addProducer(
-				{
-					id            : this._micProducer.id,
-					source        : 'mic',
-					paused        : this._micProducer.paused,
-					track         : this._micProducer.track,
-					rtpParameters : this._micProducer.rtpParameters,
-					codec         : this._micProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
-				}));
-
-			store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
-
-			await this._updateAudioDevices();
-
-			this._micProducer.on('transportclose', () =>
-			{
-				this._micProducer = null;
-			});
-
-			this._micProducer.on('trackended', () =>
-			{
-				store.dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : intl.formatMessage({
-							id             : 'devices.microphoneDisconnected',
-							defaultMessage : 'Microphone disconnected'
-						})
-					}));
-
-				this.disableMic()
-					.catch(() => {});
-			});
-
-			this._micProducer.volume = 0;
-
-			this.connectLocalHark(track);
-		}
-		catch (error)
-		{
-			logger.error('enableMic() [error:"%o"]', error);
-
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : intl.formatMessage({
-						id             : 'devices.microphoneError',
-						defaultMessage : 'An error occurred while accessing your microphone'
-					})
-				}));
-
-			if (track)
-				track.stop();
-
-		}
-
-		store.dispatch(
-			meActions.setAudioInProgress(false));
-	}
-
 	async disableMic()
 	{
 		logger.debug('disableMic()');
@@ -3750,144 +3712,6 @@ export default class RoomClient
 		this._screenSharing.stop();
 
 		store.dispatch(meActions.setScreenShareInProgress(false));
-	}
-
-	async enableWebcam()
-	{
-		logger.debug('enableWebcam()');
-
-		if (this._webcamProducer)
-			return;
-
-		if (!this._mediasoupDevice.canProduce('video'))
-		{
-			logger.error('enableWebcam() | cannot produce video');
-
-			return;
-		}
-
-		let track;
-
-		store.dispatch(
-			meActions.setWebcamInProgress(true));
-
-		try
-		{
-			const deviceId = await this._getWebcamDeviceId();
-
-			const device = this._webcams[deviceId];
-			const resolution = store.getState().settings.resolution;
-
-			if (!device)
-				throw new Error('no webcam devices');
-
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					video :
-					{
-						deviceId : { ideal: deviceId },
-						...VIDEO_CONSTRAINS[resolution]
-					}
-				});
-
-			([ track ] = stream.getVideoTracks());
-
-			if (this._useSimulcast)
-			{
-				// If VP9 is the only available video codec then use SVC.
-				const firstVideoCodec = this._mediasoupDevice
-					.rtpCapabilities
-					.codecs
-					.find((c) => c.kind === 'video');
-
-				let encodings;
-
-				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-					encodings = VIDEO_KSVC_ENCODINGS;
-				else if ('simulcastEncodings' in window.config)
-					encodings = window.config.simulcastEncodings;
-				else
-					encodings = VIDEO_SIMULCAST_ENCODINGS;
-
-				this._webcamProducer = await this._sendTransport.produce(
-					{
-						track,
-						encodings,
-						codecOptions :
-						{
-							videoGoogleStartBitrate : 1000
-						},
-						appData :
-						{
-							source : 'webcam'
-						}
-					});
-			}
-			else
-			{
-				this._webcamProducer = await this._sendTransport.produce({
-					track,
-					appData :
-					{
-						source : 'webcam'
-					}
-				});
-			}
-
-			store.dispatch(producerActions.addProducer(
-				{
-					id            : this._webcamProducer.id,
-					deviceLabel   : device.label,
-					source        : 'webcam',
-					paused        : this._webcamProducer.paused,
-					track         : this._webcamProducer.track,
-					rtpParameters : this._webcamProducer.rtpParameters,
-					codec         : this._webcamProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
-				}));
-
-			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
-
-			await this._updateWebcams();
-
-			this._webcamProducer.on('transportclose', () =>
-			{
-				this._webcamProducer = null;
-			});
-
-			this._webcamProducer.on('trackended', () =>
-			{
-				store.dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : intl.formatMessage({
-							id             : 'devices.cameraDisconnected',
-							defaultMessage : 'Camera disconnected'
-						})
-					}));
-
-				this.disableWebcam()
-					.catch(() => {});
-			});
-		}
-		catch (error)
-		{
-			logger.error('_setWebcamProducer() [error:"%o"]', error);
-
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : intl.formatMessage({
-						id             : 'devices.cameraError',
-						defaultMessage : 'An error occurred while accessing your camera'
-					})
-				}));
-
-			if (track)
-				track.stop();
-		}
-
-		store.dispatch(
-			meActions.setWebcamInProgress(false));
 	}
 
 	async disableExtraVideo(id)

@@ -466,7 +466,7 @@ const Me = (props) =>
 												onClick={() =>
 												{
 													if (micState === 'off')
-														roomClient.enableMic();
+														roomClient.updateMic({ restart: true });
 													else if (micState === 'on')
 														roomClient.muteMic();
 													else
@@ -500,7 +500,7 @@ const Me = (props) =>
 												onClick={() =>
 												{
 													if (micState === 'off')
-														roomClient.enableMic();
+														roomClient.updateMic({ restart: true });
 													else if (micState === 'on')
 														roomClient.muteMic();
 													else
@@ -538,7 +538,7 @@ const Me = (props) =>
 												{
 													webcamState === 'on' ?
 														roomClient.disableWebcam() :
-														roomClient.enableWebcam();
+														roomClient.updateWebcam({ restart: true });
 												}}
 											>
 												{ webcamState === 'on' ?
@@ -563,7 +563,7 @@ const Me = (props) =>
 												{
 													webcamState === 'on' ?
 														roomClient.disableWebcam() :
-														roomClient.enableWebcam();
+														roomClient.updateWebcam({ restart: true });
 												}}
 											>
 												{ webcamState === 'on' ?
@@ -598,23 +598,10 @@ const Me = (props) =>
 													size='small'
 													onClick={() =>
 													{
-														switch (screenState)
-														{
-															case 'on':
-															{
-																roomClient.disableScreenSharing();
-																break;
-															}
-															case 'off':
-															{
-																roomClient.enableScreenSharing();
-																break;
-															}
-															default:
-															{
-																break;
-															}
-														}
+														if (screenState === 'off')
+															roomClient.enableScreenSharing();
+														else if (screenState === 'on')
+															roomClient.disableScreenSharing();
 													}}
 												>
 													{ (screenState === 'on' || screenState === 'unsupported') &&
@@ -643,23 +630,10 @@ const Me = (props) =>
 													size='large'
 													onClick={() =>
 													{
-														switch (screenState)
-														{
-															case 'on':
-															{
-																roomClient.disableScreenSharing();
-																break;
-															}
-															case 'off':
-															{
-																roomClient.enableScreenSharing();
-																break;
-															}
-															default:
-															{
-																break;
-															}
-														}
+														if (screenState === 'off')
+															roomClient.enableScreenSharing();
+														else if (screenState === 'on')
+															roomClient.disableScreenSharing();
 													}}
 												>
 													{ (screenState === 'on' || screenState === 'unsupported') &&

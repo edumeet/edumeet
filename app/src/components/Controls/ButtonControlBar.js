@@ -191,8 +191,11 @@ const ButtonControlBar = (props) =>
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
 					{
-						micState === 'on' ?
-							roomClient.muteMic() :
+						if (micState === 'off')
+							roomClient.updateMic({ restart: true });
+						else if (micState === 'on')
+							roomClient.muteMic();
+						else
 							roomClient.unmuteMic();
 					}}
 				>
@@ -217,7 +220,7 @@ const ButtonControlBar = (props) =>
 					{
 						webcamState === 'on' ?
 							roomClient.disableWebcam() :
-							roomClient.enableWebcam();
+							roomClient.updateWebcam({ restart: true });
 					}}
 				>
 					{ webcamState === 'on' ?
@@ -239,23 +242,10 @@ const ButtonControlBar = (props) =>
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
 					{
-						switch (screenState)
-						{
-							case 'on':
-							{
-								roomClient.disableScreenSharing();
-								break;
-							}
-							case 'off':
-							{
-								roomClient.enableScreenSharing();
-								break;
-							}
-							default:
-							{
-								break;
-							}
-						}
+						if (screenState === 'off')
+							roomClient.enableScreenSharing();
+						else if (screenState === 'on')
+							roomClient.disableScreenSharing();
 					}}
 				>
 					{ screenState === 'on' || screenState === 'unsupported' ?
