@@ -230,34 +230,36 @@ const ButtonControlBar = (props) =>
 					}
 				</Fab>
 			</Tooltip>
-			<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'right'}>
-				<Fab
-					aria-label={intl.formatMessage({
-						id             : 'device.startScreenSharing',
-						defaultMessage : 'Start screen sharing'
-					})}
-					className={classes.fab}
-					disabled={!me.canShareScreen || me.screenShareInProgress}
-					color={screenState === 'on' ? 'primary' : 'default'}
-					size={smallScreen ? 'large' : 'medium'}
-					onClick={() =>
-					{
-						if (screenState === 'off')
-							roomClient.updateScreenSharing({ start: true });
-						else if (screenState === 'on')
-							roomClient.disableScreenSharing();
-					}}
-				>
-					{ screenState === 'on' || screenState === 'unsupported' ?
-						<ScreenOffIcon/>
-						:null
-					}
-					{ screenState === 'off' ?
-						<ScreenIcon/>
-						:null
-					}
-				</Fab>
-			</Tooltip>
+			{ me.browser.platform !== 'mobile' &&
+				<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'right'}>
+					<Fab
+						aria-label={intl.formatMessage({
+							id             : 'device.startScreenSharing',
+							defaultMessage : 'Start screen sharing'
+						})}
+						className={classes.fab}
+						disabled={!me.canShareScreen || me.screenShareInProgress}
+						color={screenState === 'on' ? 'primary' : 'default'}
+						size={smallScreen ? 'large' : 'medium'}
+						onClick={() =>
+						{
+							if (screenState === 'off')
+								roomClient.updateScreenSharing({ start: true });
+							else if (screenState === 'on')
+								roomClient.disableScreenSharing();
+						}}
+					>
+						{ screenState === 'on' || screenState === 'unsupported' ?
+							<ScreenOffIcon/>
+							:null
+						}
+						{ screenState === 'off' ?
+							<ScreenIcon/>
+							:null
+						}
+					</Fab>
+				</Tooltip>
+			}
 		</div>
 	);
 };
