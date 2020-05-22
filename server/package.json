@@ -1,17 +1,19 @@
 {
 	"name": "multiparty-meeting-server",
-	"version": "3.2.1",
+	"version": "3.3.0",
 	"private": true,
 	"description": "multiparty meeting server",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
 	"license": "MIT",
 	"main": "lib/index.js",
 	"scripts": {
-		"start": "DEBUG=${DEBUG:='*mediasoup* *INFO* *WARN* *ERROR*'} INTERACTIVE=${INTERACTIVE:='true'} node server.js",
-		"connect": "node connect.js"
+		"start": "node server.js",
+		"connect": "node connect.js",
+		"lint": "eslint -c .eslintrc.json --ext .js *.js lib/"
 	},
 	"dependencies": {
 		"awaitqueue": "^1.0.0",
+		"axios": "^0.19.2",
 		"base-64": "^0.1.0",
 		"body-parser": "^1.19.0",
 		"colors": "^1.4.0",
@@ -24,13 +26,19 @@
 		"express-socket.io-session": "^1.3.5",
 		"helmet": "^3.21.2",
 		"ims-lti": "^3.0.2",
-		"mediasoup": "^3.5.5",
+		"jsonwebtoken": "^8.5.1",
+		"mediasoup": "^3.5.14",
 		"openid-client": "^3.7.3",
 		"passport": "^0.4.0",
 		"passport-lti": "0.0.7",
 		"pidusage": "^2.0.17",
+		"prom-client": ">=12.0.0",
 		"redis": "^2.8.0",
 		"socket.io": "^2.3.0",
-		"spdy": "^4.0.1"
+		"spdy": "^4.0.1",
+		"uuid": "^7.0.2"
+	},
+	"devDependencies": {
+		"eslint": "6.8.0"
 	}
 }

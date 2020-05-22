@@ -1,6 +1,6 @@
 {
 	"name": "multiparty-meeting",
-	"version": "3.2.1",
+	"version": "3.3.0",
 	"private": true,
 	"description": "multiparty meeting service",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
@@ -20,17 +20,19 @@
 		"hark": "^1.2.3",
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
-		"mediasoup-client": "^3.5.4",
+		"mediasoup-client": "^3.6.5",
 		"notistack": "^0.9.5",
 		"prop-types": "^15.7.2",
 		"random-string": "^0.2.0",
 		"react": "^16.10.2",
 		"react-cookie-consent": "^2.5.0",
 		"react-dom": "^16.10.2",
+		"react-flip-toolkit": "^7.0.9",
 		"react-intl": "^3.4.0",
 		"react-redux": "^7.1.1",
 		"react-router-dom": "^5.1.2",
-		"react-scripts": "3.0.1",
+		"react-scripts": "3.4.1",
+		"react-wakelock-react16": "0.0.7",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
 		"redux-persist": "^6.0.0",
@@ -48,7 +50,8 @@
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"electron": "electron --no-sandbox .",
-		"dev": "nf start -p 3000"
+		"dev": "nf start -p 3000",
+		"lint": "eslint -c .eslintrc.json --ext .js src"
 	},
 	"browserslist": [
 		">0.2%",
@@ -58,6 +61,7 @@
 	],
 	"devDependencies": {
 		"electron": "^7.1.1",
+		"eslint-plugin-react": "^7.19.0",
 		"foreman": "^3.0.1",
 		"redux-mock-store": "^1.5.3"
 	}

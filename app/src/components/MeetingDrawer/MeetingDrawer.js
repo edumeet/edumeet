@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { raisedHandsSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../actions/toolareaActions';
@@ -51,6 +52,7 @@ const MeetingDrawer = (props) =>
 		currentToolTab,
 		unreadMessages,
 		unreadFiles,
+		raisedHands,
 		closeDrawer,
 		setToolTab,
 		classes,
@@ -93,10 +95,14 @@ const MeetingDrawer = (props) =>
 						}
 					/>
 					<Tab
-						label={intl.formatMessage({
-							id             : 'label.participants',
-							defaultMessage : 'Participants'
-						})}
+						label={
+							<Badge color='secondary' badgeContent={raisedHands}>
+								{intl.formatMessage({
+									id             : 'label.participants',
+									defaultMessage : 'Participants'
+								})}
+							</Badge>
+						}
 					/>
 				</Tabs>
 				<IconButton onClick={closeDrawer}>
@@ -116,16 +122,21 @@ MeetingDrawer.propTypes =
 	setToolTab     : PropTypes.func.isRequired,
 	unreadMessages : PropTypes.number.isRequired,
 	unreadFiles    : PropTypes.number.isRequired,
+	raisedHands    : PropTypes.number.isRequired,
 	closeDrawer    : PropTypes.func.isRequired,
 	classes        : PropTypes.object.isRequired,
 	theme          : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) => ({
-	currentToolTab : state.toolarea.currentToolTab,
-	unreadMessages : state.toolarea.unreadMessages,
-	unreadFiles    : state.toolarea.unreadFiles
-});
+const mapStateToProps = (state) =>
+{
+	return {
+		currentToolTab : state.toolarea.currentToolTab,
+		unreadMessages : state.toolarea.unreadMessages,
+		unreadFiles    : state.toolarea.unreadFiles,
+		raisedHands    : raisedHandsSelector(state)
+	};
+};
 
 const mapDispatchToProps = {
 	setToolTab : toolareaActions.setToolTab
@@ -141,7 +152,8 @@ export default connect(
 			return (
 				prev.toolarea.currentToolTab === next.toolarea.currentToolTab &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
-				prev.toolarea.unreadFiles === next.toolarea.unreadFiles
+				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
+				prev.peers === next.peers
 			);
 		}
 	}

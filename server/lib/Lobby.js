@@ -14,7 +14,7 @@ class Lobby extends EventEmitter
 		// Closed flag.
 		this._closed = false;
 
-		this._peers = new Map();
+		this._peers = {};
 	}
 
 	close()
@@ -23,67 +23,73 @@ class Lobby extends EventEmitter
 
 		this._closed = true;
 
-		this._peers.forEach((peer) =>
+		// Close the peers.
+		for (const peer in this._peers)
 		{
-			if (!peer.closed)
-				peer.close();
-		});
+			if (!this._peers[peer].closed)
+				this._peers[peer].close();
+		}
 
-		this._peers.clear();
+		this._peers = null;
 	}
 
 	checkEmpty()
 	{
 		logger.info('checkEmpty()');
-		
-		return this._peers.size === 0;
+
+		return Object.keys(this._peers).length === 0;
 	}
 
 	peerList()
 	{
 		logger.info('peerList()');
 
-		return Array.from(this._peers.values()).map((peer) =>
+		return Object.values(this._peers).map((peer) =>
 			({
-				peerId      : peer.id,
-				displayName : peer.displayName 
+				id          : peer.id,
+				displayName : peer.displayName,
+				picture     : peer.picture
 			}));
 	}
 
 	hasPeer(peerId)
 	{
-		return this._peers.has(peerId);
+		return this._peers[peerId] != null;
 	}
 
 	promoteAllPeers()
 	{
 		logger.info('promoteAllPeers()');
 
-		this._peers.forEach((peer) =>
+		for (const peer in this._peers)
 		{
-			if (peer.socket)
-				this.promotePeer(peer.id);
-		});
+			if (!this._peers[peer].closed)
+				this.promotePeer(peer);
+		}
 	}
 
 	promotePeer(peerId)
 	{
 		logger.info('promotePeer() [peer:"%s"]', peerId);
 
-		const peer = this._peers.get(peerId);
+		const peer = this._peers[peerId];
 
 		if (peer)
 		{
 			peer.socket.removeListener('request', peer.socketRequestHandler);
-			peer.removeListener('authenticationChanged', peer.authenticationHandler);
+			peer.removeListener('gotRole', peer.gotRoleHandler);
+			peer.removeListener('displayNameChanged', peer.displayNameChangeHandler);
+			peer.removeListener('pictureChanged', peer.pictureChangeHandler);
 			peer.removeListener('close', peer.closeHandler);
 
 			peer.socketRequestHandler = null;
-			peer.authenticationHandler = null;
+			peer.gotRoleHandler = null;
+			peer.displayNameChangeHandler = null;
+			peer.pictureChangeHandler = null;
 			peer.closeHandler = null;
 
 			this.emit('promotePeer', peer);
-			this._peers.delete(peerId);
+			delete this._peers[peerId];
 		}
 	}
 
@@ -99,7 +105,7 @@ class Lobby extends EventEmitter
 			logger.debug(
 				'Peer "request" event [method:"%s", peer:"%s"]',
 				request.method, peer.id);
-			
+
 			if (this._closed)
 				return;
 
@@ -112,16 +118,25 @@ class Lobby extends EventEmitter
 				});
 		};
 
-		peer.authenticationHandler = () =>
+		peer.gotRoleHandler = () =>
 		{
-			logger.info('parkPeer() | authenticationChange [peer:"%s"]', peer.id);
+			logger.info('parkPeer() | rolesChange [peer:"%s"]', peer.id);
 
-			if (peer.authenticated)
-			{
-				this.emit('changeDisplayName', peer);
-				this.emit('changePicture', peer);
-				this.emit('peerAuthenticated', peer);
-			}
+			this.emit('peerRolesChanged', peer);
+		};
+
+		peer.displayNameChangeHandler = () =>
+		{
+			logger.info('parkPeer() | displayNameChange [peer:"%s"]', peer.id);
+
+			this.emit('changeDisplayName', peer);
+		};
+
+		peer.pictureChangeHandler = () =>
+		{
+			logger.info('parkPeer() | pictureChange [peer:"%s"]', peer.id);
+
+			this.emit('changePicture', peer);
 		};
 
 		peer.closeHandler = () =>
@@ -133,21 +148,23 @@ class Lobby extends EventEmitter
 
 			this.emit('peerClosed', peer);
 
-			this._peers.delete(peer.id);
+			delete this._peers[peer.id];
 
 			if (this.checkEmpty())
 				this.emit('lobbyEmpty');
 		};
 
-		this._notification(peer.socket, 'enteredLobby');
+		this._peers[peer.id] = peer;
 
-		this._peers.set(peer.id, peer);
-
-		peer.on('authenticationChanged', peer.authenticationHandler);
+		peer.on('gotRole', peer.gotRoleHandler);
+		peer.on('displayNameChanged', peer.displayNameChangeHandler);
+		peer.on('pictureChanged', peer.pictureChangeHandler);
 
 		peer.socket.on('request', peer.socketRequestHandler);
 
 		peer.on('close', peer.closeHandler);
+
+		this._notification(peer.socket, 'enteredLobby');
 	}
 
 	async _handleSocketRequest(peer, request, cb)
@@ -169,19 +186,16 @@ class Lobby extends EventEmitter
 
 				peer.displayName = displayName;
 
-				this.emit('changeDisplayName', peer);
-
 				cb();
 
 				break;
-			}			
+			}
+
 			case 'changePicture':
 			{
 				const { picture } = request.data;
 
 				peer.picture = picture;
-
-				this.emit('changePicture', peer);
 
 				cb();
 

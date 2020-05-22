@@ -96,11 +96,6 @@ const FullScreenView = (props) =>
 		!consumer.remotelyPaused
 	);
 
-	let consumerProfile;
-
-	if (consumer)
-		consumerProfile = consumer.profile;
-
 	return (
 		<div className={classes.root}>
 			<div className={classes.controls}>
@@ -121,9 +116,25 @@ const FullScreenView = (props) =>
 			<VideoView
 				advancedMode={advancedMode}
 				videoContain
-				videoTrack={consumer ? consumer.track : null}
+				consumerSpatialLayers={consumer ? consumer.spatialLayers : null}
+				consumerTemporalLayers={consumer ? consumer.temporalLayers : null}
+				consumerCurrentSpatialLayer={
+					consumer ? consumer.currentSpatialLayer : null
+				}
+				consumerCurrentTemporalLayer={
+					consumer ? consumer.currentTemporalLayer : null
+				}
+				consumerPreferredSpatialLayer={
+					consumer ? consumer.preferredSpatialLayer : null
+				}
+				consumerPreferredTemporalLayer={
+					consumer ? consumer.preferredTemporalLayer : null
+				}
+				videoMultiLayer={consumer && consumer.type !== 'simple'}
+				videoTrack={consumer && consumer.track}
 				videoVisible={consumerVisible}
-				videoProfile={consumerProfile}
+				videoCodec={consumer && consumer.codec}
+				videoScore={consumer ? consumer.score : null}
 			/>
 		</div>
 	);
@@ -135,7 +146,7 @@ FullScreenView.propTypes =
 	consumer                 : appPropTypes.Consumer,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toolbarsVisible          : PropTypes.bool,
-	permanentTopBar             : PropTypes.bool,
+	permanentTopBar          : PropTypes.bool,
 	classes                  : PropTypes.object.isRequired
 };
 
@@ -143,7 +154,7 @@ const mapStateToProps = (state) =>
 	({
 		consumer        : state.consumers[state.room.fullScreenConsumer],
 		toolbarsVisible : state.room.toolbarsVisible,
-		permanentTopBar    : state.settings.permanentTopBar
+		permanentTopBar : state.settings.permanentTopBar
 	});
 
 const mapDispatchToProps = (dispatch) =>

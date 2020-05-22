@@ -11,10 +11,9 @@ import Peer from '../Containers/Peer';
 import Me from '../Containers/Me';
 
 const RATIO = 1.334;
-const PADDING_V = 50;
-const PADDING_H = 0;
+const PADDING = 60;
 
-const styles = () =>
+const styles = (theme) =>
 	({
 		root :
 		{
@@ -23,6 +22,7 @@ const styles = () =>
 			display        : 'flex',
 			flexDirection  : 'row',
 			flexWrap       : 'wrap',
+			overflow       : 'hidden',
 			justifyContent : 'center',
 			alignItems     : 'center',
 			alignContent   : 'center'
@@ -36,6 +36,14 @@ const styles = () =>
 		{
 			paddingTop : 60,
 			transition : 'padding .5s'
+		},
+		buttonControlBar :
+		{
+			paddingLeft                    : 60,
+			[theme.breakpoints.down('sm')] :
+			{
+				paddingLeft : 0
+			}
 		}
 	});
 
@@ -66,9 +74,11 @@ class Democratic extends React.PureComponent
 			return;
 		}
 
-		const width = this.peersRef.current.clientWidth - PADDING_H;
-		const height = this.peersRef.current.clientHeight -
-			(this.props.toolbarsVisible || this.props.permanentTopBar ? PADDING_V : PADDING_H);
+		const width =
+			this.peersRef.current.clientWidth - (this.props.buttonControlBar ? PADDING : 0);
+		const height =
+			this.peersRef.current.clientHeight -
+			(this.props.toolbarsVisible || this.props.permanentTopBar ? PADDING : 0);
 
 		let x, y, space;
 
@@ -130,6 +140,7 @@ class Democratic extends React.PureComponent
 			spotlightsPeers,
 			toolbarsVisible,
 			permanentTopBar,
+			buttonControlBar,
 			classes
 		} = this.props;
 
@@ -143,7 +154,9 @@ class Democratic extends React.PureComponent
 			<div
 				className={classnames(
 					classes.root,
-					toolbarsVisible || permanentTopBar ? classes.showingToolBar : classes.hiddenToolBar
+					toolbarsVisible || permanentTopBar ?
+						classes.showingToolBar : classes.hiddenToolBar,
+					buttonControlBar ? classes.buttonControlBar : null
 				)}
 				ref={this.peersRef}
 			>
@@ -175,17 +188,21 @@ Democratic.propTypes =
 	boxes            : PropTypes.number,
 	spotlightsPeers  : PropTypes.array.isRequired,
 	toolbarsVisible  : PropTypes.bool.isRequired,
-	permanentTopBar     : PropTypes.bool,
+	permanentTopBar  : PropTypes.bool.isRequired,
+	buttonControlBar : PropTypes.bool.isRequired,
+	toolAreaOpen     : PropTypes.bool.isRequired,
 	classes          : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		boxes           : videoBoxesSelector(state),
-		spotlightsPeers : spotlightPeersSelector(state),
-		toolbarsVisible : state.room.toolbarsVisible,
-		permanentTopBar    : state.settings.permanentTopBar
+		boxes            : videoBoxesSelector(state),
+		spotlightsPeers  : spotlightPeersSelector(state),
+		toolbarsVisible  : state.room.toolbarsVisible,
+		permanentTopBar  : state.settings.permanentTopBar,
+		buttonControlBar : state.settings.buttonControlBar,
+		toolAreaOpen     : state.toolarea.toolAreaOpen
 	};
 };
 
@@ -202,8 +219,10 @@ export default connect(
 				prev.consumers === next.consumers &&
 				prev.room.spotlights === next.room.spotlights &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
-				prev.settings.permanentTopBar === next.settings.permanentTopBar
+				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
+				prev.settings.buttonControlBar === next.settings.buttonControlBar &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}
 	}
-)(withStyles(styles)(Democratic));
+)(withStyles(styles, { withTheme: true })(Democratic));

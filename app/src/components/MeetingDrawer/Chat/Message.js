@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import DOMPurify from 'dompurify'; 
+import DOMPurify from 'dompurify';
 import marked from 'marked';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import { useIntl } from 'react-intl';
 
 const linkRenderer = new marked.Renderer();
 
@@ -13,7 +14,7 @@ linkRenderer.link = (href, title, text) =>
 {
 	title = title ? title : href;
 	text = text ? text : href;
-	
+
 	return `<a target='_blank' href='${ href }' title='${ title }'>${ text }</a>`;
 };
 
@@ -55,6 +56,8 @@ const styles = (theme) =>
 
 const Message = (props) =>
 {
+	const intl = useIntl();
+
 	const {
 		self,
 		picture,
@@ -88,7 +91,16 @@ const Message = (props) =>
 						}
 					) }}
 				/>
-				<Typography variant='caption'>{self ? 'Me' : name} - {time}</Typography>
+				<Typography variant='caption'>
+					{ self ?
+						intl.formatMessage({
+							id             : 'room.me',
+							defaultMessage : 'Me'
+						})
+						:
+						name
+					} - {time}
+				</Typography>
 			</div>
 		</Paper>
 	);

@@ -110,6 +110,11 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
+		case 'CLEAR_CONSUMERS':
+		{
+			return initialState;
+		}
+
 		default:
 			return state;
 	}

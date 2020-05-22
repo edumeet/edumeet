@@ -12,6 +12,7 @@ export default class Spotlights extends EventEmitter
 		this._signalingSocket = signalingSocket;
 		this._maxSpotlights = maxSpotlights;
 		this._peerList = [];
+		this._unmutablePeerList = [];
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
 		this._started = false;
@@ -45,12 +46,80 @@ export default class Spotlights extends EventEmitter
 		}
 	}
 
+	getNextAsSelected(peerId)
+	{
+		let newSelectedPeer = null;
+
+		if (peerId == null && this._unmutablePeerList.length > 0)
+		{
+			peerId = this._unmutablePeerList[0];
+		}
+
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length)
+		{
+			const oldIndex = this._unmutablePeerList.indexOf(peerId);
+
+			let index = oldIndex;
+
+			index++;
+			for (let i = 0; i < this._unmutablePeerList.length; i++)
+			{
+				if (index >= this._unmutablePeerList.length)
+				{
+					index = 0;
+				}
+				newSelectedPeer = this._unmutablePeerList[index];
+				if (!this._currentSpotlights.includes(newSelectedPeer))
+				{
+					break;
+				}
+				index++;
+			}
+		}
+
+		return newSelectedPeer;
+	}
+
+	getPrevAsSelected(peerId)
+	{
+		let newSelectedPeer = null;
+
+		if (peerId == null && this._unmutablePeerList.length > 0)
+		{
+			peerId = this._unmutablePeerList[0];
+		}
+
+		if (peerId != null && this._currentSpotlights.length < this._unmutablePeerList.length)
+		{
+			const oldIndex = this._unmutablePeerList.indexOf(peerId);
+
+			let index = oldIndex;
+
+			index--;
+			for (let i = 0; i < this._unmutablePeerList.length; i++)
+			{
+				if (index < 0)
+				{
+					index = this._unmutablePeerList.length - 1;
+				}
+				newSelectedPeer = this._unmutablePeerList[index];
+				if (!this._currentSpotlights.includes(newSelectedPeer))
+				{
+					break;
+				}
+				index--;
+			}
+		}
+
+		return newSelectedPeer;
+	}
+
 	setPeerSpotlight(peerId)
 	{
 		logger.debug('setPeerSpotlight() [peerId:"%s"]', peerId);
 
 		const index = this._selectedSpotlights.indexOf(peerId);
-		
+
 		if (index !== -1)
 		{
 			this._selectedSpotlights = [];
@@ -95,16 +164,26 @@ export default class Spotlights extends EventEmitter
 		});
 	}
 
+	clearSpotlights()
+	{
+		this._started = false;
+
+		this._peerList = [];
+		this._selectedSpotlights = [];
+		this._currentSpotlights = [];
+	}
+
 	_newPeer(id)
 	{
 		logger.debug(
 			'room "newpeer" event [id: "%s"]', id);
-		
+
 		if (this._peerList.indexOf(id) === -1) // We don't have this peer in the list
 		{
 			logger.debug('_handlePeer() | adding peer [peerId: "%s"]', id);
 
 			this._peerList.push(id);
+			this._unmutablePeerList.push(id);
 
 			if (this._started)
 				this._spotlightsUpdated();
@@ -116,19 +195,10 @@ export default class Spotlights extends EventEmitter
 		logger.debug(
 			'room "peerClosed" event [peerId:%o]', id);
 
-		let index = this._peerList.indexOf(id);
+		this._peerList = this._peerList.filter((peer) => peer !== id);
+		this._unmutablePeerList = this._unmutablePeerList.filter((peer) => peer !== id);
 
-		if (index !== -1) // We have this peer in the list, remove
-		{
-			this._peerList.splice(index, 1);
-		}
-
-		index = this._selectedSpotlights.indexOf(id);
-
-		if (index !== -1) // We have this peer in the list, remove
-		{
-			this._selectedSpotlights.splice(index, 1);
-		}
+		this._selectedSpotlights = this._selectedSpotlights.filter((peer) => peer !== id);
 
 		if (this._started)
 			this._spotlightsUpdated();

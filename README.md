@@ -23,11 +23,11 @@ If you want the ansible approach, you can find ansible role [here](https://githu
 
 ## Manual installation
 * Prerequisites:
-Currently multiparty-meeting will only run on nodejs v10.*
+Currently multiparty-meeting will only run on nodejs v13.x
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
-$ sudo apt install npm build-essential redis
+$ sudo apt install git npm build-essential redis
 ```
 
 * Clone the project:
@@ -113,7 +113,7 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 
 ## TURN configuration
 
-* You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `app/public/config/config.js`
+* You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `server/config/config.js`
 
 ## Community-driven support
 
@@ -134,7 +134,7 @@ This started as a fork of the [work](https://github.com/versatica/mediasoup-demo
 
 ## License
 
-MIT
+MIT License (see `LICENSE.md`)
 
 
 Contributions to this work were made on behalf of the GÉANT project, a project that has received funding from the European Union’s Horizon 2020 research and innovation programme under Grant Agreement No. 731122 (GN4-2). On behalf of GÉANT project, GÉANT Association is the sole owner of the copyright in all material which was developed by a member of the GÉANT project.
