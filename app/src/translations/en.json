@@ -144,6 +144,7 @@
 	"settings.notificationSounds": "Notification sounds",
 	"settings.showNotifications": "Show notifications",
 	"settings.buttonControlBar": "Separate media controls",
+	"settings.showAdvancedVideo": "Advanced video settings",
 	"settings.showAdvancedAudio": "Advanced audio settings",
 	"settings.echoCancellation": "Echo cancellation",
 	"settings.autoGainControl": "Auto gain control",

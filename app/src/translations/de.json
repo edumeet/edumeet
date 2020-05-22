@@ -144,6 +144,7 @@
 	"settings.notificationSounds": "Audiosignal bei Benachrichtigungen",
 	"settings.showNotifications": "Zeige Benachrichtigungen",
 	"settings.buttonControlBar": "Separate seitliche Medienwerkzeugleiste",
+	"settings.showAdvancedVideo": null,
 	"settings.showAdvancedAudio": "Erweiterte Audio-Einstellungen",
 	"settings.echoCancellation": "Echounterdrückung",
 	"settings.autoGainControl": "Automatische Pegelregelung (Audioeingang)",

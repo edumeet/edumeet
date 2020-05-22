@@ -95,6 +95,9 @@ const MediaSettings = ({
 {
 	const intl = useIntl();
 
+	const [ audioSettingsOpen, setAudioSettingsOpen ] = React.useState(false);
+	const [ videoSettingsOpen, setVideoSettingsOpen ] = React.useState(false);
+
 	const resolutions = [ {
 		value : 'low',
 		label : intl.formatMessage({
@@ -152,13 +155,6 @@ const MediaSettings = ({
 	else
 		audioOutputDevices = [];
 
-	const [ open, setOpen ] = React.useState(true);
-
-	const advancedAudioSettings = () =>
-	{
-		setOpen(!open);
-	};
-
 	return (
 		<React.Fragment>
 			<form className={classes.setting} autoComplete='off'>
@@ -205,118 +201,130 @@ const MediaSettings = ({
 						}
 					</FormHelperText>
 				</FormControl>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={settings.resolution || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								roomClient.updateWebcam({ newResolution: event.target.value });
-						}}
-						name='Video resolution'
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{resolutions.map((resolution, index) =>
-						{
-							return (
-								<MenuItem key={index} value={resolution.value}>
-									{resolution.label}
-								</MenuItem>
-							);
+				<List className={classes.root} component='nav'>
+					<ListItem button onClick={() => setVideoSettingsOpen(!videoSettingsOpen)}>
+						<ListItemText primary={intl.formatMessage({
+							id             : 'settings.showAdvancedVideo',
+							defaultMessage : 'Advanced video settings'
 						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.resolution'
-							defaultMessage='Select your video resolution'
 						/>
-					</FormHelperText>
-				</FormControl>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={settings.frameRate || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								roomClient.updateWebcam({ newFrameRate: event.target.value });
-						}}
-						name='Frame rate'
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{ [ 1, 5, 10, 15, 20, 25, 30 ].map((frameRate) =>
-						{
-							return (
-								<MenuItem key={frameRate} value={frameRate}>
-									{frameRate}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.frameRate'
-							defaultMessage='Select your video frame rate'
-						/>
-					</FormHelperText>
-				</FormControl>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={settings.screenSharingResolution || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								roomClient.updateScreenSharing({ newResolution: event.target.value });
-						}}
-						name='Screen sharing resolution'
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{resolutions.map((resolution, index) =>
-						{
-							return (
-								<MenuItem key={index} value={resolution.value}>
-									{resolution.label}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.screenSharingResolution'
-							defaultMessage='Select your screen sharing resolution'
-						/>
-					</FormHelperText>
-				</FormControl>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={settings.screenSharingFrameRate || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								roomClient.updateScreenSharing({ newFrameRate: event.target.value });
-						}}
-						name='Frame rate'
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{ [ 1, 5, 10, 15, 20, 25, 30 ].map((screenSharingFrameRate) =>
-						{
-							return (
-								<MenuItem key={screenSharingFrameRate} value={screenSharingFrameRate}>
-									{screenSharingFrameRate}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.screenSharingFrameRate'
-							defaultMessage='Select your screen sharing frame rate'
-						/>
-					</FormHelperText>
-				</FormControl>
+						{videoSettingsOpen ? <ExpandLess /> : <ExpandMore />}
+					</ListItem>
+					<Collapse in={videoSettingsOpen} timeout='auto'>
+						<FormControl className={classes.formControl}>
+							<Select
+								value={settings.resolution || ''}
+								onChange={(event) =>
+								{
+									if (event.target.value)
+										roomClient.updateWebcam({ newResolution: event.target.value });
+								}}
+								name='Video resolution'
+								autoWidth
+								className={classes.selectEmpty}
+							>
+								{resolutions.map((resolution, index) =>
+								{
+									return (
+										<MenuItem key={index} value={resolution.value}>
+											{resolution.label}
+										</MenuItem>
+									);
+								})}
+							</Select>
+							<FormHelperText>
+								<FormattedMessage
+									id='settings.resolution'
+									defaultMessage='Select your video resolution'
+								/>
+							</FormHelperText>
+						</FormControl>
+						<FormControl className={classes.formControl}>
+							<Select
+								value={settings.frameRate || ''}
+								onChange={(event) =>
+								{
+									if (event.target.value)
+										roomClient.updateWebcam({ newFrameRate: event.target.value });
+								}}
+								name='Frame rate'
+								autoWidth
+								className={classes.selectEmpty}
+							>
+								{ [ 1, 5, 10, 15, 20, 25, 30 ].map((frameRate) =>
+								{
+									return (
+										<MenuItem key={frameRate} value={frameRate}>
+											{frameRate}
+										</MenuItem>
+									);
+								})}
+							</Select>
+							<FormHelperText>
+								<FormattedMessage
+									id='settings.frameRate'
+									defaultMessage='Select your video frame rate'
+								/>
+							</FormHelperText>
+						</FormControl>
+						<FormControl className={classes.formControl}>
+							<Select
+								value={settings.screenSharingResolution || ''}
+								onChange={(event) =>
+								{
+									if (event.target.value)
+										roomClient.updateScreenSharing({ newResolution: event.target.value });
+								}}
+								name='Screen sharing resolution'
+								autoWidth
+								className={classes.selectEmpty}
+							>
+								{resolutions.map((resolution, index) =>
+								{
+									return (
+										<MenuItem key={index} value={resolution.value}>
+											{resolution.label}
+										</MenuItem>
+									);
+								})}
+							</Select>
+							<FormHelperText>
+								<FormattedMessage
+									id='settings.screenSharingResolution'
+									defaultMessage='Select your screen sharing resolution'
+								/>
+							</FormHelperText>
+						</FormControl>
+						<FormControl className={classes.formControl}>
+							<Select
+								value={settings.screenSharingFrameRate || ''}
+								onChange={(event) =>
+								{
+									if (event.target.value)
+										roomClient.updateScreenSharing({ newFrameRate: event.target.value });
+								}}
+								name='Frame rate'
+								autoWidth
+								className={classes.selectEmpty}
+							>
+								{ [ 1, 5, 10, 15, 20, 25, 30 ].map((screenSharingFrameRate) =>
+								{
+									return (
+										<MenuItem key={screenSharingFrameRate} value={screenSharingFrameRate}>
+											{screenSharingFrameRate}
+										</MenuItem>
+									);
+								})}
+							</Select>
+							<FormHelperText>
+								<FormattedMessage
+									id='settings.screenSharingFrameRate'
+									defaultMessage='Select your screen sharing frame rate'
+								/>
+							</FormHelperText>
+						</FormControl>
+					</Collapse>
+				</List>
 			</form>
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
@@ -357,10 +365,8 @@ const MediaSettings = ({
 						}
 					</FormHelperText>
 				</FormControl>
-			</form>
-			{ 'audioOutputSupportedBrowsers' in window.config &&
-				window.config.audioOutputSupportedBrowsers.includes(me.browser.name) &&
-				<form className={classes.setting} autoComplete='off'>
+				{ 'audioOutputSupportedBrowsers' in window.config &&
+					window.config.audioOutputSupportedBrowsers.includes(me.browser.name) &&
 					<FormControl className={classes.formControl}>
 						<Select
 							value={settings.selectedAudioOutputDevice || ''}
@@ -404,122 +410,122 @@ const MediaSettings = ({
 							}
 						</FormHelperText>
 					</FormControl>
-				</form>
-			}
-			<List className={classes.root} component='nav'>
-				<ListItem button onClick={advancedAudioSettings}>
-					<ListItemText primary={intl.formatMessage({
-						id             : 'settings.showAdvancedAudio',
-						defaultMessage : 'Show advanced audio settings'
-					})}
-					/>
-					{open ? <ExpandLess /> : <ExpandMore />}
-				</ListItem>
-				<Collapse in={!open} timeout='auto'>
-					<List component='div'>
-						<ListItem className={classes.nested}>
-							<FormControlLabel
-								className={classnames(classes.setting, classes.switchLabel)}
-								control={
-									<Switch color='secondary'
-										checked={settings.echoCancellation}
-										onChange={
-											(event) =>
-											{
-												setEchoCancellation(event.target.checked);
-												roomClient.updateMic();
-											}}
-									/>}
-								labelPlacement='start'
-								label={intl.formatMessage({
-									id             : 'settings.echoCancellation',
-									defaultMessage : 'Echo cancellation'
-								})}
-							/>
-						</ListItem>
-						<ListItem className={classes.nested}>
-							<FormControlLabel
-								className={classnames(classes.setting, classes.switchLabel)}
-								control={
-									<Switch color='secondary'
-										checked={settings.autoGainControl} onChange={
-											(event) =>
-											{
-												setAutoGainControl(event.target.checked);
-												roomClient.updateMic();
-											}}
-									/>}
-								labelPlacement='start'
-								label={intl.formatMessage({
-									id             : 'settings.autoGainControl',
-									defaultMessage : 'Auto gain control'
-								})}
-							/>
-						</ListItem>
-						<ListItem className={classes.nested}>
-							<FormControlLabel
-								className={classnames(classes.setting, classes.switchLabel)}
-								control={
-									<Switch color='secondary'
-										checked={settings.noiseSuppression} onChange={
-											(event) =>
-											{
-												setNoiseSuppression(event.target.checked);
-												roomClient.updateMic();
-											}}
-									/>}
-								labelPlacement='start'
-								label={intl.formatMessage({
-									id             : 'settings.noiseSuppression',
-									defaultMessage : 'Noise suppression'
-								})}
-							/>
-						</ListItem>
-						<ListItem className={classes.nested}>
-							<FormControlLabel
-								className={classnames(classes.setting, classes.switchLabel)}
-								control={
-									<Switch color='secondary'
-										checked={settings.voiceActivatedUnmute} onChange={
-											(event) =>
-											{
-												setVoiceActivatedUnmute(event.target.checked);
-											}}
-									/>}
-								labelPlacement='start'
-								label={intl.formatMessage({
-									id             : 'settings.voiceActivatedUnmute',
-									defaultMessage : 'Voice activated unmute'
-								})}
-							/>
-						</ListItem>
-						<ListItem className={classes.nested}>
-							<div className={classes.margin} />
-							<Typography gutterBottom>
-								{
-									intl.formatMessage({
-										id             : 'settings.noiseThreshold',
-										defaultMessage : 'Noise threshold'
-									})
-								}:
-							</Typography>
-							<NoiseSlider className={classnames(classes.slider, classnames.setting)}
-								key={'noise-threshold-slider'}
-								min={-100}
-								value={settings.noiseThreshold}
-								max={0}
-								valueLabelDisplay={'auto'}
-								onChange={
-									(event, value) =>
+				}
+				<List className={classes.root} component='nav'>
+					<ListItem button onClick={() => setAudioSettingsOpen(!audioSettingsOpen)}>
+						<ListItemText primary={intl.formatMessage({
+							id             : 'settings.showAdvancedAudio',
+							defaultMessage : 'Advanced audio settings'
+						})}
+						/>
+						{audioSettingsOpen ? <ExpandLess /> : <ExpandMore />}
+					</ListItem>
+					<Collapse in={audioSettingsOpen} timeout='auto'>
+						<List component='div'>
+							<ListItem className={classes.nested}>
+								<FormControlLabel
+									className={classnames(classes.setting, classes.switchLabel)}
+									control={
+										<Switch color='secondary'
+											checked={settings.echoCancellation}
+											onChange={
+												(event) =>
+												{
+													setEchoCancellation(event.target.checked);
+													roomClient.updateMic();
+												}}
+										/>}
+									labelPlacement='start'
+									label={intl.formatMessage({
+										id             : 'settings.echoCancellation',
+										defaultMessage : 'Echo cancellation'
+									})}
+								/>
+							</ListItem>
+							<ListItem className={classes.nested}>
+								<FormControlLabel
+									className={classnames(classes.setting, classes.switchLabel)}
+									control={
+										<Switch color='secondary'
+											checked={settings.autoGainControl} onChange={
+												(event) =>
+												{
+													setAutoGainControl(event.target.checked);
+													roomClient.updateMic();
+												}}
+										/>}
+									labelPlacement='start'
+									label={intl.formatMessage({
+										id             : 'settings.autoGainControl',
+										defaultMessage : 'Auto gain control'
+									})}
+								/>
+							</ListItem>
+							<ListItem className={classes.nested}>
+								<FormControlLabel
+									className={classnames(classes.setting, classes.switchLabel)}
+									control={
+										<Switch color='secondary'
+											checked={settings.noiseSuppression} onChange={
+												(event) =>
+												{
+													setNoiseSuppression(event.target.checked);
+													roomClient.updateMic();
+												}}
+										/>}
+									labelPlacement='start'
+									label={intl.formatMessage({
+										id             : 'settings.noiseSuppression',
+										defaultMessage : 'Noise suppression'
+									})}
+								/>
+							</ListItem>
+							<ListItem className={classes.nested}>
+								<FormControlLabel
+									className={classnames(classes.setting, classes.switchLabel)}
+									control={
+										<Switch color='secondary'
+											checked={settings.voiceActivatedUnmute} onChange={
+												(event) =>
+												{
+													setVoiceActivatedUnmute(event.target.checked);
+												}}
+										/>}
+									labelPlacement='start'
+									label={intl.formatMessage({
+										id             : 'settings.voiceActivatedUnmute',
+										defaultMessage : 'Voice activated unmute'
+									})}
+								/>
+							</ListItem>
+							<ListItem className={classes.nested}>
+								<div className={classes.margin} />
+								<Typography gutterBottom>
 									{
-										roomClient._setNoiseThreshold(value);
-									}}
-								marks={[ { value: volume, label: `${volume} dB` } ]}
-							/>
-						</ListItem>
-					</List>
-				</Collapse>
-			</List>
+										intl.formatMessage({
+											id             : 'settings.noiseThreshold',
+											defaultMessage : 'Noise threshold'
+										})
+									}:
+								</Typography>
+								<NoiseSlider className={classnames(classes.slider, classnames.setting)}
+									key={'noise-threshold-slider'}
+									min={-100}
+									value={settings.noiseThreshold}
+									max={0}
+									valueLabelDisplay={'auto'}
+									onChange={
+										(event, value) =>
+										{
+											roomClient._setNoiseThreshold(value);
+										}}
+									marks={[ { value: volume, label: `${volume} dB` } ]}
+								/>
+							</ListItem>
+						</List>
+					</Collapse>
+				</List>
+			</form>
 		</React.Fragment>
 	);
 };
