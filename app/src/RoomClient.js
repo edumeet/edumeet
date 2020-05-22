@@ -1153,12 +1153,13 @@ export default class RoomClient
 			meActions.setAudioOutputInProgress(false));
 	}
 
-	async updateMic({ restart = false, newDeviceId = null } = {})
+	async updateMic({ restart = false, newDeviceId = null, exactDevice = false } = {})
 	{
 		logger.debug(
-			'updateMic() [restart:"%s", newDeviceId:"%s"]',
+			'updateMic() [restart:"%s", newDeviceId:"%s", exactDevice:"%s"]',
 			restart,
-			newDeviceId
+			newDeviceId,
+			exactDevice
 		);
 
 		let track;
@@ -1201,20 +1202,23 @@ export default class RoomClient
 				if (this._micProducer)
 					await this.disableMic();
 
-				const stream = await navigator.mediaDevices.getUserMedia(
-					{
-						audio : {
-							deviceId : { ideal: deviceId },
-							sampleRate,
-							channelCount,
-							volume,
-							autoGainControl,
-							echoCancellation,
-							noiseSuppression,
-							sampleSize
-						}
+				const deviceIdConstraintType= exactDevice ? 'exact' : 'ideal';
+				const mediaConstraints=
+				{
+					audio : {
+						deviceId : { [deviceIdConstraintType]: deviceId },
+						sampleRate,
+						channelCount,
+						volume,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
 					}
-				);
+				};
+
+				logger.debug('mediaConstraints: %o', mediaConstraints);
+				const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
 				([ track ] = stream.getAudioTracks());
 
@@ -1324,13 +1328,15 @@ export default class RoomClient
 		restart = false,
 		newDeviceId = null,
 		newResolution = null,
-		newFrameRate = null
+		newFrameRate = null,
+		exactDevice = false
 	} = {})
 	{
 		logger.debug(
-			'updateWebcam() [restart:"%s", newDeviceId:"%s", newResolution:"%s", newFrameRate:"%s"]',
+			'updateWebcam() [restart:"%s", newDeviceId:"%s", exactDevice:"%s", newResolution:"%s", newFrameRate:"%s"]',
 			restart,
 			newDeviceId,
+			exactDevice,
 			newResolution,
 			newFrameRate
 		);
@@ -1374,15 +1380,19 @@ export default class RoomClient
 				if (this._webcamProducer)
 					await this.disableWebcam();
 
-				const stream = await navigator.mediaDevices.getUserMedia(
+				const deviceIdConstraintType= exactDevice ? 'exact' : 'ideal';
+				const mediaConstraints =
+				{
+					video :
 					{
-						video :
-						{
-							deviceId : { ideal: deviceId },
-							...VIDEO_CONSTRAINS[resolution],
-							frameRate
-						}
-					});
+						deviceId : { [deviceIdConstraintType]: deviceId },
+						...VIDEO_CONSTRAINS[resolution],
+						frameRate
+					}
+				};
+
+				logger.debug('mediaConstraints: %o', mediaConstraints);
+				const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
 				([ track ] = stream.getVideoTracks());
 

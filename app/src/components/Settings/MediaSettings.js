@@ -171,7 +171,8 @@ const MediaSettings = ({
 							{
 								roomClient.updateWebcam({
 									restart     : true,
-									newDeviceId : event.target.value
+									newDeviceId : event.target.value,
+									exactDevice : true
 								});
 							}
 						}}
@@ -325,7 +326,9 @@ const MediaSettings = ({
 						onChange={(event) =>
 						{
 							if (event.target.value)
-								roomClient.updateMic({ restart: true, newDeviceId: event.target.value });
+								roomClient.updateMic(
+									{ restart: true, newDeviceId: event.target.value, exactDevice: true }
+								);
 						}}
 						displayEmpty
 						name={intl.formatMessage({
