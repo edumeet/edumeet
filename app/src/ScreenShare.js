@@ -224,6 +224,13 @@ export default class ScreenShare
 					else
 						return new DisplayMediaScreenShare();
 				}
+				case 'safari':
+				{
+					if (device.version >= 13.0)
+						return new DisplayMediaScreenShare();
+					else
+						return new DefaultScreenShare();
+				}
 				case 'chrome':
 				case 'edge':
 				{
