@@ -339,7 +339,7 @@ const MediaSettings = ({
 						{ audioDevices.map((audio, index) =>
 						{
 							return (
-								<MenuItem key={index} value={audio.deviceId}>{audio.label!=='' ? audio.label : index}</MenuItem>
+								<MenuItem key={index} value={audio.deviceId}>{audio.label==='' ? index+1 : audio.label }</MenuItem>
 							);
 						})}
 					</Select>
