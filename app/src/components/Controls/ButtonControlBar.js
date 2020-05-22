@@ -23,6 +23,7 @@ const styles = (theme) =>
 		{
 			position                     : 'fixed',
 			display                      : 'flex',
+			zIndex                       : 30,
 			[theme.breakpoints.up('md')] :
 			{
 				top            : '50%',
