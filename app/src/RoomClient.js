@@ -1218,6 +1218,10 @@ export default class RoomClient
 
 				([ track ] = stream.getAudioTracks());
 
+				const { deviceId: trackDeviceId } = track.getSettings();
+
+				store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
+
 				this._micProducer = await this._sendTransport.produce(
 					{
 						track,
@@ -1385,6 +1389,10 @@ export default class RoomClient
 					});
 
 				([ track ] = stream.getVideoTracks());
+
+				const { deviceId: trackDeviceId } = track.getSettings();
+
+				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
 				if (this._useSimulcast)
 				{
