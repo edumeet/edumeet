@@ -133,6 +133,15 @@ var config =
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
 	title                : 'Multiparty meeting',
+	// Service & Support URL
+	// if not set then not displayed on the about modals
+	supportUrl           : 'https://support.example.com',
+	// Privacy and dataprotection URL or path
+	// by default privacy/privacy.html
+	// that is a placeholder for your policies
+	//
+	// but an external url could be also used here	 
+	privacyUrl           : 'static/privacy.html',
 	theme                :
 	{
 		palette :
