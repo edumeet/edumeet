@@ -54,6 +54,31 @@ const styles = (theme) =>
 		{
 			opacity    : 0,
 			transition : 'opacity .5s'
+		},
+		move :
+		{
+			left                           : '30vw',
+			top                            : '50%',
+			transform                      : 'translate(0%, -50%)',
+			flexDirection                  : 'column',
+			justifyContent                 : 'center',
+			alignItems                     : 'center',
+			[theme.breakpoints.down('lg')] :
+			{
+				left : '40vw'
+			},
+			[theme.breakpoints.down('md')] :
+			{
+				left : '50vw'
+			},
+			[theme.breakpoints.down('sm')] :
+			{
+				left : '70vw'
+			},
+			[theme.breakpoints.down('xs')] :
+			{
+				left : '90vw'
+			}
 		}
 	});
 
@@ -65,6 +90,8 @@ const ButtonControlBar = (props) =>
 		roomClient,
 		toolbarsVisible,
 		hiddenControls,
+		drawerOverlayed,
+		toolAreaOpen,
 		me,
 		micProducer,
 		webcamProducer,
@@ -177,7 +204,11 @@ const ButtonControlBar = (props) =>
 					classes.root,
 					hiddenControls ?
 						(toolbarsVisible ? classes.show : classes.hide) :
-						classes.show)
+						classes.show,
+					toolAreaOpen &&
+						(me.browser.platform !== 'mobile' && !drawerOverlayed) ?
+						classes.move : null
+				)
 			}
 		>
 			<Tooltip title={micTip} placement={smallScreen ? 'top' : 'right'}>
@@ -270,6 +301,8 @@ ButtonControlBar.propTypes =
 	roomClient      : PropTypes.any.isRequired,
 	toolbarsVisible : PropTypes.bool.isRequired,
 	hiddenControls  : PropTypes.bool.isRequired,
+	drawerOverlayed : PropTypes.bool.isRequired,
+	toolAreaOpen    : PropTypes.bool.isRequired,
 	me              : appPropTypes.Me.isRequired,
 	micProducer     : appPropTypes.Producer,
 	webcamProducer  : appPropTypes.Producer,
@@ -282,6 +315,8 @@ const mapStateToProps = (state) =>
 	({
 		toolbarsVisible : state.room.toolbarsVisible,
 		hiddenControls  : state.settings.hiddenControls,
+		drawerOverlayed : state.settings.drawerOverlayed,
+		toolAreaOpen    : state.toolarea.toolAreaOpen,
 		...meProducersSelector(state),
 		me              : state.me
 	});
@@ -296,6 +331,8 @@ export default withRoomContext(connect(
 			return (
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
 				prev.settings.hiddenControls === next.settings.hiddenControls &&
+				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.producers === next.producers &&
 				prev.me === next.me
 			);
