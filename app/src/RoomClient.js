@@ -402,7 +402,7 @@ export default class RoomClient
 						}
 						else
 						{
-							this.updateMic({ restart: true });
+							this.updateMic({ start: true });
 
 							store.dispatch(requestActions.notify(
 								{
@@ -421,7 +421,7 @@ export default class RoomClient
 						if (this._webcamProducer)
 							this.disableWebcam();
 						else
-							this.updateWebcam({ restart: true });
+							this.updateWebcam({ start: true });
 
 						break;
 					}
@@ -969,7 +969,7 @@ export default class RoomClient
 
 		if (!this._micProducer)
 		{
-			this.updateMic({ restart: true });
+			this.updateMic({ start: true });
 		}
 		else
 		{
@@ -1153,10 +1153,11 @@ export default class RoomClient
 			meActions.setAudioOutputInProgress(false));
 	}
 
-	async updateMic({ restart = false, newDeviceId = null } = {})
+	async updateMic({ start = false, restart = false, newDeviceId = null } = {})
 	{
 		logger.debug(
-			'updateMic() [restart:"%s", newDeviceId:"%s"]',
+			'updateMic() [start:"%s", restart:"%s", newDeviceId:"%s"]',
+			start,
 			restart,
 			newDeviceId
 		);
@@ -1192,11 +1193,12 @@ export default class RoomClient
 				sampleSize
 			} = store.getState().settings;
 
-			if (restart)
+			if (
+				(restart && this._micProducer) ||
+				start
+			)
 			{
 				this.disconnectLocalHark();
-
-				store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
 
 				if (this._micProducer)
 					await this.disableMic();
@@ -1325,6 +1327,7 @@ export default class RoomClient
 	}
 
 	async updateWebcam({
+		start = false,
 		restart = false,
 		newDeviceId = null,
 		newResolution = null,
@@ -1332,7 +1335,8 @@ export default class RoomClient
 	} = {})
 	{
 		logger.debug(
-			'updateWebcam() [restart:"%s", newDeviceId:"%s", newResolution:"%s", newFrameRate:"%s"]',
+			'updateWebcam() [start:"%s", restart:"%s", newDeviceId:"%s", newResolution:"%s", newFrameRate:"%s"]',
+			start,
 			restart,
 			newDeviceId,
 			newResolution,
@@ -1371,10 +1375,11 @@ export default class RoomClient
 				frameRate
 			} = store.getState().settings;
 
-			if (restart)
+			if (
+				(restart && this._webcamProducer) ||
+				start
+			)
 			{
-				store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
-
 				if (this._webcamProducer)
 					await this.disableWebcam();
 
@@ -1439,7 +1444,6 @@ export default class RoomClient
 				store.dispatch(producerActions.addProducer(
 					{
 						id            : this._webcamProducer.id,
-						deviceLabel   : device.label,
 						source        : 'webcam',
 						paused        : this._webcamProducer.paused,
 						track         : this._webcamProducer.track,
@@ -3226,7 +3230,7 @@ export default class RoomClient
 				if (this._mediasoupDevice.canProduce('audio'))
 					if (!this._muted)
 					{
-						await this.updateMic({ restart: true });
+						await this.updateMic({ start: true });
 						let autoMuteThreshold = 4;
 
 						if ('autoMuteThreshold' in window.config)
@@ -3238,7 +3242,7 @@ export default class RoomClient
 					}
 
 				if (joinVideo)
-					this.updateWebcam({ restart: true });
+					this.updateWebcam({ start: true });
 			}
 
 			await this._updateAudioOutputDevices();
@@ -3585,12 +3589,12 @@ export default class RoomClient
 	}
 
 	async updateScreenSharing({
-		restart = false,
+		start = false,
 		newResolution = null,
 		newFrameRate = null
 	} = {})
 	{
-		logger.debug('updateScreenSharing() [restart:"%s"]', restart);
+		logger.debug('updateScreenSharing() [start:"%s"]', start);
 
 		let track;
 
@@ -3617,7 +3621,7 @@ export default class RoomClient
 				screenSharingFrameRate
 			} = store.getState().settings;
 
-			if (restart)
+			if (start)
 			{
 				const stream = await this._screenSharing.start({
 					...VIDEO_CONSTRAINS[screenSharingResolution],

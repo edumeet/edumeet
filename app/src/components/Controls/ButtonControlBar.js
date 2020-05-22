@@ -192,7 +192,7 @@ const ButtonControlBar = (props) =>
 					onClick={() =>
 					{
 						if (micState === 'off')
-							roomClient.updateMic({ restart: true });
+							roomClient.updateMic({ start: true });
 						else if (micState === 'on')
 							roomClient.muteMic();
 						else
@@ -220,7 +220,7 @@ const ButtonControlBar = (props) =>
 					{
 						webcamState === 'on' ?
 							roomClient.disableWebcam() :
-							roomClient.updateWebcam({ restart: true });
+							roomClient.updateWebcam({ start: true });
 					}}
 				>
 					{ webcamState === 'on' ?
@@ -243,7 +243,7 @@ const ButtonControlBar = (props) =>
 					onClick={() =>
 					{
 						if (screenState === 'off')
-							roomClient.updateScreenSharing({ restart: true });
+							roomClient.updateScreenSharing({ start: true });
 						else if (screenState === 'on')
 							roomClient.disableScreenSharing();
 					}}

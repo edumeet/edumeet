@@ -466,7 +466,7 @@ const Me = (props) =>
 												onClick={() =>
 												{
 													if (micState === 'off')
-														roomClient.updateMic({ restart: true });
+														roomClient.updateMic({ start: true });
 													else if (micState === 'on')
 														roomClient.muteMic();
 													else
@@ -500,7 +500,7 @@ const Me = (props) =>
 												onClick={() =>
 												{
 													if (micState === 'off')
-														roomClient.updateMic({ restart: true });
+														roomClient.updateMic({ start: true });
 													else if (micState === 'on')
 														roomClient.muteMic();
 													else
@@ -538,7 +538,7 @@ const Me = (props) =>
 												{
 													webcamState === 'on' ?
 														roomClient.disableWebcam() :
-														roomClient.updateWebcam({ restart: true });
+														roomClient.updateWebcam({ start: true });
 												}}
 											>
 												{ webcamState === 'on' ?
@@ -563,7 +563,7 @@ const Me = (props) =>
 												{
 													webcamState === 'on' ?
 														roomClient.disableWebcam() :
-														roomClient.updateWebcam({ restart: true });
+														roomClient.updateWebcam({ start: true });
 												}}
 											>
 												{ webcamState === 'on' ?
@@ -599,7 +599,7 @@ const Me = (props) =>
 													onClick={() =>
 													{
 														if (screenState === 'off')
-															roomClient.updateScreenSharing({ restart: true });
+															roomClient.updateScreenSharing({ start: true });
 														else if (screenState === 'on')
 															roomClient.disableScreenSharing();
 													}}
@@ -631,7 +631,7 @@ const Me = (props) =>
 													onClick={() =>
 													{
 														if (screenState === 'off')
-															roomClient.updateScreenSharing({ restart: true });
+															roomClient.updateScreenSharing({ start: true });
 														else if (screenState === 'on')
 															roomClient.disableScreenSharing();
 													}}
