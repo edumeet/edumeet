@@ -26,7 +26,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Avatar from '@material-ui/core/Avatar';
 import Badge from '@material-ui/core/Badge';
 import Paper from '@material-ui/core/Paper';
-import ExtensionIcon from '@material-ui/icons/Extension';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -328,7 +327,7 @@ const TopBar = (props) =>
 								onClick={(event) => handleMenuOpen(event, 'moreActions')}
 								color='inherit'
 							>
-								<ExtensionIcon />
+								<MoreIcon />
 							</IconButton>
 						</Tooltip>
 						{ fullscreenEnabled &&
@@ -747,17 +746,63 @@ const TopBar = (props) =>
 					</MenuItem>
 				}
 				<MenuItem
-					aria-label={intl.formatMessage({
-						id             : 'label.moreActions',
-						defaultMessage : 'Add video'
-					})}
-					onClick={(event) => handleMenuOpen(event, 'moreActions')}
+					disabled={!canProduceExtraVideo}
+					onClick={() =>
+					{
+						handleMenuClose();
+						setExtraVideoOpen(!room.extraVideoOpen);
+					}}
 				>
-					<ExtensionIcon />
+					<VideoCallIcon
+						aria-label={intl.formatMessage({
+							id             : 'label.addVideo',
+							defaultMessage : 'Add video'
+						})}
+					/>
 					<p className={classes.moreAction}>
 						<FormattedMessage
-							id='label.moreActions'
-							defaultMessage='More actions'
+							id='label.addVideo'
+							defaultMessage='Add video'
+						/>
+					</p>
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
+						setHelpOpen(!room.helpOpen);
+					}}
+				>
+					<HelpIcon
+						aria-label={intl.formatMessage({
+							id             : 'room.help',
+							defaultMessage : 'Help'
+						})}
+					/>
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='room.help'
+							defaultMessage='Help'
+						/>
+					</p>
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
+						setAboutOpen(!room.aboutOpen);
+					}}
+				>
+					<InfoIcon
+						aria-label={intl.formatMessage({
+							id             : 'room.about',
+							defaultMessage : 'About'
+						})}
+					/>
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='room.about'
+							defaultMessage='About'
 						/>
 					</p>
 				</MenuItem>
