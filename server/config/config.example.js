@@ -40,6 +40,12 @@ module.exports =
 			// could be discovered on:
 			// issuerURL + '/.well-known/openid-configuration'
 
+			// e.g. google OIDC config
+			// Follow this guide to get credential:  
+			// https://developers.google.com/identity/protocols/oauth2/openid-connect
+			// use this issuerURL
+			// issuerURL     : 'https://accounts.google.com/',
+			
 			issuerURL     : 'https://example.com',
 			clientOptions :
 			{
@@ -73,7 +79,9 @@ module.exports =
 			credential : 'example'
 		}
 	],
+	// bittorrent tracker
 	fileTracker  : 'wss://tracker.lab.vvc.niif.hu:443',
+	// redis server options
 	redisOptions : {},
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',
