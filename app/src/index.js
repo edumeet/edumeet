@@ -79,6 +79,7 @@ const supportedBrowsers={
 	'safari'                       : '>12',
 	'firefox'                      : '>=60',
 	'chrome'                       : '>=74',
+	'chromium'                     : '>=74',
 	'opera'                        : '>=62',
 	'samsung internet for android' : '>=11.1.1.52'
 };
