@@ -1153,7 +1153,14 @@ export default class RoomClient
 			meActions.setAudioOutputInProgress(false));
 	}
 
-	async updateMic({ start = false, restart = false, newDeviceId = null } = {})
+	// Only Firefox supports applyConstraints to audio tracks
+	// See:
+	// https://bugs.chromium.org/p/chromium/issues/detail?id=796964
+	async updateMic({
+		start = false,
+		restart = false || this._device.flag !== 'firefox',
+		newDeviceId = null
+	} = {})
 	{
 		logger.debug(
 			'updateMic() [start:"%s", restart:"%s", newDeviceId:"%s"]',
