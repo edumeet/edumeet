@@ -213,6 +213,8 @@ export default class ScreenShare
 	{
 		if (isElectron())
 			return new ElectronScreenShare();
+		else if (device.platform !== 'desktop')
+			return new DefaultScreenShare();
 		else
 		{
 			switch (device.flag)
@@ -224,7 +226,16 @@ export default class ScreenShare
 					else
 						return new DisplayMediaScreenShare();
 				}
+				case 'safari':
+				{
+					if (device.version >= 13.0)
+						return new DisplayMediaScreenShare();
+					else
+						return new DefaultScreenShare();
+				}
 				case 'chrome':
+				case 'chromium':
+				case 'opera':
 				case 'edge':
 				{
 					return new DisplayMediaScreenShare();

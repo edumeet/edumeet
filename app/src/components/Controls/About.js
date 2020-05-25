@@ -13,6 +13,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
 
 const styles = (theme) =>
 	({
@@ -45,9 +46,13 @@ const styles = (theme) =>
 			display      : 'block',
 			textAlign    : 'center',
 			marginBottom : theme.spacing(1)
+		},
+		divider :
+		{
+			marginBottom : theme.spacing(3)
 		}
 	});
-
+const eduMeetUrl='https://edumeet.org';
 const About = ({
 	aboutOpen,
 	handleCloseAbout,
@@ -68,7 +73,7 @@ const About = ({
 					defaultMessage='About'
 				/>
 			</DialogTitle>
-			<DialogContent dividers='true'>
+			<DialogContent dividers>
 				<DialogContentText paragraph>
 					Contributions to this work were made on behalf of the GÉANT
 					project, a project that has received funding from the
@@ -86,16 +91,33 @@ const About = ({
 					Amsterdam, The Netherlands. UK branch address: City House,
 					126-130 Hills Road, Cambridge CB2 1PQ, UK.
 				</DialogContentText>
-				<Link href='https://edumeet.org' target='_blank' rel='noreferrer' color='secondary' variant='h6' className={classes.link}>
-					https://edumeet.org
-				</Link>
-				<DialogContentText align='center' variant='h7'>
+				<DialogContentText align='center' paragraph>
+					<Link href={eduMeetUrl} target='_blank' rel='noreferrer' color='secondary' variant='h6'>
+						{eduMeetUrl}
+					</Link>
+				</DialogContentText>
+				<DialogContentText align='center' variant='body2'>
 					<FormattedMessage
 						id='label.version'
 						defaultMessage='Version'
 					/>
 					:{` ${process.env.REACT_APP_VERSION}`}
 				</DialogContentText>
+				<Divider variant='middle' light className={classes.divider}/>
+				{
+					window.config.supportUrl
+					&&
+					<DialogContentText align='center' paragraph>
+						<span>Visit for more info: </span>
+						<Link href={window.config.supportUrl} target='_blank' rel='noreferrer' color='secondary'>
+							{ window.config.supportUrl }
+						</Link>
+					</DialogContentText>
+				}
+				<Link href={window.config.privacyUrl ? window.config.privacyUrl : 'privacy/privacy.html'} target='_blank' rel='noreferrer' color='secondary' className={classes.link}>
+					Data protection and Privacy Policy
+				</Link>
+
 			</DialogContent>
 			<DialogActions>
 				{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }

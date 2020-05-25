@@ -20,7 +20,7 @@
 		"hark": "^1.2.3",
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
-		"mediasoup-client": "^3.6.4",
+		"mediasoup-client": "^3.6.5",
 		"notistack": "^0.9.5",
 		"prop-types": "^15.7.2",
 		"random-string": "^0.2.0",
