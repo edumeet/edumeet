@@ -141,7 +141,7 @@ var config =
 	// that is a placeholder for your policies
 	//
 	// but an external url could be also used here	 
-	privacyUrl           : 'static/privacy.html',
+	privacyUrl           : 'privacy/privacy.html',
 	theme                :
 	{
 		palette :
