@@ -63,8 +63,8 @@
 	"room.help": "Pomoc",
 	"room.about": "O pogramie",
 	"room.shortcutKeys": "Skróty klawiaturowe",
-	"room.browsePeersSpotlight": null,
-	"room.stopAllScreenSharing": null,
+	"room.browsePeersSpotlight": "Przeglądaj aktywnych uczestnikow",
+	"room.stopAllScreenSharing": "Zatrzymaj wszystkie współdzielone ekrany",
 
 	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj spację aby mówić",
 
@@ -86,9 +86,9 @@
 	"tooltip.muteParticipantVideo": "Wyłącz wideo użytkownika",
 	"tooltip.raisedHand": "Podnieś rękę",
 	"tooltip.muteScreenSharing": "Anuluj udostępniania pulpitu przez użytkownika",
-	"tooltip.muteParticipantAudioModerator": null,
-	"tooltip.muteParticipantVideoModerator": null,
-	"tooltip.muteScreenSharingModerator": null,
+	"tooltip.muteParticipantAudioModerator": "Wycisz użytkownika globalnie",
+	"tooltip.muteParticipantVideoModerator": "Wyłącz wideo użytkownika globalnie",
+	"tooltip.muteScreenSharingModerator": "Anuluj współdzielenie ekranu użytkownika globalnie",
 
 	"label.roomName": "Nazwa konferencji",
 	"label.chooseRoomButton": "Kontynuuj",
@@ -119,7 +119,7 @@
 	"label.addVideo": "Dodaj wideo",
 	"label.promoteAllPeers": "Wpuść wszystkich",
 	"label.moreActions": "Więcej akcji",
-	"label.version": null,
+	"label.version": "Wersja",
 
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",
@@ -132,9 +132,9 @@
 	"settings.selectAudioOutput": "Wybierz urządzenie wyjściowe audio",
 	"settings.cantSelectAudioOutput": "Nie można wybrać urządzenia wyjściowego audio",
 	"settings.resolution": "Wybór rozdzielczości wideo",
-	"settings.frameRate": null,
-	"settings.screenSharingResolution": null,
-	"settings.screenSharingFrameRate": null,
+	"settings.frameRate": "Wybór liczby klatek na sekundę",
+	"settings.screenSharingResolution": "Wybór rozdzielczości ekranu współdzielonego",
+	"settings.screenSharingFrameRate": "Wybór liczby klatek na sekundę dla ekranu współdzielonego",
 	"settings.layout": "Układ konferencji",
 	"settings.selectRoomLayout": "Ustawienia układu konferencji",
 	"settings.advancedMode": "Tryb zaawansowany",
@@ -144,14 +144,14 @@
 	"settings.notificationSounds": "Powiadomienia dźwiękiem",
 	"settings.showNotifications": "Pokaż powiadomienia",
 	"settings.buttonControlBar": "Rozdziel kontrolki mediów",
-	"settings.showAdvancedVideo": null,
-	"settings.showAdvancedAudio": null,
+	"settings.showAdvancedVideo": "Zaawansowane ustawienia wideo",
+	"settings.showAdvancedAudio": "Zaawansowane ustawienia audio",
 	"settings.echoCancellation": "Usuwanie echa",
 	"settings.autoGainControl": "Auto korekta wzmocnienia",
 	"settings.noiseSuppression": "Wyciszenie szumów",
 	"settings.drawerOverlayed": "Szuflada nad zawartością",
-	"settings.voiceActivatedUnmute": null,
-	"settings.noiseThreshold": null,
+	"settings.voiceActivatedUnmute": "Aktywacja mikrofonu głosem",
+	"settings.noiseThreshold": "Próg szumu",
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",
@@ -197,9 +197,9 @@
 	"moderator.clearFiles": "Moderator wyczyścił pliki",
 	"moderator.muteAudio": "Moderator wyciszył audio",
 	"moderator.muteVideo": "Moderator wyciszył twoje video",
-	"moderator.stopScreenSharing": null,
+	"moderator.stopScreenSharing": "Moderator wyłączył współdzielenie Twojego ekranu",
 
-	"unsupportedBrowser.titleUnsupportedBrowser": null,
-	"unsupportedBrowser.titlewebrtcUnavailable": null,
-	"unsupportedBrowser.bodyText": null
+	"unsupportedBrowser.titleUnsupportedBrowser": "Wykryto niekompatybilną przeglądarkę!",
+	"unsupportedBrowser.titlewebrtcUnavailable": "Twoja przeglądarka nie wspiera wymaganej funkcjonalności!",
+	"unsupportedBrowser.bodyText": "Usług wideokonferencji wymaga funkcjonalności, które nie jest wspierana przez Twoją przeglądarkę. Zaktualizuj przeglądarkę, zmień ją lub sprawdź jej ustawienia. Wspierane przeglądarki:"
 }
