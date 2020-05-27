@@ -2,7 +2,7 @@ import isElectron from 'is-electron';
 
 let electron = null;
 
-if (isElectron())
+if (isElectron() && typeof window.require === 'function')
 	electron = window.require('electron');
 
 class ElectronScreenShare
@@ -211,7 +211,7 @@ export default class ScreenShare
 {
 	static create(device)
 	{
-		if (isElectron())
+		if (isElectron() && electron)
 			return new ElectronScreenShare();
 		else if (device.platform !== 'desktop')
 			return new DefaultScreenShare();
