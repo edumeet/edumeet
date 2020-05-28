@@ -219,7 +219,7 @@ export default class ScreenShare
 {
 	static create(device)
 	{
-		if (isElectron() && electron)
+		if (electron)
 			return new ElectronScreenShare();
 		else if (device.platform !== 'desktop')
 			return new DefaultScreenShare();
