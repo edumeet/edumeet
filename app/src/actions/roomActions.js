@@ -118,10 +118,16 @@ export const setDisplayMode = (mode) =>
 		payload : { mode }
 	});
 
-export const setSelectedPeer = (selectedPeerId) =>
+export const addSelectedPeer = (peerId) =>
 	({
-		type    : 'SET_SELECTED_PEER',
-		payload : { selectedPeerId }
+		type    : 'ADD_SELECTED_PEER',
+		payload : { peerId }
+	});
+
+export const removeSelectedPeer = (peerId) =>
+	({
+		type    : 'REMOVE_SELECTED_PEER',
+		payload : { peerId }
 	});
 
 export const setSpotlights = (spotlights) =>

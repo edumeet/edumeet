@@ -303,7 +303,7 @@ class Filmstrip extends React.PureComponent
 									<Grid key={peerId} item>
 										<div
 											key={peerId}
-											onClick={() => roomClient.setSelectedPeer(peerId)}
+											// onClick={() => roomClient.setSelectedPeer(peerId)}
 											className={classnames(classes.filmItem, {
 												selected : this.props.selectedPeerId === peerId,
 												active   : peerId === activePeerId

@@ -297,6 +297,7 @@ export default class RoomClient
 
 				switch (key)
 				{
+					/*
 					case String.fromCharCode(37):
 					{
 						const newPeerId = this._spotlights.getPrevAsSelected(
@@ -305,6 +306,7 @@ export default class RoomClient
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
+
 					case String.fromCharCode(39):
 					{
 						const newPeerId = this._spotlights.getNextAsSelected(
@@ -313,6 +315,8 @@ export default class RoomClient
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
+					*/
+
 					case 'A': // Activate advanced mode
 					{
 						store.dispatch(settingsActions.toggleAdvancedMode());
@@ -1516,14 +1520,24 @@ export default class RoomClient
 			meActions.setWebcamInProgress(false));
 	}
 
-	setSelectedPeer(peerId)
+	addSelectedPeer(peerId)
 	{
-		logger.debug('setSelectedPeer() [peerId:"%s"]', peerId);
+		logger.debug('addSelectedPeer() [peerId:"%s"]', peerId);
 
-		this._spotlights.setPeerSpotlight(peerId);
+		this._spotlights.addPeerToSpotlight(peerId);
 
 		store.dispatch(
-			roomActions.setSelectedPeer(peerId));
+			roomActions.addSelectedPeer(peerId));
+	}
+
+	removeSelectedPeer(peerId)
+	{
+		logger.debug('removeSelectedPeer() [peerId:"%s"]', peerId);
+
+		this._spotlights.removePeerSpotlight(peerId);
+
+		store.dispatch(
+			roomActions.removeSelectedPeer(peerId));
 	}
 
 	async promoteAllLobbyPeers()
