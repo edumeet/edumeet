@@ -15,7 +15,6 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
-import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 
 const styles = (theme) =>
 	({
@@ -281,14 +280,7 @@ const ButtonControlBar = (props) =>
 								roomClient.disableScreenSharing();
 						}}
 					>
-						{ screenState === 'on' || screenState === 'unsupported' ?
-							<ScreenOffIcon/>
-							:null
-						}
-						{ screenState === 'off' ?
-							<ScreenIcon/>
-							:null
-						}
+						<ScreenIcon/>
 					</Fab>
 				</Tooltip>
 			}

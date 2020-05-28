@@ -21,7 +21,6 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
-import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
 import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
 
 const styles = (theme) =>
@@ -652,13 +651,7 @@ const Me = (props) =>
 															roomClient.disableScreenSharing();
 													}}
 												>
-													{ (screenState === 'on' || screenState === 'unsupported') &&
-													<ScreenOffIcon/>
-													}
-													{ screenState === 'off' &&
 													<ScreenIcon/>
-													}
-
 												</IconButton>
 											</div>
 											:
@@ -684,12 +677,7 @@ const Me = (props) =>
 															roomClient.disableScreenSharing();
 													}}
 												>
-													{ (screenState === 'on' || screenState === 'unsupported') &&
-													<ScreenOffIcon/>
-													}
-													{ screenState === 'off' &&
 													<ScreenIcon/>
-													}
 												</Fab>
 											</div>
 										}
