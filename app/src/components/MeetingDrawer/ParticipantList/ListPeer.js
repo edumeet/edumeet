@@ -54,10 +54,9 @@ const styles = (theme) =>
 			flexGrow    : 1,
 			alignItems  : 'center'
 		},
-		indicators :
+		indicator :
 		{
-			display : 'flex',
-			padding : theme.spacing(1)
+			margin : theme.spacing(1)
 		},
 		buttons :
 		{
@@ -149,7 +148,7 @@ const ListPeer = (props) =>
 					className={classes.buttons}
 					style={{ color: green[500] }}
 					disabled={!isModerator || peer.raisedHandInProgress}
-					onClick={(e) =>
+					onClick={() =>
 					{
 						roomClient.lowerPeerHand(peer.id);
 					}}
@@ -157,14 +156,37 @@ const ListPeer = (props) =>
 					<PanIcon />
 				</IconButton>
 			}
-			{ spotlight &&
-				<IconButton
-					className={classes.buttons}
-					style={{ color: green[500] }}
-					disabled
+			{ isSelected ?
+				<Tooltip
+					title={intl.formatMessage({
+						id             : 'tooltip.inSpotlight',
+						defaultMessage : 'In spotlight'
+					})}
 				>
-					<RecordVoiceOverIcon />
-				</IconButton>
+					<IconButton
+						className={classes.buttons}
+						style={{ color: green[500] }}
+						onClick={() =>
+						{
+							roomClient.removeSelectedPeer(peer.id);
+						}}
+					>
+						<AddToQueueIcon />
+					</IconButton>
+				</Tooltip>
+				:
+				spotlight &&
+					<Tooltip
+						title={intl.formatMessage({
+							id             : 'tooltip.isSpeaker',
+							defaultMessage : 'Active speaker'
+						})}
+					>
+						<RecordVoiceOverIcon
+							className={classes.indicator}
+							style={{ color: green[500] }}
+						/>
+					</Tooltip>
 			}
 			<Tooltip
 				title={intl.formatMessage({
@@ -181,7 +203,7 @@ const ListPeer = (props) =>
 					color={micEnabled ? 'primary' : 'secondary'}
 					disabled={peer.peerAudioInProgress}
 					className={classes.buttons}
-					onClick={(e) =>
+					onClick={() =>
 					{
 						micEnabled ?
 							roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
@@ -226,11 +248,15 @@ const ListPeer = (props) =>
 							{peer.displayName}
 						</Typography>
 						<MenuItem
-							disabled={peer.peerVideoInProgress || !webcamConsumer}
-							onClick={(e) =>
+							disabled={
+								peer.peerVideoInProgress ||
+								!webcamConsumer ||
+								!spotlight
+							}
+							onClick={() =>
 							{
 								// handleMenuClose();
-	
+
 								webcamEnabled ?
 									roomClient.modifyPeerConsumer(peer.id, 'webcam', true) :
 									roomClient.modifyPeerConsumer(peer.id, 'webcam', false);
@@ -256,11 +282,15 @@ const ListPeer = (props) =>
 							</p>
 						</MenuItem>
 						<MenuItem
-							disabled={peer.peerScreenInProgress || !screenConsumer}
-							onClick={(e) =>
+							disabled={
+								peer.peerScreenInProgress ||
+								!screenConsumer ||
+								!spotlight
+							}
+							onClick={() =>
 							{
 								// handleMenuClose();
-	
+
 								screenVisible ?
 									roomClient.modifyPeerConsumer(peer.id, 'screen', true) :
 									roomClient.modifyPeerConsumer(peer.id, 'screen', false);
@@ -286,10 +316,10 @@ const ListPeer = (props) =>
 							</p>
 						</MenuItem>
 						<MenuItem
-							onClick={(e) =>
+							onClick={() =>
 							{
 								// handleMenuClose();
-	
+
 								isSelected ?
 									roomClient.removeSelectedPeer(peer.id) :
 									roomClient.addSelectedPeer(peer.id);
@@ -317,7 +347,11 @@ const ListPeer = (props) =>
 						{ isModerator &&
 							<React.Fragment>
 								<Divider />
-								<Typography className={classnames(classes.moreActionsHeader, classes.moderator)}>
+								<Typography
+									className={
+										classnames(classes.moreActionsHeader, classes.moderator)
+									}
+								>
 									<FormattedMessage
 										id='room.moderatoractions'
 										defaultMessage='Moderator actions'
@@ -325,10 +359,10 @@ const ListPeer = (props) =>
 								</Typography>
 								<MenuItem
 									disabled={peer.peerKickInProgress}
-									onClick={(e) =>
+									onClick={() =>
 									{
 										// handleMenuClose();
-			
+
 										roomClient.kickPeer(peer.id);
 									}}
 								>
@@ -342,10 +376,10 @@ const ListPeer = (props) =>
 								</MenuItem>
 								<MenuItem
 									disabled={!micConsumer || peer.stopPeerAudioInProgress}
-									onClick={(e) =>
+									onClick={() =>
 									{
 										// handleMenuClose();
-			
+
 										roomClient.mutePeer(peer.id);
 									}}
 								>
@@ -363,10 +397,10 @@ const ListPeer = (props) =>
 								</MenuItem>
 								<MenuItem
 									disabled={!webcamConsumer || peer.stopPeerVideoInProgress}
-									onClick={(e) =>
+									onClick={() =>
 									{
 										// handleMenuClose();
-			
+
 										roomClient.stopPeerVideo(peer.id);
 									}}
 								>
@@ -384,7 +418,7 @@ const ListPeer = (props) =>
 								</MenuItem>
 								<MenuItem
 									disabled={!screenConsumer || peer.stopPeerScreenSharingInProgress}
-									onClick={(e) =>
+									onClick={() =>
 									{
 										// handleMenuClose();
 
@@ -422,7 +456,7 @@ ListPeer.propTypes =
 	micConsumer    : appPropTypes.Consumer,
 	webcamConsumer : appPropTypes.Consumer,
 	screenConsumer : appPropTypes.Consumer,
-	isSelected     : PropTypes.bool.isRequired,
+	isSelected     : PropTypes.bool,
 	children       : PropTypes.object,
 	classes        : PropTypes.object.isRequired
 };
@@ -435,8 +469,7 @@ const makeMapStateToProps = (initialState, { id }) =>
 	{
 		return {
 			peer : state.peers[id],
-			...getPeerConsumers(state, id),
-			isSelected : state.room.selectedPeers.includes(id)
+			...getPeerConsumers(state, id)
 		};
 	};
 
@@ -452,8 +485,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.peers === next.peers &&
-				prev.consumers === next.consumers &&
-				prev.room.selectedPeers === next.room.selectedPeers
+				prev.consumers === next.consumers
 			);
 		}
 	}

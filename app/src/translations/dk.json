@@ -84,6 +84,8 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
 	"tooltip.unMuteScreenSharing": null,

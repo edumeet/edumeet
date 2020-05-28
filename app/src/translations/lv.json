@@ -83,6 +83,8 @@
 	"tooltip.kickParticipant": "Izvadīt (izspert) dalībnieku",
 	"tooltip.muteParticipant": "Noklusināt dalībnieku",
 	"tooltip.muteParticipantVideo": "Atslēgt dalībnieka video",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "Pacelt roku",
 	"tooltip.muteScreenSharing": null,
 	"tooltip.unMuteScreenSharing": null,

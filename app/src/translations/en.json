@@ -84,6 +84,8 @@
 	"tooltip.kickParticipant": "Kick out",
 	"tooltip.muteParticipant": "Mute audio",
 	"tooltip.muteParticipantVideo": "Mute video",
+	"tooltip.inSpotlight": "In spotlight",
+	"tooltip.isSpeaker": "Active speaker",
 	"tooltip.raisedHand": "Raise hand",
 	"tooltip.muteScreenSharing": "Mute screen share",
 	"tooltip.unMuteScreenSharing": "Unmute screen share",

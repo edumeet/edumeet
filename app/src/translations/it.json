@@ -84,6 +84,8 @@
 	"tooltip.kickParticipant": "Espelli partecipante",
 	"tooltip.muteParticipant": "Muta partecipante",
 	"tooltip.muteParticipantVideo": "Ferma video partecipante",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "Mano alzata",
 	"tooltip.muteScreenSharing": "Ferma condivisione schermo partecipante",
 	"tooltip.unMuteScreenSharing": null,

@@ -84,6 +84,8 @@
 	"tooltip.kickParticipant": "Wyrzuć użytkownika",
 	"tooltip.muteParticipant": "Wycisz użytkownika",
 	"tooltip.muteParticipantVideo": "Wyłącz wideo użytkownika",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "Podnieś rękę",
 	"tooltip.muteScreenSharing": "Anuluj udostępniania pulpitu przez użytkownika",
 	"tooltip.unMuteScreenSharing": null,

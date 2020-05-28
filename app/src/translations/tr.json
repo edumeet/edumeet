@@ -84,6 +84,8 @@
 	"tooltip.kickParticipant": "Katılımcıyı kov",
 	"tooltip.muteParticipant": "Katılımcının sesini kapat",
 	"tooltip.muteParticipantVideo": "Katılımcının videosunu kapat",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "El kaldır",
 	"tooltip.muteScreenSharing": "Katılımcının ekran paylaşımını durdur",
 	"tooltip.unMuteScreenSharing": null,

@@ -84,6 +84,8 @@
 	"tooltip.kickParticipant": "Résztvevő kirúgása",
 	"tooltip.muteParticipant": "Résztvevő némítása",
 	"tooltip.muteParticipantVideo": "Résztvevő videóstreamének némítása",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "Jelentkezés",
 	"tooltip.muteScreenSharing": "Képernyőmegosztás szüneteltetése",
 	"tooltip.unMuteScreenSharing": null,

@@ -83,6 +83,8 @@
 	"tooltip.kickParticipant": "踢出",
 	"tooltip.muteParticipant": "靜音",
 	"tooltip.muteParticipantVideo": "隱藏視訊",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "舉手",
 	"tooltip.muteScreenSharing": "隱藏螢幕分享",
 	"tooltip.unMuteScreenSharing": null,

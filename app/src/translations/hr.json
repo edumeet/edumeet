@@ -84,6 +84,8 @@
 	"tooltip.kickParticipant": "Izbaci sudionika",
 	"tooltip.muteParticipant": "Utišaj sudionika",
 	"tooltip.muteParticipantVideo": "Ne prikazuj video sudionika",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "Podigni ruku",
 	"tooltip.muteScreenSharing": "Ne prikazuj dijeljenje ekrana sudionika",
 	"tooltip.unMuteScreenSharing": null,

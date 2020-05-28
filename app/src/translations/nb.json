@@ -84,6 +84,8 @@
 	"tooltip.kickParticipant": "Spark ut",
 	"tooltip.muteParticipant": "Mute lyd",
 	"tooltip.muteParticipantVideo": "Mute video",
+	"tooltip.inSpotlight": "I fokus",
+	"tooltip.isSpeaker": "Snakker",
 	"tooltip.raisedHand": "Rekk opp hånden",
 	"tooltip.muteScreenSharing": "Mute skjermdeling",
 	"tooltip.unMuteScreenSharing": "Unmute skjermdeling",

@@ -130,6 +130,11 @@ export const removeSelectedPeer = (peerId) =>
 		payload : { peerId }
 	});
 
+export const clearSelectedPeers = () =>
+	({
+		type : 'CLEAR_SELECTED_PEERS'
+	});
+
 export const setSpotlights = (spotlights) =>
 	({
 		type    : 'SET_SPOTLIGHTS',

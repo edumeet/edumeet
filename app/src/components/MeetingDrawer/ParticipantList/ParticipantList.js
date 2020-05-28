@@ -74,6 +74,7 @@ class ParticipantList extends React.PureComponent
 			isModerator,
 			participants,
 			spotlights,
+			selectedPeers,
 			classes
 		} = this.props;
 
@@ -120,6 +121,7 @@ class ParticipantList extends React.PureComponent
 										advancedMode={advancedMode}
 										isModerator={isModerator}
 										spotlight={spotlights.includes(peer.id)}
+										isSelected={selectedPeers.includes(peer.id)}
 									>
 										<Volume small id={peer.id} />
 									</ListPeer>
@@ -135,11 +137,12 @@ class ParticipantList extends React.PureComponent
 
 ParticipantList.propTypes =
 {
-	advancedMode : PropTypes.bool,
-	isModerator  : PropTypes.bool,
-	participants : PropTypes.array,
-	spotlights   : PropTypes.array,
-	classes      : PropTypes.object.isRequired
+	advancedMode  : PropTypes.bool,
+	isModerator   : PropTypes.bool.isRequired,
+	participants  : PropTypes.array.isRequired,
+	spotlights    : PropTypes.array.isRequired,
+	selectedPeers : PropTypes.array.isRequired,
+	classes       : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -149,9 +152,10 @@ const makeMapStateToProps = () =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			isModerator  : hasPermission(state),
-			participants : participantListSelector(state),
-			spotlights   : state.room.spotlights
+			isModerator   : hasPermission(state),
+			participants  : participantListSelector(state),
+			spotlights    : state.room.spotlights,
+			selectedPeers : state.room.selectedPeers
 		};
 	};
 
@@ -166,7 +170,8 @@ const ParticipantListContainer = connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room === next.room &&
+				prev.room.spotlights === next.room.spotlights &&
+				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.me.roles === next.me.roles &&
 				prev.peers === next.peers
 			);

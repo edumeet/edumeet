@@ -215,6 +215,11 @@ const room = (state = initialState, action) =>
 			return { ...state, selectedPeers };
 		}
 
+		case 'CLEAR_SELECTED_PEERS':
+		{
+			return { ...state, selectedPeers: [] };
+		}
+
 		case 'SET_SPOTLIGHTS':
 		{
 			const { spotlights } = action.payload;
