@@ -139,6 +139,8 @@
 	"settings.selectRoomLayout": "Wähle ein Raumlayout",
 	"settings.advancedMode": "Erweiterter Modus",
 	"settings.permanentTopBar": "Permanente obere Leiste",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Anzahl der sichtbaren Videos",
 	"settings.hiddenControls": "Medienwerkzeugleiste automatisch ausblenden",
 	"settings.notificationSounds": "Audiosignal bei Benachrichtigungen",

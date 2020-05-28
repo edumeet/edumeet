@@ -139,6 +139,8 @@
 	"settings.selectRoomLayout": "Вибір розташування кімнати",
 	"settings.advancedMode": "Розширений режим",
 	"settings.permanentTopBar": "Постійний верхній рядок",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Кількість видимих ​​відео",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,

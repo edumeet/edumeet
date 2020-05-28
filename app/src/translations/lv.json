@@ -133,6 +133,8 @@
 	"settings.selectRoomLayout": "Iestatiet sapulces telpas izkārtojumu",
 	"settings.advancedMode": "Advancētais režīms",
 	"settings.permanentTopBar": "Pastāvīga augšējā (ekrānaugšas) josla",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Jums redzamo video/kameru skaits",
 	"settings.hiddenControls": "Slēpto mediju vadība",
 	"settings.notificationSounds": "Paziņojumu skaņas",

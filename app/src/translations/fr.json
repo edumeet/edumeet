@@ -139,6 +139,8 @@
 	"settings.selectRoomLayout": "Sélectionnez la présentation de la salle",
 	"settings.advancedMode": "Mode avancé",
 	"settings.permanentTopBar": "Barre supérieure permanente",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Nombre de vidéos visibles",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,

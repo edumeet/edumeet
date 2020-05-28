@@ -139,6 +139,8 @@
 	"settings.selectRoomLayout": "Επιλογή περιβάλλοντος δωματίου",
 	"settings.advancedMode": "Προηγμένη λειτουργία",
 	"settings.permanentTopBar": "Μόνιμη μπάρα κορυφής",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Αριθμός ορατών βίντεο",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,

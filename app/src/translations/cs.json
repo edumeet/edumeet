@@ -138,6 +138,8 @@
 	"settings.selectRoomLayout": "Vyberte rozvržení místnosti",
 	"settings.advancedMode": "Pokočilý mód",
 	"settings.permanentTopBar": null,
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": null,
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,

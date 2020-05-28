@@ -43,7 +43,22 @@ var config =
 	 * 1, 5, 10, 15, 20, 25, 30
 	 * 
 	 **/
-
+	// The aspect ratio of the videos as shown on
+	// the screen. This is changeable in client settings.
+	// This value must match one of the defined values in
+	// viewAspectRatios EXACTLY (e.g. 1.333)
+	viewAspectRatio               : 1.333,
+	// These are the selectable aspect ratios in the settings
+	viewAspectRatios              : [ {
+		value : 1.333, // 4 / 3
+		label : '4 : 3'
+	}, {
+		value : 1.777, // 16 / 9
+		label : '16 : 9'
+	} ],
+	// The aspect ratio of the video from the camera
+	// this is not changeable in settings, only config
+	videoAspectRatio              : 1.777,
 	defaultResolution             : 'medium',
 	defaultFrameRate              : 15,
 	defaultScreenResolution       : 'veryhigh',

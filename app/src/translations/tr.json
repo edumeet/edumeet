@@ -139,6 +139,8 @@
 	"settings.selectRoomLayout": "Oda düzeni seç",
 	"settings.advancedMode": "Detaylı mod",
 	"settings.permanentTopBar": "Üst barı kalıcı yap",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "İzlenebilir video sayısı",
 	"settings.hiddenControls": "Gizli medya kontrolleri",
 	"settings.notificationSounds": "Bildirim sesleri",

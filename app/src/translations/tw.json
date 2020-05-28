@@ -138,6 +138,8 @@
 	"settings.selectRoomLayout": "選擇房間佈局",
 	"settings.advancedMode": "進階模式",
 	"settings.permanentTopBar": "固定頂端列",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "視訊數量上限",
 	"settings.hiddenControls": "隱藏控制按鈕",
 	"settings.notificationSounds": "通知音效",

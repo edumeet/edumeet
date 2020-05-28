@@ -31,54 +31,48 @@ let ScreenShare;
 let Spotlights;
 
 let requestTimeout,
-	transportOptions,
 	lastN,
-	mobileLastN;
+	mobileLastN,
+	videoAspectRatio;
 
 if (process.env.NODE_ENV !== 'test')
 {
 	({
-		requestTimeout,
-		transportOptions,
-		lastN,
-		mobileLastN
+		requestTimeout = 20000,
+		lastN = 4,
+		mobileLastN = 1,
+		videoAspectRatio = 4 / 3
 	} = window.config);
 }
 
 const logger = new Logger('RoomClient');
-
-const ROOM_OPTIONS =
-{
-	requestTimeout   : requestTimeout,
-	transportOptions : transportOptions
-};
 
 const VIDEO_CONSTRAINS =
 {
 	'low' :
 	{
 		width       : { ideal: 320 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	},
 	'medium' :
 	{
 		width       : { ideal: 640 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	},
 	'high' :
 	{
 		width       : { ideal: 1280 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	},
 	'veryhigh' :
 	{
 		width       : { ideal: 1920 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	},
 	'ultra' :
 	{
 		width       : { ideal: 3840 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	}
 };
 
@@ -89,9 +83,8 @@ const PC_PROPRIETARY_CONSTRAINTS =
 
 const VIDEO_SIMULCAST_ENCODINGS =
 [
-	{ scaleResolutionDownBy: 4 },
-	{ scaleResolutionDownBy: 2 },
-	{ scaleResolutionDownBy: 1 }
+	{ scaleResolutionDownBy: 4, maxBitRate: 100000 },
+	{ scaleResolutionDownBy: 1, maxBitRate: 1200000 }
 ];
 
 // Used for VP9 webcam video.
@@ -578,7 +571,7 @@ export default class RoomClient
 				called = true;
 				callback(new SocketTimeoutError('Request timed out'));
 			},
-			ROOM_OPTIONS.requestTimeout
+			requestTimeout
 		);
 
 		return (...args) =>

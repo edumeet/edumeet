@@ -139,6 +139,8 @@
 	"settings.selectRoomLayout": "Select room layout",
 	"settings.advancedMode": "Advanced mode",
 	"settings.permanentTopBar": "Permanent top bar",
+	"settings.aspectRatio": "Video aspect ratio",
+	"settings.selectAspectRatio": "Select video aspect ratio",
 	"settings.lastn": "Number of visible videos",
 	"settings.hiddenControls": "Hidden media controls",
 	"settings.notificationSounds": "Notification sounds",
