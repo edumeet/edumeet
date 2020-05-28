@@ -21,25 +21,54 @@ var config =
 		'safari'                       : '>12',
 		'firefox'                      : '>=60',
 		'chrome'                       : '>=74',
+		'chromium'                     : '>=74',
 		'opera'                        : '>=62',
 		'samsung internet for android' : '>=11.1.1.52'
 	},
 
 	/**
-	 * If defaultResolution is set, it will override user settings when joining:
+	 * Resolutions:
+	 * 
 	 * low ~ 320x240
 	 * medium ~ 640x480
 	 * high ~ 1280x720
 	 * veryhigh ~ 1920x1080
 	 * ultra ~ 3840x2560
+	 * 
 	 **/
-	defaultResolution  : 'medium',
+
+	/**
+	 * Frame rates:
+	 * 
+	 * 1, 5, 10, 15, 20, 25, 30
+	 * 
+	 **/
+	// The aspect ratio of the videos as shown on
+	// the screen. This is changeable in client settings.
+	// This value must match one of the defined values in
+	// viewAspectRatios EXACTLY (e.g. 1.333)
+	viewAspectRatio               : 1.333,
+	// These are the selectable aspect ratios in the settings
+	viewAspectRatios              : [ {
+		value : 1.333, // 4 / 3
+		label : '4 : 3'
+	}, {
+		value : 1.777, // 16 / 9
+		label : '16 : 9'
+	} ],
+	// The aspect ratio of the video from the camera
+	// this is not changeable in settings, only config
+	videoAspectRatio              : 1.777,
+	defaultResolution             : 'medium',
+	defaultFrameRate              : 15,
+	defaultScreenResolution       : 'veryhigh',
+	defaultScreenSharingFrameRate : 5,
 	// Enable or disable simulcast for webcam video
-	simulcast          : true,
+	simulcast                     : true,
 	// Enable or disable simulcast for screen sharing video
-	simulcastSharing   : false,
+	simulcastSharing              : false,
 	// Simulcast encoding layers and levels
-	simulcastEncodings :
+	simulcastEncodings            :
 	[
 		{ scaleResolutionDownBy: 4 },
 		{ scaleResolutionDownBy: 2 },
@@ -119,6 +148,15 @@ var config =
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
 	title                : 'Multiparty meeting',
+	// Service & Support URL
+	// if not set then not displayed on the about modals
+	supportUrl           : 'https://support.example.com',
+	// Privacy and dataprotection URL or path
+	// by default privacy/privacy.html
+	// that is a placeholder for your policies
+	//
+	// but an external url could be also used here	 
+	privacyUrl           : 'privacy/privacy.html',
 	theme                :
 	{
 		palette :

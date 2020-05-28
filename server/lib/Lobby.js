@@ -36,7 +36,7 @@ class Lobby extends EventEmitter
 	checkEmpty()
 	{
 		logger.info('checkEmpty()');
-		
+
 		return Object.keys(this._peers).length === 0;
 	}
 
@@ -105,7 +105,7 @@ class Lobby extends EventEmitter
 			logger.debug(
 				'Peer "request" event [method:"%s", peer:"%s"]',
 				request.method, peer.id);
-			
+
 			if (this._closed)
 				return;
 

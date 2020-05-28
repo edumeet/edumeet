@@ -23,6 +23,7 @@ const styles = (theme) =>
 		{
 			position                     : 'fixed',
 			display                      : 'flex',
+			zIndex                       : 30,
 			[theme.breakpoints.up('md')] :
 			{
 				top            : '50%',
@@ -53,6 +54,31 @@ const styles = (theme) =>
 		{
 			opacity    : 0,
 			transition : 'opacity .5s'
+		},
+		move :
+		{
+			left                           : '30vw',
+			top                            : '50%',
+			transform                      : 'translate(0%, -50%)',
+			flexDirection                  : 'column',
+			justifyContent                 : 'center',
+			alignItems                     : 'center',
+			[theme.breakpoints.down('lg')] :
+			{
+				left : '40vw'
+			},
+			[theme.breakpoints.down('md')] :
+			{
+				left : '50vw'
+			},
+			[theme.breakpoints.down('sm')] :
+			{
+				left : '70vw'
+			},
+			[theme.breakpoints.down('xs')] :
+			{
+				left : '90vw'
+			}
 		}
 	});
 
@@ -64,6 +90,8 @@ const ButtonControlBar = (props) =>
 		roomClient,
 		toolbarsVisible,
 		hiddenControls,
+		drawerOverlayed,
+		toolAreaOpen,
 		me,
 		micProducer,
 		webcamProducer,
@@ -176,7 +204,11 @@ const ButtonControlBar = (props) =>
 					classes.root,
 					hiddenControls ?
 						(toolbarsVisible ? classes.show : classes.hide) :
-						classes.show)
+						classes.show,
+					toolAreaOpen &&
+						(me.browser.platform !== 'mobile' && !drawerOverlayed) ?
+						classes.move : null
+				)
 			}
 		>
 			<Tooltip title={micTip} placement={smallScreen ? 'top' : 'right'}>
@@ -191,8 +223,11 @@ const ButtonControlBar = (props) =>
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
 					{
-						micState === 'on' ?
-							roomClient.muteMic() :
+						if (micState === 'off')
+							roomClient.updateMic({ start: true });
+						else if (micState === 'on')
+							roomClient.muteMic();
+						else
 							roomClient.unmuteMic();
 					}}
 				>
@@ -217,7 +252,7 @@ const ButtonControlBar = (props) =>
 					{
 						webcamState === 'on' ?
 							roomClient.disableWebcam() :
-							roomClient.enableWebcam();
+							roomClient.updateWebcam({ start: true });
 					}}
 				>
 					{ webcamState === 'on' ?
@@ -227,47 +262,36 @@ const ButtonControlBar = (props) =>
 					}
 				</Fab>
 			</Tooltip>
-			<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'right'}>
-				<Fab
-					aria-label={intl.formatMessage({
-						id             : 'device.startScreenSharing',
-						defaultMessage : 'Start screen sharing'
-					})}
-					className={classes.fab}
-					disabled={!me.canShareScreen || me.screenShareInProgress}
-					color={screenState === 'on' ? 'primary' : 'default'}
-					size={smallScreen ? 'large' : 'medium'}
-					onClick={() =>
-					{
-						switch (screenState)
+			{ me.browser.platform !== 'mobile' &&
+				<Tooltip title={screenTip} placement={smallScreen ? 'top' : 'right'}>
+					<Fab
+						aria-label={intl.formatMessage({
+							id             : 'device.startScreenSharing',
+							defaultMessage : 'Start screen sharing'
+						})}
+						className={classes.fab}
+						disabled={!me.canShareScreen || me.screenShareInProgress}
+						color={screenState === 'on' ? 'primary' : 'default'}
+						size={smallScreen ? 'large' : 'medium'}
+						onClick={() =>
 						{
-							case 'on':
-							{
+							if (screenState === 'off')
+								roomClient.updateScreenSharing({ start: true });
+							else if (screenState === 'on')
 								roomClient.disableScreenSharing();
-								break;
-							}
-							case 'off':
-							{
-								roomClient.enableScreenSharing();
-								break;
-							}
-							default:
-							{
-								break;
-							}
+						}}
+					>
+						{ screenState === 'on' || screenState === 'unsupported' ?
+							<ScreenOffIcon/>
+							:null
 						}
-					}}
-				>
-					{ screenState === 'on' || screenState === 'unsupported' ?
-						<ScreenOffIcon/>
-						:null
-					}
-					{ screenState === 'off' ?
-						<ScreenIcon/>
-						:null
-					}
-				</Fab>
-			</Tooltip>
+						{ screenState === 'off' ?
+							<ScreenIcon/>
+							:null
+						}
+					</Fab>
+				</Tooltip>
+			}
 		</div>
 	);
 };
@@ -277,6 +301,8 @@ ButtonControlBar.propTypes =
 	roomClient      : PropTypes.any.isRequired,
 	toolbarsVisible : PropTypes.bool.isRequired,
 	hiddenControls  : PropTypes.bool.isRequired,
+	drawerOverlayed : PropTypes.bool.isRequired,
+	toolAreaOpen    : PropTypes.bool.isRequired,
 	me              : appPropTypes.Me.isRequired,
 	micProducer     : appPropTypes.Producer,
 	webcamProducer  : appPropTypes.Producer,
@@ -289,6 +315,8 @@ const mapStateToProps = (state) =>
 	({
 		toolbarsVisible : state.room.toolbarsVisible,
 		hiddenControls  : state.settings.hiddenControls,
+		drawerOverlayed : state.settings.drawerOverlayed,
+		toolAreaOpen    : state.toolarea.toolAreaOpen,
 		...meProducersSelector(state),
 		me              : state.me
 	});
@@ -305,6 +333,8 @@ export default withRoomContext(connect(
 				Math.round(next.peerVolumes[prev.me.id]) &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
 				prev.settings.hiddenControls === next.settings.hiddenControls &&
+				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.producers === next.producers &&
 				prev.me === next.me
 			);

@@ -156,10 +156,10 @@ async function run()
 		// Run WebSocketServer.
 		await runWebSocketServer();
 
-		const errorHandler = (err, req, res, next) =>
+		const errorHandler = (err, req, res) =>
 		{
 			const trackingId = uuidv4();
-	
+
 			res.status(500).send(
 				`<h1>Internal Server Error</h1>
 				<p>If you report this error, please also report this 
@@ -168,7 +168,7 @@ async function run()
 				<b>${trackingId}</b></p>`
 			);
 			logger.error(
-				'Express error handler dump with tracking ID: %s, error dump: %o', 
+				'Express error handler dump with tracking ID: %s, error dump: %o',
 				trackingId, err);
 		};
 
@@ -375,18 +375,18 @@ async function setupAuth()
 				const state = JSON.parse(base64.decode(req.query.state));
 
 				const { peerId, roomId } = state;
-	
+
 				req.session.peerId = peerId;
 				req.session.roomId = roomId;
-	
+
 				let peer = peers.get(peerId);
-	
+
 				if (!peer) // User has no socket session yet, make temporary
 					peer = new Peer({ id: peerId, roomId });
-	
+
 				if (peer.roomId !== roomId) // The peer is mischievous
 					throw new Error('peer authenticated with wrong room');
-	
+
 				if (typeof config.userMapping === 'function')
 				{
 					await config.userMapping({
@@ -395,9 +395,9 @@ async function setupAuth()
 						userinfo : req.user._userinfo
 					});
 				}
-	
+
 				peer.authenticated = true;
-	
+
 				res.send(loginHelper({
 					displayName : peer.displayName,
 					picture     : peer.picture
@@ -572,13 +572,13 @@ async function runWebSocketServer()
 					email,
 					_userinfo
 				} = socket.handshake.session.passport.user;
-		
+
 				peer.authId = id;
 				peer.displayName = displayName;
 				peer.picture = picture;
 				peer.email = email;
 				peer.authenticated = true;
-		
+
 				if (typeof config.userMapping === 'function')
 				{
 					await config.userMapping({ peer, roomId, userinfo: _userinfo });

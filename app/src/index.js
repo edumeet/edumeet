@@ -79,6 +79,7 @@ const supportedBrowsers={
 	'safari'                       : '>12',
 	'firefox'                      : '>=60',
 	'chrome'                       : '>=74',
+	'chromium'                     : '>=74',
 	'opera'                        : '>=62',
 	'samsung internet for android' : '>=11.1.1.52'
 };
@@ -99,6 +100,8 @@ const intl = createIntl({
 	locale,
 	messages : messages[locale]
 }, cache);
+
+document.documentElement.lang = locale;
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
@@ -151,39 +154,42 @@ function run()
 	// Get current device.
 	const device = deviceInfo();
 
-	let unsupportedBrowser=false;
+	let unsupportedBrowser = false;
 
-	let webrtcUnavailable=false;
+	let webrtcUnavailable = false;
 
 	if (detectDevice() === undefined)
 	{
-		logger.error('Unsupported browser detected by mediasoup client detectDevice! deviceInfo: %o', device);
-		unsupportedBrowser=true;
+		logger.error('Your browser is not supported [deviceInfo:"%o"]', device);
+
+		unsupportedBrowser = true;
 	}
-	else
-	if (
+	else if (
 		navigator.mediaDevices === undefined ||
 		navigator.mediaDevices.getUserMedia === undefined ||
 		window.RTCPeerConnection === undefined
 	)
 	{
-		logger.error('WebRTC is unavialable in your browser! deviceInfo: %o', device);
-		webrtcUnavailable=true;
+		logger.error('Your browser is not supported [deviceInfo:"%o"]', device);
+
+		webrtcUnavailable = true;
 	}
-	else
-	if (!device.bowser.satisfies(
-		window.config.supportedBrowsers ? window.config.supportedBrowsers : supportedBrowsers)
+	else if (
+		!device.bowser.satisfies(
+			window.config.supportedBrowsers || supportedBrowsers
+		)
 	)
 	{
 		logger.error(
-			'Your browser is not on the supported list! Ask your server admin to add your browser to the supported list, if you think that your browser should be supported! deviceInfo: %o',
+			'Your browser is not supported [deviceInfo:"%o"]',
 			device
 		);
-		unsupportedBrowser=true;
+
+		unsupportedBrowser = true;
 	}
 	else
 	{
-		logger.debug('Supported Browser! deviceInfo: %o', device);
+		logger.debug('Your browser is supported [deviceInfo:"%o"]', device);
 	}
 
 	if (unsupportedBrowser || webrtcUnavailable)

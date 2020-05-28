@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	meProducersSelector,
@@ -177,6 +177,7 @@ const Me = (props) =>
 		screenProducer,
 		extraVideoProducers,
 		canShareScreen,
+		transports,
 		noiseVolume,
 		classes
 	} = props;
@@ -334,6 +335,20 @@ const Me = (props) =>
 			);
 	}
 
+	useEffect(() =>
+	{
+		let poll;
+
+		const interval = 1000;
+
+		if (advancedMode)
+		{
+			poll = setInterval(() => roomClient.getTransportStats(), interval);
+		}
+
+		return () => clearInterval(poll);
+	}, [ roomClient, advancedMode ]);
+
 	return (
 		<React.Fragment>
 			<div
@@ -453,7 +468,7 @@ const Me = (props) =>
 												onClick={() =>
 												{
 													if (micState === 'off')
-														roomClient.enableMic();
+														roomClient.updateMic({ start: true });
 													else if (micState === 'on')
 														roomClient.muteMic();
 													else
@@ -513,7 +528,7 @@ const Me = (props) =>
 												onClick={() =>
 												{
 													if (micState === 'off')
-														roomClient.enableMic();
+														roomClient.updateMic({ start: true });
 													else if (micState === 'on')
 														roomClient.muteMic();
 													else
@@ -571,7 +586,7 @@ const Me = (props) =>
 												{
 													webcamState === 'on' ?
 														roomClient.disableWebcam() :
-														roomClient.enableWebcam();
+														roomClient.updateWebcam({ start: true });
 												}}
 											>
 												{ webcamState === 'on' ?
@@ -596,7 +611,7 @@ const Me = (props) =>
 												{
 													webcamState === 'on' ?
 														roomClient.disableWebcam() :
-														roomClient.enableWebcam();
+														roomClient.updateWebcam({ start: true });
 												}}
 											>
 												{ webcamState === 'on' ?
@@ -631,23 +646,10 @@ const Me = (props) =>
 													size='small'
 													onClick={() =>
 													{
-														switch (screenState)
-														{
-															case 'on':
-															{
-																roomClient.disableScreenSharing();
-																break;
-															}
-															case 'off':
-															{
-																roomClient.enableScreenSharing();
-																break;
-															}
-															default:
-															{
-																break;
-															}
-														}
+														if (screenState === 'off')
+															roomClient.updateScreenSharing({ start: true });
+														else if (screenState === 'on')
+															roomClient.disableScreenSharing();
 													}}
 												>
 													{ (screenState === 'on' || screenState === 'unsupported') &&
@@ -676,23 +678,10 @@ const Me = (props) =>
 													size='large'
 													onClick={() =>
 													{
-														switch (screenState)
-														{
-															case 'on':
-															{
-																roomClient.disableScreenSharing();
-																break;
-															}
-															case 'off':
-															{
-																roomClient.enableScreenSharing();
-																break;
-															}
-															default:
-															{
-																break;
-															}
-														}
+														if (screenState === 'off')
+															roomClient.updateScreenSharing({ start: true });
+														else if (screenState === 'on')
+															roomClient.disableScreenSharing();
 													}}
 												>
 													{ (screenState === 'on' || screenState === 'unsupported') &&
@@ -721,8 +710,10 @@ const Me = (props) =>
 						videoVisible={videoVisible}
 						audioCodec={micProducer && micProducer.codec}
 						videoCodec={webcamProducer && webcamProducer.codec}
+						netInfo={transports && transports}
 						audioScore={audioScore}
 						videoScore={videoScore}
+						showQuality
 						onChangeDisplayName={(displayName) =>
 						{
 							roomClient.changeDisplayName(displayName);
@@ -849,6 +840,7 @@ const Me = (props) =>
 
 							<VideoView
 								isMe
+								isExtraVideo
 								advancedMode={advancedMode}
 								peer={me}
 								displayName={settings.displayName}
@@ -936,7 +928,8 @@ Me.propTypes =
 	canShareScreen      : PropTypes.bool.isRequired,
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
-	theme               : PropTypes.object.isRequired
+	theme               : PropTypes.object.isRequired,
+	transports          : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -963,7 +956,8 @@ const makeMapStateToProps = () =>
 			settings       : state.settings,
 			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
 			canShareScreen : hasPermission(state),
-			noiseVolume    : noise
+			noiseVolume    : noise,
+			transports     : state.transports
 		};
 	};
 
@@ -984,7 +978,8 @@ export default withRoomContext(connect(
 				prev.me === next.me &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
-				prev.settings === next.settings
+				prev.settings === next.settings &&
+				prev.transports === next.transports
 			);
 		}
 	}

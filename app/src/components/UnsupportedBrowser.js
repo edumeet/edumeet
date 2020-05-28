@@ -49,10 +49,7 @@ const styles = (theme) =>
 		}
 	});
 
-const open=true;
-const dividers=true;
-
-let dense=false;
+let dense = false;
 
 const supportedBrowsers=[
 	{ name: 'Chrome/Chromium', version: '74', vendor: 'Google' },
@@ -72,13 +69,11 @@ const UnsupportedBrowser = ({
 }) =>
 {
 	if (platform !== 'desktop')
-	{
-		dense=true;
-	}
+		dense = true;
 
 	return (
 		<Dialog
-			open={open}
+			open
 			scroll={'body'}
 			classes={{
 				paper : classes.dialogPaper
@@ -88,22 +83,22 @@ const UnsupportedBrowser = ({
 				{!webrtcUnavailable &&
 				<FormattedMessage
 					id='unsupportedBrowser.titleUnsupportedBrowser'
-					defaultMessage='Detected unsupported browser!'
+					defaultMessage='Browser not supported'
 				/>
 				}
 				{webrtcUnavailable &&
 				<FormattedMessage
 					id='unsupportedBrowser.titlewebrtcUnavailable'
-					defaultMessage='Required functionality not availble in your browser!'
+					defaultMessage='Required functionality not availble in your browser'
 				/>
 				}
 			</DialogTitle>
-			<DialogContent dividers={dividers} >
+			<DialogContent dividers>
 				<FormattedMessage
 					id='unsupportedBrowser.bodyText'
-					defaultMessage='This meeting service requires a
-						functionality that is not supported by your browser.
-						Please upgrade, or switch to a different browser, or
+					defaultMessage='This meeting service requires
+						functionality not supported by your browser.
+						Please upgrade, switch to a different browser, or
 						check your settings. Supported browsers:'
 				/>
 				<Grid container spacing={2} justify='center' alignItems='center'>

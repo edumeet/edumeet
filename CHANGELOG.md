@@ -1,5 +1,40 @@
 # Changelog
 
+## 3.3
+* Add: Rooms now scale across cores
+* Add: Permissions and roles. Users can now have different roles (moderator, admin etc.) that give different permissions.
+* Add: TURN API or fallback TURN server
+* Add: Configurable room size limit
+* Add: Prometheus monitoring support
+* Add: Possible to share several videos (ex: 2 webcams)
+* Add: Configurable audio settings (echocancellation etc.)
+* Add: Configurable audio output device (in supported browsers)
+* Add: Audio auto mute/unmute based on volume
+* Add: Handle unsupported browsers properly
+* Add: Lots of appearence settings
+* Add: Side drawer can now stay permanently open
+* Add: Move control buttons to separate control bar
+* Add: Can now "raise hand"
+* Add: Screen sharing in Safari 13+, Opera and Edge
+* Add: Extended advanced info about network in client
+* Add: Configurable screen sharing frame rate
+* Add: Help and About dialogs
+* Add: More keyboard shortcuts
+* Add: Quality indicator on videos
+* Add: More translations
+* Fix: Various UI fixes and improvements
+* Fix: Better audio/video device handling
+* Fix: Update keyboard shortcut handling
+* Fix: Authentication for load balanced scenarios
+* Fix: Signaling when entering lobby
+* Fix: Signaling timeouts and retries
+* Fix: Filesharing fixes (sharing same file twice, etc.)
+* Fix: Better handling of hark
+* Fix: Use applyContraints instead of restarting producers
+* Fix: Now handles reconnects properly if client loses connection
+* Fix: Rotating devices don't show rotated videos
+* Fix: Various fixes to client authentication
+
 ## 3.2.1
 
 * Fix: permananent top bar by default

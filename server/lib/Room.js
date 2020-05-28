@@ -1248,8 +1248,6 @@ class Room extends EventEmitter
 					peerId : peer.id
 				}, true);
 
-				this._lobby.promoteAllPeers();
-
 				// Return no error
 				cb();
 
