@@ -25,7 +25,7 @@ const initialState =
 	notificationSounds      : true,
 	buttonControlBar        : window.config.buttonControlBar || false,
 	drawerOverlayed         : window.config.drawerOverlayed || true,
-	aspectRatio             : window.config.viewAspectRatio || 1.333, // 4:3
+	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
 	...window.config.defaultAudio
 };
 

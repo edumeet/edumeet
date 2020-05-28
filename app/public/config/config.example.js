@@ -47,7 +47,7 @@ var config =
 	// the screen. This is changeable in client settings.
 	// This value must match one of the defined values in
 	// viewAspectRatios EXACTLY (e.g. 1.333)
-	viewAspectRatio               : 1.333,
+	viewAspectRatio               : 1.777,
 	// These are the selectable aspect ratios in the settings
 	viewAspectRatios              : [ {
 		value : 1.333, // 4 / 3

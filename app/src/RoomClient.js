@@ -41,7 +41,7 @@ if (process.env.NODE_ENV !== 'test')
 		requestTimeout = 20000,
 		lastN = 4,
 		mobileLastN = 1,
-		videoAspectRatio = 4 / 3
+		videoAspectRatio = 1.777 // 16 : 9
 	} = window.config);
 }
 
