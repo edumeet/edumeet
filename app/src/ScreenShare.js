@@ -2,6 +2,14 @@ import isElectron from 'is-electron';
 
 let electron = null;
 
+/** 
+ * Check if window.require function exits
+ * because electron default is "nodeIntegration: false"
+ * and this case window.require is not a function.
+ * It caused issue with Rocket Chat electron client.
+ * 
+ * TODO: do it more inteligently.
+ */
 if (isElectron() && typeof window.require === 'function')
 	electron = window.require('electron');
 
