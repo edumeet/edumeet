@@ -1070,10 +1070,13 @@ export default class RoomClient
 
 		this._hark.on('volume_change', (volume) =>
 		{
-			volume = Math.round(volume);
-
-			if (this._micProducer && (volume !== Math.round(this._hark.lastVolume)))
+			// Update only if there is a bigger diff 
+			if (this._micProducer && Math.abs(volume - this._hark.lastVolume) > 0.5)
 			{
+				// Decay calculation: keep in mind that volume range is -100 ... 0 (dB)
+				// This makes decay volume fast if difference to last saved value is big
+				// and slow for small changes. This prevents flickering volume indicator
+				// at low levels
 				if (volume < this._hark.lastVolume)
 				{
 					volume =
@@ -1081,8 +1084,8 @@ export default class RoomClient
 						Math.pow(
 							(volume - this._hark.lastVolume) /
 							(100 + this._hark.lastVolume)
-							, 4
-						) * 2;
+							, 2
+						) * 10;
 				}
 
 				this._hark.lastVolume = volume;

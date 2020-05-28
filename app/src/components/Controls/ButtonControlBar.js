@@ -329,6 +329,8 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				Math.round(prev.peerVolumes[prev.me.id]) ===
+				Math.round(next.peerVolumes[prev.me.id]) &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
 				prev.settings.hiddenControls === next.settings.hiddenControls &&
 				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
