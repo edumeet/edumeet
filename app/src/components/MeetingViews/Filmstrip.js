@@ -236,7 +236,7 @@ class Filmstrip extends React.PureComponent
 	render()
 	{
 		const {
-			roomClient,
+			// roomClient,
 			peers,
 			myId,
 			advancedMode,
@@ -332,7 +332,7 @@ class Filmstrip extends React.PureComponent
 }
 
 Filmstrip.propTypes = {
-	roomClient      : PropTypes.any.isRequired,
+	// roomClient      : PropTypes.any.isRequired,
 	activeSpeakerId : PropTypes.string,
 	advancedMode    : PropTypes.bool,
 	peers           : PropTypes.object.isRequired,
