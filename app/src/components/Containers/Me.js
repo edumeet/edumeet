@@ -538,7 +538,7 @@ const Me = (props) =>
 												{ settings.voiceActivatedUnmute ?
 													micState === 'on' ?
 														<React.Fragment>
-															<svg style={{ 'position': 'absolute' }}>
+															<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
 																<defs>
 																	<clipPath id='cut-off-indicator'>
 																		<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
