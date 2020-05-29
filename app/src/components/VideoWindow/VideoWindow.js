@@ -11,6 +11,7 @@ const VideoWindow = (props) =>
 	const {
 		advancedMode,
 		consumer,
+		aspectRatio,
 		toggleConsumerWindow
 	} = props;
 
@@ -24,7 +25,7 @@ const VideoWindow = (props) =>
 	);
 
 	return (
-		<NewWindow onUnload={toggleConsumerWindow}>
+		<NewWindow onUnload={toggleConsumerWindow} aspectRatio={aspectRatio}>
 			<FullView
 				advancedMode={advancedMode}
 				consumerSpatialLayers={consumer ? consumer.spatialLayers : null}
@@ -55,13 +56,15 @@ VideoWindow.propTypes =
 {
 	advancedMode         : PropTypes.bool,
 	consumer             : appPropTypes.Consumer,
+	aspectRatio          : PropTypes.number.isRequired,
 	toggleConsumerWindow : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		consumer : state.consumers[state.room.windowConsumer]
+		consumer    : state.consumers[state.room.windowConsumer],
+		aspectRatio : state.settings.aspectRatio
 	};
 };
 
@@ -84,7 +87,8 @@ const VideoWindowContainer = connect(
 		{
 			return (
 				prev.consumers[prev.room.windowConsumer] ===
-					next.consumers[next.room.windowConsumer]
+					next.consumers[next.room.windowConsumer] &&
+				prev.settings.aspectRatio === next.settings.aspectRatio
 			);
 		}
 	}
