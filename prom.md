@@ -46,7 +46,7 @@ on the allocated port (see `/etc/ferm/ferm.conf`).
 |           |      |                    |             |          |
 | mediasoup |      | express  socket.io |     net     | express  |
 +-----+-----+      +----+---------+-----+-----+-------+-----+----+
-      ^ min-max         ^ 443     ^ 443       ^ sock        ^ PROM_PORT
+      ^ min-max         ^ 443     ^ 443       ^ sock        ^ 8889
       | RTP             | HTTPS   | ws        |             | HTTP
       |                 |         |           |             |
       |               +-+---------+-+  +------+------+  +---+--------+
