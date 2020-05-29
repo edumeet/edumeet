@@ -24,7 +24,7 @@ If you want the ansible approach, you can find ansible role [here](https://githu
 ## Package Installation
 If you want to install it on the Debian & Ubuntu based operating systems.
 * Prerequisites:
-multiparty-meeting will run on nodejs v12.x and later versions.
+multiparty-meeting will run on nodejs v10.x and later versions. (v12.x has issues for now, please use another major version)
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 * Download .deb package from [here](https://github.com/havfo/multiparty-meeting/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
