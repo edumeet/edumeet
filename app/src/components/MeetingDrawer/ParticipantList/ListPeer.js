@@ -68,6 +68,7 @@ const styles = (theme) =>
 		},
 		moreActionsHeader :
 		{
+			fontWeight  : 700,
 			marginLeft  : theme.spacing(2),
 			marginRight : theme.spacing(2),
 			marginTop   : theme.spacing(1)

@@ -110,7 +110,10 @@ class Democratic extends React.PureComponent
 				break;
 		}
 
-		if (Math.ceil(this.state.peerWidth) !== Math.ceil(FILL_RATE * x))
+		if (
+			Math.ceil(this.state.peerWidth) !== Math.ceil(FILL_RATE * x) ||
+			Math.ceil(this.state.peerHeight) !== Math.ceil(FILL_RATE * y)
+		)
 		{
 			this.setState({
 				peerWidth  : FILL_RATE * x,
