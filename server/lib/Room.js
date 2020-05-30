@@ -786,10 +786,14 @@ class Room extends EventEmitter
 					appData : { producing, consuming }
 				};
 
+				webRtcTransportOptions.enableTcp = true;
+
 				if (forceTcp)
-				{
 					webRtcTransportOptions.enableUdp = false;
-					webRtcTransportOptions.enableTcp = true;
+				else
+				{
+					webRtcTransportOptions.enableUdp = true;
+					webRtcTransportOptions.preferUdp = true;
 				}
 
 				const transport = await router.createWebRtcTransport(

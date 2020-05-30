@@ -31,54 +31,53 @@ let ScreenShare;
 let Spotlights;
 
 let requestTimeout,
-	transportOptions,
 	lastN,
-	mobileLastN;
+	mobileLastN,
+	videoAspectRatio;
 
 if (process.env.NODE_ENV !== 'test')
 {
 	({
-		requestTimeout,
-		transportOptions,
-		lastN,
-		mobileLastN
+		requestTimeout = 20000,
+		lastN = 4,
+		mobileLastN = 1,
+		videoAspectRatio = 1.777 // 16 : 9
 	} = window.config);
 }
 
 const logger = new Logger('RoomClient');
-
-const ROOM_OPTIONS =
-{
-	requestTimeout   : requestTimeout,
-	transportOptions : transportOptions
-};
 
 const VIDEO_CONSTRAINS =
 {
 	'low' :
 	{
 		width       : { ideal: 320 },
-		aspectRatio : 1.334
+		facingMode  : { ideal: 'user' },
+		aspectRatio : videoAspectRatio
 	},
 	'medium' :
 	{
 		width       : { ideal: 640 },
-		aspectRatio : 1.334
+		facingMode  : { ideal: 'user' },
+		aspectRatio : videoAspectRatio
 	},
 	'high' :
 	{
 		width       : { ideal: 1280 },
-		aspectRatio : 1.334
+		facingMode  : { ideal: 'user' },
+		aspectRatio : videoAspectRatio
 	},
 	'veryhigh' :
 	{
 		width       : { ideal: 1920 },
-		aspectRatio : 1.334
+		facingMode  : { ideal: 'user' },
+		aspectRatio : videoAspectRatio
 	},
 	'ultra' :
 	{
 		width       : { ideal: 3840 },
-		aspectRatio : 1.334
+		facingMode  : { ideal: 'user' },
+		aspectRatio : videoAspectRatio
 	}
 };
 
@@ -89,9 +88,8 @@ const PC_PROPRIETARY_CONSTRAINTS =
 
 const VIDEO_SIMULCAST_ENCODINGS =
 [
-	{ scaleResolutionDownBy: 4 },
-	{ scaleResolutionDownBy: 2 },
-	{ scaleResolutionDownBy: 1 }
+	{ scaleResolutionDownBy: 4, maxBitRate: 100000 },
+	{ scaleResolutionDownBy: 1, maxBitRate: 1200000 }
 ];
 
 // Used for VP9 webcam video.
@@ -304,6 +302,7 @@ export default class RoomClient
 
 				switch (key)
 				{
+					/*
 					case String.fromCharCode(37):
 					{
 						const newPeerId = this._spotlights.getPrevAsSelected(
@@ -312,6 +311,7 @@ export default class RoomClient
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
+
 					case String.fromCharCode(39):
 					{
 						const newPeerId = this._spotlights.getNextAsSelected(
@@ -320,6 +320,8 @@ export default class RoomClient
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
+					*/
+
 					case 'A': // Activate advanced mode
 					{
 						store.dispatch(settingsActions.toggleAdvancedMode());
@@ -578,7 +580,7 @@ export default class RoomClient
 				called = true;
 				callback(new SocketTimeoutError('Request timed out'));
 			},
-			ROOM_OPTIONS.requestTimeout
+			requestTimeout
 		);
 
 		return (...args) =>
@@ -1073,10 +1075,13 @@ export default class RoomClient
 
 		this._hark.on('volume_change', (volume) =>
 		{
-			volume = Math.round(volume);
-
-			if (this._micProducer && (volume !== Math.round(this._hark.lastVolume)))
+			// Update only if there is a bigger diff 
+			if (this._micProducer && Math.abs(volume - this._hark.lastVolume) > 0.5)
 			{
+				// Decay calculation: keep in mind that volume range is -100 ... 0 (dB)
+				// This makes decay volume fast if difference to last saved value is big
+				// and slow for small changes. This prevents flickering volume indicator
+				// at low levels
 				if (volume < this._hark.lastVolume)
 				{
 					volume =
@@ -1084,8 +1089,8 @@ export default class RoomClient
 						Math.pow(
 							(volume - this._hark.lastVolume) /
 							(100 + this._hark.lastVolume)
-							, 4
-						) * 2;
+							, 2
+						) * 10;
 				}
 
 				this._hark.lastVolume = volume;
@@ -1312,6 +1317,8 @@ export default class RoomClient
 					);
 				}
 			}
+
+			await this._updateAudioDevices();
 		}
 		catch (error)
 		{
@@ -1501,6 +1508,8 @@ export default class RoomClient
 					);
 				}
 			}
+
+			await this._updateWebcams();
 		}
 		catch (error)
 		{
@@ -1523,14 +1532,24 @@ export default class RoomClient
 			meActions.setWebcamInProgress(false));
 	}
 
-	setSelectedPeer(peerId)
+	addSelectedPeer(peerId)
 	{
-		logger.debug('setSelectedPeer() [peerId:"%s"]', peerId);
+		logger.debug('addSelectedPeer() [peerId:"%s"]', peerId);
 
-		this._spotlights.setPeerSpotlight(peerId);
+		this._spotlights.addPeerToSpotlight(peerId);
 
 		store.dispatch(
-			roomActions.setSelectedPeer(peerId));
+			roomActions.addSelectedPeer(peerId));
+	}
+
+	removeSelectedPeer(peerId)
+	{
+		logger.debug('removeSelectedPeer() [peerId:"%s"]', peerId);
+
+		this._spotlights.removePeerSpotlight(peerId);
+
+		store.dispatch(
+			roomActions.removeSelectedPeer(peerId));
 	}
 
 	async promoteAllLobbyPeers()

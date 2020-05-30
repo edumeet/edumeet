@@ -18,7 +18,7 @@ const initialState =
 	windowConsumer                : null, // ConsumerID
 	toolbarsVisible               : true,
 	mode                          : window.config.defaultLayout || 'democratic',
-	selectedPeerId                : null,
+	selectedPeers                 : [],
 	spotlights                    : [],
 	settingsOpen                  : false,
 	extraVideoOpen                : false,
@@ -193,16 +193,31 @@ const room = (state = initialState, action) =>
 		case 'SET_DISPLAY_MODE':
 			return { ...state, mode: action.payload.mode };
 
-		case 'SET_SELECTED_PEER':
+		case 'ADD_SELECTED_PEER':
 		{
-			const { selectedPeerId } = action.payload;
+			const { peerId } = action.payload;
 
-			return {
-				...state,
+			const selectedPeers = [ ...state.selectedPeers, peerId ];
 
-				selectedPeerId : state.selectedPeerId === selectedPeerId ?
-					null : selectedPeerId
-			};
+			return { ...state, selectedPeers };
+		}
+
+		// Also listen for peers leaving
+		case 'REMOVE_PEER':
+		case 'REMOVE_SELECTED_PEER':
+		{
+			const { peerId } = action.payload;
+
+			const selectedPeers =
+				state.selectedPeers.filter((peer) =>
+					peer !== peerId);
+
+			return { ...state, selectedPeers };
+		}
+
+		case 'CLEAR_SELECTED_PEERS':
+		{
+			return { ...state, selectedPeers: [] };
 		}
 
 		case 'SET_SPOTLIGHTS':

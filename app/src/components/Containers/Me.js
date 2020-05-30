@@ -21,7 +21,7 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
-import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
+import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
 
 const styles = (theme) =>
 	({
@@ -456,12 +456,13 @@ const Me = (props) =>
 												})}
 												className={classes.smallContainer}
 												disabled={!me.canSendMic || me.audioInProgress}
-												color={
-													micState === 'on' ?
-														settings.voiceActivatedUnmute && !me.isAutoMuted ?
-															'primary'
-															: 'default'
-														: 'secondary'}
+												color={micState === 'on' ?
+													settings.voiceActivatedUnmute ?
+														me.isAutoMuted ? 'secondary'
+															: 'primary'
+														: 'default'
+													: 'secondary'
+												}
 												size='small'
 												onClick={() =>
 												{
@@ -473,13 +474,36 @@ const Me = (props) =>
 														roomClient.unmuteMic();
 												}}
 											>
-												{ micState === 'on' ?
-													<MicIcon
-														color={me.isAutoMuted ? 'secondary' : 'primary'}
-														style={{ opacity: noiseVolume }}
-													/>
-													:
-													<MicOffIcon />
+												{settings.voiceActivatedUnmute ?
+													micState === 'on' ?
+														<React.Fragment>
+															<svg style={{ 'position': 'absolute' }}>
+																<defs>
+																	<clipPath id='cut-off-indicator'>
+																		<rect x='0' y='0' width='24' height={24 - 2.4 * noiseVolume} />
+																	</clipPath>
+																</defs>
+															</svg>
+															<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+																color={'default'}
+															/>
+															<SettingsVoiceIcon
+																clip-path='url(#cut-off-indicator)'
+																style={
+																	(
+																		{ 'position': 'absolute' },
+																		{ 'opacity': '0.6' }
+																	)
+																}
+																color={me.isAutoMuted ?
+																	'primary' : 'default'}
+															/>
+														</React.Fragment>
+														: <MicOffIcon />
+													: micState === 'on' ?
+														<MicIcon />
+														:
+														<MicOffIcon />
 												}
 											</IconButton>
 										</div>
@@ -493,9 +517,12 @@ const Me = (props) =>
 												className={classes.fab}
 												disabled={!me.canSendMic || me.audioInProgress}
 												color={micState === 'on' ?
-													settings.voiceActivatedUnmute && !me.isAutoMuted? 'primary'
+													settings.voiceActivatedUnmute ?
+														me.isAutoMuted ? 'secondary'
+															: 'primary'
 														: 'default'
-													: 'secondary'}
+													: 'secondary'
+												}
 												size='large'
 												onClick={() =>
 												{
@@ -507,16 +534,36 @@ const Me = (props) =>
 														roomClient.unmuteMic();
 												}}
 											>
-												{ micState === 'on' ?
-													<MicIcon
-														color={me.isAutoMuted && settings.voiceActivatedUnmute ?
-															'secondary' : 'primary'}
-														style={me.isAutoMuted && settings.voiceActivatedUnmute ?
-															{ opacity: noiseVolume }
-															: { opacity: 1 }}
-													/>
-													:
-													<MicOffIcon />
+												{ settings.voiceActivatedUnmute ?
+													micState === 'on' ?
+														<React.Fragment>
+															<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
+																<defs>
+																	<clipPath id='cut-off-indicator'>
+																		<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
+																	</clipPath>
+																</defs>
+															</svg>
+															<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+																color={'default'}
+															/>
+															<SettingsVoiceIcon
+																clip-path='url(#cut-off-indicator)'
+																style={
+																	(
+																		{ 'position': 'absolute' },
+																		{ 'opacity': '0.6' }
+																	)
+																}
+																color={me.isAutoMuted ?
+																	'primary' : 'default'}
+															/>
+														</React.Fragment>
+														: <MicOffIcon />
+													: micState === 'on' ?
+														<MicIcon />
+														:
+														<MicOffIcon />
 												}
 											</Fab>
 										</div>
@@ -604,13 +651,7 @@ const Me = (props) =>
 															roomClient.disableScreenSharing();
 													}}
 												>
-													{ (screenState === 'on' || screenState === 'unsupported') &&
-													<ScreenOffIcon/>
-													}
-													{ screenState === 'off' &&
 													<ScreenIcon/>
-													}
-
 												</IconButton>
 											</div>
 											:
@@ -636,12 +677,7 @@ const Me = (props) =>
 															roomClient.disableScreenSharing();
 													}}
 												>
-													{ (screenState === 'on' || screenState === 'unsupported') &&
-													<ScreenOffIcon/>
-													}
-													{ screenState === 'off' &&
 													<ScreenIcon/>
-													}
 												</Fab>
 											</div>
 										}
@@ -890,18 +926,17 @@ const makeMapStateToProps = () =>
 
 	const mapStateToProps = (state) =>
 	{
-		let volume;
+		let noise;
 
-		// noiseVolume under threshold
+		// noise = volume under threshold
 		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold)
 		{
-			// noiseVolume mapped to range 0.5 ... 1 (threshold switch)
-			volume = 1 + ((Math.abs(state.peerVolumes[state.me.id] -
-				state.settings.noiseThreshold) / (-120 -
-				state.settings.noiseThreshold)));
+			// noise mapped to range 0 ... 10 
+			noise = Math.round((100 + state.peerVolumes[state.me.id]) /
+				(100 + state.settings.noiseThreshold)*10);
 		}
 		// noiseVolume over threshold: no noise but voice
-		else { volume = 0; }
+		else { noise = 10; }
 
 		return {
 			me             : state.me,
@@ -909,8 +944,8 @@ const makeMapStateToProps = () =>
 			settings       : state.settings,
 			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
 			canShareScreen : hasPermission(state),
-			transports     : state.transports,
-			noiseVolume    : volume
+			noiseVolume    : noise,
+			transports     : state.transports
 		};
 	};
 
@@ -925,10 +960,10 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				Math.round(prev.peerVolumes[prev.me.id]) ===
+				Math.round(next.peerVolumes[next.me.id]) &&
 				prev.room === next.room &&
 				prev.me === next.me &&
-				Math.round(prev.peerVolumes[prev.me.id]) ===
-					Math.round(next.peerVolumes[next.me.id]) &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&

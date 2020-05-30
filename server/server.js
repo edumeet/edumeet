@@ -421,7 +421,16 @@ async function runHttpsServer()
 	{
 		if (req.secure || config.httpOnly)
 		{
-			const ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
+			let ltiURL;
+
+			try
+			{
+				ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
+			}
+			catch (error)
+			{
+				logger.error('Error parsing LTI url: %o', error);
+			}
 
 			if (
 				req.isAuthenticated &&

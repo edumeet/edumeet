@@ -40,6 +40,12 @@ export const setScreenSharingFrameRate = (screenSharingFrameRate) =>
 		payload : { screenSharingFrameRate }
 	});
 
+export const setAspectRatio = (aspectRatio) =>
+	({
+		type    : 'SET_ASPECT_RATIO',
+		payload : { aspectRatio }
+	});
+
 export const setDisplayName = (displayName) =>
 	({
 		type    : 'SET_DISPLAY_NAME',
