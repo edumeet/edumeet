@@ -69,6 +69,12 @@ export const removePeerRole = (peerId, role) =>
 		payload : { peerId, role }
 	});
 
+export const setPeerModifyRolesInProgress = (peerId, flag) =>
+	({
+		type    : 'SET_PEER_MODIFY_ROLES_IN_PROGRESS',
+		payload : { peerId, flag }
+	});
+
 export const setPeerKickInProgress = (peerId, flag) =>
 	({
 		type    : 'SET_PEER_KICK_IN_PROGRESS',

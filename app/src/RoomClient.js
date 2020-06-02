@@ -1637,6 +1637,46 @@ export default class RoomClient
 			roomActions.setClearFileSharingInProgress(false));
 	}
 
+	async givePeerRole(peerId, roleId)
+	{
+		logger.debug('givePeerRole() [peerId:"%s", roleId:"%s"]', peerId, roleId);
+
+		store.dispatch(
+			peerActions.setPeerModifyRolesInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:giveRole', { peerId, roleId });
+		}
+		catch (error)
+		{
+			logger.error('givePeerRole() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setPeerModifyRolesInProgress(peerId, false));
+	}
+
+	async removePeerRole(peerId, roleId)
+	{
+		logger.debug('removePeerRole() [peerId:"%s", roleId:"%s"]', peerId, roleId);
+
+		store.dispatch(
+			peerActions.setPeerModifyRolesInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:removeRole', { peerId, roleId });
+		}
+		catch (error)
+		{
+			logger.error('removePeerRole() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setPeerModifyRolesInProgress(peerId, false));
+	}
+
 	async kickPeer(peerId)
 	{
 		logger.debug('kickPeer() [peerId:"%s"]', peerId);
