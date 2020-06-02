@@ -3181,6 +3181,8 @@ export default class RoomClient
 
 			store.dispatch(roomActions.setRoomPermissions(roomPermissions));
 
+			store.dispatch(roomActions.setUserRoles(userRoles));
+
 			if (allowWhenRoleMissing)
 				store.dispatch(roomActions.setAllowWhenRoleMissing(allowWhenRoleMissing));
 

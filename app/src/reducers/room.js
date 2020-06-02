@@ -34,6 +34,7 @@ const initialState =
 	clearChatInProgress           : false,
 	clearFileSharingInProgress    : false,
 	roomPermissions               : null,
+	userRoles                     : null,
 	allowWhenRoleMissing          : null
 };
 
@@ -258,6 +259,13 @@ const room = (state = initialState, action) =>
 			const { roomPermissions } = action.payload;
 
 			return { ...state, roomPermissions };
+		}
+
+		case 'SET_USER_ROLES':
+		{
+			const { userRoles } = action.payload;
+
+			return { ...state, userRoles };
 		}
 
 		case 'SET_ALLOW_WHEN_ROLE_MISSING':

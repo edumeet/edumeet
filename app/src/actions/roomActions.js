@@ -205,6 +205,12 @@ export const setRoomPermissions = (roomPermissions) =>
 		payload : { roomPermissions }
 	});
 
+export const setUserRoles = (userRoles) =>
+	({
+		type    : 'SET_USER_ROLES',
+		payload : { userRoles }
+	});
+
 export const setAllowWhenRoleMissing = (allowWhenRoleMissing) =>
 	({
 		type    : 'SET_ALLOW_WHEN_ROLE_MISSING',
