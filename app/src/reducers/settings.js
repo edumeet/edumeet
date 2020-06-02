@@ -1,6 +1,6 @@
 const initialState =
 {
-	displayName         : 'Guest ' + (Math.floor(Math.random() * (100000 - 10000)) + 10000),
+	displayName         : `Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`,
 	selectedWebcam      : null,
 	selectedAudioDevice : null,
 	advancedMode        : false,

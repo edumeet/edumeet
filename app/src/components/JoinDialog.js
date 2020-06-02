@@ -192,7 +192,7 @@ const JoinDialog = ({
 {
 	const intl = useIntl();
 
-    displayName = displayName.trimLeft();
+	displayName = displayName.trimLeft();
 
 	const handleKeyDown = (event) =>
 	{
@@ -205,8 +205,8 @@ const JoinDialog = ({
 			{
 				displayName = displayName.trim();
 
-                if (displayName === '')
-					changeDisplayName('Guest ' + (Math.floor(Math.random() * (100000 - 10000)) + 10000));
+				if (displayName === '')
+					changeDisplayName(`Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`);
 				if (room.inLobby)
 					roomClient.changeDisplayName(displayName);
 				break;
@@ -282,10 +282,10 @@ const JoinDialog = ({
 						onKeyDown={handleKeyDown}
 						onBlur={() =>
 						{
-                            displayName = displayName.trim();
+							displayName = displayName.trim();
 
 							if (displayName === '')
-								changeDisplayName('Guest ' + (Math.floor(Math.random() * (100000 - 10000)) + 10000));
+								changeDisplayName(`Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`);
 							if (room.inLobby)
 								roomClient.changeDisplayName(displayName);
 						}}

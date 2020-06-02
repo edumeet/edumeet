@@ -605,12 +605,12 @@ export default class RoomClient
 
 	async changeDisplayName(displayName)
 	{
-        displayName = displayName.trim();
+		displayName = displayName.trim();
 
 		if (!displayName)
-			displayName = 'Guest ' + (Math.floor(Math.random() * (100000 - 10000)) + 10000);
+			displayName = `Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`;
 
-        logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
+		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
 
 		store.dispatch(
 			meActions.setDisplayNameInProgress(true));
