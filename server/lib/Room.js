@@ -44,6 +44,7 @@ const roomPermissions =
 {
 	[CHANGE_ROOM_LOCK] : [ userRoles.NORMAL ],
 	[PROMOTE_PEER]     : [ userRoles.NORMAL ],
+	[MODIFY_ROLE]      : [ userRoles.MODERATOR ],
 	[SEND_CHAT]        : [ userRoles.NORMAL ],
 	[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
 	[SHARE_AUDIO]      : [ userRoles.NORMAL ],
@@ -1232,18 +1233,18 @@ class Room extends EventEmitter
 
 			case 'moderator:giveRole':
 			{
+				if (!this._hasPermission(peer, MODIFY_ROLE))
+					throw new Error('peer not authorized');
+
 				const { peerId, roleId } = request.data;
 
-				const userRole = userRoles[roleId];
+				const userRole = Object.values(userRoles).find((role) => role.id === roleId);
 
 				if (!userRole)
 					throw new Error('no such role');
 
-				if (
-					!this._hasPermission(peer, MODIFY_ROLE) ||
-					!peer.roles.some((role) => role.level >= userRole.level)
-				)
-					throw new Error('peer not authorized');
+				if (!peer.roles.some((role) => role.level >= userRole.level))
+					throw new Error('peer not authorized for this level');
 
 				const giveRolePeer = this._peers[peerId];
 
@@ -1261,18 +1262,18 @@ class Room extends EventEmitter
 
 			case 'moderator:removeRole':
 			{
+				if (!this._hasPermission(peer, MODIFY_ROLE))
+					throw new Error('peer not authorized');
+
 				const { peerId, roleId } = request.data;
 
-				const userRole = userRoles[roleId];
+				const userRole = Object.values(userRoles).find((role) => role.id === roleId);
 
 				if (!userRole)
 					throw new Error('no such role');
 
-				if (
-					!this._hasPermission(peer, MODIFY_ROLE) ||
-					!peer.roles.some((role) => role.level >= userRole.level)
-				)
-					throw new Error('peer not authorized');
+				if (!peer.roles.some((role) => role.level >= userRole.level))
+					throw new Error('peer not authorized for this level');
 
 				const removeRolePeer = this._peers[peerId];
 
