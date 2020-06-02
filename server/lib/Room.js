@@ -16,6 +16,7 @@ const {
 const permissions = require('../permissions'), {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
+	MODIFY_ROLE,
 	SEND_CHAT,
 	MODERATE_CHAT,
 	SHARE_AUDIO,
@@ -1222,6 +1223,64 @@ class Room extends EventEmitter
 					peerId      : peer.id,
 					chatMessage : chatMessage
 				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:giveRole':
+			{
+				const { peerId, roleId } = request.data;
+
+				const userRole = userRoles[roleId];
+
+				if (!userRole)
+					throw new Error('no such role');
+
+				if (
+					!this._hasPermission(peer, MODIFY_ROLE) ||
+					!peer.roles.some((role) => role.level >= userRole.level)
+				)
+					throw new Error('peer not authorized');
+
+				const giveRolePeer = this._peers[peerId];
+
+				if (!giveRolePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				// This will propagate the event automatically
+				giveRolePeer.addRole(userRole);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:removeRole':
+			{
+				const { peerId, roleId } = request.data;
+
+				const userRole = userRoles[roleId];
+
+				if (!userRole)
+					throw new Error('no such role');
+
+				if (
+					!this._hasPermission(peer, MODIFY_ROLE) ||
+					!peer.roles.some((role) => role.level >= userRole.level)
+				)
+					throw new Error('peer not authorized');
+
+				const removeRolePeer = this._peers[peerId];
+
+				if (!removeRolePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				// This will propagate the event automatically
+				removeRolePeer.removeRole(userRole);
 
 				// Return no error
 				cb();
