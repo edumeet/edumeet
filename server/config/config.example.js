@@ -11,6 +11,8 @@ const {
 	PROMOTE_PEER,
 	SEND_CHAT,
 	MODERATE_CHAT,
+	SHARE_AUDIO,
+	SHARE_VIDEO,
 	SHARE_SCREEN,
 	EXTRA_VIDEO,
 	SHARE_FILE,
@@ -259,6 +261,10 @@ module.exports =
 		[SEND_CHAT]        : [ userRoles.NORMAL ],
 		// The role(s) have permission to moderate chat
 		[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
+		// The role(s) have permission to share audio
+		[SHARE_AUDIO]      : [ userRoles.NORMAL ],
+		// The role(s) have permission to share video
+		[SHARE_VIDEO]      : [ userRoles.NORMAL ],
 		// The role(s) have permission to share screen
 		[SHARE_SCREEN]     : [ userRoles.NORMAL ],
 		// The role(s) have permission to produce extra video

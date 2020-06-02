@@ -15,6 +15,7 @@ import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
 import * as transportActions from './actions/transportActions';
+import { permissions } from './permissions';
 
 let createTorrent;
 
@@ -2931,7 +2932,7 @@ export default class RoomClient
 										id             : 'roles.gotRole',
 										defaultMessage : 'You got the role: {role}'
 									}, {
-										role
+										role : role.label
 									})
 								}));
 						}
@@ -2955,7 +2956,7 @@ export default class RoomClient
 										id             : 'roles.lostRole',
 										defaultMessage : 'You lost the role: {role}'
 									}, {
-										role
+										role : role.label
 									})
 								}));
 						}
@@ -3153,6 +3154,7 @@ export default class RoomClient
 				peers,
 				tracker,
 				roomPermissions,
+				userRoles,
 				allowWhenRoleMissing,
 				chatHistory,
 				fileHistory,
@@ -3190,7 +3192,7 @@ export default class RoomClient
 
 			for (const role of roles)
 			{
-				if (!myRoles.includes(role))
+				if (!myRoles.some((myRole) => role.id === myRole.id))
 				{
 					store.dispatch(meActions.addRole(role));
 
@@ -3200,7 +3202,7 @@ export default class RoomClient
 								id             : 'roles.gotRole',
 								defaultMessage : 'You got the role: {role}'
 							}, {
-								role
+								role : role.label
 							})
 						}));
 				}
@@ -3255,7 +3257,10 @@ export default class RoomClient
 			// Don't produce if explicitly requested to not to do it.
 			if (this._produce)
 			{
-				if (this._mediasoupDevice.canProduce('audio'))
+				if (
+					this._mediasoupDevice.canProduce('audio') &&
+					this._havePermission(permissions.SHARE_AUDIO)
+				)
 					if (!this._muted)
 					{
 						await this.updateMic({ start: true });
@@ -3269,7 +3274,10 @@ export default class RoomClient
 							this.muteMic();
 					}
 
-				if (joinVideo)
+				if (
+					joinVideo &&
+					this._havePermission(permissions.SHARE_VIDEO)
+				)
 					this.updateWebcam({ start: true });
 			}
 
@@ -4015,4 +4023,45 @@ export default class RoomClient
 		}
 	}
 
+	_havePermission(permission)
+	{
+		const {
+			roomPermissions,
+			allowWhenRoleMissing
+		} = store.getState().room;
+
+		if (!roomPermissions)
+			return false;
+
+		const { roles } = store.getState().me;
+
+		const permitted = roles.some((userRole) =>
+			roomPermissions[permission].some((permissionRole) =>
+				userRole.id === permissionRole.id
+			)
+		);
+
+		if (permitted)
+			return true;
+
+		if (!allowWhenRoleMissing)
+			return false;
+
+		const peers = Object.values(store.getState().peers);
+
+		// Allow if config is set, and no one is present
+		if (allowWhenRoleMissing.includes(permission) &&
+			peers.filter(
+				(peer) =>
+					peer.roles.some(
+						(role) => roomPermissions[permission].some((permissionRole) =>
+							role.id === permissionRole.id
+						)
+					)
+			).length === 0
+		)
+			return true;
+
+		return false;
+	}
 }

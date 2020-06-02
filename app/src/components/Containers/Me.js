@@ -175,7 +175,9 @@ const Me = (props) =>
 		webcamProducer,
 		screenProducer,
 		extraVideoProducers,
-		canShareScreen,
+		hasAudioPermission,
+		hasVideoPermission,
+		hasScreenPermission,
 		transports,
 		noiseVolume,
 		classes
@@ -197,7 +199,7 @@ const Me = (props) =>
 
 	let micTip;
 
-	if (!me.canSendMic)
+	if (!me.canSendMic || !hasAudioPermission)
 	{
 		micState = 'unsupported';
 		micTip = intl.formatMessage({
@@ -234,7 +236,7 @@ const Me = (props) =>
 
 	let webcamTip;
 
-	if (!me.canSendWebcam)
+	if (!me.canSendWebcam || !hasVideoPermission)
 	{
 		webcamState = 'unsupported';
 		webcamTip = intl.formatMessage({
@@ -263,7 +265,7 @@ const Me = (props) =>
 
 	let screenTip;
 
-	if (!me.canShareScreen)
+	if (!me.canShareScreen || !hasScreenPermission)
 	{
 		screenState = 'unsupported';
 		screenTip = intl.formatMessage({
@@ -455,7 +457,11 @@ const Me = (props) =>
 													defaultMessage : 'Mute audio'
 												})}
 												className={classes.smallContainer}
-												disabled={!me.canSendMic || me.audioInProgress}
+												disabled={
+													!me.canSendMic ||
+													!hasAudioPermission ||
+													me.audioInProgress
+												}
 												color={micState === 'on' ?
 													settings.voiceActivatedUnmute ?
 														me.isAutoMuted ? 'secondary'
@@ -515,7 +521,11 @@ const Me = (props) =>
 													defaultMessage : 'Mute audio'
 												})}
 												className={classes.fab}
-												disabled={!me.canSendMic || me.audioInProgress}
+												disabled={
+													!me.canSendMic ||
+													!hasAudioPermission ||
+													me.audioInProgress
+												}
 												color={micState === 'on' ?
 													settings.voiceActivatedUnmute ?
 														me.isAutoMuted ? 'secondary'
@@ -578,7 +588,11 @@ const Me = (props) =>
 													defaultMessage : 'Start video'
 												})}
 												className={classes.smallContainer}
-												disabled={!me.canSendWebcam || me.webcamInProgress}
+												disabled={
+													!me.canSendWebcam ||
+													!hasVideoPermission ||
+													me.webcamInProgress
+												}
 												color={webcamState === 'on' ? 'primary' : 'secondary'}
 												size='small'
 												onClick={() =>
@@ -603,7 +617,11 @@ const Me = (props) =>
 													defaultMessage : 'Start video'
 												})}
 												className={classes.fab}
-												disabled={!me.canSendWebcam || me.webcamInProgress}
+												disabled={
+													!me.canSendWebcam ||
+													!hasVideoPermission ||
+													me.webcamInProgress
+												}
 												color={webcamState === 'on' ? 'default' : 'secondary'}
 												size='large'
 												onClick={() =>
@@ -637,9 +655,9 @@ const Me = (props) =>
 													})}
 													className={classes.smallContainer}
 													disabled={
-														!canShareScreen ||
-													!me.canShareScreen ||
-													me.screenShareInProgress
+														!hasScreenPermission ||
+														!me.canShareScreen ||
+														me.screenShareInProgress
 													}
 													color='primary'
 													size='small'
@@ -663,9 +681,9 @@ const Me = (props) =>
 													})}
 													className={classes.fab}
 													disabled={
-														!canShareScreen ||
-													!me.canShareScreen ||
-													me.screenShareInProgress
+														!hasScreenPermission ||
+														!me.canShareScreen ||
+														me.screenShareInProgress
 													}
 													color={screenState === 'on' ? 'primary' : 'default'}
 													size='large'
@@ -913,7 +931,9 @@ Me.propTypes =
 	spacing             : PropTypes.number,
 	style               : PropTypes.object,
 	smallContainer      : PropTypes.bool,
-	canShareScreen      : PropTypes.bool.isRequired,
+	hasAudioPermission  : PropTypes.bool.isRequired,
+	hasVideoPermission  : PropTypes.bool.isRequired,
+	hasScreenPermission : PropTypes.bool.isRequired,
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired,
@@ -922,7 +942,12 @@ Me.propTypes =
 
 const makeMapStateToProps = () =>
 {
-	const hasPermission = makePermissionSelector(permissions.SHARE_SCREEN);
+	const canShareAudio =
+		makePermissionSelector(permissions.SHARE_AUDIO);
+	const canShareVideo =
+		makePermissionSelector(permissions.SHARE_VIDEO);
+	const canShareScreen =
+		makePermissionSelector(permissions.SHARE_SCREEN);
 
 	const mapStateToProps = (state) =>
 	{
@@ -939,13 +964,15 @@ const makeMapStateToProps = () =>
 		else { noise = 10; }
 
 		return {
-			me             : state.me,
+			me                  : state.me,
 			...meProducersSelector(state),
-			settings       : state.settings,
-			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
-			canShareScreen : hasPermission(state),
-			noiseVolume    : noise,
-			transports     : state.transports
+			settings            : state.settings,
+			activeSpeaker       : state.me.id === state.room.activeSpeakerId,
+			hasAudioPermission  : canShareAudio(state),
+			hasVideoPermission  : canShareVideo(state),
+			hasScreenPermission : canShareScreen(state),
+			noiseVolume         : noise,
+			transports          : state.transports
 		};
 	};
 

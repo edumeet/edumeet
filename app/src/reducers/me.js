@@ -3,7 +3,7 @@ const initialState =
 	id                    : null,
 	picture               : null,
 	browser               : null,
-	roles                 : [ 'normal' ], // Default role
+	roles                 : [],
 	canSendMic            : false,
 	canSendWebcam         : false,
 	canShareScreen        : false,
@@ -56,7 +56,7 @@ const me = (state = initialState, action) =>
 
 		case 'ADD_ROLE':
 		{
-			if (state.roles.includes(action.payload.role))
+			if (state.roles.some((role) => role.id === action.payload.role.id))
 				return state;
 
 			const roles = [ ...state.roles, action.payload.role ];
@@ -67,7 +67,7 @@ const me = (state = initialState, action) =>
 		case 'REMOVE_ROLE':
 		{
 			const roles = state.roles.filter((role) =>
-				role !== action.payload.role);
+				role.id !== action.payload.role.id);
 
 			return { ...state, roles };
 		}

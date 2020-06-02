@@ -245,8 +245,10 @@ export const makePermissionSelector = (permission) =>
 			if (!roomPermissions)
 				return false;
 
-			const permitted = roles.some((role) =>
-				roomPermissions[permission].includes(role)
+			const permitted = roles.some((userRole) =>
+				roomPermissions[permission].some((permissionRole) =>
+					userRole.id === permissionRole.id
+				)
 			);
 
 			if (permitted)
@@ -260,7 +262,9 @@ export const makePermissionSelector = (permission) =>
 				peers.filter(
 					(peer) =>
 						peer.roles.some(
-							(role) => roomPermissions[permission].includes(role)
+							(role) => roomPermissions[permission].some((permissionRole) =>
+								role.id === permissionRole.id
+							)
 						)
 				).length === 0
 			)

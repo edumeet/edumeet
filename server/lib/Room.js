@@ -18,6 +18,8 @@ const permissions = require('../permissions'), {
 	PROMOTE_PEER,
 	SEND_CHAT,
 	MODERATE_CHAT,
+	SHARE_AUDIO,
+	SHARE_VIDEO,
 	SHARE_SCREEN,
 	EXTRA_VIDEO,
 	SHARE_FILE,
@@ -43,6 +45,8 @@ const roomPermissions =
 	[PROMOTE_PEER]     : [ userRoles.NORMAL ],
 	[SEND_CHAT]        : [ userRoles.NORMAL ],
 	[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
+	[SHARE_AUDIO]      : [ userRoles.NORMAL ],
+	[SHARE_VIDEO]      : [ userRoles.NORMAL ],
 	[SHARE_SCREEN]     : [ userRoles.NORMAL ],
 	[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
 	[SHARE_FILE]       : [ userRoles.NORMAL ],
@@ -586,7 +590,7 @@ class Room extends EventEmitter
 
 			// Got permission to promote peers, notify peer of
 			// peers in lobby
-			if (roomPermissions.PROMOTE_PEER.includes(newRole))
+			if (roomPermissions.PROMOTE_PEER.some((role) => role.id === newRole.id))
 			{
 				const lobbyPeers = this._lobby.peerList();
 
@@ -645,7 +649,7 @@ class Room extends EventEmitter
 
 		// Need this to know if this peer was the last with PROMOTE_PEER
 		const hasPromotePeer = peer.roles.some((role) =>
-			roomPermissions[PROMOTE_PEER].includes(role)
+			roomPermissions[PROMOTE_PEER].some((roomRole) => role.id === roomRole.id)
 		);
 
 		delete this._peers[peer.id];
@@ -863,6 +867,25 @@ class Room extends EventEmitter
 			case 'produce':
 			{
 				let { appData } = request.data;
+
+				if (
+					!appData.source ||
+					![ 'mic', 'webcam', 'screen', 'extravideo' ]
+						.includes(appData.source)
+				)
+					throw new Error('invalid producer source');
+
+				if (
+					appData.source === 'mic' &&
+					!this._hasPermission(peer, SHARE_AUDIO)
+				)
+					throw new Error('peer not authorized');
+
+				if (
+					appData.source === 'webcam' &&
+					!this._hasPermission(peer, SHARE_VIDEO)
+				)
+					throw new Error('peer not authorized');
 
 				if (
 					appData.source === 'screen' &&
@@ -1695,7 +1718,7 @@ class Room extends EventEmitter
 	_hasPermission(peer, permission)
 	{
 		const hasPermission = peer.roles.some((role) =>
-			roomPermissions[permission].includes(role)
+			roomPermissions[permission].some((roomRole) => role.id === roomRole.id)
 		);
 
 		if (hasPermission)
@@ -1713,7 +1736,9 @@ class Room extends EventEmitter
 
 	_hasAccess(peer, access)
 	{
-		return peer.roles.some((role) => roomAccess[access].includes(role));
+		return peer.roles.some((role) =>
+			roomAccess[access].some((roomRole) => role.id === roomRole.id)
+		);
 	}
 
 	/**
@@ -1747,7 +1772,9 @@ class Room extends EventEmitter
 					peer.joined === joined &&
 					peer !== excludePeer &&
 					peer.roles.some(
-						(role) => roomPermissions[permission].includes(role)
+						(role) =>
+							roomPermissions[permission].some((roomRole) =>
+								role.id === roomRole.id)
 					)
 			);
 	}
