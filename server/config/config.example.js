@@ -9,6 +9,7 @@ const {
 const {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
+	MODIFY_ROLE,
 	SEND_CHAT,
 	MODERATE_CHAT,
 	SHARE_AUDIO,
@@ -257,6 +258,8 @@ module.exports =
 		[CHANGE_ROOM_LOCK] : [ userRoles.MODERATOR ],
 		// The role(s) have permission to promote a peer from the lobby
 		[PROMOTE_PEER]     : [ userRoles.NORMAL ],
+		// The role(s) have permission to give/remove other peers roles
+		[MODIFY_ROLE]      : [ userRoles.NORMAL ],
 		// The role(s) have permission to send chat messages
 		[SEND_CHAT]        : [ userRoles.NORMAL ],
 		// The role(s) have permission to moderate chat
