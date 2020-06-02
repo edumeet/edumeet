@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	meProducersSelector,
@@ -21,7 +21,7 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
-import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
+import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
 
 const styles = (theme) =>
 	({
@@ -137,14 +137,15 @@ const styles = (theme) =>
 			transform       : 'translate(-50%, 0%)',
 			color           : 'rgba(255, 255, 255, 0.7)',
 			fontSize        : '1.3em',
-			backgroundColor : 'rgba(255, 0, 0, 0.9)',
+			backgroundColor : 'rgba(245, 0, 87, 0.70)',
 			margin          : '4px',
 			padding         : theme.spacing(2),
-			zIndex          : 31,
+			zIndex          : 1200,
 			borderRadius    : '20px',
 			textAlign       : 'center',
 			opacity         : 0,
 			transition      : 'opacity 1s ease',
+			pointerEvents   : 'none',
 			'&.enabled'     :
 			{
 				transition : 'opacity 0.1s',
@@ -175,6 +176,8 @@ const Me = (props) =>
 		screenProducer,
 		extraVideoProducers,
 		canShareScreen,
+		transports,
+		noiseVolume,
 		classes
 	} = props;
 
@@ -284,6 +287,25 @@ const Me = (props) =>
 			defaultMessage : 'Start screen sharing'
 		});
 	}
+	const [
+		screenShareTooltipOpen,
+		screenShareTooltipSetOpen
+	] = React.useState(false);
+
+	const screenShareTooltipHandleClose = () =>
+	{
+		screenShareTooltipSetOpen(false);
+	};
+
+	const screenShareTooltipHandleOpen = () =>
+	{
+		screenShareTooltipSetOpen(true);
+	};
+
+	if (screenState === 'off' && me.screenShareInProgress && screenShareTooltipOpen)
+	{
+		screenShareTooltipHandleClose();
+	}
 
 	const spacingStyle =
 	{
@@ -311,6 +333,20 @@ const Me = (props) =>
 					(prev.score < curr.score ? prev : curr)
 			);
 	}
+
+	useEffect(() =>
+	{
+		let poll;
+
+		const interval = 1000;
+
+		if (advancedMode)
+		{
+			poll = setInterval(() => roomClient.getTransportStats(), interval);
+		}
+
+		return () => clearInterval(poll);
+	}, [ roomClient, advancedMode ]);
 
 	return (
 		<React.Fragment>
@@ -344,8 +380,8 @@ const Me = (props) =>
 				}}
 				style={spacingStyle}
 			>
-				
-				{ me.browser.platform !== 'mobile' &&
+
+				{ me.browser.platform !== 'mobile' && smallContainer &&
 				<div className={classnames(
 					classes.ptt,
 					(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
@@ -354,10 +390,22 @@ const Me = (props) =>
 					<FormattedMessage
 						id='me.mutedPTT'
 						defaultMessage='You are muted, hold down SPACE-BAR to talk'
-					/>	
+					/>
 				</div>
 				}
 				<div className={classes.viewContainer} style={style}>
+					{ me.browser.platform !== 'mobile' && !smallContainer &&
+						<div className={classnames(
+							classes.ptt,
+							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
+						)}
+						>
+							<FormattedMessage
+								id='me.mutedPTT'
+								defaultMessage='You are muted, hold down SPACE-BAR to talk'
+							/>
+						</div>
+					}
 					<p className={
 						classnames(
 							classes.meTag,
@@ -408,22 +456,54 @@ const Me = (props) =>
 												})}
 												className={classes.smallContainer}
 												disabled={!me.canSendMic || me.audioInProgress}
-												color={micState === 'on' ? 'primary' : 'secondary'}
+												color={micState === 'on' ?
+													settings.voiceActivatedUnmute ?
+														me.isAutoMuted ? 'secondary'
+															: 'primary'
+														: 'default'
+													: 'secondary'
+												}
 												size='small'
 												onClick={() =>
 												{
 													if (micState === 'off')
-														roomClient.enableMic();
+														roomClient.updateMic({ start: true });
 													else if (micState === 'on')
 														roomClient.muteMic();
 													else
 														roomClient.unmuteMic();
 												}}
 											>
-												{ micState === 'on' ?
-													<MicIcon />
-													:
-													<MicOffIcon />
+												{settings.voiceActivatedUnmute ?
+													micState === 'on' ?
+														<React.Fragment>
+															<svg style={{ 'position': 'absolute' }}>
+																<defs>
+																	<clipPath id='cut-off-indicator'>
+																		<rect x='0' y='0' width='24' height={24 - 2.4 * noiseVolume} />
+																	</clipPath>
+																</defs>
+															</svg>
+															<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+																color={'default'}
+															/>
+															<SettingsVoiceIcon
+																clip-path='url(#cut-off-indicator)'
+																style={
+																	(
+																		{ 'position': 'absolute' },
+																		{ 'opacity': '0.6' }
+																	)
+																}
+																color={me.isAutoMuted ?
+																	'primary' : 'default'}
+															/>
+														</React.Fragment>
+														: <MicOffIcon />
+													: micState === 'on' ?
+														<MicIcon />
+														:
+														<MicOffIcon />
 												}
 											</IconButton>
 										</div>
@@ -436,22 +516,54 @@ const Me = (props) =>
 												})}
 												className={classes.fab}
 												disabled={!me.canSendMic || me.audioInProgress}
-												color={micState === 'on' ? 'default' : 'secondary'}
+												color={micState === 'on' ?
+													settings.voiceActivatedUnmute ?
+														me.isAutoMuted ? 'secondary'
+															: 'primary'
+														: 'default'
+													: 'secondary'
+												}
 												size='large'
 												onClick={() =>
 												{
 													if (micState === 'off')
-														roomClient.enableMic();
+														roomClient.updateMic({ start: true });
 													else if (micState === 'on')
 														roomClient.muteMic();
 													else
 														roomClient.unmuteMic();
 												}}
 											>
-												{ micState === 'on' ?
-													<MicIcon />
-													:
-													<MicOffIcon />
+												{ settings.voiceActivatedUnmute ?
+													micState === 'on' ?
+														<React.Fragment>
+															<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
+																<defs>
+																	<clipPath id='cut-off-indicator'>
+																		<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
+																	</clipPath>
+																</defs>
+															</svg>
+															<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+																color={'default'}
+															/>
+															<SettingsVoiceIcon
+																clip-path='url(#cut-off-indicator)'
+																style={
+																	(
+																		{ 'position': 'absolute' },
+																		{ 'opacity': '0.6' }
+																	)
+																}
+																color={me.isAutoMuted ?
+																	'primary' : 'default'}
+															/>
+														</React.Fragment>
+														: <MicOffIcon />
+													: micState === 'on' ?
+														<MicIcon />
+														:
+														<MicOffIcon />
 												}
 											</Fab>
 										</div>
@@ -473,7 +585,7 @@ const Me = (props) =>
 												{
 													webcamState === 'on' ?
 														roomClient.disableWebcam() :
-														roomClient.enableWebcam();
+														roomClient.updateWebcam({ start: true });
 												}}
 											>
 												{ webcamState === 'on' ?
@@ -498,7 +610,7 @@ const Me = (props) =>
 												{
 													webcamState === 'on' ?
 														roomClient.disableWebcam() :
-														roomClient.enableWebcam();
+														roomClient.updateWebcam({ start: true });
 												}}
 											>
 												{ webcamState === 'on' ?
@@ -511,7 +623,11 @@ const Me = (props) =>
 									}
 								</Tooltip>
 								{ me.browser.platform !== 'mobile' &&
-									<Tooltip title={screenTip} placement='left'>
+									<Tooltip open={screenShareTooltipOpen}
+										onClose={screenShareTooltipHandleClose}
+										onOpen={screenShareTooltipHandleOpen}
+										title={screenTip} placement='left'
+									>
 										{ smallContainer ?
 											<div>
 												<IconButton
@@ -529,32 +645,13 @@ const Me = (props) =>
 													size='small'
 													onClick={() =>
 													{
-														switch (screenState)
-														{
-															case 'on':
-															{
-																roomClient.disableScreenSharing();
-																break;
-															}
-															case 'off':
-															{
-																roomClient.enableScreenSharing();
-																break;
-															}
-															default:
-															{
-																break;
-															}
-														}
+														if (screenState === 'off')
+															roomClient.updateScreenSharing({ start: true });
+														else if (screenState === 'on')
+															roomClient.disableScreenSharing();
 													}}
 												>
-													{ (screenState === 'on' || screenState === 'unsupported') &&
-													<ScreenOffIcon/>
-													}
-													{ screenState === 'off' &&
 													<ScreenIcon/>
-													}
-
 												</IconButton>
 											</div>
 											:
@@ -574,31 +671,13 @@ const Me = (props) =>
 													size='large'
 													onClick={() =>
 													{
-														switch (screenState)
-														{
-															case 'on':
-															{
-																roomClient.disableScreenSharing();
-																break;
-															}
-															case 'off':
-															{
-																roomClient.enableScreenSharing();
-																break;
-															}
-															default:
-															{
-																break;
-															}
-														}
+														if (screenState === 'off')
+															roomClient.updateScreenSharing({ start: true });
+														else if (screenState === 'on')
+															roomClient.disableScreenSharing();
 													}}
 												>
-													{ (screenState === 'on' || screenState === 'unsupported') &&
-													<ScreenOffIcon/>
-													}
-													{ screenState === 'off' &&
 													<ScreenIcon/>
-													}
 												</Fab>
 											</div>
 										}
@@ -619,8 +698,10 @@ const Me = (props) =>
 						videoVisible={videoVisible}
 						audioCodec={micProducer && micProducer.codec}
 						videoCodec={webcamProducer && webcamProducer.codec}
+						netInfo={transports && transports}
 						audioScore={audioScore}
 						videoScore={videoScore}
+						showQuality
 						onChangeDisplayName={(displayName) =>
 						{
 							roomClient.changeDisplayName(displayName);
@@ -747,6 +828,7 @@ const Me = (props) =>
 
 							<VideoView
 								isMe
+								isExtraVideo
 								advancedMode={advancedMode}
 								peer={me}
 								displayName={settings.displayName}
@@ -800,7 +882,7 @@ const Me = (props) =>
 								defaultMessage='ME'
 							/>
 						</p>
-						
+
 						<VideoView
 							isMe
 							isScreen
@@ -832,8 +914,10 @@ Me.propTypes =
 	style               : PropTypes.object,
 	smallContainer      : PropTypes.bool,
 	canShareScreen      : PropTypes.bool.isRequired,
+	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
-	theme               : PropTypes.object.isRequired
+	theme               : PropTypes.object.isRequired,
+	transports          : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -842,12 +926,26 @@ const makeMapStateToProps = () =>
 
 	const mapStateToProps = (state) =>
 	{
+		let noise;
+
+		// noise = volume under threshold
+		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold)
+		{
+			// noise mapped to range 0 ... 10 
+			noise = Math.round((100 + state.peerVolumes[state.me.id]) /
+				(100 + state.settings.noiseThreshold)*10);
+		}
+		// noiseVolume over threshold: no noise but voice
+		else { noise = 10; }
+
 		return {
 			me             : state.me,
 			...meProducersSelector(state),
 			settings       : state.settings,
 			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
-			canShareScreen : hasPermission(state)
+			canShareScreen : hasPermission(state),
+			noiseVolume    : noise,
+			transports     : state.transports
 		};
 	};
 
@@ -862,11 +960,14 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				Math.round(prev.peerVolumes[prev.me.id]) ===
+				Math.round(next.peerVolumes[next.me.id]) &&
 				prev.room === next.room &&
 				prev.me === next.me &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
-				prev.settings === next.settings
+				prev.settings === next.settings &&
+				prev.transports === next.transports
 			);
 		}
 	}

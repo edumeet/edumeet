@@ -9,7 +9,7 @@ export const addResponseMessage = (message) =>
 		type    : 'ADD_NEW_RESPONSE_MESSAGE',
 		payload : { message }
 	});
-	
+
 export const addChatHistory = (chatHistory) =>
 	({
 		type    : 'ADD_CHAT_HISTORY',

@@ -45,31 +45,23 @@ export default class Spotlights extends EventEmitter
 		}
 	}
 
-	setPeerSpotlight(peerId)
+	addPeerToSpotlight(peerId)
 	{
-		logger.debug('setPeerSpotlight() [peerId:"%s"]', peerId);
+		logger.debug('addPeerToSpotlight() [peerId:"%s"]', peerId);
 
-		const index = this._selectedSpotlights.indexOf(peerId);
-		
-		if (index !== -1)
-		{
-			this._selectedSpotlights = [];
-		}
-		else
-		{
-			this._selectedSpotlights = [ peerId ];
-		}
+		this._selectedSpotlights = [ ...this._selectedSpotlights, peerId ];
 
-		/*
-		if (index === -1) // We don't have this peer in the list, adding
-		{
-			this._selectedSpotlights.push(peerId);
-		}
-		else // We have this peer, remove
-		{
-			this._selectedSpotlights.splice(index, 1);
-		}
-		*/
+		if (this._started)
+			this._spotlightsUpdated();
+	}
+
+	removePeerSpotlight(peerId)
+	{
+		logger.debug('removePeerSpotlight() [peerId:"%s"]', peerId);
+
+		this._selectedSpotlights =
+			this._selectedSpotlights.filter((peer) =>
+				peer !== peerId);
 
 		if (this._started)
 			this._spotlightsUpdated();
@@ -108,7 +100,7 @@ export default class Spotlights extends EventEmitter
 	{
 		logger.debug(
 			'room "newpeer" event [id: "%s"]', id);
-		
+
 		if (this._peerList.indexOf(id) === -1) // We don't have this peer in the list
 		{
 			logger.debug('_handlePeer() | adding peer [peerId: "%s"]', id);
@@ -160,6 +152,12 @@ export default class Spotlights extends EventEmitter
 	{
 		let spotlights;
 
+		const maxSpotlights =
+			this._selectedSpotlights.length >
+			this._maxSpotlights ?
+				this._selectedSpotlights.length :
+				this._maxSpotlights;
+
 		if (this._selectedSpotlights.length > 0)
 		{
 			spotlights = [ ...new Set([ ...this._selectedSpotlights, ...this._peerList ]) ];
@@ -171,13 +169,13 @@ export default class Spotlights extends EventEmitter
 
 		if (
 			!this._arraysEqual(
-				this._currentSpotlights, spotlights.slice(0, this._maxSpotlights)
+				this._currentSpotlights, spotlights.slice(0, maxSpotlights)
 			)
 		)
 		{
 			logger.debug('_spotlightsUpdated() | spotlights updated, emitting');
 
-			this._currentSpotlights = spotlights.slice(0, this._maxSpotlights);
+			this._currentSpotlights = spotlights.slice(0, maxSpotlights);
 			this.emit('spotlights-updated', this._currentSpotlights);
 		}
 		else

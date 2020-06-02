@@ -4,6 +4,7 @@ import * as appPropTypes from '../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../actions/roomActions';
 import * as settingsActions from '../../actions/settingsActions';
+import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -11,7 +12,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
-import Checkbox from '@material-ui/core/Checkbox';
+import Switch from '@material-ui/core/Switch';
 
 const styles = (theme) =>
 	({
@@ -22,6 +23,13 @@ const styles = (theme) =>
 		formControl :
 		{
 			display : 'flex'
+		},
+		switchLabel : {
+			justifyContent : 'space-between',
+			flex           : 'auto',
+			display        : 'flex',
+			padding        : theme.spacing(1),
+			marginRight    : 0
 		}
 	});
 
@@ -35,6 +43,7 @@ const AppearenceSettings = ({
 	onToggleShowNotifications,
 	onToggleDrawerOverlayed,
 	handleChangeMode,
+	handleChangeAspectRatio,
 	classes
 }) =>
 {
@@ -54,60 +63,101 @@ const AppearenceSettings = ({
 		})
 	} ];
 
+	const aspectRatios = window.config.aspectRatios || [ {
+		value : 1.333,
+		label : '4 : 3'
+	}, {
+		value : 1.777,
+		label : '16 : 9'
+	} ];
+
 	return (
 		<React.Fragment>
-			<form className={classes.setting} autoComplete='off'>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={room.mode || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								handleChangeMode(event.target.value);
-						}}
-						name={intl.formatMessage({
-							id             : 'settings.layout',
-							defaultMessage : 'Room layout'
-						})}
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{ modes.map((mode, index) =>
-						{
-							return (
-								<MenuItem key={index} value={mode.value}>
-									{mode.label}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.selectRoomLayout'
-							defaultMessage='Select room layout'
-						/>
-					</FormHelperText>
-				</FormControl>
-			</form>
+			<FormControl className={classes.setting}>
+				<Select
+					value={room.mode || ''}
+					onChange={(event) =>
+					{
+						if (event.target.value)
+							handleChangeMode(event.target.value);
+					}}
+					name={intl.formatMessage({
+						id             : 'settings.layout',
+						defaultMessage : 'Room layout'
+					})}
+					autoWidth
+					className={classes.selectEmpty}
+				>
+					{ modes.map((mode, index) =>
+					{
+						return (
+							<MenuItem key={index} value={mode.value}>
+								{mode.label}
+							</MenuItem>
+						);
+					})}
+				</Select>
+				<FormHelperText>
+					<FormattedMessage
+						id='settings.selectRoomLayout'
+						defaultMessage='Select room layout'
+					/>
+				</FormHelperText>
+			</FormControl>
+			<FormControl className={classes.setting}>
+				<Select
+					value={settings.aspectRatio || ''}
+					onChange={(event) =>
+					{
+						if (event.target.value)
+							handleChangeAspectRatio(event.target.value);
+					}}
+					name={intl.formatMessage({
+						id             : 'settings.aspectRatio',
+						defaultMessage : 'Video aspect ratio'
+					})}
+					autoWidth
+					className={classes.selectEmpty}
+				>
+					{ aspectRatios.map((aspectRatio, index) =>
+					{
+						return (
+							<MenuItem key={index} value={aspectRatio.value}>
+								{aspectRatio.label}
+							</MenuItem>
+						);
+					})}
+				</Select>
+				<FormHelperText>
+					<FormattedMessage
+						id='settings.selectAspectRatio'
+						defaultMessage='Select video aspect ratio'
+					/>
+				</FormHelperText>
+			</FormControl>
 			<FormControlLabel
-				className={classes.setting}
-				control={<Checkbox checked={settings.permanentTopBar} onChange={onTogglePermanentTopBar} value='permanentTopBar' />}
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={
+					<Switch checked={settings.permanentTopBar} onChange={onTogglePermanentTopBar} value='permanentTopBar' />}
+				labelPlacement='start'
 				label={intl.formatMessage({
 					id             : 'settings.permanentTopBar',
 					defaultMessage : 'Permanent top bar'
 				})}
 			/>
 			<FormControlLabel
-				className={classes.setting}
-				control={<Checkbox checked={settings.hiddenControls} onChange={onToggleHiddenControls} value='hiddenControls' />}
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={<Switch checked={settings.hiddenControls} onChange={onToggleHiddenControls} value='hiddenControls' />}
+				labelPlacement='start'
 				label={intl.formatMessage({
 					id             : 'settings.hiddenControls',
 					defaultMessage : 'Hidden media controls'
 				})}
 			/>
 			<FormControlLabel
-				className={classes.setting}
-				control={<Checkbox checked={settings.buttonControlBar} onChange={onToggleButtonControlBar} value='buttonControlBar' />}
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={<Switch checked={settings.buttonControlBar} onChange={onToggleButtonControlBar} value='buttonControlBar' />}
+				labelPlacement='start'
 				label={intl.formatMessage({
 					id             : 'settings.buttonControlBar',
 					defaultMessage : 'Separate media controls'
@@ -115,8 +165,9 @@ const AppearenceSettings = ({
 			/>
 			{ !isMobile &&
 				<FormControlLabel
-					className={classes.setting}
-					control={<Checkbox checked={settings.drawerOverlayed} onChange={onToggleDrawerOverlayed} value='drawerOverlayed' />}
+					className={classnames(classes.setting, classes.switchLabel)}
+					control={<Switch checked={settings.drawerOverlayed} onChange={onToggleDrawerOverlayed} value='drawerOverlayed' />}
+					labelPlacement='start'
 					label={intl.formatMessage({
 						id             : 'settings.drawerOverlayed',
 						defaultMessage : 'Side drawer over content'
@@ -124,8 +175,9 @@ const AppearenceSettings = ({
 				/>
 			}
 			<FormControlLabel
-				className={classes.setting}
-				control={<Checkbox checked={settings.showNotifications} onChange={onToggleShowNotifications} value='showNotifications' />}
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={<Switch checked={settings.showNotifications} onChange={onToggleShowNotifications} value='showNotifications' />}
+				labelPlacement='start'
 				label={intl.formatMessage({
 					id             : 'settings.showNotifications',
 					defaultMessage : 'Show notifications'
@@ -146,6 +198,7 @@ AppearenceSettings.propTypes =
 	onToggleShowNotifications : PropTypes.func.isRequired,
 	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
 	handleChangeMode          : PropTypes.func.isRequired,
+	handleChangeAspectRatio   : PropTypes.func.isRequired,
 	classes                   : PropTypes.object.isRequired
 };
 
@@ -162,7 +215,8 @@ const mapDispatchToProps = {
 	onToggleShowNotifications : settingsActions.toggleShowNotifications,
 	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
 	onToggleDrawerOverlayed   : settingsActions.toggleDrawerOverlayed,
-	handleChangeMode          : roomActions.setDisplayMode
+	handleChangeMode          : roomActions.setDisplayMode,
+	handleChangeAspectRatio   : settingsActions.setAspectRatio
 };
 
 export default connect(

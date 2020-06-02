@@ -12,11 +12,11 @@ import Peer from '../Containers/Peer';
 import SpeakerPeer from '../Containers/SpeakerPeer';
 import Grid from '@material-ui/core/Grid';
 
-const RATIO = 1.334;
-const PADDING_V = 40;
-const PADDING_H = 0;
-const FILMSTRING_PADDING_V = 10;
-const FILMSTRING_PADDING_H = 0;
+const PADDING_V = 64;
+const FILMSTRING_PADDING_V = 0;
+const FILMSTRING_PADDING_H = 10;
+
+const FILL_RATE = 0.95;
 
 const styles = () =>
 	({
@@ -60,7 +60,7 @@ const styles = () =>
 		},
 		showingToolBar :
 		{
-			paddingTop : 60,
+			paddingTop : PADDING_V,
 			transition : 'padding .5s'
 		}
 	});
@@ -120,6 +120,13 @@ class Filmstrip extends React.PureComponent
 
 	updateDimensions = () =>
 	{
+		const {
+			toolbarsVisible,
+			permanentTopBar,
+			boxes,
+			aspectRatio
+		} = this.props;
+
 		const newState = {};
 
 		const root = this.rootContainer.current;
@@ -132,7 +139,7 @@ class Filmstrip extends React.PureComponent
 		// 4/5 speaker
 		// 1/5 filmstrip
 		const availableSpeakerHeight = (root.clientHeight * 0.8) -
-			(this.props.toolbarsVisible || this.props.permanentTopBar ? PADDING_V : PADDING_H);
+			(toolbarsVisible || permanentTopBar ? PADDING_V : 0);
 
 		const availableFilmstripHeight = root.clientHeight * 0.2;
 
@@ -140,20 +147,20 @@ class Filmstrip extends React.PureComponent
 
 		if (speaker)
 		{
-			let speakerWidth = (availableWidth - PADDING_H);
+			let speakerWidth = availableWidth;
 
-			let speakerHeight = speakerWidth / RATIO;
-	
+			let speakerHeight = speakerWidth / aspectRatio;
+
 			if (this.isSharingCamera(this.getActivePeerId()))
 			{
 				speakerWidth /= 2;
-				speakerHeight = speakerWidth / RATIO;
+				speakerHeight = speakerWidth / aspectRatio;
 			}
-	
-			if (speakerHeight > (availableSpeakerHeight - PADDING_V))
+
+			if (speakerHeight > availableSpeakerHeight)
 			{
-				speakerHeight = (availableSpeakerHeight - PADDING_V);
-				speakerWidth = speakerHeight * RATIO;
+				speakerHeight = availableSpeakerHeight;
+				speakerWidth = speakerHeight * aspectRatio;
 			}
 
 			newState.speakerWidth = speakerWidth;
@@ -166,20 +173,20 @@ class Filmstrip extends React.PureComponent
 		{
 			let filmStripHeight = availableFilmstripHeight - FILMSTRING_PADDING_V;
 
-			let filmStripWidth = filmStripHeight * RATIO;
-	
+			let filmStripWidth = filmStripHeight * aspectRatio;
+
 			if (
-				(filmStripWidth * this.props.boxes) >
+				(filmStripWidth * boxes) >
 				(availableWidth - FILMSTRING_PADDING_H)
 			)
 			{
 				filmStripWidth = (availableWidth - FILMSTRING_PADDING_H) /
-					this.props.boxes;
-				filmStripHeight = filmStripWidth / RATIO;
+					boxes;
+				filmStripHeight = filmStripWidth / aspectRatio;
 			}
 
-			newState.filmStripWidth = filmStripWidth;
-			newState.filmStripHeight = filmStripHeight;
+			newState.filmStripWidth = filmStripWidth * FILL_RATE;
+			newState.filmStripHeight = filmStripHeight * FILL_RATE;
 		}
 
 		this.setState({
@@ -229,7 +236,7 @@ class Filmstrip extends React.PureComponent
 	render()
 	{
 		const {
-			roomClient,
+			// roomClient,
 			peers,
 			myId,
 			advancedMode,
@@ -254,7 +261,7 @@ class Filmstrip extends React.PureComponent
 		};
 
 		return (
-			<div 
+			<div
 				className={classnames(
 					classes.root,
 					toolbarsVisible || permanentTopBar ?
@@ -296,7 +303,7 @@ class Filmstrip extends React.PureComponent
 									<Grid key={peerId} item>
 										<div
 											key={peerId}
-											onClick={() => roomClient.setSelectedPeer(peerId)}
+											// onClick={() => roomClient.setSelectedPeer(peerId)}
 											className={classnames(classes.filmItem, {
 												selected : this.props.selectedPeerId === peerId,
 												active   : peerId === activePeerId
@@ -325,7 +332,7 @@ class Filmstrip extends React.PureComponent
 }
 
 Filmstrip.propTypes = {
-	roomClient      : PropTypes.any.isRequired,
+	// roomClient      : PropTypes.any.isRequired,
 	activeSpeakerId : PropTypes.string,
 	advancedMode    : PropTypes.bool,
 	peers           : PropTypes.object.isRequired,
@@ -336,7 +343,8 @@ Filmstrip.propTypes = {
 	boxes           : PropTypes.number,
 	toolbarsVisible : PropTypes.bool.isRequired,
 	toolAreaOpen    : PropTypes.bool.isRequired,
-	permanentTopBar : PropTypes.bool,
+	permanentTopBar : PropTypes.bool.isRequired,
+	aspectRatio     : PropTypes.number.isRequired,
 	classes         : PropTypes.object.isRequired
 };
 
@@ -352,6 +360,7 @@ const mapStateToProps = (state) =>
 		boxes           : videoBoxesSelector(state),
 		toolbarsVisible : state.room.toolbarsVisible,
 		toolAreaOpen    : state.toolarea.toolAreaOpen,
+		aspectRatio     : state.settings.aspectRatio,
 		permanentTopBar : state.settings.permanentTopBar
 	};
 };
@@ -369,6 +378,7 @@ export default withRoomContext(connect(
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
+				prev.settings.aspectRatio === next.settings.aspectRatio &&
 				prev.peers === next.peers &&
 				prev.consumers === next.consumers &&
 				prev.room.spotlights === next.room.spotlights &&

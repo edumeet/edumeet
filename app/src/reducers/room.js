@@ -10,7 +10,7 @@ const initialState =
 	// access code to the room if locked and joinByAccessCode == true
 	accessCode                    : '',
 	// if true: accessCode is a possibility to open the room
-	joinByAccessCode              : true, 
+	joinByAccessCode              : true,
 	activeSpeakerId               : null,
 	torrentSupport                : false,
 	showSettings                  : false,
@@ -18,7 +18,7 @@ const initialState =
 	windowConsumer                : null, // ConsumerID
 	toolbarsVisible               : true,
 	mode                          : window.config.defaultLayout || 'democratic',
-	selectedPeerId                : null,
+	selectedPeers                 : [],
 	spotlights                    : [],
 	settingsOpen                  : false,
 	extraVideoOpen                : false,
@@ -107,7 +107,7 @@ const room = (state = initialState, action) =>
 
 			return { ...state, lockDialogOpen };
 		}
-	
+
 		case 'SET_SETTINGS_OPEN':
 		{
 			const { settingsOpen } = action.payload;
@@ -135,7 +135,7 @@ const room = (state = initialState, action) =>
 
 			return { ...state, aboutOpen };
 		}
-			
+
 		case 'SET_SETTINGS_TAB':
 		{
 			const { tab } = action.payload;
@@ -193,16 +193,31 @@ const room = (state = initialState, action) =>
 		case 'SET_DISPLAY_MODE':
 			return { ...state, mode: action.payload.mode };
 
-		case 'SET_SELECTED_PEER':
+		case 'ADD_SELECTED_PEER':
 		{
-			const { selectedPeerId } = action.payload;
+			const { peerId } = action.payload;
 
-			return {
-				...state,
+			const selectedPeers = [ ...state.selectedPeers, peerId ];
 
-				selectedPeerId : state.selectedPeerId === selectedPeerId ?
-					null : selectedPeerId
-			};
+			return { ...state, selectedPeers };
+		}
+
+		// Also listen for peers leaving
+		case 'REMOVE_PEER':
+		case 'REMOVE_SELECTED_PEER':
+		{
+			const { peerId } = action.payload;
+
+			const selectedPeers =
+				state.selectedPeers.filter((peer) =>
+					peer !== peerId);
+
+			return { ...state, selectedPeers };
+		}
+
+		case 'CLEAR_SELECTED_PEERS':
+		{
+			return { ...state, selectedPeers: [] };
 		}
 
 		case 'SET_SPOTLIGHTS':
@@ -225,6 +240,9 @@ const room = (state = initialState, action) =>
 
 		case 'STOP_ALL_VIDEO_IN_PROGRESS':
 			return { ...state, stopAllVideoInProgress: action.payload.flag };
+
+		case 'STOP_ALL_SCREEN_SHARING_IN_PROGRESS':
+			return { ...state, stopAllScreenSharingInProgress: action.payload.flag };
 
 		case 'CLOSE_MEETING_IN_PROGRESS':
 			return { ...state, closeMeetingInProgress: action.payload.flag };

@@ -1,25 +1,31 @@
 const initialState =
 {
-	displayName         : `Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`,
-	selectedWebcam      : null,
-	selectedAudioDevice : null,
-	advancedMode        : false,
-	sampleRate          : 48000,
-	channelCount        : 1,
-	volume              : 1.0,
-	autoGainControl     : true,
-	echoCancellation    : true,
-	noiseSuppression    : true,
-	sampleSize          : 16,
+	displayName             : `Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`,
+	selectedWebcam          : null,
+	selectedAudioDevice     : null,
+	advancedMode            : false,
+	sampleRate              : 48000,
+	channelCount            : 1,
+	volume                  : 1.0,
+	autoGainControl         : false,
+	echoCancellation        : true,
+	noiseSuppression        : true,
+	voiceActivatedUnmute    : false,
+	noiseThreshold          : -50,
+	sampleSize              : 16,
 	// low, medium, high, veryhigh, ultra
-	resolution          : window.config.defaultResolution || 'medium',
-	lastN               : 4,
-	permanentTopBar     : true,
-	hiddenControls      : false,
-	showNotifications   : true,
-	notificationSounds  : true,
-	buttonControlBar    : window.config.buttonControlBar || false,
-	drawerOverlayed     : window.config.drawerOverlayed || true,
+	resolution              : window.config.defaultResolution || 'medium',
+	frameRate               : window.config.defaultFrameRate || 15,
+	screenSharingResolution : window.config.defaultScreenResolution || 'veryhigh',
+	screenSharingFrameRate  : window.config.defaultScreenSharingFrameRate || 5,
+	lastN                   : 4,
+	permanentTopBar         : true,
+	hiddenControls          : false,
+	showNotifications       : true,
+	notificationSounds      : true,
+	buttonControlBar        : window.config.buttonControlBar || false,
+	drawerOverlayed         : window.config.drawerOverlayed || true,
+	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
 	...window.config.defaultAudio
 };
 
@@ -41,7 +47,7 @@ const settings = (state = initialState, action) =>
 		{
 			return { ...state, selectedAudioOutputDevice: action.payload.deviceId };
 		}
-	
+
 		case 'SET_DISPLAY_NAME':
 		{
 			const { displayName } = action.payload;
@@ -98,6 +104,20 @@ const settings = (state = initialState, action) =>
 			return { ...state, noiseSuppression };
 		}
 
+		case 'SET_VOICE_ACTIVATED_UNMUTE':
+		{
+			const { voiceActivatedUnmute } = action.payload;
+
+			return { ...state, voiceActivatedUnmute };
+		}
+
+		case 'SET_NOISE_THRESHOLD':
+		{
+			const { noiseThreshold } = action.payload;
+
+			return { ...state, noiseThreshold };
+		}
+
 		case 'SET_DEFAULT_AUDIO':
 		{
 			const { audio } = action.payload;
@@ -105,32 +125,18 @@ const settings = (state = initialState, action) =>
 			return { ...state, audio };
 		}
 
-		case 'TOGGLE_AUTO_GAIN_CONTROL':
-		{
-			const autoGainControl = !state.autoGainControl;
-
-			return { ...state, autoGainControl };
-		}
-
-		case 'TOGGLE_ECHO_CANCELLATION':
-		{
-			const echoCancellation = !state.echoCancellation;
-
-			return { ...state, echoCancellation };
-		}
-
-		case 'TOGGLE_NOISE_SUPPRESSION':
-		{
-			const noiseSuppression = !state.noiseSuppression;
-
-			return { ...state, noiseSuppression };
-		}
-
 		case 'SET_SAMPLE_SIZE':
 		{
 			const { sampleSize } = action.payload;
 
 			return { ...state, sampleSize };
+		}
+
+		case 'SET_ASPECT_RATIO':
+		{
+			const { aspectRatio } = action.payload;
+
+			return { ...state, aspectRatio };
 		}
 
 		case 'SET_LAST_N':
@@ -187,6 +193,27 @@ const settings = (state = initialState, action) =>
 			const { resolution } = action.payload;
 
 			return { ...state, resolution };
+		}
+
+		case 'SET_VIDEO_FRAME_RATE':
+		{
+			const { frameRate } = action.payload;
+
+			return { ...state, frameRate };
+		}
+
+		case 'SET_SCREEN_SHARING_RESOLUTION':
+		{
+			const { screenSharingResolution } = action.payload;
+
+			return { ...state, screenSharingResolution };
+		}
+
+		case 'SET_SCREEN_SHARING_FRAME_RATE':
+		{
+			const { screenSharingFrameRate } = action.payload;
+
+			return { ...state, screenSharingFrameRate };
 		}
 
 		default:

@@ -60,7 +60,7 @@ class MessageList extends React.Component
 			myPicture,
 			classes
 		} = this.props;
-	
+
 		return (
 			<div className={classes.root} ref={(node) => { this.node = node; }}>
 				{

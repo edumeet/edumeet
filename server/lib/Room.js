@@ -3,6 +3,7 @@ const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
+const { SocketTimeoutError } = require('./errors');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
@@ -492,7 +493,7 @@ class Room extends EventEmitter
 				peer.socket.handshake.session.save();
 
 				let turnServers;
-		
+
 				if ('turnAPIURI' in config)
 				{
 					try
@@ -506,7 +507,7 @@ class Room extends EventEmitter
 									'ip'      : peer.socket.request.connection.remoteAddress
 								}
 							});
-			
+
 						turnServers = [ {
 							urls       : data.uris,
 							username   : data.username,
@@ -517,7 +518,7 @@ class Room extends EventEmitter
 					{
 						if ('backupTurnServers' in config)
 							turnServers = config.backupTurnServers;
-			
+
 						logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
 					}
 				}
@@ -525,7 +526,7 @@ class Room extends EventEmitter
 				{
 					turnServers = config.backupTurnServers;
 				}
-		
+
 				this._notification(peer.socket, 'roomReady', { turnServers });
 			}
 		})
@@ -778,17 +779,21 @@ class Room extends EventEmitter
 				// initiate mediasoup Transports and be ready when he later joins.
 
 				const { forceTcp, producing, consuming } = request.data;
-				
+
 				const webRtcTransportOptions =
 				{
 					...config.mediasoup.webRtcTransport,
 					appData : { producing, consuming }
 				};
 
+				webRtcTransportOptions.enableTcp = true;
+
 				if (forceTcp)
-				{
 					webRtcTransportOptions.enableUdp = false;
-					webRtcTransportOptions.enableTcp = true;
+				else
+				{
+					webRtcTransportOptions.enableUdp = true;
+					webRtcTransportOptions.preferUdp = true;
 				}
 
 				const transport = await router.createWebRtcTransport(
@@ -1186,7 +1191,7 @@ class Room extends EventEmitter
 					throw new Error('peer not authorized');
 
 				const { chatMessage } = request.data;
-	
+
 				this._chatHistory.push(chatMessage);
 
 				// Spread to others
@@ -1205,7 +1210,7 @@ class Room extends EventEmitter
 			{
 				if (!this._hasPermission(peer, MODERATE_CHAT))
 					throw new Error('peer not authorized');
-	
+
 				this._chatHistory = [];
 
 				// Spread to others
@@ -1247,8 +1252,6 @@ class Room extends EventEmitter
 					peerId : peer.id
 				}, true);
 
-				this._lobby.promoteAllPeers();
-
 				// Return no error
 				cb();
 
@@ -1258,7 +1261,7 @@ class Room extends EventEmitter
 			case 'setAccessCode':
 			{
 				const { accessCode } = request.data;
-	
+
 				this._accessCode = accessCode;
 
 				// Spread to others
@@ -1278,7 +1281,7 @@ class Room extends EventEmitter
 			case 'setJoinByAccessCode':
 			{
 				const { joinByAccessCode } = request.data;
-	
+
 				this._joinByAccessCode = joinByAccessCode;
 
 				// Spread to others
@@ -1327,7 +1330,7 @@ class Room extends EventEmitter
 					throw new Error('peer not authorized');
 
 				const { magnetUri } = request.data;
-	
+
 				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
 
 				// Spread to others
@@ -1346,7 +1349,7 @@ class Room extends EventEmitter
 			{
 				if (!this._hasPermission(peer, MODERATE_FILES))
 					throw new Error('peer not authorized');
-	
+
 				this._fileHistory = [];
 
 				// Spread to others
@@ -1435,6 +1438,38 @@ class Room extends EventEmitter
 
 				// Spread to others
 				this._notification(peer.socket, 'moderator:stopVideo', null, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopAllScreenSharing':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:stopScreenSharing', null, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopScreenSharing':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const stopVideoPeer = this._peers[peerId];
+
+				if (!stopVideoPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(stopVideoPeer.socket, 'moderator:stopScreenSharing');
 
 				cb();
 
@@ -1727,9 +1762,9 @@ class Room extends EventEmitter
 				if (called)
 					return;
 				called = true;
-				callback(new Error('Request timeout.'));
+				callback(new SocketTimeoutError('Request timed out'));
 			},
-			10000
+			config.requestTimeout || 20000
 		);
 
 		return (...args) =>
@@ -1743,7 +1778,7 @@ class Room extends EventEmitter
 		};
 	}
 
-	_request(socket, method, data = {})
+	_sendRequest(socket, method, data = {})
 	{
 		return new Promise((resolve, reject) =>
 		{
@@ -1763,6 +1798,33 @@ class Room extends EventEmitter
 				})
 			);
 		});
+	}
+
+	async _request(socket, method, data)
+	{
+		logger.debug('_request() [method:"%s", data:"%o"]', method, data);
+
+		const {
+			requestRetries = 3
+		} = config;
+
+		for (let tries = 0; tries < requestRetries; tries++)
+		{
+			try
+			{
+				return await this._sendRequest(socket, method, data);
+			}
+			catch (error)
+			{
+				if (
+					error instanceof SocketTimeoutError &&
+					tries < requestRetries
+				)
+					logger.warn('_request() | timeout, retrying [attempt:"%s"]', tries);
+				else
+					throw error;
+			}
+		}
 	}
 
 	_notification(socket, method, data = {}, broadcast = false, includeSender = false)
@@ -1847,7 +1909,7 @@ class Room extends EventEmitter
 
 		for (const routerId of this._mediasoupRouters.keys())
 		{
-			const routerLoad = 
+			const routerLoad =
 				Object.values(this._peers).filter((peer) => peer.routerId === routerId).length;
 
 			if (routerLoad < load)

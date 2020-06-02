@@ -228,14 +228,14 @@ const Peer = (props) =>
 						{
 							if (touchTimeout)
 								clearTimeout(touchTimeout);
-		
+
 							setHover(true);
 						}}
 						onTouchEnd={() =>
 						{
 							if (touchTimeout)
 								clearTimeout(touchTimeout);
-		
+
 							touchTimeout = setTimeout(() =>
 							{
 								setHover(false);
@@ -445,14 +445,14 @@ const Peer = (props) =>
 						{
 							if (touchTimeout)
 								clearTimeout(touchTimeout);
-		
+
 							setHover(true);
 						}}
 						onTouchEnd={() =>
 						{
 							if (touchTimeout)
 								clearTimeout(touchTimeout);
-		
+
 							touchTimeout = setTimeout(() =>
 							{
 								setHover(false);
@@ -471,7 +471,7 @@ const Peer = (props) =>
 									</p>
 								</div>
 							}
-		
+
 							<div
 								className={classnames(classes.controls, hover ? 'hover' : null)}
 								onMouseOver={() => setHover(true)}
@@ -480,14 +480,14 @@ const Peer = (props) =>
 								{
 									if (touchTimeout)
 										clearTimeout(touchTimeout);
-				
+
 									setHover(true);
 								}}
 								onTouchEnd={() =>
 								{
 									if (touchTimeout)
 										clearTimeout(touchTimeout);
-				
+
 									touchTimeout = setTimeout(() =>
 									{
 										setHover(false);
@@ -544,7 +544,7 @@ const Peer = (props) =>
 										}
 									</Tooltip>
 								}
-		
+
 								<Tooltip
 									title={intl.formatMessage({
 										id             : 'label.fullscreen',
@@ -588,7 +588,7 @@ const Peer = (props) =>
 									}
 								</Tooltip>
 							</div>
-		
+
 							<VideoView
 								showQuality
 								advancedMode={advancedMode}
@@ -629,14 +629,14 @@ const Peer = (props) =>
 					{
 						if (touchTimeout)
 							clearTimeout(touchTimeout);
-	
+
 						setHover(true);
 					}}
 					onTouchEnd={() =>
 					{
 						if (touchTimeout)
 							clearTimeout(touchTimeout);
-	
+
 						touchTimeout = setTimeout(() =>
 						{
 							setHover(false);
@@ -663,7 +663,7 @@ const Peer = (props) =>
 							{
 								if (touchTimeout)
 									clearTimeout(touchTimeout);
-			
+
 								setHover(true);
 							}}
 							onTouchEnd={() =>
@@ -671,7 +671,7 @@ const Peer = (props) =>
 
 								if (touchTimeout)
 									clearTimeout(touchTimeout);
-			
+
 								touchTimeout = setTimeout(() =>
 								{
 									setHover(false);

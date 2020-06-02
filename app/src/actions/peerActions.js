@@ -26,13 +26,13 @@ export const setPeerVideoInProgress = (peerId, flag) =>
 		type    : 'SET_PEER_VIDEO_IN_PROGRESS',
 		payload : { peerId, flag }
 	});
-	
+
 export const setPeerAudioInProgress = (peerId, flag) =>
 	({
 		type    : 'SET_PEER_AUDIO_IN_PROGRESS',
 		payload : { peerId, flag }
 	});
-	
+
 export const setPeerScreenInProgress = (peerId, flag) =>
 	({
 		type    : 'SET_PEER_SCREEN_IN_PROGRESS',
@@ -84,5 +84,11 @@ export const setMutePeerInProgress = (peerId, flag) =>
 export const setStopPeerVideoInProgress = (peerId, flag) =>
 	({
 		type    : 'STOP_PEER_VIDEO_IN_PROGRESS',
+		payload : { peerId, flag }
+	});
+
+export const setStopPeerScreenSharingInProgress = (peerId, flag) =>
+	({
+		type    : 'STOP_PEER_SCREEN_SHARING_IN_PROGRESS',
 		payload : { peerId, flag }
 	});

@@ -26,7 +26,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Avatar from '@material-ui/core/Avatar';
 import Badge from '@material-ui/core/Badge';
 import Paper from '@material-ui/core/Paper';
-import ExtensionIcon from '@material-ui/icons/Extension';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -312,7 +311,7 @@ const TopBar = (props) =>
 					</Typography>
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						<Tooltip 
+						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
 								defaultMessage : 'More actions'
@@ -324,11 +323,11 @@ const TopBar = (props) =>
 									currentMenu === 'moreActions' ?
 										'material-appbar' : undefined
 								}
-								aria-haspopup='true'
+								aria-haspopup
 								onClick={(event) => handleMenuOpen(event, 'moreActions')}
 								color='inherit'
 							>
-								<ExtensionIcon />
+								<MoreIcon />
 							</IconButton>
 						</Tooltip>
 						{ fullscreenEnabled &&
@@ -350,7 +349,7 @@ const TopBar = (props) =>
 								</IconButton>
 							</Tooltip>
 						}
-						<Tooltip 
+						<Tooltip
 							title={intl.formatMessage({
 								id             : 'tooltip.participants',
 								defaultMessage : 'Show participants'
@@ -421,7 +420,7 @@ const TopBar = (props) =>
 							</span>
 						</Tooltip>
 						{ lobbyPeers.length > 0 &&
-							<Tooltip 
+							<Tooltip
 								title={intl.formatMessage({
 									id             : 'tooltip.lobby',
 									defaultMessage : 'Show lobby'
@@ -457,7 +456,7 @@ const TopBar = (props) =>
 									})}
 									className={classes.actionButton}
 									color='inherit'
-									onClick={() => 
+									onClick={() =>
 									{
 										loggedIn ? roomClient.logout() : roomClient.login();
 									}}
@@ -472,8 +471,36 @@ const TopBar = (props) =>
 						}
 					</div>
 					<div className={classes.sectionMobile}>
+						{ lobbyPeers.length > 0 &&
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'tooltip.lobby',
+								defaultMessage : 'Show lobby'
+							})}
+						>
+							<span className={classes.disabledButton}>
+								<IconButton
+									aria-label={intl.formatMessage({
+										id             : 'tooltip.lobby',
+										defaultMessage : 'Show lobby'
+									})}
+									className={classes.actionButton}
+									color='inherit'
+									disabled={!canPromote}
+									onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
+								>
+									<PulsingBadge
+										color='secondary'
+										badgeContent={lobbyPeers.length}
+									>
+										<SecurityIcon />
+									</PulsingBadge>
+								</IconButton>
+							</span>
+						</Tooltip>
+						}
 						<IconButton
-							aria-haspopup='true'
+							aria-haspopup
 							onClick={handleMobileMenuOpen}
 							color='inherit'
 						>
@@ -530,8 +557,8 @@ const TopBar = (props) =>
 								/>
 							</p>
 						</MenuItem>
-						<MenuItem 
-							onClick={() => 
+						<MenuItem
+							onClick={() =>
 							{
 								handleMenuClose();
 								setHelpOpen(!room.helpOpen);
@@ -550,8 +577,8 @@ const TopBar = (props) =>
 								/>
 							</p>
 						</MenuItem>
-						<MenuItem 
-							onClick={() => 
+						<MenuItem
+							onClick={() =>
 							{
 								handleMenuClose();
 								setAboutOpen(!room.aboutOpen);
@@ -584,7 +611,7 @@ const TopBar = (props) =>
 				{ loginEnabled &&
 					<MenuItem
 						aria-label={loginTooltip}
-						onClick={() => 
+						onClick={() =>
 						{
 							handleMenuClose();
 							loggedIn ? roomClient.logout() : roomClient.login();
@@ -669,33 +696,6 @@ const TopBar = (props) =>
 						/>
 					</p>
 				</MenuItem>
-				{ lobbyPeers.length > 0 &&
-					<MenuItem 
-						aria-label={intl.formatMessage({
-							id             : 'tooltip.lobby',
-							defaultMessage : 'Show lobby'
-						})}
-						disabled={!canPromote}
-						onClick={() =>
-						{
-							handleMenuClose();
-							setLockDialogOpen(!room.lockDialogOpen);
-						}}
-					>
-						<PulsingBadge
-							color='secondary'
-							badgeContent={lobbyPeers.length}
-						>
-							<SecurityIcon />
-						</PulsingBadge>
-						<p className={classes.moreAction}>
-							<FormattedMessage
-								id='tooltip.lobby'
-								defaultMessage='Show lobby'
-							/>
-						</p>
-					</MenuItem>
-				}
 				<MenuItem
 					aria-label={intl.formatMessage({
 						id             : 'tooltip.participants',
@@ -746,17 +746,63 @@ const TopBar = (props) =>
 					</MenuItem>
 				}
 				<MenuItem
-					aria-label={intl.formatMessage({
-						id             : 'label.moreActions',
-						defaultMessage : 'Add video'
-					})}
-					onClick={(event) => handleMenuOpen(event, 'moreActions')}
+					disabled={!canProduceExtraVideo}
+					onClick={() =>
+					{
+						handleMenuClose();
+						setExtraVideoOpen(!room.extraVideoOpen);
+					}}
 				>
-					<ExtensionIcon />
+					<VideoCallIcon
+						aria-label={intl.formatMessage({
+							id             : 'label.addVideo',
+							defaultMessage : 'Add video'
+						})}
+					/>
 					<p className={classes.moreAction}>
 						<FormattedMessage
-							id='label.moreActions'
-							defaultMessage='More actions'
+							id='label.addVideo'
+							defaultMessage='Add video'
+						/>
+					</p>
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
+						setHelpOpen(!room.helpOpen);
+					}}
+				>
+					<HelpIcon
+						aria-label={intl.formatMessage({
+							id             : 'room.help',
+							defaultMessage : 'Help'
+						})}
+					/>
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='room.help'
+							defaultMessage='Help'
+						/>
+					</p>
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
+						setAboutOpen(!room.aboutOpen);
+					}}
+				>
+					<InfoIcon
+						aria-label={intl.formatMessage({
+							id             : 'room.about',
+							defaultMessage : 'About'
+						})}
+					/>
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='room.about'
+							defaultMessage='About'
 						/>
 					</p>
 				</MenuItem>

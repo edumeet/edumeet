@@ -9,8 +9,6 @@ import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
@@ -24,6 +22,14 @@ const shortcuts=[
 	{ key: '2', label: 'label.filmstrip', defaultMessage: 'Filmstrip View' },
 	{ key: 'space', label: 'me.mutedPTT', defaultMessage: 'Push SPACE to talk' },
 	{ key: 'a', label: 'label.advanced', defaultMessage: 'Show advanced information' }
+
+	/*
+	{
+		key: `${String.fromCharCode(8592)} ${String.fromCharCode(8594)}`,
+		label: 'room.browsePeersSpotlight',
+		defaultMessage: 'Browse participants into Spotlight'
+	}
+	*/
 ];
 const styles = (theme) =>
 	({
@@ -61,11 +67,14 @@ const styles = (theme) =>
 		shortcuts : {
 			display       : 'flex',
 			flexDirection : 'row',
-			alignItems    : 'center'
+			alignItems    : 'center',
+			paddingLeft   : theme.spacing(2),
+			paddingRight  : theme.spacing(2)
 		},
 		tabsHeader :
 		{
-			flexGrow : 1
+			flexGrow     : 1,
+			marginBottom : theme.spacing(1)
 		}
 	});
 
@@ -92,6 +101,7 @@ const Help = ({
 				/>
 			</DialogTitle>
 			<Tabs
+				value={0}
 				className={classes.tabsHeader}
 				indicatorColor='primary'
 				textColor='primary'
@@ -106,25 +116,20 @@ const Help = ({
 					}
 				/>
 			</Tabs>
-			<DialogContent dividers='true'>				
-				<DialogContentText>
-					{shortcuts.map((value, index) => 
-					{
-						return (
-							<div key={index} className={classes.shortcuts}>
-								<Paper className={classes.paper}>									
-									{value.key}
-								</Paper>
-								<FormattedMessage
-									id={value.label}
-									defaultMessage={value.defaultMessage}
-								/>
-							</div>
-						);
-					})}
-
-				</DialogContentText>
-			</DialogContent>
+			{shortcuts.map((value, index) =>
+			{
+				return (
+					<div key={index} className={classes.shortcuts}>
+						<Paper className={classes.paper}>
+							{value.key}
+						</Paper>
+						<FormattedMessage
+							id={value.label}
+							defaultMessage={value.defaultMessage}
+						/>
+					</div>
+				);
+			})}
 			<DialogActions>
 				<Button onClick={() => { handleCloseHelp(false); }} color='primary'>
 					<FormattedMessage
@@ -133,7 +138,7 @@ const Help = ({
 					/>
 				</Button>
 			</DialogActions>
-		</Dialog>		
+		</Dialog>
 	);
 };
 
@@ -141,7 +146,7 @@ Help.propTypes =
 {
 	roomClient      : PropTypes.object.isRequired,
 	helpOpen        : PropTypes.bool.isRequired,
-	handleCloseHelp : PropTypes.func.isRequired, 
+	handleCloseHelp : PropTypes.func.isRequired,
 	classes         : PropTypes.object.isRequired
 };
 

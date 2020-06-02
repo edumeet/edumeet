@@ -168,7 +168,7 @@ module.exports = async function(rooms, peers, config)
 					for (const [ producerId, producer ] of transport._producers)
 					{
 						logger.debug(`visiting producer ${producerId}`);
-						const { roomId, peerId, displayName, userAgent, kind, codec } = 
+						const { roomId, peerId, displayName, userAgent, kind, codec } =
 							commonLabels(producer, (peer) => peer._producers.has(producerId));
 						const a = await producer.getStats();
 
@@ -200,7 +200,7 @@ module.exports = async function(rooms, peers, config)
 					for (const [ consumerId, consumer ] of transport._consumers)
 					{
 						logger.debug(`visiting consumer ${consumerId}`);
-						const { roomId, peerId, displayName, userAgent, kind, codec } = 
+						const { roomId, peerId, displayName, userAgent, kind, codec } =
 							commonLabels(consumer, (peer) => peer._consumers.has(consumerId));
 						const a = await consumer.getStats();
 

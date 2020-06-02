@@ -118,10 +118,21 @@ export const setDisplayMode = (mode) =>
 		payload : { mode }
 	});
 
-export const setSelectedPeer = (selectedPeerId) =>
+export const addSelectedPeer = (peerId) =>
 	({
-		type    : 'SET_SELECTED_PEER',
-		payload : { selectedPeerId }
+		type    : 'ADD_SELECTED_PEER',
+		payload : { peerId }
+	});
+
+export const removeSelectedPeer = (peerId) =>
+	({
+		type    : 'REMOVE_SELECTED_PEER',
+		payload : { peerId }
+	});
+
+export const clearSelectedPeers = () =>
+	({
+		type : 'CLEAR_SELECTED_PEERS'
 	});
 
 export const setSpotlights = (spotlights) =>
@@ -161,6 +172,12 @@ export const setMuteAllInProgress = (flag) =>
 export const setStopAllVideoInProgress = (flag) =>
 	({
 		type    : 'STOP_ALL_VIDEO_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const setStopAllScreenSharingInProgress = (flag) =>
+	({
+		type    : 'STOP_ALL_SCREEN_SHARING_IN_PROGRESS',
 		payload : { flag }
 	});
 
