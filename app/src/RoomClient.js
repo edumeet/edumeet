@@ -53,31 +53,26 @@ const VIDEO_CONSTRAINS =
 	'low' :
 	{
 		width       : { ideal: 320 },
-		facingMode  : { ideal: 'user' },
 		aspectRatio : videoAspectRatio
 	},
 	'medium' :
 	{
 		width       : { ideal: 640 },
-		facingMode  : { ideal: 'user' },
 		aspectRatio : videoAspectRatio
 	},
 	'high' :
 	{
 		width       : { ideal: 1280 },
-		facingMode  : { ideal: 'user' },
 		aspectRatio : videoAspectRatio
 	},
 	'veryhigh' :
 	{
 		width       : { ideal: 1920 },
-		facingMode  : { ideal: 'user' },
 		aspectRatio : videoAspectRatio
 	},
 	'ultra' :
 	{
 		width       : { ideal: 3840 },
-		facingMode  : { ideal: 'user' },
 		aspectRatio : videoAspectRatio
 	}
 };
