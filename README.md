@@ -21,6 +21,30 @@ If you want the automatic approach, you can find a docker image [here](https://h
 If you want the ansible approach, you can find ansible role [here](https://github.com/misi/mm-ansible/).
 [![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
 
+## Package Installation
+If you want to install it on the Debian & Ubuntu based operating systems.
+* Prerequisites:
+multiparty-meeting will run on nodejs v10.x and later versions. (v12.x has issues for now, please use another major version)
+To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
+
+* Download .deb package from [here](https://github.com/havfo/multiparty-meeting/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
+
+* Unzip the file
+```bash
+$ unzip multiparty-meeting.zip
+```
+* Install the package
+```bash
+$ sudo apt install multiparty-meeting/multiparty-meeting.deb
+```
+* After package installation, don't forget the configure ip address in config file.
+```bash
+$ sudo nano /etc/meeting/server-config.js
+```
+* Finally, start the service by (it's enabled by default)
+```bash
+$ sudo systemctl start multiparty-meeting
+```
 ## Manual installation
 * Prerequisites:
 Currently multiparty-meeting will only run on nodejs v13.x
