@@ -115,6 +115,9 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 
 * You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `app/config.js`
 
+## Prometheus monitoring
+To enable the exporter, have a look at [prom](prom.md).
+
 ## Community-driven support
 
 * Open mailing list: community@lists.edumeet.org

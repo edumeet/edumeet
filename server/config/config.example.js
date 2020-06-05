@@ -396,6 +396,7 @@ module.exports =
 	/*
 	prometheus: {
 		deidentify: false, // deidentify IP addresses
+		// listen: 'localhost', // exporter listens on this address
 		numeric: false, // show numeric IP addresses
 		port: 8889, // allocated port
 		quiet: false // include fewer labels
