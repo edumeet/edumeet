@@ -383,7 +383,7 @@ class Room extends EventEmitter
 			const { producer, volume } = volumes[0];
 
 			// Notify all Peers.
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this.getJoinedPeers())
 			{
 				this._notification(
 					peer.socket,
@@ -398,7 +398,7 @@ class Room extends EventEmitter
 		this._audioLevelObserver.on('silence', () =>
 		{
 			// Notify all Peers.
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this.getJoinedPeers())
 			{
 				this._notification(
 					peer.socket,
@@ -713,7 +713,7 @@ class Room extends EventEmitter
 				// Tell the new Peer about already joined Peers.
 				// And also create Consumers for existing Producers.
 
-				const joinedPeers = this._getJoinedPeers(peer);
+				const joinedPeers = this.getJoinedPeers(peer);
 
 				const peerInfos = joinedPeers
 					.map((joinedPeer) => (joinedPeer.peerInfo));
@@ -758,7 +758,7 @@ class Room extends EventEmitter
 				}
 
 				// Notify the new Peer to all other Peers.
-				for (const otherPeer of this._getJoinedPeers(peer))
+				for (const otherPeer of this.getJoinedPeers(peer))
 				{
 					this._notification(
 						otherPeer.socket,
@@ -950,7 +950,7 @@ class Room extends EventEmitter
 				cb(null, { id: producer.id });
 
 				// Optimization: Create a server-side Consumer for each Peer.
-				for (const otherPeer of this._getJoinedPeers(peer))
+				for (const otherPeer of this.getJoinedPeers(peer))
 				{
 					this._createConsumer(
 						{
@@ -1802,9 +1802,9 @@ class Room extends EventEmitter
 	}
 
 	/**
-	 * Helper to get the list of joined peers.
+	 * Get the list of joined peers.
 	 */
-	_getJoinedPeers(excludePeer = undefined)
+	getJoinedPeers(excludePeer = undefined)
 	{
 		return Object.values(this._peers)
 			.filter((peer) => peer.joined && peer !== excludePeer);

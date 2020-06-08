@@ -380,6 +380,7 @@ async function setupAuth()
 				req.session.roomId = roomId;
 
 				let peer = peers.get(peerId);
+				const room = rooms.get(roomId);
 
 				if (!peer) // User has no socket session yet, make temporary
 					peer = new Peer({ id: peerId, roomId });
@@ -391,6 +392,7 @@ async function setupAuth()
 				{
 					await config.userMapping({
 						peer,
+						room,
 						roomId,
 						userinfo : req.user._userinfo
 					});
@@ -590,7 +592,7 @@ async function runWebSocketServer()
 
 				if (typeof config.userMapping === 'function')
 				{
-					await config.userMapping({ peer, roomId, userinfo: _userinfo });
+					await config.userMapping({ peer, room, roomId, userinfo: _userinfo });
 				}
 			}
 

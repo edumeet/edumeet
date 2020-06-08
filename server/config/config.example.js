@@ -153,7 +153,7 @@ module.exports =
 	// Examples:
 	/*
 	// All authenicated users will be MODERATOR and AUTHENTICATED
-	userMapping : async ({ peer, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		peer.addRole(userRoles.MODERATOR);
 		peer.addRole(userRoles.AUTHENTICATED);
@@ -161,7 +161,7 @@ module.exports =
 	// All authenicated users will be AUTHENTICATED,
 	// and those with the moderator role set in the userinfo
 	// will also be MODERATOR
-	userMapping : async ({ peer, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (
 			Array.isArray(userinfo.meet_roles) &&
@@ -181,10 +181,27 @@ module.exports =
 
 		peer.addRole(userRoles.AUTHENTICATED);
 	},
+	// First authenticated user will be moderator,
+	// all others will be AUTHENTICATED
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
+	{
+		if (room)
+		{
+			const peers = room.getJoinedPeers();
+
+			if (peers.some((_peer) => _peer.authenticated))
+				peer.addRole(userRoles.AUTHENTICATED);
+			else
+			{
+				peer.addRole(userRoles.MODERATOR);
+				peer.addRole(userRoles.AUTHENTICATED);
+			}
+		}
+	},
 	// All authenicated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
-	userMapping : async ({ peer, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (userinfo.email && userinfo.email.endsWith('@example.com'))
 		{
@@ -192,11 +209,11 @@ module.exports =
 		}
 
 		peer.addRole(userRoles.AUTHENTICATED);
-	}
+	},
 	// All authenicated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
-	userMapping : async ({ peer, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (userinfo.email && userinfo.email.endsWith('@example.com'))
 		{
@@ -207,7 +224,7 @@ module.exports =
 	},
 	*/
 	// eslint-disable-next-line no-unused-vars
-	userMapping           : async ({ peer, roomId, userinfo }) =>
+	userMapping           : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (userinfo.picture != null)
 		{
