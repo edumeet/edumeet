@@ -15,7 +15,8 @@ const persistConfig =
 	key             : 'root',
 	storage         : storage,
 	stateReconciler : autoMergeLevel2,
-	whitelist       : [ 'settings' ]
+	// whitelist       : [ 'settings']
+	whitelist       : [ 'settings', 'intl' ]
 };
 
 const reduxMiddlewares =
@@ -49,8 +50,17 @@ const enhancer = composeEnhancers(
 
 const pReducer = persistReducer(persistConfig, rootReducer);
 
+const initialState = {
+	intl : {
+		locale   : null,
+		messages : null
+	}
+	// ...other initialState
+};
+
 export const store = createStore(
 	pReducer,
+	initialState,
 	enhancer
 );
 

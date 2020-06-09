@@ -13,6 +13,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
+import { withRoomContext } from '../../RoomContext';
 
 const styles = (theme) =>
 	({
@@ -33,20 +34,26 @@ const styles = (theme) =>
 		}
 	});
 
-const AppearenceSettings = ({
-	isMobile,
-	room,
-	settings,
-	onTogglePermanentTopBar,
-	onToggleHiddenControls,
-	onToggleButtonControlBar,
-	onToggleShowNotifications,
-	onToggleDrawerOverlayed,
-	handleChangeMode,
-	handleChangeAspectRatio,
-	classes
-}) =>
+const AppearenceSettings = (props) =>
 {
+	const {
+		roomClient,
+		isMobile,
+		room,
+		locale,
+		settings,
+		onTogglePermanentTopBar,
+		onToggleHiddenControls,
+		onToggleButtonControlBar,
+		onToggleShowNotifications,
+		onToggleDrawerOverlayed,
+		handleChangeMode,
+		handleChangeAspectRatio,
+		classes,
+		localesList
+
+	} = props;
+
 	const intl = useIntl();
 
 	const modes = [ {
@@ -73,6 +80,42 @@ const AppearenceSettings = ({
 
 	return (
 		<React.Fragment>
+
+			{/* MOJE */}
+			<FormControl className={classes.setting}>
+				<Select
+					value={locale || ''}
+					onChange={(event) =>
+					{
+						if (event.target.value)
+							roomClient.setLocale(event.target.value);
+					}
+					}
+					name={intl.formatMessage({
+						id             : 'settings.language',
+						defaultMessage : 'Language'
+					})}
+					autoWidth
+					className={classes.selectEmpty}
+				>
+					{ localesList.map((item, index) =>
+					{
+						return (
+							<MenuItem key={index} value={item.locale[0]}>
+								{item.name}
+							</MenuItem>
+						);
+					})}
+				</Select>
+				<FormHelperText>
+					<FormattedMessage
+						id='settings.language'
+						defaultMessage='Select language'
+					/>
+				</FormHelperText>
+			</FormControl>
+			{/* MOJE */}
+
 			<FormControl className={classes.setting}>
 				<Select
 					value={room.mode || ''}
@@ -189,6 +232,7 @@ const AppearenceSettings = ({
 
 AppearenceSettings.propTypes =
 {
+	roomClient          				  : PropTypes.any.isRequired,
 	isMobile                  : PropTypes.bool.isRequired,
 	room                      : appPropTypes.Room.isRequired,
 	settings                  : PropTypes.object.isRequired,
@@ -199,14 +243,19 @@ AppearenceSettings.propTypes =
 	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
 	handleChangeMode          : PropTypes.func.isRequired,
 	handleChangeAspectRatio   : PropTypes.func.isRequired,
-	classes                   : PropTypes.object.isRequired
+	classes                   : PropTypes.object.isRequired,
+	intl               					  : PropTypes.object.isRequired,
+	locale             					  : PropTypes.object.isRequired,
+	localesList        					  : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
-		isMobile : state.me.browser.platform === 'mobile',
-		room     : state.room,
-		settings : state.settings
+		isMobile   	: state.me.browser.platform === 'mobile',
+		room      		: state.room,
+		settings   	: state.settings,
+		locale    		: state.intl.locale,
+		localesList : state.intl.list
 	});
 
 const mapDispatchToProps = {
@@ -219,7 +268,7 @@ const mapDispatchToProps = {
 	handleChangeAspectRatio   : settingsActions.setAspectRatio
 };
 
-export default connect(
+export default withRoomContext(connect(
 	mapStateToProps,
 	mapDispatchToProps,
 	null,
@@ -229,8 +278,10 @@ export default connect(
 			return (
 				prev.me.browser === next.me.browser &&
 				prev.room === next.room &&
-				prev.settings === next.settings
+				prev.settings === next.settings &&
+				prev.locale === next.locale &&
+				prev.localesList === next.localesList
 			);
 		}
 	}
-)(withStyles(styles)(AppearenceSettings));
+)(withStyles(styles)(AppearenceSettings)));
