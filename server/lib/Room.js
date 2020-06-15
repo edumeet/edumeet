@@ -16,8 +16,11 @@ const {
 const permissions = require('../permissions'), {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
+	MODIFY_ROLE,
 	SEND_CHAT,
 	MODERATE_CHAT,
+	SHARE_AUDIO,
+	SHARE_VIDEO,
 	SHARE_SCREEN,
 	EXTRA_VIDEO,
 	SHARE_FILE,
@@ -41,8 +44,11 @@ const roomPermissions =
 {
 	[CHANGE_ROOM_LOCK] : [ userRoles.NORMAL ],
 	[PROMOTE_PEER]     : [ userRoles.NORMAL ],
+	[MODIFY_ROLE]      : [ userRoles.MODERATOR ],
 	[SEND_CHAT]        : [ userRoles.NORMAL ],
 	[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
+	[SHARE_AUDIO]      : [ userRoles.NORMAL ],
+	[SHARE_VIDEO]      : [ userRoles.NORMAL ],
 	[SHARE_SCREEN]     : [ userRoles.NORMAL ],
 	[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
 	[SHARE_FILE]       : [ userRoles.NORMAL ],
@@ -377,7 +383,7 @@ class Room extends EventEmitter
 			const { producer, volume } = volumes[0];
 
 			// Notify all Peers.
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this.getJoinedPeers())
 			{
 				this._notification(
 					peer.socket,
@@ -392,7 +398,7 @@ class Room extends EventEmitter
 		this._audioLevelObserver.on('silence', () =>
 		{
 			// Notify all Peers.
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this.getJoinedPeers())
 			{
 				this._notification(
 					peer.socket,
@@ -586,7 +592,7 @@ class Room extends EventEmitter
 
 			// Got permission to promote peers, notify peer of
 			// peers in lobby
-			if (roomPermissions.PROMOTE_PEER.includes(newRole))
+			if (roomPermissions.PROMOTE_PEER.some((role) => role.id === newRole.id))
 			{
 				const lobbyPeers = this._lobby.peerList();
 
@@ -645,7 +651,7 @@ class Room extends EventEmitter
 
 		// Need this to know if this peer was the last with PROMOTE_PEER
 		const hasPromotePeer = peer.roles.some((role) =>
-			roomPermissions[PROMOTE_PEER].includes(role)
+			roomPermissions[PROMOTE_PEER].some((roomRole) => role.id === roomRole.id)
 		);
 
 		delete this._peers[peer.id];
@@ -707,7 +713,7 @@ class Room extends EventEmitter
 				// Tell the new Peer about already joined Peers.
 				// And also create Consumers for existing Producers.
 
-				const joinedPeers = this._getJoinedPeers(peer);
+				const joinedPeers = this.getJoinedPeers(peer);
 
 				const peerInfos = joinedPeers
 					.map((joinedPeer) => (joinedPeer.peerInfo));
@@ -752,7 +758,7 @@ class Room extends EventEmitter
 				}
 
 				// Notify the new Peer to all other Peers.
-				for (const otherPeer of this._getJoinedPeers(peer))
+				for (const otherPeer of this.getJoinedPeers(peer))
 				{
 					this._notification(
 						otherPeer.socket,
@@ -786,10 +792,14 @@ class Room extends EventEmitter
 					appData : { producing, consuming }
 				};
 
+				webRtcTransportOptions.enableTcp = true;
+
 				if (forceTcp)
-				{
 					webRtcTransportOptions.enableUdp = false;
-					webRtcTransportOptions.enableTcp = true;
+				else
+				{
+					webRtcTransportOptions.enableUdp = true;
+					webRtcTransportOptions.preferUdp = true;
 				}
 
 				const transport = await router.createWebRtcTransport(
@@ -861,6 +871,25 @@ class Room extends EventEmitter
 				let { appData } = request.data;
 
 				if (
+					!appData.source ||
+					![ 'mic', 'webcam', 'screen', 'extravideo' ]
+						.includes(appData.source)
+				)
+					throw new Error('invalid producer source');
+
+				if (
+					appData.source === 'mic' &&
+					!this._hasPermission(peer, SHARE_AUDIO)
+				)
+					throw new Error('peer not authorized');
+
+				if (
+					appData.source === 'webcam' &&
+					!this._hasPermission(peer, SHARE_VIDEO)
+				)
+					throw new Error('peer not authorized');
+
+				if (
 					appData.source === 'screen' &&
 					!this._hasPermission(peer, SHARE_SCREEN)
 				)
@@ -921,7 +950,7 @@ class Room extends EventEmitter
 				cb(null, { id: producer.id });
 
 				// Optimization: Create a server-side Consumer for each Peer.
-				for (const otherPeer of this._getJoinedPeers(peer))
+				for (const otherPeer of this.getJoinedPeers(peer))
 				{
 					this._createConsumer(
 						{
@@ -1195,6 +1224,64 @@ class Room extends EventEmitter
 					peerId      : peer.id,
 					chatMessage : chatMessage
 				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:giveRole':
+			{
+				if (!this._hasPermission(peer, MODIFY_ROLE))
+					throw new Error('peer not authorized');
+
+				const { peerId, roleId } = request.data;
+
+				const userRole = Object.values(userRoles).find((role) => role.id === roleId);
+
+				if (!userRole)
+					throw new Error('no such role');
+
+				if (!peer.roles.some((role) => role.level >= userRole.level))
+					throw new Error('peer not authorized for this level');
+
+				const giveRolePeer = this._peers[peerId];
+
+				if (!giveRolePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				// This will propagate the event automatically
+				giveRolePeer.addRole(userRole);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:removeRole':
+			{
+				if (!this._hasPermission(peer, MODIFY_ROLE))
+					throw new Error('peer not authorized');
+
+				const { peerId, roleId } = request.data;
+
+				const userRole = Object.values(userRoles).find((role) => role.id === roleId);
+
+				if (!userRole)
+					throw new Error('no such role');
+
+				if (!peer.roles.some((role) => role.level >= userRole.level))
+					throw new Error('peer not authorized for this level');
+
+				const removeRolePeer = this._peers[peerId];
+
+				if (!removeRolePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				// This will propagate the event automatically
+				removeRolePeer.removeRole(userRole);
 
 				// Return no error
 				cb();
@@ -1691,7 +1778,7 @@ class Room extends EventEmitter
 	_hasPermission(peer, permission)
 	{
 		const hasPermission = peer.roles.some((role) =>
-			roomPermissions[permission].includes(role)
+			roomPermissions[permission].some((roomRole) => role.id === roomRole.id)
 		);
 
 		if (hasPermission)
@@ -1709,13 +1796,15 @@ class Room extends EventEmitter
 
 	_hasAccess(peer, access)
 	{
-		return peer.roles.some((role) => roomAccess[access].includes(role));
+		return peer.roles.some((role) =>
+			roomAccess[access].some((roomRole) => role.id === roomRole.id)
+		);
 	}
 
 	/**
-	 * Helper to get the list of joined peers.
+	 * Get the list of joined peers.
 	 */
-	_getJoinedPeers(excludePeer = undefined)
+	getJoinedPeers(excludePeer = undefined)
 	{
 		return Object.values(this._peers)
 			.filter((peer) => peer.joined && peer !== excludePeer);
@@ -1743,7 +1832,9 @@ class Room extends EventEmitter
 					peer.joined === joined &&
 					peer !== excludePeer &&
 					peer.roles.some(
-						(role) => roomPermissions[permission].includes(role)
+						(role) =>
+							roomPermissions[permission].some((roomRole) =>
+								role.id === roomRole.id)
 					)
 			);
 	}

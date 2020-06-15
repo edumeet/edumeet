@@ -118,10 +118,21 @@ export const setDisplayMode = (mode) =>
 		payload : { mode }
 	});
 
-export const setSelectedPeer = (selectedPeerId) =>
+export const addSelectedPeer = (peerId) =>
 	({
-		type    : 'SET_SELECTED_PEER',
-		payload : { selectedPeerId }
+		type    : 'ADD_SELECTED_PEER',
+		payload : { peerId }
+	});
+
+export const removeSelectedPeer = (peerId) =>
+	({
+		type    : 'REMOVE_SELECTED_PEER',
+		payload : { peerId }
+	});
+
+export const clearSelectedPeers = () =>
+	({
+		type : 'CLEAR_SELECTED_PEERS'
 	});
 
 export const setSpotlights = (spotlights) =>
@@ -192,6 +203,12 @@ export const setRoomPermissions = (roomPermissions) =>
 	({
 		type    : 'SET_ROOM_PERMISSIONS',
 		payload : { roomPermissions }
+	});
+
+export const setUserRoles = (userRoles) =>
+	({
+		type    : 'SET_USER_ROLES',
+		payload : { userRoles }
 	});
 
 export const setAllowWhenRoleMissing = (allowWhenRoleMissing) =>

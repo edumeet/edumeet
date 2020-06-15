@@ -521,7 +521,7 @@ const MediaSettings = ({
 										{
 											roomClient._setNoiseThreshold(value);
 										}}
-									marks={[ { value: volume, label: `${volume} dB` } ]}
+									marks={[ { value: volume, label: `${volume.toFixed(0)} dB` } ]}
 								/>
 							</ListItem>
 						</List>

@@ -242,6 +242,7 @@ module.exports = async function(rooms, peers, config)
 	try
 	{
 		logger.debug(`config.deidentify=${config.deidentify}`);
+		logger.debug(`config.listen=${config.listen}`);
 		logger.debug(`config.numeric=${config.numeric}`);
 		logger.debug(`config.port=${config.port}`);
 		logger.debug(`config.quiet=${config.quiet}`);
@@ -270,12 +271,13 @@ module.exports = async function(rooms, peers, config)
 
 			res.end(data);
 		});
-		const server = app.listen(config.port || 8889, () =>
-		{
-			const address = server.address();
+		const server = app.listen(config.port || 8889,
+			config.listen || undefined, () =>
+			{
+				const address = server.address();
 
-			logger.info(`listening ${address.address}:${address.port}`);
-		});
+				logger.info(`listening ${address.address}:${address.port}`);
+			});
 	}
 	catch (err)
 	{

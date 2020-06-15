@@ -171,10 +171,14 @@ class NewWindow extends React.PureComponent
 			url,
 			title,
 			name,
+			aspectRatio,
 			features,
 			onBlock,
 			center
 		} = this.props;
+
+		features.width = '800px';
+		features.height = `${800 / aspectRatio}px`;
 
 		if (center === 'parent')
 		{
@@ -267,16 +271,17 @@ class NewWindow extends React.PureComponent
 }
 
 NewWindow.propTypes = {
-	children   : PropTypes.node,
-	url        : PropTypes.string,
-	name       : PropTypes.string,
-	title      : PropTypes.string,
-	features   : PropTypes.object,
-	onUnload   : PropTypes.func,
-	onBlock    : PropTypes.func,
-	center     : PropTypes.oneOf([ 'parent', 'screen' ]),
-	copyStyles : PropTypes.bool,
-	classes    : PropTypes.object.isRequired
+	children    : PropTypes.node,
+	url         : PropTypes.string,
+	name        : PropTypes.string,
+	title       : PropTypes.string,
+	aspectRatio : PropTypes.number,
+	features    : PropTypes.object,
+	onUnload    : PropTypes.func,
+	onBlock     : PropTypes.func,
+	center      : PropTypes.oneOf([ 'parent', 'screen' ]),
+	copyStyles  : PropTypes.bool,
+	classes     : PropTypes.object.isRequired
 };
 
 function copyStyles(source, target)

@@ -15,6 +15,7 @@ import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
 import * as transportActions from './actions/transportActions';
+import { permissions } from './permissions';
 
 let createTorrent;
 
@@ -31,54 +32,48 @@ let ScreenShare;
 let Spotlights;
 
 let requestTimeout,
-	transportOptions,
 	lastN,
-	mobileLastN;
+	mobileLastN,
+	videoAspectRatio;
 
 if (process.env.NODE_ENV !== 'test')
 {
 	({
-		requestTimeout,
-		transportOptions,
-		lastN,
-		mobileLastN
+		requestTimeout = 20000,
+		lastN = 4,
+		mobileLastN = 1,
+		videoAspectRatio = 1.777 // 16 : 9
 	} = window.config);
 }
 
 const logger = new Logger('RoomClient');
-
-const ROOM_OPTIONS =
-{
-	requestTimeout   : requestTimeout,
-	transportOptions : transportOptions
-};
 
 const VIDEO_CONSTRAINS =
 {
 	'low' :
 	{
 		width       : { ideal: 320 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	},
 	'medium' :
 	{
 		width       : { ideal: 640 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	},
 	'high' :
 	{
 		width       : { ideal: 1280 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	},
 	'veryhigh' :
 	{
 		width       : { ideal: 1920 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	},
 	'ultra' :
 	{
 		width       : { ideal: 3840 },
-		aspectRatio : 1.334
+		aspectRatio : videoAspectRatio
 	}
 };
 
@@ -89,9 +84,8 @@ const PC_PROPRIETARY_CONSTRAINTS =
 
 const VIDEO_SIMULCAST_ENCODINGS =
 [
-	{ scaleResolutionDownBy: 4 },
-	{ scaleResolutionDownBy: 2 },
-	{ scaleResolutionDownBy: 1 }
+	{ scaleResolutionDownBy: 4, maxBitRate: 100000 },
+	{ scaleResolutionDownBy: 1, maxBitRate: 1200000 }
 ];
 
 // Used for VP9 webcam video.
@@ -304,6 +298,8 @@ export default class RoomClient
 
 				switch (key)
 				{
+					
+					/*
 					case String.fromCharCode(37):
 					{
 						const newPeerId = this._spotlights.getPrevAsSelected(
@@ -312,6 +308,7 @@ export default class RoomClient
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
+
 					case String.fromCharCode(39):
 					{
 						const newPeerId = this._spotlights.getNextAsSelected(
@@ -320,6 +317,8 @@ export default class RoomClient
 						if (newPeerId) this.setSelectedPeer(newPeerId);
 						break;
 					}
+					*/
+
 					case 'A': // Activate advanced mode
 					{
 						store.dispatch(settingsActions.toggleAdvancedMode());
@@ -578,7 +577,7 @@ export default class RoomClient
 				called = true;
 				callback(new SocketTimeoutError('Request timed out'));
 			},
-			ROOM_OPTIONS.requestTimeout
+			requestTimeout
 		);
 
 		return (...args) =>
@@ -1073,10 +1072,13 @@ export default class RoomClient
 
 		this._hark.on('volume_change', (volume) =>
 		{
-			volume = Math.round(volume);
-
-			if (this._micProducer && (volume !== Math.round(this._hark.lastVolume)))
+			// Update only if there is a bigger diff 
+			if (this._micProducer && Math.abs(volume - this._hark.lastVolume) > 0.5)
 			{
+				// Decay calculation: keep in mind that volume range is -100 ... 0 (dB)
+				// This makes decay volume fast if difference to last saved value is big
+				// and slow for small changes. This prevents flickering volume indicator
+				// at low levels
 				if (volume < this._hark.lastVolume)
 				{
 					volume =
@@ -1084,8 +1086,8 @@ export default class RoomClient
 						Math.pow(
 							(volume - this._hark.lastVolume) /
 							(100 + this._hark.lastVolume)
-							, 4
-						) * 2;
+							, 2
+						) * 10;
 				}
 
 				this._hark.lastVolume = volume;
@@ -1312,6 +1314,8 @@ export default class RoomClient
 					);
 				}
 			}
+
+			await this._updateAudioDevices();
 		}
 		catch (error)
 		{
@@ -1501,6 +1505,8 @@ export default class RoomClient
 					);
 				}
 			}
+
+			await this._updateWebcams();
 		}
 		catch (error)
 		{
@@ -1523,14 +1529,24 @@ export default class RoomClient
 			meActions.setWebcamInProgress(false));
 	}
 
-	setSelectedPeer(peerId)
+	addSelectedPeer(peerId)
 	{
-		logger.debug('setSelectedPeer() [peerId:"%s"]', peerId);
+		logger.debug('addSelectedPeer() [peerId:"%s"]', peerId);
 
-		this._spotlights.setPeerSpotlight(peerId);
+		this._spotlights.addPeerToSpotlight(peerId);
 
 		store.dispatch(
-			roomActions.setSelectedPeer(peerId));
+			roomActions.addSelectedPeer(peerId));
+	}
+
+	removeSelectedPeer(peerId)
+	{
+		logger.debug('removeSelectedPeer() [peerId:"%s"]', peerId);
+
+		this._spotlights.removePeerSpotlight(peerId);
+
+		store.dispatch(
+			roomActions.removeSelectedPeer(peerId));
 	}
 
 	async promoteAllLobbyPeers()
@@ -1615,6 +1631,46 @@ export default class RoomClient
 
 		store.dispatch(
 			roomActions.setClearFileSharingInProgress(false));
+	}
+
+	async givePeerRole(peerId, roleId)
+	{
+		logger.debug('givePeerRole() [peerId:"%s", roleId:"%s"]', peerId, roleId);
+
+		store.dispatch(
+			peerActions.setPeerModifyRolesInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:giveRole', { peerId, roleId });
+		}
+		catch (error)
+		{
+			logger.error('givePeerRole() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setPeerModifyRolesInProgress(peerId, false));
+	}
+
+	async removePeerRole(peerId, roleId)
+	{
+		logger.debug('removePeerRole() [peerId:"%s", roleId:"%s"]', peerId, roleId);
+
+		store.dispatch(
+			peerActions.setPeerModifyRolesInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:removeRole', { peerId, roleId });
+		}
+		catch (error)
+		{
+			logger.error('removePeerRole() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setPeerModifyRolesInProgress(peerId, false));
 	}
 
 	async kickPeer(peerId)
@@ -2912,7 +2968,7 @@ export default class RoomClient
 										id             : 'roles.gotRole',
 										defaultMessage : 'You got the role: {role}'
 									}, {
-										role
+										role : role.label
 									})
 								}));
 						}
@@ -2936,7 +2992,7 @@ export default class RoomClient
 										id             : 'roles.lostRole',
 										defaultMessage : 'You lost the role: {role}'
 									}, {
-										role
+										role : role.label
 									})
 								}));
 						}
@@ -3134,6 +3190,7 @@ export default class RoomClient
 				peers,
 				tracker,
 				roomPermissions,
+				userRoles,
 				allowWhenRoleMissing,
 				chatHistory,
 				fileHistory,
@@ -3162,6 +3219,8 @@ export default class RoomClient
 
 			store.dispatch(roomActions.setRoomPermissions(roomPermissions));
 
+			store.dispatch(roomActions.setUserRoles(userRoles));
+
 			if (allowWhenRoleMissing)
 				store.dispatch(roomActions.setAllowWhenRoleMissing(allowWhenRoleMissing));
 
@@ -3169,7 +3228,7 @@ export default class RoomClient
 
 			for (const role of roles)
 			{
-				if (!myRoles.includes(role))
+				if (!myRoles.some((myRole) => role.id === myRole.id))
 				{
 					store.dispatch(meActions.addRole(role));
 
@@ -3179,7 +3238,7 @@ export default class RoomClient
 								id             : 'roles.gotRole',
 								defaultMessage : 'You got the role: {role}'
 							}, {
-								role
+								role : role.label
 							})
 						}));
 				}
@@ -3234,7 +3293,10 @@ export default class RoomClient
 			// Don't produce if explicitly requested to not to do it.
 			if (this._produce)
 			{
-				if (this._mediasoupDevice.canProduce('audio'))
+				if (
+					this._mediasoupDevice.canProduce('audio') &&
+					this._havePermission(permissions.SHARE_AUDIO)
+				)
 					if (!this._muted)
 					{
 						await this.updateMic({ start: true });
@@ -3248,7 +3310,10 @@ export default class RoomClient
 							this.muteMic();
 					}
 
-				if (joinVideo)
+				if (
+					joinVideo &&
+					this._havePermission(permissions.SHARE_VIDEO)
+				)
 					this.updateWebcam({ start: true });
 			}
 
@@ -3994,4 +4059,45 @@ export default class RoomClient
 		}
 	}
 
+	_havePermission(permission)
+	{
+		const {
+			roomPermissions,
+			allowWhenRoleMissing
+		} = store.getState().room;
+
+		if (!roomPermissions)
+			return false;
+
+		const { roles } = store.getState().me;
+
+		const permitted = roles.some((userRole) =>
+			roomPermissions[permission].some((permissionRole) =>
+				userRole.id === permissionRole.id
+			)
+		);
+
+		if (permitted)
+			return true;
+
+		if (!allowWhenRoleMissing)
+			return false;
+
+		const peers = Object.values(store.getState().peers);
+
+		// Allow if config is set, and no one is present
+		if (allowWhenRoleMissing.includes(permission) &&
+			peers.filter(
+				(peer) =>
+					peer.roles.some(
+						(role) => roomPermissions[permission].some((permissionRole) =>
+							role.id === permissionRole.id
+						)
+					)
+			).length === 0
+		)
+			return true;
+
+		return false;
+	}
 }

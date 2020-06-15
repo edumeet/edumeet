@@ -9,8 +9,11 @@ const {
 const {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
+	MODIFY_ROLE,
 	SEND_CHAT,
 	MODERATE_CHAT,
+	SHARE_AUDIO,
+	SHARE_VIDEO,
 	SHARE_SCREEN,
 	EXTRA_VIDEO,
 	SHARE_FILE,
@@ -150,7 +153,7 @@ module.exports =
 	// Examples:
 	/*
 	// All authenicated users will be MODERATOR and AUTHENTICATED
-	userMapping : async ({ peer, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		peer.addRole(userRoles.MODERATOR);
 		peer.addRole(userRoles.AUTHENTICATED);
@@ -158,7 +161,7 @@ module.exports =
 	// All authenicated users will be AUTHENTICATED,
 	// and those with the moderator role set in the userinfo
 	// will also be MODERATOR
-	userMapping : async ({ peer, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (
 			Array.isArray(userinfo.meet_roles) &&
@@ -178,10 +181,27 @@ module.exports =
 
 		peer.addRole(userRoles.AUTHENTICATED);
 	},
+	// First authenticated user will be moderator,
+	// all others will be AUTHENTICATED
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
+	{
+		if (room)
+		{
+			const peers = room.getJoinedPeers();
+
+			if (peers.some((_peer) => _peer.authenticated))
+				peer.addRole(userRoles.AUTHENTICATED);
+			else
+			{
+				peer.addRole(userRoles.MODERATOR);
+				peer.addRole(userRoles.AUTHENTICATED);
+			}
+		}
+	},
 	// All authenicated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
-	userMapping : async ({ peer, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (userinfo.email && userinfo.email.endsWith('@example.com'))
 		{
@@ -189,11 +209,11 @@ module.exports =
 		}
 
 		peer.addRole(userRoles.AUTHENTICATED);
-	}
+	},
 	// All authenicated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
-	userMapping : async ({ peer, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (userinfo.email && userinfo.email.endsWith('@example.com'))
 		{
@@ -204,7 +224,7 @@ module.exports =
 	},
 	*/
 	// eslint-disable-next-line no-unused-vars
-	userMapping           : async ({ peer, roomId, userinfo }) =>
+	userMapping           : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (userinfo.picture != null)
 		{
@@ -255,10 +275,16 @@ module.exports =
 		[CHANGE_ROOM_LOCK] : [ userRoles.MODERATOR ],
 		// The role(s) have permission to promote a peer from the lobby
 		[PROMOTE_PEER]     : [ userRoles.NORMAL ],
+		// The role(s) have permission to give/remove other peers roles
+		[MODIFY_ROLE]      : [ userRoles.NORMAL ],
 		// The role(s) have permission to send chat messages
 		[SEND_CHAT]        : [ userRoles.NORMAL ],
 		// The role(s) have permission to moderate chat
 		[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
+		// The role(s) have permission to share audio
+		[SHARE_AUDIO]      : [ userRoles.NORMAL ],
+		// The role(s) have permission to share video
+		[SHARE_VIDEO]      : [ userRoles.NORMAL ],
 		// The role(s) have permission to share screen
 		[SHARE_SCREEN]     : [ userRoles.NORMAL ],
 		// The role(s) have permission to produce extra video
@@ -387,6 +413,7 @@ module.exports =
 	/*
 	prometheus: {
 		deidentify: false, // deidentify IP addresses
+		// listen: 'localhost', // exporter listens on this address
 		numeric: false, // show numeric IP addresses
 		port: 8889, // allocated port
 		quiet: false // include fewer labels

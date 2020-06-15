@@ -25,6 +25,7 @@ const initialState =
 	notificationSounds      : true,
 	buttonControlBar        : window.config.buttonControlBar || false,
 	drawerOverlayed         : window.config.drawerOverlayed || true,
+	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
 	...window.config.defaultAudio
 };
 
@@ -129,6 +130,13 @@ const settings = (state = initialState, action) =>
 			const { sampleSize } = action.payload;
 
 			return { ...state, sampleSize };
+		}
+
+		case 'SET_ASPECT_RATIO':
+		{
+			const { aspectRatio } = action.payload;
+
+			return { ...state, aspectRatio };
 		}
 
 		case 'SET_LAST_N':

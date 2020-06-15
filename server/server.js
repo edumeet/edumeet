@@ -380,6 +380,7 @@ async function setupAuth()
 				req.session.roomId = roomId;
 
 				let peer = peers.get(peerId);
+				const room = rooms.get(roomId);
 
 				if (!peer) // User has no socket session yet, make temporary
 					peer = new Peer({ id: peerId, roomId });
@@ -391,6 +392,7 @@ async function setupAuth()
 				{
 					await config.userMapping({
 						peer,
+						room,
 						roomId,
 						userinfo : req.user._userinfo
 					});
@@ -421,7 +423,16 @@ async function runHttpsServer()
 	{
 		if (req.secure || config.httpOnly)
 		{
-			const ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
+			let ltiURL;
+
+			try
+			{
+				ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
+			}
+			catch (error)
+			{
+				logger.error('Error parsing LTI url: %o', error);
+			}
 
 			if (
 				req.isAuthenticated &&
@@ -581,7 +592,7 @@ async function runWebSocketServer()
 
 				if (typeof config.userMapping === 'function')
 				{
-					await config.userMapping({ peer, roomId, userinfo: _userinfo });
+					await config.userMapping({ peer, room, roomId, userinfo: _userinfo });
 				}
 			}
 

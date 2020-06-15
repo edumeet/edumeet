@@ -43,6 +43,7 @@ const AppearenceSettings = ({
 	onToggleShowNotifications,
 	onToggleDrawerOverlayed,
 	handleChangeMode,
+	handleChangeAspectRatio,
 	classes
 }) =>
 {
@@ -62,41 +63,78 @@ const AppearenceSettings = ({
 		})
 	} ];
 
+	const aspectRatios = window.config.aspectRatios || [ {
+		value : 1.333,
+		label : '4 : 3'
+	}, {
+		value : 1.777,
+		label : '16 : 9'
+	} ];
+
 	return (
 		<React.Fragment>
-			<form className={classes.setting} autoComplete='off'>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={room.mode || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								handleChangeMode(event.target.value);
-						}}
-						name={intl.formatMessage({
-							id             : 'settings.layout',
-							defaultMessage : 'Room layout'
-						})}
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{ modes.map((mode, index) =>
-						{
-							return (
-								<MenuItem key={index} value={mode.value}>
-									{mode.label}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.selectRoomLayout'
-							defaultMessage='Select room layout'
-						/>
-					</FormHelperText>
-				</FormControl>
-			</form>
+			<FormControl className={classes.setting}>
+				<Select
+					value={room.mode || ''}
+					onChange={(event) =>
+					{
+						if (event.target.value)
+							handleChangeMode(event.target.value);
+					}}
+					name={intl.formatMessage({
+						id             : 'settings.layout',
+						defaultMessage : 'Room layout'
+					})}
+					autoWidth
+					className={classes.selectEmpty}
+				>
+					{ modes.map((mode, index) =>
+					{
+						return (
+							<MenuItem key={index} value={mode.value}>
+								{mode.label}
+							</MenuItem>
+						);
+					})}
+				</Select>
+				<FormHelperText>
+					<FormattedMessage
+						id='settings.selectRoomLayout'
+						defaultMessage='Select room layout'
+					/>
+				</FormHelperText>
+			</FormControl>
+			<FormControl className={classes.setting}>
+				<Select
+					value={settings.aspectRatio || ''}
+					onChange={(event) =>
+					{
+						if (event.target.value)
+							handleChangeAspectRatio(event.target.value);
+					}}
+					name={intl.formatMessage({
+						id             : 'settings.aspectRatio',
+						defaultMessage : 'Video aspect ratio'
+					})}
+					autoWidth
+					className={classes.selectEmpty}
+				>
+					{ aspectRatios.map((aspectRatio, index) =>
+					{
+						return (
+							<MenuItem key={index} value={aspectRatio.value}>
+								{aspectRatio.label}
+							</MenuItem>
+						);
+					})}
+				</Select>
+				<FormHelperText>
+					<FormattedMessage
+						id='settings.selectAspectRatio'
+						defaultMessage='Select video aspect ratio'
+					/>
+				</FormHelperText>
+			</FormControl>
 			<FormControlLabel
 				className={classnames(classes.setting, classes.switchLabel)}
 				control={
@@ -160,6 +198,7 @@ AppearenceSettings.propTypes =
 	onToggleShowNotifications : PropTypes.func.isRequired,
 	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
 	handleChangeMode          : PropTypes.func.isRequired,
+	handleChangeAspectRatio   : PropTypes.func.isRequired,
 	classes                   : PropTypes.object.isRequired
 };
 
@@ -176,7 +215,8 @@ const mapDispatchToProps = {
 	onToggleShowNotifications : settingsActions.toggleShowNotifications,
 	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
 	onToggleDrawerOverlayed   : settingsActions.toggleDrawerOverlayed,
-	handleChangeMode          : roomActions.setDisplayMode
+	handleChangeMode          : roomActions.setDisplayMode,
+	handleChangeAspectRatio   : settingsActions.setAspectRatio
 };
 
 export default connect(
