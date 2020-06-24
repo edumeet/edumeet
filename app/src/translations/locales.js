@@ -1,24 +1,24 @@
 const list = [
-	{ name: 'English',				file: 'en', locale: [ 'en' ] },
-	{ name: 'Chech',					file: 'cs', locale: [ 'cs' ] },
-	{ name: 'Chinese (Simplified)',	file: 'cn', locale: [ 'zn', 'zn-cn' ] }, // hans
+	{ name: 'English',				file: 'en', locale: [ 'en', 'en-en' ] },
+	{ name: 'Chech',					file: 'cs', locale: [ 'cs', 'cs-cs' ] },
+	{ name: 'Chinese (Simplified)',	file: 'cn', locale: [ 'zn', 'zn-zn', 'zn-cn' ] }, // hans
 	{ name: 'Chinese (Traditional)',	file: 'tw', locale: [ 'zn-tw', 'zn-hk', 'zn-sg' ] }, // hant
-	{ name: 'Croatian',				file: 'hr', locale: [ 'hr' ] },
-	{ name: 'Danish',				file: 'dk', locale: [ 'dk' ] },
-	{ name: 'French',				file: 'fr', locale: [ 'fr' ] },
-	{ name: 'German',				file: 'de', locale: [ 'de' ] },
-	{ name: 'Greek',					file: 'el', locale: [ 'el' ] },
-	{ name: 'Hindi',					file: 'hi', locale: [ 'hi' ] },
-	{ name: 'Hungarian',				file: 'hu', locale: [ 'hu' ] },
-	{ name: 'Italian',				file: 'it', locale: [ 'it' ] },
-	{ name: 'Latvian',				file: 'lv', locale: [ 'lv' ] },
-	{ name: 'Norwegian',				file: 'nb', locale: [ 'nb' ] },
-	{ name: 'Polish',				file: 'pl', locale: [ 'pl' ] },
-	{ name: 'Portuguese',			file: 'pt', locale: [ 'pt' ] },
-	{ name: 'Romanian',				file: 'ro', locale: [ 'ro' ] },
-	{ name: 'Spanish',				file: 'es', locale: [ 'es' ] },
-	{ name: 'Turkish',				file: 'tr', locale: [ 'tr' ] },
-	{ name: 'Ukrainian',				file: 'uk', locale: [ 'uk' ] }
+	{ name: 'Croatian',				file: 'hr', locale: [ 'hr', 'hr-hr' ] },
+	{ name: 'Danish',				file: 'dk', locale: [ 'dk', 'dk-dk' ] },
+	{ name: 'French',				file: 'fr', locale: [ 'fr', 'fr-fr' ] },
+	{ name: 'German',				file: 'de', locale: [ 'de', 'de-de' ] },
+	{ name: 'Greek',					file: 'el', locale: [ 'el', 'el-el' ] },
+	{ name: 'Hindi',					file: 'hi', locale: [ 'hi', 'hi-hi' ] },
+	{ name: 'Hungarian',				file: 'hu', locale: [ 'hu', 'hu-hu' ] },
+	{ name: 'Italian',				file: 'it', locale: [ 'it', 'it-it' ] },
+	{ name: 'Latvian',				file: 'lv', locale: [ 'lv', 'lv-lv' ] },
+	{ name: 'Norwegian',				file: 'nb', locale: [ 'nb', 'nb-nb' ] },
+	{ name: 'Polish',				file: 'pl', locale: [ 'pl', 'pl-pl' ] },
+	{ name: 'Portuguese',			file: 'pt', locale: [ 'pt', 'pt-pt' ] },
+	{ name: 'Romanian',				file: 'ro', locale: [ 'ro', 'ro-ro' ] },
+	{ name: 'Spanish',				file: 'es', locale: [ 'es', 'es-es' ] },
+	{ name: 'Turkish',				file: 'tr', locale: [ 'tr', 'tr-tr' ] },
+	{ name: 'Ukrainian',				file: 'uk', locale: [ 'uk', 'uk-uk' ] }
 ];
 
 export const detect = () =>
