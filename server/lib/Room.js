@@ -587,7 +587,7 @@ class Room extends EventEmitter
 			// Spread to others
 			this._notification(peer.socket, 'gotRole', {
 				peerId : peer.id,
-				role   : newRole
+				roleId : newRole.id
 			}, true, true);
 
 			// Got permission to promote peers, notify peer of
@@ -611,7 +611,7 @@ class Room extends EventEmitter
 			// Spread to others
 			this._notification(peer.socket, 'lostRole', {
 				peerId : peer.id,
-				role   : oldRole
+				roleId : oldRole.id
 			}, true, true);
 		});
 
@@ -725,7 +725,7 @@ class Room extends EventEmitter
 					lobbyPeers = this._lobby.peerList();
 
 				cb(null, {
-					roles                : peer.roles,
+					roles                : peer.roles.map((role) => role.id),
 					peers                : peerInfos,
 					tracker              : config.fileTracker,
 					authenticated        : peer.authenticated,
@@ -763,12 +763,7 @@ class Room extends EventEmitter
 					this._notification(
 						otherPeer.socket,
 						'newPeer',
-						{
-							id          : peer.id,
-							displayName : displayName,
-							picture     : picture,
-							roles       : peer.roles
-						}
+						peer.peerInfo
 					);
 				}
 
@@ -1240,7 +1235,7 @@ class Room extends EventEmitter
 
 				const userRole = Object.values(userRoles).find((role) => role.id === roleId);
 
-				if (!userRole)
+				if (!userRole || !userRole.promotable)
 					throw new Error('no such role');
 
 				if (!peer.roles.some((role) => role.level >= userRole.level))
@@ -1269,7 +1264,7 @@ class Room extends EventEmitter
 
 				const userRole = Object.values(userRoles).find((role) => role.id === roleId);
 
-				if (!userRole)
+				if (!userRole || !userRole.promotable)
 					throw new Error('no such role');
 
 				if (!peer.roles.some((role) => role.level >= userRole.level))

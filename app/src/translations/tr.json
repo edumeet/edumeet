@@ -205,6 +205,7 @@
 	"moderator.clearChat": "Moderatör sohbeti temizledi",
 	"moderator.clearFiles": "Moderatör dosyaları temizledi",
 	"moderator.muteAudio": "Moderatör sesinizi kapattı",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderatör videonuzu durdurdu",
 	"moderator.stopScreenSharing": "Moderatör ekran paylaşımınızı durdurdu",
 

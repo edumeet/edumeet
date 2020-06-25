@@ -57,16 +57,16 @@ export const setPeerPicture = (peerId, picture) =>
 		payload : { peerId, picture }
 	});
 
-export const addPeerRole = (peerId, role) =>
+export const addPeerRole = (peerId, roleId) =>
 	({
 		type    : 'ADD_PEER_ROLE',
-		payload : { peerId, role }
+		payload : { peerId, roleId }
 	});
 
-export const removePeerRole = (peerId, role) =>
+export const removePeerRole = (peerId, roleId) =>
 	({
 		type    : 'REMOVE_PEER_ROLE',
-		payload : { peerId, role }
+		payload : { peerId, roleId }
 	});
 
 export const setPeerModifyRolesInProgress = (peerId, flag) =>

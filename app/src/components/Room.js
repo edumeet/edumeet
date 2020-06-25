@@ -29,6 +29,7 @@ import ExtraVideo from './Controls/ExtraVideo';
 import ButtonControlBar from './Controls/ButtonControlBar';
 import Help from './Controls/Help';
 import About from './Controls/About';
+import RolesManager from './Controls/RolesManager';
 
 const TIMEOUT = window.config.hideTimeout || 5000;
 
@@ -286,7 +287,9 @@ class Room extends React.PureComponent
 				{ room.aboutOpen &&
 					<About />
 				}
-
+				{ room.rolesManagerOpen &&
+					<RolesManager />
+				}
 			</div>
 		);
 	}

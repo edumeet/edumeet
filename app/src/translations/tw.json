@@ -204,6 +204,7 @@
 	"moderator.clearChat": "管理員清除了聊天",
 	"moderator.clearFiles": "管理員清除了所有檔案",
 	"moderator.muteAudio": "您已被管理員靜音",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "您的視訊已被管理員關閉",
 	"moderator.stopScreenSharing": null,
 

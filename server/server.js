@@ -355,7 +355,7 @@ async function setupAuth()
 		{
 			for (const role of peer.roles)
 			{
-				if (role !== userRoles.NORMAL)
+				if (role.id !== userRoles.NORMAL.id)
 					peer.removeRole(role);
 			}
 		}
