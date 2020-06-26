@@ -13,14 +13,14 @@ for closed connections but that `prom-client`
 custom collectors.
 
 This version has been ported from an earlier Python version that was not part
-of `multiparty-meeting` but connected as an interactive client.
+of `edumeet` but connected as an interactive client.
 
 ## Configuration
 
 See `prometheus` in `server/config/config.example.js` for options and
 applicable defaults.
 
-If `multiparty-meeting` was installed with 
+If `edumeet` was installed with 
 [`mm-absible`](https://github.com/misi/mm-ansible)
 it may be necessary to open the `iptables` firewall for incoming TCP traffic
 on the allocated port (see `/etc/ferm/ferm.conf`).

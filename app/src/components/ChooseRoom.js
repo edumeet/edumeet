@@ -125,7 +125,7 @@ const ChooseRoom = ({
 				}}
 			>
 				<DialogTitle>
-					{ window.config.title ? window.config.title : 'Multiparty meeting' }
+					{ window.config.title ? window.config.title : 'edumeet' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>

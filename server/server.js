@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-process.title = 'multiparty-meeting-server';
+process.title = 'edumeet-server';
 
 const config = require('./config/config');
 const fs = require('fs');
