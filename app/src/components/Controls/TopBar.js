@@ -872,9 +872,9 @@ TopBar.propTypes =
 	canPromote           : PropTypes.bool.isRequired,
 	classes              : PropTypes.object.isRequired,
 	theme                : PropTypes.object.isRequired,
-	intl            				 : PropTypes.object.isRequired,
-	locale          				 : PropTypes.object.isRequired,
-	localesList     				 : PropTypes.object.isRequired
+	intl                 : PropTypes.object.isRequired,
+	locale               : PropTypes.object.isRequired,
+	localesList          : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>

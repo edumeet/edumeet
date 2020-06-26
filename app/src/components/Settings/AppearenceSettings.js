@@ -244,17 +244,17 @@ AppearenceSettings.propTypes =
 	handleChangeMode          : PropTypes.func.isRequired,
 	handleChangeAspectRatio   : PropTypes.func.isRequired,
 	classes                   : PropTypes.object.isRequired,
-	intl               					  : PropTypes.object.isRequired,
-	locale             					  : PropTypes.object.isRequired,
-	localesList        					  : PropTypes.object.isRequired
+	intl                      : PropTypes.object.isRequired,
+	locale                    : PropTypes.object.isRequired,
+	localesList               : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
 		isMobile   	: state.me.browser.platform === 'mobile',
-		room      		: state.room,
-		settings   	: state.settings,
-		locale    		: state.intl.locale,
+		room        : state.room,
+		settings    : state.settings,
+		locale      : state.intl.locale,
 		localesList : state.intl.list
 	});
 
