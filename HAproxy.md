@@ -26,7 +26,7 @@ In this basic example we use the following names and ips:
 This is most easily done using Ansible (see below), but can be done
 in any way you choose (manual, Docker, Ansible).
 
-Read more here: [mm-ansible](https://github.com/misi/mm-ansible)
+Read more here: [mm-ansible](https://github.com/edumeet/edumeet-ansible)
 [![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
 
 ## Setup Redis for central HTTP session store

@@ -21,7 +21,7 @@ See `prometheus` in `server/config/config.example.js` for options and
 applicable defaults.
 
 If `edumeet` was installed with 
-[`mm-absible`](https://github.com/misi/mm-ansible)
+[`mm-absible`](https://github.com/edumeet/edumeet-ansible)
 it may be necessary to open the `iptables` firewall for incoming TCP traffic
 on the allocated port (see `/etc/ferm/ferm.conf`).
 
