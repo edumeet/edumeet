@@ -970,8 +970,8 @@ export default withRoomContext(connect(
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
-				prev.locale === next.locale &&
-				prev.localesList === next.localesList
+				prev.intl.locale === next.intl.locale &&
+				prev.intl.localesList === next.intl.localesList
 			);
 		}
 	}

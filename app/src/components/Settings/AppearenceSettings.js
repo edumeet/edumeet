@@ -279,8 +279,8 @@ export default withRoomContext(connect(
 				prev.me.browser === next.me.browser &&
 				prev.room === next.room &&
 				prev.settings === next.settings &&
-				prev.locale === next.locale &&
-				prev.localesList === next.localesList
+				prev.intl.locale === next.intl.locale &&
+				prev.intl.localesList === next.intl.localesList
 			);
 		}
 	}
