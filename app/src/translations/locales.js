@@ -12,7 +12,7 @@ const list = [
 	{ name: 'Hungarian',				file: 'hu', locale: [ 'hu', 'hu-hu' ] },
 	{ name: 'Italian',				file: 'it', locale: [ 'it', 'it-it' ] },
 	{ name: 'Latvian',				file: 'lv', locale: [ 'lv', 'lv-lv' ] },
-	{ name: 'Norwegian',				file: 'nb', locale: [ 'nb', 'nb-nb' ] },
+	{ name: 'Norwegian',				file: 'nb', locale: [ 'nb', 'nb-no' ] },
 	{ name: 'Polish',				file: 'pl', locale: [ 'pl', 'pl-pl' ] },
 	{ name: 'Portuguese',			file: 'pt', locale: [ 'pt', 'pt-pt' ] },
 	{ name: 'Romanian',				file: 'ro', locale: [ 'ro', 'ro-ro' ] },
