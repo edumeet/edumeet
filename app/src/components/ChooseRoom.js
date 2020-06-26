@@ -1,21 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../RoomContext';
 import isElectron from 'is-electron';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import randomString from 'random-string';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import IconButton from '@material-ui/core/IconButton';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
 import CookieConsent from 'react-cookie-consent';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -88,63 +82,12 @@ const styles = (theme) =>
 
 const DialogTitle = withStyles(styles)((props) =>
 {
-	const [ open, setOpen ] = useState(false);
-
-	const intl = useIntl();
-
-	useEffect(() =>
-	{
-		const openTimer = setTimeout(() => setOpen(true), 1000);
-		const closeTimer = setTimeout(() => setOpen(false), 4000);
-
-		return () =>
-		{
-			clearTimeout(openTimer);
-			clearTimeout(closeTimer);
-		};
-	}, []);
-
-	const { children, classes, myPicture, onLogin, ...other } = props;
-
-	const handleTooltipClose = () =>
-	{
-		setOpen(false);
-	};
-
-	const handleTooltipOpen = () =>
-	{
-		setOpen(true);
-	};
+	const { children, classes, ...other } = props;
 
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config && window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 			<Typography variant='h5'>{children}</Typography>
-			{ window.config && window.config.loginEnabled &&
-				<Tooltip
-					onClose={handleTooltipClose}
-					onOpen={handleTooltipOpen}
-					open={open}
-					title={intl.formatMessage({
-						id             : 'tooltip.login',
-						defaultMessage : 'Click to log in'
-					})}
-					placement='left'
-				>
-					<IconButton
-						aria-label='Account'
-						className={classes.loginButton}
-						color='inherit'
-						onClick={onLogin}
-					>
-						{ myPicture ?
-							<Avatar src={myPicture} className={classes.largeAvatar} />
-							:
-							<AccountCircle className={classes.largeIcon} />
-						}
-					</IconButton>
-				</Tooltip>
-			}
 		</MuiDialogTitle>
 	);
 });
@@ -165,9 +108,6 @@ const DialogActions = withStyles((theme) => ({
 }))(MuiDialogActions);
 
 const ChooseRoom = ({
-	roomClient,
-	loggedIn,
-	myPicture,
 	classes
 }) =>
 {
@@ -184,14 +124,8 @@ const ChooseRoom = ({
 					paper : classes.dialogPaper
 				}}
 			>
-				<DialogTitle
-					myPicture={myPicture}
-					onLogin={() => 
-					{
-						loggedIn ? roomClient.logout() : roomClient.login();
-					}}
-				>
-					{ window.config && window.config.title ? window.config.title : 'Multiparty meeting' }
+				<DialogTitle>
+					{ window.config.title ? window.config.title : 'Multiparty meeting' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>
@@ -244,7 +178,8 @@ const ChooseRoom = ({
 					<CookieConsent buttonText={intl.formatMessage({
 						id             : 'room.consentUnderstand',
 						defaultMessage : 'I understand'
-					})}>
+					})}
+					>
 						<FormattedMessage
 							id='room.cookieConsent'
 							defaultMessage='This website uses cookies to enhance the user experience'
@@ -258,34 +193,7 @@ const ChooseRoom = ({
 
 ChooseRoom.propTypes =
 {
-	roomClient   : PropTypes.any.isRequired,
-	loginEnabled : PropTypes.bool.isRequired,
-	loggedIn     : PropTypes.bool.isRequired,
-	myPicture    : PropTypes.string,
-	classes      : PropTypes.object.isRequired
+	classes : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
-{
-	return {
-		loginEnabled : state.me.loginEnabled,
-		loggedIn     : state.me.loggedIn,
-		myPicture    : state.me.picture
-	};
-};
-
-export default withRoomContext(connect(
-	mapStateToProps,
-	null,
-	null,
-	{
-		areStatesEqual : (next, prev) =>
-		{
-			return (
-				prev.me.loginEnabled === next.me.loginEnabled &&
-				prev.me.loggedIn === next.me.loggedIn &&
-				prev.me.picture === next.me.picture
-			);
-		}
-	}
-)(withStyles(styles)(ChooseRoom)));
+export default withStyles(styles)(ChooseRoom);

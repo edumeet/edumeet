@@ -2,7 +2,15 @@ import isElectron from 'is-electron';
 
 let electron = null;
 
-if (isElectron())
+/** 
+ * Check if window.require function exits
+ * because electron default is "nodeIntegration: false"
+ * and this case window.require is not a function.
+ * It caused issue with Rocket Chat electron client.
+ * 
+ * TODO: do it more inteligently.
+ */
+if (isElectron() && typeof window.require === 'function')
 	electron = window.require('electron');
 
 class ElectronScreenShare
@@ -211,8 +219,10 @@ export default class ScreenShare
 {
 	static create(device)
 	{
-		if (isElectron())
+		if (isElectron() && electron)
 			return new ElectronScreenShare();
+		else if (device.platform !== 'desktop')
+			return new DefaultScreenShare();
 		else
 		{
 			switch (device.flag)
@@ -224,11 +234,17 @@ export default class ScreenShare
 					else
 						return new DisplayMediaScreenShare();
 				}
-				case 'chrome':
+				case 'safari':
 				{
-					return new DisplayMediaScreenShare();
+					if (device.version >= 13.0)
+						return new DisplayMediaScreenShare();
+					else
+						return new DefaultScreenShare();
 				}
-				case 'msedge':
+				case 'chrome':
+				case 'chromium':
+				case 'opera':
+				case 'edge':
 				{
 					return new DisplayMediaScreenShare();
 				}

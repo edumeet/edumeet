@@ -1,6 +1,7 @@
 import Logger from './Logger';
 import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
+import { SocketTimeoutError } from './utils';
 import * as requestActions from './actions/requestActions';
 import * as meActions from './actions/meActions';
 import * as roomActions from './actions/roomActions';
@@ -13,6 +14,7 @@ import * as lobbyPeerActions from './actions/lobbyPeerActions';
 import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
+import * as transportActions from './actions/transportActions';
 
 let createTorrent;
 
@@ -28,22 +30,18 @@ let ScreenShare;
 
 let Spotlights;
 
-let turnServers,
-	requestTimeout,
+let requestTimeout,
 	transportOptions,
 	lastN,
-	mobileLastN,
-	defaultResolution;
+	mobileLastN;
 
 if (process.env.NODE_ENV !== 'test')
 {
 	({
-		turnServers,
 		requestTimeout,
 		transportOptions,
 		lastN,
-		mobileLastN,
-		defaultResolution
+		mobileLastN
 	} = window.config);
 }
 
@@ -52,8 +50,7 @@ const logger = new Logger('RoomClient');
 const ROOM_OPTIONS =
 {
 	requestTimeout   : requestTimeout,
-	transportOptions : transportOptions,
-	turnServers      : turnServers
+	transportOptions : transportOptions
 };
 
 const VIDEO_CONSTRAINS =
@@ -127,7 +124,16 @@ export default class RoomClient
 	}
 
 	constructor(
-		{ peerId, accessCode, device, useSimulcast, useSharingSimulcast, produce, forceTcp, displayName, muted } = {})
+		{
+			peerId,
+			accessCode,
+			device,
+			produce,
+			forceTcp,
+			displayName,
+			muted,
+			basePath
+		} = {})
 	{
 		if (!peerId)
 			throw new Error('Missing peerId');
@@ -135,8 +141,8 @@ export default class RoomClient
 			throw new Error('Missing device');
 
 		logger.debug(
-			'constructor() [peerId: "%s", device: "%s", useSimulcast: "%s", produce: "%s", forceTcp: "%s", displayName ""]',
-			peerId, device.flag, useSimulcast, produce, forceTcp, displayName);
+			'constructor() [peerId: "%s", device: "%s", produce: "%s", forceTcp: "%s", displayName ""]',
+			peerId, device.flag, produce, forceTcp, displayName);
 
 		this._signalingUrl = null;
 
@@ -149,21 +155,26 @@ export default class RoomClient
 		// Whether we force TCP
 		this._forceTcp = forceTcp;
 
+		// URL basepath
+		this._basePath = basePath;
+
 		// Use displayName
 		if (displayName)
 			store.dispatch(settingsActions.setDisplayName(displayName));
+
+		this._tracker = 'wss://tracker.lab.vvc.niif.hu:443';
 
 		// Torrent support
 		this._torrentSupport = null;
 
 		// Whether simulcast should be used.
-		this._useSimulcast = useSimulcast;
+		this._useSimulcast = false;
 
 		if ('simulcast' in window.config)
 			this._useSimulcast = window.config.simulcast;
 
 		// Whether simulcast should be used for sharing
-		this._useSharingSimulcast = useSharingSimulcast;
+		this._useSharingSimulcast = false;
 
 		if ('simulcastSharing' in window.config)
 			this._useSharingSimulcast = window.config.simulcastSharing;
@@ -192,14 +203,14 @@ export default class RoomClient
 		// @type {mediasoupClient.Device}
 		this._mediasoupDevice = null;
 
+		// Put the browser info into state
+		store.dispatch(meActions.setBrowser(device));
+
 		// Our WebTorrent client
 		this._webTorrent = null;
 
-		if (defaultResolution)
-			store.dispatch(settingsActions.setVideoResolution(defaultResolution));
-
 		// Max spotlights
-		if (device.bowser.getPlatformType() === 'desktop')
+		if (device.platform === 'desktop')
 			this._maxSpotlights = lastN;
 		else
 			this._maxSpotlights = mobileLastN;
@@ -222,14 +233,22 @@ export default class RoomClient
 		// Local mic hark
 		this._hark = null;
 
+		// Local MediaStream for hark
+		this._harkStream = null;
+
 		// Local webcam mediasoup Producer.
 		this._webcamProducer = null;
+
+		// Extra videos being produced
+		this._extraVideoProducers = new Map();
 
 		// Map of webcam MediaDeviceInfos indexed by deviceId.
 		// @type {Map<String, MediaDeviceInfos>}
 		this._webcams = {};
 
 		this._audioDevices = {};
+
+		this._audioOutputDevices = {};
 
 		// mediasoup Consumers.
 		// @type {Map<String, mediasoupClient.Consumer>}
@@ -269,9 +288,10 @@ export default class RoomClient
 
 	_startKeyListener()
 	{
-		// Add keypress event listener on document
-		document.addEventListener('keypress', (event) =>
+		// Add keydown event listener on document
+		document.addEventListener('keydown', (event) =>
 		{
+			if (event.repeat) return;
 			const key = String.fromCharCode(event.which);
 
 			const source = event.target;
@@ -280,11 +300,27 @@ export default class RoomClient
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
-				logger.debug('keyPress() [key:"%s"]', key);
+				logger.debug('keyDown() [key:"%s"]', key);
 
 				switch (key)
 				{
-					case 'a': // Activate advanced mode
+					case String.fromCharCode(37):
+					{
+						const newPeerId = this._spotlights.getPrevAsSelected(
+							store.getState().room.selectedPeerId);
+
+						if (newPeerId) this.setSelectedPeer(newPeerId);
+						break;
+					}
+					case String.fromCharCode(39):
+					{
+						const newPeerId = this._spotlights.getNextAsSelected(
+							store.getState().room.selectedPeerId);
+
+						if (newPeerId) this.setSelectedPeer(newPeerId);
+						break;
+					}
+					case 'A': // Activate advanced mode
 					{
 						store.dispatch(settingsActions.toggleAdvancedMode());
 						store.dispatch(requestActions.notify(
@@ -323,8 +359,19 @@ export default class RoomClient
 						break;
 					}
 
-					case ' ':
-					case 'm': // Toggle microphone
+					case ' ': // Push To Talk start
+					{
+						if (this._micProducer)
+						{
+							if (this._micProducer.paused)
+							{
+								this.unmuteMic();
+							}
+						}
+
+						break;
+					}
+					case 'M': // Toggle microphone
 					{
 						if (this._micProducer)
 						{
@@ -335,7 +382,7 @@ export default class RoomClient
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
-											id             : 'devices.microPhoneMute',
+											id             : 'devices.microphoneMute',
 											defaultMessage : 'Muted your microphone'
 										})
 									}));
@@ -347,7 +394,7 @@ export default class RoomClient
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
-											id             : 'devices.microPhoneUnMute',
+											id             : 'devices.microphoneUnMute',
 											defaultMessage : 'Unmuted your microphone'
 										})
 									}));
@@ -355,7 +402,7 @@ export default class RoomClient
 						}
 						else
 						{
-							this.enableMic();
+							this.updateMic({ start: true });
 
 							store.dispatch(requestActions.notify(
 								{
@@ -369,12 +416,19 @@ export default class RoomClient
 						break;
 					}
 
-					case 'v': // Toggle video
+					case 'V': // Toggle video
 					{
 						if (this._webcamProducer)
 							this.disableWebcam();
 						else
-							this.enableWebcam();
+							this.updateWebcam({ start: true });
+
+						break;
+					}
+
+					case 'H': // Open help dialog
+					{
+						store.dispatch(roomActions.setHelpOpen(true));
 
 						break;
 					}
@@ -386,6 +440,41 @@ export default class RoomClient
 				}
 			}
 		});
+		document.addEventListener('keyup', (event) =>
+		{
+			const key = String.fromCharCode(event.which);
+
+			const source = event.target;
+
+			const exclude = [ 'input', 'textarea' ];
+
+			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
+			{
+				logger.debug('keyUp() [key:"%s"]', key);
+
+				switch (key)
+				{
+					case ' ': // Push To Talk stop
+					{
+						if (this._micProducer)
+						{
+							if (!this._micProducer.paused)
+							{
+								this.muteMic();
+							}
+						}
+
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+			}
+			event.preventDefault();
+		}, true);
+
 	}
 
 	_startDevicesListener()
@@ -396,6 +485,7 @@ export default class RoomClient
 
 			await this._updateAudioDevices();
 			await this._updateWebcams();
+			await this._updateAudioOutputDevices();
 
 			store.dispatch(requestActions.notify(
 				{
@@ -407,16 +497,16 @@ export default class RoomClient
 		});
 	}
 
-	login()
+	login(roomId = this._roomId)
 	{
-		const url = `/auth/login?id=${this._peerId}`;
+		const url = `/auth/login?peerId=${this._peerId}&roomId=${roomId}`;
 
 		window.open(url, 'loginWindow');
 	}
 
-	logout()
+	logout(roomId = this._roomId)
 	{
-		window.open('/auth/logout', 'logoutWindow');
+		window.open(`/auth/logout?peerId=${this._peerId}&roomId=${roomId}`, 'logoutWindow');
 	}
 
 	receiveLoginChildWindow(data)
@@ -425,16 +515,8 @@ export default class RoomClient
 
 		const { displayName, picture } = data;
 
-		if (store.getState().room.state === 'connected')
-		{
-			this.changeDisplayName(displayName);
-			this.changePicture(picture);
-		}
-		else
-		{
-			store.dispatch(settingsActions.setDisplayName(displayName));
-			store.dispatch(meActions.setPicture(picture));
-		}
+		store.dispatch(settingsActions.setDisplayName(displayName));
+		store.dispatch(meActions.setPicture(picture));
 
 		store.dispatch(meActions.loggedIn(true));
 
@@ -451,6 +533,8 @@ export default class RoomClient
 	{
 		logger.debug('receiveLogoutChildWindow()');
 
+		store.dispatch(meActions.setPicture(null));
+
 		store.dispatch(meActions.loggedIn(false));
 
 		store.dispatch(requestActions.notify(
@@ -464,22 +548,22 @@ export default class RoomClient
 
 	_soundNotification()
 	{
-		const alertPromise = this._soundAlert.play();
+		const { notificationSounds } = store.getState().settings;
 
-		if (alertPromise !== undefined)
+		if (notificationSounds)
 		{
-			alertPromise
-				.then()
-				.catch((error) =>
-				{
-					logger.error('_soundAlert.play() | failed: %o', error);
-				});
-		}
-	}
+			const alertPromise = this._soundAlert.play();
 
-	notify(text)
-	{
-		store.dispatch(requestActions.notify({ text: text }));
+			if (alertPromise !== undefined)
+			{
+				alertPromise
+					.then()
+					.catch((error) =>
+					{
+						logger.error('_soundAlert.play() [error:"%o"]', error);
+					});
+			}
+		}
 	}
 
 	timeoutCallback(callback)
@@ -492,7 +576,7 @@ export default class RoomClient
 				if (called)
 					return;
 				called = true;
-				callback(new Error('Request timeout.'));
+				callback(new SocketTimeoutError('Request timed out'));
 			},
 			ROOM_OPTIONS.requestTimeout
 		);
@@ -508,13 +592,13 @@ export default class RoomClient
 		};
 	}
 
-	sendRequest(method, data)
+	_sendRequest(method, data)
 	{
 		return new Promise((resolve, reject) =>
 		{
 			if (!this._signalingSocket)
 			{
-				reject('No socket connection.');
+				reject('No socket connection');
 			}
 			else
 			{
@@ -524,17 +608,70 @@ export default class RoomClient
 					this.timeoutCallback((err, response) =>
 					{
 						if (err)
-						{
 							reject(err);
-						}
 						else
-						{
 							resolve(response);
-						}
 					})
 				);
 			}
 		});
+	}
+
+	async getTransportStats()
+	{
+		try
+		{
+			if (this._recvTransport)
+			{
+				logger.debug('getTransportStats() - recv [transportId: "%s"]', this._recvTransport.id);
+
+				const recv = await this.sendRequest('getTransportStats', { transportId: this._recvTransport.id });
+
+				store.dispatch(
+					transportActions.addTransportStats(recv, 'recv'));
+			}
+
+			if (this._sendTransport)
+			{
+				logger.debug('getTransportStats() - send [transportId: "%s"]', this._sendTransport.id);
+
+				const send = await this.sendRequest('getTransportStats', { transportId: this._sendTransport.id });
+
+				store.dispatch(
+					transportActions.addTransportStats(send, 'send'));
+			}
+		}
+		catch (error)
+		{
+			logger.error('getTransportStats() [error:"%o"]', error);
+		}
+	}
+
+	async sendRequest(method, data)
+	{
+		logger.debug('sendRequest() [method:"%s", data:"%o"]', method, data);
+
+		const {
+			requestRetries = 3
+		} = window.config;
+
+		for (let tries = 0; tries < requestRetries; tries++)
+		{
+			try
+			{
+				return await this._sendRequest(method, data);
+			}
+			catch (error)
+			{
+				if (
+					error instanceof SocketTimeoutError &&
+					tries < requestRetries
+				)
+					logger.warn('sendRequest() | timeout, retrying [attempt:"%s"]', tries);
+				else
+					throw error;
+			}
+		}
 	}
 
 	async changeDisplayName(displayName)
@@ -565,7 +702,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('changeDisplayName() | failed: %o', error);
+			logger.error('changeDisplayName() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -591,7 +728,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('changePicture() | failed: %o', error);
+			logger.error('changePicture() [error:"%o"]', error);
 		}
 	}
 
@@ -608,7 +745,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('sendChatMessage() | failed: %o', error);
+			logger.error('sendChatMessage() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -627,7 +764,7 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				return store.dispatch(requestActions.notify(
+				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
@@ -635,6 +772,8 @@ export default class RoomClient
 							defaultMessage : 'Unable to save file'
 						})
 					}));
+
+				return;
 			}
 
 			saveAs(blob, file.name);
@@ -651,7 +790,9 @@ export default class RoomClient
 		if (existingTorrent)
 		{
 			// Never add duplicate torrents, use the existing one instead.
-			return this._handleTorrent(existingTorrent);
+			this._handleTorrent(existingTorrent);
+
+			return;
 		}
 
 		this._webTorrent.add(magnetUri, this._handleTorrent);
@@ -663,11 +804,13 @@ export default class RoomClient
 		// same file was sent multiple times.
 		if (torrent.progress === 1)
 		{
-			return store.dispatch(
+			store.dispatch(
 				fileActions.setFileDone(
 					torrent.magnetURI,
 					torrent.files
 				));
+
+			return;
 		}
 
 		let lastMove = 0;
@@ -686,7 +829,7 @@ export default class RoomClient
 			}
 		});
 
-		torrent.on('done', () => 
+		torrent.on('done', () =>
 		{
 			store.dispatch(
 				fileActions.setFileDone(
@@ -710,7 +853,7 @@ export default class RoomClient
 		{
 			if (err)
 			{
-				return store.dispatch(requestActions.notify(
+				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
@@ -718,18 +861,35 @@ export default class RoomClient
 							defaultMessage : 'Unable to share file'
 						})
 					}));
+
+				return;
 			}
 
 			const existingTorrent = this._webTorrent.get(torrent);
 
 			if (existingTorrent)
 			{
-				return this._sendFile(existingTorrent.magnetURI);
+				store.dispatch(requestActions.notify(
+					{
+						text : intl.formatMessage({
+							id             : 'filesharing.successfulFileShare',
+							defaultMessage : 'File successfully shared'
+						})
+					}));
+
+				store.dispatch(fileActions.addFile(
+					this._peerId,
+					existingTorrent.magnetURI
+				));
+
+				this._sendFile(existingTorrent.magnetURI);
+
+				return;
 			}
 
 			this._webTorrent.seed(
 				files,
-				{ announceList: [ [ 'wss://tracker.lab.vvc.niif.hu:443' ] ] },
+				{ announceList: [ [ this._tracker ] ] },
 				(newTorrent) =>
 				{
 					store.dispatch(requestActions.notify(
@@ -753,7 +913,7 @@ export default class RoomClient
 	// { file, name, picture }
 	async _sendFile(magnetUri)
 	{
-		logger.debug('sendFile() [magnetUri: %o]', magnetUri);
+		logger.debug('sendFile() [magnetUri:"%o"]', magnetUri);
 
 		try
 		{
@@ -761,7 +921,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('sendFile() | failed: %o', error);
+			logger.error('sendFile() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -771,62 +931,6 @@ export default class RoomClient
 						defaultMessage : 'Unable to share file'
 					})
 				}));
-		}
-	}
-
-	async getServerHistory()
-	{
-		logger.debug('getServerHistory()');
-
-		try
-		{
-			const {
-				chatHistory,
-				fileHistory,
-				lastNHistory,
-				locked,
-				lobbyPeers,
-				accessCode
-			} = await this.sendRequest('serverHistory');
-
-			(chatHistory.length > 0) && store.dispatch(
-				chatActions.addChatHistory(chatHistory));
-
-			(fileHistory.length > 0) && store.dispatch(
-				fileActions.addFileHistory(fileHistory));
-
-			if (lastNHistory.length > 0)
-			{
-				logger.debug('Got lastNHistory');
-
-				// Remove our self from list
-				const index = lastNHistory.indexOf(this._peerId);
-
-				lastNHistory.splice(index, 1);
-
-				this._spotlights.addSpeakerList(lastNHistory);
-			}
-
-			locked ? 
-				store.dispatch(roomActions.setRoomLocked()) :
-				store.dispatch(roomActions.setRoomUnLocked());
-
-			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
-			{
-				store.dispatch(
-					lobbyPeerActions.addLobbyPeer(peer.peerId));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName));
-				store.dispatch(
-					lobbyPeerActions.setLobbyPeerPicture(peer.picture));
-			});
-
-			(accessCode != null) && store.dispatch(
-				roomActions.setAccessCode(accessCode));
-		}
-		catch (error)
-		{
-			logger.error('getServerHistory() | failed: %o', error);
 		}
 	}
 
@@ -846,7 +950,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('muteMic() | failed: %o', error);
+			logger.error('muteMic() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -865,7 +969,7 @@ export default class RoomClient
 
 		if (!this._micProducer)
 		{
-			this.enableMic();
+			this.updateMic({ start: true });
 		}
 		else
 		{
@@ -875,13 +979,13 @@ export default class RoomClient
 			{
 				await this.sendRequest(
 					'resumeProducer', { producerId: this._micProducer.id });
-	
+
 				store.dispatch(
 					producerActions.setProducerResumed(this._micProducer.id));
 			}
 			catch (error)
 			{
-				logger.error('unmuteMic() | failed: %o', error);
+				logger.error('unmuteMic() [error:"%o"]', error);
 
 				store.dispatch(requestActions.notify(
 					{
@@ -914,232 +1018,498 @@ export default class RoomClient
 			{
 				if (consumer.kind === 'video')
 				{
-					if (spotlights.indexOf(consumer.appData.peerId) > -1)
-					{
+					if (spotlights.includes(consumer.appData.peerId))
 						await this._resumeConsumer(consumer);
-					}
 					else
-					{
 						await this._pauseConsumer(consumer);
-					}
 				}
 			}
 		}
 		catch (error)
 		{
-			logger.error('updateSpotlights() failed: %o', error);
+			logger.error('updateSpotlights() [error:"%o"]', error);
 		}
 	}
 
-	async getAudioTrack()
+	disconnectLocalHark()
 	{
-		await navigator.mediaDevices.getUserMedia(
-			{
-				audio : true, video : false 
-			});
+		logger.debug('disconnectLocalHark()');
+
+		if (this._harkStream != null)
+		{
+			let [ track ] = this._harkStream.getAudioTracks();
+
+			track.stop();
+			track = null;
+
+			this._harkStream = null;
+		}
+
+		if (this._hark != null)
+			this._hark.stop();
 	}
 
-	async getVideoTrack()
+	connectLocalHark(track)
 	{
-		await navigator.mediaDevices.getUserMedia(
+		logger.debug('connectLocalHark() [track:"%o"]', track);
+
+		this._harkStream = new MediaStream();
+
+		const newTrack = track.clone();
+
+		this._harkStream.addTrack(newTrack);
+
+		newTrack.enabled = true;
+
+		this._hark = hark(this._harkStream,
 			{
-				audio : false, video : true 
+				play      : false,
+				interval  : 10,
+				threshold : store.getState().settings.noiseThreshold,
+				history   : 100
 			});
+
+		this._hark.lastVolume = -100;
+
+		this._hark.on('volume_change', (volume) =>
+		{
+			volume = Math.round(volume);
+
+			if (this._micProducer && (volume !== Math.round(this._hark.lastVolume)))
+			{
+				if (volume < this._hark.lastVolume)
+				{
+					volume =
+						this._hark.lastVolume -
+						Math.pow(
+							(volume - this._hark.lastVolume) /
+							(100 + this._hark.lastVolume)
+							, 4
+						) * 2;
+				}
+
+				this._hark.lastVolume = volume;
+
+				store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
+			}
+		});
+
+		this._hark.on('speaking', () =>
+		{
+			store.dispatch(meActions.setIsSpeaking(true));
+
+			if (
+				(store.getState().settings.voiceActivatedUnmute ||
+				store.getState().me.isAutoMuted) &&
+				this._micProducer &&
+				this._micProducer.paused
+			)
+				this._micProducer.resume();
+
+			store.dispatch(meActions.setAutoMuted(false)); // sanity action
+		});
+
+		this._hark.on('stopped_speaking', () =>
+		{
+			store.dispatch(meActions.setIsSpeaking(false));
+
+			if (
+				store.getState().settings.voiceActivatedUnmute &&
+				this._micProducer &&
+				!this._micProducer.paused
+			)
+			{
+				this._micProducer.pause();
+
+				store.dispatch(meActions.setAutoMuted(true));
+			}
+		});
 	}
 
-	async changeAudioDevice(deviceId)
+	async changeAudioOutputDevice(deviceId)
 	{
-		logger.debug('changeAudioDevice() [deviceId: %s]', deviceId);
+		logger.debug('changeAudioOutputDevice() [deviceId:"%s"]', deviceId);
 
 		store.dispatch(
-			meActions.setAudioInProgress(true));
+			meActions.setAudioOutputInProgress(true));
 
 		try
 		{
+			const device = this._audioOutputDevices[deviceId];
+
+			if (!device)
+				throw new Error('Selected audio output device no longer available');
+
+			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
+
+			await this._updateAudioOutputDevices();
+		}
+		catch (error)
+		{
+			logger.error('changeAudioOutputDevice() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			meActions.setAudioOutputInProgress(false));
+	}
+
+	async updateMic({ start = false, restart = false, newDeviceId = null } = {})
+	{
+		logger.debug(
+			'updateMic() [start:"%s", restart:"%s", newDeviceId:"%s"]',
+			start,
+			restart,
+			newDeviceId
+		);
+
+		let track;
+
+		try
+		{
+			if (!this._mediasoupDevice.canProduce('audio'))
+				throw new Error('cannot produce audio');
+
+			if (newDeviceId && !restart)
+				throw new Error('changing device requires restart');
+
+			if (newDeviceId)
+				store.dispatch(settingsActions.setSelectedAudioDevice(newDeviceId));
+
+			store.dispatch(meActions.setAudioInProgress(true));
+
+			const deviceId = await this._getAudioDeviceId();
 			const device = this._audioDevices[deviceId];
 
 			if (!device)
 				throw new Error('no audio devices');
 
-			logger.debug(
-				'changeAudioDevice() | new selected webcam [device:%o]',
-				device);
+			const {
+				sampleRate,
+				channelCount,
+				volume,
+				autoGainControl,
+				echoCancellation,
+				noiseSuppression,
+				sampleSize
+			} = store.getState().settings;
 
-			if (this._micProducer && this._micProducer.track)
-				this._micProducer.track.stop();
+			if (
+				(restart && this._micProducer) ||
+				start
+			)
+			{
+				this.disconnectLocalHark();
 
-			logger.debug('changeAudioDevice() | calling getUserMedia()');
+				if (this._micProducer)
+					await this.disableMic();
 
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					audio :
+				const stream = await navigator.mediaDevices.getUserMedia(
 					{
-						deviceId : { exact: device.deviceId }
+						audio : {
+							deviceId : { ideal: deviceId },
+							sampleRate,
+							channelCount,
+							volume,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
+						}
 					}
+				);
+
+				([ track ] = stream.getAudioTracks());
+
+				const { deviceId: trackDeviceId } = track.getSettings();
+
+				store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
+
+				this._micProducer = await this._sendTransport.produce(
+					{
+						track,
+						codecOptions :
+						{
+							opusStereo          : false,
+							opusDtx             : true,
+							opusFec             : true,
+							opusPtime           : '3',
+							opusMaxPlaybackRate	: 48000
+						},
+						appData :
+						{ source: 'mic' }
+					});
+
+				store.dispatch(producerActions.addProducer(
+					{
+						id            : this._micProducer.id,
+						source        : 'mic',
+						paused        : this._micProducer.paused,
+						track         : this._micProducer.track,
+						rtpParameters : this._micProducer.rtpParameters,
+						codec         : this._micProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
+					}));
+
+				this._micProducer.on('transportclose', () =>
+				{
+					this._micProducer = null;
 				});
 
-			const track = stream.getAudioTracks()[0];
+				this._micProducer.on('trackended', () =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							type : 'error',
+							text : intl.formatMessage({
+								id             : 'devices.microphoneDisconnected',
+								defaultMessage : 'Microphone disconnected'
+							})
+						}));
 
-			if (this._micProducer)
-				await this._micProducer.replaceTrack({ track });
+					this.disableMic();
+				});
 
-			if (this._micProducer)
 				this._micProducer.volume = 0;
 
-			const harkStream = new MediaStream();
-
-			harkStream.addTrack(track);
-
-			if (!harkStream.getAudioTracks()[0])
-				throw new Error('changeAudioDevice(): given stream has no audio track');
-
-			if (this._hark != null)
-				this._hark.stop();
-
-			this._hark = hark(harkStream, { play: false });
-
-			// eslint-disable-next-line no-unused-vars
-			this._hark.on('volume_change', (dBs, threshold) =>
-			{
-				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-				//   Math.pow(10, dBs / 20)
-				// However it does not produce a visually useful output, so let exaggerate
-				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-				// minimize component renderings.
-				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-				if (volume === 1)
-					volume = 0;
-
-				volume = Math.round(volume);
-
-				if (this._micProducer && volume !== this._micProducer.volume)
-				{
-					this._micProducer.volume = volume;
-
-					store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
-				}
-			});
-			if (this._micProducer && this._micProducer.id)
-				store.dispatch(
-					producerActions.setProducerTrack(this._micProducer.id, track));
-
-			store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
-
-			await this._updateAudioDevices();
-		}
-		catch (error)
-		{
-			logger.error('changeAudioDevice() failed: %o', error);
-		}
-
-		store.dispatch(
-			meActions.setAudioInProgress(false));
-	}
-
-	async changeVideoResolution(resolution)
-	{
-		logger.debug('changeVideoResolution() [resolution: %s]', resolution);
-
-		store.dispatch(
-			meActions.setWebcamInProgress(true));
-
-		try
-		{
-			const deviceId = await this._getWebcamDeviceId();
-
-			const device = this._webcams[deviceId];
-
-			if (!device)
-				throw new Error('no webcam devices');
-
-			this._webcamProducer.track.stop();
-
-			logger.debug('changeVideoResolution() | calling getUserMedia()');
-
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					video :
-					{
-						deviceId : { exact: device.deviceId },
-						...VIDEO_CONSTRAINS[resolution]
-					}
-				});
-
-			const track = stream.getVideoTracks()[0];
-
-			await this._webcamProducer.replaceTrack({ track });
-
-			store.dispatch(
-				producerActions.setProducerTrack(this._webcamProducer.id, track));
-
-			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
-			store.dispatch(settingsActions.setVideoResolution(resolution));
-
-			await this._updateWebcams();
-		}
-		catch (error)
-		{
-			logger.error('changeVideoResolution() failed: %o', error);
-		}
-
-		store.dispatch(
-			meActions.setWebcamInProgress(false));
-	}
-
-	async changeWebcam(deviceId)
-	{
-		logger.debug('changeWebcam() [deviceId: %s]', deviceId);
-
-		store.dispatch(
-			meActions.setWebcamInProgress(true));
-
-		try
-		{
-			const device = this._webcams[deviceId];
-			const resolution = store.getState().settings.resolution;
-
-			if (!device)
-				throw new Error('no webcam devices');
-			
-			logger.debug(
-				'changeWebcam() | new selected webcam [device:%o]',
-				device);
-			if (this._webcamProducer && this._webcamProducer.track)
-				this._webcamProducer.track.stop();
-
-			logger.debug('changeWebcam() | calling getUserMedia()');
-
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					video :
-					{
-						deviceId : { exact: device.deviceId },
-						...VIDEO_CONSTRAINS[resolution]
-					}
-				});
-			if (stream){
-				const track = stream.getVideoTracks()[0];
-				if (track) {
-					await this._webcamProducer.replaceTrack({ track });
-	
-					store.dispatch(
-						producerActions.setProducerTrack(this._webcamProducer.id, track));
-							
-				} else {
-					logger.warn('getVideoTracks Error: First Video Track is null')
-				}
-	
-			} else {
-				logger.warn ('getUserMedia Error: Stream is null!') 
+				this.connectLocalHark(track);
 			}
-			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
+			else if (this._micProducer)
+			{
+				({ track } = this._micProducer);
 
-			await this._updateWebcams();
+				await track.applyConstraints(
+					{
+						sampleRate,
+						channelCount,
+						volume,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
+					}
+				);
+
+				if (this._harkStream != null)
+				{
+					const [ harkTrack ] = this._harkStream.getAudioTracks();
+
+					harkTrack && await harkTrack.applyConstraints(
+						{
+							sampleRate,
+							channelCount,
+							volume,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
+						}
+					);
+				}
+			}
 		}
 		catch (error)
 		{
-			logger.error('changeWebcam() failed: %o', error);
+			logger.error('updateMic() [error:"%o"]', error);
+
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'devices.microphoneError',
+						defaultMessage : 'An error occurred while accessing your microphone'
+					})
+				}));
+
+			if (track)
+				track.stop();
+		}
+
+		store.dispatch(meActions.setAudioInProgress(false));
+	}
+
+	async updateWebcam({
+		start = false,
+		restart = false,
+		newDeviceId = null,
+		newResolution = null,
+		newFrameRate = null
+	} = {})
+	{
+		logger.debug(
+			'updateWebcam() [start:"%s", restart:"%s", newDeviceId:"%s", newResolution:"%s", newFrameRate:"%s"]',
+			start,
+			restart,
+			newDeviceId,
+			newResolution,
+			newFrameRate
+		);
+
+		let track;
+
+		try
+		{
+			if (!this._mediasoupDevice.canProduce('video'))
+				throw new Error('cannot produce video');
+
+			if (newDeviceId && !restart)
+				throw new Error('changing device requires restart');
+
+			if (newDeviceId)
+				store.dispatch(settingsActions.setSelectedWebcamDevice(newDeviceId));
+
+			if (newResolution)
+				store.dispatch(settingsActions.setVideoResolution(newResolution));
+
+			if (newFrameRate)
+				store.dispatch(settingsActions.setVideoFrameRate(newFrameRate));
+
+			store.dispatch(meActions.setWebcamInProgress(true));
+
+			const deviceId = await this._getWebcamDeviceId();
+			const device = this._webcams[deviceId];
+
+			if (!device)
+				throw new Error('no webcam devices');
+
+			const {
+				resolution,
+				frameRate
+			} = store.getState().settings;
+
+			if (
+				(restart && this._webcamProducer) ||
+				start
+			)
+			{
+				if (this._webcamProducer)
+					await this.disableWebcam();
+
+				const stream = await navigator.mediaDevices.getUserMedia(
+					{
+						video :
+						{
+							deviceId : { ideal: deviceId },
+							...VIDEO_CONSTRAINS[resolution],
+							frameRate
+						}
+					});
+
+				([ track ] = stream.getVideoTracks());
+
+				const { deviceId: trackDeviceId } = track.getSettings();
+
+				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
+
+				if (this._useSimulcast)
+				{
+					// If VP9 is the only available video codec then use SVC.
+					const firstVideoCodec = this._mediasoupDevice
+						.rtpCapabilities
+						.codecs
+						.find((c) => c.kind === 'video');
+
+					let encodings;
+
+					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+						encodings = VIDEO_KSVC_ENCODINGS;
+					else if ('simulcastEncodings' in window.config)
+						encodings = window.config.simulcastEncodings;
+					else
+						encodings = VIDEO_SIMULCAST_ENCODINGS;
+
+					this._webcamProducer = await this._sendTransport.produce(
+						{
+							track,
+							encodings,
+							codecOptions :
+							{
+								videoGoogleStartBitrate : 1000
+							},
+							appData :
+							{
+								source : 'webcam'
+							}
+						});
+				}
+				else
+				{
+					this._webcamProducer = await this._sendTransport.produce({
+						track,
+						appData :
+						{
+							source : 'webcam'
+						}
+					});
+				}
+
+				store.dispatch(producerActions.addProducer(
+					{
+						id            : this._webcamProducer.id,
+						source        : 'webcam',
+						paused        : this._webcamProducer.paused,
+						track         : this._webcamProducer.track,
+						rtpParameters : this._webcamProducer.rtpParameters,
+						codec         : this._webcamProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
+					}));
+
+				this._webcamProducer.on('transportclose', () =>
+				{
+					this._webcamProducer = null;
+				});
+
+				this._webcamProducer.on('trackended', () =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							type : 'error',
+							text : intl.formatMessage({
+								id             : 'devices.cameraDisconnected',
+								defaultMessage : 'Camera disconnected'
+							})
+						}));
+
+					this.disableWebcam();
+				});
+			}
+			else if (this._webcamProducer)
+			{
+				({ track } = this._webcamProducer);
+
+				await track.applyConstraints(
+					{
+						...VIDEO_CONSTRAINS[resolution],
+						frameRate
+					}
+				);
+
+				// Also change resolution of extra video producers
+				for (const producer of this._extraVideoProducers.values())
+				{
+					({ track } = producer);
+
+					await track.applyConstraints(
+						{
+							...VIDEO_CONSTRAINS[resolution],
+							frameRate
+						}
+					);
+				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('updateWebcam() [error:"%o"]', error);
+
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'devices.cameraError',
+						defaultMessage : 'An error occurred while accessing your camera'
+					})
+				}));
+
+			if (track)
+				track.stop();
 		}
 
 		store.dispatch(
@@ -1156,6 +1526,26 @@ export default class RoomClient
 			roomActions.setSelectedPeer(peerId));
 	}
 
+	async promoteAllLobbyPeers()
+	{
+		logger.debug('promoteAllLobbyPeers()');
+
+		store.dispatch(
+			roomActions.setLobbyPeersPromotionInProgress(true));
+
+		try
+		{
+			await this.sendRequest('promoteAllPeers');
+		}
+		catch (error)
+		{
+			logger.error('promoteAllLobbyPeers() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setLobbyPeersPromotionInProgress(false));
+	}
+
 	async promoteLobbyPeer(peerId)
 	{
 		logger.debug('promoteLobbyPeer() [peerId:"%s"]', peerId);
@@ -1169,11 +1559,215 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('promoteLobbyPeer() failed: %o', error);
+			logger.error('promoteLobbyPeer() [error:"%o"]', error);
 		}
 
 		store.dispatch(
 			lobbyPeerActions.setLobbyPeerPromotionInProgress(peerId, false));
+	}
+
+	async clearChat()
+	{
+		logger.debug('clearChat()');
+
+		store.dispatch(
+			roomActions.setClearChatInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:clearChat');
+
+			store.dispatch(chatActions.clearChat());
+		}
+		catch (error)
+		{
+			logger.error('clearChat() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setClearChatInProgress(false));
+	}
+
+	async clearFileSharing()
+	{
+		logger.debug('clearFileSharing()');
+
+		store.dispatch(
+			roomActions.setClearFileSharingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:clearFileSharing');
+
+			store.dispatch(fileActions.clearFiles());
+		}
+		catch (error)
+		{
+			logger.error('clearFileSharing() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setClearFileSharingInProgress(false));
+	}
+
+	async kickPeer(peerId)
+	{
+		logger.debug('kickPeer() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setPeerKickInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:kickPeer', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('kickPeer() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setPeerKickInProgress(peerId, false));
+	}
+
+	async mutePeer(peerId)
+	{
+		logger.debug('mutePeer() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setMutePeerInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:mute', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('mutePeer() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setMutePeerInProgress(peerId, false));
+	}
+
+	async stopPeerVideo(peerId)
+	{
+		logger.debug('stopPeerVideo() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setStopPeerVideoInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopVideo', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('stopPeerVideo() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setStopPeerVideoInProgress(peerId, false));
+	}
+
+	async stopPeerScreenSharing(peerId)
+	{
+		logger.debug('stopPeerScreenSharing() [peerId:"%s"]', peerId);
+
+		store.dispatch(
+			peerActions.setStopPeerScreenSharingInProgress(peerId, true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopScreenSharing', { peerId });
+		}
+		catch (error)
+		{
+			logger.error('stopPeerScreenSharing() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			peerActions.setStopPeerScreenSharingInProgress(peerId, false));
+	}
+
+	async muteAllPeers()
+	{
+		logger.debug('muteAllPeers()');
+
+		store.dispatch(
+			roomActions.setMuteAllInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:muteAll');
+		}
+		catch (error)
+		{
+			logger.error('muteAllPeers() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setMuteAllInProgress(false));
+	}
+
+	async stopAllPeerVideo()
+	{
+		logger.debug('stopAllPeerVideo()');
+
+		store.dispatch(
+			roomActions.setStopAllVideoInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopAllVideo');
+		}
+		catch (error)
+		{
+			logger.error('stopAllPeerVideo() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setStopAllVideoInProgress(false));
+	}
+
+	async stopAllPeerScreenSharing()
+	{
+		logger.debug('stopAllPeerScreenSharing()');
+
+		store.dispatch(
+			roomActions.setStopAllScreenSharingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:stopAllScreenSharing');
+		}
+		catch (error)
+		{
+			logger.error('stopAllPeerScreenSharing() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setStopAllScreenSharingInProgress(false));
+	}
+
+	async closeMeeting()
+	{
+		logger.debug('closeMeeting()');
+
+		store.dispatch(
+			roomActions.setCloseMeetingInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:closeMeeting');
+		}
+		catch (error)
+		{
+			logger.error('closeMeeting() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setCloseMeetingInProgress(false));
 	}
 
 	// type: mic/webcam/screen
@@ -1203,9 +1797,7 @@ export default class RoomClient
 				if (consumer.appData.peerId === peerId && consumer.appData.source === type)
 				{
 					if (mute)
-					{
 						await this._pauseConsumer(consumer);
-					}
 					else
 						await this._resumeConsumer(consumer);
 				}
@@ -1213,7 +1805,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('modifyPeerConsumer() failed: %o', error);
+			logger.error('modifyPeerConsumer() [error:"%o"]', error);
 		}
 
 		if (type === 'mic')
@@ -1229,7 +1821,7 @@ export default class RoomClient
 
 	async _pauseConsumer(consumer)
 	{
-		logger.debug('_pauseConsumer() [consumer: %o]', consumer);
+		logger.debug('_pauseConsumer() [consumer:"%o"]', consumer);
 
 		if (consumer.paused || consumer.closed)
 			return;
@@ -1245,13 +1837,13 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_pauseConsumer() | failed:%o', error);
+			logger.error('_pauseConsumer() [error:"%o"]', error);
 		}
 	}
 
 	async _resumeConsumer(consumer)
 	{
-		logger.debug('_resumeConsumer() [consumer: %o]', consumer);
+		logger.debug('_resumeConsumer() [consumer:"%o"]', consumer);
 
 		if (!consumer.paused || consumer.closed)
 			return;
@@ -1267,39 +1859,59 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_resumeConsumer() | failed:%o', error);
+			logger.error('_resumeConsumer() [error:"%o"]', error);
 		}
 	}
 
-	async sendRaiseHandState(state)
+	async lowerPeerHand(peerId)
 	{
-		logger.debug('sendRaiseHandState: ', state);
+		logger.debug('lowerPeerHand() [peerId:"%s"]', peerId);
 
 		store.dispatch(
-			meActions.setMyRaiseHandStateInProgress(true));
+			peerActions.setPeerRaisedHandInProgress(peerId, true));
 
 		try
 		{
-			await this.sendRequest('raiseHand', { raiseHandState: state });
-
-			store.dispatch(
-				meActions.setMyRaiseHandState(state));
+			await this.sendRequest('moderator:lowerHand', { peerId });
 		}
 		catch (error)
 		{
-			logger.error('sendRaiseHandState() | failed: %o', error);
-
-			// We need to refresh the component for it to render changed state
-			store.dispatch(meActions.setMyRaiseHandState(!state));
+			logger.error('lowerPeerHand() [error:"%o"]', error);
 		}
 
 		store.dispatch(
-			meActions.setMyRaiseHandStateInProgress(false));
+			peerActions.setPeerRaisedHandInProgress(peerId, false));
+	}
+
+	async setRaisedHand(raisedHand)
+	{
+		logger.debug('setRaisedHand: ', raisedHand);
+
+		store.dispatch(
+			meActions.setRaisedHandInProgress(true));
+
+		try
+		{
+			await this.sendRequest('raisedHand', { raisedHand });
+
+			store.dispatch(
+				meActions.setRaisedHand(raisedHand));
+		}
+		catch (error)
+		{
+			logger.error('setRaisedHand() [error:"%o"]', error);
+
+			// We need to refresh the component for it to render changed state
+			store.dispatch(meActions.setRaisedHand(!raisedHand));
+		}
+
+		store.dispatch(
+			meActions.setRaisedHandInProgress(false));
 	}
 
 	async setMaxSendingSpatialLayer(spatialLayer)
 	{
-		logger.debug('setMaxSendingSpatialLayer() [spatialLayer:%s]', spatialLayer);
+		logger.debug('setMaxSendingSpatialLayer() [spatialLayer:"%s"]', spatialLayer);
 
 		try
 		{
@@ -1310,14 +1922,14 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setMaxSendingSpatialLayer() | failed:"%o"', error);
+			logger.error('setMaxSendingSpatialLayer() [error:"%o"]', error);
 		}
 	}
 
 	async setConsumerPreferredLayers(consumerId, spatialLayer, temporalLayer)
 	{
 		logger.debug(
-			'setConsumerPreferredLayers() [consumerId:%s, spatialLayer:%s, temporalLayer:%s]',
+			'setConsumerPreferredLayers() [consumerId:"%s", spatialLayer:"%s", temporalLayer:"%s"]',
 			consumerId, spatialLayer, temporalLayer);
 
 		try
@@ -1330,14 +1942,14 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPreferredLayers() | failed:"%o"', error);
+			logger.error('setConsumerPreferredLayers() [error:"%o"]', error);
 		}
 	}
 
 	async setConsumerPriority(consumerId, priority)
 	{
 		logger.debug(
-			'setConsumerPriority() [consumerId:%s, priority:%d]',
+			'setConsumerPriority() [consumerId:"%s", priority:%d]',
 			consumerId, priority);
 
 		try
@@ -1348,13 +1960,13 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPriority() | failed:%o', error);
+			logger.error('setConsumerPriority() [error:"%o"]', error);
 		}
 	}
 
 	async requestConsumerKeyFrame(consumerId)
 	{
-		logger.debug('requestConsumerKeyFrame() [consumerId:%s]', consumerId);
+		logger.debug('requestConsumerKeyFrame() [consumerId:"%s"]', consumerId);
 
 		try
 		{
@@ -1362,7 +1974,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('requestConsumerKeyFrame() | failed:%o', error);
+			logger.error('requestConsumerKeyFrame() [error:"%o"]', error);
 		}
 	}
 
@@ -1428,27 +2040,6 @@ export default class RoomClient
 
 		this._signalingUrl = getSignalingUrl(this._peerId, roomId);
 
-		this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
-
-		this._webTorrent = this._torrentSupport && new WebTorrent({
-			tracker : {
-				rtcConfig : {
-					iceServers : ROOM_OPTIONS.turnServers
-				}
-			}
-		});
-
-		this._webTorrent.on('error', (error) =>
-		{
-			logger.error('Filesharing [error:"%o"]', error);
-
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : intl.formatMessage({ id: 'filesharing.error', defaultMessage: 'There was a filesharing error' })
-				}));
-		});
-
 		this._screenSharing = ScreenShare.create(this._device);
 
 		this._signalingSocket = io(this._signalingUrl);
@@ -1490,6 +2081,55 @@ export default class RoomClient
 					})
 				}));
 
+			if (this._screenSharingProducer)
+			{
+				this._screenSharingProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._screenSharingProducer.id));
+
+				this._screenSharingProducer = null;
+			}
+
+			if (this._webcamProducer)
+			{
+				this._webcamProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._webcamProducer.id));
+
+				this._webcamProducer = null;
+			}
+
+			if (this._micProducer)
+			{
+				this._micProducer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(this._micProducer.id));
+
+				this._micProducer = null;
+			}
+
+			if (this._sendTransport)
+			{
+				this._sendTransport.close();
+
+				this._sendTransport = null;
+			}
+
+			if (this._recvTransport)
+			{
+				this._recvTransport.close();
+
+				this._recvTransport = null;
+			}
+
+			this._spotlights.clearSpotlights();
+
+			store.dispatch(peerActions.clearPeers());
+			store.dispatch(consumerActions.clearConsumers());
+			store.dispatch(roomActions.clearSpotlights());
 			store.dispatch(roomActions.setRoomState('connecting'));
 		});
 
@@ -1526,7 +2166,7 @@ export default class RoomClient
 		this._signalingSocket.on('request', async (request, cb) =>
 		{
 			logger.debug(
-				'socket "request" event [method:%s, data:%o]',
+				'socket "request" event [method:"%s", data:"%o"]',
 				request.method, request.data);
 
 			switch (request.method)
@@ -1544,23 +2184,12 @@ export default class RoomClient
 						producerPaused
 					} = request.data;
 
-					let codecOptions;
-
-					if (kind === 'audio')
-					{
-						codecOptions =
-						{
-							opusStereo : 1
-						};
-					}
-
 					const consumer = await this._recvTransport.consume(
 						{
 							id,
 							producerId,
 							kind,
 							rtpParameters,
-							codecOptions,
 							appData : { ...appData, peerId } // Trick.
 						});
 
@@ -1613,19 +2242,8 @@ export default class RoomClient
 
 						consumer.hark = hark(stream, { play: false });
 
-						// eslint-disable-next-line no-unused-vars
-						consumer.hark.on('volume_change', (dBs, threshold) =>
+						consumer.hark.on('volume_change', (volume) =>
 						{
-							// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-							//   Math.pow(10, dBs / 20)
-							// However it does not produce a visually useful output, so let exaggerate
-							// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-							// minimize component renderings.
-							let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-							if (volume === 1)
-								volume = 0;
-
 							volume = Math.round(volume);
 
 							if (consumer && volume !== consumer.volume)
@@ -1652,20 +2270,21 @@ export default class RoomClient
 		this._signalingSocket.on('notification', async (notification) =>
 		{
 			logger.debug(
-				'socket "notification" event [method:%s, data:%o]',
+				'socket "notification" event [method:"%s", data:"%o"]',
 				notification.method, notification.data);
 
 			try
 			{
 				switch (notification.method)
 				{
+
 					case 'enteredLobby':
 					{
 						store.dispatch(roomActions.setInLobby(true));
 
 						const { displayName } = store.getState().settings;
 						const { picture } = store.getState().me;
-	
+
 						await this.sendRequest('changeDisplayName', { displayName });
 						await this.sendRequest('changePicture', { picture });
 						break;
@@ -1674,25 +2293,43 @@ export default class RoomClient
 					case 'signInRequired':
 					{
 						store.dispatch(roomActions.setSignInRequired(true));
-	
+
 						break;
 					}
-						
+
+					case 'overRoomLimit':
+					{
+						store.dispatch(roomActions.setOverRoomLimit(true));
+
+						break;
+					}
+
 					case 'roomReady':
 					{
+						const { turnServers } = notification.data;
+
+						this._turnServers = turnServers;
+
 						store.dispatch(roomActions.toggleJoined());
 						store.dispatch(roomActions.setInLobby(false));
-	
+
 						await this._joinRoom({ joinVideo });
-	
+
 						break;
 					}
-	
+
+					case 'roomBack':
+					{
+						await this._joinRoom({ joinVideo });
+
+						break;
+					}
+
 					case 'lockRoom':
 					{
 						store.dispatch(
 							roomActions.setRoomLocked());
-	
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -1700,15 +2337,15 @@ export default class RoomClient
 									defaultMessage : 'Room is now locked'
 								})
 							}));
-	
+
 						break;
 					}
-	
+
 					case 'unlockRoom':
 					{
 						store.dispatch(
 							roomActions.setRoomUnLocked());
-						
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -1716,19 +2353,21 @@ export default class RoomClient
 									defaultMessage : 'Room is now unlocked'
 								})
 							}));
-	
+
 						break;
 					}
-	
+
 					case 'parkedPeer':
 					{
 						const { peerId } = notification.data;
-	
+
 						store.dispatch(
 							lobbyPeerActions.addLobbyPeer(peerId));
 						store.dispatch(
 							roomActions.setToolbarsVisible(true));
-	
+
+						this._soundNotification();
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -1736,17 +2375,60 @@ export default class RoomClient
 									defaultMessage : 'New participant entered the lobby'
 								})
 							}));
-	
+
 						break;
 					}
-	
+
+					case 'parkedPeers':
+					{
+						const { lobbyPeers } = notification.data;
+
+						if (lobbyPeers.length > 0)
+						{
+							lobbyPeers.forEach((peer) =>
+							{
+								store.dispatch(
+									lobbyPeerActions.addLobbyPeer(peer.id));
+
+								store.dispatch(
+									lobbyPeerActions.setLobbyPeerDisplayName(
+										peer.displayName,
+										peer.id
+									)
+								);
+
+								store.dispatch(
+									lobbyPeerActions.setLobbyPeerPicture(
+										peer.picture,
+										peer.id
+									)
+								);
+							});
+
+							store.dispatch(
+								roomActions.setToolbarsVisible(true));
+
+							this._soundNotification();
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'room.newLobbyPeer',
+										defaultMessage : 'New participant entered the lobby'
+									})
+								}));
+						}
+
+						break;
+					}
+
 					case 'lobby:peerClosed':
 					{
 						const { peerId } = notification.data;
-	
+
 						store.dispatch(
 							lobbyPeerActions.removeLobbyPeer(peerId));
-	
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -1754,10 +2436,10 @@ export default class RoomClient
 									defaultMessage : 'Participant in lobby left'
 								})
 							}));
-	
+
 						break;
 					}
-	
+
 					case 'lobby:promotedPeer':
 					{
 						const { peerId } = notification.data;
@@ -1767,7 +2449,7 @@ export default class RoomClient
 
 						break;
 					}
-	
+
 					case 'lobby:changeDisplayName':
 					{
 						const { peerId, displayName } = notification.data;
@@ -1787,11 +2469,11 @@ export default class RoomClient
 
 						break;
 					}
-					
+
 					case 'lobby:changePicture':
 					{
 						const { peerId, picture } = notification.data;
-	
+
 						store.dispatch(
 							lobbyPeerActions.setLobbyPeerPicture(picture, peerId));
 
@@ -1809,7 +2491,7 @@ export default class RoomClient
 					case 'setAccessCode':
 					{
 						const { accessCode } = notification.data;
-	
+
 						store.dispatch(
 							roomActions.setAccessCode(accessCode));
 
@@ -1823,14 +2505,14 @@ export default class RoomClient
 
 						break;
 					}
-	
+
 					case 'setJoinByAccessCode':
 					{
 						const { joinByAccessCode } = notification.data;
-						
+
 						store.dispatch(
 							roomActions.setJoinByAccessCode(joinByAccessCode));
-						
+
 						if (joinByAccessCode)
 						{
 							store.dispatch(requestActions.notify(
@@ -1841,7 +2523,7 @@ export default class RoomClient
 									})
 								}));
 						}
-						else 
+						else
 						{
 							store.dispatch(requestActions.notify(
 								{
@@ -1854,20 +2536,20 @@ export default class RoomClient
 
 						break;
 					}
-	
+
 					case 'activeSpeaker':
 					{
 						const { peerId } = notification.data;
-	
+
 						store.dispatch(
 							roomActions.setRoomActiveSpeaker(peerId));
 
 						if (peerId && peerId !== this._peerId)
 							this._spotlights.handleActiveSpeaker(peerId);
-	
+
 						break;
 					}
-	
+
 					case 'changeDisplayName':
 					{
 						const { peerId, displayName, oldDisplayName } = notification.data;
@@ -1898,6 +2580,58 @@ export default class RoomClient
 						break;
 					}
 
+					case 'raisedHand':
+					{
+						const {
+							peerId,
+							raisedHand,
+							raisedHandTimestamp
+						} = notification.data;
+
+						store.dispatch(
+							peerActions.setPeerRaisedHand(
+								peerId,
+								raisedHand,
+								raisedHandTimestamp
+							)
+						);
+
+						const { displayName } = store.getState().peers[peerId];
+
+						let text;
+
+						if (raisedHand)
+						{
+							text = intl.formatMessage({
+								id             : 'room.raisedHand',
+								defaultMessage : '{displayName} raised their hand'
+							}, {
+								displayName
+							});
+						}
+						else
+						{
+							text = intl.formatMessage({
+								id             : 'room.loweredHand',
+								defaultMessage : '{displayName} put their hand down'
+							}, {
+								displayName
+							});
+						}
+
+						if (displayName)
+						{
+							store.dispatch(requestActions.notify(
+								{
+									text
+								}));
+						}
+
+						this._soundNotification();
+
+						break;
+					}
+
 					case 'chatMessage':
 					{
 						const { peerId, chatMessage } = notification.data;
@@ -1915,6 +2649,21 @@ export default class RoomClient
 								roomActions.setToolbarsVisible(true));
 							this._soundNotification();
 						}
+
+						break;
+					}
+
+					case 'moderator:clearChat':
+					{
+						store.dispatch(chatActions.clearChat());
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.clearChat',
+									defaultMessage : 'Moderator cleared the chat'
+								})
+							}));
 
 						break;
 					}
@@ -1947,6 +2696,21 @@ export default class RoomClient
 						break;
 					}
 
+					case 'moderator:clearFileSharing':
+					{
+						store.dispatch(fileActions.clearFiles());
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.clearFiles',
+									defaultMessage : 'Moderator cleared the files'
+								})
+							}));
+
+						break;
+					}
+
 					case 'producerScore':
 					{
 						const { producerId, score } = notification.data;
@@ -1959,10 +2723,12 @@ export default class RoomClient
 
 					case 'newPeer':
 					{
-						const { id, displayName, picture } = notification.data;
+						const { id, displayName, picture, roles } = notification.data;
 
 						store.dispatch(
-							peerActions.addPeer({ id, displayName, picture, consumers: [] }));
+							peerActions.addPeer({ id, displayName, picture, roles, consumers: [] }));
+
+						this._soundNotification();
 
 						store.dispatch(requestActions.notify(
 							{
@@ -1991,77 +2757,188 @@ export default class RoomClient
 					{
 						const { consumerId } = notification.data;
 						const consumer = this._consumers.get(consumerId);
-	
+
 						if (!consumer)
 							break;
-	
+
 						consumer.close();
-	
+
 						if (consumer.hark != null)
 							consumer.hark.stop();
-	
+
 						this._consumers.delete(consumerId);
-	
+
 						const { peerId } = consumer.appData;
-	
+
 						store.dispatch(
 							consumerActions.removeConsumer(consumerId, peerId));
-	
+
 						break;
 					}
-	
+
 					case 'consumerPaused':
 					{
 						const { consumerId } = notification.data;
 						const consumer = this._consumers.get(consumerId);
-	
+
 						if (!consumer)
 							break;
-	
+
 						store.dispatch(
 							consumerActions.setConsumerPaused(consumerId, 'remote'));
 
 						break;
 					}
-	
+
 					case 'consumerResumed':
 					{
 						const { consumerId } = notification.data;
 						const consumer = this._consumers.get(consumerId);
-	
+
 						if (!consumer)
 							break;
-	
+
 						store.dispatch(
 							consumerActions.setConsumerResumed(consumerId, 'remote'));
-	
+
 						break;
 					}
-	
+
 					case 'consumerLayersChanged':
 					{
 						const { consumerId, spatialLayer, temporalLayer } = notification.data;
 						const consumer = this._consumers.get(consumerId);
-	
+
 						if (!consumer)
 							break;
-	
+
 						store.dispatch(consumerActions.setConsumerCurrentLayers(
 							consumerId, spatialLayer, temporalLayer));
-	
+
 						break;
 					}
-	
+
 					case 'consumerScore':
 					{
 						const { consumerId, score } = notification.data;
-	
+
 						store.dispatch(
 							consumerActions.setConsumerScore(consumerId, score));
-	
+
 						break;
 					}
-	
+
+					case 'moderator:mute':
+					{
+						if (this._micProducer && !this._micProducer.paused)
+						{
+							this.muteMic();
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'moderator.muteAudio',
+										defaultMessage : 'Moderator muted your audio'
+									})
+								}));
+						}
+
+						break;
+					}
+
+					case 'moderator:stopVideo':
+					{
+						this.disableWebcam();
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.muteVideo',
+									defaultMessage : 'Moderator stopped your video'
+								})
+							}));
+
+						break;
+					}
+
+					case 'moderator:stopScreenSharing':
+					{
+						this.disableScreenSharing();
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'moderator.stopScreenSharing',
+									defaultMessage : 'Moderator stopped your screen sharing'
+								})
+							}));
+
+						break;
+					}
+
+					case 'moderator:kick':
+					{
+						// Need some feedback
+						this.close();
+
+						break;
+					}
+
+					case 'moderator:lowerHand':
+					{
+						this.setRaisedHand(false);
+
+						break;
+					}
+
+					case 'gotRole':
+					{
+						const { peerId, role } = notification.data;
+
+						if (peerId === this._peerId)
+						{
+							store.dispatch(meActions.addRole(role));
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'roles.gotRole',
+										defaultMessage : 'You got the role: {role}'
+									}, {
+										role
+									})
+								}));
+						}
+						else
+							store.dispatch(peerActions.addPeerRole(peerId, role));
+
+						break;
+					}
+
+					case 'lostRole':
+					{
+						const { peerId, role } = notification.data;
+
+						if (peerId === this._peerId)
+						{
+							store.dispatch(meActions.removeRole(role));
+
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'roles.lostRole',
+										defaultMessage : 'You lost the role: {role}'
+									}, {
+										role
+									})
+								}));
+						}
+						else
+							store.dispatch(peerActions.removePeerRole(peerId, role));
+
+						break;
+					}
+
 					default:
 					{
 						logger.error(
@@ -2071,7 +2948,7 @@ export default class RoomClient
 			}
 			catch (error)
 			{
-				logger.error('error on socket "notification" event failed:"%o"', error);
+				logger.error('error on socket "notification" event [error:"%o"]', error);
 
 				store.dispatch(requestActions.notify(
 					{
@@ -2090,10 +2967,8 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
-		const {
-			displayName,
-			picture
-		} = store.getState().settings;
+		const { displayName } = store.getState().settings;
+		const { picture } = store.getState().me;
 
 		try
 		{
@@ -2110,7 +2985,7 @@ export default class RoomClient
 			this._webTorrent.on('error', (error) =>
 			{
 				logger.error('Filesharing [error:"%o"]', error);
-	
+
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
@@ -2125,6 +3000,9 @@ export default class RoomClient
 
 			const routerRtpCapabilities =
 				await this.sendRequest('getRouterRtpCapabilities');
+
+			routerRtpCapabilities.headerExtensions = routerRtpCapabilities.headerExtensions
+				.filter((ext) => ext.uri !== 'urn:3gpp:video-orientation');
 
 			await this._mediasoupDevice.load({ routerRtpCapabilities });
 
@@ -2151,7 +3029,9 @@ export default class RoomClient
 						iceParameters,
 						iceCandidates,
 						dtlsParameters,
-						iceServers             : ROOM_OPTIONS.turnServers,
+						iceServers             : this._turnServers,
+						// TODO: Fix for issue #72
+						iceTransportPolicy     : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined,
 						proprietaryConstraints : PC_PROPRIETARY_CONSTRAINTS
 					});
 
@@ -2213,7 +3093,9 @@ export default class RoomClient
 					iceParameters,
 					iceCandidates,
 					dtlsParameters,
-					iceServers : ROOM_OPTIONS.turnServers
+					iceServers         : this._turnServers,
+					// TODO: Fix for issue #72
+					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined
 				});
 
 			this._recvTransport.on(
@@ -2239,7 +3121,20 @@ export default class RoomClient
 					canShareFiles : this._torrentSupport
 				}));
 
-			const { peers, authenticated } = await this.sendRequest(
+			const {
+				authenticated,
+				roles,
+				peers,
+				tracker,
+				roomPermissions,
+				allowWhenRoleMissing,
+				chatHistory,
+				fileHistory,
+				lastNHistory,
+				locked,
+				lobbyPeers,
+				accessCode
+			} = await this.sendRequest(
 				'join',
 				{
 					displayName     : displayName,
@@ -2247,9 +3142,41 @@ export default class RoomClient
 					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
 				});
 
+			logger.debug(
+				'_joinRoom() joined [authenticated:"%s", peers:"%o", roles:"%o"]',
+				authenticated,
+				peers,
+				roles
+			);
+
+			tracker && (this._tracker = tracker);
+
 			store.dispatch(meActions.loggedIn(authenticated));
 
-			logger.debug('_joinRoom() joined, got peers [peers:"%o"]', peers);
+			store.dispatch(roomActions.setRoomPermissions(roomPermissions));
+
+			if (allowWhenRoleMissing)
+				store.dispatch(roomActions.setAllowWhenRoleMissing(allowWhenRoleMissing));
+
+			const myRoles = store.getState().me.roles;
+
+			for (const role of roles)
+			{
+				if (!myRoles.includes(role))
+				{
+					store.dispatch(meActions.addRole(role));
+
+					store.dispatch(requestActions.notify(
+						{
+							text : intl.formatMessage({
+								id             : 'roles.gotRole',
+								defaultMessage : 'You got the role: {role}'
+							}, {
+								role
+							})
+						}));
+				}
+			}
 
 			for (const peer of peers)
 			{
@@ -2265,23 +3192,76 @@ export default class RoomClient
 				this.updateSpotlights(spotlights);
 			});
 
+			(chatHistory.length > 0) && store.dispatch(
+				chatActions.addChatHistory(chatHistory));
+
+			(fileHistory.length > 0) && store.dispatch(
+				fileActions.addFileHistory(fileHistory));
+
+			if (lastNHistory.length > 0)
+			{
+				logger.debug('_joinRoom() | got lastN history');
+
+				this._spotlights.addSpeakerList(
+					lastNHistory.filter((peerId) => peerId !== this._peerId)
+				);
+			}
+
+			locked ?
+				store.dispatch(roomActions.setRoomLocked()) :
+				store.dispatch(roomActions.setRoomUnLocked());
+
+			(lobbyPeers.length > 0) && lobbyPeers.forEach((peer) =>
+			{
+				store.dispatch(
+					lobbyPeerActions.addLobbyPeer(peer.id));
+				store.dispatch(
+					lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.id));
+				store.dispatch(
+					lobbyPeerActions.setLobbyPeerPicture(peer.picture, peer.id));
+			});
+
+			(accessCode != null) && store.dispatch(
+				roomActions.setAccessCode(accessCode));
+
 			// Don't produce if explicitly requested to not to do it.
 			if (this._produce)
 			{
 				if (this._mediasoupDevice.canProduce('audio'))
 					if (!this._muted)
-						this.enableMic();
+					{
+						await this.updateMic({ start: true });
+						let autoMuteThreshold = 4;
 
-				if (joinVideo && this._mediasoupDevice.canProduce('video'))
-					this.enableWebcam();
+						if ('autoMuteThreshold' in window.config)
+						{
+							autoMuteThreshold = window.config.autoMuteThreshold;
+						}
+						if (autoMuteThreshold && peers.length >= autoMuteThreshold)
+							this.muteMic();
+					}
+
+				if (joinVideo)
+					this.updateWebcam({ start: true });
+			}
+
+			await this._updateAudioOutputDevices();
+
+			const { selectedAudioOutputDevice } = store.getState().settings;
+
+			if (!selectedAudioOutputDevice && this._audioOutputDevices !== {})
+			{
+				store.dispatch(
+					settingsActions.setSelectedAudioOutputDevice(
+						Object.keys(this._audioOutputDevices)[0]
+					)
+				);
 			}
 
 			store.dispatch(roomActions.setRoomState('connected'));
 
 			// Clean all the existing notifications.
 			store.dispatch(notificationActions.removeAllNotifications());
-
-			this.getServerHistory();
 
 			store.dispatch(requestActions.notify(
 				{
@@ -2295,7 +3275,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_joinRoom() failed:"%o"', error);
+			logger.error('_joinRoom() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -2340,7 +3320,7 @@ export default class RoomClient
 					})
 				}));
 
-			logger.error('lockRoom() | failed: %o', error);
+			logger.error('lockRoom() [error:"%o"]', error);
 		}
 	}
 
@@ -2374,7 +3354,7 @@ export default class RoomClient
 					})
 				}));
 
-			logger.error('unlockRoom() | failed: %o', error);
+			logger.error('unlockRoom() [error:"%o"]', error);
 		}
 	}
 
@@ -2396,7 +3376,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setAccessCode() | failed: %o', error);
+			logger.error('setAccessCode() [error:"%o"]', error);
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
@@ -2423,7 +3403,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setAccessCode() | failed: %o', error);
+			logger.error('setAccessCode() [error:"%o"]', error);
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
@@ -2432,14 +3412,19 @@ export default class RoomClient
 		}
 	}
 
-	async enableMic()
+	async addExtraVideo(videoDeviceId)
 	{
-		if (this._micProducer)
-			return;
+		logger.debug(
+			'addExtraVideo() [videoDeviceId:"%s"]',
+			videoDeviceId
+		);
 
-		if (this._mediasoupDevice && !this._mediasoupDevice.canProduce('audio'))
+		store.dispatch(
+			roomActions.setExtraVideoOpen(false));
+
+		if (!this._mediasoupDevice.canProduce('video'))
 		{
-			logger.error('enableMic() | cannot produce audio');
+			logger.error('addExtraVideo() | cannot produce video');
 
 			return;
 		}
@@ -2447,136 +3432,131 @@ export default class RoomClient
 		let track;
 
 		store.dispatch(
-			meActions.setAudioInProgress(true));
+			meActions.setWebcamInProgress(true));
 
 		try
 		{
-			const deviceId = await this._getAudioDeviceId();
-
-			const device = this._audioDevices[deviceId];
+			const device = this._webcams[videoDeviceId];
+			const resolution = store.getState().settings.resolution;
 
 			if (!device)
-				throw new Error('no audio devices');
-			
-			logger.debug(
-				'enableMic() | new selected audio device [device:%o]',
-				device);
-
-			logger.debug('enableMic() | calling getUserMedia()');
+				throw new Error('no webcam devices');
 
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
-					audio : {
-						deviceId : { ideal: deviceId }
-					}
-				}
-			);
-
-			track = stream.getAudioTracks()[0];
-
-			this._micProducer = await this._sendTransport.produce(
-				{
-					track,
-					codecOptions :
+					video :
 					{
-						opusStereo : 1,
-						opusDtx    : 1
-					},
-					appData : 
-					{ source: 'mic' }
+						deviceId : { ideal: videoDeviceId },
+						...VIDEO_CONSTRAINS[resolution]
+					}
 				});
+
+			([ track ] = stream.getVideoTracks());
+
+			let producer;
+
+			if (this._useSimulcast)
+			{
+				// If VP9 is the only available video codec then use SVC.
+				const firstVideoCodec = this._mediasoupDevice
+					.rtpCapabilities
+					.codecs
+					.find((c) => c.kind === 'video');
+
+				let encodings;
+
+				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+					encodings = VIDEO_KSVC_ENCODINGS;
+				else if ('simulcastEncodings' in window.config)
+					encodings = window.config.simulcastEncodings;
+				else
+					encodings = VIDEO_SIMULCAST_ENCODINGS;
+
+				producer = await this._sendTransport.produce(
+					{
+						track,
+						encodings,
+						codecOptions :
+						{
+							videoGoogleStartBitrate : 1000
+						},
+						appData :
+						{
+							source : 'extravideo'
+						}
+					});
+			}
+			else
+			{
+				producer = await this._sendTransport.produce({
+					track,
+					appData :
+					{
+						source : 'extravideo'
+					}
+				});
+			}
+
+			this._extraVideoProducers.set(producer.id, producer);
 
 			store.dispatch(producerActions.addProducer(
 				{
-					id            : this._micProducer.id,
-					source        : 'mic',
-					paused        : this._micProducer.paused,
-					track         : this._micProducer.track,
-					rtpParameters : this._micProducer.rtpParameters,
-					codec         : this._micProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
+					id            : producer.id,
+					deviceLabel   : device.label,
+					source        : 'extravideo',
+					paused        : producer.paused,
+					track         : producer.track,
+					rtpParameters : producer.rtpParameters,
+					codec         : producer.rtpParameters.codecs[0].mimeType.split('/')[1]
 				}));
 
-			store.dispatch(settingsActions.setSelectedAudioDevice(deviceId));
+			// store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
 
-			await this._updateAudioDevices();
+			await this._updateWebcams();
 
-			this._micProducer.on('transportclose', () =>
+			producer.on('transportclose', () =>
 			{
-				this._micProducer = null;
+				this._extraVideoProducers.delete(producer.id);
+
+				producer = null;
 			});
 
-			this._micProducer.on('trackended', () =>
+			producer.on('trackended', () =>
 			{
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
-							id             : 'devices.microphoneDisconnected',
-							defaultMessage : 'Microphone disconnected'
+							id             : 'devices.cameraDisconnected',
+							defaultMessage : 'Camera disconnected'
 						})
 					}));
 
-				this.disableMic()
+				this.disableExtraVideo(producer.id)
 					.catch(() => {});
 			});
 
-			this._micProducer.volume = 0;
-
-			const harkStream = new MediaStream();
-
-			harkStream.addTrack(track);
-
-			if (!harkStream.getAudioTracks()[0])
-				throw new Error('enableMic(): given stream has no audio track');
-
-			if (this._hark != null)
-				this._hark.stop();
-
-			this._hark = hark(harkStream, { play: false });
-
-			// eslint-disable-next-line no-unused-vars
-			this._hark.on('volume_change', (dBs, threshold) =>
-			{
-				// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
-				//   Math.pow(10, dBs / 20)
-				// However it does not produce a visually useful output, so let exaggerate
-				// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
-				// minimize component renderings.
-				let volume = Math.round(Math.pow(10, dBs / 85) * 10);
-
-				if (volume === 1)
-					volume = 0;
-
-				volume = Math.round(volume);
-
-				if (this._micProducer && volume !== this._micProducer.volume)
-				{
-					this._micProducer.volume = volume;
-
-					store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
-				}
-			});
+			logger.debug('addExtraVideo() succeeded');
 		}
 		catch (error)
 		{
-			logger.error('enableMic() failed:%o', error);
+			logger.error('addExtraVideo() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
 					type : 'error',
 					text : intl.formatMessage({
-						id             : 'devices.microphoneError',
-						defaultMessage : 'An error occurred while accessing your microphone'
+						id             : 'devices.cameraError',
+						defaultMessage : 'An error occurred while accessing your camera'
 					})
 				}));
 
 			if (track)
 				track.stop();
-
 		}
 
 		store.dispatch(
-			meActions.setAudioInProgress(false));
+			meActions.setWebcamInProgress(false));
 	}
 
 	async disableMic()
@@ -2608,21 +3588,15 @@ export default class RoomClient
 		store.dispatch(meActions.setAudioInProgress(false));
 	}
 
-	async enableScreenSharing()
+	async updateScreenSharing({
+		start = false,
+		newResolution = null,
+		newFrameRate = null
+	} = {})
 	{
-		if (this._screenSharingProducer)
-			return;
-
-		if (!this._mediasoupDevice.canProduce('video'))
-		{
-			logger.error('enableScreenSharing() | cannot produce video');
-
-			return;
-		}
+		logger.debug('updateScreenSharing() [start:"%s"]', start);
 
 		let track;
-
-		store.dispatch(meActions.setScreenShareInProgress(true));
 
 		try
 		{
@@ -2631,33 +3605,46 @@ export default class RoomClient
 			if (!available)
 				throw new Error('screen sharing not available');
 
-			logger.debug('enableScreenSharing() | calling getUserMedia()');
+			if (!this._mediasoupDevice.canProduce('video'))
+				throw new Error('cannot produce video');
 
-			const stream = await this._screenSharing.start({
-				width     : 1920,
-				height    : 1080,
-				frameRate : 5
-			});
+			if (newResolution)
+				store.dispatch(settingsActions.setScreenSharingResolution(newResolution));
 
-			track = stream.getVideoTracks()[0];
+			if (newFrameRate)
+				store.dispatch(settingsActions.setScreenSharingFrameRate(newFrameRate));
 
-			if (this._useSharingSimulcast)
+			store.dispatch(meActions.setScreenShareInProgress(true));
+
+			const {
+				screenSharingResolution,
+				screenSharingFrameRate
+			} = store.getState().settings;
+
+			if (start)
 			{
-				// If VP9 is the only available video codec then use SVC.
-				const firstVideoCodec = this._mediasoupDevice
-					.rtpCapabilities
-					.codecs
-					.find((c) => c.kind === 'video');
+				const stream = await this._screenSharing.start({
+					...VIDEO_CONSTRAINS[screenSharingResolution],
+					frameRate : screenSharingFrameRate
+				});
 
-				let encodings;
+				([ track ] = stream.getVideoTracks());
 
-				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+				if (this._useSharingSimulcast)
 				{
-					encodings = VIDEO_SVC_ENCODINGS;
-				}
-				else
-				{
-					if ('simulcastEncodings' in window.config)
+					// If VP9 is the only available video codec then use SVC.
+					const firstVideoCodec = this._mediasoupDevice
+						.rtpCapabilities
+						.codecs
+						.find((c) => c.kind === 'video');
+
+					let encodings;
+
+					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+					{
+						encodings = VIDEO_SVC_ENCODINGS;
+					}
+					else if ('simulcastEncodings' in window.config)
 					{
 						encodings = window.config.simulcastEncodings
 							.map((encoding) => ({ ...encoding, dtx: true }));
@@ -2667,69 +3654,77 @@ export default class RoomClient
 						encodings = VIDEO_SIMULCAST_ENCODINGS
 							.map((encoding) => ({ ...encoding, dtx: true }));
 					}
-				}
 
-				this._screenSharingProducer = await this._sendTransport.produce(
-					{
-						track,
-						encodings,
-						codecOptions :
+					this._screenSharingProducer = await this._sendTransport.produce(
 						{
-							videoGoogleStartBitrate : 1000
-						},
-						appData : 
+							track,
+							encodings,
+							codecOptions :
+							{
+								videoGoogleStartBitrate : 1000
+							},
+							appData :
+							{
+								source : 'screen'
+							}
+						});
+				}
+				else
+				{
+					this._screenSharingProducer = await this._sendTransport.produce({
+						track,
+						appData :
 						{
 							source : 'screen'
 						}
 					});
-			}
-			else
-			{
-				this._screenSharingProducer = await this._sendTransport.produce({
-					track,
-					appData : 
+				}
+
+				store.dispatch(producerActions.addProducer(
 					{
-						source : 'screen'
-					}
-				});
-			}
-
-			store.dispatch(producerActions.addProducer(
-				{
-					id            : this._screenSharingProducer.id,
-					deviceLabel   : 'screen',
-					source        : 'screen',
-					paused        : this._screenSharingProducer.paused,
-					track         : this._screenSharingProducer.track,
-					rtpParameters : this._screenSharingProducer.rtpParameters,
-					codec         : this._screenSharingProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
-				}));
-
-			this._screenSharingProducer.on('transportclose', () =>
-			{
-				this._screenSharingProducer = null;
-			});
-
-			this._screenSharingProducer.on('trackended', () =>
-			{
-				store.dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : intl.formatMessage({
-							id             : 'devices.screenSharingDisconnected',
-							defaultMessage : 'Screen sharing disconnected'
-						})
+						id            : this._screenSharingProducer.id,
+						deviceLabel   : 'screen',
+						source        : 'screen',
+						paused        : this._screenSharingProducer.paused,
+						track         : this._screenSharingProducer.track,
+						rtpParameters : this._screenSharingProducer.rtpParameters,
+						codec         : this._screenSharingProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
 					}));
 
-				this.disableScreenSharing()
-					.catch(() => {});
-			});
+				this._screenSharingProducer.on('transportclose', () =>
+				{
+					this._screenSharingProducer = null;
+				});
 
-			logger.debug('enableScreenSharing() succeeded');
+				this._screenSharingProducer.on('trackended', () =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							type : 'error',
+							text : intl.formatMessage({
+								id             : 'devices.screenSharingDisconnected',
+								defaultMessage : 'Screen sharing disconnected'
+							})
+						}));
+
+					this.disableScreenSharing();
+				});
+			}
+			else if (this._screenSharingProducer)
+			{
+				({ track } = this._screenSharingProducer);
+
+				await track.applyConstraints(
+					{
+						...VIDEO_CONSTRAINS[screenSharingResolution],
+						frameRate : screenSharingFrameRate
+					}
+				);
+			}
 		}
 		catch (error)
 		{
-			logger.error('enableScreenSharing() failed: %o', error);
+			logger.error('updateScreenSharing() [error:"%o"]', error);
 
 			store.dispatch(requestActions.notify(
 				{
@@ -2773,155 +3768,40 @@ export default class RoomClient
 
 		this._screenSharingProducer = null;
 
+		this._screenSharing.stop();
+
 		store.dispatch(meActions.setScreenShareInProgress(false));
 	}
 
-	async enableWebcam()
+	async disableExtraVideo(id)
 	{
+		logger.debug('disableExtraVideo()');
 
-		if (this._webcamProducer)
+		const producer = this._extraVideoProducers.get(id);
+
+		if (!producer)
 			return;
 
-		if (!this._mediasoupDevice.canProduce('video'))
-		{
-			logger.error('enableWebcam() | cannot produce video');
+		store.dispatch(meActions.setWebcamInProgress(true));
 
-			return;
-		}
-
-		let track;
+		producer.close();
 
 		store.dispatch(
-			meActions.setWebcamInProgress(true));
+			producerActions.removeProducer(id));
 
 		try
 		{
-			const deviceId = await this._getWebcamDeviceId();
-
-			const device = this._webcams[deviceId];
-			const resolution = store.getState().settings.resolution;
-
-			if (!device)
-				throw new Error('no webcam devices');
-			
-			logger.debug(
-				'_setWebcamProducer() | new selected webcam [device:%o]',
-				device);
-
-			logger.debug('_setWebcamProducer() | calling getUserMedia()');
-
-			const stream = await navigator.mediaDevices.getUserMedia(
-				{
-					video :
-					{
-						deviceId : { ideal: deviceId },
-						...VIDEO_CONSTRAINS[resolution]
-					}
-				});
-
-			track = stream.getVideoTracks()[0];
-
-			if (this._useSimulcast)
-			{
-				// If VP9 is the only available video codec then use SVC.
-				const firstVideoCodec = this._mediasoupDevice
-					.rtpCapabilities
-					.codecs
-					.find((c) => c.kind === 'video');
-
-				let encodings;
-
-				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-					encodings = VIDEO_KSVC_ENCODINGS;
-				else
-				{
-					if ('simulcastEncodings' in window.config)
-						encodings = window.config.simulcastEncodings;
-					else
-						encodings = VIDEO_SIMULCAST_ENCODINGS;
-				}
-
-				this._webcamProducer = await this._sendTransport.produce(
-					{
-						track,
-						encodings,
-						codecOptions :
-						{
-							videoGoogleStartBitrate : 1000
-						},
-						appData : 
-						{
-							source : 'webcam'
-						}
-					});
-			}
-			else
-			{
-				this._webcamProducer = await this._sendTransport.produce({
-					track,
-					appData : 
-					{
-						source : 'webcam'
-					}
-				});
-			}
-
-			store.dispatch(producerActions.addProducer(
-				{
-					id            : this._webcamProducer.id,
-					deviceLabel   : device.label,
-					source        : 'webcam',
-					paused        : this._webcamProducer.paused,
-					track         : this._webcamProducer.track,
-					rtpParameters : this._webcamProducer.rtpParameters,
-					codec         : this._webcamProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
-				}));
-
-			store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
-
-			await this._updateWebcams();
-
-			this._webcamProducer.on('transportclose', () =>
-			{
-				this._webcamProducer = null;
-			});
-
-			this._webcamProducer.on('trackended', () =>
-			{
-				store.dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : intl.formatMessage({
-							id             : 'devices.cameraDisconnected',
-							defaultMessage : 'Camera disconnected'
-						})
-					}));
-
-				this.disableWebcam()
-					.catch(() => {});
-			});
-
-			logger.debug('_setWebcamProducer() succeeded');
+			await this.sendRequest(
+				'closeProducer', { producerId: id });
 		}
 		catch (error)
 		{
-			logger.error('_setWebcamProducer() failed:%o', error);
-
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : intl.formatMessage({
-						id             : 'devices.cameraError',
-						defaultMessage : 'An error occurred while accessing your camera'
-					})
-				}));
-
-			if (track)
-				track.stop();
+			logger.error('disableWebcam() [error:"%o"]', error);
 		}
 
-		store.dispatch(
-			meActions.setWebcamInProgress(false));
+		this._extraVideoProducers.delete(id);
+
+		store.dispatch(meActions.setWebcamInProgress(false));
 	}
 
 	async disableWebcam()
@@ -2953,6 +3833,16 @@ export default class RoomClient
 		store.dispatch(meActions.setWebcamInProgress(false));
 	}
 
+	async _setNoiseThreshold(threshold)
+	{
+		logger.debug('_setNoiseThreshold() [threshold:"%s"]', threshold);
+
+		this._hark.setThreshold(threshold);
+
+		store.dispatch(
+			settingsActions.setNoiseThreshold(threshold));
+	}
+
 	async _updateAudioDevices()
 	{
 		logger.debug('_updateAudioDevices()');
@@ -2979,7 +3869,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_updateAudioDevices() failed:%o', error);
+			logger.error('_updateAudioDevices() [error:"%o"]', error);
 		}
 	}
 
@@ -3009,7 +3899,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_updateWebcams() failed:%o', error);
+			logger.error('_updateWebcams() [error:"%o"]', error);
 		}
 	}
 
@@ -3036,7 +3926,7 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_getAudioDeviceId() failed:%o', error);
+			logger.error('_getAudioDeviceId() [error:"%o"]', error);
 		}
 	}
 
@@ -3063,7 +3953,38 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_getWebcamDeviceId() failed:%o', error);
+			logger.error('_getWebcamDeviceId() [error:"%o"]', error);
 		}
 	}
+
+	async _updateAudioOutputDevices()
+	{
+		logger.debug('_updateAudioOutputDevices()');
+
+		// Reset the list.
+		this._audioOutputDevices = {};
+
+		try
+		{
+			logger.debug('_updateAudioOutputDevices() | calling enumerateDevices()');
+
+			const devices = await navigator.mediaDevices.enumerateDevices();
+
+			for (const device of devices)
+			{
+				if (device.kind !== 'audiooutput')
+					continue;
+
+				this._audioOutputDevices[device.deviceId] = device;
+			}
+
+			store.dispatch(
+				meActions.setAudioOutputDevices(this._audioOutputDevices));
+		}
+		catch (error)
+		{
+			logger.error('_updateAudioOutputDevices() [error:"%o"]', error);
+		}
+	}
+
 }

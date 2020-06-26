@@ -2,6 +2,8 @@ const initialState =
 {
 	id                    : null,
 	picture               : null,
+	browser               : null,
+	roles                 : [ 'normal' ], // Default role
 	canSendMic            : false,
 	canSendWebcam         : false,
 	canShareScreen        : false,
@@ -13,9 +15,11 @@ const initialState =
 	screenShareInProgress : false,
 	displayNameInProgress : false,
 	loginEnabled          : false,
-	raiseHand             : false,
-	raiseHandInProgress   : false,
-	loggedIn              : false
+	raisedHand            : false,
+	raisedHandInProgress  : false,
+	loggedIn              : false,
+	isSpeaking            : false,
+	isAutoMuted           : true
 };
 
 const me = (state = initialState, action) =>
@@ -36,11 +40,36 @@ const me = (state = initialState, action) =>
 			};
 		}
 
+		case 'SET_BROWSER':
+		{
+			const { browser } = action.payload;
+
+			return { ...state, browser };
+		}
+
 		case 'LOGGED_IN':
 		{
 			const { flag } = action.payload;
 
 			return { ...state, loggedIn: flag };
+		}
+
+		case 'ADD_ROLE':
+		{
+			if (state.roles.includes(action.payload.role))
+				return state;
+
+			const roles = [ ...state.roles, action.payload.role ];
+
+			return { ...state, roles };
+		}
+
+		case 'REMOVE_ROLE':
+		{
+			const roles = state.roles.filter((role) =>
+				role !== action.payload.role);
+
+			return { ...state, roles };
 		}
 
 		case 'SET_PICTURE':
@@ -71,6 +100,13 @@ const me = (state = initialState, action) =>
 			return { ...state, audioDevices: devices };
 		}
 
+		case 'SET_AUDIO_OUTPUT_DEVICES':
+		{
+			const { devices } = action.payload;
+
+			return { ...state, audioOutputDevices: devices };
+		}
+
 		case 'SET_WEBCAM_DEVICES':
 		{
 			const { devices } = action.payload;
@@ -99,18 +135,18 @@ const me = (state = initialState, action) =>
 			return { ...state, screenShareInProgress: flag };
 		}
 
-		case 'SET_MY_RAISE_HAND_STATE':
+		case 'SET_RAISED_HAND':
 		{
 			const { flag } = action.payload;
 
-			return { ...state, raiseHand: flag };
+			return { ...state, raisedHand: flag };
 		}
 
-		case 'SET_MY_RAISE_HAND_STATE_IN_PROGRESS':
+		case 'SET_RAISED_HAND_IN_PROGRESS':
 		{
 			const { flag } = action.payload;
 
-			return { ...state, raiseHandInProgress: flag };
+			return { ...state, raisedHandInProgress: flag };
 		}
 
 		case 'SET_DISPLAY_NAME_IN_PROGRESS':
@@ -118,6 +154,20 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, displayNameInProgress: flag };
+		}
+
+		case 'SET_IS_SPEAKING':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, isSpeaking: flag };
+		}
+
+		case 'SET_AUTO_MUTED':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, isAutoMuted: flag };
 		}
 
 		default:

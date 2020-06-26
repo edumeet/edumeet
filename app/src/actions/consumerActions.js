@@ -10,6 +10,11 @@ export const removeConsumer = (consumerId, peerId) =>
 		payload : { consumerId, peerId }
 	});
 
+export const clearConsumers = () =>
+	({
+		type : 'CLEAR_CONSUMERS'
+	});
+
 export const setConsumerPaused = (consumerId, originator) =>
 	({
 		type    : 'SET_CONSUMER_PAUSED',
@@ -35,12 +40,10 @@ export const setConsumerPreferredLayers = (consumerId, spatialLayer, temporalLay
 	});
 
 export const setConsumerPriority = (consumerId, priority) =>
-	{
-		return {
-			type    : 'SET_CONSUMER_PRIORITY',
-			payload : { consumerId, priority }
-		};
-	};
+	({
+		type    : 'SET_CONSUMER_PRIORITY',
+		payload : { consumerId, priority }
+	});
 
 export const setConsumerTrack = (consumerId, track) =>
 	({

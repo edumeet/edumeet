@@ -10,6 +10,7 @@ export default class PeerAudio extends React.PureComponent
 		// Latest received audio track.
 		// @type {MediaStreamTrack}
 		this._audioTrack = null;
+		this._audioOutputDevice = null;
 	}
 
 	render()
@@ -24,17 +25,21 @@ export default class PeerAudio extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { audioTrack } = this.props;
+		const { audioTrack, audioOutputDevice } = this.props;
 
 		this._setTrack(audioTrack);
+		this._setOutputDevice(audioOutputDevice);
 	}
 
-	// eslint-disable-next-line camelcase
-	UNSAFE_componentWillReceiveProps(nextProps)
+	componentDidUpdate(prevProps)
 	{
-		const { audioTrack } = nextProps;
+		if (prevProps !== this.props)
+		{
+			const { audioTrack, audioOutputDevice } = this.props;
 
-		this._setTrack(audioTrack);
+			this._setTrack(audioTrack);
+			this._setOutputDevice(audioOutputDevice);
+		}
 	}
 
 	_setTrack(audioTrack)
@@ -60,9 +65,23 @@ export default class PeerAudio extends React.PureComponent
 			audio.srcObject = null;
 		}
 	}
+
+	_setOutputDevice(audioOutputDevice)
+	{
+		if (this._audioOutputDevice === audioOutputDevice)
+			return;
+
+		this._audioOutputDevice = audioOutputDevice;
+
+		const { audio } = this.refs;
+
+		if (audioOutputDevice && typeof audio.setSinkId === 'function')
+			audio.setSinkId(audioOutputDevice);
+	}
 }
 
 PeerAudio.propTypes =
 {
-	audioTrack : PropTypes.any
+	audioTrack        : PropTypes.any,
+	audioOutputDevice : PropTypes.string
 };

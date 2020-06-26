@@ -106,6 +106,12 @@
 		"no-invalid-regexp": 2,
 		"no-invalid-this": 2,
 		"no-irregular-whitespace": 2,
+		"no-trailing-spaces": [
+			"error",
+			{
+				"ignoreComments": true
+			}
+		],
 		"no-lonely-if": 2,
 		"no-mixed-operators": 2,
 		"no-mixed-spaces-and-tabs": 2,

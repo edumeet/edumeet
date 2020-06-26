@@ -1,9 +1,59 @@
 const EventEmitter = require('events').EventEmitter;
+const AwaitQueue = require('awaitqueue');
+const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
+const { SocketTimeoutError } = require('./errors');
+const { v4: uuidv4 } = require('uuid');
+const jwt = require('jsonwebtoken');
+const userRoles = require('../userRoles');
+
+const {
+	BYPASS_ROOM_LOCK,
+	BYPASS_LOBBY
+} = require('../access');
+
+const permissions = require('../permissions'), {
+	CHANGE_ROOM_LOCK,
+	PROMOTE_PEER,
+	SEND_CHAT,
+	MODERATE_CHAT,
+	SHARE_SCREEN,
+	EXTRA_VIDEO,
+	SHARE_FILE,
+	MODERATE_FILES,
+	MODERATE_ROOM
+} = permissions;
+
 const config = require('../config/config');
 
 const logger = new Logger('Room');
+
+// In case they are not configured properly
+const roomAccess =
+{
+	[BYPASS_ROOM_LOCK] : [ userRoles.ADMIN ],
+	[BYPASS_LOBBY]     : [ userRoles.NORMAL ],
+	...config.accessFromRoles
+};
+
+const roomPermissions =
+{
+	[CHANGE_ROOM_LOCK] : [ userRoles.NORMAL ],
+	[PROMOTE_PEER]     : [ userRoles.NORMAL ],
+	[SEND_CHAT]        : [ userRoles.NORMAL ],
+	[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
+	[SHARE_SCREEN]     : [ userRoles.NORMAL ],
+	[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
+	[SHARE_FILE]       : [ userRoles.NORMAL ],
+	[MODERATE_FILES]   : [ userRoles.MODERATOR ],
+	[MODERATE_ROOM]    : [ userRoles.MODERATOR ],
+	...config.permissionsFromRoles
+};
+
+const roomAllowWhenRoleMissing = config.allowWhenRoleMissing || [];
+
+const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 
 class Room extends EventEmitter
 {
@@ -12,43 +62,65 @@ class Room extends EventEmitter
 	 *
 	 * @async
 	 *
-	 * @param {mediasoup.Worker} mediasoupWorker - The mediasoup Worker in which a new
+	 * @param {mediasoup.Worker} mediasoupWorkers - The mediasoup Worker in which a new
 	 *   mediasoup Router must be created.
 	 * @param {String} roomId - Id of the Room instance.
 	 */
-	static async create({ mediasoupWorker, roomId })
+	static async create({ mediasoupWorkers, roomId })
 	{
 		logger.info('create() [roomId:"%s"]', roomId);
+
+		// Shuffle workers to get random cores
+		let shuffledWorkers = mediasoupWorkers.sort(() => Math.random() - 0.5);
 
 		// Router media codecs.
 		const mediaCodecs = config.mediasoup.router.mediaCodecs;
 
-		// Create a mediasoup Router.
-		const mediasoupRouter = await mediasoupWorker.createRouter({ mediaCodecs });
+		const mediasoupRouters = new Map();
 
-		// Create a mediasoup AudioLevelObserver.
-		const audioLevelObserver = await mediasoupRouter.createAudioLevelObserver(
+		let firstRouter = null;
+
+		for (const worker of shuffledWorkers)
+		{
+			const router = await worker.createRouter({ mediaCodecs });
+
+			if (!firstRouter)
+				firstRouter = router;
+
+			mediasoupRouters.set(router.id, router);
+		}
+
+		// Create a mediasoup AudioLevelObserver on first router
+		const audioLevelObserver = await firstRouter.createAudioLevelObserver(
 			{
 				maxEntries : 1,
 				threshold  : -80,
 				interval   : 800
 			});
 
-		return new Room({ roomId, mediasoupRouter, audioLevelObserver });
+		firstRouter = null;
+		shuffledWorkers = null;
+
+		return new Room({ roomId, mediasoupRouters, audioLevelObserver });
 	}
 
-	constructor({ roomId, mediasoupRouter, audioLevelObserver })
+	constructor({ roomId, mediasoupRouters, audioLevelObserver })
 	{
 		logger.info('constructor() [roomId:"%s"]', roomId);
 
 		super();
 		this.setMaxListeners(Infinity);
 
+		this._uuid = uuidv4();
+
 		// Room ID.
 		this._roomId = roomId;
 
 		// Closed flag.
 		this._closed = false;
+
+		// Joining queue
+		this._queue = new AwaitQueue();
 
 		// Locked flag.
 		this._locked = false;
@@ -70,8 +142,15 @@ class Room extends EventEmitter
 
 		this._peers = {};
 
-		// mediasoup Router instance.
-		this._mediasoupRouter = mediasoupRouter;
+		this._selfDestructTimeout = null;
+
+		// Array of mediasoup Router instances.
+		this._mediasoupRouters = mediasoupRouters;
+
+		// The router we are currently putting peers in
+		this._routerIterator = this._mediasoupRouters.values();
+
+		this._currentRouter = this._routerIterator.next().value;
 
 		// mediasoup AudioLevelObserver.
 		this._audioLevelObserver = audioLevelObserver;
@@ -94,71 +173,119 @@ class Room extends EventEmitter
 
 		this._closed = true;
 
+		this._queue.close();
+
+		this._queue = null;
+
+		if (this._selfDestructTimeout)
+			clearTimeout(this._selfDestructTimeout);
+
+		this._selfDestructTimeout = null;
+
+		this._chatHistory = null;
+
+		this._fileHistory = null;
+
 		this._lobby.close();
+
+		this._lobby = null;
 
 		// Close the peers.
 		for (const peer in this._peers)
 		{
-			if (Object.prototype.hasOwnProperty.call(this._peers, peer))
-			{
-				if (!peer.closed)
-					peer.close();
-			}
+			if (!this._peers[peer].closed)
+				this._peers[peer].close();
 		}
 
 		this._peers = null;
 
-		// Close the mediasoup Router.
-		this._mediasoupRouter.close();
+		// Close the mediasoup Routers.
+		for (const router of this._mediasoupRouters.values())
+		{
+			router.close();
+		}
+
+		this._routerIterator = null;
+
+		this._currentRouter = null;
+
+		this._mediasoupRouters.clear();
+
+		this._audioLevelObserver = null;
 
 		// Emit 'close' event.
 		this.emit('close');
 	}
 
-	handlePeer(peer)
+	verifyPeer({ id, token })
 	{
-		logger.info('handlePeer() [peer:"%s"]', peer.id);
+		try
+		{
+			const decoded = jwt.verify(token, this._uuid);
 
-		// This will allow reconnects to join despite lock
+			logger.info('verifyPeer() [decoded:"%o"]', decoded);
+
+			return decoded.id === id;
+		}
+		catch (err)
+		{
+			logger.warn('verifyPeer() | invalid token');
+		}
+
+		return false;
+	}
+
+	handlePeer({ peer, returning })
+	{
+		logger.info('handlePeer() [peer:"%s", roles:"%s", returning:"%s"]', peer.id, peer.roles, returning);
+
+		// Should not happen
 		if (this._peers[peer.id])
 		{
 			logger.warn(
 				'handleConnection() | there is already a peer with same peerId [peer:"%s"]',
 				peer.id);
+		}
 
-			peer.close();
-
-			return;
+		// Returning user
+		if (returning)
+			this._peerJoining(peer, true);
+		// Has a role that is allowed to bypass room lock
+		else if (this._hasAccess(peer, BYPASS_ROOM_LOCK))
+			this._peerJoining(peer);
+		else if (
+			'maxUsersPerRoom' in config &&
+			(
+				Object.keys(this._peers).length +
+				this._lobby.peerList().length
+			) >= config.maxUsersPerRoom)
+		{
+			this._handleOverRoomLimit(peer);
 		}
 		else if (this._locked)
-		{
 			this._parkPeer(peer);
-		}
 		else
 		{
-			peer.authenticated ?
+			// Has a role that is allowed to bypass lobby
+			this._hasAccess(peer, BYPASS_LOBBY) ?
 				this._peerJoining(peer) :
 				this._handleGuest(peer);
 		}
 	}
 
+	_handleOverRoomLimit(peer)
+	{
+		this._notification(peer.socket, 'overRoomLimit');
+	}
+
 	_handleGuest(peer)
 	{
-		if (config.requireSignInToAccess)
-		{
-			if (config.activateOnHostJoin && !this.checkEmpty())
-			{
-				this._peerJoining(peer);
-			}
-			else
-			{
-				this._parkPeer(peer);
-				this._notification(peer.socket, 'signInRequired');
-			}
-		}
+		if (config.activateOnHostJoin && !this.checkEmpty())
+			this._peerJoining(peer);
 		else
 		{
-			this._peerJoining(peer);
+			this._parkPeer(peer);
+			this._notification(peer.socket, 'signInRequired');
 		}
 	}
 
@@ -172,22 +299,38 @@ class Room extends EventEmitter
 
 			this._peerJoining(promotedPeer);
 
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this._getAllowedPeers(PROMOTE_PEER))
 			{
 				this._notification(peer.socket, 'lobby:promotedPeer', { peerId: id });
 			}
 		});
 
-		this._lobby.on('peerAuthenticated', (peer) =>
+		this._lobby.on('peerRolesChanged', (peer) =>
 		{
-			!this._locked && this._lobby.promotePeer(peer.id);
+			// Has a role that is allowed to bypass room lock
+			if (this._hasAccess(peer, BYPASS_ROOM_LOCK))
+			{
+				this._lobby.promotePeer(peer.id);
+
+				return;
+			}
+
+			if ( // Has a role that is allowed to bypass lobby
+				!this._locked &&
+				this._hasAccess(peer, BYPASS_LOBBY)
+			)
+			{
+				this._lobby.promotePeer(peer.id);
+
+				return;
+			}
 		});
 
 		this._lobby.on('changeDisplayName', (changedPeer) =>
 		{
 			const { id, displayName } = changedPeer;
 
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this._getAllowedPeers(PROMOTE_PEER))
 			{
 				this._notification(peer.socket, 'lobby:changeDisplayName', { peerId: id, displayName });
 			}
@@ -197,7 +340,7 @@ class Room extends EventEmitter
 		{
 			const { id, picture } = changedPeer;
 
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this._getAllowedPeers(PROMOTE_PEER))
 			{
 				this._notification(peer.socket, 'lobby:changePicture', { peerId: id, picture });
 			}
@@ -209,7 +352,7 @@ class Room extends EventEmitter
 
 			const { id } = closedPeer;
 
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this._getAllowedPeers(PROMOTE_PEER))
 			{
 				this._notification(peer.socket, 'lobby:peerClosed', { peerId: id });
 			}
@@ -269,7 +412,7 @@ class Room extends EventEmitter
 		);
 	}
 
-	async dump()
+	dump()
 	{
 		return {
 			roomId : this._roomId,
@@ -286,7 +429,10 @@ class Room extends EventEmitter
 	{
 		logger.debug('selfDestructCountdown() started');
 
-		setTimeout(() =>
+		if (this._selfDestructTimeout)
+			clearTimeout(this._selfDestructTimeout);
+
+		this._selfDestructTimeout = setTimeout(() =>
 		{
 			if (this._closed)
 				return;
@@ -303,7 +449,6 @@ class Room extends EventEmitter
 		}, 10000);
 	}
 
-	// checks both room and lobby
 	checkEmpty()
 	{
 		return Object.keys(this._peers).length === 0;
@@ -313,74 +458,91 @@ class Room extends EventEmitter
 	{
 		this._lobby.parkPeer(parkPeer);
 
-		for (const peer of this._getJoinedPeers())
+		for (const peer of this._getAllowedPeers(PROMOTE_PEER))
 		{
 			this._notification(peer.socket, 'parkedPeer', { peerId: parkPeer.id });
 		}
 	}
 
-	_peerJoining(peer)
+	_peerJoining(peer, returning = false)
 	{
-		peer.socket.join(this._roomId);
-
-		const index = this._lastN.indexOf(peer.id);
-
-		if (index === -1) // We don't have this peer, add to end
+		this._queue.push(async () =>
 		{
-			this._lastN.push(peer.id);
-		}
+			peer.socket.join(this._roomId);
 
-		this._peers[peer.id] = peer;
+			// If we don't have this peer, add to end
+			!this._lastN.includes(peer.id) && this._lastN.push(peer.id);
 
-		this._handlePeer(peer);
-		this._notification(peer.socket, 'roomReady');
+			this._peers[peer.id] = peer;
+
+			// Assign routerId
+			peer.routerId = await this._getRouterId();
+
+			this._handlePeer(peer);
+
+			if (returning)
+			{
+				this._notification(peer.socket, 'roomBack');
+			}
+			else
+			{
+				const token = jwt.sign({ id: peer.id }, this._uuid, { noTimestamp: true });
+
+				peer.socket.handshake.session.token = token;
+
+				peer.socket.handshake.session.save();
+
+				let turnServers;
+
+				if ('turnAPIURI' in config)
+				{
+					try
+					{
+						const { data } = await axios.get(
+							config.turnAPIURI,
+							{
+								params : {
+									...config.turnAPIparams,
+									'api_key' : config.turnAPIKey,
+									'ip'      : peer.socket.request.connection.remoteAddress
+								}
+							});
+
+						turnServers = [ {
+							urls       : data.uris,
+							username   : data.username,
+							credential : data.password
+						} ];
+					}
+					catch (error)
+					{
+						if ('backupTurnServers' in config)
+							turnServers = config.backupTurnServers;
+
+						logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
+					}
+				}
+				else if ('backupTurnServers' in config)
+				{
+					turnServers = config.backupTurnServers;
+				}
+
+				this._notification(peer.socket, 'roomReady', { turnServers });
+			}
+		})
+			.catch((error) =>
+			{
+				logger.error('_peerJoining() [error:"%o"]', error);
+			});
 	}
 
 	_handlePeer(peer)
 	{
 		logger.debug('_handlePeer() [peer:"%s"]', peer.id);
 
-		peer.socket.on('request', (request, cb) =>
-		{
-			logger.debug(
-				'Peer "request" event [method:"%s", peerId:"%s"]',
-				request.method, peer.id);
-
-			this._handleSocketRequest(peer, request, cb)
-				.catch((error) =>
-				{
-					logger.error('"request" failed [error:"%o"]', error);
-
-					cb(error);
-				});
-		});
-
 		peer.on('close', () =>
 		{
-			if (this._closed)
-				return;
-
-			// If the Peer was joined, notify all Peers.
-			if (peer.joined)
-			{
-				this._notification(peer.socket, 'peerClosed', { peerId: peer.id }, true);
-			}
-
-			const index = this._lastN.indexOf(peer.id);
-
-			if (index > -1) // We have this peer in the list, remove
-			{
-				this._lastN.splice(index, 1);
-			}
-
-			delete this._peers[peer.id];
-
-			// If this is the last Peer in the room and
-			// lobby is empty, close the room after a while.
-			if (this.checkEmpty() && this._lobby.checkEmpty())
-			{
-				this.selfDestructCountdown();
-			}
+			this._handlePeerClose(peer);
 		});
 
 		peer.on('displayNameChanged', ({ oldDisplayName }) =>
@@ -409,42 +571,124 @@ class Room extends EventEmitter
 				picture : peer.picture
 			}, true);
 		});
+
+		peer.on('gotRole', ({ newRole }) =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'gotRole', {
+				peerId : peer.id,
+				role   : newRole
+			}, true, true);
+
+			// Got permission to promote peers, notify peer of
+			// peers in lobby
+			if (roomPermissions.PROMOTE_PEER.includes(newRole))
+			{
+				const lobbyPeers = this._lobby.peerList();
+
+				lobbyPeers.length > 0 && this._notification(peer.socket, 'parkedPeers', {
+					lobbyPeers
+				});
+			}
+		});
+
+		peer.on('lostRole', ({ oldRole }) =>
+		{
+			// Ensure the Peer is joined.
+			if (!peer.joined)
+				return;
+
+			// Spread to others
+			this._notification(peer.socket, 'lostRole', {
+				peerId : peer.id,
+				role   : oldRole
+			}, true, true);
+		});
+
+		peer.socket.on('request', (request, cb) =>
+		{
+			logger.debug(
+				'Peer "request" event [method:"%s", peerId:"%s"]',
+				request.method, peer.id);
+
+			this._handleSocketRequest(peer, request, cb)
+				.catch((error) =>
+				{
+					logger.error('"request" failed [error:"%o"]', error);
+
+					cb(error);
+				});
+		});
+
+		// Peer left before we were done joining
+		if (peer.closed)
+			this._handlePeerClose(peer);
+	}
+
+	_handlePeerClose(peer)
+	{
+		logger.debug('_handlePeerClose() [peer:"%s"]', peer.id);
+
+		if (this._closed)
+			return;
+
+		// If the Peer was joined, notify all Peers.
+		if (peer.joined)
+			this._notification(peer.socket, 'peerClosed', { peerId: peer.id }, true);
+
+		// Remove from lastN
+		this._lastN = this._lastN.filter((id) => id !== peer.id);
+
+		// Need this to know if this peer was the last with PROMOTE_PEER
+		const hasPromotePeer = peer.roles.some((role) =>
+			roomPermissions[PROMOTE_PEER].includes(role)
+		);
+
+		delete this._peers[peer.id];
+
+		// No peers left with PROMOTE_PEER, might need to give
+		// lobbyPeers to peers that are left.
+		if (
+			hasPromotePeer &&
+			!this._lobby.checkEmpty() &&
+			roomAllowWhenRoleMissing.includes(PROMOTE_PEER) &&
+			this._getPeersWithPermission(PROMOTE_PEER).length === 0
+		)
+		{
+			const lobbyPeers = this._lobby.peerList();
+
+			for (const allowedPeer of this._getAllowedPeers(PROMOTE_PEER))
+			{
+				this._notification(allowedPeer.socket, 'parkedPeers', { lobbyPeers });
+			}
+		}
+
+		// If this is the last Peer in the room and
+		// lobby is empty, close the room after a while.
+		if (this.checkEmpty() && this._lobby.checkEmpty())
+			this.selfDestructCountdown();
 	}
 
 	async _handleSocketRequest(peer, request, cb)
 	{
+		const router =
+			this._mediasoupRouters.get(peer.routerId);
+
 		switch (request.method)
 		{
 			case 'getRouterRtpCapabilities':
 			{
-				cb(null, this._mediasoupRouter.rtpCapabilities);
+				cb(null, router.rtpCapabilities);
 
 				break;
 			}
 
 			case 'join':
 			{
-
-				try
-				{
-					if (peer.socket.handshake.session.passport.user.displayName)
-					{
-						this._notification(
-							peer.socket,
-							'changeDisplayname',
-							{
-								peerId         : peer.id,
-								displayName    : peer.socket.handshake.session.passport.user.displayName,
-								oldDisplayName : ''
-							},
-							true
-						);
-					}
-				}
-				catch (error)
-				{
-					logger.error(error);
-				}
 				// Ensure the Peer is not already joined.
 				if (peer.joined)
 					throw new Error('Peer already joined');
@@ -463,16 +707,32 @@ class Room extends EventEmitter
 				// Tell the new Peer about already joined Peers.
 				// And also create Consumers for existing Producers.
 
-				const joinedPeers =
-				[
-					...this._getJoinedPeers()
-				];
+				const joinedPeers = this._getJoinedPeers(peer);
 
 				const peerInfos = joinedPeers
-					.filter((joinedPeer) => joinedPeer.id !== peer.id)
 					.map((joinedPeer) => (joinedPeer.peerInfo));
 
-				cb(null, { peers: peerInfos, authenticated: peer.authenticated });
+				let lobbyPeers = [];
+
+				// Allowed to promote peers, notify about lobbypeers
+				if (this._hasPermission(peer, PROMOTE_PEER))
+					lobbyPeers = this._lobby.peerList();
+
+				cb(null, {
+					roles                : peer.roles,
+					peers                : peerInfos,
+					tracker              : config.fileTracker,
+					authenticated        : peer.authenticated,
+					roomPermissions      : roomPermissions,
+					userRoles            : userRoles,
+					allowWhenRoleMissing : roomAllowWhenRoleMissing,
+					chatHistory          : this._chatHistory,
+					fileHistory          : this._fileHistory,
+					lastNHistory         : this._lastN,
+					locked               : this._locked,
+					lobbyPeers           : lobbyPeers,
+					accessCode           : this._accessCode
+				});
 
 				// Mark the new Peer as joined.
 				peer.joined = true;
@@ -492,7 +752,7 @@ class Room extends EventEmitter
 				}
 
 				// Notify the new Peer to all other Peers.
-				for (const otherPeer of this._getJoinedPeers({ excludePeer: peer }))
+				for (const otherPeer of this._getJoinedPeers(peer))
 				{
 					this._notification(
 						otherPeer.socket,
@@ -500,7 +760,8 @@ class Room extends EventEmitter
 						{
 							id          : peer.id,
 							displayName : displayName,
-							picture     : picture
+							picture     : picture,
+							roles       : peer.roles
 						}
 					);
 				}
@@ -518,7 +779,7 @@ class Room extends EventEmitter
 				// initiate mediasoup Transports and be ready when he later joins.
 
 				const { forceTcp, producing, consuming } = request.data;
-				
+
 				const webRtcTransportOptions =
 				{
 					...config.mediasoup.webRtcTransport,
@@ -531,7 +792,7 @@ class Room extends EventEmitter
 					webRtcTransportOptions.enableTcp = true;
 				}
 
-				const transport = await this._mediasoupRouter.createWebRtcTransport(
+				const transport = await router.createWebRtcTransport(
 					webRtcTransportOptions
 				);
 
@@ -597,12 +858,25 @@ class Room extends EventEmitter
 
 			case 'produce':
 			{
+				let { appData } = request.data;
+
+				if (
+					appData.source === 'screen' &&
+					!this._hasPermission(peer, SHARE_SCREEN)
+				)
+					throw new Error('peer not authorized');
+
+				if (
+					appData.source === 'extravideo' &&
+					!this._hasPermission(peer, EXTRA_VIDEO)
+				)
+					throw new Error('peer not authorized');
+
 				// Ensure the Peer is joined.
 				if (!peer.joined)
 					throw new Error('Peer not yet joined');
 
 				const { transportId, kind, rtpParameters } = request.data;
-				let { appData } = request.data;
 				const transport = peer.getTransport(transportId);
 
 				if (!transport)
@@ -614,6 +888,19 @@ class Room extends EventEmitter
 
 				const producer =
 					await transport.produce({ kind, rtpParameters, appData });
+
+				const pipeRouters = this._getRoutersToPipeTo(peer.routerId);
+
+				for (const [ routerId, destinationRouter ] of this._mediasoupRouters)
+				{
+					if (pipeRouters.includes(routerId))
+					{
+						await router.pipeToRouter({
+							producerId : producer.id,
+							router     : destinationRouter
+						});
+					}
+				}
 
 				// Store the Producer into the Peer data Object.
 				peer.addProducer(producer.id, producer);
@@ -634,7 +921,7 @@ class Room extends EventEmitter
 				cb(null, { id: producer.id });
 
 				// Optimization: Create a server-side Consumer for each Peer.
-				for (const otherPeer of this._getJoinedPeers({ excludePeer: peer }))
+				for (const otherPeer of this._getJoinedPeers(peer))
 				{
 					this._createConsumer(
 						{
@@ -861,16 +1148,10 @@ class Room extends EventEmitter
 					throw new Error('Peer not yet joined');
 
 				const { displayName } = request.data;
-				const oldDisplayName = peer.displayName;
 
 				peer.displayName = displayName;
 
-				// Spread to others
-				this._notification(peer.socket, 'changeDisplayName', {
-					peerId         : peer.id,
-					displayName    : displayName,
-					oldDisplayName : oldDisplayName
-				}, true);
+				// This will be spread through events from the peer object
 
 				// Return no error
 				cb();
@@ -878,7 +1159,7 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'changePicture':
+			/* case 'changePicture':
 			{
 				// Ensure the Peer is joined.
 				if (!peer.joined)
@@ -898,12 +1179,15 @@ class Room extends EventEmitter
 				cb();
 
 				break;
-			}
+			} */
 
 			case 'chatMessage':
 			{
+				if (!this._hasPermission(peer, SEND_CHAT))
+					throw new Error('peer not authorized');
+
 				const { chatMessage } = request.data;
-	
+
 				this._chatHistory.push(chatMessage);
 
 				// Spread to others
@@ -918,28 +1202,27 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'serverHistory':
+			case 'moderator:clearChat':
 			{
-				// Return to sender
-				const lobbyPeers = this._lobby.peerList();
+				if (!this._hasPermission(peer, MODERATE_CHAT))
+					throw new Error('peer not authorized');
 
-				cb(
-					null,
-					{
-						chatHistory  : this._chatHistory,
-						fileHistory  : this._fileHistory,
-						lastNHistory : this._lastN,
-						locked       : this._locked,
-						lobbyPeers   : lobbyPeers,
-						accessCode   : this._accessCode
-					}
-				);
+				this._chatHistory = [];
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:clearChat', null, true);
+
+				// Return no error
+				cb();
 
 				break;
 			}
 
 			case 'lockRoom':
 			{
+				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK))
+					throw new Error('peer not authorized');
+
 				this._locked = true;
 
 				// Spread to others
@@ -955,14 +1238,15 @@ class Room extends EventEmitter
 
 			case 'unlockRoom':
 			{
+				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK))
+					throw new Error('peer not authorized');
+
 				this._locked = false;
 
 				// Spread to others
 				this._notification(peer.socket, 'unlockRoom', {
 					peerId : peer.id
 				}, true);
-
-				this._lobby.promoteAllPeers();
 
 				// Return no error
 				cb();
@@ -973,7 +1257,7 @@ class Room extends EventEmitter
 			case 'setAccessCode':
 			{
 				const { accessCode } = request.data;
-	
+
 				this._accessCode = accessCode;
 
 				// Spread to others
@@ -993,7 +1277,7 @@ class Room extends EventEmitter
 			case 'setJoinByAccessCode':
 			{
 				const { joinByAccessCode } = request.data;
-	
+
 				this._joinByAccessCode = joinByAccessCode;
 
 				// Spread to others
@@ -1010,6 +1294,9 @@ class Room extends EventEmitter
 
 			case 'promotePeer':
 			{
+				if (!this._hasPermission(peer, PROMOTE_PEER))
+					throw new Error('peer not authorized');
+
 				const { peerId } = request.data;
 
 				this._lobby.promotePeer(peerId);
@@ -1022,6 +1309,9 @@ class Room extends EventEmitter
 
 			case 'promoteAllPeers':
 			{
+				if (!this._hasPermission(peer, PROMOTE_PEER))
+					throw new Error('peer not authorized');
+
 				this._lobby.promoteAllPeers();
 
 				// Return no error
@@ -1032,8 +1322,11 @@ class Room extends EventEmitter
 
 			case 'sendFile':
 			{
+				if (!this._hasPermission(peer, SHARE_FILE))
+					throw new Error('peer not authorized');
+
 				const { magnetUri } = request.data;
-	
+
 				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
 
 				// Spread to others
@@ -1048,19 +1341,187 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'raiseHand':
+			case 'moderator:clearFileSharing':
+			{
+				if (!this._hasPermission(peer, MODERATE_FILES))
+					throw new Error('peer not authorized');
+
+				this._fileHistory = [];
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:clearFileSharing', null, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'raisedHand':
 			{
 				const { raisedHand } = request.data;
 
 				peer.raisedHand = raisedHand;
 
 				// Spread to others
-				this._notification(peer.socket, 'raiseHand', {
-					peerId     : peer.id,
-					raisedHand : raisedHand
+				this._notification(peer.socket, 'raisedHand', {
+					peerId              : peer.id,
+					raisedHand          : raisedHand,
+					raisedHandTimestamp : peer.raisedHandTimestamp
 				}, true);
 
 				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:mute':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const mutePeer = this._peers[peerId];
+
+				if (!mutePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(mutePeer.socket, 'moderator:mute');
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:muteAll':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:mute', null, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopVideo':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const stopVideoPeer = this._peers[peerId];
+
+				if (!stopVideoPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(stopVideoPeer.socket, 'moderator:stopVideo');
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopAllVideo':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:stopVideo', null, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopAllScreenSharing':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				// Spread to others
+				this._notification(peer.socket, 'moderator:stopScreenSharing', null, true);
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:stopScreenSharing':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const stopVideoPeer = this._peers[peerId];
+
+				if (!stopVideoPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(stopVideoPeer.socket, 'moderator:stopScreenSharing');
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:closeMeeting':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				this._notification(peer.socket, 'moderator:kick', null,	true);
+
+				cb();
+
+				// Close the room
+				this.close();
+
+				break;
+			}
+
+			case 'moderator:kickPeer':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const kickPeer = this._peers[peerId];
+
+				if (!kickPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(kickPeer.socket, 'moderator:kick');
+
+				kickPeer.close();
+
+				cb();
+
+				break;
+			}
+
+			case 'moderator:lowerHand':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { peerId } = request.data;
+
+				const lowerPeer = this._peers[peerId];
+
+				if (!lowerPeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				this._notification(lowerPeer.socket, 'moderator:lowerHand');
+
 				cb();
 
 				break;
@@ -1089,6 +1550,8 @@ class Room extends EventEmitter
 			producer.id
 		);
 
+		const router = this._mediasoupRouters.get(producerPeer.routerId);
+
 		// Optimization:
 		// - Create the server-side Consumer. If video, do it paused.
 		// - Tell its Peer about it and wait for its response.
@@ -1099,7 +1562,7 @@ class Room extends EventEmitter
 		// NOTE: Don't create the Consumer if the remote Peer cannot consume it.
 		if (
 			!consumerPeer.rtpCapabilities ||
-			!this._mediasoupRouter.canConsume(
+			!router.canConsume(
 				{
 					producerId      : producer.id,
 					rtpCapabilities : consumerPeer.rtpCapabilities
@@ -1131,6 +1594,9 @@ class Room extends EventEmitter
 					rtpCapabilities : consumerPeer.rtpCapabilities,
 					paused          : producer.kind === 'video'
 				});
+
+			if (producer.kind === 'audio')
+				await consumer.setPriority(255);
 		}
 		catch (error)
 		{
@@ -1222,13 +1688,64 @@ class Room extends EventEmitter
 		}
 	}
 
+	_hasPermission(peer, permission)
+	{
+		const hasPermission = peer.roles.some((role) =>
+			roomPermissions[permission].includes(role)
+		);
+
+		if (hasPermission)
+			return true;
+
+		// Allow if config is set, and no one is present
+		if (
+			roomAllowWhenRoleMissing.includes(permission) &&
+			this._getPeersWithPermission(permission).length === 0
+		)
+			return true;
+
+		return false;
+	}
+
+	_hasAccess(peer, access)
+	{
+		return peer.roles.some((role) => roomAccess[access].includes(role));
+	}
+
 	/**
 	 * Helper to get the list of joined peers.
 	 */
-	_getJoinedPeers({ excludePeer = undefined } = {})
+	_getJoinedPeers(excludePeer = undefined)
 	{
 		return Object.values(this._peers)
 			.filter((peer) => peer.joined && peer !== excludePeer);
+	}
+
+	_getAllowedPeers(permission = null, excludePeer = undefined, joined = true)
+	{
+		const peers = this._getPeersWithPermission(permission, excludePeer, joined);
+
+		if (peers.length > 0)
+			return peers;
+
+		// Allow if config is set, and no one is present
+		if (roomAllowWhenRoleMissing.includes(permission))
+			return Object.values(this._peers);
+
+		return peers;
+	}
+
+	_getPeersWithPermission(permission = null, excludePeer = undefined, joined = true)
+	{
+		return Object.values(this._peers)
+			.filter(
+				(peer) =>
+					peer.joined === joined &&
+					peer !== excludePeer &&
+					peer.roles.some(
+						(role) => roomPermissions[permission].includes(role)
+					)
+			);
 	}
 
 	_timeoutCallback(callback)
@@ -1241,9 +1758,9 @@ class Room extends EventEmitter
 				if (called)
 					return;
 				called = true;
-				callback(new Error('Request timeout.'));
+				callback(new SocketTimeoutError('Request timed out'));
 			},
-			10000
+			config.requestTimeout || 20000
 		);
 
 		return (...args) =>
@@ -1257,7 +1774,7 @@ class Room extends EventEmitter
 		};
 	}
 
-	_request(socket, method, data = {})
+	_sendRequest(socket, method, data = {})
 	{
 		return new Promise((resolve, reject) =>
 		{
@@ -1279,18 +1796,126 @@ class Room extends EventEmitter
 		});
 	}
 
-	_notification(socket, method, data = {}, broadcast = false)
+	async _request(socket, method, data)
+	{
+		logger.debug('_request() [method:"%s", data:"%o"]', method, data);
+
+		const {
+			requestRetries = 3
+		} = config;
+
+		for (let tries = 0; tries < requestRetries; tries++)
+		{
+			try
+			{
+				return await this._sendRequest(socket, method, data);
+			}
+			catch (error)
+			{
+				if (
+					error instanceof SocketTimeoutError &&
+					tries < requestRetries
+				)
+					logger.warn('_request() | timeout, retrying [attempt:"%s"]', tries);
+				else
+					throw error;
+			}
+		}
+	}
+
+	_notification(socket, method, data = {}, broadcast = false, includeSender = false)
 	{
 		if (broadcast)
 		{
 			socket.broadcast.to(this._roomId).emit(
 				'notification', { method, data }
 			);
+
+			if (includeSender)
+				socket.emit('notification', { method, data });
 		}
 		else
 		{
 			socket.emit('notification', { method, data });
 		}
+	}
+
+	async _pipeProducersToNewRouter()
+	{
+		const peersToPipe =
+			Object.values(this._peers)
+				.filter((peer) => peer.routerId !== this._currentRouter.id);
+
+		for (const peer of peersToPipe)
+		{
+			const srcRouter = this._mediasoupRouters.get(peer.routerId);
+
+			for (const producerId of peer.producers.keys())
+			{
+				await srcRouter.pipeToRouter({
+					producerId,
+					router : this._currentRouter
+				});
+			}
+		}
+	}
+
+	async _getRouterId()
+	{
+		if (this._currentRouter)
+		{
+			const routerLoad =
+				Object.values(this._peers)
+					.filter((peer) => peer.routerId === this._currentRouter.id).length;
+
+			if (routerLoad >= ROUTER_SCALE_SIZE)
+			{
+				this._currentRouter = this._routerIterator.next().value;
+
+				if (this._currentRouter)
+				{
+					await this._pipeProducersToNewRouter();
+
+					return this._currentRouter.id;
+				}
+			}
+			else
+			{
+				return this._currentRouter.id;
+			}
+		}
+
+		return this._getLeastLoadedRouter();
+	}
+
+	// Returns an array of router ids we need to pipe to
+	_getRoutersToPipeTo(originRouterId)
+	{
+		return Object.values(this._peers)
+			.map((peer) => peer.routerId)
+			.filter((routerId, index, self) =>
+				routerId !== originRouterId && self.indexOf(routerId) === index
+			);
+	}
+
+	_getLeastLoadedRouter()
+	{
+		let load = Infinity;
+		let id;
+
+		for (const routerId of this._mediasoupRouters.keys())
+		{
+			const routerLoad =
+				Object.values(this._peers).filter((peer) => peer.routerId === routerId).length;
+
+			if (routerLoad < load)
+			{
+				id = routerId;
+				load = routerLoad;
+			}
+		}
+
+		return id;
 	}
 }
 

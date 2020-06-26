@@ -1,16 +1,19 @@
 const EventEmitter = require('events').EventEmitter;
+const userRoles = require('../userRoles');
 const Logger = require('./Logger');
 
 const logger = new Logger('Peer');
 
 class Peer extends EventEmitter
 {
-	constructor({ id, socket })
+	constructor({ id, roomId, socket })
 	{
-		logger.info('constructor() [id:"%s", socket:"%s"]', id, socket.id);
+		logger.info('constructor() [id:"%s"]', id);
 		super();
 
 		this._id = id;
+
+		this._roomId = roomId;
 
 		this._authId = null;
 
@@ -20,9 +23,15 @@ class Peer extends EventEmitter
 
 		this._joined = false;
 
+		this._joinedTimestamp = null;
+
 		this._inLobby = false;
 
 		this._authenticated = false;
+
+		this._authenticatedTimestamp = null;
+
+		this._roles = [ userRoles.NORMAL ];
 
 		this._displayName = false;
 
@@ -30,17 +39,19 @@ class Peer extends EventEmitter
 
 		this._email = null;
 
+		this._routerId = null;
+
 		this._rtpCapabilities = null;
 
 		this._raisedHand = false;
+
+		this._raisedHandTimestamp = null;
 
 		this._transports = new Map();
 
 		this._producers = new Map();
 
 		this._consumers = new Map();
-
-		this._checkAuthentication();
 
 		this._handlePeer();
 	}
@@ -53,61 +64,30 @@ class Peer extends EventEmitter
 
 		// Iterate and close all mediasoup Transport associated to this Peer, so all
 		// its Producers and Consumers will also be closed.
-		this.transports.forEach((transport) =>
+		for (const transport of this.transports.values())
 		{
 			transport.close();
-		});
+		}
 
-		if (this._socket)
-			this._socket.disconnect(true);
+		if (this.socket)
+			this.socket.disconnect(true);
 
 		this.emit('close');
 	}
 
 	_handlePeer()
 	{
-		this.socket.use((packet, next) =>
+		if (this.socket)
 		{
-			this._checkAuthentication();
+			this.socket.on('disconnect', () =>
+			{
+				if (this.closed)
+					return;
 
-			return next();
-		});
+				logger.debug('"disconnect" event [id:%s]', this.id);
 
-		this.socket.on('disconnect', () =>
-		{
-			if (this.closed)
-				return;
-
-			logger.debug('"disconnect" event [id:%s]', this.id);
-
-			this.close();
-		});
-	}
-
-	_checkAuthentication()
-	{
-		if (
-			Boolean(this.socket.handshake.session.passport) &&
-			Boolean(this.socket.handshake.session.passport.user)
-		)
-		{
-			const {
-				id,
-				displayName,
-				picture,
-				email
-			} = this.socket.handshake.session.passport.user;
-
-			id && (this.authId = id);
-			displayName && (this.displayName = displayName);
-			picture && (this.picture = picture);
-			email && (this.email = email);
-
-			this.authenticated = true;
-		}
-		else
-		{
-			this.authenticated = false;
+				this.close();
+			});
 		}
 	}
 
@@ -119,6 +99,16 @@ class Peer extends EventEmitter
 	set id(id)
 	{
 		this._id = id;
+	}
+
+	get roomId()
+	{
+		return this._roomId;
+	}
+
+	set roomId(roomId)
+	{
+		this._roomId = roomId;
 	}
 
 	get authId()
@@ -153,7 +143,16 @@ class Peer extends EventEmitter
 
 	set joined(joined)
 	{
+		joined ?
+			this._joinedTimestamp = Date.now() :
+			this._joinedTimestamp = null;
+
 		this._joined = joined;
+	}
+
+	get joinedTimestamp()
+	{
+		return this._joinedTimestamp;
 	}
 
 	get inLobby()
@@ -175,12 +174,26 @@ class Peer extends EventEmitter
 	{
 		if (authenticated !== this._authenticated)
 		{
+			authenticated ?
+				this._authenticatedTimestamp = Date.now() :
+				this._authenticatedTimestamp = null;
+
 			const oldAuthenticated = this._authenticated;
 
 			this._authenticated = authenticated;
 
 			this.emit('authenticationChanged', { oldAuthenticated });
 		}
+	}
+
+	get authenticatedTimestamp()
+	{
+		return this._authenticatedTimestamp;
+	}
+
+	get roles()
+	{
+		return this._roles;
 	}
 
 	get displayName()
@@ -195,7 +208,7 @@ class Peer extends EventEmitter
 			const oldDisplayName = this._displayName;
 
 			this._displayName = displayName;
-			
+
 			this.emit('displayNameChanged', { oldDisplayName });
 		}
 	}
@@ -212,7 +225,7 @@ class Peer extends EventEmitter
 			const oldPicture = this._picture;
 
 			this._picture = picture;
-			
+
 			this.emit('pictureChanged', { oldPicture });
 		}
 	}
@@ -225,6 +238,16 @@ class Peer extends EventEmitter
 	set email(email)
 	{
 		this._email = email;
+	}
+
+	get routerId()
+	{
+		return this._routerId;
+	}
+
+	set routerId(routerId)
+	{
+		this._routerId = routerId;
 	}
 
 	get rtpCapabilities()
@@ -244,7 +267,16 @@ class Peer extends EventEmitter
 
 	set raisedHand(raisedHand)
 	{
+		raisedHand ?
+			this._raisedHandTimestamp = Date.now() :
+			this._raisedHandTimestamp = null;
+
 		this._raisedHand = raisedHand;
+	}
+
+	get raisedHandTimestamp()
+	{
+		return this._raisedHandTimestamp;
 	}
 
 	get transports()
@@ -260,6 +292,35 @@ class Peer extends EventEmitter
 	get consumers()
 	{
 		return this._consumers;
+	}
+
+	addRole(newRole)
+	{
+		if (!this._roles.includes(newRole))
+		{
+			this._roles.push(newRole);
+
+			logger.info('addRole() | [newRole:"%s]"', newRole);
+
+			this.emit('gotRole', { newRole });
+		}
+	}
+
+	removeRole(oldRole)
+	{
+		if (this._roles.includes(oldRole))
+		{
+			this._roles = this._roles.filter((role) => role !== oldRole);
+
+			logger.info('removeRole() | [oldRole:"%s]"', oldRole);
+
+			this.emit('lostRole', { oldRole });
+		}
+	}
+
+	hasRole(role)
+	{
+		return this._roles.includes(role);
 	}
 
 	addTransport(id, transport)
@@ -317,9 +378,12 @@ class Peer extends EventEmitter
 	{
 		const peerInfo =
 		{
-			id          : this.id,
-			displayName : this.displayName,
-			picture     : this.picture
+			id                  : this.id,
+			displayName         : this.displayName,
+			picture             : this.picture,
+			roles               : this.roles,
+			raisedHand          : this.raisedHand,
+			raisedHandTimestamp : this.raisedHandTimestamp
 		};
 
 		return peerInfo;

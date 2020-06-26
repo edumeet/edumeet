@@ -1,16 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-	passivePeersSelector,
-	spotlightPeersSelector
+	participantListSelector,
+	makePermissionSelector
 } from '../../Selectors';
-import classNames from 'classnames';
+import { permissions } from '../../../permissions';
+import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
 import PropTypes from 'prop-types';
+import { Flipper, Flipped } from 'react-flip-toolkit';
 import { FormattedMessage } from 'react-intl';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
+import ListModerator from './ListModerator';
 import Volume from '../../Containers/Volume';
 
 const styles = (theme) =>
@@ -30,12 +33,10 @@ const styles = (theme) =>
 		},
 		listheader :
 		{
-			padding    : theme.spacing(1),
 			fontWeight : 'bolder'
 		},
 		listItem :
 		{
-			padding      : theme.spacing(1),
 			width        : '100%',
 			overflow     : 'hidden',
 			cursor       : 'pointer',
@@ -76,14 +77,26 @@ class ParticipantList extends React.PureComponent
 		const {
 			roomClient,
 			advancedMode,
-			passivePeers,
+			isModerator,
+			participants,
+			spotlights,
 			selectedPeerId,
-			spotlightPeers,
 			classes
 		} = this.props;
 
 		return (
 			<div className={classes.root} ref={(node) => { this.node = node; }}>
+				{ isModerator &&
+					<ul className={classes.list}>
+						<li className={classes.listheader}>
+							<FormattedMessage
+								id='room.moderatoractions'
+								defaultMessage='Moderator actions'
+							/>
+						</li>
+						<ListModerator />
+					</ul>
+				}
 				<ul className={classes.list}>
 					<li className={classes.listheader}>
 						<FormattedMessage
@@ -96,42 +109,42 @@ class ParticipantList extends React.PureComponent
 				<ul className={classes.list}>
 					<li className={classes.listheader}>
 						<FormattedMessage
-							id='room.spotlights'
-							defaultMessage='Participants in Spotlight'
+							id='label.participants'
+							defaultMessage='Participants'
 						/>
 					</li>
-					{ spotlightPeers.map((peerId) => (
-						<li
-							key={peerId}
-							className={classNames(classes.listItem, {
-								selected : peerId === selectedPeerId
-							})}
-							onClick={() => roomClient.setSelectedPeer(peerId)}
-						>
-							<ListPeer id={peerId} advancedMode={advancedMode}>
-								<Volume small id={peerId} />
-							</ListPeer>
-						</li>
-					))}
-				</ul>
-				<ul className={classes.list}>
-					<li className={classes.listheader}>
-						<FormattedMessage
-							id='room.passive'
-							defaultMessage='Passive Participants'
-						/>
-					</li>
-					{ passivePeers.map((peerId) => (
-						<li
-							key={peerId}
-							className={classNames(classes.listItem, {
-								selected : peerId === selectedPeerId
-							})}
-							onClick={() => roomClient.setSelectedPeer(peerId)}
-						>
-							<ListPeer id={peerId} advancedMode={advancedMode} />
-						</li>
-					))}
+					<Flipper
+						flipKey={participants}
+					>
+						{ participants.map((peer) => (
+							<Flipped key={peer.id} flipId={peer.id}>
+								<li
+									key={peer.id}
+									className={classnames(classes.listItem, {
+										selected : peer.id === selectedPeerId
+									})}
+									onClick={() => roomClient.setSelectedPeer(peer.id)}
+								>
+									{ spotlights.includes(peer.id) ?
+										<ListPeer
+											id={peer.id}
+											advancedMode={advancedMode}
+											isModerator={isModerator}
+											spotlight
+										>
+											<Volume small id={peer.id} />
+										</ListPeer>
+										:
+										<ListPeer
+											id={peer.id}
+											advancedMode={advancedMode}
+											isModerator={isModerator}
+										/>
+									}
+								</li>
+							</Flipped>
+						))}
+					</Flipper>
 				</ul>
 			</div>
 		);
@@ -142,32 +155,41 @@ ParticipantList.propTypes =
 {
 	roomClient     : PropTypes.any.isRequired,
 	advancedMode   : PropTypes.bool,
-	passivePeers   : PropTypes.array,
+	isModerator    : PropTypes.bool,
+	participants   : PropTypes.array,
+	spotlights     : PropTypes.array,
 	selectedPeerId : PropTypes.string,
-	spotlightPeers : PropTypes.array,
 	classes        : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
+const makeMapStateToProps = () =>
 {
-	return {
-		passivePeers   : passivePeersSelector(state),
-		selectedPeerId : state.room.selectedPeerId,
-		spotlightPeers : spotlightPeersSelector(state)
+	const hasPermission = makePermissionSelector(permissions.MODERATE_ROOM);
+
+	const mapStateToProps = (state) =>
+	{
+		return {
+			isModerator    : hasPermission(state),
+			participants   : participantListSelector(state),
+			spotlights     : state.room.spotlights,
+			selectedPeerId : state.room.selectedPeerId
+		};
 	};
+
+	return mapStateToProps;
 };
 
 const ParticipantListContainer = withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	null,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.peers === next.peers &&
-				prev.room.spotlights === next.room.spotlights &&
-				prev.room.selectedPeerId === next.room.selectedPeerId
+				prev.room === next.room &&
+				prev.me.roles === next.me.roles &&
+				prev.peers === next.peers
 			);
 		}
 	}

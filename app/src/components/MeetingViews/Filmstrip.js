@@ -12,6 +12,12 @@ import Peer from '../Containers/Peer';
 import SpeakerPeer from '../Containers/SpeakerPeer';
 import Grid from '@material-ui/core/Grid';
 
+const RATIO = 1.334;
+const PADDING_V = 40;
+const PADDING_H = 0;
+const FILMSTRING_PADDING_V = 10;
+const FILMSTRING_PADDING_H = 0;
+
 const styles = () =>
 	({
 		root :
@@ -19,25 +25,24 @@ const styles = () =>
 			height              : '100%',
 			width               : '100%',
 			display             : 'grid',
+			overflow            : 'hidden',
 			gridTemplateColumns : '1fr',
-			gridTemplateRows    : '1.6fr minmax(0, 0.4fr)'
+			gridTemplateRows    : '1fr 0.25fr'
 		},
 		speaker :
 		{
-			gridArea       : '1 / 1 / 2 / 2',
+			gridArea       : '1 / 1 / 1 / 1',
 			display        : 'flex',
 			justifyContent : 'center',
-			alignItems     : 'center',
-			paddingTop     : 40
+			alignItems     : 'center'
 		},
 		filmStrip :
 		{
-			gridArea : '2 / 1 / 3 / 2'
+			gridArea : '2 / 1 / 2 / 1'
 		},
 		filmItem :
 		{
 			display      : 'flex',
-			marginLeft   : '6px',
 			border       : 'var(--peer-border)',
 			'&.selected' :
 			{
@@ -45,8 +50,18 @@ const styles = () =>
 			},
 			'&.active' :
 			{
-				opacity : '0.6'
+				borderColor : 'var(--selected-peer-border-color)'
 			}
+		},
+		hiddenToolBar :
+		{
+			paddingTop : 0,
+			transition : 'padding .5s'
+		},
+		showingToolBar :
+		{
+			paddingTop : 60,
+			transition : 'padding .5s'
 		}
 	});
 
@@ -57,6 +72,8 @@ class Filmstrip extends React.PureComponent
 		super(props);
 
 		this.resizeTimeout = null;
+
+		this.rootContainer = React.createRef();
 
 		this.activePeerContainer = React.createRef();
 
@@ -105,24 +122,38 @@ class Filmstrip extends React.PureComponent
 	{
 		const newState = {};
 
+		const root = this.rootContainer.current;
+
+		if (!root)
+			return;
+
+		const availableWidth = root.clientWidth;
+		// Grid is:
+		// 4/5 speaker
+		// 1/5 filmstrip
+		const availableSpeakerHeight = (root.clientHeight * 0.8) -
+			(this.props.toolbarsVisible || this.props.permanentTopBar ? PADDING_V : PADDING_H);
+
+		const availableFilmstripHeight = root.clientHeight * 0.2;
+
 		const speaker = this.activePeerContainer.current;
 
 		if (speaker)
 		{
-			let speakerWidth = (speaker.clientWidth - 100);
+			let speakerWidth = (availableWidth - PADDING_H);
 
-			let speakerHeight = (speakerWidth / 4) * 3;
-	
+			let speakerHeight = speakerWidth / RATIO;
+
 			if (this.isSharingCamera(this.getActivePeerId()))
 			{
 				speakerWidth /= 2;
-				speakerHeight = (speakerWidth / 4) * 3;
+				speakerHeight = speakerWidth / RATIO;
 			}
-	
-			if (speakerHeight > (speaker.clientHeight - 60))
+
+			if (speakerHeight > (availableSpeakerHeight - PADDING_V))
 			{
-				speakerHeight = (speaker.clientHeight - 60);
-				speakerWidth = (speakerHeight / 3) * 4;
+				speakerHeight = (availableSpeakerHeight - PADDING_V);
+				speakerWidth = speakerHeight * RATIO;
 			}
 
 			newState.speakerWidth = speakerWidth;
@@ -133,14 +164,18 @@ class Filmstrip extends React.PureComponent
 
 		if (filmStrip)
 		{
-			let filmStripHeight = filmStrip.clientHeight - 10;
+			let filmStripHeight = availableFilmstripHeight - FILMSTRING_PADDING_V;
 
-			let filmStripWidth = (filmStripHeight / 3) * 4;
-	
-			if (filmStripWidth * this.props.boxes > (filmStrip.clientWidth - 50))
+			let filmStripWidth = filmStripHeight * RATIO;
+
+			if (
+				(filmStripWidth * this.props.boxes) >
+				(availableWidth - FILMSTRING_PADDING_H)
+			)
 			{
-				filmStripWidth = (filmStrip.clientWidth - 50) / this.props.boxes;
-				filmStripHeight = (filmStripWidth / 4) * 3;
+				filmStripWidth = (availableWidth - FILMSTRING_PADDING_H) /
+					this.props.boxes;
+				filmStripHeight = filmStripWidth / RATIO;
 			}
 
 			newState.filmStripWidth = filmStripWidth;
@@ -172,27 +207,21 @@ class Filmstrip extends React.PureComponent
 		window.removeEventListener('resize', this.updateDimensions);
 	}
 
-	componentWillUpdate(nextProps)
-	{
-		if (nextProps !== this.props)
-		{
-			if (
-				nextProps.activeSpeakerId != null &&
-				nextProps.activeSpeakerId !== this.props.myId
-			)
-			{
-				// eslint-disable-next-line react/no-did-update-set-state
-				this.setState({
-					lastSpeaker : nextProps.activeSpeakerId
-				});
-			}
-		}
-	}
-
 	componentDidUpdate(prevProps)
 	{
 		if (prevProps !== this.props)
 		{
+			if (
+				this.props.activeSpeakerId != null &&
+				this.props.activeSpeakerId !== this.props.myId
+			)
+			{
+				// eslint-disable-next-line react/no-did-update-set-state
+				this.setState({
+					lastSpeaker : this.props.activeSpeakerId
+				});
+			}
+
 			this.updateDimensions();
 		}
 	}
@@ -205,6 +234,8 @@ class Filmstrip extends React.PureComponent
 			myId,
 			advancedMode,
 			spotlights,
+			toolbarsVisible,
+			permanentTopBar,
 			classes
 		} = this.props;
 
@@ -223,7 +254,14 @@ class Filmstrip extends React.PureComponent
 		};
 
 		return (
-			<div className={classes.root}>
+			<div
+				className={classnames(
+					classes.root,
+					toolbarsVisible || permanentTopBar ?
+						classes.showingToolBar : classes.hiddenToolBar
+				)}
+				ref={this.rootContainer}
+			>
 				<div className={classes.speaker} ref={this.activePeerContainer}>
 					{ peers[activePeerId] &&
 						<SpeakerPeer
@@ -245,7 +283,7 @@ class Filmstrip extends React.PureComponent
 								<Me
 									advancedMode={advancedMode}
 									style={peerStyle}
-									smallButtons
+									smallContainer
 								/>
 							</div>
 						</Grid>
@@ -268,7 +306,7 @@ class Filmstrip extends React.PureComponent
 												advancedMode={advancedMode}
 												id={peerId}
 												style={peerStyle}
-												smallButtons
+												smallContainer
 											/>
 										</div>
 									</Grid>
@@ -287,28 +325,34 @@ class Filmstrip extends React.PureComponent
 }
 
 Filmstrip.propTypes = {
-	roomClient       : PropTypes.any.isRequired,
-	activeSpeakerId  : PropTypes.string,
-	advancedMode     : PropTypes.bool,
-	peers            : PropTypes.object.isRequired,
-	consumers        : PropTypes.object.isRequired,
-	myId             : PropTypes.string.isRequired,
-	selectedPeerId   : PropTypes.string,
-	spotlights       : PropTypes.array.isRequired,
-	boxes            : PropTypes.number,
-	classes          : PropTypes.object.isRequired
+	roomClient      : PropTypes.any.isRequired,
+	activeSpeakerId : PropTypes.string,
+	advancedMode    : PropTypes.bool,
+	peers           : PropTypes.object.isRequired,
+	consumers       : PropTypes.object.isRequired,
+	myId            : PropTypes.string.isRequired,
+	selectedPeerId  : PropTypes.string,
+	spotlights      : PropTypes.array.isRequired,
+	boxes           : PropTypes.number,
+	toolbarsVisible : PropTypes.bool.isRequired,
+	toolAreaOpen    : PropTypes.bool.isRequired,
+	permanentTopBar : PropTypes.bool,
+	classes         : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		activeSpeakerId  : state.room.activeSpeakerId,
-		selectedPeerId   : state.room.selectedPeerId,
-		peers            : state.peers,
-		consumers        : state.consumers,
-		myId             : state.me.id,
-		spotlights       : state.room.spotlights,
-		boxes            : videoBoxesSelector(state)
+		activeSpeakerId : state.room.activeSpeakerId,
+		selectedPeerId  : state.room.selectedPeerId,
+		peers           : state.peers,
+		consumers       : state.consumers,
+		myId            : state.me.id,
+		spotlights      : state.room.spotlights,
+		boxes           : videoBoxesSelector(state),
+		toolbarsVisible : state.room.toolbarsVisible,
+		toolAreaOpen    : state.toolarea.toolAreaOpen,
+		permanentTopBar : state.settings.permanentTopBar
 	};
 };
 
@@ -322,6 +366,9 @@ export default withRoomContext(connect(
 			return (
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.selectedPeerId === next.room.selectedPeerId &&
+				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
+				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
 				prev.peers === next.peers &&
 				prev.consumers === next.consumers &&
 				prev.room.spotlights === next.room.spotlights &&
