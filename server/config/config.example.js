@@ -71,7 +71,7 @@ module.exports =
 		'ip_ver'    		: 'ipv4',
 		'servercount'	: '2'
 	},
-
+	turnAPITimeout    : 2 * 1000,
 	// Backup turnservers if REST fails or is not configured
 	backupTurnServers : [
 		{

@@ -507,7 +507,8 @@ class Room extends EventEmitter
 						const { data } = await axios.get(
 							config.turnAPIURI,
 							{
-								params : {
+								timeout : config.turnAPITimeout || 2000,
+								params  : {
 									...config.turnAPIparams,
 									'api_key' : config.turnAPIKey,
 									'ip'      : peer.socket.request.connection.remoteAddress
