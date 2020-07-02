@@ -1,5 +1,10 @@
 {
- "name": "App",
+ "short_name": "Multiparty Meeting",
+ "name": "Multiparty Meeting - Simple web meetings",
+ "start_url": ".",
+ "display": "standalone",
+ "theme_color": "#000000",
+ "background_color": "#ffffff"
  "icons": [
   {
    "src": "\/android-icon-36x36.png",
