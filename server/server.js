@@ -156,7 +156,7 @@ async function run()
 		// Run WebSocketServer.
 		await runWebSocketServer();
 
-		const errorHandler = (err, req, res) =>
+		const errorHandler = (err, req, res, next) =>
 		{
 			const trackingId = uuidv4();
 
