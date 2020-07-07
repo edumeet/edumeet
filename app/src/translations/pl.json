@@ -94,10 +94,10 @@
 	"tooltip.unMuteScreenSharing": "Włądź dźwięk współdzielonego ekreanu",
 	"tooltip.unMuteParticipantVideo": "Włącz dźwięk wideo użytkownika",
 	"tooltip.unMuteParticipant": "Włącz dźwięk użytkownika",
-	"tooltip.addParticipantToSpotlight": "Dodaj użytkownika do aktywnych",
-	"tooltip.removeParticipantFromSpotlight": "Usuń użytkownika z aktywnych",
+	"tooltip.addParticipantToSpotlight": "Użytkownik zawsze widoczny",
+	"tooltip.removeParticipantFromSpotlight": "Usuń użytkownika z zawsze widocznych",
 	"tooltip.muteParticipantAudioModerator": "Wycisz użytkownika globalnie",
-	"tooltip.muteParticipantVideoModerator": "Wycisz wideo użytkownika globalnie",
+	"tooltip.muteParticipantVideoModerator": "Wyłącz wideo użytkownika globalnie",
 	"tooltip.muteScreenSharingModerator": "Wycisz współdzielony ekran użytkownika globalnie",
 
 	"label.roomName": "Nazwa",
