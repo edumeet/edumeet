@@ -2956,11 +2956,13 @@ export default class RoomClient
 
 					case 'gotRole':
 					{
-						const { peerId, role } = notification.data;
+						const { peerId, roleId } = notification.data;
+
+						const userRoles = store.getState().room.userRoles;
 
 						if (peerId === this._peerId)
 						{
-							store.dispatch(meActions.addRole(role));
+							store.dispatch(meActions.addRole(roleId));
 
 							store.dispatch(requestActions.notify(
 								{
@@ -2968,23 +2970,25 @@ export default class RoomClient
 										id             : 'roles.gotRole',
 										defaultMessage : 'You got the role: {role}'
 									}, {
-										role : role.label
+										role : userRoles.get(roleId).label
 									})
 								}));
 						}
 						else
-							store.dispatch(peerActions.addPeerRole(peerId, role));
+							store.dispatch(peerActions.addPeerRole(peerId, roleId));
 
 						break;
 					}
 
 					case 'lostRole':
 					{
-						const { peerId, role } = notification.data;
+						const { peerId, roleId } = notification.data;
+
+						const userRoles = store.getState().room.userRoles;
 
 						if (peerId === this._peerId)
 						{
-							store.dispatch(meActions.removeRole(role));
+							store.dispatch(meActions.removeRole(roleId));
 
 							store.dispatch(requestActions.notify(
 								{
@@ -2992,12 +2996,12 @@ export default class RoomClient
 										id             : 'roles.lostRole',
 										defaultMessage : 'You lost the role: {role}'
 									}, {
-										role : role.label
+										role : userRoles.get(roleId).label
 									})
 								}));
 						}
 						else
-							store.dispatch(peerActions.removePeerRole(peerId, role));
+							store.dispatch(peerActions.removePeerRole(peerId, roleId));
 
 						break;
 					}
@@ -3207,10 +3211,11 @@ export default class RoomClient
 				});
 
 			logger.debug(
-				'_joinRoom() joined [authenticated:"%s", peers:"%o", roles:"%o"]',
+				'_joinRoom() joined [authenticated:"%s", peers:"%o", roles:"%o", userRoles:"%o"]',
 				authenticated,
 				peers,
-				roles
+				roles,
+				userRoles
 			);
 
 			tracker && (this._tracker = tracker);
@@ -3219,18 +3224,22 @@ export default class RoomClient
 
 			store.dispatch(roomActions.setRoomPermissions(roomPermissions));
 
-			store.dispatch(roomActions.setUserRoles(userRoles));
+			const roomUserRoles = new Map();
+
+			Object.entries(userRoles).forEach(([ key, val ]) => roomUserRoles.set(val.id, val));
+
+			store.dispatch(roomActions.setUserRoles(roomUserRoles));
 
 			if (allowWhenRoleMissing)
 				store.dispatch(roomActions.setAllowWhenRoleMissing(allowWhenRoleMissing));
 
 			const myRoles = store.getState().me.roles;
 
-			for (const role of roles)
+			for (const roleId of roles)
 			{
-				if (!myRoles.some((myRole) => role.id === myRole.id))
+				if (!myRoles.some((myRoleId) => roleId === myRoleId))
 				{
-					store.dispatch(meActions.addRole(role));
+					store.dispatch(meActions.addRole(roleId));
 
 					store.dispatch(requestActions.notify(
 						{
@@ -3238,7 +3247,7 @@ export default class RoomClient
 								id             : 'roles.gotRole',
 								defaultMessage : 'You got the role: {role}'
 							}, {
-								role : role.label
+								role : roomUserRoles.get(roleId).label
 							})
 						}));
 				}
@@ -4071,9 +4080,9 @@ export default class RoomClient
 
 		const { roles } = store.getState().me;
 
-		const permitted = roles.some((userRole) =>
+		const permitted = roles.some((userRoleId) =>
 			roomPermissions[permission].some((permissionRole) =>
-				userRole.id === permissionRole.id
+				userRoleId === permissionRole.id
 			)
 		);
 
@@ -4090,8 +4099,8 @@ export default class RoomClient
 			peers.filter(
 				(peer) =>
 					peer.roles.some(
-						(role) => roomPermissions[permission].some((permissionRole) =>
-							role.id === permissionRole.id
+						(roleId) => roomPermissions[permission].some((permissionRole) =>
+							roleId === permissionRole.id
 						)
 					)
 			).length === 0

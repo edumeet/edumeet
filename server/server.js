@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-process.title = 'multiparty-meeting-server';
+process.title = 'edumeet-server';
 
 const config = require('./config/config');
 const fs = require('fs');
@@ -156,7 +156,7 @@ async function run()
 		// Run WebSocketServer.
 		await runWebSocketServer();
 
-		const errorHandler = (err, req, res) =>
+		const errorHandler = (err, req, res, next) =>
 		{
 			const trackingId = uuidv4();
 
@@ -355,7 +355,7 @@ async function setupAuth()
 		{
 			for (const role of peer.roles)
 			{
-				if (role !== userRoles.NORMAL)
+				if (role.id !== userRoles.NORMAL.id)
 					peer.removeRole(role);
 			}
 		}

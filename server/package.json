@@ -1,8 +1,8 @@
 {
-	"name": "multiparty-meeting-server",
+	"name": "edumeet-server",
 	"version": "3.3.0",
 	"private": true,
-	"description": "multiparty meeting server",
+	"description": "edumeet server",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
 	"license": "MIT",
 	"main": "lib/index.js",

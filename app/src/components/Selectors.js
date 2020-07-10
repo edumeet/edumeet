@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 
 const meRolesSelect = (state) => state.me.roles;
+const userRolesSelect = (state) => state.room.userRoles;
 const roomPermissionsSelect = (state) => state.room.roomPermissions;
 const roomAllowWhenRoleMissing = (state) => state.room.allowWhenRoleMissing;
 const producersSelect = (state) => state.producers;
@@ -101,6 +102,25 @@ export const passiveMicConsumerSelector = createSelector(
 		Object.values(consumers).filter(
 			(consumer) => consumer.source === 'mic' && !spotlights.includes(consumer.peerId)
 		)
+);
+
+export const highestRoleLevelSelector = createSelector(
+	meRolesSelect,
+	userRolesSelect,
+	(roles, userRoles) =>
+	{
+		let level = 0;
+
+		for (const role of roles)
+		{
+			const tmpLevel = userRoles.get(role).level;
+
+			if (tmpLevel > level)
+				level = tmpLevel;
+		}
+
+		return level;
+	}
 );
 
 export const spotlightsLengthSelector = createSelector(
@@ -245,9 +265,9 @@ export const makePermissionSelector = (permission) =>
 			if (!roomPermissions)
 				return false;
 
-			const permitted = roles.some((userRole) =>
+			const permitted = roles.some((roleId) =>
 				roomPermissions[permission].some((permissionRole) =>
-					userRole.id === permissionRole.id
+					roleId === permissionRole.id
 				)
 			);
 
@@ -262,8 +282,8 @@ export const makePermissionSelector = (permission) =>
 				peers.filter(
 					(peer) =>
 						peer.roles.some(
-							(role) => roomPermissions[permission].some((permissionRole) =>
-								role.id === permissionRole.id
+							(roleId) => roomPermissions[permission].some((permissionRole) =>
+								roleId === permissionRole.id
 							)
 						)
 				).length === 0

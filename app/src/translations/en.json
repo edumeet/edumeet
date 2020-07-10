@@ -205,6 +205,7 @@
 	"moderator.clearChat": "Moderator cleared the chat",
 	"moderator.clearFiles": "Moderator cleared the files",
 	"moderator.muteAudio": "Moderator muted your audio",
+	"moderator.modifyPeerRoles": "Change roles",
 	"moderator.muteVideo": "Moderator muted your video",
 	"moderator.stopScreenSharing": "Moderator stopped your screen sharing",
 

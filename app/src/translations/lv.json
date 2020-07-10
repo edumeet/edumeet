@@ -199,6 +199,7 @@
 	"moderator.clearChat": "Moderators nodzēsa tērziņus",
 	"moderator.clearFiles": "Moderators notīrīja failus",
 	"moderator.muteAudio": "Moderators noklusināja jūsu mikrofonu",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderators atslēdza jūsu kameru",
 	"moderator.stopScreenSharing": null,
 

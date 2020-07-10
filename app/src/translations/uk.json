@@ -200,10 +200,11 @@
 
 	"devices.cameraDisconnected": "Камера відключена",
 	"devices.cameraError": "Під час доступу до камери сталася помилка",
-	
+
 	"moderator.clearChat": "Модератор очистив чат",
 	"moderator.clearFiles": "Модератор очистив файли",
 	"moderator.muteAudio": "Модератор відключив ваше аудіо (ваш звук)",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Модератор відключив ваше відео",
 	"moderator.stopScreenSharing": "Модератор припинив спільне користування екраном",
 

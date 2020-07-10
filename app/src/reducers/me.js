@@ -56,18 +56,15 @@ const me = (state = initialState, action) =>
 
 		case 'ADD_ROLE':
 		{
-			if (state.roles.some((role) => role.id === action.payload.role.id))
-				return state;
-
-			const roles = [ ...state.roles, action.payload.role ];
+			const roles = [ ...state.roles, action.payload.roleId ];
 
 			return { ...state, roles };
 		}
 
 		case 'REMOVE_ROLE':
 		{
-			const roles = state.roles.filter((role) =>
-				role.id !== action.payload.role.id);
+			const roles = state.roles.filter((roleId) =>
+				roleId !== action.payload.roleId);
 
 			return { ...state, roles };
 		}

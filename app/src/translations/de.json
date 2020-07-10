@@ -205,6 +205,7 @@
 	"moderator.clearChat": "Moderator hat Chat gelöscht",
 	"moderator.clearFiles": "Moderator hat geteilte Dateiliste gelöscht",
 	"moderator.muteAudio": "Moderator hat dich stummgeschaltet",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderator hat dein Video gestoppt",
 	"moderator.stopScreenSharing": "Moderator hat deine Bildschirmfreigabe gestoppt",
 

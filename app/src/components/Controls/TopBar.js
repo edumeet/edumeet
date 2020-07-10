@@ -307,7 +307,7 @@ const TopBar = (props) =>
 						color='inherit'
 						noWrap
 					>
-						{ window.config.title ? window.config.title : 'Multiparty meeting' }
+						{ window.config.title ? window.config.title : 'edumeet' }
 					</Typography>
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>

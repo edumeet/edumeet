@@ -74,8 +74,8 @@ class NewWindow extends React.PureComponent
 	static defaultProps =
 	{
 		url        : '',
-		name       : 'Multiparty Meeting',
-		title      : 'Multiparty Meeting',
+		name       : 'edumeet',
+		title      : 'edumeet',
 		features   : { width: '800px', height: '600px' },
 		onBlock    : null,
 		onUnload   : null,

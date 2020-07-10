@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { makePeerConsumerSelector } from '../../Selectors';
 import { withStyles } from '@material-ui/core/styles';
+import * as roomActions from '../../../actions/roomActions';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../../appPropTypes';
 import { withRoomContext } from '../../../RoomContext';
@@ -27,6 +28,7 @@ import PanIcon from '@material-ui/icons/PanTool';
 import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
 import RecordVoiceOverIcon from '@material-ui/icons/RecordVoiceOver';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
@@ -107,6 +109,7 @@ const ListPeer = (props) =>
 		isModerator,
 		spotlight,
 		peer,
+		openRolesManager,
 		micConsumer,
 		webcamConsumer,
 		screenConsumer,
@@ -438,6 +441,22 @@ const ListPeer = (props) =>
 										/>
 									</p>
 								</MenuItem>
+								<MenuItem
+									onClick={() =>
+									{
+										// handleMenuClose();
+
+										openRolesManager(peer.id);
+									}}
+								>
+									<AccountTreeIcon />
+									<p className={classes.moreAction}>
+										<FormattedMessage
+											id='moderator.modifyPeerRoles'
+											defaultMessage='Change roles'
+										/>
+									</p>
+								</MenuItem>
 							</React.Fragment>
 						}
 					</Paper>
@@ -449,17 +468,18 @@ const ListPeer = (props) =>
 
 ListPeer.propTypes =
 {
-	roomClient     : PropTypes.any.isRequired,
-	advancedMode   : PropTypes.bool,
-	isModerator    : PropTypes.bool,
-	spotlight      : PropTypes.bool,
-	peer           : appPropTypes.Peer.isRequired,
-	micConsumer    : appPropTypes.Consumer,
-	webcamConsumer : appPropTypes.Consumer,
-	screenConsumer : appPropTypes.Consumer,
-	isSelected     : PropTypes.bool,
-	children       : PropTypes.object,
-	classes        : PropTypes.object.isRequired
+	roomClient       : PropTypes.any.isRequired,
+	advancedMode     : PropTypes.bool,
+	isModerator      : PropTypes.bool,
+	spotlight        : PropTypes.bool,
+	peer             : appPropTypes.Peer.isRequired,
+	openRolesManager : PropTypes.func.isRequired,
+	micConsumer      : appPropTypes.Consumer,
+	webcamConsumer   : appPropTypes.Consumer,
+	screenConsumer   : appPropTypes.Consumer,
+	isSelected       : PropTypes.bool,
+	children         : PropTypes.object,
+	classes          : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -477,9 +497,20 @@ const makeMapStateToProps = (initialState, { id }) =>
 	return mapStateToProps;
 };
 
+const mapDispatchToProps = (dispatch) =>
+{
+	return {
+		openRolesManager : (peerId) =>
+		{
+			dispatch(roomActions.setRolesManagerPeer(peerId));
+			dispatch(roomActions.setRolesManagerOpen(true));
+		}
+	};
+};
+
 export default withRoomContext(connect(
 	makeMapStateToProps,
-	null,
+	mapDispatchToProps,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
