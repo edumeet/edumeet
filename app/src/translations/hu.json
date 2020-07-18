@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Billentyűparancsok",
 	"room.browsePeersSpotlight": "Résztvevők böngészése",
 	"room.stopAllScreenSharing": "Összes képernyőmegosztás leállítása",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 

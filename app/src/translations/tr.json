@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Kısayol Tuşları",
 	"room.browsePeersSpotlight": "Gündeme alınacak katılımcıyı seç",
 	"room.stopAllScreenSharing": "Tüm ekran paylaşımlarını durdur",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Sesiniz kapalı, konuşmak için SPACE tuşuna basılı tutun",
 

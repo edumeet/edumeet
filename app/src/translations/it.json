@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Scorciatoie da tastiera",
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 	
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 

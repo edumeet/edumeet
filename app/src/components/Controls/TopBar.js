@@ -35,6 +35,8 @@ import PeopleIcon from '@material-ui/icons/People';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import VideoCallIcon from '@material-ui/icons/VideoCall';
+import SelfViewOnIcon from '@material-ui/icons/Videocam';
+import SelfViewOffIcon from '@material-ui/icons/VideocamOff';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
@@ -227,6 +229,7 @@ const TopBar = (props) =>
 		setHelpOpen,
 		setAboutOpen,
 		setLockDialogOpen,
+		setHideSelfView,
 		toggleToolArea,
 		openUsersTab,
 		unread,
@@ -561,6 +564,44 @@ const TopBar = (props) =>
 							onClick={() =>
 							{
 								handleMenuClose();
+								setHideSelfView(!room.hideSelfView);
+							}}
+						>
+							{ room.hideSelfView ?
+							<SelfViewOnIcon
+								aria-label={intl.formatMessage({
+									id             : 'room.showSelfView',
+									defaultMessage : 'Show self view video'
+								})}
+							/>
+							:
+							<SelfViewOffIcon
+								aria-label={intl.formatMessage({
+									id             : 'room.hideSelfView',
+									defaultMessage : 'Hide self view video'
+								})}
+							/>
+							}
+							{ room.hideSelfView ?
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='room.showSelfView'
+									defaultMessage='Show self view video'
+								/>
+							</p>
+							:
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='room.hideSelfView'
+									defaultMessage='Hide self view video'
+								/>
+							</p>
+							}
+						</MenuItem>
+						<MenuItem
+							onClick={() =>
+							{
+								handleMenuClose();
 								setHelpOpen(!room.helpOpen);
 							}}
 						>
@@ -770,6 +811,44 @@ const TopBar = (props) =>
 					onClick={() =>
 					{
 						handleMenuClose();
+						setHideSelfView(!room.hideSelfView);
+					}}
+				>
+					{ room.hideSelfView ?
+					<SelfViewOnIcon
+						aria-label={intl.formatMessage({
+							id             : 'room.showSelfView',
+							defaultMessage : 'Show self view video'
+						})}
+					/>
+					:
+					<SelfViewOffIcon
+						aria-label={intl.formatMessage({
+							id             : 'room.hideSelfView',
+							defaultMessage : 'Hide self view video'
+						})}
+					/>
+					}
+					{ room.hideSelfView ?
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='room.showSelfView'
+							defaultMessage='Show self view video'
+						/>
+					</p>
+					:
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='room.hideSelfView'
+							defaultMessage='Hide self view video'
+						/>
+					</p>
+					}
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
 						setHelpOpen(!room.helpOpen);
 					}}
 				>
@@ -833,6 +912,7 @@ TopBar.propTypes =
 	setHelpOpen          : PropTypes.func.isRequired,
 	setAboutOpen         : PropTypes.func.isRequired,
 	setLockDialogOpen    : PropTypes.func.isRequired,
+	setHideSelfView      : PropTypes.func.isRequired
 	toggleToolArea       : PropTypes.func.isRequired,
 	openUsersTab         : PropTypes.func.isRequired,
 	unread               : PropTypes.number.isRequired,
@@ -901,6 +981,10 @@ const mapDispatchToProps = (dispatch) =>
 		setLockDialogOpen : (lockDialogOpen) =>
 		{
 			dispatch(roomActions.setLockDialogOpen(lockDialogOpen));
+		},
+		setHideSelfView : (hideSelfView) =>
+		{
+			dispatch(roomActions.setHideSelfView(hideSelfView));
 		},
 		toggleToolArea : () =>
 		{

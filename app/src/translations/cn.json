@@ -64,6 +64,8 @@
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 	
 	"me.mutedPTT": null,
 

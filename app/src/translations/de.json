@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Tastaturkürzel",
 	"room.browsePeersSpotlight": "Teilnehmer durchgehen und anzeigen",
 	"room.stopAllScreenSharing": "Stoppe alle Bildschirmfreigaben",
+	"room.hideSelfView": "Selbstansicht-Video ausblenden",
+	"room.showSelfView": "Selbstansicht-Video anzeigen",
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 

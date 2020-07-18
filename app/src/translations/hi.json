@@ -65,6 +65,8 @@
 	"room.shortcutKeys": " शॉर्टकट बट्टन",
 	"room.browsePeersSpotlight": "देखिये प्रतिभागी जो स्पॉटलाइट मे हैं",
 	"room.stopAllScreenSharing": "स्क्रीन का आदान-प्रदान स्थगित कीजिए ",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "आप शांत हैं, बात करने के लिए स्पेस-बार दबाईए",
 

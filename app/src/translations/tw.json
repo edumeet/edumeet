@@ -64,6 +64,8 @@
 	"room.about": "關於",
 	"room.shortcutKeys": "鍵盤快速鍵",
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "您已靜音，請按下 空白鍵 來說話",
 
