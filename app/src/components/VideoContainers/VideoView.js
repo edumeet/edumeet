@@ -395,9 +395,9 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden  : !videoVisible,
+						hidden       : !videoVisible,
 						'isMirrored' : isMirrored,
-						contain : videoContain
+						contain      : videoContain
 					})}
 					autoPlay
 					playsInline
@@ -560,7 +560,7 @@ VideoView.propTypes =
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
 	classes                        : PropTypes.object.isRequired,
-	netInfo               		   : PropTypes.object
+	netInfo                        : PropTypes.object
 };
 
 export default withStyles(styles)(VideoView);
