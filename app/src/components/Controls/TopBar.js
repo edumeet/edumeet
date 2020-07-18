@@ -815,34 +815,34 @@ const TopBar = (props) =>
 					}}
 				>
 					{ room.hideSelfView ?
-					<SelfViewOnIcon
-						aria-label={intl.formatMessage({
-							id             : 'room.showSelfView',
-							defaultMessage : 'Show self view video'
-						})}
-					/>
-					:
-					<SelfViewOffIcon
-						aria-label={intl.formatMessage({
-							id             : 'room.hideSelfView',
-							defaultMessage : 'Hide self view video'
-						})}
-					/>
+						<SelfViewOnIcon
+							aria-label={intl.formatMessage({
+								id             : 'room.showSelfView',
+								defaultMessage : 'Show self view video'
+							})}
+						/>
+						:
+						<SelfViewOffIcon
+							aria-label={intl.formatMessage({
+								id             : 'room.hideSelfView',
+								defaultMessage : 'Hide self view video'
+							})}
+						/>
 					}
 					{ room.hideSelfView ?
-					<p className={classes.moreAction}>
-						<FormattedMessage
-							id='room.showSelfView'
-							defaultMessage='Show self view video'
-						/>
-					</p>
-					:
-					<p className={classes.moreAction}>
-						<FormattedMessage
-							id='room.hideSelfView'
-							defaultMessage='Hide self view video'
-						/>
-					</p>
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='room.showSelfView'
+								defaultMessage='Show self view video'
+							/>
+						</p>
+						:
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='room.hideSelfView'
+								defaultMessage='Hide self view video'
+							/>
+						</p>
 					}
 				</MenuItem>
 				<MenuItem
