@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": "Sidemeny over innhold",
 	"settings.voiceActivatedUnmute": "Stemmeaktivert autodemping",
 	"settings.noiseThreshold": "Støyterskel",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

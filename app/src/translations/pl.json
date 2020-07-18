@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": "Szuflada nad zawartością",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": "Lustrzany widok własnego wideo",
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",

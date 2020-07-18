@@ -155,6 +155,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",

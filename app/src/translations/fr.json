@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",
