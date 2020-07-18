@@ -36,7 +36,7 @@ const styles = (theme) =>
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
 			backgroundColor    : 'var(--peer-video-bg-color)',
-			'&.isMirrored          :
+			'&.isMirrored' :
 			{
 				transform : 'scaleX(-1)'
 			},

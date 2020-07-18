@@ -298,7 +298,7 @@ export default class RoomClient
 
 				switch (key)
 				{
-					
+
 					/*
 					case String.fromCharCode(37):
 					{
