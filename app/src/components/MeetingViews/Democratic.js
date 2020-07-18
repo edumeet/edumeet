@@ -176,11 +176,13 @@ class Democratic extends React.PureComponent
 				)}
 				ref={this.peersRef}
 			>
-				{ !hideSelfView && <Me
+				{ !hideSelfView &&
+				<Me
 					advancedMode={advancedMode}
 					spacing={6}
 					style={style}
-				/> }
+				/>
+				}
 				{ spotlightsPeers.map((peer) =>
 				{
 					return (

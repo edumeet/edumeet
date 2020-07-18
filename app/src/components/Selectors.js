@@ -199,7 +199,7 @@ export const videoBoxesSelector = createSelector(
 	) =>
 	{
 		return spotlightsLength + (isHidden ? 0 : 1) +
-			(isHidden ? 0 : screenProducers.length) + screenConsumers.length + 
+			(isHidden ? 0 : screenProducers.length) + screenConsumers.length +
 			(isHidden ? 0 : extraVideoProducers.length) + extraVideoConsumers.length;
 	}
 );
