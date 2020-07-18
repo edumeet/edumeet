@@ -288,13 +288,13 @@ class Filmstrip extends React.PureComponent
 									active : myId === activePeerId
 								})}
 							>
-							{ !hideSelfView &&
-							<Me
-								advancedMode={advancedMode}
-								style={peerStyle}
-								smallContainer
-							/>
-							}
+								{ !hideSelfView &&
+								<Me
+									advancedMode={advancedMode}
+									style={peerStyle}
+									smallContainer
+								/>
+								}
 							</div>
 						</Grid>
 

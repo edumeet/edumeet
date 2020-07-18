@@ -912,7 +912,7 @@ TopBar.propTypes =
 	setHelpOpen          : PropTypes.func.isRequired,
 	setAboutOpen         : PropTypes.func.isRequired,
 	setLockDialogOpen    : PropTypes.func.isRequired,
-	setHideSelfView      : PropTypes.func.isRequired
+	setHideSelfView      : PropTypes.func.isRequired,
 	toggleToolArea       : PropTypes.func.isRequired,
 	openUsersTab         : PropTypes.func.isRequired,
 	unread               : PropTypes.number.isRequired,
