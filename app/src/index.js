@@ -42,6 +42,7 @@ import messagesUkrainian from './translations/uk';
 import messagesTurkish from './translations/tr';
 import messagesLatvian from './translations/lv';
 import messagesRussian from './translations/ru';
+import messagesKazakh from './translations/kk';
 
 import './index.css';
 
@@ -70,7 +71,8 @@ const messages =
 	'uk'      : messagesUkrainian,
 	'tr'      : messagesTurkish,
 	'lv'      : messagesLatvian,
-	'ru'      : messagesRussian
+	'ru'      : messagesRussian,
+	'kk'      : messagesKazakh
 };
 
 const supportedBrowsers={

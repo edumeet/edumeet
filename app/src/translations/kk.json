@@ -14,7 +14,7 @@
 	"room.youUnLocked": "Сіз бейнеконференцияға қосылуды аштыңыз",
 	"room.cantUnLock": "Бейнеконференцияға қосылуды ашу мүмкін емес",
 	"room.locked": "Бейнеконференцияға қосылу енді жабық",
-	"room.unlocked": "Бейнеконференцияларға қосылу ашық"",
+	"room.unlocked": "Бейнеконференцияларға қосылу ашық",
 	"room.newLobbyPeer": "Жаңа қатысушы кірді",
 	"room.lobbyPeerLeft": "Жаңа қатысушы кетті",
 	"room.lobbyPeerChangedDisplayName": "Қатысушы атын {displayName} етіп өзгертті",
