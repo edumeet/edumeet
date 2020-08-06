@@ -14,7 +14,7 @@
 	"room.youUnLocked": "Вы открыли доступ к видеоконференции",
 	"room.cantUnLock": "Невозможно открыть доступ к видеоконференции",
 	"room.locked": "Доступ к видеоконференции закрыт",
-	"room.unlocked": "Доступ к видеоконференции открыт"",
+	"room.unlocked": "Доступ к видеоконференции открыт",
 	"room.newLobbyPeer": "Зашел новый участник",
 	"room.lobbyPeerLeft": "Участник вышел",
 	"room.lobbyPeerChangedDisplayName": "Участник изменил имя на {displayName}",

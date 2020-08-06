@@ -41,6 +41,7 @@ import messagesItalian from './translations/it';
 import messagesUkrainian from './translations/uk';
 import messagesTurkish from './translations/tr';
 import messagesLatvian from './translations/lv';
+import messagesRussian from './translations/ru';
 
 import './index.css';
 
@@ -68,7 +69,8 @@ const messages =
 	'it'      : messagesItalian,
 	'uk'      : messagesUkrainian,
 	'tr'      : messagesTurkish,
-	'lv'      : messagesLatvian
+	'lv'      : messagesLatvian,
+	'ru'      : messagesRussian
 };
 
 const supportedBrowsers={
