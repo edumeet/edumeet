@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": "Barra laterale sovrapposta",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",

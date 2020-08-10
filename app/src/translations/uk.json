@@ -160,6 +160,7 @@
 	"settings.drawerOverlayed": "Боковий ящик над вмістом",
 	"settings.voiceActivatedUnmute": "Активований голос вмикається",
 	"settings.noiseThreshold": "Поріг шуму",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",

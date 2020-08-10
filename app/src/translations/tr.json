@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": "Yan menü içeriğin üzerine geçsin",
 	"settings.voiceActivatedUnmute": "Konuşunca mikrofonu aç",
 	"settings.noiseThreshold": "Gürültü eşiği",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",

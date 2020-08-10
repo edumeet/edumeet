@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": "Seitenpanel verdeckt Hauptinhalt",
 	"settings.voiceActivatedUnmute": "Automatische Spracherkennung",
 	"settings.noiseThreshold": "Geräuschepegel",
+	"settings.mirrorOwnVideo": "Ansicht des eigenen Videos spiegeln",
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",

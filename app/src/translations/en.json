@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": "Side drawer over content",
 	"settings.voiceActivatedUnmute": "Voice activated unmute",
 	"settings.noiseThreshold": "Noise threshold",
+	"settings.mirrorOwnVideo": "Mirror view of own video",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

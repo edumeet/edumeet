@@ -128,3 +128,7 @@ export const setLastN = (lastN) =>
 		type    : 'SET_LAST_N',
 		payload : { lastN }
 	});
+export const toggleMirrorOwnVideo = () =>
+	({
+		type : 'TOGGLE_MIRROR_OWN_VIDEO'
+	});

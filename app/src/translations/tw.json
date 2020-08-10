@@ -160,6 +160,7 @@
 	"settings.drawerOverlayed": "側邊欄覆蓋畫面",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "無法保存文件",
 	"filesharing.startingFileShare": "開始分享文件",

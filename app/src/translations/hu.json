@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": "Oldalsáv a tartalom felett",
 	"settings.voiceActivatedUnmute": "Beszéd aktivált mikrofon némítás",
 	"settings.noiseThreshold": "Zajszint",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

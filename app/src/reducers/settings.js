@@ -23,6 +23,7 @@ const initialState =
 	hiddenControls          : false,
 	showNotifications       : true,
 	notificationSounds      : true,
+	mirrorOwnVideo          : true,
 	buttonControlBar        : window.config.buttonControlBar || false,
 	drawerOverlayed         : window.config.drawerOverlayed || true,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
@@ -214,6 +215,13 @@ const settings = (state = initialState, action) =>
 			const { screenSharingFrameRate } = action.payload;
 
 			return { ...state, screenSharingFrameRate };
+		}
+
+		case 'TOGGLE_MIRROR_OWN_VIDEO':
+		{
+			const mirrorOwnVideo = !state.mirrorOwnVideo;
+
+			return { ...state, mirrorOwnVideo };
 		}
 
 		default:

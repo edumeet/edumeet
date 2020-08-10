@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": "Bočni izbornik iznad sadržaja",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",

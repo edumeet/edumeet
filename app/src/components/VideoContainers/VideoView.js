@@ -36,7 +36,7 @@ const styles = (theme) =>
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
 			backgroundColor    : 'var(--peer-video-bg-color)',
-			'&.isMe'           :
+			'&.isMirrored'     :
 			{
 				transform : 'scaleX(-1)'
 			},
@@ -187,6 +187,7 @@ class VideoView extends React.PureComponent
 	{
 		const {
 			isMe,
+			isMirrored,
 			isScreen,
 			isExtraVideo,
 			showQuality,
@@ -394,9 +395,9 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden  : !videoVisible,
-						'isMe'  : isMe && !isScreen,
-						contain : videoContain
+						hidden       : !videoVisible,
+						'isMirrored' : isMirrored,
+						contain      : videoContain
 					})}
 					autoPlay
 					playsInline
@@ -534,6 +535,7 @@ class VideoView extends React.PureComponent
 VideoView.propTypes =
 {
 	isMe                           : PropTypes.bool,
+	isMirrored                     : PropTypes.bool,
 	isScreen                       : PropTypes.bool,
 	isExtraVideo   	               : PropTypes.bool,
 	showQuality                    : PropTypes.bool,
@@ -558,7 +560,7 @@ VideoView.propTypes =
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
 	classes                        : PropTypes.object.isRequired,
-	netInfo               						   : PropTypes.object
+	netInfo                        : PropTypes.object
 };
 
 export default withStyles(styles)(VideoView);

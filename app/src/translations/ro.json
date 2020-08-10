@@ -161,6 +161,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Încercarea de a salva fișierul a eșuat",
 	"filesharing.startingFileShare": "Partajarea fișierului",
