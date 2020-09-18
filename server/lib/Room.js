@@ -75,13 +75,16 @@ class Room extends EventEmitter
 		{
 			const routerId = peer._routerId;
 
-			if (routerLoads.get(routerId))
+			if (routerId)
 			{
-				routerLoads.set(routerId, routerLoads.get(routerId) + 1);
-			}
-			else
-			{
-				routerLoads.set(routerId, 1);
+				if (routerLoads.get(routerId))
+				{
+					routerLoads.set(routerId, routerLoads.get(routerId) + 1);
+				}
+				else
+				{
+					routerLoads.set(routerId, 1);
+				}
 			}
 		}
 
@@ -94,15 +97,12 @@ class Room extends EventEmitter
 				if (workerLoads.get(worker._pid))
 				{
 					workerLoads.set(worker._pid, workerLoads.get(worker._pid) +
-						routerLoads.get(routerId));
-				}
-				else if (routerLoads.get(routerId))
-				{
-					workerLoads.set(worker._pid, routerLoads.get(routerId));
+						(routerLoads.get(routerId)?routerLoads.get(routerId):0));
 				}
 				else
 				{
-					workerLoads.set(worker._pid, 0);
+					workerLoads.set(worker._pid,
+						(routerLoads.get(routerId)?routerLoads.get(routerId):0));
 				}
 			}
 		}
