@@ -1022,7 +1022,11 @@ export default class RoomClient
 					if (spotlights.includes(consumer.appData.peerId))
 						await this._resumeConsumer(consumer);
 					else
+					{
 						await this._pauseConsumer(consumer);
+						store.dispatch(
+							roomActions.removeSelectedPeer(consumer.appData.peerId));
+					}
 				}
 			}
 		}

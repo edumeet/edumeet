@@ -152,11 +152,12 @@ export default class Spotlights extends EventEmitter
 	{
 		let spotlights;
 
-		const maxSpotlights =
-			this._selectedSpotlights.length >
-			this._maxSpotlights ?
-				this._selectedSpotlights.length :
-				this._maxSpotlights;
+		const maxSpotlights = this._maxSpotlights;
+
+		while (this._selectedSpotlights.length > this._maxSpotlights)
+		{
+			this._selectedSpotlights.shift();
+		}
 
 		if (this._selectedSpotlights.length > 0)
 		{
