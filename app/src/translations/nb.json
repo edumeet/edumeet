@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Hurtigtaster",
 	"room.browsePeersSpotlight": "Bytt mellom synlig deltaker",
 	"room.stopAllScreenSharing": "Stopp all skjermdeling",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 

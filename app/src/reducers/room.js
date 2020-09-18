@@ -23,6 +23,7 @@ const initialState =
 	rolesManagerPeer              : null, // peerId
 	settingsOpen                  : false,
 	extraVideoOpen                : false,
+	hideSelfView                  : false,
 	rolesManagerOpen              : false,
 	helpOpen                      : false,
 	aboutOpen                     : false,
@@ -289,6 +290,13 @@ const room = (state = initialState, action) =>
 			const { allowWhenRoleMissing } = action.payload;
 
 			return { ...state, allowWhenRoleMissing };
+		}
+
+		case 'SET_HIDE_SELF_VIEW':
+		{
+			const { hideSelfView } = action.payload;
+
+			return { ...state, hideSelfView };
 		}
 
 		default:

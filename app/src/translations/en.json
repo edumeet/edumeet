@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Shortcut Keys",
 	"room.browsePeersSpotlight": "Browse participants into Spotlight",
 	"room.stopAllScreenSharing": "Stop all screen sharing",
+	"room.hideSelfView": "Hide self view video",
+	"room.showSelfView": "Show self view video",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
