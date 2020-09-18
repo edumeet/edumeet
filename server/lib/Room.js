@@ -302,9 +302,13 @@ class Room extends EventEmitter
 			router.close();
 		}
 
-		this._routerIterator = null;
-
 		this._currentRouter = null;
+
+		this._allPeers = null;
+
+		this._pipedRoutersIds = null;
+
+		this._mediasoupWorkers = null;
 
 		this._mediasoupRouters.clear();
 
