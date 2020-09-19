@@ -535,6 +535,13 @@ class Room extends EventEmitter
 				}
 
 				this._notification(peer.socket, 'roomReady', { turnServers });
+
+				if (config.activateOnHostJoin && this._lobby.peerList().length > 0 &&
+					!this._locked && peer.roles.some((role) =>
+					config.permissionsFromRoles.PROMOTE_PEER.includes(role)))
+				{
+					this._lobby.promoteAllPeers();
+				}
 			}
 		})
 			.catch((error) =>
