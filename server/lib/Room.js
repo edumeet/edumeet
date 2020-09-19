@@ -674,6 +674,16 @@ class Room extends EventEmitter
 			}
 		}
 
+		if (this._locked && peer.roles.some((role) =>
+			roomPermissions[CHANGE_ROOM_LOCK].includes(role)) &&
+			this._getPeersWithPermission(CHANGE_ROOM_LOCK).length === 0)
+		{
+				this._locked = false;
+				this._notification(peer.socket, 'unlockRoom', {
+					peerId : peer.id
+				}, true);
+		}
+
 		// If this is the last Peer in the room and
 		// lobby is empty, close the room after a while.
 		if (this.checkEmpty() && this._lobby.checkEmpty())
