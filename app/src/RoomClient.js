@@ -1397,11 +1397,31 @@ export default class RoomClient
 				start
 			)
 			{
+				const {
+					sampleRate,
+					channelCount,
+					volume,
+					autoGainControl,
+					echoCancellation,
+					noiseSuppression,
+					sampleSize
+				} = store.getState().settings;
+	
 				if (this._webcamProducer)
 					await this.disableWebcam();
 
 				const stream = await navigator.mediaDevices.getUserMedia(
 					{
+						audio : {
+							deviceId : { ideal: deviceId },
+							sampleRate,
+							channelCount,
+							volume,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
+						},
 						video :
 						{
 							deviceId : { ideal: deviceId },
@@ -3309,6 +3329,12 @@ export default class RoomClient
 			if (this._produce)
 			{
 				if (
+					joinVideo &&
+					this._havePermission(permissions.SHARE_VIDEO)
+				){
+					this.updateWebcam({ start: true });
+				}
+				if (
 					this._mediasoupDevice.canProduce('audio') &&
 					this._havePermission(permissions.SHARE_AUDIO)
 				)
@@ -3325,11 +3351,7 @@ export default class RoomClient
 							this.muteMic();
 					}
 
-				if (
-					joinVideo &&
-					this._havePermission(permissions.SHARE_VIDEO)
-				)
-					this.updateWebcam({ start: true });
+				
 			}
 
 			await this._updateAudioOutputDevices();
