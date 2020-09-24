@@ -657,7 +657,7 @@ async function getOrCreateRoom({ roomId })
 
 		// const mediasoupWorker = getMediasoupWorker();
 
-		room = await Room.create({ mediasoupWorkers, roomId });
+		room = await Room.create({ mediasoupWorkers, roomId, peers });
 
 		rooms.set(roomId, room);
 
