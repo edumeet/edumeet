@@ -58,4 +58,4 @@ Open fully the settings **Click on show more!!**
 ## moodle plugin
 
 Alternatively you can use edumeet moodle plugin:
-[https://github.com/misi/moodle-mod_multipartymeeting](https://github.com/misi/moodle-mod_multipartymeeting)
+[https://github.com/edumeet/moodle-mod_edumeet](https://github.com/edumeet/moodle-mod_edumeet)
