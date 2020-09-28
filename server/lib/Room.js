@@ -64,7 +64,8 @@ const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 class Room extends EventEmitter
 {
 
-	static getLeastLoadedRouter(mediasoupWorkers, peers, mediasoupRouters, pipedRoutersIds = [])
+	static getLeastLoadedRouter(mediasoupWorkers, peers, mediasoupRouters, 
+		pipedRoutersIds = [])
 	{
 
 		const routerLoads = new Map();
@@ -107,10 +108,12 @@ class Room extends EventEmitter
 			}
 		}
 
-		const sortedWorkerLoads = new Map([...workerLoads.entries()].sort((a, b) => a[1] - b[1]));
+		const sortedWorkerLoads = new Map( [ ...workerLoads.entries() ].sort(
+			(a, b) => a[1] - b[1]));
 
 		// we don't care about if router is piped, just choose the least loaded worker
-		if (pipedRoutersIds.length === 0 || pipedRoutersIds.length === mediasoupRouters.size)
+		if (pipedRoutersIds.length === 0 || 
+			pipedRoutersIds.length === mediasoupRouters.size)
 		{
 			const workerId = sortedWorkerLoads.keys().next().value;
 
@@ -140,39 +143,41 @@ class Room extends EventEmitter
 					if (worker._pid === workerId)
 					{
 						for (const router of worker._routers)
-		{
+						{
 							const routerId = router._internal.routerId;
 
-							//on purpose we check if the worker loat is below the limit, as in reality the worker load is imortant, not the router load
-							if (mediasoupRouters.has(routerId) && pipedRoutersIds.includes(routerId) && workerLoad < ROUTER_SCALE_SIZE)
-			{
+							//on purpose we check if the worker loat is below the limit,
+							//as in reality the worker load is imortant,
+							//not the router load
+							if (mediasoupRouters.has(routerId) && 
+								pipedRoutersIds.includes(routerId) && 
+								workerLoad < ROUTER_SCALE_SIZE)
+							{
 								return routerId;
 							}
-						}
-					}
-			}
-		}
-
-			//no piped router found, we need to return router from least loaded worker
-			const workerId = sortedWorkerLoads.keys().next().value;
-
-		for (const worker of mediasoupWorkers)
-		{
-				if (worker._pid === workerId)
-			{
-
-				for (const router of worker._routers)
-				{
-					const routerId = router._internal.routerId;
-
-					if (mediasoupRouters.has(routerId))
-					{
-							return routerId;
 						}
 					}
 				}
 			}
 
+			//no piped router found, we need to return router from least loaded worker
+			const workerId = sortedWorkerLoads.keys().next().value;
+
+			for (const worker of mediasoupWorkers)
+			{
+				if (worker._pid === workerId)
+				{
+					for (const router of worker._routers)
+					{
+						const routerId = router._internal.routerId;
+
+						if (mediasoupRouters.has(routerId))
+						{
+							return routerId;
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -2081,13 +2086,13 @@ class Room extends EventEmitter
 	async _getRouterId()
 	{
 		const routerId = Room.getLeastLoadedRouter(
-			this._mediasoupWorkers,this._allPeers,
+			this._mediasoupWorkers,this._allPeers, 
 			this._mediasoupRouters, this._pipedRoutersIds);
 
-			if (!this._pipedRoutersIds.includes(routerId))
+		if (!this._pipedRoutersIds.includes(routerId))
 		{
-				await this._pipeProducersToNewRouter(routerId);
-				this._pipedRoutersIds.push(routerId);
+			await this._pipeProducersToNewRouter(routerId);
+			this._pipedRoutersIds.push(routerId);
 		}
 
 		return routerId;
