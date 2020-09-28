@@ -64,7 +64,7 @@ const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 class Room extends EventEmitter
 {
 
-	static getLeastLoadedRouter(mediasoupWorkers, peers, mediasoupRouters, 
+	static getLeastLoadedRouter(mediasoupWorkers, peers, mediasoupRouters,
 		pipedRoutersIds = [])
 	{
 
@@ -108,11 +108,11 @@ class Room extends EventEmitter
 			}
 		}
 
-		const sortedWorkerLoads = new Map( [ ...workerLoads.entries() ].sort(
+		const sortedWorkerLoads = new Map([ ...workerLoads.entries() ].sort(
 			(a, b) => a[1] - b[1]));
 
 		// we don't care about if router is piped, just choose the least loaded worker
-		if (pipedRoutersIds.length === 0 || 
+		if (pipedRoutersIds.length === 0 ||
 			pipedRoutersIds.length === mediasoupRouters.size)
 		{
 			const workerId = sortedWorkerLoads.keys().next().value;
@@ -135,8 +135,8 @@ class Room extends EventEmitter
 		}
 		else
 		{
-			//find if there is a piped router that is on a worker that is below limit
-			for (const [workerId, workerLoad] of sortedWorkerLoads.entries())
+			// find if there is a piped router that is on a worker that is below limit
+			for (const [ workerId, workerLoad ] of sortedWorkerLoads.entries())
 			{
 				for (const worker of mediasoupWorkers)
 				{
@@ -146,11 +146,11 @@ class Room extends EventEmitter
 						{
 							const routerId = router._internal.routerId;
 
-							//on purpose we check if the worker loat is below the limit,
-							//as in reality the worker load is imortant,
-							//not the router load
-							if (mediasoupRouters.has(routerId) && 
-								pipedRoutersIds.includes(routerId) && 
+							// on purpose we check if the worker load is below the limit,
+							// as in reality the worker load is imortant,
+							// not the router load
+							if (mediasoupRouters.has(routerId) &&
+								pipedRoutersIds.includes(routerId) &&
 								workerLoad < ROUTER_SCALE_SIZE)
 							{
 								return routerId;
@@ -160,7 +160,7 @@ class Room extends EventEmitter
 				}
 			}
 
-			//no piped router found, we need to return router from least loaded worker
+			// no piped router found, we need to return router from least loaded worker
 			const workerId = sortedWorkerLoads.keys().next().value;
 
 			for (const worker of mediasoupWorkers)
@@ -2086,7 +2086,7 @@ class Room extends EventEmitter
 	async _getRouterId()
 	{
 		const routerId = Room.getLeastLoadedRouter(
-			this._mediasoupWorkers,this._allPeers, 
+			this._mediasoupWorkers, this._allPeers,
 			this._mediasoupRouters, this._pipedRoutersIds);
 
 		if (!this._pipedRoutersIds.includes(routerId))
