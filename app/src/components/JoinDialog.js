@@ -215,6 +215,14 @@ const JoinDialog = ({
 				break;
 		}
 	};
+	
+	let decodedRoomId = null;                                                          
+	try{                                                                           
+		decodedRoomId = decodeURI(window.location.pathname.slice(1));                                             
+	}catch{                                                                        
+		decodedRoomId = roomId;                                                        
+		roomId = encodeURI(roomId);
+	}  
 
 	return (
 		<div className={classes.root}>
@@ -248,7 +256,7 @@ const JoinDialog = ({
 							id='room.roomId'
 							defaultMessage='Room ID: {roomName}'
 							values={{
-								roomName : roomId
+								roomName : decodedRoomId
 							}}
 						/>
 					</DialogContentText>
