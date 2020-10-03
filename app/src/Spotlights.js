@@ -26,7 +26,6 @@ export default class Spotlights
 		this._spotlightsUpdated();
 	}
 
-
 	peerInSpotlights(peerId)
 	{
 		return this._currentSpotlights.indexOf(peerId) !== -1;
@@ -37,7 +36,7 @@ export default class Spotlights
 		logger.debug('addPeerToSpotlight() [peerId:"%s"]', peerId);
 
 		this._selectedSpotlights = [ ...this._selectedSpotlights, peerId ];
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
 	removePeerSpotlight(peerId)
@@ -48,7 +47,7 @@ export default class Spotlights
 			this._selectedSpotlights.filter((peer) =>
 				peer !== peerId);
 
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
 	clearSpotlights()
@@ -125,7 +124,7 @@ export default class Spotlights
 		}
 
 		if (!this._arraysEqual(
-				this._currentSpotlights, spotlights.slice(0, maxSpotlights)))
+			this._currentSpotlights, spotlights.slice(0, maxSpotlights)))
 		{
 			logger.debug('_spotlightsUpdated() | spotlights updated, emitting');
 

@@ -1398,7 +1398,6 @@ export default class RoomClient
 				start
 			)
 			{
-				
 				if (this._webcamProducer)
 					await this.disableWebcam();
 
@@ -2788,7 +2787,7 @@ export default class RoomClient
 						const { id, displayName, picture, roles } = notification.data;
 
 						store.dispatch(peerActions.addPeer(
-								{ id, displayName, picture, roles, consumers: [] }));
+							{ id, displayName, picture, roles, consumers: [] }));
 
 						this._spotlights.newPeer(id);
 
@@ -3291,7 +3290,8 @@ export default class RoomClient
 				if (
 					joinVideo &&
 					this._havePermission(permissions.SHARE_VIDEO)
-				){
+				)
+				{
 					this.updateWebcam({ start: true });
 				}
 				if (
@@ -3310,8 +3310,6 @@ export default class RoomClient
 						if (autoMuteThreshold && peers.length >= autoMuteThreshold)
 							this.muteMic();
 					}
-
-				
 			}
 
 			await this._updateAudioOutputDevices();
