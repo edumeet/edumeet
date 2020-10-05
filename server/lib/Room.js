@@ -71,7 +71,7 @@ class Room extends EventEmitter
 
 		const workerLoads = new Map();
 
-		let pipedRoutersIds = new Set();
+		const pipedRoutersIds = new Set();
 
 		for (const peer of peers.values())
 		{
@@ -2079,7 +2079,7 @@ class Room extends EventEmitter
 
 				await srcRouter.pipeToRouter({
 					producerId : producerId,
-					router : router
+					router     : router
 				});
 			}
 		}
