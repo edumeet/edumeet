@@ -29,10 +29,10 @@ If you want the ansible approach, you can find ansible role [here](https://githu
 If you want to install it on the Debian & Ubuntu based operating systems.
 
 * Prerequisites:
-multiparty-meeting will run on nodejs v10.x and later versions. (v12.x has a know issue for now, please until it will be fixed use the 10.x version)
+EduMeet will run on nodejs v10.x and later versions. (v12.x has a know issue for now, please until it will be fixed use the 10.x version)
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
-* Download .deb package from [here](https://github.com/havfo/multiparty-meeting/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
+* Download .deb package from [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
 
 * Unzip the file
 
@@ -61,7 +61,7 @@ $ sudo systemctl start multiparty-meeting
 ## Manual installation
 
 * Prerequisites:
-Currently multiparty-meeting will only run on nodejs v13.x
+Currently EduMeet will only run on nodejs v13.x
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
@@ -71,8 +71,8 @@ $ sudo apt install git npm build-essential redis
 * Clone the project:
 
 ```bash
-$ git clone https://github.com/havfo/multiparty-meeting.git
-$ cd multiparty-meeting
+$ git clone https://github.com/edumeet/edumeet.git
+$ cd edumeet
 ```
 
 * Copy `server/config/config.example.js` to `server/config/config.js` :
@@ -135,7 +135,7 @@ $ systemctl daemon-reload
 $ systemctl start multiparty-meeting
 ```
 
-* If you want to start multiparty-meeting at boot time:
+* If you want to start EduMeet at boot time:
 
 ```bash
 $ systemctl enable multiparty-meeting
