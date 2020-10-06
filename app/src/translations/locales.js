@@ -60,6 +60,11 @@ const list = [
 		locale : [ 'it', 'it-it' ]
 	},
 	{
+		name   : 'Kazakh',
+		file   : 'kk',
+		locale : [ 'kk', 'kk-kz	' ]
+	},
+	{
 		name   : 'Latvian',
 		file   : 'lv',
 		locale : [ 'lv', 'lv-lv' ]
@@ -83,6 +88,11 @@ const list = [
 		name   : 'Romanian',
 		file   : 'ro',
 		locale : [ 'ro', 'ro-ro' ]
+	},
+	{
+		name   : 'Russian',
+		file   : 'ru',
+		locale : [ 'ru', 'ru-ru' ]
 	},
 	{
 		name   : 'Spanish',
