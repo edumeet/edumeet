@@ -2724,21 +2724,27 @@ export default class RoomClient
 					case 'newPeer':
 					{
 						const { id, displayName, picture, roles } = notification.data;
+						let enableJoinNotification = true; // Default
+
+						if(window.config.enableJoinNotification !== undefined)
+							enableJoinNotification = window.config.enableJoinNotification;
 
 						store.dispatch(
 							peerActions.addPeer({ id, displayName, picture, roles, consumers: [] }));
+														
+						if(enableJoinNotification) {
+							this._soundNotification();
 
-						this._soundNotification();
-
-						store.dispatch(requestActions.notify(
-							{
-								text : intl.formatMessage({
-									id             : 'room.newPeer',
-									defaultMessage : '{displayName} joined the room'
-								}, {
-									displayName
-								})
-							}));
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'room.newPeer',
+										defaultMessage : '{displayName} joined the room'
+									}, {
+										displayName
+									})
+								}));
+						}
 
 						break;
 					}

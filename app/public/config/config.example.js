@@ -117,6 +117,8 @@ var config =
 	// If false, will push videos away to make room for side
 	// drawer. If true, will overlay side drawer over videos
 	drawerOverlayed      : true,
+  // Enable 'user joined the room' notifications
+  enableJoinNotification : true,
 	// Position of notifications
 	notificationPosition : 'right',
 	// Timeout for autohiding topbar and button control bar
