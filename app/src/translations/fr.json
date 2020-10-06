@@ -65,6 +65,8 @@
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": null,
 
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",
@@ -204,6 +207,7 @@
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": null,
 	"moderator.stopScreenSharing": null,
 

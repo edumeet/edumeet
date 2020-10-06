@@ -147,7 +147,7 @@ var config =
 	lockLastN            : false,
 	// Add file and uncomment for adding logo to appbar
 	// logo       : 'images/logo.svg',
-	title                : 'Multiparty meeting',
+	title                : 'edumeet',
 	// Service & Support URL
 	// if not set then not displayed on the about modals
 	supportUrl           : 'https://support.example.com',

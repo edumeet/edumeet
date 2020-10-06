@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Scorciatoie da tastiera",
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 	
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": "Barra laterale sovrapposta",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",
@@ -205,6 +208,7 @@
 	"moderator.clearChat": "Il moderatore ha pulito la chat",
 	"moderator.clearFiles": "Il moderatore ha pulito i file",
 	"moderator.muteAudio": "Il moderatore ha mutato il tuo audio",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Il moderatore ha fermato il tuo video",
 	"moderator.stopScreenSharing": null,
 

@@ -1,8 +1,8 @@
 {
-	"name": "multiparty-meeting",
+	"name": "edumeet",
 	"version": "3.3.0",
 	"private": true,
-	"description": "multiparty meeting service",
+	"description": "edumeet meeting service",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
 	"license": "MIT",
 	"homepage": "./",

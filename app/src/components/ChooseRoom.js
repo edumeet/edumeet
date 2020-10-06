@@ -125,7 +125,7 @@ const ChooseRoom = ({
 				}}
 			>
 				<DialogTitle>
-					{ window.config.title ? window.config.title : 'Multiparty meeting' }
+					{ window.config.title ? window.config.title : 'edumeet' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>
@@ -163,7 +163,7 @@ const ChooseRoom = ({
 				<DialogActions>
 					<Button
 						component={Link}
-						to={roomId}
+						to={encodeURI(encodeURI(roomId))}
 						variant='contained'
 						color='secondary'
 					>

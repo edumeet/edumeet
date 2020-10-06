@@ -707,6 +707,7 @@ const Me = (props) =>
 
 					<VideoView
 						isMe
+						isMirrored={settings.mirrorOwnVideo}
 						VideoView
 						advancedMode={advancedMode}
 						peer={me}
@@ -846,6 +847,7 @@ const Me = (props) =>
 
 							<VideoView
 								isMe
+								isMirrored={settings.mirrorOwnVideo}
 								isExtraVideo
 								advancedMode={advancedMode}
 								peer={me}

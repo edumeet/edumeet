@@ -64,6 +64,8 @@
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
 
@@ -155,6 +157,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",
@@ -199,6 +202,7 @@
 	"moderator.clearChat": "Moderators nodzēsa tērziņus",
 	"moderator.clearFiles": "Moderators notīrīja failus",
 	"moderator.muteAudio": "Moderators noklusināja jūsu mikrofonu",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderators atslēdza jūsu kameru",
 	"moderator.stopScreenSharing": null,
 

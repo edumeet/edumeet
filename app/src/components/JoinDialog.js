@@ -192,6 +192,8 @@ const JoinDialog = ({
 {
 	const intl = useIntl();
 
+	displayName = displayName.trimLeft();
+
 	const handleKeyDown = (event) =>
 	{
 		const { key } = event;
@@ -201,8 +203,10 @@ const JoinDialog = ({
 			case 'Enter':
 			case 'Escape':
 			{
+				displayName = displayName.trim();
+
 				if (displayName === '')
-					changeDisplayName('Guest');
+					changeDisplayName(`Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`);
 				if (room.inLobby)
 					roomClient.changeDisplayName(displayName);
 				break;
@@ -211,6 +215,14 @@ const JoinDialog = ({
 				break;
 		}
 	};
+	
+	let decodedRoomId = null;                                                          
+	try{                                                                           
+		decodedRoomId = decodeURI(window.location.pathname.slice(1));                                             
+	}catch{                                                                        
+		decodedRoomId = roomId;                                                        
+		roomId = encodeURI(roomId);
+	}  
 
 	return (
 		<div className={classes.root}>
@@ -228,7 +240,7 @@ const JoinDialog = ({
 					}}
 					loggedIn={loggedIn}
 				>
-					{ window.config.title ? window.config.title : 'Multiparty meeting' }
+					{ window.config.title ? window.config.title : 'edumeet' }
 					<hr />
 				</DialogTitle>
 				<DialogContent>
@@ -244,7 +256,7 @@ const JoinDialog = ({
 							id='room.roomId'
 							defaultMessage='Room ID: {roomName}'
 							values={{
-								roomName : roomId
+								roomName : decodedRoomId
 							}}
 						/>
 					</DialogContentText>
@@ -278,8 +290,10 @@ const JoinDialog = ({
 						onKeyDown={handleKeyDown}
 						onBlur={() =>
 						{
+							displayName = displayName.trim();
+
 							if (displayName === '')
-								changeDisplayName('Guest');
+								changeDisplayName(`Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`);
 							if (room.inLobby)
 								roomClient.changeDisplayName(displayName);
 						}}

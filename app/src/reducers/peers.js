@@ -60,15 +60,15 @@ const peer = (state = initialState, action) =>
 
 		case 'ADD_PEER_ROLE':
 		{
-			const roles = [ ...state.roles, action.payload.role ];
+			const roles = [ ...state.roles, action.payload.roleId ];
 
 			return { ...state, roles };
 		}
 
 		case 'REMOVE_PEER_ROLE':
 		{
-			const roles = state.roles.filter((role) =>
-				role !== action.payload.role);
+			const roles = state.roles.filter((roleId) =>
+				roleId !== action.payload.roleId);
 
 			return { ...state, roles };
 		}

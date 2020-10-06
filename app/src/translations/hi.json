@@ -65,6 +65,8 @@
 	"room.shortcutKeys": " शॉर्टकट बट्टन",
 	"room.browsePeersSpotlight": "देखिये प्रतिभागी जो स्पॉटलाइट मे हैं",
 	"room.stopAllScreenSharing": "स्क्रीन का आदान-प्रदान स्थगित कीजिए ",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "आप शांत हैं, बात करने के लिए स्पेस-बार दबाईए",
 
@@ -161,6 +163,7 @@
     "settings.drawerOverlayed": "बगल के दराज़ का सामान",
     "settings.voiceActivatedUnmute": "आवाज सक्रिय अनम्यूट",
 	"settings.noiseThreshold": "शोर सीमा",
+	"settings.mirrorOwnVideo": null,
 
     "filesharing.saveFileError" :  "फ़ाइल सहेजने में असमर्थ",
     "filesharing.startingFileShare" :  "फ़ाइल के आदान-प्रदान का प्रयास है",

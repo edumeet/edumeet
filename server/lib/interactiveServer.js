@@ -8,8 +8,8 @@ const mediasoup = require('mediasoup');
 const colors = require('colors/safe');
 const pidusage = require('pidusage');
 
-const SOCKET_PATH_UNIX = '/tmp/multiparty-meeting-server.sock';
-const SOCKET_PATH_WIN = path.join('\\\\?\\pipe', process.cwd(), 'multiparty-meeting-server');
+const SOCKET_PATH_UNIX = '/tmp/edumeet-server.sock';
+const SOCKET_PATH_WIN = path.join('\\\\?\\pipe', process.cwd(), 'edumeet-server');
 const SOCKET_PATH = os.platform() === 'win32' ? SOCKET_PATH_WIN : SOCKET_PATH_UNIX;
 
 // Maps to store all mediasoup objects.

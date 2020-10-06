@@ -64,6 +64,8 @@
 	"room.about": "關於",
 	"room.shortcutKeys": "鍵盤快速鍵",
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "您已靜音，請按下 空白鍵 來說話",
 
@@ -160,6 +162,7 @@
 	"settings.drawerOverlayed": "側邊欄覆蓋畫面",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "無法保存文件",
 	"filesharing.startingFileShare": "開始分享文件",
@@ -204,6 +207,7 @@
 	"moderator.clearChat": "管理員清除了聊天",
 	"moderator.clearFiles": "管理員清除了所有檔案",
 	"moderator.muteAudio": "您已被管理員靜音",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "您的視訊已被管理員關閉",
 	"moderator.stopScreenSharing": null,
 

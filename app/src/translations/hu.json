@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Billentyűparancsok",
 	"room.browsePeersSpotlight": "Résztvevők böngészése",
 	"room.stopAllScreenSharing": "Összes képernyőmegosztás leállítása",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 
@@ -123,7 +125,7 @@
 	"label.media": "Média",
 	"label.appearance": "Megjelenés",
 	"label.advanced": "Részletek",
-	"label.addVideo": "Videó hozzáadása",
+	"label.addVideo": "Új videó bemenet hozzáadása",
 	"label.promoteAllPeers": "Mindenkit beengedek",
 	"label.moreActions": "További műveletek",
 	"label.version": "Verzió",
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": "Oldalsáv a tartalom felett",
 	"settings.voiceActivatedUnmute": "Beszéd aktivált mikrofon némítás",
 	"settings.noiseThreshold": "Zajszint",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",
@@ -205,6 +208,7 @@
 	"moderator.clearChat": "A moderátor kiürítette a chat történelmet",
 	"moderator.clearFiles": "A moderátor kiürítette a file megosztás történelmet",
 	"moderator.muteAudio": "A moderátor elnémította a hangod",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "A moderátor elnémította a videód",
 	"moderator.stopScreenSharing": "A moderátor leállította a képernyőmegosztásod",
 

@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Prečaci",
 	"room.browsePeersSpotlight": "Pretražite sudionike u središtu pažnje",
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": "Bočni izbornik iznad sadržaja",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",
@@ -205,6 +208,7 @@
 	"moderator.clearChat": "Moderator je izbrisao razgovor",
 	"moderator.clearFiles": "Moderator je izbrisao datoteke",
 	"moderator.muteAudio": "Moderator je utišao tvoj zvuk",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderator je zaustavio tvoj video",
 	"moderator.stopScreenSharing": null,
 

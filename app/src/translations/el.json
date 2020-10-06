@@ -65,6 +65,8 @@
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": null,
 
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Αδυναμία αποθήκευσης του αρχείου",
 	"filesharing.startingFileShare": "Προσπάθεια διαμοιρασμού αρχείου",
@@ -205,6 +208,7 @@
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": null,
 	"moderator.stopScreenSharing": null,
 	

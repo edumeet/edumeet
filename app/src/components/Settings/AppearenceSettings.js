@@ -47,6 +47,7 @@ const AppearenceSettings = (props) =>
 		onToggleButtonControlBar,
 		onToggleShowNotifications,
 		onToggleDrawerOverlayed,
+		onToggleMirrorOwnVideo,
 		handleChangeMode,
 		handleChangeAspectRatio,
 		classes,
@@ -180,6 +181,16 @@ const AppearenceSettings = (props) =>
 			<FormControlLabel
 				className={classnames(classes.setting, classes.switchLabel)}
 				control={
+					<Switch checked={settings.mirrorOwnVideo} onChange={onToggleMirrorOwnVideo} value='mirrorOwnVideo' />}
+				labelPlacement='start'
+				label={intl.formatMessage({
+					id             : 'settings.mirrorOwnVideo',
+					defaultMessage : 'Mirror view of own video'
+				})}
+			/>
+			<FormControlLabel
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={
 					<Switch checked={settings.permanentTopBar} onChange={onTogglePermanentTopBar} value='permanentTopBar' />}
 				labelPlacement='start'
 				label={intl.formatMessage({
@@ -240,6 +251,7 @@ AppearenceSettings.propTypes =
 	onToggleButtonControlBar  : PropTypes.func.isRequired,
 	onToggleShowNotifications : PropTypes.func.isRequired,
 	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
+	onToggleMirrorOwnVideo    : PropTypes.func.isRequired,
 	handleChangeMode          : PropTypes.func.isRequired,
 	handleChangeAspectRatio   : PropTypes.func.isRequired,
 	classes                   : PropTypes.object.isRequired,
@@ -263,6 +275,7 @@ const mapDispatchToProps = {
 	onToggleShowNotifications : settingsActions.toggleShowNotifications,
 	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
 	onToggleDrawerOverlayed   : settingsActions.toggleDrawerOverlayed,
+	onToggleMirrorOwnVideo    : settingsActions.toggleMirrorOwnVideo,
 	handleChangeMode          : roomActions.setDisplayMode,
 	handleChangeAspectRatio   : settingsActions.setAspectRatio
 };

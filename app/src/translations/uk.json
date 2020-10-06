@@ -65,10 +65,12 @@
 	"room.shortcutKeys": "Гарячі клавіші",
 	"room.browsePeersSpotlight": "Переглянути учасників у центрі уваги",
 	"room.stopAllScreenSharing": "Зупинити спільне використання екрану",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
+
 	"me.mutedPTT":" У вас вимкнено звук, утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
 	"roles.gotRole": "Ви отримали роль {role}",
 	"roles.lostRole": "Ви втратили роль {role}",
-
 
 	"tooltip.login": "Увійти",
 	"tooltip.logout": "Вихід",
@@ -160,6 +162,7 @@
 	"settings.drawerOverlayed": "Боковий ящик над вмістом",
 	"settings.voiceActivatedUnmute": "Активований голос вмикається",
 	"settings.noiseThreshold": "Поріг шуму",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",
@@ -200,10 +203,11 @@
 
 	"devices.cameraDisconnected": "Камера відключена",
 	"devices.cameraError": "Під час доступу до камери сталася помилка",
-	
+
 	"moderator.clearChat": "Модератор очистив чат",
 	"moderator.clearFiles": "Модератор очистив файли",
 	"moderator.muteAudio": "Модератор відключив ваше аудіо (ваш звук)",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Модератор відключив ваше відео",
 	"moderator.stopScreenSharing": "Модератор припинив спільне користування екраном",
 

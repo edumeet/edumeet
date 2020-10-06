@@ -52,8 +52,8 @@ if [ "$1" = "config" ]; then
 	exit 0
 fi
 
-ROOMS=`docker exec -t mm_mm_1 /opt/multiparty-meeting/server/connect.js --stats | grep 'rooms' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | sed -E 's/rooms:([0-9]+)/\1/g'`
-PEERS=`docker exec -t mm_mm_1 /opt/multiparty-meeting/server/connect.js --stats | grep 'peers' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | sed -E 's/peers:([0-9]+)/\1/g'`
+ROOMS=`docker exec -t mm_mm_1 /opt/edumeet/server/connect.js --stats | grep 'rooms' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | sed -E 's/rooms:([0-9]+)/\1/g'`
+PEERS=`docker exec -t mm_mm_1 /opt/edumeet/server/connect.js --stats | grep 'peers' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | sed -E 's/peers:([0-9]+)/\1/g'`
 
 echo "rooms.value ${ROOMS}"
 echo "peers.value ${PEERS}"

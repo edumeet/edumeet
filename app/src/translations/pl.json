@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Skróty klawiaturowe",
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": "Ukryj pogląd swojego wideo",
+	"room.showSelfView": "Pokaż pogląd swojego wideo",
 
 	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj spację aby mówić",
 
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": "Szuflada nad zawartością",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": "Lustrzany widok własnego wideo",
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",
@@ -205,6 +208,7 @@
 	"moderator.clearChat": "Moderator wyczyścił chat",
 	"moderator.clearFiles": "Moderator wyczyścił pliki",
 	"moderator.muteAudio": "Moderator wyciszył audio",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderator wyciszył twoje video",
 	"moderator.stopScreenSharing": null,
 

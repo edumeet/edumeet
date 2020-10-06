@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Hurtigtaster",
 	"room.browsePeersSpotlight": "Bytt mellom synlig deltaker",
 	"room.stopAllScreenSharing": "Stopp all skjermdeling",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": "Sidemeny over innhold",
 	"settings.voiceActivatedUnmute": "Stemmeaktivert autodemping",
 	"settings.noiseThreshold": "Støyterskel",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",
@@ -205,6 +208,7 @@
 	"moderator.clearChat": "Moderator tømte chatten",
 	"moderator.clearFiles": "Moderator fjernet filer",
 	"moderator.muteAudio": "Moderator mutet lyden din",
+	"moderator.modifyPeerRoles": "Endre roller",
 	"moderator.muteVideo": "Moderator mutet videoen din",
 	"moderator.stopScreenSharing": "Moderator mutet skjermdelingen din",
 	

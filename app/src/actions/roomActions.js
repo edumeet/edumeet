@@ -70,6 +70,18 @@ export const setExtraVideoOpen = (extraVideoOpen) =>
 		payload : { extraVideoOpen }
 	});
 
+export const setRolesManagerOpen = (rolesManagerOpen) =>
+	({
+		type    : 'SET_ROLES_MANAGER_OPEN',
+		payload : { rolesManagerOpen }
+	});
+
+export const setRolesManagerPeer = (rolesManagerPeer) =>
+	({
+		type    : 'SET_ROLES_MANAGER_PEER',
+		payload : { rolesManagerPeer }
+	});
+
 export const setHelpOpen = (helpOpen) =>
 	({
 		type    : 'SET_HELP_OPEN',
@@ -215,4 +227,10 @@ export const setAllowWhenRoleMissing = (allowWhenRoleMissing) =>
 	({
 		type    : 'SET_ALLOW_WHEN_ROLE_MISSING',
 		payload : { allowWhenRoleMissing }
+	});
+
+export const setHideSelfView = (hideSelfView) =>
+	({
+		type    : 'SET_HIDE_SELF_VIEW',
+		payload : { hideSelfView }
 	});

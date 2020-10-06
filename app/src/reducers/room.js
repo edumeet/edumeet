@@ -20,8 +20,11 @@ const initialState =
 	mode                          : window.config.defaultLayout || 'democratic',
 	selectedPeers                 : [],
 	spotlights                    : [],
+	rolesManagerPeer              : null, // peerId
 	settingsOpen                  : false,
 	extraVideoOpen                : false,
+	hideSelfView                  : false,
+	rolesManagerOpen              : false,
 	helpOpen                      : false,
 	aboutOpen                     : false,
 	currentSettingsTab            : 'media', // media, appearence, advanced
@@ -121,6 +124,20 @@ const room = (state = initialState, action) =>
 			const { extraVideoOpen } = action.payload;
 
 			return { ...state, extraVideoOpen };
+		}
+
+		case 'SET_ROLES_MANAGER_PEER':
+		{
+			const { rolesManagerPeer } = action.payload;
+
+			return { ...state, rolesManagerPeer };
+		}
+
+		case 'SET_ROLES_MANAGER_OPEN':
+		{
+			const { rolesManagerOpen } = action.payload;
+
+			return { ...state, rolesManagerOpen };
 		}
 
 		case 'SET_HELP_OPEN':
@@ -273,6 +290,13 @@ const room = (state = initialState, action) =>
 			const { allowWhenRoleMissing } = action.payload;
 
 			return { ...state, allowWhenRoleMissing };
+		}
+
+		case 'SET_HIDE_SELF_VIEW':
+		{
+			const { hideSelfView } = action.payload;
+
+			return { ...state, hideSelfView };
 		}
 
 		default:

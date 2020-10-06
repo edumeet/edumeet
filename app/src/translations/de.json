@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Tastaturkürzel",
 	"room.browsePeersSpotlight": "Teilnehmer durchgehen und anzeigen",
 	"room.stopAllScreenSharing": "Stoppe alle Bildschirmfreigaben",
+	"room.hideSelfView": "Selbstansicht-Video ausblenden",
+	"room.showSelfView": "Selbstansicht-Video anzeigen",
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": "Seitenpanel verdeckt Hauptinhalt",
 	"settings.voiceActivatedUnmute": "Automatische Spracherkennung",
 	"settings.noiseThreshold": "Geräuschepegel",
+	"settings.mirrorOwnVideo": "Ansicht des eigenen Videos spiegeln",
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",
@@ -205,6 +208,7 @@
 	"moderator.clearChat": "Moderator hat Chat gelöscht",
 	"moderator.clearFiles": "Moderator hat geteilte Dateiliste gelöscht",
 	"moderator.muteAudio": "Moderator hat dich stummgeschaltet",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderator hat dein Video gestoppt",
 	"moderator.stopScreenSharing": "Moderator hat deine Bildschirmfreigabe gestoppt",
 

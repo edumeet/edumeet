@@ -64,6 +64,8 @@
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 	
 	"me.mutedPTT": null,
 
@@ -161,6 +163,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "无法保存文件",
 	"filesharing.startingFileShare": "正在尝试共享文件",
@@ -205,6 +208,7 @@
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": null,
 	"moderator.stopScreenSharing": null,
 
