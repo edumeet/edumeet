@@ -81,7 +81,6 @@ const AppearenceSettings = (props) =>
 	return (
 		<React.Fragment>
 
-			{/* MOJE */}
 			<FormControl className={classes.setting}>
 				<Select
 					value={locale || ''}
@@ -114,7 +113,6 @@ const AppearenceSettings = (props) =>
 					/>
 				</FormHelperText>
 			</FormControl>
-			{/* MOJE */}
 
 			<FormControl className={classes.setting}>
 				<Select
@@ -147,6 +145,7 @@ const AppearenceSettings = (props) =>
 					/>
 				</FormHelperText>
 			</FormControl>
+
 			<FormControl className={classes.setting}>
 				<Select
 					value={settings.aspectRatio || ''}
