@@ -84,6 +84,7 @@ const MeetingDrawer = (props) =>
 							</Badge>
 						}
 					/>
+					{ ((window.config.showFilesharingTab === undefined) || (window.config.showFilesharingTab === true)) ?
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={unreadFiles}>
@@ -94,6 +95,7 @@ const MeetingDrawer = (props) =>
 							</Badge>
 						}
 					/>
+					: null}
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={raisedHands}>
