@@ -222,6 +222,7 @@ const MediaSettings = ({
 								name='Video resolution'
 								autoWidth
 								className={classes.selectEmpty}
+								disabled={window.config.lockVideoSettings !== undefined ? window.config.lockVideoSettings : false}
 							>
 								{resolutions.map((resolution, index) =>
 								{
@@ -308,6 +309,7 @@ const MediaSettings = ({
 								name='Frame rate'
 								autoWidth
 								className={classes.selectEmpty}
+								disabled={window.config.lockVideoSettings !== undefined ? window.config.lockVideoSettings : false}
 							>
 								{ [ 1, 5, 10, 15, 20, 25, 30 ].map((screenSharingFrameRate) =>
 								{

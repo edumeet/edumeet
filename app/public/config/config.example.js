@@ -48,6 +48,8 @@ var config =
 	defaultFrameRate              : 15,
 	defaultScreenResolution       : 'veryhigh',
 	defaultScreenSharingFrameRate : 5,
+  // Lock configured video settings for all users
+  lockVideoSettings             : false,
 	// Enable or disable simulcast for webcam video
 	simulcast                     : true,
 	// Enable or disable simulcast for screen sharing video
