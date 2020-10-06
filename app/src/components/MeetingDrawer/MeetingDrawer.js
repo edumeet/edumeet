@@ -44,8 +44,8 @@ const styles = (theme) =>
 		}
 	});
 
-const showFilesharingTab = (window.config.showFilesharingTab === undefined)
-						|| (window.config.showFilesharingTab === true);
+const enableFileSharing = (window.config.enableFileSharing === undefined)
+						|| (window.config.enableFileSharing === true);
 
 const MeetingDrawer = (props) =>
 {
@@ -87,18 +87,17 @@ const MeetingDrawer = (props) =>
 							</Badge>
 						}
 					/>
-					{ showFilesharingTab ?
-						<Tab
-							label={
-								<Badge color='secondary' badgeContent={unreadFiles}>
-									{intl.formatMessage({
-										id             : 'label.filesharing',
-										defaultMessage : 'File sharing'
-									})}
-								</Badge>
-							}
-						/>
-						: null}
+					<Tab
+						label={
+							<Badge color='secondary' badgeContent={unreadFiles}>
+								{intl.formatMessage({
+									id             : 'label.filesharing',
+									defaultMessage : 'File sharing'
+								})}
+							</Badge>
+						}
+						disabled={!enableFileSharing}
+					/>
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={raisedHands}>
