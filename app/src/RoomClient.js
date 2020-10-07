@@ -4,6 +4,7 @@ import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
 import * as requestActions from './actions/requestActions';
 import * as meActions from './actions/meActions';
+import * as intlActions from './actions/intlActions';
 import * as roomActions from './actions/roomActions';
 import * as peerActions from './actions/peerActions';
 import * as peerVolumeActions from './actions/peerVolumeActions';
@@ -16,6 +17,8 @@ import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
 import * as transportActions from './actions/transportActions';
 import { permissions } from './permissions';
+// import { updateIntl } from 'react-intl-redux';
+import * as locales from './translations/locales';
 
 let createTorrent;
 
@@ -115,6 +118,7 @@ export default class RoomClient
 	{
 		store = data.store;
 		intl = data.intl;
+
 	}
 
 	constructor(
@@ -255,6 +259,9 @@ export default class RoomClient
 		this._startKeyListener();
 
 		this._startDevicesListener();
+
+		this.setLocale(store.getState().intl.locale);
+
 	}
 
 	close()
@@ -494,6 +501,21 @@ export default class RoomClient
 					})
 				}));
 		});
+	}
+
+	setLocale(locale)
+	{
+
+		if (locale === null) locale = locales.detect();
+		const one = locales.loadOne(locale);
+
+		store.dispatch(intlActions.updateIntl({
+			locale   : one.locale[0],
+			messages : one.messages,
+			list   	 : locales.getList()
+		}));
+
+		document.documentElement.lang = one.locale[0].toUpperCase();
 	}
 
 	login(roomId = this._roomId)
