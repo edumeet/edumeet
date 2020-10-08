@@ -16,6 +16,7 @@ import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
 import * as transportActions from './actions/transportActions';
+import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 // import { updateIntl } from 'react-intl-redux';
 import * as locales from './translations/locales';
@@ -31,8 +32,6 @@ let mediasoupClient;
 let io;
 
 let ScreenShare;
-
-let Spotlights;
 
 let requestTimeout,
 	lastN,
@@ -217,7 +216,7 @@ export default class RoomClient
 			settingsActions.setLastN(this._maxSpotlights));
 
 		// Manager of spotlight
-		this._spotlights = null;
+		this._spotlights = new Spotlights(this._maxSpotlights, this);
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -1035,6 +1034,8 @@ export default class RoomClient
 	{
 		logger.debug('updateSpotlights()');
 
+		store.dispatch(roomActions.setSpotlights(spotlights));
+
 		try
 		{
 			for (const consumer of this._consumers.values())
@@ -1419,7 +1420,6 @@ export default class RoomClient
 				start
 			)
 			{
-				
 				if (this._webcamProducer)
 					await this.disableWebcam();
 
@@ -2100,13 +2100,6 @@ export default class RoomClient
 			'./ScreenShare'
 		));
 
-		({ default: Spotlights } = await import(
-
-			/* webpackPrefetch: true */
-			/* webpackChunkName: "spotlights" */
-			'./Spotlights'
-		));
-
 		mediasoupClient = await import(
 
 			/* webpackPrefetch: true */
@@ -2135,8 +2128,6 @@ export default class RoomClient
 		this._screenSharing = ScreenShare.create(this._device);
 
 		this._signalingSocket = io(this._signalingUrl);
-
-		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
 		store.dispatch(roomActions.setRoomState('connecting'));
 
@@ -2817,8 +2808,10 @@ export default class RoomClient
 					{
 						const { id, displayName, picture, roles } = notification.data;
 
-						store.dispatch(
-							peerActions.addPeer({ id, displayName, picture, roles, consumers: [] }));
+						store.dispatch(peerActions.addPeer(
+							{ id, displayName, picture, roles, consumers: [] }));
+
+						this._spotlights.newPeer(id);
 
 						this._soundNotification();
 
@@ -2838,6 +2831,8 @@ export default class RoomClient
 					case 'peerClosed':
 					{
 						const { peerId } = notification.data;
+
+						this._spotlights.closePeer(peerId);
 
 						store.dispatch(
 							peerActions.removePeer(peerId));
@@ -3288,28 +3283,11 @@ export default class RoomClient
 					peerActions.addPeer({ ...peer, consumers: [] }));
 			}
 
-			this._spotlights.addPeers(peers);
-
-			this._spotlights.on('spotlights-updated', (spotlights) =>
-			{
-				store.dispatch(roomActions.setSpotlights(spotlights));
-				this.updateSpotlights(spotlights);
-			});
-
 			(chatHistory.length > 0) && store.dispatch(
 				chatActions.addChatHistory(chatHistory));
 
 			(fileHistory.length > 0) && store.dispatch(
 				fileActions.addFileHistory(fileHistory));
-
-			if (lastNHistory.length > 0)
-			{
-				logger.debug('_joinRoom() | got lastN history');
-
-				this._spotlights.addSpeakerList(
-					lastNHistory.filter((peerId) => peerId !== this._peerId)
-				);
-			}
 
 			locked ?
 				store.dispatch(roomActions.setRoomLocked()) :
@@ -3334,7 +3312,8 @@ export default class RoomClient
 				if (
 					joinVideo &&
 					this._havePermission(permissions.SHARE_VIDEO)
-				){
+				)
+				{
 					this.updateWebcam({ start: true });
 				}
 				if (
@@ -3353,8 +3332,6 @@ export default class RoomClient
 						if (autoMuteThreshold && peers.length >= autoMuteThreshold)
 							this.muteMic();
 					}
-
-				
 			}
 
 			await this._updateAudioOutputDevices();
@@ -3383,7 +3360,16 @@ export default class RoomClient
 					})
 				}));
 
-			this._spotlights.start();
+			this._spotlights.addPeers(peers);
+
+			if (lastNHistory.length > 0)
+			{
+				logger.debug('_joinRoom() | got lastN history');
+
+				this._spotlights.addSpeakerList(
+					lastNHistory.filter((peerId) => peerId !== this._peerId)
+				);
+			}
 		}
 		catch (error)
 		{

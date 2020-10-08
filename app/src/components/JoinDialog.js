@@ -206,7 +206,8 @@ const JoinDialog = ({
 				displayName = displayName.trim();
 
 				if (displayName === '')
-					changeDisplayName(`Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`);
+					changeDisplayName(
+						`Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`);
 				if (room.inLobby)
 					roomClient.changeDisplayName(displayName);
 				break;
@@ -215,14 +216,18 @@ const JoinDialog = ({
 				break;
 		}
 	};
-	
-	let decodedRoomId = null;                                                          
-	try{                                                                           
-		decodedRoomId = decodeURI(window.location.pathname.slice(1));                                             
-	}catch{                                                                        
-		decodedRoomId = roomId;                                                        
+
+	let decodedRoomId = null;
+
+	try
+	{
+		decodedRoomId = decodeURI(window.location.pathname.slice(1));
+	}
+	catch
+	{
+		decodedRoomId = roomId;
 		roomId = encodeURI(roomId);
-	}  
+	}
 
 	return (
 		<div className={classes.root}>
