@@ -79,7 +79,10 @@ class Room extends EventEmitter
 
 			if (routerId)
 			{
-				pipedRoutersIds.add(routerId);
+				if (mediasoupRouters.has(routerId))
+				{
+					pipedRoutersIds.add(routerId);
+				}
 
 				if (routerLoads.has(routerId))
 				{
