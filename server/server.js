@@ -27,7 +27,7 @@ const {
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
 const imsLti = require('ims-lti');
-const { SAMLStrategy, generateServiceProviderMetadata } = require('passport-saml');
+const SAMLStrategy = require('passport-saml').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const redis = require('redis');
 const redisClient = redis.createClient(config.redisOptions);
@@ -385,7 +385,6 @@ async function setupAuth()
 		typeof (config.auth.strategy) !== 'undefined' &&
 		config.auth.strategy === 'saml' &&
 		typeof (config.auth.saml) !== 'undefined' &&
-		typeof (config.auth.saml.path) !== 'undefined' &&
 		typeof (config.auth.saml.entryPoint) !== 'undefined' &&
 		typeof (config.auth.saml.issuer) !== 'undefined' &&
 		typeof (config.auth.saml.cert) !== 'undefined'
@@ -475,15 +474,20 @@ async function setupAuth()
 			config.auth.saml.decryptionCert &&
 			config.auth.saml.signingCert)
 		{
-			const metadata = generateServiceProviderMetadata(
+			const metadata = samlStrategy.generateServiceProviderMetadata(
 				config.auth.saml.decryptionCert,
 				config.auth.saml.signingCert
 			);
 
 			if (metadata)
+			{
+				res.set('Content-Type', 'text/xml');
 				res.send(metadata);
+			}
 			else
+			{
 				res.status('Error generating SAML metadata', 500);
+			}
 		}
 		else
 			res.status('Missing SAML decryptionCert or signingKey from config', 500);
@@ -616,7 +620,7 @@ async function runHttpsServer()
 		mainListener.listen(config.listeningPort);
 }
 
-function isPathAlreadyTaken(url)
+function isPathAlreadyTaken(actualUrl)
 {
 	const alreadyTakenPath =
 		[
@@ -630,7 +634,7 @@ function isPathAlreadyTaken(url)
 
 	alreadyTakenPath.forEach((path) =>
 	{
-		if (url.toString().startsWith(path))
+		if (actualUrl.toString().startsWith(path))
 			return true;
 	});
 

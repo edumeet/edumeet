@@ -3,12 +3,6 @@ const os = require('os');
 
 const userRoles = require('../userRoles');
 
-/* uncomment for SAML Auth
-const samlSPCert = require('saml_cert.pem');
-const samlSPKey = require('saml_privkey.pem');
-const samlValidationCert = require('fedaration_cert.pem');
-*/
-
 const {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
@@ -74,13 +68,17 @@ module.exports =
 		},
 		saml :
 		{
+			// where edumeet.example.com is your edumeet server
+			callbackUrl    : 'https://edumeet.example.com/auth/callback',
+			issuer         : 'https://edumeet.example.com',
 			callbackUrl    : 'https://localhost/auth/callback',
 			entryPoint     : 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
-			issuer         : 'passport-saml',
+			privateCert    : fs.readFileSync('config/saml_privkey.pem', 'utf-8'),
+			signingCert    : fs.readFileSync('config/saml_cert.pem', 'utf-8'),
+			decryptionPvk  : fs.readFileSync('config/saml_privkey.pem', 'utf-8'),
+			decryptionCert : fs.readFileSync('config/saml_cert.pem', 'utf-8'),
 			// Federation cert
-			cert           : fs.readFileSync('config/saml_cert.pem'),
-			decryptionCert : fs.readFileSync('config/saml_privkey.pem'),
-			signingCert    : fs.readFileSync('config/federation_cert.pem')
+			cert           : fs.readFileSync('config/federation_cert.pem', 'utf-8')
 		},
 
 		local :
