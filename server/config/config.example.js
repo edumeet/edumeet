@@ -71,7 +71,6 @@ module.exports =
 			// where edumeet.example.com is your edumeet server
 			callbackUrl    : 'https://edumeet.example.com/auth/callback',
 			issuer         : 'https://edumeet.example.com',
-			callbackUrl    : 'https://localhost/auth/callback',
 			entryPoint     : 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
 			privateCert    : fs.readFileSync('config/saml_privkey.pem', 'utf-8'),
 			signingCert    : fs.readFileSync('config/saml_cert.pem', 'utf-8'),
