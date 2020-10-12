@@ -280,6 +280,11 @@ module.exports =
 			peer.displayName = userinfo.name;
 		}
 
+		if (userinfo.displayName != null)
+		{
+			peer.displayName = userinfo.displayName;
+		}
+
 		if (userinfo.email != null)
 		{
 			peer.email = userinfo.email;
