@@ -4,7 +4,7 @@ const userRoles = require('../userRoles');
 /* uncomment for SAML Auth
 const samlSPCert = require('saml_cert.pem');
 const samlSPKey = require('saml_privkey.pem');
-const samlValidationCert = require('fedaration_cert');
+const samlValidationCert = require('fedaration_cert.pem');
 */
 
 const {
