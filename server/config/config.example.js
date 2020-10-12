@@ -1,6 +1,12 @@
 const os = require('os');
 const userRoles = require('../userRoles');
 
+/* uncomment for SAML Auth
+const samlSPCert = require('saml_cert.pem');
+const samlSPKey = require('saml_privkey.pem');
+const samlValidationCert = require('fedaration_cert');
+*/
+
 const {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
@@ -31,12 +37,16 @@ module.exports =
 	/*
 	auth :
 	{
+		// Always enabled if configured
 		lti :
 		{
 			consumerKey    : 'key',
 			consumerSecret : 'secret'
 		},
-		oidc:
+
+		// Auth strategy to use (default oidc)
+		strategy : 'oidc',
+		oidc :
 		{
 			// The issuer URL for OpenID Connect discovery
 			// The OpenID Provider Configuration Document
@@ -59,6 +69,26 @@ module.exports =
 				redirect_uri  : 'https://client.example.com/auth/callback'
 			}
 
+		},
+		saml :
+		{
+			callbackUrl    : 'https://localhost/auth/callback',
+			entryPoint     : 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
+			issuer         : 'passport-saml',
+			// Federation cert
+			cert           : samlValidationCert,
+			decryptionCert : samlSPCert,
+			signingCert    : samlSPKey
+		},
+
+		local :
+		{
+			users : [
+				{ id: 1, username: 'alice', password: 'alice-secret',
+					displayName: 'Alice', emails: [ { value: 'alice@atlanta.com' } ] },
+				{ id: 2, username: 'bob', password: 'bob-secret',
+					displayName: 'Bob', emails: [ { value: 'bob@biloxi.com' } ] }
+			]
 		}
 	},
 	*/
