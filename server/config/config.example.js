@@ -1,4 +1,6 @@
 const os = require('os');
+const fs = require('fs');
+
 const userRoles = require('../userRoles');
 
 /* uncomment for SAML Auth
@@ -76,9 +78,9 @@ module.exports =
 			entryPoint     : 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
 			issuer         : 'passport-saml',
 			// Federation cert
-			cert           : samlValidationCert,
-			decryptionCert : samlSPCert,
-			signingCert    : samlSPKey
+			cert           : fs.readFileSync('config/saml_cert.pem'),
+			decryptionCert : fs.readFileSync('config/saml_privkey.pem'),
+			signingCert    : fs.readFileSync('config/federation_cert.pem')
 		},
 
 		local :
