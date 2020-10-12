@@ -279,9 +279,11 @@ function setupLocal()
 				return done(null, null);
 			else
 			{
-				delete found.password;
+				const userinfo = { ...found };
 
-				return done(null, { id: found.id, _userinfo: found });
+				delete userinfo.password;
+
+				return done(null, { id: found.id, _userinfo: userinfo });
 			}
 		}
 	);
