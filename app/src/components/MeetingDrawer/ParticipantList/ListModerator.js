@@ -10,17 +10,17 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			padding : theme.spacing(1),
-			display : 'flex',
-			flexWrap : 'wrap',
+			padding     : theme.spacing(1),
+			display     : 'flex',
+			flexWrap    : 'wrap',
 			marginRight : -theme.spacing(1),
-			marginTop : -theme.spacing(1)
+			marginTop   : -theme.spacing(1)
 		},
 		button :
 		{
-			marginTop : theme.spacing(1),
+			marginTop   : theme.spacing(1),
 			marginRight : theme.spacing(1),
-			flexGrow : '1'
+			flexGrow    : '1'
 		}
 	});
 
