@@ -10,12 +10,17 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			padding : theme.spacing(1),
-			display : 'flex'
+			padding     : theme.spacing(1),
+			display     : 'flex',
+			flexWrap    : 'wrap',
+			marginRight : -theme.spacing(1),
+			marginTop   : -theme.spacing(1)
 		},
-		divider :
+		button :
 		{
-			marginLeft : theme.spacing(2)
+			marginTop   : theme.spacing(1),
+			marginRight : theme.spacing(1),
+			flexGrow    : '1'
 		}
 	});
 
@@ -36,6 +41,7 @@ const ListModerator = (props) =>
 					id             : 'room.muteAll',
 					defaultMessage : 'Mute all'
 				})}
+				className={classes.button}
 				variant='contained'
 				color='secondary'
 				disabled={room.muteAllInProgress}
@@ -46,12 +52,12 @@ const ListModerator = (props) =>
 					defaultMessage='Mute all'
 				/>
 			</Button>
-			<div className={classes.divider} />
 			<Button
 				aria-label={intl.formatMessage({
 					id             : 'room.stopAllVideo',
 					defaultMessage : 'Stop all video'
 				})}
+				className={classes.button}
 				variant='contained'
 				color='secondary'
 				disabled={room.stopAllVideoInProgress}
@@ -62,12 +68,12 @@ const ListModerator = (props) =>
 					defaultMessage='Stop all video'
 				/>
 			</Button>
-			<div className={classes.divider} />
 			<Button
 				aria-label={intl.formatMessage({
 					id             : 'room.stopAllScreenSharing',
 					defaultMessage : 'Stop all screen sharing'
 				})}
+				className={classes.button}
 				variant='contained'
 				color='secondary'
 				disabled={room.stopAllScreenSharingInProgress}
@@ -78,12 +84,12 @@ const ListModerator = (props) =>
 					defaultMessage='Stop all screen sharing'
 				/>
 			</Button>
-			<div className={classes.divider} />
 			<Button
 				aria-label={intl.formatMessage({
 					id             : 'room.closeMeeting',
 					defaultMessage : 'Close meeting'
 				})}
+				className={classes.button}
 				variant='contained'
 				color='secondary'
 				disabled={room.closeMeetingInProgress}
