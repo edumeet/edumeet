@@ -88,8 +88,9 @@ const app = express();
 
 app.use(helmet.hsts());
 const sharedCookieParser=cookieParser();
+
 app.use(sharedCookieParser);
-app.use(bodyParser.json( { limit: '5mb' }));
+app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
 const session = expressSession({
@@ -418,7 +419,9 @@ async function setupAuth()
 			peerId : req.query.peerId,
 			roomId : req.query.roomId
 		}));
-		if (authStrategy== 'saml') {
+
+		if (authStrategy== 'saml')
+		{
 			req.session.samlstate=state;
 		}
 
@@ -505,14 +508,15 @@ async function setupAuth()
 			try
 			{
 				let state;
+
 				if (authStrategy == 'saml')
 					state=req.session.samlstate;
 				else
 				{
 					if (req.method === 'GET')
-					state = JSON.parse(base64.decode(req.query.state));
-				if (req.method === 'POST')
-					state = JSON.parse(base64.decode(req.body.state));
+						state = JSON.parse(base64.decode(req.query.state));
+					if (req.method === 'POST')
+						state = JSON.parse(base64.decode(req.body.state));
 				}
 				const { peerId, roomId } = state;
 
@@ -654,7 +658,9 @@ async function runWebSocketServer()
 {
 	io = require('socket.io')(mainListener);
 
-	io.use(sharedSession(session, sharedCookieParser, { autoSave : true },{cookie: false}));
+	io.use(
+		sharedSession(session, sharedCookieParser, { autoSave: true }, { cookie: false })
+	);
 
 	// Handle connections from clients.
 	io.on('connection', (socket) =>

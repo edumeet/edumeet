@@ -266,7 +266,8 @@ module.exports =
 				peer.picture = userinfo.picture;
 			}
 		}
-		if(userinfo['urn:oid:0.9.2342.19200300.100.1.60'] != null ){
+		if (userinfo['urn:oid:0.9.2342.19200300.100.1.60'] != null)
+		{
 			peer.picture = `data:image/jpeg;base64, ${userinfo['urn:oid:0.9.2342.19200300.100.1.60']}`;
 		}
 
