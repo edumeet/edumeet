@@ -87,10 +87,10 @@ const tls =
 const app = express();
 
 app.use(helmet.hsts());
-
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const sharedCookieParser=cookieParser();
+app.use(sharedCookieParser);
+app.use(bodyParser.json( { limit: '5mb' }));
+app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
 const session = expressSession({
 	secret            : config.cookieSecret,
@@ -648,11 +648,7 @@ async function runWebSocketServer()
 {
 	io = require('socket.io')(mainListener);
 
-	io.use(
-		sharedSession(session, {
-			autoSave : true
-		})
-	);
+	io.use(sharedSession(session, sharedCookieParser, { autoSave : true },{cookie: false}));
 
 	// Handle connections from clients.
 	io.on('connection', (socket) =>
