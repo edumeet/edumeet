@@ -2,6 +2,7 @@
 
 process.title = 'edumeet-server';
 
+const bcrypt = require('bcrypt');
 const config = require('./config/config');
 const fs = require('fs');
 const http = require('http');
@@ -268,12 +269,13 @@ function setupSAML()
 function setupLocal()
 {
 	localStrategy = new LocalStrategy(
-		function(username, password, done)
+		function(username, plaintextPassword, done)
 		{
 			const found = config.auth.local.users.find((element) =>
 			{
 				// TODO use encrypted password
-				return element.username === username && element.password === password;
+				return element.username === username &&
+					bcrypt.compareSync(plaintextPassword, element.passwordHash);
 			});
 
 			if (found === undefined)

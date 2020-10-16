@@ -15,6 +15,7 @@
 		"awaitqueue": "^1.0.0",
 		"axios": "^0.19.2",
 		"base-64": "^0.1.0",
+		"bcrypt": "^5.0.0",
 		"body-parser": "^1.19.0",
 		"colors": "^1.4.0",
 		"compression": "^1.7.4",

@@ -80,13 +80,24 @@ module.exports =
 			cert           : fs.readFileSync('config/federation_cert.pem', 'utf-8')
 		},
 
+		// to create password hash use: node server/utils/password_encode.js cleartextpassword
 		local :
 		{
 			users : [
-				{ id: 1, username: 'alice', password: 'alice-secret',
-					displayName: 'Alice', emails: [ { value: 'alice@atlanta.com' } ] },
-				{ id: 2, username: 'bob', password: 'bob-secret',
-					displayName: 'Bob', emails: [ { value: 'bob@biloxi.com' } ] }
+				{
+					id           : 1,
+					username     : 'alice',
+					passwordHash : '$2b$10$PAXXw.6cL3zJLd7ZX.AnL.sFg2nxjQPDmMmGSOQYIJSa0TrZ9azG6',
+					displayName  : 'Alice',
+					emails       : [ { value: 'alice@atlanta.com' } ]
+				},
+				{
+					id           : 2,
+					username     : 'bob',
+					passwordHash : '$2b$10$BzAkXcZ54JxhHTqCQcFn8.H6klY/G48t4jDBeTE2d2lZJk/.tvv0G',
+					displayName  : 'Bob',
+					emails       : [ { value: 'bob@biloxi.com' } ]
+				}
 			]
 		}
 	},
