@@ -266,6 +266,9 @@ module.exports =
 				peer.picture = userinfo.picture;
 			}
 		}
+		if(userinfo['urn:oid:0.9.2342.19200300.100.1.60'] != null ){
+			peer.picture = `data:image/jpeg;base64, ${userinfo['urn:oid:0.9.2342.19200300.100.1.60']}`;
+		}
 
 		if (userinfo.nickname != null)
 		{
@@ -280,6 +283,11 @@ module.exports =
 		if (userinfo.displayName != null)
 		{
 			peer.displayName = userinfo.displayName;
+		}
+
+		if (userinfo['urn:oid:2.16.840.1.113730.3.1.241'] != null)
+		{
+			peer.displayName = userinfo['urn:oid:2.16.840.1.113730.3.1.241'];
 		}
 
 		if (userinfo.email != null)
