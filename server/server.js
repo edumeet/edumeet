@@ -418,6 +418,9 @@ async function setupAuth()
 			peerId : req.query.peerId,
 			roomId : req.query.roomId
 		}));
+		if (authStrategy== 'saml') {
+			req.session.samlstate=state;
+		}
 
 		if (authStrategy === 'local' && !(req.user && req.password))
 		{
@@ -502,12 +505,15 @@ async function setupAuth()
 			try
 			{
 				let state;
-
-				if (req.method === 'GET')
+				if (authStrategy == 'saml')
+					state=req.session.samlstate;
+				else
+				{
+					if (req.method === 'GET')
 					state = JSON.parse(base64.decode(req.query.state));
 				if (req.method === 'POST')
 					state = JSON.parse(base64.decode(req.body.state));
-
+				}
 				const { peerId, roomId } = state;
 
 				req.session.peerId = peerId;
