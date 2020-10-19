@@ -217,17 +217,13 @@ const JoinDialog = ({
 		}
 	};
 
-	let decodedRoomId = null;
-
-	try
-	{
-		decodedRoomId = decodeURI(window.location.pathname.slice(1));
-	}
-	catch
-	{
-		decodedRoomId = roomId;
-		roomId = encodeURI(roomId);
-	}
+	let decodedRoomId = null;                                                          
+	try{                                                                           
+		decodedRoomId = decodeURIComponent(window.location.pathname.slice(1));                                             
+	}catch{                                                                        
+		decodedRoomId = roomId;                                                        
+		roomId = encodeURIComponent(roomId);
+	}  
 
 	return (
 		<div className={classes.root}>
