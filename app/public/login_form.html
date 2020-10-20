@@ -4,14 +4,45 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="https://cdn.muicss.com/mui-0.10.3/css/mui.css" />
+    <script src="https://cdn.muicss.com/mui-0.10.3/js/mui.js"></script>
+    <style>
+      /* Add font-smoothing */
+      html,
+      body,
+      input,
+      textarea,
+      button {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
+	  }
+	  body {margin-top: 5rem;}
+	</style>
 </head>
 <body>
+	<table class="mui-body" cellpadding="0" cellspacing="0" border="0">
+	<div class="mui-container">
+	<div class="mui-form">
+	<legend>Login</legend>
 	<form action="/auth/callback" method="post">
-		<input type="text" name="username" id="username">
-		<input type="password" name="password" id="password">
+		<div class="mui-textfield mui-textfield--float-label">
+			<input type="text" name="username" id="username" required="required"/>
+			<label>Username</label>
+		  </div>
+		  <div class="mui-textfield mui-textfield--float-label">
+			<input type="password" name="password" id="password" required="required"/>
+			<label>Password</label>
+		  </div>
 		<input type="hidden" name="state" id="state">
-		<input type="submit" value="Login">
+		<button type="submit" class="mui-btn mui-btn--raised"><span>Submit</span></button>
 	</form>
+	</div>
+	</div>
+	</table>
 	<script type="text/javascript">		
 		var url = new URL(window.location);
 		var state = url.searchParams.get("state");
