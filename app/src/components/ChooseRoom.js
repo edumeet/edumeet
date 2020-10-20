@@ -163,7 +163,7 @@ const ChooseRoom = ({
 				<DialogActions>
 					<Button
 						component={Link}
-						to={encodeURI(encodeURI(roomId))}
+						to={encodeURIComponent(encodeURI(roomId))}
 						variant='contained'
 						color='secondary'
 					>
