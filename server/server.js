@@ -18,7 +18,6 @@ const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
-const url = require('url');
 const userRoles = require('./userRoles');
 const {
 	loginHelper,
@@ -422,19 +421,14 @@ async function setupAuth()
 			roomId : req.query.roomId
 		}));
 
-		if (authStrategy== 'saml')
+		if (authStrategy== 'saml' && authStrategy=='local')
 		{
-			req.session.samlstate=state;
+			req.session.authState=state;
 		}
 
 		if (authStrategy === 'local' && !(req.user && req.password))
 		{
-			res.redirect(url.format({
-				pathname : '/login_dialog',
-				query    : {
-					'state' : state
-				}
-			}));
+			res.redirect('/login_dialog');
 		}
 		else
 		{
@@ -511,8 +505,8 @@ async function setupAuth()
 			{
 				let state;
 
-				if (authStrategy == 'saml')
-					state=req.session.samlstate;
+				if (authStrategy == 'saml' || authStrategy == 'local')
+					state=req.session.authState;
 				else
 				{
 					if (req.method === 'GET')
