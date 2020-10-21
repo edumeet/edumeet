@@ -421,7 +421,7 @@ async function setupAuth()
 			roomId : req.query.roomId
 		}));
 
-		if (authStrategy== 'saml' && authStrategy=='local')
+		if (authStrategy== 'saml' || authStrategy=='local')
 		{
 			req.session.authState=state;
 		}
