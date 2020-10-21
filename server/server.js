@@ -430,7 +430,7 @@ async function setupAuth()
 		if (authStrategy === 'local' && !(req.user && req.password))
 		{
 			res.redirect(url.format({
-				pathname : '/login_form.html',
+				pathname : '/login_dialog',
 				query    : {
 					'state' : state
 				}
