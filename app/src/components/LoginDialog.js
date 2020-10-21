@@ -127,9 +127,6 @@ const ChooseRoom = ({
 
 	};
 
-	const urlParams = new URLSearchParams(window.location.search);
-	const stateParam = urlParams.get('state');
-
 	return (
 		<div className={classes.root}>
 			<Dialog
@@ -173,20 +170,6 @@ const ChooseRoom = ({
 							margin='normal'
 							name='password'
 							type='password'
-							fullWidth
-						/>
-
-						<TextField
-							id='state'
-							label={intl.formatMessage({
-								id             : 'label.roomName?',
-								defaultMessage : 'State'
-							})}
-							variant='outlined'
-							margin='normal'
-							name='state'
-							type='text'
-							value={stateParam}
 							fullWidth
 						/>
 
