@@ -141,6 +141,7 @@ const ChooseRoom = ({
 							variant='outlined'
 							margin='normal'
 							name='username'
+							required
 							fullWidth
 						/>
 						<TextField
@@ -153,6 +154,7 @@ const ChooseRoom = ({
 							margin='normal'
 							name='password'
 							type='password'
+							required
 							fullWidth
 						/>
 
