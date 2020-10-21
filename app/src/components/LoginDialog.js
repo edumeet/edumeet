@@ -4,7 +4,6 @@ import isElectron from 'is-electron';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -120,23 +119,23 @@ const ChooseRoom = ({
 				}}
 			>
 				<DialogTitle>
-					{ window.config.title ? window.config.title : 'edumeet' }
+					{/* { window.config.title ? window.config.title : 'edumeet' } */}
+					{
+						intl.formatMessage({
+							id             : 'label.login',
+							defaultMessage : 'Login'
+						})}
+
 					<hr />
 				</DialogTitle>
 
 				<form method='post' action='/auth/callback'>
 					<DialogContent>
-						<DialogContentText gutterBottom>
-							<FormattedMessage
-								id='room.chooseRoom?'
-								defaultMessage='Insert login and password'
-							/>
-						</DialogContentText>
 
 						<TextField
 							id='username'
 							label={intl.formatMessage({
-								id             : 'label.roomName?',
+								id             : 'label.username',
 								defaultMessage : 'Username'
 							})}
 							variant='outlined'
@@ -147,7 +146,7 @@ const ChooseRoom = ({
 						<TextField
 							id='password'
 							label={intl.formatMessage({
-								id             : 'label.roomName?',
+								id             : 'label.password',
 								defaultMessage : 'Password'
 							})}
 							variant='outlined'
@@ -166,7 +165,7 @@ const ChooseRoom = ({
 							type='submit'
 						>
 							<FormattedMessage
-								id='label.chooseRoomButton?'
+								id='label.login'
 								defaultMessage='Login'
 							/>
 						</Button>

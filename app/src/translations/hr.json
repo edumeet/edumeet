@@ -129,6 +129,9 @@
 	"label.promoteAllPeers": "Promoviraj sve",
 	"label.moreActions": "Više akcija",
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings":  "Postavke",
 	"settings.camera": "Kamera",

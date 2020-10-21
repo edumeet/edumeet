@@ -128,7 +128,10 @@
 	"label.addVideo": "Dodaj wideo",
 	"label.promoteAllPeers": "Wpuść wszystkich",
 	"label.moreActions": "Więcej akcji",
-	"label.version": null,
+	"label.version": "Wersja",
+	"label.username": "Użytkownik",
+	"label.password": "Hasło",
+	"label.login": "Zaloguj",
 
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",

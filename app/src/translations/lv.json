@@ -126,6 +126,9 @@
 	"label.addVideo": "Pievienot video",
 	"label.moreActions": null,
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",
