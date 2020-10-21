@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import isElectron from 'is-electron';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
-import randomString from 'random-string';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import Typography from '@material-ui/core/Typography';
@@ -14,11 +12,6 @@ import CookieConsent from 'react-cookie-consent';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
-
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import FormHelperText from '@material-ui/core/FormHelperText';
 
 const styles = (theme) =>
 	({
@@ -116,16 +109,7 @@ const ChooseRoom = ({
 	classes
 }) =>
 {
-	const [ roomId, setRoomId ] =
-		useState(randomString({ length: 8 }).toLowerCase());
-
 	const intl = useIntl();
-
-	const handleSubmit = (e) =>
-	{
-		alert('OLABOGA');
-
-	};
 
 	return (
 		<div className={classes.root}>
