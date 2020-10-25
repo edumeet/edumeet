@@ -10,6 +10,7 @@
 	"dependencies": {
 		"@material-ui/core": "^4.5.1",
 		"@material-ui/icons": "^4.5.1",
+		"@material-ui/lab": "^4.0.0-alpha.56",
 		"bowser": "^2.7.0",
 		"classnames": "^2.2.6",
 		"create-torrent": "^4.4.1",
