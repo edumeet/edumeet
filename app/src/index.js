@@ -16,7 +16,7 @@ import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
-import ChooseRoom from './components/ChooseRoom';
+import JoinDialog from './components/JoinDialog';
 import LoginDialog from './components/LoginDialog';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
@@ -186,7 +186,7 @@ function run()
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
 											<Switch>
-												<Route exact path='/' component={ChooseRoom} />
+												<Route exact path='/' component={JoinDialog} />
 												<Route exact path='/login_dialog' component={LoginDialog} />
 												<Route path='/:id' component={App} />
 											</Switch>
