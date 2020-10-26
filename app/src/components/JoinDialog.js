@@ -195,7 +195,52 @@ const JoinDialog = ({
 		(location.pathname === '/') && history.push(roomId);
 	});
 
-	const handleKeyDown = (event) =>
+	const _askForPerms = () =>
+	{
+		if (mediaPerms.video || mediaPerms.audio)
+		{
+			navigator.mediaDevices.getUserMedia(mediaPerms);
+		}
+	};
+
+	const handleSetMediaPerms = (event, newMediaPerms) =>
+	{
+		if (newMediaPerms !== null)
+		{
+			setMediaPerms(JSON.parse(newMediaPerms));
+		}
+
+	};
+
+	const handleSetAuthType = (event, newAuthType) =>
+	{
+		if (newAuthType !== null)
+		{
+			setAuthType(newAuthType);
+		}
+
+	};
+
+	const handleJoinAsGuest = () =>
+	{
+		_askForPerms();
+
+		roomClient.join({ roomId, joinVideo: mediaPerms.video, joinAudio: mediaPerms.audio });
+	};
+
+	const handleJoinByAuth = () =>
+	{
+		_askForPerms();
+
+		loggedIn ? roomClient.logout(roomId) : roomClient.login(roomId);
+	};
+
+	const handleJoinUsingEnterKey = (event) =>
+	{
+		if (event.key === 'Enter') document.getElementById('buttonJoin').click();
+	};
+
+	const handleChangeDisplayName = (event) =>
 	{
 		const { key } = event;
 
@@ -219,51 +264,10 @@ const JoinDialog = ({
 		}
 	};
 
-	const handleJoinAsGuest = () =>
-	{
-
-		if (mediaPerms.video || mediaPerms.audio)
-		{
-			navigator.mediaDevices.getUserMedia(mediaPerms);
-		}
-
-		roomClient.join({ roomId, joinVideo: mediaPerms.video, joinAudio: mediaPerms.audio });
-	};
-
-	const handleLogin = () =>
-	{
-		navigator.mediaDevices.getUserMedia(mediaPerms);
-
-		loggedIn ? roomClient.logout(roomId) : roomClient.login(roomId);
-	};
-
-	const handleJoinByEnterKey = (event) =>
-	{
-		if (event.key === 'Enter') document.getElementById('buttonJoin').click();
-	};
-
-	const handleMediaPerms = (event, newMediaPerms) =>
-	{
-		if (newMediaPerms !== null)
-		{
-			setMediaPerms(JSON.parse(newMediaPerms));
-		}
-
-	};
-
-	const handleAuthType = (event, newAuthType) =>
-	{
-		if (newAuthType !== null)
-		{
-			setAuthType(newAuthType);
-		}
-
-	};
-
 	return (
 		<div className={classes.root}>
 			<Dialog
-				onKeyDown={handleJoinByEnterKey}
+				onKeyDown={handleJoinUsingEnterKey}
 				open
 				classes={{
 					paper : classes.dialogPaper
@@ -320,7 +324,7 @@ const JoinDialog = ({
 						<Grid item>
 							<ToggleButtonGroup
 								value={authType}
-								onChange={handleAuthType}
+								onChange={handleSetAuthType}
 								aria-label='choose auth'
 								exclusive
 							>
@@ -376,7 +380,7 @@ const JoinDialog = ({
 
 							changeDisplayName(value);
 						}}
-						onKeyDown={handleKeyDown}
+						onKeyDown={handleChangeDisplayName}
 						onBlur={() =>
 						{
 							displayName = displayName.trim();
@@ -413,7 +417,7 @@ const JoinDialog = ({
 								<ToggleButtonGroup
 									value={JSON.stringify(mediaPerms)}
 									// value='{ audio: true, video: false }'
-									onChange={handleRoomMediaPerm}
+									onChange={handleSetMediaPerms}
 									aria-label='choose permission'
 									exclusive
 								>
@@ -456,7 +460,7 @@ const JoinDialog = ({
 							{authType === 'auth' &&
 							<Grid item>
 								<Button
-									onClick={handleLogin}
+									onClick={handleJoinByAuth}
 									variant='contained'
 									color='secondary'
 									id='buttonJoin'
