@@ -205,7 +205,7 @@ const JoinDialog = ({
 
 	};
 
-	const handleJoinAsGuest = () =>
+	const handleJoin = () =>
 	{
 		_askForPerms();
 
@@ -218,13 +218,20 @@ const JoinDialog = ({
 		});
 	};
 
-	const handleJoinByAuth = () =>
+	const handleAuth = () =>
 	{
 		_askForPerms();
 
 		const encodedRoomId = encodeURIComponent(roomId);
 
-		loggedIn ? roomClient.logout(encodedRoomId) : roomClient.login(encodedRoomId);
+		!loggedIn ?
+			roomClient.login(encodedRoomId) :
+			roomClient.join({
+				roomId    : encodedRoomId,
+				joinVideo : mediaPerms.video,
+				joinAudio : mediaPerms.audio
+			});
+
 	};
 
 	const handleJoinUsingEnterKey = (event) =>
@@ -408,7 +415,6 @@ const JoinDialog = ({
 							<Grid item>
 								<ToggleButtonGroup
 									value={JSON.stringify(mediaPerms)}
-									// value='{ audio: true, video: false }'
 									onChange={handleSetMediaPerms}
 									aria-label='choose permission'
 									exclusive
@@ -432,11 +438,11 @@ const JoinDialog = ({
 							</Grid>
 							{/* /MEDIA PERMISSION BUTTONS */}
 
-							{/* JOIN BUTTON */}
-							{authType === 'guest' &&
+							{/* JOIN/AUTH BUTTON */}
+							{authType === 'guest' && !loggedIn &&
 							<Grid item>
 								<Button
-									onClick={handleJoinAsGuest}
+									onClick={handleJoin}
 									variant='contained'
 									color='secondary'
 									id='buttonJoin'
@@ -449,10 +455,11 @@ const JoinDialog = ({
 
 							</Grid>
 							}
-							{authType === 'auth' &&
+
+							{authType === 'auth' && !loggedIn &&
 							<Grid item>
 								<Button
-									onClick={handleJoinByAuth}
+									onClick={handleAuth}
 									variant='contained'
 									color='secondary'
 									id='buttonJoin'
@@ -460,6 +467,23 @@ const JoinDialog = ({
 									<FormattedMessage
 										id='room.login'
 										defaultMessage='Login'
+									/>
+								</Button>
+
+							</Grid>
+							}
+
+							{authType === 'auth' && loggedIn &&
+							<Grid item>
+								<Button
+									onClick={handleJoin}
+									variant='contained'
+									color='secondary'
+									id='buttonJoin'
+								>
+									<FormattedMessage
+										id='room.login'
+										defaultMessage='Join'
 									/>
 								</Button>
 
