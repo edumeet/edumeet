@@ -587,20 +587,27 @@ async function runHttpsServer()
 
 				res.redirect(ltiURL);
 			}
-			else{
-				let specialChars = "<>@!^*()+[]{}:;|'\"\\,~`";
-				let redir =false; 
-				for(i = 0; i < specialChars.length;i++){
-					if(req.url.substring(1).indexOf(specialChars[i]) > -1){
+			else
+			{
+				const specialChars = "<>@!^*()+[]{}:;|'\"\\,~`";
+				let redir =false;
+
+				for (let i = 0; i < specialChars.length; i++)
+				{
+					if (req.url.substring(1).indexOf(specialChars[i]) > -1)
+					{
 						redir=true;
 					}
 				}
-				if (redir){
-					req.url = '/'+encodeURIComponent(encodeURI(req.url.substring(1)));
+				if (redir)
+				{
+					req.url = `/${encodeURIComponent(encodeURI(req.url.substring(1)))}`;
 					res.redirect(`https://${req.hostname}${req.url}`);
-				}else{
-					return next();				
-				}			
+				}
+				else
+				{
+					return next();
+				}
 			}
 		}
 		else
