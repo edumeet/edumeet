@@ -133,6 +133,7 @@ const ChooseRoom = ({
 					<DialogContent>
 
 						<TextField
+							autoFocus
 							id='username'
 							label={intl.formatMessage({
 								id             : 'label.username',
