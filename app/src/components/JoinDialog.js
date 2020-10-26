@@ -164,19 +164,19 @@ const JoinDialog = ({
 	const [ authType, setAuthType ] = useState('guest');
 
 	const [ roomId, setRoomId ] = useState(
-		decodeURI(location.pathname.slice(1)) ||
+		encodeURIComponent(location.pathname.slice(1)) ||
 		randomString({ length: 8 }).toLowerCase()
 	);
 
 	useEffect(() =>
 	{
-		window.history.replaceState({}, null, roomId);
+		window.history.replaceState({}, null, encodeURIComponent(roomId) || '/');
 
 	}, [ roomId ]);
 
 	useEffect(() =>
 	{
-		(location.pathname === '/') && history.push(roomId);
+		(location.pathname === '/') && history.push(encodeURIComponent(roomId));
 	});
 
 	const _askForPerms = () =>
@@ -209,14 +209,22 @@ const JoinDialog = ({
 	{
 		_askForPerms();
 
-		roomClient.join({ roomId, joinVideo: mediaPerms.video, joinAudio: mediaPerms.audio });
+		const encodedRoomId = encodeURIComponent(roomId);
+
+		roomClient.join({
+			roomId    : encodedRoomId,
+			joinVideo : mediaPerms.video,
+			joinAudio : mediaPerms.audio
+		});
 	};
 
 	const handleJoinByAuth = () =>
 	{
 		_askForPerms();
 
-		loggedIn ? roomClient.logout(roomId) : roomClient.login(roomId);
+		const encodedRoomId = encodeURIComponent(roomId);
+
+		loggedIn ? roomClient.logout(encodedRoomId) : roomClient.login(encodedRoomId);
 	};
 
 	const handleJoinUsingEnterKey = (event) =>
@@ -248,17 +256,6 @@ const JoinDialog = ({
 		}
 	};
 
-	let decodedRoomId = null;
-
-	try
-	{
-		decodedRoomId = decodeURIComponent(window.location.pathname.slice(1));
-	}
-	catch
-	{
-		decodedRoomId = roomId;
-	}
-
 	return (
 		<div className={classes.root}>
 			<Dialog
@@ -284,7 +281,7 @@ const JoinDialog = ({
 							id             : 'label.roomName',
 							defaultMessage : 'Room name'
 						})}
-						value={decodedRoomId}
+						value={decodeURIComponent(roomId)}
 						variant='outlined'
 						margin='normal'
 						InputProps={{
