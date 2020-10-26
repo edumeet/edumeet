@@ -99,23 +99,7 @@ const styles = (theme) =>
 
 const DialogTitle = withStyles(styles)((props) =>
 {
-	const [ open, setOpen ] = useState(false);
-
-	const intl = useIntl();
-
-	useEffect(() =>
-	{
-		const openTimer = setTimeout(() => setOpen(true), 1000);
-		const closeTimer = setTimeout(() => setOpen(false), 4000);
-
-		return () =>
-		{
-			clearTimeout(openTimer);
-			clearTimeout(closeTimer);
-		};
-	}, []);
-
-	const { children, classes, myPicture, onLogin, loggedIn, ...other } = props;
+	const { children, classes, myPicture, loggedIn, ...other } = props;
 
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
