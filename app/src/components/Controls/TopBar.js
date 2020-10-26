@@ -532,6 +532,7 @@ const TopBar = (props) =>
 						variant='contained'
 						color='secondary'
 						onClick={() => roomClient.close()}
+						href={room.name}
 					>
 						<FormattedMessage
 							id='label.leave'

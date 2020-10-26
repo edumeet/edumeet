@@ -9,17 +9,27 @@ import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import CookieConsent from 'react-cookie-consent';
+import Grid from '@material-ui/core/Grid';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
+import BlockIcon from '@material-ui/icons/Block';
+import MicIcon from '@material-ui/icons/Mic';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
+import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import randomString from 'random-string';
+import { useHistory, useLocation } from 'react-router-dom';
 
 const styles = (theme) =>
 	({
@@ -64,21 +74,18 @@ const styles = (theme) =>
 			display       : 'block',
 			paddingBottom : '1vh'
 		},
-		loginButton :
-		{
-			position : 'absolute',
-			right    : theme.spacing(2),
-			top      : theme.spacing(2),
-			padding  : 0
-		},
 		largeIcon :
 		{
 			fontSize : '2em'
 		},
 		largeAvatar :
 		{
-			width  : 50,
-			height : 50
+			width    : 50,
+			height   : 50,
+			position : 'absolute',
+			right    : theme.spacing(2),
+			top      : theme.spacing(2),
+			padding  : 0
 		},
 		green :
 		{
@@ -92,72 +99,26 @@ const styles = (theme) =>
 
 const DialogTitle = withStyles(styles)((props) =>
 {
-	const [ open, setOpen ] = useState(false);
-
-	const intl = useIntl();
-
-	useEffect(() =>
-	{
-		const openTimer = setTimeout(() => setOpen(true), 1000);
-		const closeTimer = setTimeout(() => setOpen(false), 4000);
-
-		return () =>
-		{
-			clearTimeout(openTimer);
-			clearTimeout(closeTimer);
-		};
-	}, []);
-
-	const { children, classes, myPicture, onLogin, loggedIn, ...other } = props;
-
-	const handleTooltipClose = () =>
-	{
-		setOpen(false);
-	};
-
-	const handleTooltipOpen = () =>
-	{
-		setOpen(true);
-	};
-
-	const loginTooltip = loggedIn ?
-		intl.formatMessage({
-			id             : 'tooltip.logout',
-			defaultMessage : 'Log out'
-		})
-		:
-		intl.formatMessage({
-			id             : 'tooltip.login',
-			defaultMessage : 'Log in'
-		});
+	const { children, classes, myPicture, loggedIn, ...other } = props;
 
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
 			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 			<Typography variant='h5'>{children}</Typography>
 			{ window.config.loginEnabled &&
-				<Tooltip
-					onClose={handleTooltipClose}
-					onOpen={handleTooltipOpen}
-					open={open}
-					title={loginTooltip}
-					placement='left'
-				>
-					<IconButton
-						aria-label='Account'
-						className={classes.loginButton}
-						color='inherit'
-						onClick={onLogin}
-					>
-						{ myPicture ?
-							<Avatar src={myPicture} className={classes.largeAvatar} />
-							:
-							<AccountCircle
-								className={classnames(classes.largeIcon, loggedIn ? classes.green : null)}
-							/>
-						}
-					</IconButton>
-				</Tooltip>
+			<React.Fragment
+				aria-label='Account'
+				color='inherit'
+			>
+				{ myPicture ?
+					<Avatar src={myPicture} className={classes.largeAvatar} />
+					:
+					<AccountCircle
+						className={classnames(classes.largeAvatar, loggedIn ? classes.green : null)}
+					/>
+				}
+			</React.Fragment>
+
 			}
 		</MuiDialogTitle>
 	);
@@ -181,20 +142,89 @@ const DialogActions = withStyles((theme) => ({
 const JoinDialog = ({
 	roomClient,
 	room,
-	roomId,
+	mediaPerms,
 	displayName,
 	displayNameInProgress,
 	loggedIn,
 	myPicture,
 	changeDisplayName,
+	setMediaPerms,
 	classes
 }) =>
 {
+
+	const location = useLocation();
+
+	const history = useHistory();
+
 	const intl = useIntl();
 
 	displayName = displayName.trimLeft();
 
-	const handleKeyDown = (event) =>
+	const [ authType, setAuthType ] = useState('guest');
+
+	const [ roomId, setRoomId ] = useState(
+		decodeURI(location.pathname.slice(1)) ||
+		randomString({ length: 8 }).toLowerCase()
+	);
+
+	useEffect(() =>
+	{
+		window.history.replaceState({}, null, roomId);
+
+	}, [ roomId ]);
+
+	useEffect(() =>
+	{
+		(location.pathname === '/') && history.push(roomId);
+	});
+
+	const _askForPerms = () =>
+	{
+		if (mediaPerms.video || mediaPerms.audio)
+		{
+			navigator.mediaDevices.getUserMedia(mediaPerms);
+		}
+	};
+
+	const handleSetMediaPerms = (event, newMediaPerms) =>
+	{
+		if (newMediaPerms !== null)
+		{
+			setMediaPerms(JSON.parse(newMediaPerms));
+		}
+
+	};
+
+	const handleSetAuthType = (event, newAuthType) =>
+	{
+		if (newAuthType !== null)
+		{
+			setAuthType(newAuthType);
+		}
+
+	};
+
+	const handleJoinAsGuest = () =>
+	{
+		_askForPerms();
+
+		roomClient.join({ roomId, joinVideo: mediaPerms.video, joinAudio: mediaPerms.audio });
+	};
+
+	const handleJoinByAuth = () =>
+	{
+		_askForPerms();
+
+		loggedIn ? roomClient.logout(roomId) : roomClient.login(roomId);
+	};
+
+	const handleJoinUsingEnterKey = (event) =>
+	{
+		if (event.key === 'Enter') document.getElementById('buttonJoin').click();
+	};
+
+	const handleChangeDisplayName = (event) =>
 	{
 		const { key } = event;
 
@@ -202,6 +232,7 @@ const JoinDialog = ({
 		{
 			case 'Enter':
 			case 'Escape':
+
 			{
 				displayName = displayName.trim();
 
@@ -228,6 +259,7 @@ const JoinDialog = ({
 	return (
 		<div className={classes.root}>
 			<Dialog
+				onKeyDown={handleJoinUsingEnterKey}
 				open
 				classes={{
 					paper : classes.dialogPaper
@@ -235,43 +267,86 @@ const JoinDialog = ({
 			>
 				<DialogTitle
 					myPicture={myPicture}
-					onLogin={() =>
-					{
-						loggedIn ? roomClient.logout(roomId) : roomClient.login(roomId);
-					}}
-					loggedIn={loggedIn}
 				>
 					{ window.config.title ? window.config.title : 'edumeet' }
 					<hr />
 				</DialogTitle>
+
 				<DialogContent>
-					<DialogContentText gutterBottom>
-						<FormattedMessage
-							id='room.aboutToJoin'
-							defaultMessage='You are about to join a meeting'
-						/>
-					</DialogContentText>
+					{/* ROOM NAME */}
+					<TextField
+						autoFocus
+						id='roomId'
+						label={intl.formatMessage({
+							id             : 'label.roomName',
+							defaultMessage : 'Room name'
+						})}
+						value={roomId}
+						variant='outlined'
+						margin='normal'
+						InputProps={{
+							startAdornment : (
+								<InputAdornment position='start'>
+									<MeetingRoomIcon />
+								</InputAdornment>
+							)
+						}}
+						onChange={(event) =>
+						{
+							const { value } = event.target;
 
-					<DialogContentText variant='h6' gutterBottom align='center'>
-						<FormattedMessage
-							id='room.roomId'
-							defaultMessage='Room ID: {roomName}'
-							values={{
-								roomName : decodedRoomId
-							}}
-						/>
-					</DialogContentText>
+							setRoomId(value.toLowerCase());
 
-					<DialogContentText gutterBottom>
-						<FormattedMessage
-							id='room.setYourName'
-							defaultMessage={
-								`Set your name for participation, 
-								and choose how you want to join:`
-							}
-						/>
-					</DialogContentText>
+						}}
+						onBlur={() =>
+						{
+							if (roomId === '')
+								setRoomId(randomString({ length: 8 }).toLowerCase());
+						}}
+						fullWidth
+					/>
+					{/* /ROOM NAME */}
 
+					{/* AUTH TOGGLE BUTTONS */}
+					<Grid container
+						direction='row'
+						justify='space-between'
+						alignItems='center'
+					>
+						<Grid item>
+							<ToggleButtonGroup
+								value={authType}
+								onChange={handleSetAuthType}
+								aria-label='choose auth'
+								exclusive
+							>
+								<ToggleButton value='guest'>
+									<WorkOutlineIcon/>&nbsp;
+
+									<FormattedMessage
+										id='room.joinRoomm'
+										defaultMessage='Guest'
+									/>
+								</ToggleButton>
+
+								<ToggleButton value='auth'>
+									<VpnKeyIcon/>&nbsp;
+
+									<FormattedMessage
+										id='room.joinRoomm'
+										defaultMessage='Auth User'
+									/>
+								</ToggleButton>
+
+							</ToggleButtonGroup >
+
+						</Grid>
+
+					</Grid>
+					{/* /AUTH TOGGLE BUTTONS */}
+
+					{/* GUEST NAME FIELD */}
+					{authType === 'guest' &&
 					<TextField
 						id='displayname'
 						label={intl.formatMessage({
@@ -280,6 +355,15 @@ const JoinDialog = ({
 						})}
 						value={displayName}
 						variant='outlined'
+
+						InputProps={{
+							startAdornment : (
+								<InputAdornment position='start'>
+									<AccountCircle />
+								</InputAdornment>
+							)
+						}}
+
 						margin='normal'
 						disabled={displayNameInProgress}
 						onChange={(event) =>
@@ -288,7 +372,7 @@ const JoinDialog = ({
 
 							changeDisplayName(value);
 						}}
-						onKeyDown={handleKeyDown}
+						onKeyDown={handleChangeDisplayName}
 						onBlur={() =>
 						{
 							displayName = displayName.trim();
@@ -300,6 +384,9 @@ const JoinDialog = ({
 						}}
 						fullWidth
 					/>
+					}
+					{/* /GUEST NAME FIELD*/}
+
 					{!room.inLobby && room.overRoomLimit &&
 						<DialogContentText className={classes.red} variant='h6' gutterBottom>
 							<FormattedMessage
@@ -315,32 +402,74 @@ const JoinDialog = ({
 
 				{ !room.inLobby ?
 					<DialogActions>
-						<Button
-							onClick={() =>
-							{
-								roomClient.join({ roomId, joinVideo: false });
-							}}
-							variant='contained'
-							color='secondary'
-						>
-							<FormattedMessage
-								id='room.audioOnly'
-								defaultMessage='Audio only'
-							/>
-						</Button>
-						<Button
-							onClick={() =>
-							{
-								roomClient.join({ roomId, joinVideo: true });
-							}}
-							variant='contained'
-							color='secondary'
-						>
-							<FormattedMessage
-								id='room.audioVideo'
-								defaultMessage='Audio and Video'
-							/>
-						</Button>
+						<Grid container direction='row' justify='space-between'>
+
+							{/* MEDIA PERMISSIONS TOGGLE BUTTONS */}
+							<Grid item>
+								<ToggleButtonGroup
+									value={JSON.stringify(mediaPerms)}
+									// value='{ audio: true, video: false }'
+									onChange={handleSetMediaPerms}
+									aria-label='choose permission'
+									exclusive
+								>
+									<ToggleButton value='{"audio":false,"video":false}'>
+										<BlockIcon/>
+									</ToggleButton>
+									<ToggleButton value='{"audio":true,"video":false}'>
+										<MicIcon/>
+									</ToggleButton>
+									<ToggleButton value='{"audio":false,"video":true}'>
+										<VideocamIcon/>
+									</ToggleButton>
+									<ToggleButton value='{"audio":true,"video":true}'>
+										<MicIcon/> +
+										<VideocamIcon/>
+									</ToggleButton>
+
+								</ToggleButtonGroup >
+
+							</Grid>
+							{/* /MEDIA PERMISSION BUTTONS */}
+
+							{/* JOIN BUTTON */}
+							{authType === 'guest' &&
+							<Grid item>
+								<Button
+									onClick={handleJoinAsGuest}
+									variant='contained'
+									color='secondary'
+									id='buttonJoin'
+								>
+									<FormattedMessage
+										id='room.join'
+										defaultMessage='Join'
+									/>
+								</Button>
+
+							</Grid>
+							}
+							{authType === 'auth' &&
+							<Grid item>
+								<Button
+									onClick={handleJoinByAuth}
+									variant='contained'
+									color='secondary'
+									id='buttonJoin'
+								>
+									<FormattedMessage
+										id='room.login'
+										defaultMessage='Login'
+									/>
+								</Button>
+
+							</Grid>
+							}
+
+							{/* /JOIN BUTTON */}
+
+						</Grid>
+
 					</DialogActions>
 					:
 					<DialogContent>
@@ -413,13 +542,16 @@ JoinDialog.propTypes =
 	loggedIn              : PropTypes.bool.isRequired,
 	myPicture             : PropTypes.string,
 	changeDisplayName     : PropTypes.func.isRequired,
-	classes               : PropTypes.object.isRequired
+	setMediaPerms  	      : PropTypes.func.isRequired,
+	classes               : PropTypes.object.isRequired,
+	mediaPerms            : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
 		room                  : state.room,
+		mediaPerms            : state.settings.mediaPerms,
 		displayName           : state.settings.displayName,
 		displayNameInProgress : state.me.displayNameInProgress,
 		loginEnabled          : state.me.loginEnabled,
@@ -434,7 +566,13 @@ const mapDispatchToProps = (dispatch) =>
 		changeDisplayName : (displayName) =>
 		{
 			dispatch(settingsActions.setDisplayName(displayName));
+		},
+
+		setMediaPerms : (mediaPerms) =>
+		{
+			dispatch(settingsActions.setMediaPerms(mediaPerms));
 		}
+
 	};
 };
 
@@ -450,6 +588,7 @@ export default withRoomContext(connect(
 				prev.room.signInRequired === next.room.signInRequired &&
 				prev.room.overRoomLimit === next.room.overRoomLimit &&
 				prev.settings.displayName === next.settings.displayName &&
+				prev.settings === next.settings &&
 				prev.me.displayNameInProgress === next.me.displayNameInProgress &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.loggedIn === next.me.loggedIn &&

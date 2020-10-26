@@ -2115,7 +2115,7 @@ export default class RoomClient
 		));
 	}
 
-	async join({ roomId, joinVideo })
+	async join({ roomId, joinVideo, joinAudio })
 	{
 		await this._loadDynamicImports();
 
@@ -2396,14 +2396,14 @@ export default class RoomClient
 						store.dispatch(roomActions.toggleJoined());
 						store.dispatch(roomActions.setInLobby(false));
 
-						await this._joinRoom({ joinVideo });
+						await this._joinRoom({ joinVideo, joinAudio });
 
 						break;
 					}
 
 					case 'roomBack':
 					{
-						await this._joinRoom({ joinVideo });
+						await this._joinRoom({ joinVideo, joinAudio });
 
 						break;
 					}
@@ -3054,7 +3054,7 @@ export default class RoomClient
 		});
 	}
 
-	async _joinRoom({ joinVideo })
+	async _joinRoom({ joinVideo, joinAudio })
 	{
 		logger.debug('_joinRoom()');
 
@@ -3317,6 +3317,7 @@ export default class RoomClient
 					this.updateWebcam({ start: true });
 				}
 				if (
+					joinAudio &&
 					this._mediasoupDevice.canProduce('audio') &&
 					this._havePermission(permissions.SHARE_AUDIO)
 				)

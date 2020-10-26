@@ -27,6 +27,7 @@ const initialState =
 	buttonControlBar        : window.config.buttonControlBar || false,
 	drawerOverlayed         : window.config.drawerOverlayed || true,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
+	mediaPerms              : { audio: true, video: true },
 	...window.config.defaultAudio
 };
 
@@ -222,6 +223,13 @@ const settings = (state = initialState, action) =>
 			const mirrorOwnVideo = !state.mirrorOwnVideo;
 
 			return { ...state, mirrorOwnVideo };
+		}
+
+		case 'SET_MEDIA_PERMS':
+		{
+			const { mediaPerms } = action.payload;
+
+			return { ...state, mediaPerms };
 		}
 
 		default:

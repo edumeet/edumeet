@@ -8,7 +8,7 @@ import { createIntl } from 'react-intl';
 // import { createIntl, createIntlCache } from 'react-intl';
 import { IntlProvider } from 'react-intl-redux';
 
-import { Route, HashRouter, BrowserRouter } from 'react-router-dom';
+import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
@@ -17,7 +17,7 @@ import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
-import ChooseRoom from './components/ChooseRoom';
+import JoinDialog from './components/JoinDialog';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
@@ -185,8 +185,10 @@ function run()
 								<Router basename={basePath}>
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
-											<Route exact path='/' component={ChooseRoom} />
-											<Route path='/:id' component={App} />
+											<Switch>
+												<Route exact path='/' component={JoinDialog} />
+												<Route path='/:id' component={App} />
+											</Switch>
 										</React.Fragment>
 									</Suspense>
 								</Router>
