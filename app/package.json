@@ -33,7 +33,7 @@
 		"react-intl-redux": "^2.2.0",
 		"react-redux": "^7.1.1",
 		"react-router-dom": "^5.1.2",
-		"react-scripts": "^3.4.3",
+		"react-scripts": "^4.0.0",
 		"react-wakelock-react16": "0.0.7",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
