@@ -590,24 +590,17 @@ async function runHttpsServer()
 			else
 			{
 				const specialChars = "<>@!^*()+[]{}:;|'\"\\,~`";
-				let redir =false;
 
 				for (let i = 0; i < specialChars.length; i++)
 				{
 					if (req.url.substring(1).indexOf(specialChars[i]) > -1)
 					{
-						redir=true;
+						req.url = `/${encodeURIComponent(encodeURI(req.url.substring(1)))}`;
+						res.redirect(`${req.url}`);
 					}
 				}
-				if (redir)
-				{
-					req.url = `/${encodeURIComponent(encodeURI(req.url.substring(1)))}`;
-					res.redirect(`https://${req.hostname}${req.url}`);
-				}
-				else
-				{
-					return next();
-				}
+
+				return next();
 			}
 		}
 		else
