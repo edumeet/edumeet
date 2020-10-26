@@ -129,6 +129,9 @@
 	"label.promoteAllPeers": "Hepsini kabul et",
 	"label.moreActions": "Daha fazla eylem",
 	"label.version": "Versiyon",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",

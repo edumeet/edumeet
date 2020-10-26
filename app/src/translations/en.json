@@ -129,6 +129,9 @@
 	"label.promoteAllPeers": "Promote all",
 	"label.moreActions": "More actions",
 	"label.version": "Version",
+	"label.username": "Username",
+	"label.password": "Password",
+	"label.login": "Login",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",

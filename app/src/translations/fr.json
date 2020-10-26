@@ -98,6 +98,9 @@
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"label.roomName": "Nom de la salle",
 	"label.chooseRoomButton": "Continuer",

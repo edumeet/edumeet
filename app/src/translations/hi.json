@@ -129,6 +129,9 @@
 	"label.promoteAllPeers": " सभी को बढ़ायें",
 	"label.moreActions": "अन्य क्रीयएं",
     "label.version": " संस्करण",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
     
 	"settings.settings" :  "सेटिंग",
     "settings.camera" :  "कैमरा",

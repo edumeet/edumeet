@@ -128,6 +128,9 @@
 	"label.promoteAllPeers": "提升全部",
 	"label.moreActions": "更多",
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "設置",
 	"settings.camera": "視訊來源",

@@ -128,6 +128,9 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",

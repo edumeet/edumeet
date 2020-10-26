@@ -5,7 +5,6 @@ import { Provider } from 'react-redux';
 import isElectron from 'is-electron';
 
 import { createIntl } from 'react-intl';
-// import { createIntl, createIntlCache } from 'react-intl';
 import { IntlProvider } from 'react-intl-redux';
 
 import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
@@ -17,7 +16,8 @@ import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
-import JoinDialog from './components/JoinDialog';
+import ChooseRoom from './components/ChooseRoom';
+import LoginDialog from './components/LoginDialog';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
@@ -186,7 +186,8 @@ function run()
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
 											<Switch>
-												<Route exact path='/' component={JoinDialog} />
+												<Route exact path='/' component={ChooseRoom} />
+												<Route exact path='/login_dialog' component={LoginDialog} />
 												<Route path='/:id' component={App} />
 											</Switch>
 										</React.Fragment>

@@ -127,6 +127,9 @@
 	"label.promoteAllPeers": "Продвигать всех",
 	"label.moreActions": "Дополнительные действия",
 	"label.version": "Версия",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Настройки",
 	"settings.camera": "Камера",

@@ -9,3 +9,4 @@ node_modules/
 /server/certs/
 !/server/certs/mediasoup-demo.localhost.*
 .vscode
+/app/public/config/*.pem

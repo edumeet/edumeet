@@ -129,6 +129,9 @@
 	"label.promoteAllPeers": "Alle Teilnehmer reinlassen",
 	"label.moreActions": "Weitere Aktionen",
 	"label.version": "Version",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",

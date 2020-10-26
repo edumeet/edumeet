@@ -98,6 +98,9 @@
 	"tooltip.muteParticipantAudioModerator": "Résztvevő hangjának némítása mindenkinél",
 	"tooltip.muteParticipantVideoModerator": "Résztvevő videójának némítása mindenkinél",
 	"tooltip.muteScreenSharingModerator": "Résztvevő képernyőmegosztásának leállítása mindenkinél",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",

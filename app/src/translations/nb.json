@@ -129,6 +129,9 @@
 	"label.promoteAllPeers": "Slipp inn alle",
 	"label.moreActions": "Flere handlinger",
 	"label.version": "Versjon",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",

@@ -1,4 +1,6 @@
 const os = require('os');
+// const fs = require('fs');
+
 const userRoles = require('../userRoles');
 
 const {
@@ -31,12 +33,16 @@ module.exports =
 	/*
 	auth :
 	{
+		// Always enabled if configured
 		lti :
 		{
 			consumerKey    : 'key',
 			consumerSecret : 'secret'
 		},
-		oidc:
+
+		// Auth strategy to use (default oidc)
+		strategy : 'oidc',
+		oidc :
 		{
 			// The issuer URL for OpenID Connect discovery
 			// The OpenID Provider Configuration Document
@@ -59,6 +65,40 @@ module.exports =
 				redirect_uri  : 'https://client.example.com/auth/callback'
 			}
 
+		},
+		saml :
+		{
+			// where edumeet.example.com is your edumeet server
+			callbackUrl    : 'https://edumeet.example.com/auth/callback',
+			issuer         : 'https://edumeet.example.com',
+			entryPoint     : 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
+			privateCert    : fs.readFileSync('config/saml_privkey.pem', 'utf-8'),
+			signingCert    : fs.readFileSync('config/saml_cert.pem', 'utf-8'),
+			decryptionPvk  : fs.readFileSync('config/saml_privkey.pem', 'utf-8'),
+			decryptionCert : fs.readFileSync('config/saml_cert.pem', 'utf-8'),
+			// Federation cert
+			cert           : fs.readFileSync('config/federation_cert.pem', 'utf-8')
+		},
+
+		// to create password hash use: node server/utils/password_encode.js cleartextpassword
+		local :
+		{
+			users : [
+				{
+					id           : 1,
+					username     : 'alice',
+					passwordHash : '$2b$10$PAXXw.6cL3zJLd7ZX.AnL.sFg2nxjQPDmMmGSOQYIJSa0TrZ9azG6',
+					displayName  : 'Alice',
+					emails       : [ { value: 'alice@atlanta.com' } ]
+				},
+				{
+					id           : 2,
+					username     : 'bob',
+					passwordHash : '$2b$10$BzAkXcZ54JxhHTqCQcFn8.H6klY/G48t4jDBeTE2d2lZJk/.tvv0G',
+					displayName  : 'Bob',
+					emails       : [ { value: 'bob@biloxi.com' } ]
+				}
+			]
 		}
 	},
 	*/
@@ -237,6 +277,10 @@ module.exports =
 				peer.picture = userinfo.picture;
 			}
 		}
+		if (userinfo['urn:oid:0.9.2342.19200300.100.1.60'] != null)
+		{
+			peer.picture = `data:image/jpeg;base64, ${userinfo['urn:oid:0.9.2342.19200300.100.1.60']}`;
+		}
 
 		if (userinfo.nickname != null)
 		{
@@ -246,6 +290,16 @@ module.exports =
 		if (userinfo.name != null)
 		{
 			peer.displayName = userinfo.name;
+		}
+
+		if (userinfo.displayName != null)
+		{
+			peer.displayName = userinfo.displayName;
+		}
+
+		if (userinfo['urn:oid:2.16.840.1.113730.3.1.241'] != null)
+		{
+			peer.displayName = userinfo['urn:oid:2.16.840.1.113730.3.1.241'];
 		}
 
 		if (userinfo.email != null)
