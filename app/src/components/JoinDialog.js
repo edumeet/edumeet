@@ -412,6 +412,7 @@ const JoinDialog = ({
 						<Grid container direction='row' justify='space-between'>
 
 							{/* MEDIA PERMISSIONS TOGGLE BUTTONS */}
+							{window.config.loginEnabled &&
 							<Grid item>
 								<ToggleButtonGroup
 									value={JSON.stringify(mediaPerms)}
@@ -436,6 +437,7 @@ const JoinDialog = ({
 								</ToggleButtonGroup >
 
 							</Grid>
+							}
 							{/* /MEDIA PERMISSION BUTTONS */}
 
 							{/* JOIN/AUTH BUTTON */}
