@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
@@ -18,7 +17,6 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Tooltip from '@material-ui/core/Tooltip';
 import CookieConsent from 'react-cookie-consent';
 import Grid from '@material-ui/core/Grid';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -76,21 +74,18 @@ const styles = (theme) =>
 			display       : 'block',
 			paddingBottom : '1vh'
 		},
-		loginButton :
-		{
-			position : 'absolute',
-			right    : theme.spacing(2),
-			top      : theme.spacing(2),
-			padding  : 0
-		},
 		largeIcon :
 		{
 			fontSize : '2em'
 		},
 		largeAvatar :
 		{
-			width  : 50,
-			height : 50
+			width    : 50,
+			height   : 50,
+			position : 'absolute',
+			right    : theme.spacing(2),
+			top      : theme.spacing(2),
+			padding  : 0
 		},
 		green :
 		{
@@ -122,54 +117,24 @@ const DialogTitle = withStyles(styles)((props) =>
 
 	const { children, classes, myPicture, onLogin, loggedIn, ...other } = props;
 
-	const handleTooltipClose = () =>
-	{
-		setOpen(false);
-	};
-
-	const handleTooltipOpen = () =>
-	{
-		setOpen(true);
-	};
-
-	const loginTooltip = loggedIn ?
-		intl.formatMessage({
-			id             : 'tooltip.logout',
-			defaultMessage : 'Log out'
-		})
-		:
-		intl.formatMessage({
-			id             : 'tooltip.login',
-			defaultMessage : 'Log in'
-		});
-
 	return (
 		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
 			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
 			<Typography variant='h5'>{children}</Typography>
 			{ window.config.loginEnabled &&
-				<Tooltip
-					onClose={handleTooltipClose}
-					onOpen={handleTooltipOpen}
-					open={open}
-					title={loginTooltip}
-					placement='left'
-				>
-					<IconButton
-						aria-label='Account'
-						className={classes.loginButton}
-						color='inherit'
-						onClick={onLogin}
-					>
-						{ myPicture ?
-							<Avatar src={myPicture} className={classes.largeAvatar} />
-							:
-							<AccountCircle
-								className={classnames(classes.largeIcon, loggedIn ? classes.green : null)}
-							/>
-						}
-					</IconButton>
-				</Tooltip>
+			<React.Fragment
+				aria-label='Account'
+				color='inherit'
+			>
+				{ myPicture ?
+					<Avatar src={myPicture} className={classes.largeAvatar} />
+					:
+					<AccountCircle
+						className={classnames(classes.largeAvatar, loggedIn ? classes.green : null)}
+					/>
+				}
+			</React.Fragment>
+
 			}
 		</MuiDialogTitle>
 	);
@@ -269,7 +234,7 @@ const JoinDialog = ({
 	{
 		navigator.mediaDevices.getUserMedia(mediaPerms);
 
-		roomClient.join({ roomId, joinVideo: mediaPerms.video, joinAudio: mediaPerms.audio });
+		loggedIn ? roomClient.logout(roomId) : roomClient.login(roomId);
 	};
 
 	const handleJoinByEnterKey = (event) =>
@@ -306,11 +271,6 @@ const JoinDialog = ({
 			>
 				<DialogTitle
 					myPicture={myPicture}
-					onLogin={() =>
-					{
-						loggedIn ? roomClient.logout(roomId) : roomClient.login(roomId);
-					}}
-					loggedIn={loggedIn}
 				>
 					{ window.config.title ? window.config.title : 'edumeet' }
 					<hr />
