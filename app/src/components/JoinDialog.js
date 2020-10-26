@@ -257,10 +257,9 @@ const JoinDialog = ({
 	const handleJoinAsGuest = () =>
 	{
 
-		if (mediaPerms.video !== false && mediaPerms.audio !== false)
+		if (mediaPerms.video || mediaPerms.audio)
 		{
 			navigator.mediaDevices.getUserMedia(mediaPerms);
-
 		}
 
 		roomClient.join({ roomId, joinVideo: mediaPerms.video, joinAudio: mediaPerms.audio });
@@ -278,7 +277,7 @@ const JoinDialog = ({
 		if (event.key === 'Enter') document.getElementById('buttonJoin').click();
 	};
 
-	const handleRoomMediaPerm = (event, newMediaPerms) =>
+	const handleMediaPerms = (event, newMediaPerms) =>
 	{
 		if (newMediaPerms !== null)
 		{
