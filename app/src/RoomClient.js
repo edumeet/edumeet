@@ -3250,7 +3250,7 @@ export default class RoomClient
 
 			const roomUserRoles = new Map();
 
-			Object.entries(userRoles).forEach(([ key, val ]) => roomUserRoles.set(val.id, val));
+			Object.values(userRoles).forEach((val) => roomUserRoles.set(val.id, val));
 
 			store.dispatch(roomActions.setUserRoles(roomUserRoles));
 
