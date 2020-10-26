@@ -164,7 +164,7 @@ const JoinDialog = ({
 	const [ authType, setAuthType ] = useState('guest');
 
 	const [ roomId, setRoomId ] = useState(
-		encodeURIComponent(location.pathname.slice(1)) ||
+		decodeURIComponent(location.pathname.slice(1)) ||
 		randomString({ length: 8 }).toLowerCase()
 	);
 
@@ -281,7 +281,7 @@ const JoinDialog = ({
 							id             : 'label.roomName',
 							defaultMessage : 'Room name'
 						})}
-						value={decodeURIComponent(roomId)}
+						value={roomId}
 						variant='outlined'
 						margin='normal'
 						InputProps={{
