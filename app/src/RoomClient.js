@@ -283,7 +283,7 @@ export default class RoomClient
 
 		store.dispatch(roomActions.setRoomState('closed'));
 
-		window.location = '/';
+		window.location = `/${this._roomId}`;
 	}
 
 	_startKeyListener()
