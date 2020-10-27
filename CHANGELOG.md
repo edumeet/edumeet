@@ -1,7 +1,9 @@
 # Changelog
 
-## 3.4.0 
-### Added:
+## 3.4.0
+
+### Added
+
 * Multiparty meeting renamed to edumeet
 * Merged room selector- and join- dialog - default keyboard focus on login field
 * Localization selectable
@@ -40,13 +42,19 @@
 * Update TopBar leave button
 * Add joinAudio capability
 * Standardize Auth button
-### upgrade depencies: 
-  * webtorrent from 0.107.17 to 0.108.1 …
-  * Upgrade React-scripts
-### Languages:
+
+### upgrade depencies
+
+* webtorrent from 0.107.17 to 0.108.1 …
+* Upgrade React-scripts
+
+### Languages
+
 * Updates translations: hu, tr, no, pl, uk
 * Addad translations: Hindi (hi), Russian (ru), Kazakh (ka)
-### Bugfixes:
+
+### Bugfixes
+
 * Hopefully fix to silent peer issue, ref #256
 * Set timeout for TURN API request, fixes #484
 * Fix only firefox handles applyConstraints to audio tracks correctly
@@ -59,7 +67,7 @@
 * Add constraint for user facing camera. Update media devices properly
 * Cleanup on close
 * Fixed null values for peers not yet assigned to a router
-* Fix URL sanitizer bug 
+* Fix URL sanitizer bug
 * Removed audio request modification
 * Fix race in spotlights
 * Fix piping bug when peers returning to router
@@ -74,6 +82,7 @@
 * Fix close room link
 
 ## 3.3
+
 * Add: Rooms now scale across cores
 * Add: Permissions and roles. Users can now have different roles (moderator, admin etc.) that give different permissions.
 * Add: TURN API or fallback TURN server
