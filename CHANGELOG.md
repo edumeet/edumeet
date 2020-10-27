@@ -93,7 +93,7 @@
 * Add: Configurable audio output device (in supported browsers)
 * Add: Audio auto mute/unmute based on volume
 * Add: Handle unsupported browsers properly
-* Add: Lots of appearence settings
+* Add: Lots of appearance settings
 * Add: Side drawer can now stay permanently open
 * Add: Move control buttons to separate control bar
 * Add: Can now "raise hand"

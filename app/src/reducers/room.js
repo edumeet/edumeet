@@ -27,7 +27,7 @@ const initialState =
 	rolesManagerOpen              : false,
 	helpOpen                      : false,
 	aboutOpen                     : false,
-	currentSettingsTab            : 'media', // media, appearence, advanced
+	currentSettingsTab            : 'media', // media, appearance, advanced
 	lockDialogOpen                : false,
 	joined                        : false,
 	muteAllInProgress             : false,

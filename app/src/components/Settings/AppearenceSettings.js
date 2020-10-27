@@ -34,7 +34,7 @@ const styles = (theme) =>
 		}
 	});
 
-const AppearenceSettings = (props) =>
+const AppearanceSettings = (props) =>
 {
 	const {
 		roomClient,
@@ -240,7 +240,7 @@ const AppearenceSettings = (props) =>
 	);
 };
 
-AppearenceSettings.propTypes =
+AppearanceSettings.propTypes =
 {
 	roomClient          				  : PropTypes.any.isRequired,
 	isMobile                  : PropTypes.bool.isRequired,
@@ -296,4 +296,4 @@ export default withRoomContext(connect(
 			);
 		}
 	}
-)(withStyles(styles)(AppearenceSettings)));
+)(withStyles(styles)(AppearanceSettings)));
