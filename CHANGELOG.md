@@ -11,7 +11,7 @@
 * New worker load calculation so router selection is based on that and not random anymore
 * New permissions and roles:
   * Propagate userRoles to client state, ref #437
-  * Extend userRoles and use the new audio, video permissions, ref #437 
+  * Extend userRoles and use the new audio, video permissions, ref #437
   * New permission to modify peer roles
   * Create room actions for giving and taking roles
   * Add functions to client for modifying roles live
