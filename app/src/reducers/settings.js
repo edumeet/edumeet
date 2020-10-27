@@ -13,6 +13,8 @@ const initialState =
 	voiceActivatedUnmute    : false,
 	noiseThreshold          : -50,
 	sampleSize              : 16,
+	audioMuted              : false,
+	videoMuted              : false,
 	// low, medium, high, veryhigh, ultra
 	resolution              : window.config.defaultResolution || 'medium',
 	frameRate               : window.config.defaultFrameRate || 15,
@@ -230,6 +232,20 @@ const settings = (state = initialState, action) =>
 			const { mediaPerms } = action.payload;
 
 			return { ...state, mediaPerms };
+		}
+
+		case 'SET_AUDIO_MUTED':
+		{
+			const { audioMuted } = action.payload;
+
+			return { ...state, audioMuted };
+		}
+
+		case 'SET_VIDEO_MUTED':
+		{
+			const { videoMuted } = action.payload;
+
+			return { ...state, videoMuted };
 		}
 
 		default:

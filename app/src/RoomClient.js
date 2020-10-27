@@ -969,6 +969,10 @@ export default class RoomClient
 
 			store.dispatch(
 				producerActions.setProducerPaused(this._micProducer.id));
+
+			store.dispatch(
+				settingsActions.setAudioMuted(true));
+
 		}
 		catch (error)
 		{
@@ -1004,6 +1008,10 @@ export default class RoomClient
 
 				store.dispatch(
 					producerActions.setProducerResumed(this._micProducer.id));
+
+				store.dispatch(
+					settingsActions.setAudioMuted(false));
+
 			}
 			catch (error)
 			{
@@ -1367,6 +1375,7 @@ export default class RoomClient
 	}
 
 	async updateWebcam({
+		init = false,
 		start = false,
 		restart = false,
 		newDeviceId = null,
@@ -1401,6 +1410,13 @@ export default class RoomClient
 
 			if (newFrameRate)
 				store.dispatch(settingsActions.setVideoFrameRate(newFrameRate));
+
+			const { videoMuted } = store.getState().settings;
+
+			if (init && videoMuted)
+				return;
+			else
+				store.dispatch(settingsActions.setVideoMuted(false));
 
 			store.dispatch(meActions.setWebcamInProgress(true));
 
@@ -3314,7 +3330,7 @@ export default class RoomClient
 					this._havePermission(permissions.SHARE_VIDEO)
 				)
 				{
-					this.updateWebcam({ start: true });
+					this.updateWebcam({ init: true, start: true });
 				}
 				if (
 					joinAudio &&
@@ -3928,7 +3944,7 @@ export default class RoomClient
 		}
 
 		this._webcamProducer = null;
-
+		store.dispatch(settingsActions.setVideoMuted(true));
 		store.dispatch(meActions.setWebcamInProgress(false));
 	}
 

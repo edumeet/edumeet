@@ -215,7 +215,9 @@ const Me = (props) =>
 			defaultMessage : 'Activate audio'
 		});
 	}
-	else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
+	else if (!micProducer.locallyPaused &&
+		!micProducer.remotelyPaused &&
+		!settings.audioMuted)
 	{
 		micState = 'on';
 		micTip = intl.formatMessage({
@@ -244,7 +246,7 @@ const Me = (props) =>
 			defaultMessage : 'Video unsupported'
 		});
 	}
-	else if (webcamProducer)
+	else if (webcamProducer && !settings.videoMuted)
 	{
 		webcamState = 'on';
 		webcamTip = intl.formatMessage({
