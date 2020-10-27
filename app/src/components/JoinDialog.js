@@ -94,7 +94,39 @@ const styles = (theme) =>
 		red :
 		{
 			color : 'rgba(153, 0, 0, 1)'
+		},
+		joinButton :
+		{
+			background : '#2e7031',
+			color      : 'white',
+			'&:hover'  : {
+				backgroundColor : '#2e7031'
+			}
+		},
+		mediaDevicesAnySelectedButton :
+		{
+			'& .Mui-selected' : {
+				color           : 'white',
+				backgroundColor : '#5F9B2D',
+				'&:hover'       : {
+					color           : 'white',
+					backgroundColor : '#5F9B2D'
+				} }
+
+		},
+
+		mediaDevicesNoneSelectedButton :
+		{
+			'& .Mui-selected' : {
+				color           : 'white',
+				backgroundColor : '#f50057',
+				'&:hover'       : {
+					color           : 'white',
+					backgroundColor : '#f50057'
+				} }
+
 		}
+
 	});
 
 const DialogTitle = withStyles(styles)((props) =>
@@ -236,7 +268,7 @@ const JoinDialog = ({
 
 	const handleJoinUsingEnterKey = (event) =>
 	{
-		if (event.key === 'Enter') document.getElementById('buttonJoin').click();
+		if (event.key === 'Enter') document.getElementById('joinButton').click();
 	};
 
 	const handleChangeDisplayName = (event) =>
@@ -417,6 +449,12 @@ const JoinDialog = ({
 								<ToggleButtonGroup
 									value={JSON.stringify(mediaPerms)}
 									onChange={handleSetMediaPerms}
+									className={
+										JSON.stringify(mediaPerms) ===
+										'{"audio":false,"video":false}' ?
+											classes.mediaDevicesNoneSelectedButton :
+											classes.mediaDevicesAnySelectedButton
+									}
 									aria-label='choose permission'
 									exclusive
 								>
@@ -446,8 +484,8 @@ const JoinDialog = ({
 								<Button
 									onClick={handleJoin}
 									variant='contained'
-									color='secondary'
-									id='buttonJoin'
+									className={classes.joinButton}
+									id='joinButton'
 								>
 									<FormattedMessage
 										id='room.join'
@@ -464,7 +502,7 @@ const JoinDialog = ({
 									onClick={handleAuth}
 									variant='contained'
 									color='secondary'
-									id='buttonJoin'
+									id='joinButton'
 								>
 									<FormattedMessage
 										id='room.login'
@@ -481,7 +519,7 @@ const JoinDialog = ({
 									onClick={handleJoin}
 									variant='contained'
 									color='secondary'
-									id='buttonJoin'
+									id='joinButton'
 								>
 									<FormattedMessage
 										id='room.login'
