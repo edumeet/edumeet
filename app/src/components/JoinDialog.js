@@ -341,7 +341,7 @@ const JoinDialog = ({
 
 									<FormattedMessage
 										id='room.joinRoomm'
-										defaultMessage='Auth User'
+										defaultMessage='Auth'
 									/>
 								</ToggleButton>
 
@@ -468,7 +468,7 @@ const JoinDialog = ({
 								>
 									<FormattedMessage
 										id='room.login'
-										defaultMessage='Login'
+										defaultMessage='Next'
 									/>
 								</Button>
 
