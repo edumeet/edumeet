@@ -193,7 +193,9 @@ const JoinDialog = ({
 
 	displayName = displayName.trimLeft();
 
-	const [ authType, setAuthType ] = useState('guest');
+	const authTypeDefault = (loggedIn) ? 'auth' : 'guest';
+
+	const [ authType, setAuthType ] = useState(authTypeDefault);
 
 	const [ roomId, setRoomId ] = useState(
 		decodeURIComponent(location.pathname.slice(1)) ||
