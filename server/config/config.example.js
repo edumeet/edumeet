@@ -21,6 +21,21 @@ const {
 // const AwaitQueue = require('awaitqueue');
 // const axios = require('axios');
 
+
+function getListenIps() {
+  const interfaces = os.networkInterfaces();
+  const addresses = [];
+ 
+  Object.keys(interfaces).forEach((netInterface) => {
+   interfaces[netInterface].forEach((interfaceObject) => {
+    if (interfaceObject.family === 'IPv4' && !interfaceObject.internal) {
+     addresses.push({ ip: interfaceObject.address, announcedIp: null });
+    }
+   });
+  });
+  return(addresses);
+ }
+
 module.exports =
 {
 
@@ -360,15 +375,7 @@ module.exports =
 		// mediasoup WebRtcTransport settings.
 		webRtcTransport :
 		{
-			listenIps :
-			[
-				// change 192.0.2.1 IPv4 to your server's IPv4 address!!
-				{ ip: '192.0.2.1', announcedIp: null }
-
-				// Can have multiple listening interfaces
-				// change 2001:DB8::1 IPv6 to your server's IPv6 address!!
-				// { ip: '2001:DB8::1', announcedIp: null }
-			],
+			listenIps: getListenIps(),
 			initialAvailableOutgoingBitrate : 1000000,
 			minimumAvailableOutgoingBitrate : 600000,
 			// Additional options that are not part of WebRtcTransportOptions.
