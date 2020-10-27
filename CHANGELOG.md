@@ -66,8 +66,6 @@
 * Fix piped router count
 * Add comma to prometheus config code
 * Removed code that is problematic and also unused
-* Fix federation pem
-* Fix saml load cert from file
 * Remove duplicated callbackURL
 * Fix moderator buttons layout
 * Fix: Special chars are not sanitized in URL
