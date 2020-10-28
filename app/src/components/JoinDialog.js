@@ -19,7 +19,7 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import CookieConsent from 'react-cookie-consent';
 import Grid from '@material-ui/core/Grid';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import BlockIcon from '@material-ui/icons/Block';
@@ -30,6 +30,7 @@ import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import randomString from 'random-string';
 import { useHistory, useLocation } from 'react-router-dom';
+import IconButton from '@material-ui/core/IconButton';
 
 const styles = (theme) =>
 	({
@@ -74,11 +75,7 @@ const styles = (theme) =>
 			display       : 'block',
 			paddingBottom : '1vh'
 		},
-		largeIcon :
-		{
-			fontSize : '2em'
-		},
-		largeAvatar :
+		accountButton :
 		{
 			width    : 50,
 			height   : 50,
@@ -86,6 +83,22 @@ const styles = (theme) =>
 			right    : theme.spacing(2),
 			top      : theme.spacing(2),
 			padding  : 0
+		},
+		accountButtonAvatar :
+		{
+			width  : '100%',
+			height : '100%'
+		},
+
+		accountButtonLabel :
+		{
+			width    : 100,
+			height   : 25,
+			position : 'absolute',
+			right    : 30,
+			top      : 10,
+			padding  : 0
+
 		},
 		green :
 		{
@@ -128,33 +141,6 @@ const styles = (theme) =>
 		}
 
 	});
-
-const DialogTitle = withStyles(styles)((props) =>
-{
-	const { children, classes, myPicture, loggedIn, ...other } = props;
-
-	return (
-		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
-			<Typography variant='h5'>{children}</Typography>
-			{ window.config.loginEnabled &&
-			<React.Fragment
-				aria-label='Account'
-				color='inherit'
-			>
-				{ myPicture ?
-					<Avatar src={myPicture} className={classes.largeAvatar} />
-					:
-					<AccountCircle
-						className={classnames(classes.largeAvatar, loggedIn ? classes.green : null)}
-					/>
-				}
-			</React.Fragment>
-
-			}
-		</MuiDialogTitle>
-	);
-});
 
 const DialogContent = withStyles((theme) => ({
 	root :
@@ -306,11 +292,42 @@ const JoinDialog = ({
 					paper : classes.dialogPaper
 				}}
 			>
-				<DialogTitle
-					myPicture={myPicture}
-				>
-					{ window.config.title ? window.config.title : 'edumeet' }
-					<hr />
+
+				<DialogTitle disableTypography className={classes.dialogTitle}>
+					{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+					{ window.config.loginEnabled &&
+					<IconButton
+						className={classes.accountButton}
+						onClick={
+							loggedIn ?
+								() => roomClient.logout(roomId) :
+								() => roomClient.login(roomId)
+						}
+					>
+						<Typography variant='h6' className={classes.accountButtonLabel}>
+							{loggedIn ? 'Logout' : 'Login'}
+						</Typography>
+
+						{ myPicture ?
+							<Avatar src={myPicture} className={classes.accountButtonAvatar} />
+							:
+							<AccountCircle
+								className={
+									classnames(
+										classes.accountButtonAvatar, loggedIn ? classes.green : null
+									)
+								}
+							/>
+						}
+					</IconButton>
+
+					}
+
+					<Typography variant='h5'>
+						{ window.config.title ? window.config.title : 'edumeet' }
+						<hr />
+					</Typography>
+
 				</DialogTitle>
 
 				<DialogContent>
@@ -349,6 +366,7 @@ const JoinDialog = ({
 					{/* /ROOM NAME */}
 
 					{/* AUTH TOGGLE BUTTONS */}
+					{false &&
 					<Grid container
 						direction='row'
 						justify='space-between'
@@ -384,10 +402,10 @@ const JoinDialog = ({
 						</Grid>
 
 					</Grid>
+					}
 					{/* /AUTH TOGGLE BUTTONS */}
 
-					{/* GUEST NAME FIELD */}
-					{authType === 'guest' &&
+					{/* NAME FIELD */}
 					<TextField
 						id='displayname'
 						label={intl.formatMessage({
@@ -425,8 +443,7 @@ const JoinDialog = ({
 						}}
 						fullWidth
 					/>
-					}
-					{/* /GUEST NAME FIELD*/}
+					{/* NAME FIELD*/}
 
 					{!room.inLobby && room.overRoomLimit &&
 						<DialogContentText className={classes.red} variant='h6' gutterBottom>
