@@ -238,6 +238,7 @@ const JoinDialog = ({
 		});
 	};
 
+	/*
 	const handleAuth = () =>
 	{
 		_askForPerms();
@@ -253,6 +254,7 @@ const JoinDialog = ({
 			});
 
 	};
+	*/
 
 	const handleJoinUsingEnterKey = (event) =>
 	{
