@@ -520,7 +520,7 @@ const JoinDialog = ({
 								<Button
 									onClick={handleJoin}
 									variant='contained'
-									color='secondary'
+									className={classes.joinButton}
 									id='joinButton'
 								>
 									<FormattedMessage
