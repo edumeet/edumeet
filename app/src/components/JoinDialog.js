@@ -498,7 +498,6 @@ const JoinDialog = ({
 							{/* /MEDIA PERMISSION BUTTONS */}
 
 							{/* JOIN/AUTH BUTTON */}
-							{authType === 'guest' &&
 							<Grid item>
 								<Button
 									onClick={handleJoin}
@@ -513,8 +512,7 @@ const JoinDialog = ({
 								</Button>
 
 							</Grid>
-							}
-
+							{/*
 							{authType === 'auth' && !loggedIn &&
 							<Grid item>
 								<Button
@@ -531,7 +529,6 @@ const JoinDialog = ({
 
 							</Grid>
 							}
-
 							{authType === 'auth' && loggedIn &&
 							<Grid item>
 								<Button
@@ -548,6 +545,7 @@ const JoinDialog = ({
 
 							</Grid>
 							}
+							*/}
 
 							{/* /JOIN BUTTON */}
 
