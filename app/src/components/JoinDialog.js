@@ -102,7 +102,7 @@ const styles = (theme) =>
 		},
 		green :
 		{
-			color : 'rgba(0, 153, 0, 1)'
+			color : '#5F9B2D'
 		},
 		red :
 		{
@@ -504,7 +504,7 @@ const JoinDialog = ({
 								<Button
 									onClick={handleJoin}
 									variant='contained'
-									className={classes.joinButton}
+									color='primary'
 									id='joinButton'
 								>
 									<FormattedMessage
