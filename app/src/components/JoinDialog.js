@@ -12,12 +12,15 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import CookieConsent from 'react-cookie-consent';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -457,44 +460,58 @@ const JoinDialog = ({
 							/>
 						</DialogContentText>
 					}
-
 				</DialogContent>
 
 				{ !room.inLobby ?
+
 					<DialogActions>
-						<Grid container direction='row' justify='space-between'>
+
+						<Grid container
+							direction='row'
+							justify='space-between'
+							alignItems='flex-end'
+						>
 
 							{/* MEDIA PERMISSIONS TOGGLE BUTTONS */}
 							{window.config.loginEnabled &&
 							<Grid item>
-								<ToggleButtonGroup
-									value={JSON.stringify(mediaPerms)}
-									onChange={handleSetMediaPerms}
-									className={
-										JSON.stringify(mediaPerms) ===
-										'{"audio":false,"video":false}' ?
-											classes.mediaDevicesNoneSelectedButton :
-											classes.mediaDevicesAnySelectedButton
-									}
-									aria-label='choose permission'
-									exclusive
-								>
-									<ToggleButton value='{"audio":false,"video":false}'>
-										<BlockIcon/>
-									</ToggleButton>
-									<ToggleButton value='{"audio":true,"video":false}'>
-										<MicIcon/>
-									</ToggleButton>
-									<ToggleButton value='{"audio":false,"video":true}'>
-										<VideocamIcon/>
-									</ToggleButton>
-									<ToggleButton value='{"audio":true,"video":true}'>
-										<MicIcon/> +
-										<VideocamIcon/>
-									</ToggleButton>
-
-								</ToggleButtonGroup >
-
+								<FormControl component='fieldset'>
+									<Box mb={1}>
+										<FormLabel component='legend'>
+											<FormattedMessage
+												id='room.chooseMedia'
+												defaultMessage='Choose Media'
+											/>
+										</FormLabel>
+									</Box>
+									<ToggleButtonGroup
+										value={JSON.stringify(mediaPerms)}
+										size='small'
+										onChange={handleSetMediaPerms}
+										className={
+											JSON.stringify(mediaPerms) ===
+											'{"audio":false,"video":false}' ?
+												classes.mediaDevicesNoneSelectedButton :
+												classes.mediaDevicesAnySelectedButton
+										}
+										aria-label='choose permission'
+										exclusive
+									>
+										<ToggleButton value='{"audio":false,"video":false}'>
+											<BlockIcon/>
+										</ToggleButton>
+										<ToggleButton value='{"audio":true,"video":false}'>
+											<MicIcon/>
+										</ToggleButton>
+										<ToggleButton value='{"audio":false,"video":true}'>
+											<VideocamIcon/>
+										</ToggleButton>
+										<ToggleButton value='{"audio":true,"video":true}'>
+											<MicIcon/> +
+											<VideocamIcon/>
+										</ToggleButton>
+									</ToggleButtonGroup >
+								</FormControl>
 							</Grid>
 							}
 							{/* /MEDIA PERMISSION BUTTONS */}
