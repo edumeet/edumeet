@@ -22,7 +22,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import CookieConsent from 'react-cookie-consent';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import BlockIcon from '@material-ui/icons/Block';
@@ -34,6 +34,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import randomString from 'random-string';
 import { useHistory, useLocation } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = (theme) =>
 	({
@@ -73,36 +74,16 @@ const styles = (theme) =>
 				width : '90vw'
 			}
 		},
-		logo :
-		{
-			display       : 'block',
-			paddingBottom : '1vh'
-		},
 		accountButton :
 		{
-			width    : 50,
-			height   : 50,
-			position : 'absolute',
-			right    : theme.spacing(2),
-			top      : theme.spacing(2),
-			padding  : 0
+			padding : 0
 		},
 		accountButtonAvatar :
 		{
-			width  : '100%',
-			height : '100%'
+			width  : 50,
+			height : 50
 		},
 
-		accountButtonLabel :
-		{
-			width    : 100,
-			height   : 25,
-			position : 'absolute',
-			right    : 30,
-			top      : 10,
-			padding  : 0
-
-		},
 		green :
 		{
 			color : '#5F9B2D'
@@ -145,10 +126,19 @@ const styles = (theme) =>
 
 	});
 
+const DialogTitle = withStyles((theme) => ({
+	root :
+	{
+		margin  : 0,
+		padding : theme.spacing(1)
+	}
+}))(MuiDialogTitle);
+
 const DialogContent = withStyles((theme) => ({
 	root :
 	{
-		padding : theme.spacing(2)
+		padding    : theme.spacing(2),
+		paddingTop : theme.spacing(1)
 	}
 }))(MuiDialogContent);
 
@@ -299,43 +289,50 @@ const JoinDialog = ({
 			>
 
 				<DialogTitle disableTypography className={classes.dialogTitle}>
-					{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
-					{ window.config.loginEnabled &&
-					<IconButton
-						className={classes.accountButton}
-						onClick={
-							loggedIn ?
-								() => roomClient.logout(roomId) :
-								() => roomClient.login(roomId)
-						}
+					<Grid
+						container
+						direction='row'
+						justify='space-between'
+						alignItems='center'
 					>
-						<Typography variant='h6' className={classes.accountButtonLabel}>
-							{loggedIn ? 'Logout' : 'Login'}
-						</Typography>
+						<Grid item>
+							{ window.config.logo !=='' ?
+								<img alt='Logo' src={window.config.logo} /> :
+								<Typography variant='h5'> {window.config.title} </Typography>
+							}
+						</Grid>
+						<Grid item>
+							{ window.config.loginEnabled &&
+							<Tooltip open title={loggedIn ? 'Logout' : 'Login'} placement='left'>
+								<IconButton
+									className={classes.accountButton}
+									onClick={
+										loggedIn ?
+											() => roomClient.logout(roomId) :
+											() => roomClient.login(roomId)
+									}
+								>
+									{ myPicture ?
+										<Avatar src={myPicture} className={classes.accountButtonAvatar} />
+										:
+										<AccountCircle
+											className={
+												classnames(
+													classes.accountButtonAvatar, loggedIn ? classes.green : null
+												)
+											}
+										/>
+									}
+								</IconButton>
+							</Tooltip>
+							}
 
-						{ myPicture ?
-							<Avatar src={myPicture} className={classes.accountButtonAvatar} />
-							:
-							<AccountCircle
-								className={
-									classnames(
-										classes.accountButtonAvatar, loggedIn ? classes.green : null
-									)
-								}
-							/>
-						}
-					</IconButton>
-
-					}
-
-					<Typography variant='h5'>
-						{ window.config.title ? window.config.title : 'edumeet' }
-						<hr />
-					</Typography>
-
+						</Grid>
+					</Grid>
 				</DialogTitle>
 
 				<DialogContent>
+					<hr />
 					{/* ROOM NAME */}
 					<TextField
 						autoFocus
