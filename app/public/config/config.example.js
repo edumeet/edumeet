@@ -145,8 +145,8 @@ var config =
 	maxLastN             : 5,
 	// If truthy, users can NOT change number of speakers visible
 	lockLastN            : false,
-	// Add file and uncomment for adding logo to appbar
-	// logo       : 'images/logo.svg',
+	// Show logo if not null, else show title
+	logo                 : 'images/logo.example.png',
 	title                : 'edumeet',
 	// Service & Support URL
 	// if not set then not displayed on the about modals
