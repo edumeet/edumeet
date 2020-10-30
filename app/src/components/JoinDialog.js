@@ -160,7 +160,9 @@ const JoinDialog = ({
 	myPicture,
 	changeDisplayName,
 	setMediaPerms,
-	classes
+	classes,
+	setAudioMuted,
+	setVideoMuted
 }) =>
 {
 
@@ -202,11 +204,11 @@ const JoinDialog = ({
 
 	const handleSetMediaPerms = (event, newMediaPerms) =>
 	{
+
 		if (newMediaPerms !== null)
 		{
 			setMediaPerms(JSON.parse(newMediaPerms));
 		}
-
 	};
 
 	const handleSetAuthType = (event, newAuthType) =>
@@ -220,6 +222,10 @@ const JoinDialog = ({
 
 	const handleJoin = () =>
 	{
+		setAudioMuted(false);
+
+		setVideoMuted(false);
+
 		_askForPerms();
 
 		const encodedRoomId = encodeURIComponent(roomId);
@@ -641,7 +647,9 @@ JoinDialog.propTypes =
 	changeDisplayName     : PropTypes.func.isRequired,
 	setMediaPerms  	      : PropTypes.func.isRequired,
 	classes               : PropTypes.object.isRequired,
-	mediaPerms            : PropTypes.object.isRequired
+	mediaPerms            : PropTypes.object.isRequired,
+	setAudioMuted         : PropTypes.bool.isRequired,
+	setVideoMuted         : PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -668,6 +676,14 @@ const mapDispatchToProps = (dispatch) =>
 		setMediaPerms : (mediaPerms) =>
 		{
 			dispatch(settingsActions.setMediaPerms(mediaPerms));
+		},
+		setAudioMuted : (flag) =>
+		{
+			dispatch(settingsActions.setAudioMuted(flag));
+		},
+		setVideoMuted : (flag) =>
+		{
+			dispatch(settingsActions.setVideoMuted(flag));
 		}
 
 	};
