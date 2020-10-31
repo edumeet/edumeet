@@ -145,7 +145,8 @@ var config =
 	maxLastN             : 5,
 	// If truthy, users can NOT change number of speakers visible
 	lockLastN            : false,
-	// Show logo if not null, else show title
+	// Show logo if "logo" is not null, else show title
+	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
 	logo                 : 'images/logo.example.png',
 	title                : 'edumeet',
 	// Service & Support URL
