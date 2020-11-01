@@ -311,7 +311,14 @@ const JoinDialog = ({
 						</Grid>
 						<Grid item>
 							{ window.config.loginEnabled &&
-							<Tooltip open title={loggedIn ? 'Logout' : 'Login'} placement='left'>
+							<Tooltip
+								open
+								title={intl.formatMessage({
+									id             : loggedIn ? 'label.logout' : 'label.login',
+									defaultMessage : loggedIn ? 'Logout' : 'Login'
+								})}
+								placement='left'
+							>
 								<IconButton
 									className={classes.accountButton}
 									onClick={
@@ -558,7 +565,7 @@ const JoinDialog = ({
 									id='joinButton'
 								>
 									<FormattedMessage
-										id='room.join'
+										id='label.join'
 										defaultMessage='Join'
 									/>
 								</Button>
