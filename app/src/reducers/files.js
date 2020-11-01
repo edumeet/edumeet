@@ -8,10 +8,12 @@ const files = (state = {}, action) =>
 
 			const newFile = {
 				active    : false,
+				type      : 'file',
 				progress  : 0,
 				files     : null,
 				peerId    : peerId,
-				magnetUri : magnetUri
+				magnetUri : magnetUri,
+				time      : Date.now()
 			};
 
 			return { ...state, [magnetUri]: newFile };
@@ -25,9 +27,12 @@ const files = (state = {}, action) =>
 			// eslint-disable-next-line
 			fileHistory.map((file) =>
 			{
+				// console.log('ADD1', fileHistory);
 				const newFile =
 				{
 					active   : false,
+					type     : 'file',
+					time     : Date.now(),
 					progress : 0,
 					files    : null,
 					...file
@@ -78,6 +83,8 @@ const files = (state = {}, action) =>
 				...file,
 				files    : sharedFiles,
 				progress : 1,
+				// type : 'file',
+				// time : Date.now(),
 				active   : false,
 				timeout  : false
 			};

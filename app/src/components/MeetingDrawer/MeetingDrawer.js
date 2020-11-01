@@ -94,6 +94,7 @@ const MeetingDrawer = (props) =>
 							</Badge>
 						}
 					/>
+
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={raisedHands}>
