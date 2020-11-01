@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} hebt die Hand",
 	"room.loweredHand": "{displayName} senkt die Hand",
 	"room.extraVideo": "Video hinzufügen",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Der Raum ist voll, probiere es später nochmal",
 	"room.help": "Hilfe",
 	"room.about": "Über",

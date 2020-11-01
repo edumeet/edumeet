@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} rakk opp hånden",
 	"room.loweredHand": "{displayName} tok ned hånden",
 	"room.extraVideo": "Ekstra video",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Rommet er fullt, prøv igjen om litt.",
 	"room.help": "Hjelp",
 	"room.about": "Om",

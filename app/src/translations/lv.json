@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} pacēla roku",
 	"room.loweredHand": "{displayName} nolaida roku",
 	"room.extraVideo": "Papildus video",
+	"room.extraVideoDuplication": null,
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,

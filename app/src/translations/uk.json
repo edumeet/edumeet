@@ -59,6 +59,7 @@
 	"room.raisedHand": " {displayName} підняв руку",
 	"room.loweredHand": " {displayName} опустив руку",
 	"room.extraVideo": "Додаткове відео",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Кімната переповнена, спробуйте знову через деякий час",	
 	"room.help": "Допомога",
 	"room.about": "Про нас",

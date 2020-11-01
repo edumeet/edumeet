@@ -58,6 +58,7 @@
 	"room.raisedHand": null,
 	"room.loweredHand": null,
 	"room.extraVideo": null,
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": null,
 	"room.help": null,
 	"room.about": null,

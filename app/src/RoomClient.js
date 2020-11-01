@@ -3568,90 +3568,117 @@ export default class RoomClient
 
 			([ track ] = stream.getVideoTracks());
 
-			let producer;
+			let exists = false;
 
-			if (this._useSimulcast)
+			this._extraVideoProducers.forEach(function(value)
 			{
-				// If VP9 is the only available video codec then use SVC.
-				const firstVideoCodec = this._mediasoupDevice
-					.rtpCapabilities
-					.codecs
-					.find((c) => c.kind === 'video');
+				if (value._track.label===track.label)
+				{
+					exists=true;
+				}
+			});
 
-				let encodings;
+			if (!exists)
+			{
 
-				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-					encodings = VIDEO_KSVC_ENCODINGS;
-				else if ('simulcastEncodings' in window.config)
-					encodings = window.config.simulcastEncodings;
-				else
-					encodings = VIDEO_SIMULCAST_ENCODINGS;
+				let producer;
 
-				producer = await this._sendTransport.produce(
-					{
-						track,
-						encodings,
-						codecOptions :
+				if (this._useSimulcast)
+				{
+					// If VP9 is the only available video codec then use SVC.
+					const firstVideoCodec = this._mediasoupDevice
+						.rtpCapabilities
+						.codecs
+						.find((c) => c.kind === 'video');
+
+					let encodings;
+
+					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+						encodings = VIDEO_KSVC_ENCODINGS;
+					else if ('simulcastEncodings' in window.config)
+						encodings = window.config.simulcastEncodings;
+					else
+						encodings = VIDEO_SIMULCAST_ENCODINGS;
+
+					producer = await this._sendTransport.produce(
 						{
-							videoGoogleStartBitrate : 1000
-						},
+							track,
+							encodings,
+							codecOptions :
+							{
+								videoGoogleStartBitrate : 1000
+							},
+							appData :
+							{
+								source : 'extravideo'
+							}
+						});
+				}
+				else
+				{
+					producer = await this._sendTransport.produce({
+						track,
 						appData :
 						{
 							source : 'extravideo'
 						}
 					});
+				}
+
+				this._extraVideoProducers.set(producer.id, producer);
+
+				store.dispatch(producerActions.addProducer(
+					{
+						id            : producer.id,
+						deviceLabel   : device.label,
+						source        : 'extravideo',
+						paused        : producer.paused,
+						track         : producer.track,
+						rtpParameters : producer.rtpParameters,
+						codec         : producer.rtpParameters.codecs[0].mimeType.split('/')[1]
+					}));
+
+				// store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
+
+				await this._updateWebcams();
+
+				producer.on('transportclose', () =>
+				{
+					this._extraVideoProducers.delete(producer.id);
+
+					producer = null;
+				});
+
+				producer.on('trackended', () =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							type : 'error',
+							text : intl.formatMessage({
+								id             : 'devices.cameraDisconnected',
+								defaultMessage : 'Camera disconnected'
+							})
+						}));
+
+					this.disableExtraVideo(producer.id)
+						.catch(() => {});
+				});
+
+				logger.debug('addExtraVideo() succeeded');
+
 			}
 			else
 			{
-				producer = await this._sendTransport.produce({
-					track,
-					appData :
-					{
-						source : 'extravideo'
-					}
-				});
-			}
-
-			this._extraVideoProducers.set(producer.id, producer);
-
-			store.dispatch(producerActions.addProducer(
-				{
-					id            : producer.id,
-					deviceLabel   : device.label,
-					source        : 'extravideo',
-					paused        : producer.paused,
-					track         : producer.track,
-					rtpParameters : producer.rtpParameters,
-					codec         : producer.rtpParameters.codecs[0].mimeType.split('/')[1]
-				}));
-
-			// store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
-
-			await this._updateWebcams();
-
-			producer.on('transportclose', () =>
-			{
-				this._extraVideoProducers.delete(producer.id);
-
-				producer = null;
-			});
-
-			producer.on('trackended', () =>
-			{
+				logger.error('addExtraVideo() duplicate');
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
-							id             : 'devices.cameraDisconnected',
-							defaultMessage : 'Camera disconnected'
+							id             : 'room.extraVideoDuplication',
+							defaultMessage : 'Extra videodevice duplication errordefault'
 						})
 					}));
-
-				this.disableExtraVideo(producer.id)
-					.catch(() => {});
-			});
-
-			logger.debug('addExtraVideo() succeeded');
+			}
 		}
 		catch (error)
 		{

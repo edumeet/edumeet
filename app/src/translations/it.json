@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} ha alzato la mano",
 	"room.loweredHand": "{displayName} ha abbassato la mano",
 	"room.extraVideo": "Video extra",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "La stanza è piena, riprova più tardi.",
 	"room.help": "Aiuto",
 	"room.about": "Informazioni su",

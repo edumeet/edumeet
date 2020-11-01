@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} поднял(а) руку",
 	"room.loweredHand": "{displayName} опустил(а) руку",
 	"room.extraVideo": "Дополнительное видео",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Видеоконференция заполнена, повторите попытку через некоторое время.",
 	"room.help": "Помощь",
 	"room.about": "О нас",

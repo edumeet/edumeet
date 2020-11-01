@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} elini kaldırdı",
 	"room.loweredHand": "{displayName} elini indirdi",
 	"room.extraVideo": "İlave video",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Oda dolu, bir süre sonra tekrar deneyin",
 	"room.help": "Yardım",
 	"room.about": "Hakkında",

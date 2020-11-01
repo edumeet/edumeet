@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} ने हाथ ऊपर कीया है",
 	"room.loweredHand": "{displayName} ने हाथ नीचे कीया है ",
 	"room.extraVideo": "अतीरिक्त विडियो",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "कमरा रिक्त नहीं है, कुछ देर बाद कोशिश करें",
 	"room.help": "सहायता",
 	"room.about": "बारे में",
