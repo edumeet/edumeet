@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
@@ -501,17 +501,26 @@ const JoinDialog = ({
 										exclusive
 									>
 										<ToggleButton value='{"audio":false,"video":false}'>
-											<BlockIcon/>
+											<Tooltip title='none' placement='bottom'>
+												<BlockIcon/>
+											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":true,"video":false}'>
-											<MicIcon/>
+											<Tooltip title='mic' placement='bottom'>
+												<MicIcon/>
+											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":false,"video":true}'>
-											<VideocamIcon/>
+											<Tooltip title='cam' placement='bottom'>
+												<VideocamIcon/>
+											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":true,"video":true}'>
-											<MicIcon/> +
-											<VideocamIcon/>
+											<Tooltip title='mic + cam' placement='bottom'>
+												<span style={{ display: 'flex', flexDirection: 'row' }}>
+													<MicIcon/>+<VideocamIcon/>
+												</span>
+											</Tooltip>
 										</ToggleButton>
 									</ToggleButtonGroup >
 								</FormControl>
