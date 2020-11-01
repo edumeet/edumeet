@@ -132,6 +132,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",
@@ -181,11 +183,13 @@
 
 	"devices.devicesChanged": "Cihazlarınız değişti, ayarlar kutusundan cihazlarınızı yapılandırın",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Ses desteklenmiyor",
 	"device.activateAudio": "Sesi aktif et",
 	"device.muteAudio": "Sesi kapat",
 	"device.unMuteAudio": "Sesi aç",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video desteklenmiyor",
 	"device.startVideo": "Video başlat",
 	"device.stopVideo": "Video durdur",
@@ -202,11 +206,15 @@
 	"devices.microphoneMuteError": "Mikrofonunuz kapatılamıyor",
 	"devices.microphoneUnMuteError": "Mikrofonunuz açılamıyor",
 
-	"devices.screenSharingDisconnected" : "Ekran paylaşımı bağlı değil",
+	"devices.screenSharingDisconnected": "Ekran paylaşımı bağlı değil",
 	"devices.screenSharingError": "Ekranınıza erişilirken bir hata oluştu",
 
 	"devices.cameraDisconnected": "Kamera bağlı değil",
 	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": "Moderatör sohbeti temizledi",
 	"moderator.clearFiles": "Moderatör dosyaları temizledi",

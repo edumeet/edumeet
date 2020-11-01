@@ -101,6 +101,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"label.roomName": "Nombre de la sala",
 	"label.chooseRoomButton": "Continuar",
@@ -181,11 +183,13 @@
 
 	"devices.devicesChanged": "Sus dispositivos han cambiado, vuelva a configurarlos en la ventana de ajustes",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Sonido no disponible",
 	"device.activateAudio": "Activar sonido",
 	"device.muteAudio": "Silenciar sonido",
 	"device.unMuteAudio": "Reactivar sonido",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Vídeo no disponible",
 	"device.startVideo": "Iniciar vídeo",
 	"device.stopVideo": "Detener vídeo",
@@ -207,6 +211,10 @@
 
 	"devices.cameraDisconnected": "Cámara desconectada",
 	"devices.cameraError": "Hubo un error al acceder a su cámara",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
