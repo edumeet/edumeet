@@ -486,7 +486,7 @@ const JoinDialog = ({
 									<Box mb={1}>
 										<FormLabel component='legend'>
 											<FormattedMessage
-												id='room.chooseMedia'
+												id='devices.chooseMedia'
 												defaultMessage='Choose Media'
 											/>
 										</FormLabel>
@@ -505,22 +505,39 @@ const JoinDialog = ({
 										exclusive
 									>
 										<ToggleButton value='{"audio":false,"video":false}'>
-											<Tooltip title='none' placement='bottom'>
+											<Tooltip title={intl.formatMessage({
+												id             : 'devices.disableBothMicrophoneAndCamera',
+												defaultMessage : 'Disable both Microphone And Camera'
+											})} placement='bottom'
+											>
 												<BlockIcon/>
 											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":true,"video":false}'>
-											<Tooltip title='mic' placement='bottom'>
+											<Tooltip title={intl.formatMessage({
+												id             : 'devices.enableOnlyMicrophone',
+												defaultMessage : 'Enable only Microphone'
+											})} placement='bottom'
+											>
+
 												<MicIcon/>
 											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":false,"video":true}'>
-											<Tooltip title='cam' placement='bottom'>
+											<Tooltip title={intl.formatMessage({
+												id             : 'devices.enableOnlyCamera',
+												defaultMessage : 'Enable only Camera'
+											})} placement='bottom'
+											>
 												<VideocamIcon/>
 											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":true,"video":true}'>
-											<Tooltip title='mic + cam' placement='bottom'>
+											<Tooltip title={intl.formatMessage({
+												id             : 'devices.enableBothMicrophoneAndCamera',
+												defaultMessage : 'Enable both Microphone and Camera'
+											})} placement='bottom'
+											>
 												<span style={{ display: 'flex', flexDirection: 'row' }}>
 													<MicIcon/>+<VideocamIcon/>
 												</span>
