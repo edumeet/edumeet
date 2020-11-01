@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Tastaturkürzel",
 	"room.browsePeersSpotlight": "Teilnehmer durchgehen und anzeigen",
 	"room.stopAllScreenSharing": "Stoppe alle Bildschirmfreigaben",
+	"room.hideSelfView": "Selbstansicht-Video ausblenden",
+	"room.showSelfView": "Selbstansicht-Video anzeigen",
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 
@@ -127,6 +129,9 @@
 	"label.promoteAllPeers": "Alle Teilnehmer reinlassen",
 	"label.moreActions": "Weitere Aktionen",
 	"label.version": "Version",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",

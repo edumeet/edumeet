@@ -64,6 +64,8 @@
 	"room.about": "關於",
 	"room.shortcutKeys": "鍵盤快速鍵",
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "您已靜音，請按下 空白鍵 來說話",
 
@@ -126,6 +128,9 @@
 	"label.promoteAllPeers": "提升全部",
 	"label.moreActions": "更多",
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "設置",
 	"settings.camera": "視訊來源",

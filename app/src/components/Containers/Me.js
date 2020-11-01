@@ -215,7 +215,9 @@ const Me = (props) =>
 			defaultMessage : 'Activate audio'
 		});
 	}
-	else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
+	else if (!micProducer.locallyPaused &&
+		!micProducer.remotelyPaused &&
+		!settings.audioMuted)
 	{
 		micState = 'on';
 		micTip = intl.formatMessage({
@@ -244,7 +246,7 @@ const Me = (props) =>
 			defaultMessage : 'Video unsupported'
 		});
 	}
-	else if (webcamProducer)
+	else if (webcamProducer && !settings.videoMuted)
 	{
 		webcamState = 'on';
 		webcamTip = intl.formatMessage({
@@ -528,9 +530,8 @@ const Me = (props) =>
 												}
 												color={micState === 'on' ?
 													settings.voiceActivatedUnmute ?
-														me.isAutoMuted ? 'secondary'
-															: 'primary'
-														: 'default'
+														me.isAutoMuted ? 'secondary' : 'primary'
+														: 'primary'
 													: 'secondary'
 												}
 												size='large'
@@ -622,7 +623,7 @@ const Me = (props) =>
 													!hasVideoPermission ||
 													me.webcamInProgress
 												}
-												color={webcamState === 'on' ? 'default' : 'secondary'}
+												color={webcamState === 'on' ? 'primary' : 'secondary'}
 												size='large'
 												onClick={() =>
 												{
@@ -659,7 +660,7 @@ const Me = (props) =>
 														!me.canShareScreen ||
 														me.screenShareInProgress
 													}
-													color='primary'
+													color={screenState === 'on' ? 'primary' : 'secondary'}
 													size='small'
 													onClick={() =>
 													{
@@ -685,7 +686,7 @@ const Me = (props) =>
 														!me.canShareScreen ||
 														me.screenShareInProgress
 													}
-													color={screenState === 'on' ? 'primary' : 'default'}
+													color={screenState === 'on' ? 'primary' : 'secondary'}
 													size='large'
 													onClick={() =>
 													{

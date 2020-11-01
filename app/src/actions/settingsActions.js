@@ -132,3 +132,21 @@ export const toggleMirrorOwnVideo = () =>
 	({
 		type : 'TOGGLE_MIRROR_OWN_VIDEO'
 	});
+
+export const setMediaPerms = (mediaPerms) =>
+	({
+		type    : 'SET_MEDIA_PERMS',
+		payload : { mediaPerms }
+	});
+
+export const setAudioMuted = (audioMuted) =>
+	({
+		type    : 'SET_AUDIO_MUTED',
+		payload : { audioMuted }
+	});
+
+export const setVideoMuted = (videoMuted) =>
+	({
+		type    : 'SET_VIDEO_MUTED',
+		payload : { videoMuted }
+	});

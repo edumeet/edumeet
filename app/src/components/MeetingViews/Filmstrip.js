@@ -243,6 +243,7 @@ class Filmstrip extends React.PureComponent
 			spotlights,
 			toolbarsVisible,
 			permanentTopBar,
+			hideSelfView,
 			classes
 		} = this.props;
 
@@ -287,11 +288,13 @@ class Filmstrip extends React.PureComponent
 									active : myId === activePeerId
 								})}
 							>
+								{ !hideSelfView &&
 								<Me
 									advancedMode={advancedMode}
 									style={peerStyle}
 									smallContainer
 								/>
+								}
 							</div>
 						</Grid>
 
@@ -342,6 +345,7 @@ Filmstrip.propTypes = {
 	spotlights      : PropTypes.array.isRequired,
 	boxes           : PropTypes.number,
 	toolbarsVisible : PropTypes.bool.isRequired,
+	hideSelfView    : PropTypes.bool.isRequired,
 	toolAreaOpen    : PropTypes.bool.isRequired,
 	permanentTopBar : PropTypes.bool.isRequired,
 	aspectRatio     : PropTypes.number.isRequired,
@@ -359,6 +363,7 @@ const mapStateToProps = (state) =>
 		spotlights      : state.room.spotlights,
 		boxes           : videoBoxesSelector(state),
 		toolbarsVisible : state.room.toolbarsVisible,
+		hideSelfView    : state.room.hideSelfView,
 		toolAreaOpen    : state.toolarea.toolAreaOpen,
 		aspectRatio     : state.settings.aspectRatio,
 		permanentTopBar : state.settings.permanentTopBar
@@ -376,6 +381,7 @@ export default withRoomContext(connect(
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.selectedPeerId === next.room.selectedPeerId &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.room.hideSelfView === next.room.hideSelfView &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
 				prev.settings.aspectRatio === next.settings.aspectRatio &&

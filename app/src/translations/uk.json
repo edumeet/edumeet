@@ -65,10 +65,12 @@
 	"room.shortcutKeys": "Гарячі клавіші",
 	"room.browsePeersSpotlight": "Переглянути учасників у центрі уваги",
 	"room.stopAllScreenSharing": "Зупинити спільне використання екрану",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
+
 	"me.mutedPTT":" У вас вимкнено звук, утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
 	"roles.gotRole": "Ви отримали роль {role}",
 	"roles.lostRole": "Ви втратили роль {role}",
-
 
 	"tooltip.login": "Увійти",
 	"tooltip.logout": "Вихід",
@@ -126,6 +128,9 @@
 	"label.promoteAllPeers": "Сприяти всім",
 	"label.moreActions": "Більше дій",
 	"label.version": "Версія",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Налаштування",
 	"settings.camera": "Камера",

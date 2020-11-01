@@ -171,10 +171,6 @@ class VideoView extends React.PureComponent
 			videoHeight : null
 		};
 
-		// Latest received audio track
-		// @type {MediaStreamTrack}
-		this._audioTrack = null;
-
 		// Latest received video track.
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
@@ -405,14 +401,6 @@ class VideoView extends React.PureComponent
 					controls={false}
 				/>
 
-				<audio
-					ref='audioElement'
-					autoPlay
-					playsInline
-					muted={isMe}
-					controls={false}
-				/>
-
 				{children}
 			</div>
 		);
@@ -420,9 +408,9 @@ class VideoView extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { videoTrack, audioTrack } = this.props;
+		const { videoTrack } = this.props;
 
-		this._setTracks(videoTrack, audioTrack);
+		this._setTracks(videoTrack);
 	}
 
 	componentWillUnmount()
@@ -443,24 +431,23 @@ class VideoView extends React.PureComponent
 	{
 		if (prevProps !== this.props)
 		{
-			const { videoTrack, audioTrack } = this.props;
+			const { videoTrack } = this.props;
 
-			this._setTracks(videoTrack, audioTrack);
+			this._setTracks(videoTrack);
 		}
 	}
 
-	_setTracks(videoTrack, audioTrack)
+	_setTracks(videoTrack)
 	{
-		if (this._videoTrack === videoTrack && this._audioTrack === audioTrack)
+		if (this._videoTrack === videoTrack)
 			return;
 
 		this._videoTrack = videoTrack;
-		this._audioTrack = audioTrack;
 
 		clearInterval(this._videoResolutionTimer);
 		this._hideVideoResolution();
 
-		const { videoElement, audioElement } = this.refs;
+		const { videoElement } = this.refs;
 
 		if (videoTrack)
 		{
@@ -472,12 +459,6 @@ class VideoView extends React.PureComponent
 
 			videoElement.oncanplay = () => this.setState({ videoCanPlay: true });
 
-			videoElement.onplay = () =>
-			{
-				audioElement.play()
-					.catch((error) => logger.warn('audioElement.play() [error:"%o]', error));
-			};
-
 			videoElement.play()
 				.catch((error) => logger.warn('videoElement.play() [error:"%o]', error));
 
@@ -486,21 +467,6 @@ class VideoView extends React.PureComponent
 		else
 		{
 			videoElement.srcObject = null;
-		}
-
-		if (audioTrack)
-		{
-			const stream = new MediaStream();
-
-			stream.addTrack(audioTrack);
-			audioElement.srcObject = stream;
-
-			audioElement.play()
-				.catch((error) => logger.warn('audioElement.play() [error:"%o]', error));
-		}
-		else
-		{
-			audioElement.srcObject = null;
 		}
 	}
 
@@ -544,7 +510,6 @@ VideoView.propTypes =
 	videoContain                   : PropTypes.bool,
 	advancedMode                   : PropTypes.bool,
 	videoTrack                     : PropTypes.any,
-	audioTrack                     : PropTypes.any,
 	videoVisible                   : PropTypes.bool.isRequired,
 	consumerSpatialLayers          : PropTypes.number,
 	consumerTemporalLayers         : PropTypes.number,

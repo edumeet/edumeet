@@ -4,6 +4,7 @@ import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
 import * as requestActions from './actions/requestActions';
 import * as meActions from './actions/meActions';
+import * as intlActions from './actions/intlActions';
 import * as roomActions from './actions/roomActions';
 import * as peerActions from './actions/peerActions';
 import * as peerVolumeActions from './actions/peerVolumeActions';
@@ -15,7 +16,10 @@ import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
 import * as notificationActions from './actions/notificationActions';
 import * as transportActions from './actions/transportActions';
+import Spotlights from './Spotlights';
 import { permissions } from './permissions';
+// import { updateIntl } from 'react-intl-redux';
+import * as locales from './translations/locales';
 
 let createTorrent;
 
@@ -28,8 +32,6 @@ let mediasoupClient;
 let io;
 
 let ScreenShare;
-
-let Spotlights;
 
 let requestTimeout,
 	lastN,
@@ -115,6 +117,7 @@ export default class RoomClient
 	{
 		store = data.store;
 		intl = data.intl;
+
 	}
 
 	constructor(
@@ -213,7 +216,7 @@ export default class RoomClient
 			settingsActions.setLastN(this._maxSpotlights));
 
 		// Manager of spotlight
-		this._spotlights = null;
+		this._spotlights = new Spotlights(this._maxSpotlights, this);
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -255,6 +258,9 @@ export default class RoomClient
 		this._startKeyListener();
 
 		this._startDevicesListener();
+
+		this.setLocale(store.getState().intl.locale);
+
 	}
 
 	close()
@@ -277,7 +283,7 @@ export default class RoomClient
 
 		store.dispatch(roomActions.setRoomState('closed'));
 
-		window.location = '/';
+		window.location = `/${this._roomId}`;
 	}
 
 	_startKeyListener()
@@ -496,6 +502,21 @@ export default class RoomClient
 		});
 	}
 
+	setLocale(locale)
+	{
+
+		if (locale === null) locale = locales.detect();
+		const one = locales.loadOne(locale);
+
+		store.dispatch(intlActions.updateIntl({
+			locale   : one.locale[0],
+			messages : one.messages,
+			list   	 : locales.getList()
+		}));
+
+		document.documentElement.lang = one.locale[0].toUpperCase();
+	}
+
 	login(roomId = this._roomId)
 	{
 		const url = `/auth/login?peerId=${this._peerId}&roomId=${roomId}`;
@@ -675,10 +696,12 @@ export default class RoomClient
 
 	async changeDisplayName(displayName)
 	{
-		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
+		displayName = displayName.trim();
 
 		if (!displayName)
-			displayName = 'Guest';
+			displayName = `Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`;
+
+		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
 
 		store.dispatch(
 			meActions.setDisplayNameInProgress(true));
@@ -946,6 +969,10 @@ export default class RoomClient
 
 			store.dispatch(
 				producerActions.setProducerPaused(this._micProducer.id));
+
+			store.dispatch(
+				settingsActions.setAudioMuted(true));
+
 		}
 		catch (error)
 		{
@@ -981,6 +1008,10 @@ export default class RoomClient
 
 				store.dispatch(
 					producerActions.setProducerResumed(this._micProducer.id));
+
+				store.dispatch(
+					settingsActions.setAudioMuted(false));
+
 			}
 			catch (error)
 			{
@@ -1011,6 +1042,8 @@ export default class RoomClient
 	{
 		logger.debug('updateSpotlights()');
 
+		store.dispatch(roomActions.setSpotlights(spotlights));
+
 		try
 		{
 			for (const consumer of this._consumers.values())
@@ -1020,7 +1053,11 @@ export default class RoomClient
 					if (spotlights.includes(consumer.appData.peerId))
 						await this._resumeConsumer(consumer);
 					else
+					{
 						await this._pauseConsumer(consumer);
+						store.dispatch(
+							roomActions.removeSelectedPeer(consumer.appData.peerId));
+					}
 				}
 			}
 		}
@@ -1338,6 +1375,7 @@ export default class RoomClient
 	}
 
 	async updateWebcam({
+		init = false,
 		start = false,
 		restart = false,
 		newDeviceId = null,
@@ -1372,6 +1410,13 @@ export default class RoomClient
 
 			if (newFrameRate)
 				store.dispatch(settingsActions.setVideoFrameRate(newFrameRate));
+
+			const { videoMuted } = store.getState().settings;
+
+			if (init && videoMuted)
+				return;
+			else
+				store.dispatch(settingsActions.setVideoMuted(false));
 
 			store.dispatch(meActions.setWebcamInProgress(true));
 
@@ -2071,13 +2116,6 @@ export default class RoomClient
 			'./ScreenShare'
 		));
 
-		({ default: Spotlights } = await import(
-
-			/* webpackPrefetch: true */
-			/* webpackChunkName: "spotlights" */
-			'./Spotlights'
-		));
-
 		mediasoupClient = await import(
 
 			/* webpackPrefetch: true */
@@ -2093,7 +2131,7 @@ export default class RoomClient
 		));
 	}
 
-	async join({ roomId, joinVideo })
+	async join({ roomId, joinVideo, joinAudio })
 	{
 		await this._loadDynamicImports();
 
@@ -2106,8 +2144,6 @@ export default class RoomClient
 		this._screenSharing = ScreenShare.create(this._device);
 
 		this._signalingSocket = io(this._signalingUrl);
-
-		this._spotlights = new Spotlights(this._maxSpotlights, this._signalingSocket);
 
 		store.dispatch(roomActions.setRoomState('connecting'));
 
@@ -2376,14 +2412,14 @@ export default class RoomClient
 						store.dispatch(roomActions.toggleJoined());
 						store.dispatch(roomActions.setInLobby(false));
 
-						await this._joinRoom({ joinVideo });
+						await this._joinRoom({ joinVideo, joinAudio });
 
 						break;
 					}
 
 					case 'roomBack':
 					{
-						await this._joinRoom({ joinVideo });
+						await this._joinRoom({ joinVideo, joinAudio });
 
 						break;
 					}
@@ -2788,8 +2824,10 @@ export default class RoomClient
 					{
 						const { id, displayName, picture, roles } = notification.data;
 
-						store.dispatch(
-							peerActions.addPeer({ id, displayName, picture, roles, consumers: [] }));
+						store.dispatch(peerActions.addPeer(
+							{ id, displayName, picture, roles, consumers: [] }));
+
+						this._spotlights.newPeer(id);
 
 						this._soundNotification();
 
@@ -2809,6 +2847,8 @@ export default class RoomClient
 					case 'peerClosed':
 					{
 						const { peerId } = notification.data;
+
+						this._spotlights.closePeer(peerId);
 
 						store.dispatch(
 							peerActions.removePeer(peerId));
@@ -3030,7 +3070,7 @@ export default class RoomClient
 		});
 	}
 
-	async _joinRoom({ joinVideo })
+	async _joinRoom({ joinVideo, joinAudio })
 	{
 		logger.debug('_joinRoom()');
 
@@ -3226,7 +3266,7 @@ export default class RoomClient
 
 			const roomUserRoles = new Map();
 
-			Object.entries(userRoles).forEach(([ key, val ]) => roomUserRoles.set(val.id, val));
+			Object.values(userRoles).forEach((val) => roomUserRoles.set(val.id, val));
 
 			store.dispatch(roomActions.setUserRoles(roomUserRoles));
 
@@ -3259,28 +3299,11 @@ export default class RoomClient
 					peerActions.addPeer({ ...peer, consumers: [] }));
 			}
 
-			this._spotlights.addPeers(peers);
-
-			this._spotlights.on('spotlights-updated', (spotlights) =>
-			{
-				store.dispatch(roomActions.setSpotlights(spotlights));
-				this.updateSpotlights(spotlights);
-			});
-
 			(chatHistory.length > 0) && store.dispatch(
 				chatActions.addChatHistory(chatHistory));
 
 			(fileHistory.length > 0) && store.dispatch(
 				fileActions.addFileHistory(fileHistory));
-
-			if (lastNHistory.length > 0)
-			{
-				logger.debug('_joinRoom() | got lastN history');
-
-				this._spotlights.addSpeakerList(
-					lastNHistory.filter((peerId) => peerId !== this._peerId)
-				);
-			}
 
 			locked ?
 				store.dispatch(roomActions.setRoomLocked()) :
@@ -3303,6 +3326,14 @@ export default class RoomClient
 			if (this._produce)
 			{
 				if (
+					joinVideo &&
+					this._havePermission(permissions.SHARE_VIDEO)
+				)
+				{
+					this.updateWebcam({ init: true, start: true });
+				}
+				if (
+					joinAudio &&
 					this._mediasoupDevice.canProduce('audio') &&
 					this._havePermission(permissions.SHARE_AUDIO)
 				)
@@ -3318,12 +3349,6 @@ export default class RoomClient
 						if (autoMuteThreshold && peers.length >= autoMuteThreshold)
 							this.muteMic();
 					}
-
-				if (
-					joinVideo &&
-					this._havePermission(permissions.SHARE_VIDEO)
-				)
-					this.updateWebcam({ start: true });
 			}
 
 			await this._updateAudioOutputDevices();
@@ -3352,7 +3377,16 @@ export default class RoomClient
 					})
 				}));
 
-			this._spotlights.start();
+			this._spotlights.addPeers(peers);
+
+			if (lastNHistory.length > 0)
+			{
+				logger.debug('_joinRoom() | got lastN history');
+
+				this._spotlights.addSpeakerList(
+					lastNHistory.filter((peerId) => peerId !== this._peerId)
+				);
+			}
 		}
 		catch (error)
 		{
@@ -3910,7 +3944,7 @@ export default class RoomClient
 		}
 
 		this._webcamProducer = null;
-
+		store.dispatch(settingsActions.setVideoMuted(true));
 		store.dispatch(meActions.setWebcamInProgress(false));
 	}
 

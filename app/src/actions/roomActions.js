@@ -228,3 +228,9 @@ export const setAllowWhenRoleMissing = (allowWhenRoleMissing) =>
 		type    : 'SET_ALLOW_WHEN_ROLE_MISSING',
 		payload : { allowWhenRoleMissing }
 	});
+
+export const setHideSelfView = (hideSelfView) =>
+	({
+		type    : 'SET_HIDE_SELF_VIEW',
+		payload : { hideSelfView }
+	});

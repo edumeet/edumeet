@@ -1,48 +1,34 @@
-import { EventEmitter } from 'events';
 import Logger from './Logger';
 
 const logger = new Logger('Spotlight');
 
-export default class Spotlights extends EventEmitter
+export default class Spotlights
 {
-	constructor(maxSpotlights, signalingSocket)
+	constructor(maxSpotlights, roomClient)
 	{
-		super();
-
-		this._signalingSocket = signalingSocket;
 		this._maxSpotlights = maxSpotlights;
 		this._peerList = [];
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
-		this._started = false;
-	}
-
-	start()
-	{
-		this._handleSignaling();
-
-		this._started = true;
-		this._spotlightsUpdated();
+		this._roomClient = roomClient;
 	}
 
 	addPeers(peers)
 	{
 		for (const peer of peers)
 		{
-			this._newPeer(peer.id);
+			if (this._peerList.indexOf(peer.id) === -1)
+			{
+				logger.debug('adding peer [peerId: "%s"]', peer.id);
+				this._peerList.push(peer.id);
+			}
 		}
+		this._spotlightsUpdated();
 	}
 
 	peerInSpotlights(peerId)
 	{
-		if (this._started)
-		{
-			return this._currentSpotlights.indexOf(peerId) !== -1;
-		}
-		else
-		{
-			return false;
-		}
+		return this._currentSpotlights.indexOf(peerId) !== -1;
 	}
 
 	addPeerToSpotlight(peerId)
@@ -50,9 +36,7 @@ export default class Spotlights extends EventEmitter
 		logger.debug('addPeerToSpotlight() [peerId:"%s"]', peerId);
 
 		this._selectedSpotlights = [ ...this._selectedSpotlights, peerId ];
-
-		if (this._started)
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
 	removePeerSpotlight(peerId)
@@ -63,40 +47,17 @@ export default class Spotlights extends EventEmitter
 			this._selectedSpotlights.filter((peer) =>
 				peer !== peerId);
 
-		if (this._started)
-			this._spotlightsUpdated();
-	}
-
-	_handleSignaling()
-	{
-		this._signalingSocket.on('notification', (notification) =>
-		{
-			if (notification.method === 'newPeer')
-			{
-				const { id } = notification.data;
-
-				this._newPeer(id);
-			}
-
-			if (notification.method === 'peerClosed')
-			{
-				const { peerId } = notification.data;
-
-				this._closePeer(peerId);
-			}
-		});
+		this._spotlightsUpdated();
 	}
 
 	clearSpotlights()
 	{
-		this._started = false;
-
 		this._peerList = [];
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
 	}
 
-	_newPeer(id)
+	newPeer(id)
 	{
 		logger.debug(
 			'room "newpeer" event [id: "%s"]', id);
@@ -107,30 +68,24 @@ export default class Spotlights extends EventEmitter
 
 			this._peerList.push(id);
 
-			if (this._started)
-				this._spotlightsUpdated();
+			this._spotlightsUpdated();
 		}
 	}
 
-	_closePeer(id)
+	closePeer(id)
 	{
 		logger.debug(
 			'room "peerClosed" event [peerId:%o]', id);
 
 		this._peerList = this._peerList.filter((peer) => peer !== id);
-
 		this._selectedSpotlights = this._selectedSpotlights.filter((peer) => peer !== id);
-
-		if (this._started)
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
 	addSpeakerList(speakerList)
 	{
 		this._peerList = [ ...new Set([ ...speakerList, ...this._peerList ]) ];
-
-		if (this._started)
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
 	handleActiveSpeaker(peerId)
@@ -152,11 +107,12 @@ export default class Spotlights extends EventEmitter
 	{
 		let spotlights;
 
-		const maxSpotlights =
-			this._selectedSpotlights.length >
-			this._maxSpotlights ?
-				this._selectedSpotlights.length :
-				this._maxSpotlights;
+		const maxSpotlights = this._maxSpotlights;
+
+		while (this._selectedSpotlights.length > this._maxSpotlights)
+		{
+			this._selectedSpotlights.shift();
+		}
 
 		if (this._selectedSpotlights.length > 0)
 		{
@@ -167,19 +123,18 @@ export default class Spotlights extends EventEmitter
 			spotlights = this._peerList;
 		}
 
-		if (
-			!this._arraysEqual(
-				this._currentSpotlights, spotlights.slice(0, maxSpotlights)
-			)
-		)
+		if (!this._arraysEqual(
+			this._currentSpotlights, spotlights.slice(0, maxSpotlights)))
 		{
 			logger.debug('_spotlightsUpdated() | spotlights updated, emitting');
 
 			this._currentSpotlights = spotlights.slice(0, maxSpotlights);
-			this.emit('spotlights-updated', this._currentSpotlights);
+			this._roomClient.updateSpotlights(this._currentSpotlights);
 		}
 		else
+		{
 			logger.debug('_spotlightsUpdated() | spotlights not updated');
+		}
 	}
 
 	_arraysEqual(arr1, arr2)

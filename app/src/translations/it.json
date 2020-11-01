@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Scorciatoie da tastiera",
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 	
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
@@ -127,6 +129,9 @@
 	"label.promoteAllPeers": "Promuovi tutti",
 	"label.moreActions": "Altre azioni",
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",

@@ -64,6 +64,8 @@
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 	
 	"me.mutedPTT": null,
 
@@ -127,6 +129,9 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",

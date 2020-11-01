@@ -65,6 +65,8 @@
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": null,
 
@@ -96,6 +98,9 @@
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"label.roomName": "Nom de la salle",
 	"label.chooseRoomButton": "Continuer",

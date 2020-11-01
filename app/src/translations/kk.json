@@ -127,6 +127,9 @@
 	"label.promoteAllPeers": "Барлығын алға жылжыту",
 	"label.moreActions": "Басқа әрекеттер",
 	"label.version": "Нұсқа",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Параметрлер",
 	"settings.camera": "Камера",

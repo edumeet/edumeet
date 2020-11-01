@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Hurtigtaster",
 	"room.browsePeersSpotlight": "Bytt mellom synlig deltaker",
 	"room.stopAllScreenSharing": "Stopp all skjermdeling",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -127,6 +129,9 @@
 	"label.promoteAllPeers": "Slipp inn alle",
 	"label.moreActions": "Flere handlinger",
 	"label.version": "Versjon",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",

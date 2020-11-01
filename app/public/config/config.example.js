@@ -47,9 +47,9 @@ var config =
 	// the screen. This is changeable in client settings.
 	// This value must match one of the defined values in
 	// viewAspectRatios EXACTLY (e.g. 1.333)
-	viewAspectRatio               : 1.777,
+	viewAspectRatio  : 1.777,
 	// These are the selectable aspect ratios in the settings
-	viewAspectRatios              : [ {
+	viewAspectRatios : [ {
 		value : 1.333, // 4 / 3
 		label : '4 : 3'
 	}, {
@@ -145,8 +145,9 @@ var config =
 	maxLastN             : 5,
 	// If truthy, users can NOT change number of speakers visible
 	lockLastN            : false,
-	// Add file and uncomment for adding logo to appbar
-	// logo       : 'images/logo.svg',
+	// Show logo if "logo" is not null, else show title
+	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
+	logo                 : 'images/logo.example.png',
 	title                : 'edumeet',
 	// Service & Support URL
 	// if not set then not displayed on the about modals
@@ -175,6 +176,47 @@ var config =
 					backgroundColor : '#313131'
 				}
 			},
+			MuiButton :
+			{
+				containedPrimary :
+				{
+					backgroundColor : '#5F9B2D',
+					'&:hover'       :
+					{
+						backgroundColor : '#5F9B2D'
+					}
+				},
+				containedSecondary :
+				{
+					backgroundColor : '#f50057',
+					'&:hover'       :
+					{
+						backgroundColor : '#f50057'
+					}
+				}
+
+			},
+			MuIconButton :
+			{
+				colorPrimary :
+				{
+					backgroundColor : '#5F9B2D',
+					'&:hover'       :
+					{
+						backgroundColor : '#5F9B2D'
+					}
+				},
+				colorSecondary :
+				{
+					backgroundColor : '#f50057',
+					'&:hover'       :
+					{
+						backgroundColor : '#f50057'
+					}
+				}
+
+			},
+
 			MuiFab :
 			{
 				primary :
@@ -182,9 +224,18 @@ var config =
 					backgroundColor : '#5F9B2D',
 					'&:hover'       :
 					{
-						backgroundColor : '#518029'
+						backgroundColor : '#5F9B2D'
+					}
+				},
+				secondary :
+				{
+					backgroundColor : '#f50057',
+					'&:hover'       :
+					{
+						backgroundColor : '#f50057'
 					}
 				}
+
 			},
 			MuiBadge :
 			{

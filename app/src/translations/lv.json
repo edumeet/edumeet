@@ -64,6 +64,8 @@
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
 
@@ -124,6 +126,9 @@
 	"label.addVideo": "Pievienot video",
 	"label.moreActions": null,
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",

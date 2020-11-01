@@ -65,6 +65,8 @@
 	"room.shortcutKeys": "Kısayol Tuşları",
 	"room.browsePeersSpotlight": "Gündeme alınacak katılımcıyı seç",
 	"room.stopAllScreenSharing": "Tüm ekran paylaşımlarını durdur",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Sesiniz kapalı, konuşmak için SPACE tuşuna basılı tutun",
 
@@ -127,6 +129,9 @@
 	"label.promoteAllPeers": "Hepsini kabul et",
 	"label.moreActions": "Daha fazla eylem",
 	"label.version": "Versiyon",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
 
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",
