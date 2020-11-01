@@ -237,6 +237,8 @@ const JoinDialog = ({
 		});
 	};
 
+	const handleFocus = (event) => event.target.select();
+
 	/*
 	const handleAuth = () =>
 	{
@@ -364,6 +366,7 @@ const JoinDialog = ({
 							setRoomId(value.toLowerCase());
 
 						}}
+						onFocus={handleFocus}
 						onBlur={() =>
 						{
 							if (roomId === '')
@@ -422,6 +425,7 @@ const JoinDialog = ({
 						})}
 						value={displayName}
 						variant='outlined'
+						onFocus={handleFocus}
 
 						InputProps={{
 							startAdornment : (
