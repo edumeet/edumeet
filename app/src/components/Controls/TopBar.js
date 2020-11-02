@@ -304,15 +304,18 @@ const TopBar = (props) =>
 							<MenuIcon />
 						</IconButton>
 					</PulsingBadge>
-					{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
-					<Typography
-						className={classes.title}
-						variant='h6'
-						color='inherit'
-						noWrap
-					>
-						{ window.config.title ? window.config.title : 'edumeet' }
-					</Typography>
+					{ window.config.logo !=='' ?
+						<img alt='Logo'
+							src={window.config.logo}
+							className={classes.logo}
+						/> :
+						<Typography
+							variant='h6'
+							noWrap color='inherit'
+						>
+							{window.config.title}
+						</Typography>
+					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
 						<Tooltip

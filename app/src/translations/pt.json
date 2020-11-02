@@ -132,6 +132,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Definições",
 	"settings.camera": "Camera",
@@ -181,11 +183,13 @@
 
 	"devices.devicesChanged": "Os seus dispositivos foram alterados, configure os dispositivos na opção de definições",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Áudio não disponível",
 	"device.activateAudio": "Ativar áudio",
 	"device.muteAudio": "Desativar o microfone",
 	"device.unMuteAudio": "Ativar o microfone",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video não disponível",
 	"device.startVideo": "Iniciar vídeo",
 	"device.stopVideo": "Parar vídeo",
@@ -202,11 +206,15 @@
 	"devices.microphoneMuteError": "Não foi possível cortar o som do microfone",
 	"devices.microphoneUnMuteError": "Não foi possível ativar o som do microfone",
 
-	"devices.screenSharingDisconnected" : "Partilha de ecrã desligada",
+	"devices.screenSharingDisconnected": "Partilha de ecrã desligada",
 	"devices.screenSharingError": "Ocorreu um erro no acesso ao seu ecrã",
 
 	"devices.cameraDisconnected": "Câmara desconectada",
 	"devices.cameraError": "Ocorreu um erro no acesso à sua câmara",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,

@@ -101,6 +101,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
@@ -181,11 +183,13 @@
 
 	"devices.devicesChanged": "Az eszközei megváltoztak, konfiguráld őket be a beállítások menüben",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "A hang nem támogatott",
 	"device.activateAudio": "Hang aktiválása",
 	"device.muteAudio": "Hang némítása",
 	"device.unMuteAudio": "Hang némítás kikapcsolása",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "A videó nem támogatott",
 	"device.startVideo": "Videó indítása",
 	"device.stopVideo": "Videó leállítása",
@@ -202,11 +206,15 @@
 	"devices.microphoneMuteError": "Nem sikerült a mikrofonod némítása",
 	"devices.microphoneUnMuteError": "Nem sikerült a mikrofonod némításának kikapcsolása",
 
-	"devices.screenSharingDisconnected" : "Képernyőmegosztás kapcsolat bontva",
+	"devices.screenSharingDisconnected": "Képernyőmegosztás kapcsolat bontva",
 	"devices.screenSharingError": "Hiba történt a képernyőd megosztása során",
 
 	"devices.cameraDisconnected": "A kamera kapcsolata lebomlott",
 	"devices.cameraError": "Hiba történt a kamera elérése során",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": "A moderátor kiürítette a chat történelmet",
 	"moderator.clearFiles": "A moderátor kiürítette a file megosztás történelmet",

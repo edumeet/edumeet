@@ -77,17 +77,13 @@ const styles = (theme) =>
 		}
 	});
 
-const DialogTitle = withStyles(styles)((props) =>
-{
-	const { children, classes, ...other } = props;
-
-	return (
-		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
-			<Typography variant='h5'>{children}</Typography>
-		</MuiDialogTitle>
-	);
-});
+const DialogTitle = withStyles((theme) => ({
+	root :
+	{
+		margin  : 0,
+		padding : theme.spacing(1)
+	}
+}))(MuiDialogTitle);
 
 const DialogContent = withStyles((theme) => ({
 	root :
@@ -119,14 +115,13 @@ const ChooseRoom = ({
 				}}
 			>
 				<DialogTitle>
-					{/* { window.config.title ? window.config.title : 'edumeet' } */}
-					{
-						intl.formatMessage({
-							id             : 'label.login',
-							defaultMessage : 'Login'
-						})}
 
+					{ window.config.logo !=='' ?
+						<img alt='Logo' src={window.config.logo} /> :
+						<Typography variant='h5'> {window.config.title} </Typography>
+					}
 					<hr />
+
 				</DialogTitle>
 
 				<form method='post' action='/auth/callback'>

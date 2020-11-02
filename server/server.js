@@ -665,10 +665,10 @@ function isPathAlreadyTaken(actualUrl)
  */
 async function runWebSocketServer()
 {
-	io = require('socket.io')(mainListener);
+	io = require('socket.io')(mainListener, { cookie: false });
 
 	io.use(
-		sharedSession(session, sharedCookieParser, { autoSave: true }, { cookie: false })
+		sharedSession(session, sharedCookieParser, { autoSave: true })
 	);
 
 	// Handle connections from clients.

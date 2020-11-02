@@ -9,6 +9,7 @@ import { createMigrate, persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import rootReducer from './reducers/rootReducer';
+import { createFilter } from 'redux-persist-transform-filter';
 
 const migrations =
 {
@@ -36,9 +37,13 @@ const persistConfig =
 	version         : 0,
 	migrate         : createMigrate(migrations, { debug: false }),
 	stateReconciler : autoMergeLevel2,
-	// whitelist       : [ 'settings']
-	whitelist       : [ 'settings', 'intl' ]
+	whitelist       : [ 'settings', 'intl', 'me' ]
 };
+
+const saveSubsetFilter = createFilter(
+	'me',
+	[ 'loggedIn' ]
+);
 
 const reduxMiddlewares =
 [
@@ -85,4 +90,9 @@ export const store = createStore(
 	enhancer
 );
 
-export const persistor = persistStore(store);
+export const persistor = persistStore(store, {
+	transforms : [
+		saveSubsetFilter
+	]
+
+});

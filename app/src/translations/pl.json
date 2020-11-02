@@ -99,9 +99,9 @@
 	"tooltip.muteParticipantVideoModerator": "Wyłącz wideo użytkownika globalnie",
 	"tooltip.muteScreenSharingModerator": "Anuluj współdzielenie ekranu użytkownika globalnie",
 
-	"label.roomName": "Nazwa",
+	"label.roomName": "Nazwa pokoju",
 	"label.chooseRoomButton": "Kontynuuj",
-	"label.yourName": "Moja nazwa użytkownika",
+	"label.yourName": "Nazwa użytkownika",
 	"label.newWindow": "Nowe okno",
 	"label.fullscreen": "Tryb pełnoekranowy",
 	"label.openDrawer": "Menu",
@@ -132,6 +132,8 @@
 	"label.username": "Użytkownik",
 	"label.password": "Hasło",
 	"label.login": "Zaloguj",
+	"label.logout": "Wyloguj",
+	"label.join": "Dołącz",
 
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",
@@ -181,11 +183,13 @@
 
 	"devices.devicesChanged": "Urządzenia wejściowe się zmieniły, konfiguracja dostępna w oknie dialogowym ustawień",
 
+	"devices.enableOnlyMicrophone": "Włącz tylko Mikrofon",
 	"device.audioUnsupported": "Dźwięk nieobsługiwany",
 	"device.activateAudio": "Aktywuj mikrofon",
 	"device.muteAudio": "Wyłącz mikrofon",
 	"device.unMuteAudio": "Włącz mikrofon",
 
+	"devices.enableOnlyCamera": "Włącz tylko Kamerę",
 	"device.videoUnsupported": "Wideo nie jest obsługiwane",
 	"device.startVideo": "Włącz kamerę",
 	"device.stopVideo": "Wyłącz kamerę",
@@ -202,11 +206,15 @@
 	"devices.microphoneMuteError": "Nie można wyciszyć mikrofonu",
 	"devices.microphoneUnMuteError": "Nie można wyłączyć wyciszenia mikrofonu.",
 
-	"devices.screenSharingDisconnected" : "Udostępnianie ekranu zakończone",
+	"devices.screenSharingDisconnected": "Udostępnianie ekranu zakończone",
 	"devices.screenSharingError": "Wystąpił błąd podczas uzyskiwania dostępu do ekranu",
 
 	"devices.cameraDisconnected": "Kamera odłączona",
 	"devices.cameraError": "Wystąpił błąd podczas uzyskiwania dostępu do kamery",
+
+	"devices.enableBothMicrophoneAndCamera": "Włącz Mikrofon i Kamerę",
+	"devices.disableBothMicrophoneAndCamera": "Wyłącz Mikrofon i Kamerę",
+	"devices.chooseMedia": "Wybierz Media",
 
 	"moderator.clearChat": "Moderator wyczyścił chat",
 	"moderator.clearFiles": "Moderator wyczyścił pliki",
