@@ -13,7 +13,8 @@ import { createFilter } from 'redux-persist-transform-filter';
 
 const migrations =
 {
-	// initial version 0: we will clean up all historical data for the time 
+	// initial version 0: we will clean up all historical data 
+	// from local storage for the time 
 	// before we began with migration versioning
 	0 : (state) =>
 	{
