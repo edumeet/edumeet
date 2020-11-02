@@ -101,25 +101,27 @@ var config =
 	{
 		tcp : true
 	},
+	// defaults for audio setting on new clients / can be customized and overruled from client side
 	defaultAudio:
 	{
-		autoGainControl: false,
-		echoCancellation: true,
-		noiseSuppression: true,
-		voiceActivatedUnmute: false,
-		noiseThreshold: -90
+		autoGainControl      : false, // default : false
+		echoCancellation     : true, // default : true 
+		noiseSuppression     : true, // default : true 
+		voiceActivatedUnmute : false, // default : false / Automatically unmute speaking above noisThereshold
+		noiseThreshold       : -60 // default -60 / This is only for voiceActivatedUnmute and audio-indicator
 	},
+	// Audio options for now only centrally from config file: 
 	centralAudioOtions:
 	{
-		sampleRate: 96000,
-		channelCount: 1,
-		volume: 1.0,
-		sampleSize: 16,
-		opusStereo: false,
-		opusDtx: true,
-		opusFec: true,
-		opusPtime: '20', // 3, 5, 10, 20, 40, 60, 120
-		opusMaxPlaybackRate: 96000
+		sampleRate          : 96000, // default : 96khz / will not eat that much bandwith thanks to opus
+		channelCount        : 1, // default : 1 / usually mics are mono so this saves bandwidth
+		volume              : 1.0,  // default : 1.0
+		sampleSize          : 16,  // default : 16
+		opusStereo          : false, // default : false / usually mics are mono so this saves bandwidth
+		opusDtx             : true,  // default : true / will save bandwidth 
+		opusFec             : true, // default : true / forward error correction
+		opusPtime           : '20', // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
+		opusMaxPlaybackRate : 96000
 	},
 	/**
 	 * Set max number participants in one room that join 
