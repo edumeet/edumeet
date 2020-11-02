@@ -1230,14 +1230,21 @@ export default class RoomClient
 				throw new Error('no audio devices');
 
 			const {
-				sampleRate,
-				channelCount,
-				volume,
 				autoGainControl,
 				echoCancellation,
-				noiseSuppression,
-				sampleSize
+				noiseSuppression
 			} = store.getState().settings;
+			const {
+				sampleRate = 48000,
+				channelCount = 1,
+				volume = 1.0,
+				sampleSize = 16,
+				opusStereo = false,
+				opusDtx = true,
+				opusFec = true,
+				opusPtime = 10,
+				opusMaxPlaybackRate = 48000
+			} = window.config.centralAudioOtions;
 
 			if (
 				(restart && this._micProducer) ||
@@ -1275,11 +1282,11 @@ export default class RoomClient
 						track,
 						codecOptions :
 						{
-							opusStereo          : false,
-							opusDtx             : true,
-							opusFec             : true,
-							opusPtime           : '3',
-							opusMaxPlaybackRate	: 48000
+							opusStereo,
+							opusDtx,
+							opusFec,
+							opusPtime,
+							opusMaxPlaybackRate
 						},
 						appData :
 						{ source: 'mic' }

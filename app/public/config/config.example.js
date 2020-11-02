@@ -101,18 +101,26 @@ var config =
 	{
 		tcp : true
 	},
-	defaultAudio :
+	defaultAudio:
 	{
-		sampleRate           : 48000,
-		channelCount         : 1,
-		volume               : 1.0,
-		autoGainControl      : true,
-		echoCancellation     : true,
-		noiseSuppression     : true,
-		voiceActivatedUnmute : false,
-		sampleSize           : 16
+		autoGainControl: false,
+		echoCancellation: true,
+		noiseSuppression: true,
+		voiceActivatedUnmute: false,
+		noiseThreshold: -90
 	},
-
+	centralAudioOtions:
+	{
+		sampleRate: 96000,
+		channelCount: 1,
+		volume: 1.0,
+		sampleSize: 16,
+		opusStereo: false,
+		opusDtx: true,
+		opusFec: true,
+		opusPtime: '20', // 3, 5, 10, 20, 40, 60, 120
+		opusMaxPlaybackRate: 96000
+	},
 	/**
 	 * Set max number participants in one room that join 
 	 * unmuted. Next participant will join automatically muted
