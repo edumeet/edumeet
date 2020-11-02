@@ -589,7 +589,7 @@ async function runHttpsServer()
 			}
 			else
 			{
-				const specialChars = "<>@!^*()+[]{}:;|'\"\\,~`";
+				const specialChars = "<>@!^*()[]{}:;|'\"\\,~`";
 
 				for (let i = 0; i < specialChars.length; i++)
 				{
