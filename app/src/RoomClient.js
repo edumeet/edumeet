@@ -1234,6 +1234,14 @@ export default class RoomClient
 				echoCancellation,
 				noiseSuppression
 			} = store.getState().settings;
+
+			if (!window.config.centralAudioOptions)
+			{
+				throw new Error(
+					'Missing centralAudioOptions from app config! (See it in example config.)'
+				);
+			}
+
 			const {
 				sampleRate = 48000,
 				channelCount = 1,
