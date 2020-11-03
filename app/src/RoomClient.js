@@ -1244,7 +1244,7 @@ export default class RoomClient
 				opusFec = true,
 				opusPtime = 10,
 				opusMaxPlaybackRate = 48000
-			} = window.config.centralAudioOtions;
+			} = window.config.centralAudioOptions;
 
 			if (
 				(restart && this._micProducer) ||

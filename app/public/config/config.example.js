@@ -111,7 +111,7 @@ var config =
 		noiseThreshold       : -60 // default -60 / This is only for voiceActivatedUnmute and audio-indicator
 	},
 	// Audio options for now only centrally from config file: 
-	centralAudioOtions:
+	centralAudioOptions:
 	{
 		sampleRate          : 96000, // default : 96khz / will not eat that much bandwith thanks to opus
 		channelCount        : 1, // default : 1 / usually mics are mono so this saves bandwidth
