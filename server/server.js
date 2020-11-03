@@ -416,10 +416,10 @@ async function setupAuth()
 	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
-		const state = base64.encode(JSON.stringify({
+		const state = {
 			peerId : req.query.peerId,
 			roomId : req.query.roomId
-		}));
+		};
 
 		if (authStrategy== 'saml' || authStrategy=='local')
 		{
@@ -433,11 +433,9 @@ async function setupAuth()
 		else
 		{
 			passport.authenticate(authStrategy, {
-				state : base64.encode(JSON.stringify({
-					peerId : req.query.peerId,
-					roomId : req.query.roomId
-				}))
-			})(req, res, next);
+				state : base64.encode(JSON.stringify(state))
+			}
+			)(req, res, next);
 		}
 	});
 
