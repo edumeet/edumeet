@@ -167,6 +167,8 @@
 	"settings.drawerOverlayed": "Оңжақ панель үстінде",
 	"settings.voiceActivatedUnmute": "Дауыспен активтендіруді қосу",
 	"settings.noiseThreshold": "Шу деңгейі",
+	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Файлды сақтау мүмкін емес",
 	"filesharing.startingFileShare": "Файлды бөлісу әрекеті",

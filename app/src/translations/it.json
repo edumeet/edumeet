@@ -170,6 +170,7 @@
 	"settings.voiceActivatedUnmute": "Attivazione vocale",
 	"settings.noiseThreshold": "Soglia di rumore",
 	"settings.mirrorOwnVideo": "Specchiare il proprio video",
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",

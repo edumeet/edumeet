@@ -170,6 +170,7 @@
 	"settings.voiceActivatedUnmute": "Konuşunca mikrofonu aç",
 	"settings.noiseThreshold": "Gürültü eşiği",
 	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",
