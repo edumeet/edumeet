@@ -25,7 +25,7 @@
 	"room.peerChangedDisplayName": "{oldDisplayName} змінив ім'я на {displayName}",
 	"room.newPeer": "{displayName} приєднався до кімнати",
 	"room.newFile": "Новий файл є у доступі",
-	"room.toggleAdvancnulledMode": "Увімкнено розширений режим",
+	"room.toggleAdvancedMode": "Увімкнено розширений режим",
 	"room.setDemocratView": "Змінено макет на демократичний вигляд",
 	"room.setFilmStripView": "Змінено макет на вид фільму",
 	"room.loggedIn": "Ви ввійшли в систему",
