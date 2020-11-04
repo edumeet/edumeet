@@ -170,6 +170,9 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 * Håvar Aambø Fosstveit
 * Stefan Otto
 * Mészáros Mihály
+* Roman Drozd
+* Rémai Gábor László
+* Piotr Pawałowski
 
 This started as a fork of the [work](https://github.com/versatica/mediasoup-demo) done by:
 
