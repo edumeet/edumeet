@@ -57,7 +57,7 @@ const logger = new Logger();
 
 let roomClient;
 
-RoomClient.init({ store, intl });
+RoomClient.init({ store });
 
 const theme = createMuiTheme(window.config.theme);
 

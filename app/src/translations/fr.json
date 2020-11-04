@@ -1,4 +1,4 @@
-{	
+{
 	"socket.disconnected": "Vous avez été déconnecté",
 	"socket.reconnecting": "Vous avez été déconnecté, reconnexion en cours",
 	"socket.reconnected": "Vous êtes reconnecté",
@@ -102,6 +102,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"label.roomName": "Nom de la salle",
 	"label.chooseRoomButton": "Continuer",
@@ -181,11 +183,13 @@
 	"filesharing.missingSeeds": "Si le téléchargement prend trop de temps c’est qu’il n’y a peut-être plus personne qui partage ce torrent. Demander à quelqu’un de repartager le document.",
 	"devices.devicesChanged": "Vos périphériques ont changé, reconfigurez vos périphériques dans le menu paramètre",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Microphone non supporté",
 	"device.activateAudio": "Activer l'audio",
 	"device.muteAudio": "Désactiver l'audio",
 	"device.unMuteAudio": "Réactiver l'audio",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Vidéo non supportée",
 	"device.startVideo": "Démarrer la vidéo",
 	"device.stopVideo": "Arrêter la vidéo",
@@ -207,6 +211,10 @@
 
 	"devices.cameraDisconnected": "Caméra déconnectée",
 	"devices.cameraError": "Une erreur est apparue lors de l'accès à votre caméra",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,

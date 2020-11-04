@@ -133,6 +133,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Ρυθμίσεις",
 	"settings.camera": "Κάμερα",
@@ -182,11 +184,13 @@
 
 	"devices.devicesChanged": "Οι συσκευές σας άλλαξαν, ρυθμίστε τις συσκευές σας στο παράθυρο ρυθμίσεων",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Δεν υποστηρίζεται ήχος",
 	"device.activateAudio": "Ενεργοποίηση ήχου",
 	"device.muteAudio": "Σίγαση ήχου",
 	"device.unMuteAudio": "Άνοιγμα ήχου",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Το βίντεο δεν υποστηρίζεται",
 	"device.startVideo": "Έναρξη βίντεο",
 	"device.stopVideo": "Διακοπή βίντεο",
@@ -203,11 +207,15 @@
 	"devices.microphoneMuteError": "Δεν είναι δυνατή η σίγαση του μικροφώνου σας",
 	"devices.microphoneUnMuteError": "Δεν είναι δυνατό το άνοιγμα του μικροφώνου σας",
 
-	"devices.screenSharingDisconnected" : "Ο διαμοιρασμός οθόνης αποσυνδέθηκε",
+	"devices.screenSharingDisconnected": "Ο διαμοιρασμός οθόνης αποσυνδέθηκε",
 	"devices.screenSharingError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στην οθόνη σας",
 
 	"devices.cameraDisconnected": "Η κάμερα αποσυνδέθηκε",
 	"devices.cameraError": "Παρουσιάστηκε σφάλμα κατά την πρόσβαση στην κάμερά σας",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
@@ -215,7 +223,7 @@
 	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": null,
 	"moderator.stopScreenSharing": null,
-	
+
 	"unsupportedBrowser.titleUnsupportedBrowser": null,
 	"unsupportedBrowser.titlewebrtcUnavailable": null,
 	"unsupportedBrowser.bodyText": null

@@ -133,6 +133,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
@@ -182,11 +184,13 @@
 
 	"devices.devicesChanged": "Medieenhetene dine endret seg, du kan konfigurere enheter i innstillinger",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Lyd ikke støttet",
 	"device.activateAudio": "Aktiver lyd",
 	"device.muteAudio": "Demp lyd",
 	"device.unMuteAudio": "Aktiver lyd",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video ikke støttet",
 	"device.startVideo": "Start video",
 	"device.stopVideo": "Stopp video",
@@ -203,11 +207,15 @@
 	"devices.microphoneMuteError": "Klarte ikke å dempe mikrofonen",
 	"devices.microphoneUnMuteError": "Klarte ikke å aktivere mikrofonen",
 
-	"devices.screenSharingDisconnected" : "Skjermdelingen forsvant",
+	"devices.screenSharingDisconnected": "Skjermdelingen forsvant",
 	"devices.screenSharingError": "Det skjedde noe feil med skjermdelingen din",
 
 	"devices.cameraDisconnected": "Kamera koblet fra",
 	"devices.cameraError": "Det skjedde noe feil med kameraet ditt",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": "Moderator tømte chatten",
 	"moderator.clearFiles": "Moderator fjernet filer",
@@ -215,7 +223,7 @@
 	"moderator.modifyPeerRoles": "Endre roller",
 	"moderator.muteVideo": "Moderator mutet videoen din",
 	"moderator.stopScreenSharing": "Moderator mutet skjermdelingen din",
-	
+
 	"unsupportedBrowser.titleUnsupportedBrowser": "Nettleser ikke støttet",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Funksjonalitet som kreves er ikke tilgjengelig i denne nettleseren",
 	"unsupportedBrowser.bodyText": "Denne møtetjenesten krever funksjonalitet som ikke er støttet i denne nettleseren. Vennligst oppgrader, bytt til en annen nettleser, eller sjekk innstillinger. Støttede nettlesere:"

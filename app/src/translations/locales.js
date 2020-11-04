@@ -5,7 +5,7 @@ const list = [
 		locale : [ 'en', 'en-en' ]
 	},
 	{
-		name   : 'Chech',
+		name   : 'Czech',
 		file   : 'cs',
 		locale : [ 'cs', 'cs-cs' ]
 	},

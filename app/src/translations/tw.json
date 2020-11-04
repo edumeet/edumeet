@@ -132,6 +132,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "設置",
 	"settings.camera": "視訊來源",
@@ -181,11 +183,13 @@
 
 	"devices.devicesChanged": "您的設備已更改，請在設置中設定您的設備",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "不支援您的音訊格式",
 	"device.activateAudio": "開啟音訊",
 	"device.muteAudio": "靜音",
 	"device.unMuteAudio": "取消靜音",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "不支援您的視訊格式",
 	"device.startVideo": "開啟視訊",
 	"device.stopVideo": "關閉視訊",
@@ -202,11 +206,15 @@
 	"devices.microphoneMuteError": "無法使麥克風靜音",
 	"devices.microphoneUnMuteError": "無法取消麥克風靜音",
 
-	"devices.screenSharingDisconnected" : "螢幕分享已斷開",
+	"devices.screenSharingDisconnected": "螢幕分享已斷開",
 	"devices.screenSharingError": "螢幕分享時發生錯誤",
 
 	"devices.cameraDisconnected": "相機已斷開連接",
 	"devices.cameraError": "存取相機時發生錯誤",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": "管理員清除了聊天",
 	"moderator.clearFiles": "管理員清除了所有檔案",

@@ -237,6 +237,8 @@ const JoinDialog = ({
 		});
 	};
 
+	const handleFocus = (event) => event.target.select();
+
 	/*
 	const handleAuth = () =>
 	{
@@ -309,7 +311,14 @@ const JoinDialog = ({
 						</Grid>
 						<Grid item>
 							{ window.config.loginEnabled &&
-							<Tooltip open title={loggedIn ? 'Logout' : 'Login'} placement='left'>
+							<Tooltip
+								open
+								title={intl.formatMessage({
+									id             : loggedIn ? 'label.logout' : 'label.login',
+									defaultMessage : loggedIn ? 'Logout' : 'Login'
+								})}
+								placement='left'
+							>
 								<IconButton
 									className={classes.accountButton}
 									onClick={
@@ -364,6 +373,7 @@ const JoinDialog = ({
 							setRoomId(value.toLowerCase());
 
 						}}
+						onFocus={handleFocus}
 						onBlur={() =>
 						{
 							if (roomId === '')
@@ -422,6 +432,7 @@ const JoinDialog = ({
 						})}
 						value={displayName}
 						variant='outlined'
+						onFocus={handleFocus}
 
 						InputProps={{
 							startAdornment : (
@@ -482,7 +493,7 @@ const JoinDialog = ({
 									<Box mb={1}>
 										<FormLabel component='legend'>
 											<FormattedMessage
-												id='room.chooseMedia'
+												id='devices.chooseMedia'
 												defaultMessage='Choose Media'
 											/>
 										</FormLabel>
@@ -501,17 +512,43 @@ const JoinDialog = ({
 										exclusive
 									>
 										<ToggleButton value='{"audio":false,"video":false}'>
-											<BlockIcon/>
+											<Tooltip title={intl.formatMessage({
+												id             : 'devices.disableBothMicrophoneAndCamera',
+												defaultMessage : 'Disable both Microphone And Camera'
+											})} placement='bottom'
+											>
+												<BlockIcon/>
+											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":true,"video":false}'>
-											<MicIcon/>
+											<Tooltip title={intl.formatMessage({
+												id             : 'devices.enableOnlyMicrophone',
+												defaultMessage : 'Enable only Microphone'
+											})} placement='bottom'
+											>
+
+												<MicIcon/>
+											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":false,"video":true}'>
-											<VideocamIcon/>
+											<Tooltip title={intl.formatMessage({
+												id             : 'devices.enableOnlyCamera',
+												defaultMessage : 'Enable only Camera'
+											})} placement='bottom'
+											>
+												<VideocamIcon/>
+											</Tooltip>
 										</ToggleButton>
 										<ToggleButton value='{"audio":true,"video":true}'>
-											<MicIcon/> +
-											<VideocamIcon/>
+											<Tooltip title={intl.formatMessage({
+												id             : 'devices.enableBothMicrophoneAndCamera',
+												defaultMessage : 'Enable both Microphone and Camera'
+											})} placement='bottom'
+											>
+												<span style={{ display: 'flex', flexDirection: 'row' }}>
+													<MicIcon/>+<VideocamIcon/>
+												</span>
+											</Tooltip>
 										</ToggleButton>
 									</ToggleButtonGroup >
 								</FormControl>
@@ -528,7 +565,7 @@ const JoinDialog = ({
 									id='joinButton'
 								>
 									<FormattedMessage
-										id='room.join'
+										id='label.join'
 										defaultMessage='Join'
 									/>
 								</Button>

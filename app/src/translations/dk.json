@@ -133,6 +133,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Indstillinger",
 	"settings.camera": "Kamera",
@@ -182,11 +184,13 @@
 
 	"device.devicesChanged": "Detekteret ndringer i dine enheder, konfigurer dine enheder i indstillingsdialogen",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Lyd ikke understøttet",
 	"device.activateAudio": "Aktivér lyd",
 	"device.muteAudio": "Slå lyd til",
 	"device.unMuteAudio": "Slå lyd til",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video ikke understøttet",
 	"device.startVideo": "Start video",
 	"device.stopVideo": "Stop video",
@@ -208,6 +212,10 @@
 
 	"device.cameraDisconnected": "Kamera frakoblet",
 	"device.cameraError": "Der opstod en fejl ved tilkobling af dit kamera",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
