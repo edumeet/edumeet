@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} podniósł rękę",
 	"room.loweredHand": "{displayName} opuścił rękę",
 	"room.extraVideo": "Dodatkowy strumień wideo",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Pokój jest pełny, spróbuj za jakiś czas.",
 	"room.help": "Pomoc",
 	"room.about": "O programie",

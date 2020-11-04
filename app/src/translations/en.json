@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} raised their hand",
 	"room.loweredHand": "{displayName} put their hand down",
 	"room.extraVideo": "Extra video",
+	"room.extraVideoDuplication": "Extra videodevice duplication error",
 	"room.overRoomLimit": "The room is full, retry after some time.",
 	"room.help": "Help",
 	"room.about": "About",

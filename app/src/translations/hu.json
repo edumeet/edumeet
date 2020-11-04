@@ -59,14 +59,15 @@
 	"room.raisedHand": "{displayName} jelentkezik",
 	"room.loweredHand": "{displayName} leeresztette a kezét",
 	"room.extraVideo": "Kiegészítő videó",
+	"room.extraVideoDuplication": "Duplikációs hiba",
 	"room.overRoomLimit": "A konferenciaszoba betelt..",
 	"room.help": "Segítség",
 	"room.about": "Névjegy",
 	"room.shortcutKeys": "Billentyűparancsok",
 	"room.browsePeersSpotlight": "Résztvevők böngészése",
 	"room.stopAllScreenSharing": "Összes képernyőmegosztás leállítása",
-	"room.hideSelfView": null,
-	"room.showSelfView": null,
+	"room.hideSelfView": "Saját kamerakép elrejtése",
+	"room.showSelfView": "Saját kamerakép megjelenítése",
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 

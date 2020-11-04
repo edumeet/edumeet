@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} je podigao ruku",
 	"room.loweredHand": "{displayName} je spustio ruku",
 	"room.extraVideo": "Dodatni video",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Soba je popunjena, pokušajte ponovno kasnije.",
 	"room.help": "Pomoć",
 	"room.about": "O programu",

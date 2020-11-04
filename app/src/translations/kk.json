@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} қолын көтерді",
 	"room.loweredHand": "{displayName} қолын түсірді",
 	"room.extraVideo": "Қосымша бейне",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Бейнеконференция толды, біраз уақыттан кейін қайталап көріңіз.",
 	"room.help": "Көмек",
 	"room.about": "Біз туралы",

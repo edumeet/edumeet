@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} 舉手了",
 	"room.loweredHand": "{displayName} 放下了他的手",
 	"room.extraVideo": "其他視訊",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "房間已滿，請稍後重試",
 	"room.help": "幫助",
 	"room.about": "關於",
