@@ -133,8 +133,8 @@
 	"label.username": "Username",
 	"label.password": "Password",
 	"label.login": "Login",
-	"label.logout": null,
-	"label.join": null,
+	"label.logout": "Logout",
+	"label.join": "Join",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
