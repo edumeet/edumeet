@@ -167,6 +167,8 @@
 	"settings.drawerOverlayed": "Боковая панель поверх содержимого",
 	"settings.voiceActivatedUnmute": "Активирован звук включен",
 	"settings.noiseThreshold": "Порог шума",
+	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Невозможно сохранить файл",
 	"filesharing.startingFileShare": "Попытка поделиться файлом",

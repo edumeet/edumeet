@@ -164,6 +164,7 @@
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",

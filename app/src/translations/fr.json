@@ -170,6 +170,7 @@
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",

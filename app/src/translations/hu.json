@@ -170,6 +170,7 @@
 	"settings.voiceActivatedUnmute": "Beszéd aktivált mikrofon némítás",
 	"settings.noiseThreshold": "Zajszint",
 	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

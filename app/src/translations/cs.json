@@ -169,6 +169,7 @@
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",

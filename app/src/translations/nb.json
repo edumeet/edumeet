@@ -170,6 +170,7 @@
 	"settings.voiceActivatedUnmute": "Stemmeaktivert autodemping",
 	"settings.noiseThreshold": "Støyterskel",
 	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",
