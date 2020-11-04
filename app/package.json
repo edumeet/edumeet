@@ -1,9 +1,16 @@
 {
 	"name": "edumeet",
-	"version": "3.3.0",
+	"version": "3.4.0",
 	"private": true,
 	"description": "edumeet meeting service",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
+	"contributors": [
+		"Stefan Otto",
+		"Mészáros Mihály",
+		"Roman Drozd",
+		"Rémai Gábor László",
+		"Piotr Pawałowski"
+	],
 	"license": "MIT",
 	"homepage": "./",
 	"main": "src/electron-starter.js",
