@@ -184,13 +184,13 @@
 
 	"devices.devicesChanged": "Your devices changed, configure your devices in the settings dialog",
 
-	"devices.enableOnlyMicrophone": "Enable only Microphone@",
+	"devices.enableOnlyMicrophone": "Enable only Microphone",
 	"device.audioUnsupported": "Audio unsupported",
 	"device.activateAudio": "Activate audio",
 	"device.muteAudio": "Mute audio",
 	"device.unMuteAudio": "Unmute audio",
 
-	"devices.enableOnlyCamera": "Enable only Camera@",
+	"devices.enableOnlyCamera": "Enable only Camera",
 	"device.videoUnsupported": "Video unsupported",
 	"device.startVideo": "Start video",
 	"device.stopVideo": "Stop video",
