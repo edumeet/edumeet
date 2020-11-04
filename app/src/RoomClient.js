@@ -257,7 +257,7 @@ export default class RoomClient
 
 		this._startDevicesListener();
 
-		this.setLocale();
+		this.setLocale(store.getState().intl.locale);
 
 	}
 
@@ -500,7 +500,7 @@ export default class RoomClient
 		});
 	}
 
-	setLocale(locale = null)
+	setLocale(locale)
 	{
 
 		if (locale === null) locale = locales.detect();
