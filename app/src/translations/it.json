@@ -59,13 +59,16 @@
 	"room.raisedHand": "{displayName} ha alzato la mano",
 	"room.loweredHand": "{displayName} ha abbassato la mano",
 	"room.extraVideo": "Video extra",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "La stanza è piena, riprova più tardi.",
 	"room.help": "Aiuto",
 	"room.about": "Informazioni su",
 	"room.shortcutKeys": "Scorciatoie da tastiera",
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
-	
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
+
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
 	"roles.gotRole": "Hai ottenuto il ruolo: {role}",
@@ -84,8 +87,15 @@
 	"tooltip.kickParticipant": "Espelli partecipante",
 	"tooltip.muteParticipant": "Muta partecipante",
 	"tooltip.muteParticipantVideo": "Ferma video partecipante",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "Mano alzata",
 	"tooltip.muteScreenSharing": "Ferma condivisione schermo partecipante",
+	"tooltip.unMuteScreenSharing": null,
+	"tooltip.unMuteParticipantVideo": null,
+	"tooltip.unMuteParticipant": null,
+	"tooltip.addParticipantToSpotlight": null,
+	"tooltip.removeParticipantFromSpotlight": null,
 	"tooltip.muteParticipantAudioModerator": "Sospendi audio globale",
 	"tooltip.muteParticipantVideoModerator": "Sospendi video globale",
 	"tooltip.muteScreenSharingModerator": "Sospendi condivisione schermo globale",
@@ -120,6 +130,11 @@
 	"label.promoteAllPeers": "Promuovi tutti",
 	"label.moreActions": "Altre azioni",
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",
@@ -139,6 +154,8 @@
 	"settings.selectRoomLayout": "Seleziona aspetto stanza",
 	"settings.advancedMode": "Modalità avanzata",
 	"settings.permanentTopBar": "Barra superiore permanente",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Numero di video visibili",
 	"settings.hiddenControls": "Controlli media nascosti",
 	"settings.notificationSounds": "Suoni di notifica",
@@ -152,6 +169,7 @@
 	"settings.drawerOverlayed": "Barra laterale sovrapposta",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",
@@ -166,11 +184,13 @@
 
 	"devices.devicesChanged": "Il tuo dispositivo è cambiato, configura i dispositivi nel menù di impostazioni",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Dispositivo audio non supportato",
 	"device.activateAudio": "Attiva audio",
 	"device.muteAudio": "Silenzia audio",
 	"device.unMuteAudio": "Riattiva audio",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Dispositivo video non supportato",
 	"device.startVideo": "Attiva video",
 	"device.stopVideo": "Disattiva video",
@@ -187,15 +207,20 @@
 	"devices.microphoneMuteError": "Impossibile silenziare il microfono",
 	"devices.microphoneUnMuteError": "Impossibile riattivare il microfono",
 
-	"devices.screenSharingDisconnected" : "Disconnesso da Condivisione Schermo",
+	"devices.screenSharingDisconnected": "Disconnesso da Condivisione Schermo",
 	"devices.screenSharingError": "Errore con l'accesso al tuo schermo",
 
 	"devices.cameraDisconnected": "Videocamera scollegata",
 	"devices.cameraError": "Errore con l'accesso alla videocamera",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": "Il moderatore ha pulito la chat",
 	"moderator.clearFiles": "Il moderatore ha pulito i file",
 	"moderator.muteAudio": "Il moderatore ha mutato il tuo audio",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Il moderatore ha fermato il tuo video",
 	"moderator.stopScreenSharing": null,
 

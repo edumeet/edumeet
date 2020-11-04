@@ -7,7 +7,6 @@ import {
 import { permissions } from '../../../permissions';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../../../RoomContext';
 import PropTypes from 'prop-types';
 import { Flipper, Flipped } from 'react-flip-toolkit';
 import { FormattedMessage } from 'react-intl';
@@ -37,13 +36,9 @@ const styles = (theme) =>
 		},
 		listItem :
 		{
-			width        : '100%',
-			overflow     : 'hidden',
-			cursor       : 'pointer',
-			'&.selected' :
-			{
-				backgroundColor : 'rgba(55, 126, 255, 1)'
-			},
+			width                : '100%',
+			overflow             : 'hidden',
+			cursor               : 'pointer',
 			'&:not(:last-child)' :
 			{
 				borderBottom : '1px solid #CBCBCB'
@@ -75,12 +70,11 @@ class ParticipantList extends React.PureComponent
 	render()
 	{
 		const {
-			roomClient,
 			advancedMode,
 			isModerator,
 			participants,
 			spotlights,
-			selectedPeerId,
+			selectedPeers,
 			classes
 		} = this.props;
 
@@ -120,27 +114,17 @@ class ParticipantList extends React.PureComponent
 							<Flipped key={peer.id} flipId={peer.id}>
 								<li
 									key={peer.id}
-									className={classnames(classes.listItem, {
-										selected : peer.id === selectedPeerId
-									})}
-									onClick={() => roomClient.setSelectedPeer(peer.id)}
+									className={classnames(classes.listItem)}
 								>
-									{ spotlights.includes(peer.id) ?
-										<ListPeer
-											id={peer.id}
-											advancedMode={advancedMode}
-											isModerator={isModerator}
-											spotlight
-										>
-											<Volume small id={peer.id} />
-										</ListPeer>
-										:
-										<ListPeer
-											id={peer.id}
-											advancedMode={advancedMode}
-											isModerator={isModerator}
-										/>
-									}
+									<ListPeer
+										id={peer.id}
+										advancedMode={advancedMode}
+										isModerator={isModerator}
+										spotlight={spotlights.includes(peer.id)}
+										isSelected={selectedPeers.includes(peer.id)}
+									>
+										<Volume small id={peer.id} />
+									</ListPeer>
 								</li>
 							</Flipped>
 						))}
@@ -153,13 +137,12 @@ class ParticipantList extends React.PureComponent
 
 ParticipantList.propTypes =
 {
-	roomClient     : PropTypes.any.isRequired,
-	advancedMode   : PropTypes.bool,
-	isModerator    : PropTypes.bool,
-	participants   : PropTypes.array,
-	spotlights     : PropTypes.array,
-	selectedPeerId : PropTypes.string,
-	classes        : PropTypes.object.isRequired
+	advancedMode  : PropTypes.bool,
+	isModerator   : PropTypes.bool.isRequired,
+	participants  : PropTypes.array.isRequired,
+	spotlights    : PropTypes.array.isRequired,
+	selectedPeers : PropTypes.array.isRequired,
+	classes       : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -169,17 +152,17 @@ const makeMapStateToProps = () =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			isModerator    : hasPermission(state),
-			participants   : participantListSelector(state),
-			spotlights     : state.room.spotlights,
-			selectedPeerId : state.room.selectedPeerId
+			isModerator   : hasPermission(state),
+			participants  : participantListSelector(state),
+			spotlights    : state.room.spotlights,
+			selectedPeers : state.room.selectedPeers
 		};
 	};
 
 	return mapStateToProps;
 };
 
-const ParticipantListContainer = withRoomContext(connect(
+const ParticipantListContainer = connect(
 	makeMapStateToProps,
 	null,
 	null,
@@ -187,12 +170,13 @@ const ParticipantListContainer = withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room === next.room &&
+				prev.room.spotlights === next.room.spotlights &&
+				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.me.roles === next.me.roles &&
 				prev.peers === next.peers
 			);
 		}
 	}
-)(withStyles(styles)(ParticipantList)));
+)(withStyles(styles)(ParticipantList));
 
 export default ParticipantListContainer;

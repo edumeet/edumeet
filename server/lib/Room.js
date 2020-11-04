@@ -16,8 +16,11 @@ const {
 const permissions = require('../permissions'), {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
+	MODIFY_ROLE,
 	SEND_CHAT,
 	MODERATE_CHAT,
+	SHARE_AUDIO,
+	SHARE_VIDEO,
 	SHARE_SCREEN,
 	EXTRA_VIDEO,
 	SHARE_FILE,
@@ -41,8 +44,11 @@ const roomPermissions =
 {
 	[CHANGE_ROOM_LOCK] : [ userRoles.NORMAL ],
 	[PROMOTE_PEER]     : [ userRoles.NORMAL ],
+	[MODIFY_ROLE]      : [ userRoles.MODERATOR ],
 	[SEND_CHAT]        : [ userRoles.NORMAL ],
 	[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
+	[SHARE_AUDIO]      : [ userRoles.NORMAL ],
+	[SHARE_VIDEO]      : [ userRoles.NORMAL ],
 	[SHARE_SCREEN]     : [ userRoles.NORMAL ],
 	[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
 	[SHARE_FILE]       : [ userRoles.NORMAL ],
@@ -57,6 +63,130 @@ const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 
 class Room extends EventEmitter
 {
+
+	static getLeastLoadedRouter(mediasoupWorkers, peers, mediasoupRouters)
+	{
+
+		const routerLoads = new Map();
+
+		const workerLoads = new Map();
+
+		const pipedRoutersIds = new Set();
+
+		for (const peer of peers.values())
+		{
+			const routerId = peer.routerId;
+
+			if (routerId)
+			{
+				if (mediasoupRouters.has(routerId))
+				{
+					pipedRoutersIds.add(routerId);
+				}
+
+				if (routerLoads.has(routerId))
+				{
+					routerLoads.set(routerId, routerLoads.get(routerId) + 1);
+				}
+				else
+				{
+					routerLoads.set(routerId, 1);
+				}
+			}
+		}
+
+		for (const worker of mediasoupWorkers)
+		{
+			for (const router of worker._routers)
+			{
+				const routerId = router._internal.routerId;
+
+				if (workerLoads.has(worker._pid))
+				{
+					workerLoads.set(worker._pid, workerLoads.get(worker._pid) +
+						(routerLoads.has(routerId)?routerLoads.get(routerId):0));
+				}
+				else
+				{
+					workerLoads.set(worker._pid,
+						(routerLoads.has(routerId)?routerLoads.get(routerId):0));
+				}
+			}
+		}
+
+		const sortedWorkerLoads = new Map([ ...workerLoads.entries() ].sort(
+			(a, b) => a[1] - b[1]));
+
+		// we don't care about if router is piped, just choose the least loaded worker
+		if (pipedRoutersIds.size === 0 ||
+			pipedRoutersIds.size === mediasoupRouters.size)
+		{
+			const workerId = sortedWorkerLoads.keys().next().value;
+
+			for (const worker of mediasoupWorkers)
+			{
+				if (worker._pid === workerId)
+				{
+					for (const router of worker._routers)
+					{
+						const routerId = router._internal.routerId;
+
+						if (mediasoupRouters.has(routerId))
+						{
+							return routerId;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			// find if there is a piped router that is on a worker that is below limit
+			for (const [ workerId, workerLoad ] of sortedWorkerLoads.entries())
+			{
+				for (const worker of mediasoupWorkers)
+				{
+					if (worker._pid === workerId)
+					{
+						for (const router of worker._routers)
+						{
+							const routerId = router._internal.routerId;
+
+							// on purpose we check if the worker load is below the limit,
+							// as in reality the worker load is imortant,
+							// not the router load
+							if (mediasoupRouters.has(routerId) &&
+								pipedRoutersIds.has(routerId) &&
+								workerLoad < ROUTER_SCALE_SIZE)
+							{
+								return routerId;
+							}
+						}
+					}
+				}
+			}
+
+			// no piped router found, we need to return router from least loaded worker
+			const workerId = sortedWorkerLoads.keys().next().value;
+
+			for (const worker of mediasoupWorkers)
+			{
+				if (worker._pid === workerId)
+				{
+					for (const router of worker._routers)
+					{
+						const routerId = router._internal.routerId;
+
+						if (mediasoupRouters.has(routerId))
+						{
+							return routerId;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Factory function that creates and returns Room instance.
 	 *
@@ -66,29 +196,24 @@ class Room extends EventEmitter
 	 *   mediasoup Router must be created.
 	 * @param {String} roomId - Id of the Room instance.
 	 */
-	static async create({ mediasoupWorkers, roomId })
+	static async create({ mediasoupWorkers, roomId, peers })
 	{
 		logger.info('create() [roomId:"%s"]', roomId);
-
-		// Shuffle workers to get random cores
-		let shuffledWorkers = mediasoupWorkers.sort(() => Math.random() - 0.5);
 
 		// Router media codecs.
 		const mediaCodecs = config.mediasoup.router.mediaCodecs;
 
 		const mediasoupRouters = new Map();
 
-		let firstRouter = null;
-
-		for (const worker of shuffledWorkers)
+		for (const worker of mediasoupWorkers)
 		{
 			const router = await worker.createRouter({ mediaCodecs });
 
-			if (!firstRouter)
-				firstRouter = router;
-
 			mediasoupRouters.set(router.id, router);
 		}
+
+		const firstRouter = mediasoupRouters.get(Room.getLeastLoadedRouter(
+			mediasoupWorkers, peers, mediasoupRouters));
 
 		// Create a mediasoup AudioLevelObserver on first router
 		const audioLevelObserver = await firstRouter.createAudioLevelObserver(
@@ -98,13 +223,22 @@ class Room extends EventEmitter
 				interval   : 800
 			});
 
-		firstRouter = null;
-		shuffledWorkers = null;
-
-		return new Room({ roomId, mediasoupRouters, audioLevelObserver });
+		return new Room({
+			roomId,
+			mediasoupRouters,
+			audioLevelObserver,
+			mediasoupWorkers,
+			peers
+		});
 	}
 
-	constructor({ roomId, mediasoupRouters, audioLevelObserver })
+	constructor({
+		roomId,
+		mediasoupRouters,
+		audioLevelObserver,
+		mediasoupWorkers,
+		peers
+	})
 	{
 		logger.info('constructor() [roomId:"%s"]', roomId);
 
@@ -112,6 +246,10 @@ class Room extends EventEmitter
 		this.setMaxListeners(Infinity);
 
 		this._uuid = uuidv4();
+
+		this._mediasoupWorkers = mediasoupWorkers;
+
+		this._allPeers = peers;
 
 		// Room ID.
 		this._roomId = roomId;
@@ -146,11 +284,6 @@ class Room extends EventEmitter
 
 		// Array of mediasoup Router instances.
 		this._mediasoupRouters = mediasoupRouters;
-
-		// The router we are currently putting peers in
-		this._routerIterator = this._mediasoupRouters.values();
-
-		this._currentRouter = this._routerIterator.next().value;
 
 		// mediasoup AudioLevelObserver.
 		this._audioLevelObserver = audioLevelObserver;
@@ -205,9 +338,9 @@ class Room extends EventEmitter
 			router.close();
 		}
 
-		this._routerIterator = null;
+		this._allPeers = null;
 
-		this._currentRouter = null;
+		this._mediasoupWorkers = null;
 
 		this._mediasoupRouters.clear();
 
@@ -377,7 +510,7 @@ class Room extends EventEmitter
 			const { producer, volume } = volumes[0];
 
 			// Notify all Peers.
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this.getJoinedPeers())
 			{
 				this._notification(
 					peer.socket,
@@ -392,7 +525,7 @@ class Room extends EventEmitter
 		this._audioLevelObserver.on('silence', () =>
 		{
 			// Notify all Peers.
-			for (const peer of this._getJoinedPeers())
+			for (const peer of this.getJoinedPeers())
 			{
 				this._notification(
 					peer.socket,
@@ -501,7 +634,8 @@ class Room extends EventEmitter
 						const { data } = await axios.get(
 							config.turnAPIURI,
 							{
-								params : {
+								timeout : config.turnAPITimeout || 2000,
+								params  : {
 									...config.turnAPIparams,
 									'api_key' : config.turnAPIKey,
 									'ip'      : peer.socket.request.connection.remoteAddress
@@ -528,6 +662,13 @@ class Room extends EventEmitter
 				}
 
 				this._notification(peer.socket, 'roomReady', { turnServers });
+
+				if (config.activateOnHostJoin && this._lobby.peerList().length > 0 &&
+					!this._locked && peer.roles.some((role) =>
+					config.permissionsFromRoles.PROMOTE_PEER.includes(role)))
+				{
+					this._lobby.promoteAllPeers();
+				}
 			}
 		})
 			.catch((error) =>
@@ -581,12 +722,12 @@ class Room extends EventEmitter
 			// Spread to others
 			this._notification(peer.socket, 'gotRole', {
 				peerId : peer.id,
-				role   : newRole
+				roleId : newRole.id
 			}, true, true);
 
 			// Got permission to promote peers, notify peer of
 			// peers in lobby
-			if (roomPermissions.PROMOTE_PEER.includes(newRole))
+			if (roomPermissions.PROMOTE_PEER.some((role) => role.id === newRole.id))
 			{
 				const lobbyPeers = this._lobby.peerList();
 
@@ -605,7 +746,7 @@ class Room extends EventEmitter
 			// Spread to others
 			this._notification(peer.socket, 'lostRole', {
 				peerId : peer.id,
-				role   : oldRole
+				roleId : oldRole.id
 			}, true, true);
 		});
 
@@ -645,7 +786,7 @@ class Room extends EventEmitter
 
 		// Need this to know if this peer was the last with PROMOTE_PEER
 		const hasPromotePeer = peer.roles.some((role) =>
-			roomPermissions[PROMOTE_PEER].includes(role)
+			roomPermissions[PROMOTE_PEER].some((roomRole) => role.id === roomRole.id)
 		);
 
 		delete this._peers[peer.id];
@@ -707,7 +848,7 @@ class Room extends EventEmitter
 				// Tell the new Peer about already joined Peers.
 				// And also create Consumers for existing Producers.
 
-				const joinedPeers = this._getJoinedPeers(peer);
+				const joinedPeers = this.getJoinedPeers(peer);
 
 				const peerInfos = joinedPeers
 					.map((joinedPeer) => (joinedPeer.peerInfo));
@@ -719,7 +860,7 @@ class Room extends EventEmitter
 					lobbyPeers = this._lobby.peerList();
 
 				cb(null, {
-					roles                : peer.roles,
+					roles                : peer.roles.map((role) => role.id),
 					peers                : peerInfos,
 					tracker              : config.fileTracker,
 					authenticated        : peer.authenticated,
@@ -752,17 +893,12 @@ class Room extends EventEmitter
 				}
 
 				// Notify the new Peer to all other Peers.
-				for (const otherPeer of this._getJoinedPeers(peer))
+				for (const otherPeer of this.getJoinedPeers(peer))
 				{
 					this._notification(
 						otherPeer.socket,
 						'newPeer',
-						{
-							id          : peer.id,
-							displayName : displayName,
-							picture     : picture,
-							roles       : peer.roles
-						}
+						peer.peerInfo
 					);
 				}
 
@@ -786,10 +922,14 @@ class Room extends EventEmitter
 					appData : { producing, consuming }
 				};
 
+				webRtcTransportOptions.enableTcp = true;
+
 				if (forceTcp)
-				{
 					webRtcTransportOptions.enableUdp = false;
-					webRtcTransportOptions.enableTcp = true;
+				else
+				{
+					webRtcTransportOptions.enableUdp = true;
+					webRtcTransportOptions.preferUdp = true;
 				}
 
 				const transport = await router.createWebRtcTransport(
@@ -861,6 +1001,25 @@ class Room extends EventEmitter
 				let { appData } = request.data;
 
 				if (
+					!appData.source ||
+					![ 'mic', 'webcam', 'screen', 'extravideo' ]
+						.includes(appData.source)
+				)
+					throw new Error('invalid producer source');
+
+				if (
+					appData.source === 'mic' &&
+					!this._hasPermission(peer, SHARE_AUDIO)
+				)
+					throw new Error('peer not authorized');
+
+				if (
+					appData.source === 'webcam' &&
+					!this._hasPermission(peer, SHARE_VIDEO)
+				)
+					throw new Error('peer not authorized');
+
+				if (
 					appData.source === 'screen' &&
 					!this._hasPermission(peer, SHARE_SCREEN)
 				)
@@ -921,7 +1080,7 @@ class Room extends EventEmitter
 				cb(null, { id: producer.id });
 
 				// Optimization: Create a server-side Consumer for each Peer.
-				for (const otherPeer of this._getJoinedPeers(peer))
+				for (const otherPeer of this.getJoinedPeers(peer))
 				{
 					this._createConsumer(
 						{
@@ -1195,6 +1354,64 @@ class Room extends EventEmitter
 					peerId      : peer.id,
 					chatMessage : chatMessage
 				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:giveRole':
+			{
+				if (!this._hasPermission(peer, MODIFY_ROLE))
+					throw new Error('peer not authorized');
+
+				const { peerId, roleId } = request.data;
+
+				const userRole = Object.values(userRoles).find((role) => role.id === roleId);
+
+				if (!userRole || !userRole.promotable)
+					throw new Error('no such role');
+
+				if (!peer.roles.some((role) => role.level >= userRole.level))
+					throw new Error('peer not authorized for this level');
+
+				const giveRolePeer = this._peers[peerId];
+
+				if (!giveRolePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				// This will propagate the event automatically
+				giveRolePeer.addRole(userRole);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:removeRole':
+			{
+				if (!this._hasPermission(peer, MODIFY_ROLE))
+					throw new Error('peer not authorized');
+
+				const { peerId, roleId } = request.data;
+
+				const userRole = Object.values(userRoles).find((role) => role.id === roleId);
+
+				if (!userRole || !userRole.promotable)
+					throw new Error('no such role');
+
+				if (!peer.roles.some((role) => role.level >= userRole.level))
+					throw new Error('peer not authorized for this level');
+
+				const removeRolePeer = this._peers[peerId];
+
+				if (!removeRolePeer)
+					throw new Error(`peer with id "${peerId}" not found`);
+
+				// This will propagate the event automatically
+				removeRolePeer.removeRole(userRole);
 
 				// Return no error
 				cb();
@@ -1691,7 +1908,7 @@ class Room extends EventEmitter
 	_hasPermission(peer, permission)
 	{
 		const hasPermission = peer.roles.some((role) =>
-			roomPermissions[permission].includes(role)
+			roomPermissions[permission].some((roomRole) => role.id === roomRole.id)
 		);
 
 		if (hasPermission)
@@ -1709,13 +1926,15 @@ class Room extends EventEmitter
 
 	_hasAccess(peer, access)
 	{
-		return peer.roles.some((role) => roomAccess[access].includes(role));
+		return peer.roles.some((role) =>
+			roomAccess[access].some((roomRole) => role.id === roomRole.id)
+		);
 	}
 
 	/**
-	 * Helper to get the list of joined peers.
+	 * Get the list of joined peers.
 	 */
-	_getJoinedPeers(excludePeer = undefined)
+	getJoinedPeers(excludePeer = undefined)
 	{
 		return Object.values(this._peers)
 			.filter((peer) => peer.joined && peer !== excludePeer);
@@ -1743,7 +1962,9 @@ class Room extends EventEmitter
 					peer.joined === joined &&
 					peer !== excludePeer &&
 					peer.roles.some(
-						(role) => roomPermissions[permission].includes(role)
+						(role) =>
+							roomPermissions[permission].some((roomRole) =>
+								role.id === roomRole.id)
 					)
 			);
 	}
@@ -1840,11 +2061,13 @@ class Room extends EventEmitter
 		}
 	}
 
-	async _pipeProducersToNewRouter()
+	async _pipeProducersToRouter(routerId)
 	{
+		const router = this._mediasoupRouters.get(routerId);
+
 		const peersToPipe =
 			Object.values(this._peers)
-				.filter((peer) => peer.routerId !== this._currentRouter.id);
+				.filter((peer) => peer.routerId !== routerId && peer.routerId !== null);
 
 		for (const peer of peersToPipe)
 		{
@@ -1852,9 +2075,14 @@ class Room extends EventEmitter
 
 			for (const producerId of peer.producers.keys())
 			{
+				if (router._producers.has(producerId))
+				{
+					continue;
+				}
+
 				await srcRouter.pipeToRouter({
-					producerId,
-					router : this._currentRouter
+					producerId : producerId,
+					router     : router
 				});
 			}
 		}
@@ -1862,30 +2090,12 @@ class Room extends EventEmitter
 
 	async _getRouterId()
 	{
-		if (this._currentRouter)
-		{
-			const routerLoad =
-				Object.values(this._peers)
-					.filter((peer) => peer.routerId === this._currentRouter.id).length;
+		const routerId = Room.getLeastLoadedRouter(
+			this._mediasoupWorkers, this._allPeers, this._mediasoupRouters);
 
-			if (routerLoad >= ROUTER_SCALE_SIZE)
-			{
-				this._currentRouter = this._routerIterator.next().value;
+		await this._pipeProducersToRouter(routerId);
 
-				if (this._currentRouter)
-				{
-					await this._pipeProducersToNewRouter();
-
-					return this._currentRouter.id;
-				}
-			}
-			else
-			{
-				return this._currentRouter.id;
-			}
-		}
-
-		return this._getLeastLoadedRouter();
+		return routerId;
 	}
 
 	// Returns an array of router ids we need to pipe to
@@ -1898,25 +2108,6 @@ class Room extends EventEmitter
 			);
 	}
 
-	_getLeastLoadedRouter()
-	{
-		let load = Infinity;
-		let id;
-
-		for (const routerId of this._mediasoupRouters.keys())
-		{
-			const routerLoad =
-				Object.values(this._peers).filter((peer) => peer.routerId === routerId).length;
-
-			if (routerLoad < load)
-			{
-				id = routerId;
-				load = routerLoad;
-			}
-		}
-
-		return id;
-	}
 }
 
 module.exports = Room;

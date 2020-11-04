@@ -59,18 +59,21 @@
 	"room.raisedHand": "{displayName} hebt die Hand",
 	"room.loweredHand": "{displayName} senkt die Hand",
 	"room.extraVideo": "Video hinzufügen",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Der Raum ist voll, probiere es später nochmal",
 	"room.help": "Hilfe",
 	"room.about": "Über",
 	"room.shortcutKeys": "Tastaturkürzel",
 	"room.browsePeersSpotlight": "Teilnehmer durchgehen und anzeigen",
 	"room.stopAllScreenSharing": "Stoppe alle Bildschirmfreigaben",
+	"room.hideSelfView": "Selbstansicht-Video ausblenden",
+	"room.showSelfView": "Selbstansicht-Video anzeigen",
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 
 	"roles.gotRole": "Rolle erhalten: {role}",
 	"roles.lostRole": "Rolle entzogen: {role}",
-	
+
 	"tooltip.login": "Anmelden",
 	"tooltip.logout": "Abmelden",
 	"tooltip.admitFromLobby": "Teilnehmer reinlassen",
@@ -84,8 +87,15 @@
 	"tooltip.kickParticipant": "Rauswerfen",
 	"tooltip.muteParticipant": "Stummschalten",
 	"tooltip.muteParticipantVideo": "Video stoppen",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "Hand heben",
 	"tooltip.muteScreenSharing": "Stoppe Bildschirmfreigabe",
+	"tooltip.unMuteScreenSharing": null,
+	"tooltip.unMuteParticipantVideo": null,
+	"tooltip.unMuteParticipant": null,
+	"tooltip.addParticipantToSpotlight": null,
+	"tooltip.removeParticipantFromSpotlight": null,
 	"tooltip.muteParticipantAudioModerator": "Teilnehmer-Audio global stummschalten",
 	"tooltip.muteParticipantVideoModerator": "Teilnehmer-Video global stoppen",
 	"tooltip.muteScreenSharingModerator": "Teilnehmer-Bildschirmfreigabe global beenden",
@@ -120,6 +130,11 @@
 	"label.promoteAllPeers": "Alle Teilnehmer reinlassen",
 	"label.moreActions": "Weitere Aktionen",
 	"label.version": "Version",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",
@@ -139,6 +154,8 @@
 	"settings.selectRoomLayout": "Wähle ein Raumlayout",
 	"settings.advancedMode": "Erweiterter Modus",
 	"settings.permanentTopBar": "Permanente obere Leiste",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Anzahl der sichtbaren Videos",
 	"settings.hiddenControls": "Medienwerkzeugleiste automatisch ausblenden",
 	"settings.notificationSounds": "Audiosignal bei Benachrichtigungen",
@@ -152,6 +169,7 @@
 	"settings.drawerOverlayed": "Seitenpanel verdeckt Hauptinhalt",
 	"settings.voiceActivatedUnmute": "Automatische Spracherkennung",
 	"settings.noiseThreshold": "Geräuschepegel",
+	"settings.mirrorOwnVideo": "Ansicht des eigenen Videos spiegeln",
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",
@@ -166,11 +184,13 @@
 
 	"devices.devicesChanged": "Mediengeräte wurden aktualisiert und sind in den Einstellungen verfügbar",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Audio nicht unterstützt",
 	"device.activateAudio": "Aktiviere Audio",
 	"device.muteAudio": "Stummschalten",
 	"device.unMuteAudio": "Stummschaltung aufheben",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video nicht unterstützt",
 	"device.startVideo": "Starte Video",
 	"device.stopVideo": "Stoppe Video",
@@ -187,15 +207,20 @@
 	"devices.microphoneMuteError": "Kann Mikrofon nicht stummschalten",
 	"devices.microphoneUnMuteError": "Kann Mikrofon nicht aktivieren",
 
-	"devices.screenSharingDisconnected" : "Bildschirmfreigabe unterbrochen",
+	"devices.screenSharingDisconnected": "Bildschirmfreigabe unterbrochen",
 	"devices.screenSharingError": "Fehler bei der Bildschirmfreigabe",
 
 	"devices.cameraDisconnected": "Kamera getrennt",
 	"devices.cameraError": "Fehler mit deiner Kamera",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": "Moderator hat Chat gelöscht",
 	"moderator.clearFiles": "Moderator hat geteilte Dateiliste gelöscht",
 	"moderator.muteAudio": "Moderator hat dich stummgeschaltet",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderator hat dein Video gestoppt",
 	"moderator.stopScreenSharing": "Moderator hat deine Bildschirmfreigabe gestoppt",
 

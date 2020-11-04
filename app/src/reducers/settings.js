@@ -1,18 +1,16 @@
 const initialState =
 {
-	displayName             : 'Guest',
+	displayName             : `Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`,
 	selectedWebcam          : null,
 	selectedAudioDevice     : null,
 	advancedMode            : false,
-	sampleRate              : 48000,
-	channelCount            : 1,
-	volume                  : 1.0,
 	autoGainControl         : false,
 	echoCancellation        : true,
 	noiseSuppression        : true,
 	voiceActivatedUnmute    : false,
 	noiseThreshold          : -50,
-	sampleSize              : 16,
+	audioMuted              : false,
+	videoMuted              : false,
 	// low, medium, high, veryhigh, ultra
 	resolution              : window.config.defaultResolution || 'medium',
 	frameRate               : window.config.defaultFrameRate || 15,
@@ -23,8 +21,11 @@ const initialState =
 	hiddenControls          : false,
 	showNotifications       : true,
 	notificationSounds      : true,
+	mirrorOwnVideo          : true,
 	buttonControlBar        : window.config.buttonControlBar || false,
 	drawerOverlayed         : window.config.drawerOverlayed || true,
+	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
+	mediaPerms              : { audio: true, video: true },
 	...window.config.defaultAudio
 };
 
@@ -131,6 +132,13 @@ const settings = (state = initialState, action) =>
 			return { ...state, sampleSize };
 		}
 
+		case 'SET_ASPECT_RATIO':
+		{
+			const { aspectRatio } = action.payload;
+
+			return { ...state, aspectRatio };
+		}
+
 		case 'SET_LAST_N':
 		{
 			const { lastN } = action.payload;
@@ -206,6 +214,34 @@ const settings = (state = initialState, action) =>
 			const { screenSharingFrameRate } = action.payload;
 
 			return { ...state, screenSharingFrameRate };
+		}
+
+		case 'TOGGLE_MIRROR_OWN_VIDEO':
+		{
+			const mirrorOwnVideo = !state.mirrorOwnVideo;
+
+			return { ...state, mirrorOwnVideo };
+		}
+
+		case 'SET_MEDIA_PERMS':
+		{
+			const { mediaPerms } = action.payload;
+
+			return { ...state, mediaPerms };
+		}
+
+		case 'SET_AUDIO_MUTED':
+		{
+			const { audioMuted } = action.payload;
+
+			return { ...state, audioMuted };
+		}
+
+		case 'SET_VIDEO_MUTED':
+		{
+			const { videoMuted } = action.payload;
+
+			return { ...state, videoMuted };
 		}
 
 		default:

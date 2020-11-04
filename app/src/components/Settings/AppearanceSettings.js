@@ -13,6 +13,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
+import { withRoomContext } from '../../RoomContext';
 
 const styles = (theme) =>
 	({
@@ -33,19 +34,27 @@ const styles = (theme) =>
 		}
 	});
 
-const AppearenceSettings = ({
-	isMobile,
-	room,
-	settings,
-	onTogglePermanentTopBar,
-	onToggleHiddenControls,
-	onToggleButtonControlBar,
-	onToggleShowNotifications,
-	onToggleDrawerOverlayed,
-	handleChangeMode,
-	classes
-}) =>
+const AppearanceSettings = (props) =>
 {
+	const {
+		roomClient,
+		isMobile,
+		room,
+		locale,
+		settings,
+		onTogglePermanentTopBar,
+		onToggleHiddenControls,
+		onToggleButtonControlBar,
+		onToggleShowNotifications,
+		onToggleDrawerOverlayed,
+		onToggleMirrorOwnVideo,
+		handleChangeMode,
+		handleChangeAspectRatio,
+		classes,
+		localesList
+
+	} = props;
+
 	const intl = useIntl();
 
 	const modes = [ {
@@ -62,41 +71,123 @@ const AppearenceSettings = ({
 		})
 	} ];
 
+	const aspectRatios = window.config.aspectRatios || [ {
+		value : 1.333,
+		label : '4 : 3'
+	}, {
+		value : 1.777,
+		label : '16 : 9'
+	} ];
+
 	return (
 		<React.Fragment>
-			<form className={classes.setting} autoComplete='off'>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={room.mode || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								handleChangeMode(event.target.value);
-						}}
-						name={intl.formatMessage({
-							id             : 'settings.layout',
-							defaultMessage : 'Room layout'
-						})}
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{ modes.map((mode, index) =>
-						{
-							return (
-								<MenuItem key={index} value={mode.value}>
-									{mode.label}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.selectRoomLayout'
-							defaultMessage='Select room layout'
-						/>
-					</FormHelperText>
-				</FormControl>
-			</form>
+
+			<FormControl className={classes.setting}>
+				<Select
+					value={locale || ''}
+					onChange={(event) =>
+					{
+						if (event.target.value)
+							roomClient.setLocale(event.target.value);
+					}
+					}
+					name={intl.formatMessage({
+						id             : 'settings.language',
+						defaultMessage : 'Language'
+					})}
+					autoWidth
+					className={classes.selectEmpty}
+				>
+					{ localesList.map((item, index) =>
+					{
+						return (
+							<MenuItem key={index} value={item.locale[0]}>
+								{item.name}
+							</MenuItem>
+						);
+					})}
+				</Select>
+				<FormHelperText>
+					<FormattedMessage
+						id='settings.language'
+						defaultMessage='Select language'
+					/>
+				</FormHelperText>
+			</FormControl>
+
+			<FormControl className={classes.setting}>
+				<Select
+					value={room.mode || ''}
+					onChange={(event) =>
+					{
+						if (event.target.value)
+							handleChangeMode(event.target.value);
+					}}
+					name={intl.formatMessage({
+						id             : 'settings.layout',
+						defaultMessage : 'Room layout'
+					})}
+					autoWidth
+					className={classes.selectEmpty}
+				>
+					{ modes.map((mode, index) =>
+					{
+						return (
+							<MenuItem key={index} value={mode.value}>
+								{mode.label}
+							</MenuItem>
+						);
+					})}
+				</Select>
+				<FormHelperText>
+					<FormattedMessage
+						id='settings.selectRoomLayout'
+						defaultMessage='Select room layout'
+					/>
+				</FormHelperText>
+			</FormControl>
+
+			<FormControl className={classes.setting}>
+				<Select
+					value={settings.aspectRatio || ''}
+					onChange={(event) =>
+					{
+						if (event.target.value)
+							handleChangeAspectRatio(event.target.value);
+					}}
+					name={intl.formatMessage({
+						id             : 'settings.aspectRatio',
+						defaultMessage : 'Video aspect ratio'
+					})}
+					autoWidth
+					className={classes.selectEmpty}
+				>
+					{ aspectRatios.map((aspectRatio, index) =>
+					{
+						return (
+							<MenuItem key={index} value={aspectRatio.value}>
+								{aspectRatio.label}
+							</MenuItem>
+						);
+					})}
+				</Select>
+				<FormHelperText>
+					<FormattedMessage
+						id='settings.selectAspectRatio'
+						defaultMessage='Select video aspect ratio'
+					/>
+				</FormHelperText>
+			</FormControl>
+			<FormControlLabel
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={
+					<Switch checked={settings.mirrorOwnVideo} onChange={onToggleMirrorOwnVideo} value='mirrorOwnVideo' />}
+				labelPlacement='start'
+				label={intl.formatMessage({
+					id             : 'settings.mirrorOwnVideo',
+					defaultMessage : 'Mirror view of own video'
+				})}
+			/>
 			<FormControlLabel
 				className={classnames(classes.setting, classes.switchLabel)}
 				control={
@@ -149,8 +240,9 @@ const AppearenceSettings = ({
 	);
 };
 
-AppearenceSettings.propTypes =
+AppearanceSettings.propTypes =
 {
+	roomClient          				  : PropTypes.any.isRequired,
 	isMobile                  : PropTypes.bool.isRequired,
 	room                      : appPropTypes.Room.isRequired,
 	settings                  : PropTypes.object.isRequired,
@@ -159,15 +251,22 @@ AppearenceSettings.propTypes =
 	onToggleButtonControlBar  : PropTypes.func.isRequired,
 	onToggleShowNotifications : PropTypes.func.isRequired,
 	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
+	onToggleMirrorOwnVideo    : PropTypes.func.isRequired,
 	handleChangeMode          : PropTypes.func.isRequired,
-	classes                   : PropTypes.object.isRequired
+	handleChangeAspectRatio   : PropTypes.func.isRequired,
+	classes                   : PropTypes.object.isRequired,
+	intl                      : PropTypes.object.isRequired,
+	locale                    : PropTypes.object.isRequired,
+	localesList               : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
-		isMobile : state.me.browser.platform === 'mobile',
-		room     : state.room,
-		settings : state.settings
+		isMobile   	: state.me.browser.platform === 'mobile',
+		room        : state.room,
+		settings    : state.settings,
+		locale      : state.intl.locale,
+		localesList : state.intl.list
 	});
 
 const mapDispatchToProps = {
@@ -176,10 +275,12 @@ const mapDispatchToProps = {
 	onToggleShowNotifications : settingsActions.toggleShowNotifications,
 	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
 	onToggleDrawerOverlayed   : settingsActions.toggleDrawerOverlayed,
-	handleChangeMode          : roomActions.setDisplayMode
+	onToggleMirrorOwnVideo    : settingsActions.toggleMirrorOwnVideo,
+	handleChangeMode          : roomActions.setDisplayMode,
+	handleChangeAspectRatio   : settingsActions.setAspectRatio
 };
 
-export default connect(
+export default withRoomContext(connect(
 	mapStateToProps,
 	mapDispatchToProps,
 	null,
@@ -189,8 +290,10 @@ export default connect(
 			return (
 				prev.me.browser === next.me.browser &&
 				prev.room === next.room &&
-				prev.settings === next.settings
+				prev.settings === next.settings &&
+				prev.intl.locale === next.intl.locale &&
+				prev.intl.localesList === next.intl.localesList
 			);
 		}
 	}
-)(withStyles(styles)(AppearenceSettings));
+)(withStyles(styles)(AppearanceSettings)));

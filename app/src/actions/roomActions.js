@@ -70,6 +70,18 @@ export const setExtraVideoOpen = (extraVideoOpen) =>
 		payload : { extraVideoOpen }
 	});
 
+export const setRolesManagerOpen = (rolesManagerOpen) =>
+	({
+		type    : 'SET_ROLES_MANAGER_OPEN',
+		payload : { rolesManagerOpen }
+	});
+
+export const setRolesManagerPeer = (rolesManagerPeer) =>
+	({
+		type    : 'SET_ROLES_MANAGER_PEER',
+		payload : { rolesManagerPeer }
+	});
+
 export const setHelpOpen = (helpOpen) =>
 	({
 		type    : 'SET_HELP_OPEN',
@@ -118,10 +130,21 @@ export const setDisplayMode = (mode) =>
 		payload : { mode }
 	});
 
-export const setSelectedPeer = (selectedPeerId) =>
+export const addSelectedPeer = (peerId) =>
 	({
-		type    : 'SET_SELECTED_PEER',
-		payload : { selectedPeerId }
+		type    : 'ADD_SELECTED_PEER',
+		payload : { peerId }
+	});
+
+export const removeSelectedPeer = (peerId) =>
+	({
+		type    : 'REMOVE_SELECTED_PEER',
+		payload : { peerId }
+	});
+
+export const clearSelectedPeers = () =>
+	({
+		type : 'CLEAR_SELECTED_PEERS'
 	});
 
 export const setSpotlights = (spotlights) =>
@@ -194,8 +217,20 @@ export const setRoomPermissions = (roomPermissions) =>
 		payload : { roomPermissions }
 	});
 
+export const setUserRoles = (userRoles) =>
+	({
+		type    : 'SET_USER_ROLES',
+		payload : { userRoles }
+	});
+
 export const setAllowWhenRoleMissing = (allowWhenRoleMissing) =>
 	({
 		type    : 'SET_ALLOW_WHEN_ROLE_MISSING',
 		payload : { allowWhenRoleMissing }
+	});
+
+export const setHideSelfView = (hideSelfView) =>
+	({
+		type    : 'SET_HIDE_SELF_VIEW',
+		payload : { hideSelfView }
 	});

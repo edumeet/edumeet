@@ -1,4 +1,4 @@
-{	
+{
 	"socket.disconnected": "Vous avez été déconnecté",
 	"socket.reconnecting": "Vous avez été déconnecté, reconnexion en cours",
 	"socket.reconnected": "Vous êtes reconnecté",
@@ -59,12 +59,15 @@
 	"room.raisedHand": null,
 	"room.loweredHand": null,
 	"room.extraVideo": null,
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": null,
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": null,
 
@@ -84,11 +87,23 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.unMuteScreenSharing": null,
+	"tooltip.unMuteParticipantVideo": null,
+	"tooltip.unMuteParticipant": null,
+	"tooltip.addParticipantToSpotlight": null,
+	"tooltip.removeParticipantFromSpotlight": null,
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"label.roomName": "Nom de la salle",
 	"label.chooseRoomButton": "Continuer",
@@ -139,6 +154,8 @@
 	"settings.selectRoomLayout": "Sélectionnez la présentation de la salle",
 	"settings.advancedMode": "Mode avancé",
 	"settings.permanentTopBar": "Barre supérieure permanente",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Nombre de vidéos visibles",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
@@ -152,6 +169,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",
@@ -165,11 +183,13 @@
 	"filesharing.missingSeeds": "Si le téléchargement prend trop de temps c’est qu’il n’y a peut-être plus personne qui partage ce torrent. Demander à quelqu’un de repartager le document.",
 	"devices.devicesChanged": "Vos périphériques ont changé, reconfigurez vos périphériques dans le menu paramètre",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Microphone non supporté",
 	"device.activateAudio": "Activer l'audio",
 	"device.muteAudio": "Désactiver l'audio",
 	"device.unMuteAudio": "Réactiver l'audio",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Vidéo non supportée",
 	"device.startVideo": "Démarrer la vidéo",
 	"device.stopVideo": "Arrêter la vidéo",
@@ -192,9 +212,14 @@
 	"devices.cameraDisconnected": "Caméra déconnectée",
 	"devices.cameraError": "Une erreur est apparue lors de l'accès à votre caméra",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": null,
 	"moderator.stopScreenSharing": null,
 

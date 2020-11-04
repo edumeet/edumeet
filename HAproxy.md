@@ -1,7 +1,7 @@
 # Howto deploy a (room based) load balanced cluster
 
 This example will show how to setup an HA proxy to provide load balancing between several
-multiparty-meeting servers.
+edumeet servers.
 
 ## IP and DNS
 
@@ -21,24 +21,24 @@ In this basic example we use the following names and ips:
 
 * `meet.example.com` <=> `192.0.2.5`
 
-## Deploy multiple multiparty-meeting servers
+## Deploy multiple edumeet servers
 
 This is most easily done using Ansible (see below), but can be done
 in any way you choose (manual, Docker, Ansible).
 
-Read more here: [mm-ansible](https://github.com/misi/mm-ansible)
+Read more here: [mm-ansible](https://github.com/edumeet/edumeet-ansible)
 [![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
 
 ## Setup Redis for central HTTP session store
 
-### Use one Redis for all multiparty-meeting servers
+### Use one Redis for all edumeet servers
 
 * Deploy a Redis cluster for all instances.
   * We will use in our actual example `192.0.2.4` as redis HA cluster ip. It is out of scope howto deploy it.
 
 OR
 
-* For testing you can use Redis from one the multiparty-meeting servers. e.g. If you plan only for testing on your first multiparty-meeting server.
+* For testing you can use Redis from one the edumeet servers. e.g. If you plan only for testing on your first edumeet server.
   * Configure Redis `redis.conf` to not only bind to your loopback but also to your global ip address too:
 
     ``` plaintext
@@ -60,7 +60,7 @@ OR
 
   * **Set a password, or if you don't (like in this basic example) take care to set strict firewall rules**
 
-## Configure multiparty-meeting servers
+## Configure edumeet servers
 
 ### Server config
 
@@ -84,7 +84,7 @@ trustProxy           : ['192.0.2.5'],
 * Add to /etc/haproxy/haproxy.cfg config
 
   ``` plaintext
-    backend multipartymeeting
+    backend edumeet
         balance url_param roomId
         hash-type consistent
 
@@ -97,5 +97,5 @@ trustProxy           : ['192.0.2.5'],
         bind 192.0.2.5:443 ssl crt /root/certificate.pem
         http-request redirect scheme https unless { ssl_fc }
         reqadd X-Forwarded-Proto:\ https
-        default_backend multipartymeeting
+        default_backend edumeet
   ```

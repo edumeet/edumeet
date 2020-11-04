@@ -26,7 +26,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Avatar from '@material-ui/core/Avatar';
 import Badge from '@material-ui/core/Badge';
 import Paper from '@material-ui/core/Paper';
-import ExtensionIcon from '@material-ui/icons/Extension';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -36,6 +35,8 @@ import PeopleIcon from '@material-ui/icons/People';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import VideoCallIcon from '@material-ui/icons/VideoCall';
+import SelfViewOnIcon from '@material-ui/icons/Videocam';
+import SelfViewOffIcon from '@material-ui/icons/VideocamOff';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
@@ -175,7 +176,6 @@ const PulsingBadge = withStyles((theme) =>
 const TopBar = (props) =>
 {
 	const intl = useIntl();
-
 	const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
 	const [ anchorEl, setAnchorEl ] = useState(null);
 	const [ currentMenu, setCurrentMenu ] = useState(null);
@@ -228,13 +228,16 @@ const TopBar = (props) =>
 		setHelpOpen,
 		setAboutOpen,
 		setLockDialogOpen,
+		setHideSelfView,
 		toggleToolArea,
 		openUsersTab,
 		unread,
 		canProduceExtraVideo,
 		canLock,
 		canPromote,
-		classes
+		classes,
+		locale,
+		localesList
 	} = props;
 
 	const isMenuOpen = Boolean(anchorEl);
@@ -301,15 +304,18 @@ const TopBar = (props) =>
 							<MenuIcon />
 						</IconButton>
 					</PulsingBadge>
-					{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
-					<Typography
-						className={classes.title}
-						variant='h6'
-						color='inherit'
-						noWrap
-					>
-						{ window.config.title ? window.config.title : 'Multiparty meeting' }
-					</Typography>
+					{ window.config.logo !=='' ?
+						<img alt='Logo'
+							src={window.config.logo}
+							className={classes.logo}
+						/> :
+						<Typography
+							variant='h6'
+							noWrap color='inherit'
+						>
+							{window.config.title}
+						</Typography>
+					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
 						<Tooltip
@@ -328,7 +334,7 @@ const TopBar = (props) =>
 								onClick={(event) => handleMenuOpen(event, 'moreActions')}
 								color='inherit'
 							>
-								<ExtensionIcon />
+								<MoreIcon />
 							</IconButton>
 						</Tooltip>
 						{ fullscreenEnabled &&
@@ -509,6 +515,17 @@ const TopBar = (props) =>
 						</IconButton>
 					</div>
 					<div className={classes.divider} />
+
+					<Button
+						aria-label={locale.split(/[-_]/)[0]}
+						className={classes.actionButton}
+						color='secondary'
+						disableRipple='true'
+						onClick={(event) => handleMenuOpen(event, 'localeMenu')}
+					>
+						{locale.split(/[-_]/)[0]}
+					</Button>
+
 					<Button
 						aria-label={intl.formatMessage({
 							id             : 'label.leave',
@@ -562,6 +579,44 @@ const TopBar = (props) =>
 							onClick={() =>
 							{
 								handleMenuClose();
+								setHideSelfView(!room.hideSelfView);
+							}}
+						>
+							{ room.hideSelfView ?
+								<SelfViewOnIcon
+									aria-label={intl.formatMessage({
+										id             : 'room.showSelfView',
+										defaultMessage : 'Show self view video'
+									})}
+								/>
+								:
+								<SelfViewOffIcon
+									aria-label={intl.formatMessage({
+										id             : 'room.hideSelfView',
+										defaultMessage : 'Hide self view video'
+									})}
+								/>
+							}
+							{ room.hideSelfView ?
+								<p className={classes.moreAction}>
+									<FormattedMessage
+										id='room.showSelfView'
+										defaultMessage='Show self view video'
+									/>
+								</p>
+								:
+								<p className={classes.moreAction}>
+									<FormattedMessage
+										id='room.hideSelfView'
+										defaultMessage='Hide self view video'
+									/>
+								</p>
+							}
+						</MenuItem>
+						<MenuItem
+							onClick={() =>
+							{
+								handleMenuClose();
 								setHelpOpen(!room.helpOpen);
 							}}
 						>
@@ -600,6 +655,25 @@ const TopBar = (props) =>
 						</MenuItem>
 					</Paper>
 				}
+
+				{ currentMenu === 'localeMenu' &&
+					<Paper>
+						{localesList.map((item, index) => (
+							<MenuItem
+								selected={item.locale.includes(locale)}
+								key={index}
+								onClick={() =>
+								{
+									roomClient.setLocale(item.locale[0]);
+									handleMenuClose();
+								}}
+							>
+								{item.name}
+							</MenuItem>)
+						)}
+					</Paper>
+				}
+
 			</Popover>
 			<Menu
 				anchorEl={mobileMoreAnchorEl}
@@ -747,17 +821,101 @@ const TopBar = (props) =>
 					</MenuItem>
 				}
 				<MenuItem
-					aria-label={intl.formatMessage({
-						id             : 'label.moreActions',
-						defaultMessage : 'Add video'
-					})}
-					onClick={(event) => handleMenuOpen(event, 'moreActions')}
+					disabled={!canProduceExtraVideo}
+					onClick={() =>
+					{
+						handleMenuClose();
+						setExtraVideoOpen(!room.extraVideoOpen);
+					}}
 				>
-					<ExtensionIcon />
+					<VideoCallIcon
+						aria-label={intl.formatMessage({
+							id             : 'label.addVideo',
+							defaultMessage : 'Add video'
+						})}
+					/>
 					<p className={classes.moreAction}>
 						<FormattedMessage
-							id='label.moreActions'
-							defaultMessage='More actions'
+							id='label.addVideo'
+							defaultMessage='Add video'
+						/>
+					</p>
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
+						setHideSelfView(!room.hideSelfView);
+					}}
+				>
+					{ room.hideSelfView ?
+						<SelfViewOnIcon
+							aria-label={intl.formatMessage({
+								id             : 'room.showSelfView',
+								defaultMessage : 'Show self view video'
+							})}
+						/>
+						:
+						<SelfViewOffIcon
+							aria-label={intl.formatMessage({
+								id             : 'room.hideSelfView',
+								defaultMessage : 'Hide self view video'
+							})}
+						/>
+					}
+					{ room.hideSelfView ?
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='room.showSelfView'
+								defaultMessage='Show self view video'
+							/>
+						</p>
+						:
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='room.hideSelfView'
+								defaultMessage='Hide self view video'
+							/>
+						</p>
+					}
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
+						setHelpOpen(!room.helpOpen);
+					}}
+				>
+					<HelpIcon
+						aria-label={intl.formatMessage({
+							id             : 'room.help',
+							defaultMessage : 'Help'
+						})}
+					/>
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='room.help'
+							defaultMessage='Help'
+						/>
+					</p>
+				</MenuItem>
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
+						setAboutOpen(!room.aboutOpen);
+					}}
+				>
+					<InfoIcon
+						aria-label={intl.formatMessage({
+							id             : 'room.about',
+							defaultMessage : 'About'
+						})}
+					/>
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='room.about'
+							defaultMessage='About'
 						/>
 					</p>
 				</MenuItem>
@@ -788,6 +946,7 @@ TopBar.propTypes =
 	setHelpOpen          : PropTypes.func.isRequired,
 	setAboutOpen         : PropTypes.func.isRequired,
 	setLockDialogOpen    : PropTypes.func.isRequired,
+	setHideSelfView      : PropTypes.func.isRequired,
 	toggleToolArea       : PropTypes.func.isRequired,
 	openUsersTab         : PropTypes.func.isRequired,
 	unread               : PropTypes.number.isRequired,
@@ -795,7 +954,10 @@ TopBar.propTypes =
 	canLock              : PropTypes.bool.isRequired,
 	canPromote           : PropTypes.bool.isRequired,
 	classes              : PropTypes.object.isRequired,
-	theme                : PropTypes.object.isRequired
+	theme                : PropTypes.object.isRequired,
+	intl                 : PropTypes.object.isRequired,
+	locale               : PropTypes.object.isRequired,
+	localesList          : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -825,7 +987,9 @@ const makeMapStateToProps = () =>
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
 			canProduceExtraVideo : hasExtraVideoPermission(state),
 			canLock              : hasLockPermission(state),
-			canPromote           : hasPromotionPermission(state)
+			canPromote           : hasPromotionPermission(state),
+			locale               : state.intl.locale,
+			localesList          : state.intl.list
 		});
 
 	return mapStateToProps;
@@ -856,6 +1020,10 @@ const mapDispatchToProps = (dispatch) =>
 		setLockDialogOpen : (lockDialogOpen) =>
 		{
 			dispatch(roomActions.setLockDialogOpen(lockDialogOpen));
+		},
+		setHideSelfView : (hideSelfView) =>
+		{
+			dispatch(roomActions.setHideSelfView(hideSelfView));
 		},
 		toggleToolArea : () =>
 		{
@@ -888,7 +1056,9 @@ export default withRoomContext(connect(
 				prev.me.roles === next.me.roles &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
-				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
+				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
+				prev.intl.locale === next.intl.locale &&
+				prev.intl.localesList === next.intl.localesList
 			);
 		}
 	}

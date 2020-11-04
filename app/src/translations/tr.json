@@ -59,12 +59,15 @@
 	"room.raisedHand": "{displayName} elini kaldırdı",
 	"room.loweredHand": "{displayName} elini indirdi",
 	"room.extraVideo": "İlave video",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Oda dolu, bir süre sonra tekrar deneyin",
 	"room.help": "Yardım",
 	"room.about": "Hakkında",
 	"room.shortcutKeys": "Kısayol Tuşları",
 	"room.browsePeersSpotlight": "Gündeme alınacak katılımcıyı seç",
 	"room.stopAllScreenSharing": "Tüm ekran paylaşımlarını durdur",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Sesiniz kapalı, konuşmak için SPACE tuşuna basılı tutun",
 
@@ -84,8 +87,15 @@
 	"tooltip.kickParticipant": "Katılımcıyı kov",
 	"tooltip.muteParticipant": "Katılımcının sesini kapat",
 	"tooltip.muteParticipantVideo": "Katılımcının videosunu kapat",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "El kaldır",
 	"tooltip.muteScreenSharing": "Katılımcının ekran paylaşımını durdur",
+	"tooltip.unMuteScreenSharing": null,
+	"tooltip.unMuteParticipantVideo": null,
+	"tooltip.unMuteParticipant": null,
+	"tooltip.addParticipantToSpotlight": null,
+	"tooltip.removeParticipantFromSpotlight": null,
 	"tooltip.muteParticipantAudioModerator": "Katılımcı sesini herkesde kıs",
 	"tooltip.muteParticipantVideoModerator": "Katılımcı videosunu herkesde kapat",
 	"tooltip.muteScreenSharingModerator": "Katılımcı ekran paylaşımını herkesde durdur",
@@ -120,6 +130,11 @@
 	"label.promoteAllPeers": "Hepsini kabul et",
 	"label.moreActions": "Daha fazla eylem",
 	"label.version": "Versiyon",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",
@@ -139,6 +154,8 @@
 	"settings.selectRoomLayout": "Oda düzeni seç",
 	"settings.advancedMode": "Detaylı mod",
 	"settings.permanentTopBar": "Üst barı kalıcı yap",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "İzlenebilir video sayısı",
 	"settings.hiddenControls": "Gizli medya kontrolleri",
 	"settings.notificationSounds": "Bildirim sesleri",
@@ -152,6 +169,7 @@
 	"settings.drawerOverlayed": "Yan menü içeriğin üzerine geçsin",
 	"settings.voiceActivatedUnmute": "Konuşunca mikrofonu aç",
 	"settings.noiseThreshold": "Gürültü eşiği",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Dosya kaydedilemiyor",
 	"filesharing.startingFileShare": "Paylaşılan dosyaya erişiliyor",
@@ -166,11 +184,13 @@
 
 	"devices.devicesChanged": "Cihazlarınız değişti, ayarlar kutusundan cihazlarınızı yapılandırın",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Ses desteklenmiyor",
 	"device.activateAudio": "Sesi aktif et",
 	"device.muteAudio": "Sesi kapat",
 	"device.unMuteAudio": "Sesi aç",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video desteklenmiyor",
 	"device.startVideo": "Video başlat",
 	"device.stopVideo": "Video durdur",
@@ -187,15 +207,20 @@
 	"devices.microphoneMuteError": "Mikrofonunuz kapatılamıyor",
 	"devices.microphoneUnMuteError": "Mikrofonunuz açılamıyor",
 
-	"devices.screenSharingDisconnected" : "Ekran paylaşımı bağlı değil",
+	"devices.screenSharingDisconnected": "Ekran paylaşımı bağlı değil",
 	"devices.screenSharingError": "Ekranınıza erişilirken bir hata oluştu",
 
 	"devices.cameraDisconnected": "Kamera bağlı değil",
 	"devices.cameraError": "Kameranıza erişilirken bir hata oluştu",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": "Moderatör sohbeti temizledi",
 	"moderator.clearFiles": "Moderatör dosyaları temizledi",
 	"moderator.muteAudio": "Moderatör sesinizi kapattı",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "Moderatör videonuzu durdurdu",
 	"moderator.stopScreenSharing": "Moderatör ekran paylaşımınızı durdurdu",
 

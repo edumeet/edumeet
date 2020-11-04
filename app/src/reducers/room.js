@@ -18,13 +18,16 @@ const initialState =
 	windowConsumer                : null, // ConsumerID
 	toolbarsVisible               : true,
 	mode                          : window.config.defaultLayout || 'democratic',
-	selectedPeerId                : null,
+	selectedPeers                 : [],
 	spotlights                    : [],
+	rolesManagerPeer              : null, // peerId
 	settingsOpen                  : false,
 	extraVideoOpen                : false,
+	hideSelfView                  : false,
+	rolesManagerOpen              : false,
 	helpOpen                      : false,
 	aboutOpen                     : false,
-	currentSettingsTab            : 'media', // media, appearence, advanced
+	currentSettingsTab            : 'media', // media, appearance, advanced
 	lockDialogOpen                : false,
 	joined                        : false,
 	muteAllInProgress             : false,
@@ -34,6 +37,7 @@ const initialState =
 	clearChatInProgress           : false,
 	clearFileSharingInProgress    : false,
 	roomPermissions               : null,
+	userRoles                     : null,
 	allowWhenRoleMissing          : null
 };
 
@@ -122,6 +126,20 @@ const room = (state = initialState, action) =>
 			return { ...state, extraVideoOpen };
 		}
 
+		case 'SET_ROLES_MANAGER_PEER':
+		{
+			const { rolesManagerPeer } = action.payload;
+
+			return { ...state, rolesManagerPeer };
+		}
+
+		case 'SET_ROLES_MANAGER_OPEN':
+		{
+			const { rolesManagerOpen } = action.payload;
+
+			return { ...state, rolesManagerOpen };
+		}
+
 		case 'SET_HELP_OPEN':
 		{
 			const { helpOpen } = action.payload;
@@ -193,16 +211,31 @@ const room = (state = initialState, action) =>
 		case 'SET_DISPLAY_MODE':
 			return { ...state, mode: action.payload.mode };
 
-		case 'SET_SELECTED_PEER':
+		case 'ADD_SELECTED_PEER':
 		{
-			const { selectedPeerId } = action.payload;
+			const { peerId } = action.payload;
 
-			return {
-				...state,
+			const selectedPeers = [ ...state.selectedPeers, peerId ];
 
-				selectedPeerId : state.selectedPeerId === selectedPeerId ?
-					null : selectedPeerId
-			};
+			return { ...state, selectedPeers };
+		}
+
+		// Also listen for peers leaving
+		case 'REMOVE_PEER':
+		case 'REMOVE_SELECTED_PEER':
+		{
+			const { peerId } = action.payload;
+
+			const selectedPeers =
+				state.selectedPeers.filter((peer) =>
+					peer !== peerId);
+
+			return { ...state, selectedPeers };
+		}
+
+		case 'CLEAR_SELECTED_PEERS':
+		{
+			return { ...state, selectedPeers: [] };
 		}
 
 		case 'SET_SPOTLIGHTS':
@@ -245,11 +278,25 @@ const room = (state = initialState, action) =>
 			return { ...state, roomPermissions };
 		}
 
+		case 'SET_USER_ROLES':
+		{
+			const { userRoles } = action.payload;
+
+			return { ...state, userRoles };
+		}
+
 		case 'SET_ALLOW_WHEN_ROLE_MISSING':
 		{
 			const { allowWhenRoleMissing } = action.payload;
 
 			return { ...state, allowWhenRoleMissing };
+		}
+
+		case 'SET_HIDE_SELF_VIEW':
+		{
+			const { hideSelfView } = action.payload;
+
+			return { ...state, hideSelfView };
 		}
 
 		default:

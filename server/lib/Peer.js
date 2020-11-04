@@ -296,7 +296,10 @@ class Peer extends EventEmitter
 
 	addRole(newRole)
 	{
-		if (!this._roles.includes(newRole))
+		if (
+			!this._roles.some((role) => role.id === newRole.id) &&
+			newRole.id !== userRoles.NORMAL.id // Can not add NORMAL
+		)
 		{
 			this._roles.push(newRole);
 
@@ -308,9 +311,12 @@ class Peer extends EventEmitter
 
 	removeRole(oldRole)
 	{
-		if (this._roles.includes(oldRole))
+		if (
+			this._roles.some((role) => role.id === oldRole.id) &&
+			oldRole.id !== userRoles.NORMAL.id // Can not remove NORMAL
+		)
 		{
-			this._roles = this._roles.filter((role) => role !== oldRole);
+			this._roles = this._roles.filter((role) => role.id !== oldRole.id);
 
 			logger.info('removeRole() | [oldRole:"%s]"', oldRole);
 
@@ -320,7 +326,7 @@ class Peer extends EventEmitter
 
 	hasRole(role)
 	{
-		return this._roles.includes(role);
+		return this._roles.some((myRole) => myRole.id === role.id);
 	}
 
 	addTransport(id, transport)
@@ -381,7 +387,7 @@ class Peer extends EventEmitter
 			id                  : this.id,
 			displayName         : this.displayName,
 			picture             : this.picture,
-			roles               : this.roles,
+			roles               : this.roles.map((role) => role.id),
 			raisedHand          : this.raisedHand,
 			raisedHandTimestamp : this.raisedHandTimestamp
 		};

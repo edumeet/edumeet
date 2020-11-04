@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 
 const meRolesSelect = (state) => state.me.roles;
+const userRolesSelect = (state) => state.room.userRoles;
 const roomPermissionsSelect = (state) => state.room.roomPermissions;
 const roomAllowWhenRoleMissing = (state) => state.room.allowWhenRoleMissing;
 const producersSelect = (state) => state.producers;
@@ -10,6 +11,7 @@ const peersSelector = (state) => state.peers;
 const lobbyPeersSelector = (state) => state.lobbyPeers;
 const getPeerConsumers = (state, id) =>
 	(state.peers[id] ? state.peers[id].consumers : null);
+const isHiddenSelect = (state) => state.room.hideSelfView;
 const getAllConsumers = (state) => state.consumers;
 const peersKeySelector = createSelector(
 	peersSelector,
@@ -103,6 +105,25 @@ export const passiveMicConsumerSelector = createSelector(
 		)
 );
 
+export const highestRoleLevelSelector = createSelector(
+	meRolesSelect,
+	userRolesSelect,
+	(roles, userRoles) =>
+	{
+		let level = 0;
+
+		for (const role of roles)
+		{
+			const tmpLevel = userRoles.get(role).level;
+
+			if (tmpLevel > level)
+				level = tmpLevel;
+		}
+
+		return level;
+	}
+);
+
 export const spotlightsLengthSelector = createSelector(
 	spotlightsSelector,
 	(spotlights) => spotlights.length
@@ -162,21 +183,25 @@ export const raisedHandsSelector = createSelector(
 );
 
 export const videoBoxesSelector = createSelector(
+	isHiddenSelect,
 	spotlightsLengthSelector,
 	screenProducersSelector,
 	spotlightScreenConsumerSelector,
 	extraVideoProducersSelector,
 	spotlightExtraVideoConsumerSelector,
 	(
+		isHidden,
 		spotlightsLength,
 		screenProducers,
 		screenConsumers,
 		extraVideoProducers,
 		extraVideoConsumers
 	) =>
-		spotlightsLength + 1 + screenProducers.length +
-		screenConsumers.length + extraVideoProducers.length +
-		extraVideoConsumers.length
+	{
+		return spotlightsLength + (isHidden ? 0 : 1) +
+			(isHidden ? 0 : screenProducers.length) + screenConsumers.length +
+			(isHidden ? 0 : extraVideoProducers.length) + extraVideoConsumers.length;
+	}
 );
 
 export const meProducersSelector = createSelector(
@@ -245,8 +270,10 @@ export const makePermissionSelector = (permission) =>
 			if (!roomPermissions)
 				return false;
 
-			const permitted = roles.some((role) =>
-				roomPermissions[permission].includes(role)
+			const permitted = roles.some((roleId) =>
+				roomPermissions[permission].some((permissionRole) =>
+					roleId === permissionRole.id
+				)
 			);
 
 			if (permitted)
@@ -260,7 +287,9 @@ export const makePermissionSelector = (permission) =>
 				peers.filter(
 					(peer) =>
 						peer.roles.some(
-							(role) => roomPermissions[permission].includes(role)
+							(roleId) => roomPermissions[permission].some((permissionRole) =>
+								roleId === permissionRole.id
+							)
 						)
 				).length === 0
 			)

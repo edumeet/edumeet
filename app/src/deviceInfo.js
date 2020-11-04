@@ -2,7 +2,7 @@ import bowser from 'bowser';
 
 window.BB = bowser;
 
-export default function()
+export default function deviceInfo()
 {
 	const ua = navigator.userAgent;
 	const browser = bowser.getParser(ua);

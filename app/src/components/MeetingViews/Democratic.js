@@ -10,8 +10,10 @@ import { withStyles } from '@material-ui/core/styles';
 import Peer from '../Containers/Peer';
 import Me from '../Containers/Me';
 
-const RATIO = 1.334;
-const PADDING = 60;
+const PADDING_V = 64;
+const PADDING_H = 50;
+
+const FILL_RATE = 0.95;
 
 const styles = (theme) =>
 	({
@@ -34,12 +36,12 @@ const styles = (theme) =>
 		},
 		showingToolBar :
 		{
-			paddingTop : 60,
+			paddingTop : PADDING_V,
 			transition : 'padding .5s'
 		},
 		buttonControlBar :
 		{
-			paddingLeft                    : 60,
+			paddingLeft                    : PADDING_H,
 			[theme.breakpoints.down('sm')] :
 			{
 				paddingLeft : 0
@@ -62,47 +64,60 @@ class Democratic extends React.PureComponent
 
 	updateDimensions = () =>
 	{
-		if (!this.peersRef.current)
-		{
-			return;
-		}
+		const {
+			boxes,
+			aspectRatio,
+			buttonControlBar,
+			permanentTopBar,
+			toolbarsVisible
+		} = this.props;
 
-		const n = this.props.boxes;
+		const {
+			current
+		} = this.peersRef;
 
-		if (n === 0)
-		{
+		if (!current)
 			return;
-		}
+
+		if (boxes === 0)
+			return;
+
+		const n = boxes;
 
 		const width =
-			this.peersRef.current.clientWidth - (this.props.buttonControlBar ? PADDING : 0);
+			current.clientWidth - (buttonControlBar ? PADDING_H : 0);
 		const height =
-			this.peersRef.current.clientHeight -
-			(this.props.toolbarsVisible || this.props.permanentTopBar ? PADDING : 0);
+			current.clientHeight - (toolbarsVisible || permanentTopBar ? PADDING_V : 0);
 
 		let x, y, space;
 
-		for (let rows = 1; rows < 100; rows = rows + 1)
+		for (let rows = 1; rows <= boxes; rows = rows + 1)
 		{
 			x = width / Math.ceil(n / rows);
-			y = x / RATIO;
+			y = x / aspectRatio;
+
 			if (height < (y * rows))
 			{
 				y = height / rows;
-				x = RATIO * y;
+				x = aspectRatio * y;
+
 				break;
 			}
+
 			space = height - (y * (rows));
+
 			if (space < y)
-			{
 				break;
-			}
 		}
-		if (Math.ceil(this.state.peerWidth) !== Math.ceil(0.94 * x))
+
+		if (
+			Math.ceil(this.state.peerWidth) !== Math.ceil(FILL_RATE * x) ||
+			Math.ceil(this.state.peerHeight) !== Math.ceil(FILL_RATE * y)
+		)
 		{
 			this.setState({
-				peerWidth  : 0.94 * x,
-				peerHeight : 0.94 * y
+				peerWidth  : FILL_RATE * x,
+				peerHeight : FILL_RATE * y
 			});
 		}
 	};
@@ -141,6 +156,7 @@ class Democratic extends React.PureComponent
 			toolbarsVisible,
 			permanentTopBar,
 			buttonControlBar,
+			hideSelfView,
 			classes
 		} = this.props;
 
@@ -160,11 +176,13 @@ class Democratic extends React.PureComponent
 				)}
 				ref={this.peersRef}
 			>
+				{ !hideSelfView &&
 				<Me
 					advancedMode={advancedMode}
 					spacing={6}
 					style={style}
 				/>
+				}
 				{ spotlightsPeers.map((peer) =>
 				{
 					return (
@@ -188,9 +206,11 @@ Democratic.propTypes =
 	boxes            : PropTypes.number,
 	spotlightsPeers  : PropTypes.array.isRequired,
 	toolbarsVisible  : PropTypes.bool.isRequired,
+	hideSelfView     : PropTypes.bool.isRequired,
 	permanentTopBar  : PropTypes.bool.isRequired,
 	buttonControlBar : PropTypes.bool.isRequired,
 	toolAreaOpen     : PropTypes.bool.isRequired,
+	aspectRatio      : PropTypes.number.isRequired,
 	classes          : PropTypes.object.isRequired
 };
 
@@ -200,9 +220,11 @@ const mapStateToProps = (state) =>
 		boxes            : videoBoxesSelector(state),
 		spotlightsPeers  : spotlightPeersSelector(state),
 		toolbarsVisible  : state.room.toolbarsVisible,
+		hideSelfView     : state.room.hideSelfView,
 		permanentTopBar  : state.settings.permanentTopBar,
 		buttonControlBar : state.settings.buttonControlBar,
-		toolAreaOpen     : state.toolarea.toolAreaOpen
+		toolAreaOpen     : state.toolarea.toolAreaOpen,
+		aspectRatio      : state.settings.aspectRatio
 	};
 };
 
@@ -219,8 +241,10 @@ export default connect(
 				prev.consumers === next.consumers &&
 				prev.room.spotlights === next.room.spotlights &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.room.hideSelfView === next.room.hideSelfView &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
 				prev.settings.buttonControlBar === next.settings.buttonControlBar &&
+				prev.settings.aspectRatio === next.settings.aspectRatio &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 			);
 		}

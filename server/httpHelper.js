@@ -4,7 +4,7 @@ exports.loginHelper = function(data)
 	<html>
 		<head>
 			<meta charset='utf-8'>
-			<title>Multiparty Meeting</title>
+			<title>edumeet</title>
 		</head>
 		<body>
 			<script type='text/javascript'>
@@ -26,7 +26,7 @@ exports.logoutHelper = function()
 	<html>
 		<head>
 			<meta charset='utf-8'>
-			<title>Multiparty Meeting</title>
+			<title>edumeet</title>
 		</head>
 		<body>
 			<script type='text/javascript'>

@@ -40,6 +40,12 @@ export const setScreenSharingFrameRate = (screenSharingFrameRate) =>
 		payload : { screenSharingFrameRate }
 	});
 
+export const setAspectRatio = (aspectRatio) =>
+	({
+		type    : 'SET_ASPECT_RATIO',
+		payload : { aspectRatio }
+	});
+
 export const setDisplayName = (displayName) =>
 	({
 		type    : 'SET_DISPLAY_NAME',
@@ -121,4 +127,26 @@ export const setLastN = (lastN) =>
 	({
 		type    : 'SET_LAST_N',
 		payload : { lastN }
+	});
+export const toggleMirrorOwnVideo = () =>
+	({
+		type : 'TOGGLE_MIRROR_OWN_VIDEO'
+	});
+
+export const setMediaPerms = (mediaPerms) =>
+	({
+		type    : 'SET_MEDIA_PERMS',
+		payload : { mediaPerms }
+	});
+
+export const setAudioMuted = (audioMuted) =>
+	({
+		type    : 'SET_AUDIO_MUTED',
+		payload : { audioMuted }
+	});
+
+export const setVideoMuted = (videoMuted) =>
+	({
+		type    : 'SET_VIDEO_MUTED',
+		payload : { videoMuted }
 	});

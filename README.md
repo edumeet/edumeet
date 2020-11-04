@@ -1,4 +1,4 @@
-# eduMeet
+# edumeet
 
 A WebRTC meeting service using [mediasoup](https://mediasoup.org).
 
@@ -17,11 +17,11 @@ Try it online at https://letsmeet.no. You can add /roomname to the URL for speci
 
 ## Docker
 
-If you want the automatic approach, you can find a docker image [here](https://hub.docker.com/r/misi/mm/).
+If you want the automatic approach, you can find a docker image [here](https://hub.docker.com/r/edumeet/edumeet/).
 
 ## Ansible
 
-If you want the ansible approach, you can find ansible role [here](https://github.com/misi/mm-ansible/).
+If you want the ansible approach, you can find ansible role [here](https://github.com/edumeet/edumeet-ansible/).
 [![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
 
 ## Package Installation
@@ -29,21 +29,21 @@ If you want the ansible approach, you can find ansible role [here](https://githu
 If you want to install it on the Debian & Ubuntu based operating systems.
 
 * Prerequisites:
-multiparty-meeting will run on nodejs v10.x and later versions. (v12.x has a know issue for now, please until it will be fixed use the 10.x version)
+edumeet will run on nodejs v10.x and later versions. (v12.x has a know issue for now, please until it will be fixed use the 10.x version)
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
-* Download .deb package from [here](https://github.com/havfo/multiparty-meeting/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
+* Download .deb package from [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
 
 * Unzip the file
 
 ```bash
-$ unzip multiparty-meeting.zip
+$ unzip edumeet.zip
 ```
 
 * Install the package
 
 ```bash
-$ sudo apt install multiparty-meeting/multiparty-meeting.deb
+$ sudo apt install edumeet/edumeet.deb
 ```
 
 * After package installation, don't forget the configure ip address in config file.
@@ -55,13 +55,13 @@ $ sudo nano /etc/meeting/server-config.js
 * Finally, start the service by (it's enabled by default)
 
 ```bash
-$ sudo systemctl start multiparty-meeting
+$ sudo systemctl start edumeet
 ```
 
 ## Manual installation
 
 * Prerequisites:
-Currently multiparty-meeting will only run on nodejs v13.x
+Currently edumeet will only run on nodejs v13.x
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
@@ -71,8 +71,8 @@ $ sudo apt install git npm build-essential redis
 * Clone the project:
 
 ```bash
-$ git clone https://github.com/havfo/multiparty-meeting.git
-$ cd multiparty-meeting
+$ git clone https://github.com/edumeet/edumeet.git
+$ cd edumeet
 ```
 
 * Copy `server/config/config.example.js` to `server/config/config.js` :
@@ -121,24 +121,24 @@ $ npm start
 
 ## Deploy it in a server
 
-* Stop your locally running server. Copy systemd-service file `multiparty-meeting.service` to `/etc/systemd/system/` and check location path settings:
+* Stop your locally running server. Copy systemd-service file `edumeet.service` to `/etc/systemd/system/` and check location path settings:
 
 ```bash
-$ cp multiparty-meeting.service /etc/systemd/system/
-$ edit /etc/systemd/system/multiparty-meeting.service
+$ cp edumeet.service /etc/systemd/system/
+$ edit /etc/systemd/system/edumeet.service
 ```
 
 * Reload systemd configuration and start service:
 
 ```bash
 $ systemctl daemon-reload
-$ systemctl start multiparty-meeting
+$ systemctl start edumeet
 ```
 
-* If you want to start multiparty-meeting at boot time:
+* If you want to start edumeet at boot time:
 
 ```bash
-$ systemctl enable multiparty-meeting
+$ systemctl enable edumeet
 ```
 
 ## Ports and firewall
@@ -170,6 +170,9 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 * Håvar Aambø Fosstveit
 * Stefan Otto
 * Mészáros Mihály
+* Roman Drozd
+* Rémai Gábor László
+* Piotr Pawałowski
 
 This started as a fork of the [work](https://github.com/versatica/mediasoup-demo) done by:
 

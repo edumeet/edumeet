@@ -59,11 +59,14 @@
 	"room.raisedHand": "{displayName} 舉手了",
 	"room.loweredHand": "{displayName} 放下了他的手",
 	"room.extraVideo": "其他視訊",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "房間已滿，請稍後重試",
 	"room.help": "幫助",
 	"room.about": "關於",
 	"room.shortcutKeys": "鍵盤快速鍵",
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "您已靜音，請按下 空白鍵 來說話",
 
@@ -83,8 +86,15 @@
 	"tooltip.kickParticipant": "踢出",
 	"tooltip.muteParticipant": "靜音",
 	"tooltip.muteParticipantVideo": "隱藏視訊",
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": "舉手",
 	"tooltip.muteScreenSharing": "隱藏螢幕分享",
+	"tooltip.unMuteScreenSharing": null,
+	"tooltip.unMuteParticipantVideo": null,
+	"tooltip.unMuteParticipant": null,
+	"tooltip.addParticipantToSpotlight": null,
+	"tooltip.removeParticipantFromSpotlight": null,
 	"tooltip.muteParticipantAudioModerator": "關閉聲音",
 	"tooltip.muteParticipantVideoModerator": "關閉視訊",
 	"tooltip.muteScreenSharingModerator": "關閉螢幕分享",
@@ -119,6 +129,11 @@
 	"label.promoteAllPeers": "提升全部",
 	"label.moreActions": "更多",
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "設置",
 	"settings.camera": "視訊來源",
@@ -138,6 +153,8 @@
 	"settings.selectRoomLayout": "選擇房間佈局",
 	"settings.advancedMode": "進階模式",
 	"settings.permanentTopBar": "固定頂端列",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "視訊數量上限",
 	"settings.hiddenControls": "隱藏控制按鈕",
 	"settings.notificationSounds": "通知音效",
@@ -151,6 +168,7 @@
 	"settings.drawerOverlayed": "側邊欄覆蓋畫面",
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "無法保存文件",
 	"filesharing.startingFileShare": "開始分享文件",
@@ -165,11 +183,13 @@
 
 	"devices.devicesChanged": "您的設備已更改，請在設置中設定您的設備",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "不支援您的音訊格式",
 	"device.activateAudio": "開啟音訊",
 	"device.muteAudio": "靜音",
 	"device.unMuteAudio": "取消靜音",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "不支援您的視訊格式",
 	"device.startVideo": "開啟視訊",
 	"device.stopVideo": "關閉視訊",
@@ -186,15 +206,20 @@
 	"devices.microphoneMuteError": "無法使麥克風靜音",
 	"devices.microphoneUnMuteError": "無法取消麥克風靜音",
 
-	"devices.screenSharingDisconnected" : "螢幕分享已斷開",
+	"devices.screenSharingDisconnected": "螢幕分享已斷開",
 	"devices.screenSharingError": "螢幕分享時發生錯誤",
 
 	"devices.cameraDisconnected": "相機已斷開連接",
 	"devices.cameraError": "存取相機時發生錯誤",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": "管理員清除了聊天",
 	"moderator.clearFiles": "管理員清除了所有檔案",
 	"moderator.muteAudio": "您已被管理員靜音",
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": "您的視訊已被管理員關閉",
 	"moderator.stopScreenSharing": null,
 

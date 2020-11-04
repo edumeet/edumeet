@@ -59,12 +59,15 @@
 	"room.raisedHand": null,
 	"room.loweredHand": null,
 	"room.extraVideo": null,
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": null,
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
-	
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
+
 	"me.mutedPTT": null,
 
 	"roles.gotRole": null,
@@ -83,8 +86,15 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.unMuteScreenSharing": null,
+	"tooltip.unMuteParticipantVideo": null,
+	"tooltip.unMuteParticipant": null,
+	"tooltip.addParticipantToSpotlight": null,
+	"tooltip.removeParticipantFromSpotlight": null,
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
@@ -120,6 +130,11 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",
@@ -139,6 +154,8 @@
 	"settings.selectRoomLayout": "选择房间布局",
 	"settings.advancedMode": "高级模式",
 	"settings.permanentTopBar": "永久顶吧",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "可见视频数量",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
@@ -152,6 +169,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "无法保存文件",
 	"filesharing.startingFileShare": "正在尝试共享文件",
@@ -166,11 +184,13 @@
 
 	"devices.devicesChanged": "您的设备已更改，请在设置对话框中配置设备",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "音频不受支持",
 	"device.activateAudio": "激活音频",
 	"device.muteAudio": "静音",
 	"device.unMuteAudio": "取消静音",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "视频不受支持",
 	"device.startVideo": "开始视频",
 	"device.stopVideo": "停止视频",
@@ -187,15 +207,20 @@
 	"devices.microphoneMuteError": "无法使麦克风静音",
 	"devices.microphoneUnMuteError": "无法取消麦克风静音",
 
-	"devices.screenSharingDisconnected" : "屏幕共享已断开",
+	"devices.screenSharingDisconnected": "屏幕共享已断开",
 	"devices.screenSharingError": "访问屏幕时发生错误",
 
 	"devices.cameraDisconnected": "相机已断开连接",
 	"devices.cameraError": "访问相机时发生错误",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": null,
 	"moderator.stopScreenSharing": null,
 

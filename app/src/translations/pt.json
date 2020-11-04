@@ -59,12 +59,15 @@
 	"room.raisedHand": null,
 	"room.loweredHand": null,
 	"room.extraVideo": null,
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": null,
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": null,
 
@@ -84,8 +87,15 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.unMuteScreenSharing": null,
+	"tooltip.unMuteParticipantVideo": null,
+	"tooltip.unMuteParticipant": null,
+	"tooltip.addParticipantToSpotlight": null,
+	"tooltip.removeParticipantFromSpotlight": null,
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
@@ -120,6 +130,11 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Definições",
 	"settings.camera": "Camera",
@@ -139,6 +154,8 @@
 	"settings.selectRoomLayout": "Seleccione a disposição da sala",
 	"settings.advancedMode": "Modo avançado",
 	"settings.permanentTopBar": "Barra superior permanente",
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": "Número de vídeos visíveis",
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
@@ -152,6 +169,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Impossível de gravar o ficheiro",
 	"filesharing.startingFileShare": "Tentando partilha de ficheiro",
@@ -166,11 +184,13 @@
 
 	"devices.devicesChanged": "Os seus dispositivos foram alterados, configure os dispositivos na opção de definições",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Áudio não disponível",
 	"device.activateAudio": "Ativar áudio",
 	"device.muteAudio": "Desativar o microfone",
 	"device.unMuteAudio": "Ativar o microfone",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video não disponível",
 	"device.startVideo": "Iniciar vídeo",
 	"device.stopVideo": "Parar vídeo",
@@ -187,15 +207,20 @@
 	"devices.microphoneMuteError": "Não foi possível cortar o som do microfone",
 	"devices.microphoneUnMuteError": "Não foi possível ativar o som do microfone",
 
-	"devices.screenSharingDisconnected" : "Partilha de ecrã desligada",
+	"devices.screenSharingDisconnected": "Partilha de ecrã desligada",
 	"devices.screenSharingError": "Ocorreu um erro no acesso ao seu ecrã",
 
 	"devices.cameraDisconnected": "Câmara desconectada",
 	"devices.cameraError": "Ocorreu um erro no acesso à sua câmara",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": null,
 	"moderator.stopScreenSharing": null,
 

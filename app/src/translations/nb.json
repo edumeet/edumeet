@@ -59,12 +59,15 @@
 	"room.raisedHand": "{displayName} rakk opp hånden",
 	"room.loweredHand": "{displayName} tok ned hånden",
 	"room.extraVideo": "Ekstra video",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Rommet er fullt, prøv igjen om litt.",
 	"room.help": "Hjelp",
 	"room.about": "Om",
 	"room.shortcutKeys": "Hurtigtaster",
 	"room.browsePeersSpotlight": "Bytt mellom synlig deltaker",
 	"room.stopAllScreenSharing": "Stopp all skjermdeling",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -81,14 +84,21 @@
 	"tooltip.lobby": "Vis lobby",
 	"tooltip.settings": "Vis innstillinger",
 	"tooltip.participants": "Vis deltakere",
-	"tooltip.kickParticipant": "Spark ut deltaker",
-	"tooltip.muteParticipant": "Demp deltaker",
-	"tooltip.muteParticipantVideo": "Demp deltakervideo",
+	"tooltip.kickParticipant": "Spark ut",
+	"tooltip.muteParticipant": "Mute lyd",
+	"tooltip.muteParticipantVideo": "Mute video",
+	"tooltip.inSpotlight": "I fokus",
+	"tooltip.isSpeaker": "Snakker",
 	"tooltip.raisedHand": "Rekk opp hånden",
-	"tooltip.muteScreenSharing": "Demp deltaker skjermdeling",
-	"tooltip.muteParticipantAudioModerator": "Demp deltaker globalt",
-	"tooltip.muteParticipantVideoModerator": "Demp deltakervideo globalt",
-	"tooltip.muteScreenSharingModerator": "Demp deltakerskjermdeling globalt",
+	"tooltip.muteScreenSharing": "Mute skjermdeling",
+	"tooltip.unMuteScreenSharing": "Unmute skjermdeling",
+	"tooltip.unMuteParticipantVideo": "Unmute video",
+	"tooltip.unMuteParticipant": "Unmute lyd",
+	"tooltip.addParticipantToSpotlight": "Sett i fokus",
+	"tooltip.removeParticipantFromSpotlight": "Fjern fra fokus",
+	"tooltip.muteParticipantAudioModerator": "Stopp lyd",
+	"tooltip.muteParticipantVideoModerator": "Stopp video",
+	"tooltip.muteScreenSharingModerator": "Stopp skjermdeling",
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",
@@ -120,6 +130,11 @@
 	"label.promoteAllPeers": "Slipp inn alle",
 	"label.moreActions": "Flere handlinger",
 	"label.version": "Versjon",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
@@ -139,6 +154,8 @@
 	"settings.selectRoomLayout": "Velg møtelayout",
 	"settings.advancedMode": "Avansert modus",
 	"settings.permanentTopBar": "Permanent topplinje",
+	"settings.aspectRatio": "Videovisningsformat",
+	"settings.selectAspectRatio": "Velg videovisningsformat",
 	"settings.lastn": "Antall videoer synlig",
 	"settings.showAdvancedVideo": "Avanserte videoinnstillinger",
 	"settings.showAdvancedAudio": "Avanserte audioinnstillinger",
@@ -152,6 +169,7 @@
 	"settings.drawerOverlayed": "Sidemeny over innhold",
 	"settings.voiceActivatedUnmute": "Stemmeaktivert autodemping",
 	"settings.noiseThreshold": "Støyterskel",
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",
@@ -166,11 +184,13 @@
 
 	"devices.devicesChanged": "Medieenhetene dine endret seg, du kan konfigurere enheter i innstillinger",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Lyd ikke støttet",
 	"device.activateAudio": "Aktiver lyd",
 	"device.muteAudio": "Demp lyd",
 	"device.unMuteAudio": "Aktiver lyd",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video ikke støttet",
 	"device.startVideo": "Start video",
 	"device.stopVideo": "Stopp video",
@@ -187,18 +207,23 @@
 	"devices.microphoneMuteError": "Klarte ikke å dempe mikrofonen",
 	"devices.microphoneUnMuteError": "Klarte ikke å aktivere mikrofonen",
 
-	"devices.screenSharingDisconnected" : "Skjermdelingen forsvant",
+	"devices.screenSharingDisconnected": "Skjermdelingen forsvant",
 	"devices.screenSharingError": "Det skjedde noe feil med skjermdelingen din",
 
 	"devices.cameraDisconnected": "Kamera koblet fra",
 	"devices.cameraError": "Det skjedde noe feil med kameraet ditt",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": "Moderator tømte chatten",
 	"moderator.clearFiles": "Moderator fjernet filer",
 	"moderator.muteAudio": "Moderator mutet lyden din",
+	"moderator.modifyPeerRoles": "Endre roller",
 	"moderator.muteVideo": "Moderator mutet videoen din",
 	"moderator.stopScreenSharing": "Moderator mutet skjermdelingen din",
-	
+
 	"unsupportedBrowser.titleUnsupportedBrowser": "Nettleser ikke støttet",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Funksjonalitet som kreves er ikke tilgjengelig i denne nettleseren",
 	"unsupportedBrowser.bodyText": "Denne møtetjenesten krever funksjonalitet som ikke er støttet i denne nettleseren. Vennligst oppgrader, bytt til en annen nettleser, eller sjekk innstillinger. Støttede nettlesere:"

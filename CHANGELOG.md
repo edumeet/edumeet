@@ -1,6 +1,99 @@
 # Changelog
 
+## 3.4.0
+
+### Added
+
+* Multiparty meeting renamed to edumeet
+* Merged room selector- and join- dialog - default keyboard focus on login field
+* Localization selectable
+* Added aspect ratio 16 : 9  and this is default now, ref #439
+* New worker load calculation so router selection is based on that and not random anymore
+* New permissions and roles:
+  * Propagate userRoles to client state, ref #437
+  * Extend userRoles and use the new audio, video permissions, ref #437
+  * New permission to modify peer roles
+  * Create room actions for giving and taking roles
+  * Add functions to client for modifying roles live
+  * Ability to give roles to users
+  * Add new permission to config
+* Add room to userMapping. Example of giving moderator if there is no authenticated user
+* Promote all peers from lobby when a peer joins with the PROMOTE_PEER permission and activateOnHostJoin is true in config
+* Make menus more intuitive on mobile
+* Simplify electron screenshare check
+* Logo support
+* Improve autoMute mic-indicators, Improve audio level scaling
+* Clean up participant list
+* Add indicator for peers in focus. Ref #360
+* TCP enabled by default, prefer UDP
+* Ability for Prometheus exporter to listen on localhost
+* Make list headers bolder
+* Trim displayName inputs. Add random number to Guest displayName.
+* Removed facingMode from mobile
+* Documentation for prometheus exporter
+* Added switching of own video mirror in settings
+* Added hiding of own videos
+* Request audio and webcam permission at once, when user is requesting media
+* Add initial support for local and saml auth
+  * Local login form
+  * Add bcrypt encrypted passwords for local strategy
+  * Add displayName mapping to usermapping
+  * Add saml attriute mappings
+* Use shared cookieparser for web and websocket
+* Update TopBar leave button
+* Add joinAudio capability
+* Standardize Auth button
+
+### Migration
+
+from last master version:
+* Copy paste defaultAudio and centralAudioOtions from config.example.js to config.js 
+* Copy paste whole theme from config.example.js to config
+* Configure logo in config.js
+
+### Upgrade depencies
+
+* webtorrent from 0.107.17 to 0.108.1 …
+* Upgrade React-scripts
+
+### Languages
+
+* Updates translations: hu, tr, no, pl, uk
+* Addad translations: Hindi (hi), Russian (ru), Kazakh (ka)
+
+### Bugfixes
+
+* Hopefully fix to silent peer issue, ref #256
+* Set timeout for TURN API request, fixes #484
+* Possible fix for #582 Crackling sound
+* Fix for #444 Settings persistence
+* Fix Audio settings from config.js take no effect
+* Fix only firefox handles applyConstraints to audio tracks correctly
+* Fix (autoMuted) mic too big click area
+* Fix userRoles check
+* Fix spoltights ignoring maxLastN
+* Fix wrong config parameter naming (voiceActivatedUnmute)
+* Fix locale checking state
+* Fix express error handler
+* Add constraint for user facing camera. Update media devices properly
+* Cleanup on close
+* Fixed null values for peers not yet assigned to a router
+* Fix URL sanitizer bug
+* Removed audio request modification
+* Fix race in spotlights
+* Fix piping bug when peers returning to router
+* Fix piped router count
+* Add comma to prometheus config code
+* Removed code that is problematic and also unused
+* Remove duplicated callbackURL
+* Fix moderator buttons layout
+* Fix: Special chars are not sanitized in URL
+* Fix another roomId bug
+* Tidy: replace obj.entries with obj.values to avoid unused key
+* Fix close room link
+
 ## 3.3
+
 * Add: Rooms now scale across cores
 * Add: Permissions and roles. Users can now have different roles (moderator, admin etc.) that give different permissions.
 * Add: TURN API or fallback TURN server
@@ -11,7 +104,7 @@
 * Add: Configurable audio output device (in supported browsers)
 * Add: Audio auto mute/unmute based on volume
 * Add: Handle unsupported browsers properly
-* Add: Lots of appearence settings
+* Add: Lots of appearance settings
 * Add: Side drawer can now stay permanently open
 * Add: Move control buttons to separate control bar
 * Add: Can now "raise hand"

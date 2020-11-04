@@ -1,9 +1,16 @@
 {
-	"name": "multiparty-meeting-server",
-	"version": "3.3.0",
+	"name": "edumeet-server",
+	"version": "3.3.4",
 	"private": true,
-	"description": "multiparty meeting server",
+	"description": "edumeet server",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
+	"contributors": [
+		"Stefan Otto",
+		"Mészáros Mihály",
+		"Roman Drozd",
+		"Rémai Gábor László",
+		"Piotr Pawałowski"
+	],
 	"license": "MIT",
 	"main": "lib/index.js",
 	"scripts": {
@@ -15,6 +22,7 @@
 		"awaitqueue": "^1.0.0",
 		"axios": "^0.19.2",
 		"base-64": "^0.1.0",
+		"bcrypt": "^5.0.0",
 		"body-parser": "^1.19.0",
 		"colors": "^1.4.0",
 		"compression": "^1.7.4",
@@ -30,7 +38,9 @@
 		"mediasoup": "^3.5.14",
 		"openid-client": "^3.7.3",
 		"passport": "^0.4.0",
+		"passport-local": "^1.0.0",
 		"passport-lti": "0.0.7",
+		"passport-saml": "^1.3.5",
 		"pidusage": "^2.0.17",
 		"prom-client": ">=12.0.0",
 		"redis": "^2.8.0",

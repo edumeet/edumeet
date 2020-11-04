@@ -3,8 +3,11 @@ import React, { Suspense } from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import isElectron from 'is-electron';
-import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
-import { Route, HashRouter, BrowserRouter } from 'react-router-dom';
+
+import { createIntl } from 'react-intl';
+import { IntlProvider } from 'react-intl-redux';
+
+import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
@@ -13,7 +16,8 @@ import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
-import ChooseRoom from './components/ChooseRoom';
+import JoinDialog from './components/JoinDialog';
+import LoginDialog from './components/LoginDialog';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
@@ -22,58 +26,12 @@ import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 import { ReactLazyPreload } from './components/ReactLazyPreload';
 import { detectDevice } from 'mediasoup-client';
-// import messagesEnglish from './translations/en';
-import messagesNorwegian from './translations/nb';
-import messagesGerman from './translations/de';
-import messagesHungarian from './translations/hu';
-import messagesPolish from './translations/pl';
-import messagesDanish from './translations/dk';
-import messagesFrench from './translations/fr';
-import messagesGreek from './translations/el';
-import messagesRomanian from './translations/ro';
-import messagesPortuguese from './translations/pt';
-import messagesChineseSimplified from './translations/cn';
-import messagesChineseTraditional from './translations/tw';
-import messagesSpanish from './translations/es';
-import messagesCroatian from './translations/hr';
-import messagesCzech from './translations/cs';
-import messagesItalian from './translations/it';
-import messagesUkrainian from './translations/uk';
-import messagesTurkish from './translations/tr';
-import messagesLatvian from './translations/lv';
-import messagesRussian from './translations/ru';
-import messagesKazakh from './translations/kk';
 
 import './index.css';
 
 const App = ReactLazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
 
-const cache = createIntlCache();
-
-const messages =
-{
-	// 'en' : messagesEnglish,
-	'nb'      : messagesNorwegian,
-	'de'      : messagesGerman,
-	'hu'      : messagesHungarian,
-	'pl'      : messagesPolish,
-	'dk'      : messagesDanish,
-	'fr'      : messagesFrench,
-	'el'      : messagesGreek,
-	'ro'      : messagesRomanian,
-	'pt'      : messagesPortuguese,
-	'zh-hans' : messagesChineseSimplified,
-	'zh-hant' : messagesChineseTraditional,
-	'es'      : messagesSpanish,
-	'hr'      : messagesCroatian,
-	'cs'      : messagesCzech,
-	'it'      : messagesItalian,
-	'uk'      : messagesUkrainian,
-	'tr'      : messagesTurkish,
-	'lv'      : messagesLatvian,
-	'ru'      : messagesRussian,
-	'kk'      : messagesKazakh
-};
+// const cache = createIntlCache();
 
 const supportedBrowsers={
 	'windows' : {
@@ -88,24 +46,7 @@ const supportedBrowsers={
 	'samsung internet for android' : '>=11.1.1.52'
 };
 
-const browserLanguage = (navigator.language || navigator.browserLanguage).toLowerCase();
-
-let locale = browserLanguage.split(/[-_]/)[0]; // language without region code
-
-if (locale === 'zh')
-{
-	if (browserLanguage === 'zh-cn')
-		locale = 'zh-hans';
-	else
-		locale = 'zh-hant';
-}
-
-const intl = createIntl({
-	locale,
-	messages : messages[locale]
-}, cache);
-
-document.documentElement.lang = locale;
+const intl = createIntl();
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
@@ -116,7 +57,7 @@ const logger = new Logger();
 
 let roomClient;
 
-RoomClient.init({ store, intl });
+RoomClient.init({ store });
 
 const theme = createMuiTheme(window.config.theme);
 
@@ -200,14 +141,14 @@ function run()
 	{
 		render(
 			<MuiThemeProvider theme={theme}>
-				<RawIntlProvider value={intl}>
+				<IntlProvider value={intl}>
 					<UnsupportedBrowser
 						webrtcUnavailable={webrtcUnavailable}
 						platform={device.platform}
 					/>
-				</RawIntlProvider>
+				</IntlProvider>
 			</MuiThemeProvider>,
-			document.getElementById('multiparty-meeting')
+			document.getElementById('edumeet')
 		);
 
 		return;
@@ -237,25 +178,28 @@ function run()
 	render(
 		<Provider store={store}>
 			<MuiThemeProvider theme={theme}>
-				<RawIntlProvider value={intl}>
+				<IntlProvider value={intl}>
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
 						<RoomContext.Provider value={roomClient}>
 							<SnackbarProvider>
 								<Router basename={basePath}>
 									<Suspense fallback={<LoadingView />}>
 										<React.Fragment>
-											<Route exact path='/' component={ChooseRoom} />
-											<Route path='/:id' component={App} />
+											<Switch>
+												<Route exact path='/' component={JoinDialog} />
+												<Route exact path='/login_dialog' component={LoginDialog} />
+												<Route path='/:id' component={App} />
+											</Switch>
 										</React.Fragment>
 									</Suspense>
 								</Router>
 							</SnackbarProvider>
 						</RoomContext.Provider>
 					</PersistGate>
-				</RawIntlProvider>
+				</IntlProvider>
 			</MuiThemeProvider>
 		</Provider>,
-		document.getElementById('multiparty-meeting')
+		document.getElementById('edumeet')
 	);
 }
 

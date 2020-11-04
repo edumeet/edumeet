@@ -3,9 +3,11 @@ node_modules/
 /app/build/
 /app/public/config/config.js
 /app/public/images/logo.*
+!/app/public/images/logo.example.png
 /server/config/
 !/server/config/config.example.js
 /server/public/
 /server/certs/
 !/server/certs/mediasoup-demo.localhost.*
 .vscode
+/app/public/config/*.pem

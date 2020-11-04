@@ -1,15 +1,15 @@
 [Unit]
-Description=multiparty-meeting is a audio / video meeting service running in the browser and powered by webRTC
+Description=edumeet is a audio / video meeting service running in the browser and powered by webRTC
 After=network.target
 
 [Service]
-ExecStart=/usr/local/src/multiparty-meeting/server/server.js
+ExecStart=/usr/local/src/edumeet/server/server.js
 Restart=always
 User=nobody
 Group=nogroup
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
-WorkingDirectory=/usr/local/src/multiparty-meeting/server
+WorkingDirectory=/usr/local/src/edumeet/server
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 
 [Install]

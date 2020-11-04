@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-process.title = 'multiparty-meeting-server';
+process.title = 'edumeet-server';
 
+const bcrypt = require('bcrypt');
 const config = require('./config/config');
 const fs = require('fs');
 const http = require('http');
@@ -17,7 +18,6 @@ const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
-
 const userRoles = require('./userRoles');
 const {
 	loginHelper,
@@ -27,6 +27,8 @@ const {
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
 const imsLti = require('ims-lti');
+const SAMLStrategy = require('passport-saml').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
 const redis = require('redis');
 const redisClient = redis.createClient(config.redisOptions);
 const { Issuer, Strategy } = require('openid-client');
@@ -69,26 +71,27 @@ const tls =
 	key           : fs.readFileSync(config.tls.key),
 	secureOptions : 'tlsv12',
 	ciphers       :
-	[
-		'ECDHE-ECDSA-AES128-GCM-SHA256',
-		'ECDHE-RSA-AES128-GCM-SHA256',
-		'ECDHE-ECDSA-AES256-GCM-SHA384',
-		'ECDHE-RSA-AES256-GCM-SHA384',
-		'ECDHE-ECDSA-CHACHA20-POLY1305',
-		'ECDHE-RSA-CHACHA20-POLY1305',
-		'DHE-RSA-AES128-GCM-SHA256',
-		'DHE-RSA-AES256-GCM-SHA384'
-	].join(':'),
+		[
+			'ECDHE-ECDSA-AES128-GCM-SHA256',
+			'ECDHE-RSA-AES128-GCM-SHA256',
+			'ECDHE-ECDSA-AES256-GCM-SHA384',
+			'ECDHE-RSA-AES256-GCM-SHA384',
+			'ECDHE-ECDSA-CHACHA20-POLY1305',
+			'ECDHE-RSA-CHACHA20-POLY1305',
+			'DHE-RSA-AES128-GCM-SHA256',
+			'DHE-RSA-AES256-GCM-SHA384'
+		].join(':'),
 	honorCipherOrder : true
 };
 
 const app = express();
 
 app.use(helmet.hsts());
+const sharedCookieParser=cookieParser();
 
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(sharedCookieParser);
+app.use(bodyParser.json({ limit: '5mb' }));
+app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
 const session = expressSession({
 	secret            : config.cookieSecret,
@@ -124,6 +127,8 @@ let mainListener;
 let io;
 let oidcClient;
 let oidcStrategy;
+let samlStrategy;
+let localStrategy;
 
 async function run()
 {
@@ -138,7 +143,7 @@ async function run()
 			await promExporter(rooms, peers, config.prometheus);
 		}
 
-		if (typeof(config.auth) === 'undefined')
+		if (typeof (config.auth) === 'undefined')
 		{
 			logger.warn('Auth is not configured properly!');
 		}
@@ -156,7 +161,8 @@ async function run()
 		// Run WebSocketServer.
 		await runWebSocketServer();
 
-		const errorHandler = (err, req, res) =>
+		// eslint-disable-next-line no-unused-vars
+		const errorHandler = (err, req, res, next) =>
 		{
 			const trackingId = uuidv4();
 
@@ -197,7 +203,7 @@ function setupLTI(ltiConfig)
 
 	// Add redis nonce store
 	ltiConfig.nonceStore = new imsLti.Stores.RedisStore(ltiConfig.consumerKey, redisClient);
-	ltiConfig.passReqToCallback= true;
+	ltiConfig.passReqToCallback = true;
 
 	const ltiStrategy = new LTIStrategy(
 		ltiConfig,
@@ -240,6 +246,51 @@ function setupLTI(ltiConfig)
 	);
 
 	passport.use('lti', ltiStrategy);
+}
+
+function setupSAML()
+{
+	samlStrategy = new SAMLStrategy(
+		config.auth.saml,
+		function(profile, done)
+		{
+			return done(null,
+				{
+					id        : profile.uid,
+					_userinfo : profile
+				});
+		}
+	);
+
+	passport.use('saml', samlStrategy);
+}
+
+function setupLocal()
+{
+	localStrategy = new LocalStrategy(
+		function(username, plaintextPassword, done)
+		{
+			const found = config.auth.local.users.find((element) =>
+			{
+				// TODO use encrypted password
+				return element.username === username &&
+					bcrypt.compareSync(plaintextPassword, element.passwordHash);
+			});
+
+			if (found === undefined)
+				return done(null, null);
+			else
+			{
+				const userinfo = { ...found };
+
+				delete userinfo.password;
+
+				return done(null, { id: found.id, _userinfo: userinfo });
+			}
+		}
+	);
+
+	passport.use('local', localStrategy);
 }
 
 function setupOIDC(oidcIssuer)
@@ -302,16 +353,25 @@ async function setupAuth()
 {
 	// LTI
 	if (
-		typeof(config.auth.lti) !== 'undefined' &&
-		typeof(config.auth.lti.consumerKey) !== 'undefined' &&
-		typeof(config.auth.lti.consumerSecret) !== 'undefined'
-	) 	setupLTI(config.auth.lti);
+		typeof (config.auth.lti) !== 'undefined' &&
+		typeof (config.auth.lti.consumerKey) !== 'undefined' &&
+		typeof (config.auth.lti.consumerSecret) !== 'undefined'
+	) setupLTI(config.auth.lti);
 
 	// OIDC
 	if (
-		typeof(config.auth.oidc) !== 'undefined' &&
-		typeof(config.auth.oidc.issuerURL) !== 'undefined' &&
-		typeof(config.auth.oidc.clientOptions) !== 'undefined'
+		typeof (config.auth) !== 'undefined' &&
+		(
+			(
+				typeof (config.auth.strategy) !== 'undefined' &&
+				config.auth.strategy === 'oidc'
+			)
+			// it is default strategy
+			|| typeof (config.auth.strategy) === 'undefined'
+		) &&
+		typeof (config.auth.oidc) !== 'undefined' &&
+		typeof (config.auth.oidc.issuerURL) !== 'undefined' &&
+		typeof (config.auth.oidc.clientOptions) !== 'undefined'
 	)
 	{
 		const oidcIssuer = await Issuer.discover(config.auth.oidc.issuerURL);
@@ -321,18 +381,62 @@ async function setupAuth()
 
 	}
 
+	// SAML
+	if (
+		typeof (config.auth) !== 'undefined' &&
+		typeof (config.auth.strategy) !== 'undefined' &&
+		config.auth.strategy === 'saml' &&
+		typeof (config.auth.saml) !== 'undefined' &&
+		typeof (config.auth.saml.entryPoint) !== 'undefined' &&
+		typeof (config.auth.saml.issuer) !== 'undefined' &&
+		typeof (config.auth.saml.cert) !== 'undefined'
+	)
+	{
+		setupSAML();
+	}
+
+	// Local
+	if (
+		typeof (config.auth) !== 'undefined' &&
+		typeof (config.auth.strategy) !== 'undefined' &&
+		config.auth.strategy === 'local' &&
+		typeof (config.auth.local) !== 'undefined' &&
+		typeof (config.auth.local.users) !== 'undefined'
+	)
+	{
+		setupLocal();
+	}
+
 	app.use(passport.initialize());
 	app.use(passport.session());
+
+	// Auth strategy (by default oidc)
+	const authStrategy = (config.auth && config.auth.strategy) ? config.auth.strategy : 'oidc';
 
 	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
-		passport.authenticate('oidc', {
-			state : base64.encode(JSON.stringify({
-				peerId : req.query.peerId,
-				roomId : req.query.roomId
-			}))
-		})(req, res, next);
+		const state = {
+			peerId : req.query.peerId,
+			roomId : req.query.roomId
+		};
+
+		if (authStrategy== 'saml' || authStrategy=='local')
+		{
+			req.session.authState=state;
+		}
+
+		if (authStrategy === 'local' && !(req.user && req.password))
+		{
+			res.redirect('/login_dialog');
+		}
+		else
+		{
+			passport.authenticate(authStrategy, {
+				state : base64.encode(JSON.stringify(state))
+			}
+			)(req, res, next);
+		}
 	});
 
 	// lti launch
@@ -355,7 +459,7 @@ async function setupAuth()
 		{
 			for (const role of peer.roles)
 			{
-				if (role !== userRoles.NORMAL)
+				if (role.id !== userRoles.NORMAL.id)
 					peer.removeRole(role);
 			}
 		}
@@ -363,23 +467,58 @@ async function setupAuth()
 		req.logout();
 		req.session.destroy(() => res.send(logoutHelper()));
 	});
+	// SAML metadata
+	app.get('/auth/metadata', (req, res) =>
+	{
+		if (config.auth && config.auth.saml &&
+			config.auth.saml.decryptionCert &&
+			config.auth.saml.signingCert)
+		{
+			const metadata = samlStrategy.generateServiceProviderMetadata(
+				config.auth.saml.decryptionCert,
+				config.auth.saml.signingCert
+			);
+
+			if (metadata)
+			{
+				res.set('Content-Type', 'text/xml');
+				res.send(metadata);
+			}
+			else
+			{
+				res.status('Error generating SAML metadata', 500);
+			}
+		}
+		else
+			res.status('Missing SAML decryptionCert or signingKey from config', 500);
+	});
 
 	// callback
-	app.get(
+	app.all(
 		'/auth/callback',
-		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
+		passport.authenticate(authStrategy, { failureRedirect: '/auth/login', failureFlash: true }),
 		async (req, res, next) =>
 		{
 			try
 			{
-				const state = JSON.parse(base64.decode(req.query.state));
+				let state;
 
+				if (authStrategy == 'saml' || authStrategy == 'local')
+					state=req.session.authState;
+				else
+				{
+					if (req.method === 'GET')
+						state = JSON.parse(base64.decode(req.query.state));
+					if (req.method === 'POST')
+						state = JSON.parse(base64.decode(req.body.state));
+				}
 				const { peerId, roomId } = state;
 
 				req.session.peerId = peerId;
 				req.session.roomId = roomId;
 
 				let peer = peers.get(peerId);
+				const room = rooms.get(roomId);
 
 				if (!peer) // User has no socket session yet, make temporary
 					peer = new Peer({ id: peerId, roomId });
@@ -391,6 +530,7 @@ async function setupAuth()
 				{
 					await config.userMapping({
 						peer,
+						room,
 						roomId,
 						userinfo : req.user._userinfo
 					});
@@ -425,7 +565,7 @@ async function runHttpsServer()
 
 			try
 			{
-				ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
+				ltiURL = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
 			}
 			catch (error)
 			{
@@ -446,7 +586,20 @@ async function runHttpsServer()
 				res.redirect(ltiURL);
 			}
 			else
+			{
+				const specialChars = "<>@!^*()[]{}:;|'\"\\,~`";
+
+				for (let i = 0; i < specialChars.length; i++)
+				{
+					if (req.url.substring(1).indexOf(specialChars[i]) > -1)
+					{
+						req.url = `/${encodeURIComponent(encodeURI(req.url.substring(1)))}`;
+						res.redirect(`${req.url}`);
+					}
+				}
+
 				return next();
+			}
 		}
 		else
 			res.redirect(`https://${req.hostname}${req.url}`);
@@ -484,21 +637,21 @@ async function runHttpsServer()
 		mainListener.listen(config.listeningPort);
 }
 
-function isPathAlreadyTaken(url)
+function isPathAlreadyTaken(actualUrl)
 {
 	const alreadyTakenPath =
-	[
-		'/config/',
-		'/static/',
-		'/images/',
-		'/sounds/',
-		'/favicon.',
-		'/auth/'
-	];
+		[
+			'/config/',
+			'/static/',
+			'/images/',
+			'/sounds/',
+			'/favicon.',
+			'/auth/'
+		];
 
 	alreadyTakenPath.forEach((path) =>
 	{
-		if (url.toString().startsWith(path))
+		if (actualUrl.toString().startsWith(path))
 			return true;
 	});
 
@@ -510,12 +663,10 @@ function isPathAlreadyTaken(url)
  */
 async function runWebSocketServer()
 {
-	io = require('socket.io')(mainListener);
+	io = require('socket.io')(mainListener, { cookie: false });
 
 	io.use(
-		sharedSession(session, {
-			autoSave : true
-		})
+		sharedSession(session, sharedCookieParser, { autoSave: true })
 	);
 
 	// Handle connections from clients.
@@ -590,7 +741,7 @@ async function runWebSocketServer()
 
 				if (typeof config.userMapping === 'function')
 				{
-					await config.userMapping({ peer, roomId, userinfo: _userinfo });
+					await config.userMapping({ peer, room, roomId, userinfo: _userinfo });
 				}
 			}
 
@@ -655,7 +806,7 @@ async function getOrCreateRoom({ roomId })
 
 		// const mediasoupWorker = getMediasoupWorker();
 
-		room = await Room.create({ mediasoupWorkers, roomId });
+		room = await Room.create({ mediasoupWorkers, roomId, peers });
 
 		rooms.set(roomId, room);
 

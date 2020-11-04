@@ -58,12 +58,15 @@
 	"room.raisedHand": null,
 	"room.loweredHand": null,
 	"room.extraVideo": null,
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": null,
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": null,
 
@@ -83,8 +86,15 @@
 	"tooltip.kickParticipant": null,
 	"tooltip.muteParticipant": null,
 	"tooltip.muteParticipantVideo": null,
+	"tooltip.inSpotlight": null,
+	"tooltip.isSpeaker": null,
 	"tooltip.raisedHand": null,
 	"tooltip.muteScreenSharing": null,
+	"tooltip.unMuteScreenSharing": null,
+	"tooltip.unMuteParticipantVideo": null,
+	"tooltip.unMuteParticipant": null,
+	"tooltip.addParticipantToSpotlight": null,
+	"tooltip.removeParticipantFromSpotlight": null,
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
@@ -119,6 +129,11 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",
@@ -138,6 +153,8 @@
 	"settings.selectRoomLayout": "Vyberte rozvržení místnosti",
 	"settings.advancedMode": "Pokočilý mód",
 	"settings.permanentTopBar": null,
+	"settings.aspectRatio": null,
+	"settings.selectAspectRatio": null,
 	"settings.lastn": null,
 	"settings.hiddenControls": null,
 	"settings.notificationSounds": null,
@@ -151,6 +168,7 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",
@@ -165,11 +183,13 @@
 
 	"devices.devicesChanged": "Vaše zařízení se změnila, nastavte je v dialogu nastavení",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Audio není podporováno",
 	"device.activateAudio": "Aktivovat audio",
 	"device.muteAudio": "Ztišit zvuk",
 	"device.unMuteAudio": "Zrušit ztišení zvuku",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Video není podporováno",
 	"device.startVideo": "Spustit video",
 	"device.stopVideo": "Zastavit video",
@@ -186,15 +206,20 @@
 	"devices.microphoneMuteError": "Není možné ztišit váš mikrofon",
 	"devices.microphoneUnMuteError": "Není možné zrušit ztišení vašeho mikrofonu",
 
-	"devices.screenSharingDisconnected" : "Sdílení obrazovky odpojeno",
+	"devices.screenSharingDisconnected": "Sdílení obrazovky odpojeno",
 	"devices.screenSharingError": "Při přístupu k vaší obrazovce se vyskytla chyba",
 
 	"devices.cameraDisconnected": "Kamera odpojena",
 	"devices.cameraError": "Při přístupu k vaší kameře se vyskytla chyba",
 
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
+
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,
 	"moderator.muteAudio": null,
+	"moderator.modifyPeerRoles": null,
 	"moderator.muteVideo": null,
 	"moderator.stopScreenSharing": null,
 

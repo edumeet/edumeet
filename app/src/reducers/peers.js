@@ -22,6 +22,9 @@ const peer = (state = initialState, action) =>
 		case 'SET_PEER_KICK_IN_PROGRESS':
 			return { ...state, peerKickInProgress: action.payload.flag };
 
+		case 'SET_PEER_MODIFY_ROLES_IN_PROGRESS':
+			return { ...state, peerModifyRolesInProgress: action.payload.flag };
+
 		case 'SET_PEER_RAISED_HAND':
 			return {
 				...state,
@@ -57,15 +60,15 @@ const peer = (state = initialState, action) =>
 
 		case 'ADD_PEER_ROLE':
 		{
-			const roles = [ ...state.roles, action.payload.role ];
+			const roles = [ ...state.roles, action.payload.roleId ];
 
 			return { ...state, roles };
 		}
 
 		case 'REMOVE_PEER_ROLE':
 		{
-			const roles = state.roles.filter((role) =>
-				role !== action.payload.role);
+			const roles = state.roles.filter((roleId) =>
+				roleId !== action.payload.roleId);
 
 			return { ...state, roles };
 		}
@@ -124,18 +127,8 @@ const peers = (state = initialState, action) =>
 		case 'STOP_PEER_AUDIO_IN_PROGRESS':
 		case 'STOP_PEER_VIDEO_IN_PROGRESS':
 		case 'STOP_PEER_SCREEN_SHARING_IN_PROGRESS':
-		{
-			const oldPeer = state[action.payload.peerId];
-
-			if (!oldPeer)
-			{
-				throw new Error('no Peer found');
-			}
-
-			return { ...state, [oldPeer.id]: peer(oldPeer, action) };
-		}
-
 		case 'SET_PEER_KICK_IN_PROGRESS':
+		case 'SET_PEER_MODIFY_ROLES_IN_PROGRESS':
 		case 'REMOVE_CONSUMER':
 		{
 			const oldPeer = state[action.payload.peerId];

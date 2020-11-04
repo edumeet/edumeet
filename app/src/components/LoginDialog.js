@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import isElectron from 'is-electron';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
-import randomString from 'random-string';
 import Dialog from '@material-ui/core/Dialog';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -80,17 +77,13 @@ const styles = (theme) =>
 		}
 	});
 
-const DialogTitle = withStyles(styles)((props) =>
-{
-	const { children, classes, ...other } = props;
-
-	return (
-		<MuiDialogTitle disableTypography className={classes.dialogTitle} {...other}>
-			{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
-			<Typography variant='h5'>{children}</Typography>
-		</MuiDialogTitle>
-	);
-});
+const DialogTitle = withStyles((theme) => ({
+	root :
+	{
+		margin  : 0,
+		padding : theme.spacing(1)
+	}
+}))(MuiDialogTitle);
 
 const DialogContent = withStyles((theme) => ({
 	root :
@@ -111,9 +104,6 @@ const ChooseRoom = ({
 	classes
 }) =>
 {
-	const [ roomId, setRoomId ] =
-		useState(randomString({ length: 8 }).toLowerCase());
-
 	const intl = useIntl();
 
 	return (
@@ -125,54 +115,60 @@ const ChooseRoom = ({
 				}}
 			>
 				<DialogTitle>
-					{ window.config.title ? window.config.title : 'Multiparty meeting' }
+
+					{ window.config.logo !=='' ?
+						<img alt='Logo' src={window.config.logo} /> :
+						<Typography variant='h5'> {window.config.title} </Typography>
+					}
 					<hr />
+
 				</DialogTitle>
-				<DialogContent>
-					<DialogContentText gutterBottom>
-						<FormattedMessage
-							id='room.chooseRoom'
-							defaultMessage='Choose the name of the room you would like to join'
+
+				<form method='post' action='/auth/callback'>
+					<DialogContent>
+
+						<TextField
+							autoFocus
+							id='username'
+							label={intl.formatMessage({
+								id             : 'label.username',
+								defaultMessage : 'Username'
+							})}
+							variant='outlined'
+							margin='normal'
+							name='username'
+							required
+							fullWidth
 						/>
-					</DialogContentText>
-
-					<TextField
-						id='roomId'
-						label={intl.formatMessage({
-							id             : 'label.roomName',
-							defaultMessage : 'Room name'
-						})}
-						value={roomId}
-						variant='outlined'
-						margin='normal'
-						onChange={(event) =>
-						{
-							const { value } = event.target;
-
-							setRoomId(value.toLowerCase());
-						}}
-						onBlur={() =>
-						{
-							if (roomId === '')
-								setRoomId(randomString({ length: 8 }).toLowerCase());
-						}}
-						fullWidth
-					/>
-				</DialogContent>
-
-				<DialogActions>
-					<Button
-						component={Link}
-						to={roomId}
-						variant='contained'
-						color='secondary'
-					>
-						<FormattedMessage
-							id='label.chooseRoomButton'
-							defaultMessage='Continue'
+						<TextField
+							id='password'
+							label={intl.formatMessage({
+								id             : 'label.password',
+								defaultMessage : 'Password'
+							})}
+							variant='outlined'
+							margin='normal'
+							name='password'
+							type='password'
+							required
+							fullWidth
 						/>
-					</Button>
-				</DialogActions>
+
+					</DialogContent>
+
+					<DialogActions>
+						<Button
+							variant='contained'
+							color='secondary'
+							type='submit'
+						>
+							<FormattedMessage
+								id='label.login'
+								defaultMessage='Login'
+							/>
+						</Button>
+					</DialogActions>
+				</form>
 
 				{ !isElectron() &&
 					<CookieConsent buttonText={intl.formatMessage({

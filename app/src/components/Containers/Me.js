@@ -21,7 +21,7 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
-import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
+import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
 
 const styles = (theme) =>
 	({
@@ -175,7 +175,9 @@ const Me = (props) =>
 		webcamProducer,
 		screenProducer,
 		extraVideoProducers,
-		canShareScreen,
+		hasAudioPermission,
+		hasVideoPermission,
+		hasScreenPermission,
 		transports,
 		noiseVolume,
 		classes
@@ -197,7 +199,7 @@ const Me = (props) =>
 
 	let micTip;
 
-	if (!me.canSendMic)
+	if (!me.canSendMic || !hasAudioPermission)
 	{
 		micState = 'unsupported';
 		micTip = intl.formatMessage({
@@ -213,7 +215,9 @@ const Me = (props) =>
 			defaultMessage : 'Activate audio'
 		});
 	}
-	else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
+	else if (!micProducer.locallyPaused &&
+		!micProducer.remotelyPaused &&
+		!settings.audioMuted)
 	{
 		micState = 'on';
 		micTip = intl.formatMessage({
@@ -234,7 +238,7 @@ const Me = (props) =>
 
 	let webcamTip;
 
-	if (!me.canSendWebcam)
+	if (!me.canSendWebcam || !hasVideoPermission)
 	{
 		webcamState = 'unsupported';
 		webcamTip = intl.formatMessage({
@@ -242,7 +246,7 @@ const Me = (props) =>
 			defaultMessage : 'Video unsupported'
 		});
 	}
-	else if (webcamProducer)
+	else if (webcamProducer && !settings.videoMuted)
 	{
 		webcamState = 'on';
 		webcamTip = intl.formatMessage({
@@ -263,7 +267,7 @@ const Me = (props) =>
 
 	let screenTip;
 
-	if (!me.canShareScreen)
+	if (!me.canShareScreen || !hasScreenPermission)
 	{
 		screenState = 'unsupported';
 		screenTip = intl.formatMessage({
@@ -455,13 +459,18 @@ const Me = (props) =>
 													defaultMessage : 'Mute audio'
 												})}
 												className={classes.smallContainer}
-												disabled={!me.canSendMic || me.audioInProgress}
-												color={
-													micState === 'on' ?
-														settings.voiceActivatedUnmute && !me.isAutoMuted ?
-															'primary'
-															: 'default'
-														: 'secondary'}
+												disabled={
+													!me.canSendMic ||
+													!hasAudioPermission ||
+													me.audioInProgress
+												}
+												color={micState === 'on' ?
+													settings.voiceActivatedUnmute ?
+														me.isAutoMuted ? 'secondary'
+															: 'primary'
+														: 'default'
+													: 'secondary'
+												}
 												size='small'
 												onClick={() =>
 												{
@@ -473,13 +482,36 @@ const Me = (props) =>
 														roomClient.unmuteMic();
 												}}
 											>
-												{ micState === 'on' ?
-													<MicIcon
-														color={me.isAutoMuted ? 'secondary' : 'primary'}
-														style={{ opacity: noiseVolume }}
-													/>
-													:
-													<MicOffIcon />
+												{settings.voiceActivatedUnmute ?
+													micState === 'on' ?
+														<React.Fragment>
+															<svg style={{ 'position': 'absolute' }}>
+																<defs>
+																	<clipPath id='cut-off-indicator'>
+																		<rect x='0' y='0' width='24' height={24 - 2.4 * noiseVolume} />
+																	</clipPath>
+																</defs>
+															</svg>
+															<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+																color={'default'}
+															/>
+															<SettingsVoiceIcon
+																clip-path='url(#cut-off-indicator)'
+																style={
+																	(
+																		{ 'position': 'absolute' },
+																		{ 'opacity': '0.6' }
+																	)
+																}
+																color={me.isAutoMuted ?
+																	'primary' : 'default'}
+															/>
+														</React.Fragment>
+														: <MicOffIcon />
+													: micState === 'on' ?
+														<MicIcon />
+														:
+														<MicOffIcon />
 												}
 											</IconButton>
 										</div>
@@ -491,11 +523,17 @@ const Me = (props) =>
 													defaultMessage : 'Mute audio'
 												})}
 												className={classes.fab}
-												disabled={!me.canSendMic || me.audioInProgress}
+												disabled={
+													!me.canSendMic ||
+													!hasAudioPermission ||
+													me.audioInProgress
+												}
 												color={micState === 'on' ?
-													settings.voiceActivatedUnmute && !me.isAutoMuted? 'primary'
-														: 'default'
-													: 'secondary'}
+													settings.voiceActivatedUnmute ?
+														me.isAutoMuted ? 'secondary' : 'primary'
+														: 'primary'
+													: 'secondary'
+												}
 												size='large'
 												onClick={() =>
 												{
@@ -507,16 +545,36 @@ const Me = (props) =>
 														roomClient.unmuteMic();
 												}}
 											>
-												{ micState === 'on' ?
-													<MicIcon
-														color={me.isAutoMuted && settings.voiceActivatedUnmute ?
-															'secondary' : 'primary'}
-														style={me.isAutoMuted && settings.voiceActivatedUnmute ?
-															{ opacity: noiseVolume }
-															: { opacity: 1 }}
-													/>
-													:
-													<MicOffIcon />
+												{ settings.voiceActivatedUnmute ?
+													micState === 'on' ?
+														<React.Fragment>
+															<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
+																<defs>
+																	<clipPath id='cut-off-indicator'>
+																		<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
+																	</clipPath>
+																</defs>
+															</svg>
+															<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+																color={'default'}
+															/>
+															<SettingsVoiceIcon
+																clip-path='url(#cut-off-indicator)'
+																style={
+																	(
+																		{ 'position': 'absolute' },
+																		{ 'opacity': '0.6' }
+																	)
+																}
+																color={me.isAutoMuted ?
+																	'primary' : 'default'}
+															/>
+														</React.Fragment>
+														: <MicOffIcon />
+													: micState === 'on' ?
+														<MicIcon />
+														:
+														<MicOffIcon />
 												}
 											</Fab>
 										</div>
@@ -531,7 +589,11 @@ const Me = (props) =>
 													defaultMessage : 'Start video'
 												})}
 												className={classes.smallContainer}
-												disabled={!me.canSendWebcam || me.webcamInProgress}
+												disabled={
+													!me.canSendWebcam ||
+													!hasVideoPermission ||
+													me.webcamInProgress
+												}
 												color={webcamState === 'on' ? 'primary' : 'secondary'}
 												size='small'
 												onClick={() =>
@@ -556,8 +618,12 @@ const Me = (props) =>
 													defaultMessage : 'Start video'
 												})}
 												className={classes.fab}
-												disabled={!me.canSendWebcam || me.webcamInProgress}
-												color={webcamState === 'on' ? 'default' : 'secondary'}
+												disabled={
+													!me.canSendWebcam ||
+													!hasVideoPermission ||
+													me.webcamInProgress
+												}
+												color={webcamState === 'on' ? 'primary' : 'secondary'}
 												size='large'
 												onClick={() =>
 												{
@@ -590,11 +656,11 @@ const Me = (props) =>
 													})}
 													className={classes.smallContainer}
 													disabled={
-														!canShareScreen ||
-													!me.canShareScreen ||
-													me.screenShareInProgress
+														!hasScreenPermission ||
+														!me.canShareScreen ||
+														me.screenShareInProgress
 													}
-													color='primary'
+													color={screenState === 'on' ? 'primary' : 'secondary'}
 													size='small'
 													onClick={() =>
 													{
@@ -604,13 +670,7 @@ const Me = (props) =>
 															roomClient.disableScreenSharing();
 													}}
 												>
-													{ (screenState === 'on' || screenState === 'unsupported') &&
-													<ScreenOffIcon/>
-													}
-													{ screenState === 'off' &&
 													<ScreenIcon/>
-													}
-
 												</IconButton>
 											</div>
 											:
@@ -622,11 +682,11 @@ const Me = (props) =>
 													})}
 													className={classes.fab}
 													disabled={
-														!canShareScreen ||
-													!me.canShareScreen ||
-													me.screenShareInProgress
+														!hasScreenPermission ||
+														!me.canShareScreen ||
+														me.screenShareInProgress
 													}
-													color={screenState === 'on' ? 'primary' : 'default'}
+													color={screenState === 'on' ? 'primary' : 'secondary'}
 													size='large'
 													onClick={() =>
 													{
@@ -636,12 +696,7 @@ const Me = (props) =>
 															roomClient.disableScreenSharing();
 													}}
 												>
-													{ (screenState === 'on' || screenState === 'unsupported') &&
-													<ScreenOffIcon/>
-													}
-													{ screenState === 'off' &&
 													<ScreenIcon/>
-													}
 												</Fab>
 											</div>
 										}
@@ -653,6 +708,7 @@ const Me = (props) =>
 
 					<VideoView
 						isMe
+						isMirrored={settings.mirrorOwnVideo}
 						VideoView
 						advancedMode={advancedMode}
 						peer={me}
@@ -792,6 +848,7 @@ const Me = (props) =>
 
 							<VideoView
 								isMe
+								isMirrored={settings.mirrorOwnVideo}
 								isExtraVideo
 								advancedMode={advancedMode}
 								peer={me}
@@ -877,7 +934,9 @@ Me.propTypes =
 	spacing             : PropTypes.number,
 	style               : PropTypes.object,
 	smallContainer      : PropTypes.bool,
-	canShareScreen      : PropTypes.bool.isRequired,
+	hasAudioPermission  : PropTypes.bool.isRequired,
+	hasVideoPermission  : PropTypes.bool.isRequired,
+	hasScreenPermission : PropTypes.bool.isRequired,
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired,
@@ -886,31 +945,37 @@ Me.propTypes =
 
 const makeMapStateToProps = () =>
 {
-	const hasPermission = makePermissionSelector(permissions.SHARE_SCREEN);
+	const canShareAudio =
+		makePermissionSelector(permissions.SHARE_AUDIO);
+	const canShareVideo =
+		makePermissionSelector(permissions.SHARE_VIDEO);
+	const canShareScreen =
+		makePermissionSelector(permissions.SHARE_SCREEN);
 
 	const mapStateToProps = (state) =>
 	{
-		let volume;
+		let noise;
 
-		// noiseVolume under threshold
+		// noise = volume under threshold
 		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold)
 		{
-			// noiseVolume mapped to range 0.5 ... 1 (threshold switch)
-			volume = 1 + ((Math.abs(state.peerVolumes[state.me.id] -
-				state.settings.noiseThreshold) / (-120 -
-				state.settings.noiseThreshold)));
+			// noise mapped to range 0 ... 10 
+			noise = Math.round((100 + state.peerVolumes[state.me.id]) /
+				(100 + state.settings.noiseThreshold)*10);
 		}
 		// noiseVolume over threshold: no noise but voice
-		else { volume = 0; }
+		else { noise = 10; }
 
 		return {
-			me             : state.me,
+			me                  : state.me,
 			...meProducersSelector(state),
-			settings       : state.settings,
-			activeSpeaker  : state.me.id === state.room.activeSpeakerId,
-			canShareScreen : hasPermission(state),
-			transports     : state.transports,
-			noiseVolume    : volume
+			settings            : state.settings,
+			activeSpeaker       : state.me.id === state.room.activeSpeakerId,
+			hasAudioPermission  : canShareAudio(state),
+			hasVideoPermission  : canShareVideo(state),
+			hasScreenPermission : canShareScreen(state),
+			noiseVolume         : noise,
+			transports          : state.transports
 		};
 	};
 
@@ -925,10 +990,10 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				Math.round(prev.peerVolumes[prev.me.id]) ===
+				Math.round(next.peerVolumes[next.me.id]) &&
 				prev.room === next.room &&
 				prev.me === next.me &&
-				Math.round(prev.peerVolumes[prev.me.id]) ===
-					Math.round(next.peerVolumes[next.me.id]) &&
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
