@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "Sospendi audio globale",
 	"tooltip.muteParticipantVideoModerator": "Sospendi video globale",
 	"tooltip.muteScreenSharingModerator": "Sospendi condivisione schermo globale",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Nome della stanza",
 	"label.chooseRoomButton": "Continua",

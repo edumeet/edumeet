@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "Přerušit audio",
 	"tooltip.muteParticipantVideoModerator": "Přerušit video",
 	"tooltip.muteScreenSharingModerator": "Přerušit sdílení obrazovky",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Jméno místnosti",
 	"label.chooseRoomButton": "Pokračovat",

@@ -98,6 +98,8 @@
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Sapulces telpas nosaukums (ID)",
 	"label.chooseRoomButton": "Turpināt",

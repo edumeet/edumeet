@@ -25,7 +25,7 @@
 	"room.peerChangedDisplayName": "{oldDisplayName} змінив ім'я на {displayName}",
 	"room.newPeer": "{displayName} приєднався до кімнати",
 	"room.newFile": "Новий файл є у доступі",
-	"room.toggleAdvancedMode": "Увімкнено розширений режим",
+	"room.toggleAdvancnulledMode": "Увімкнено розширений режим",
 	"room.setDemocratView": "Змінено макет на демократичний вигляд",
 	"room.setFilmStripView": "Змінено макет на вид фільму",
 	"room.loggedIn": "Ви ввійшли в систему",
@@ -98,6 +98,8 @@
 	"tooltip.muteParticipantAudioModerator": "Відключення звуку учасника глобально",
 	"tooltip.muteParticipantVideoModerator": "Відключення відео учасника глобально",
 	"tooltip.muteScreenSharingModerator": "Відключення спільного використання екрану учаснику глобально",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Назва кімнати",
 	"label.chooseRoomButton": "Продовжити",

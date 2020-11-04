@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "Utišaj sve sudionike",
 	"tooltip.muteParticipantVideoModerator": "Ne prikazuj video svih sudionika",
 	"tooltip.muteScreenSharingModerator": "Ne prikazuj dijeljenje ekrana svih sudionika",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Naziv sobe",
 	"label.chooseRoomButton": "Nastavi",

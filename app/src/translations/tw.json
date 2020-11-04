@@ -98,6 +98,8 @@
 	"tooltip.muteParticipantAudioModerator": "關閉聲音",
 	"tooltip.muteParticipantVideoModerator": "關閉視訊",
 	"tooltip.muteScreenSharingModerator": "關閉螢幕分享",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "房間名稱",
 	"label.chooseRoomButton": "繼續",

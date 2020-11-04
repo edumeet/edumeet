@@ -3518,6 +3518,70 @@ export default class RoomClient
 		}
 	}
 
+	async startRoomRecord()
+	{
+		logger.debug('startRoomRecord()');
+
+		try
+		{
+			await this.sendRequest('startRoomRecord');
+
+			/* store.dispatch(roomActions.setRoomLocked()); */
+
+			store.dispatch(requestActions.notify(
+				{
+					text : intl.formatMessage({
+						id             : 'room.youstartedrecording',
+						defaultMessage : 'You started recording the room'
+					})
+				}));
+		}
+		catch (error)
+		{
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'room.cantRecord',
+						defaultMessage : 'Unable to record the room'
+					})
+				}));
+
+			logger.error('startRoomRecord() [error:"%o"]', error);
+		}
+	}
+	async stopRoomRecord()
+	{
+		logger.debug('stopRoomRecord()');
+
+		try
+		{
+			await this.sendRequest('stopRoomRecord');
+
+			/* store.dispatch(roomActions.setRoomLocked()); */
+			store.dispatch(requestActions.notify(
+				{
+					text : intl.formatMessage({
+						id             : 'room.youstoppedrecording',
+						defaultMessage : 'You stopped recording the room'
+					})
+				}));
+		}
+		catch (error)
+		{
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : intl.formatMessage({
+						id             : 'room.cantRecord',
+						defaultMessage : 'Unable to record the room'
+					})
+				}));
+
+			logger.error('stopRoomRecord() [error:"%o"]', error);
+		}
+	}
+
 	async lockRoom()
 	{
 		logger.debug('lockRoom()');

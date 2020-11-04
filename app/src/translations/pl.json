@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "Wycisz uczestnika dla wszystkich",
 	"tooltip.muteParticipantVideoModerator": "Wyłącz wideo uczestnika dla wszystkich",
 	"tooltip.muteScreenSharingModerator": "Wyłącz współdzielenie ekranu przez uczestnika dla wszystkich",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Nazwa pokoju",
 	"label.chooseRoomButton": "Kontynuuj",

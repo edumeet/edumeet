@@ -97,6 +97,8 @@
 	"tooltip.muteParticipantAudioModerator": "Дыбысты барлық жерде өшіру",
 	"tooltip.muteParticipantVideoModerator": "Қатысушы бейнесін барлық жерде өшіру",
 	"tooltip.muteScreenSharingModerator": "Барлық жерде қатысушылардың экранын бөлісуді өшіру",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Видеоконференция атауы",
 	"label.chooseRoomButton": "Жалғастыру",

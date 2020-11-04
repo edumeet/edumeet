@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
 	"room.stopAllScreenSharing": null,
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "房间名称",
 	"label.chooseRoomButton": "继续",

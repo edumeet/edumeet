@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "Teilnehmer-Audio für alle stummschalten",
 	"tooltip.muteParticipantVideoModerator": "Teilnehmer-Video für alle beenden",
 	"tooltip.muteScreenSharingModerator": "Teilnehmer-Bildschirmfreigabe für alle beenden",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Name des Raums",
 	"label.chooseRoomButton": "Weiter",

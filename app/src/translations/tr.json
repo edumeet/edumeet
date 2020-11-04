@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "Katılımcı sesini herkesde kıs",
 	"tooltip.muteParticipantVideoModerator": "Katılımcı videosunu herkesde kapat",
 	"tooltip.muteScreenSharingModerator": "Katılımcı ekran paylaşımını herkesde durdur",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Oda adı",
 	"label.chooseRoomButton": "Devam",

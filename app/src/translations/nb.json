@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "Stopp lyd",
 	"tooltip.muteParticipantVideoModerator": "Stopp video",
 	"tooltip.muteScreenSharingModerator": "Stopp skjermdeling",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",

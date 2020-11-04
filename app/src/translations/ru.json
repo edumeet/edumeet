@@ -97,6 +97,8 @@
 	"tooltip.muteParticipantAudioModerator": "Везде отключить звук участника",
 	"tooltip.muteParticipantVideoModerator": "Везде отключить видео участника",
 	"tooltip.muteScreenSharingModerator": "Везде отключить совместные использования экрана участника",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "ID видеоконференции",
 	"label.chooseRoomButton": "Продолжить",

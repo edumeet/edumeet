@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "Værelsesnavn",
 	"label.chooseRoomButton": "Fortsæt",

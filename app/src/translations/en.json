@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "Stop audio",
 	"tooltip.muteParticipantVideoModerator": "Stop video",
 	"tooltip.muteScreenSharingModerator": "Stop screen share",
+	"tooltip.startRecording": "Start recording the room",
+	"tooltip.stopRecording": "Stop recording the room",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",

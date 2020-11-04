@@ -99,6 +99,8 @@
 	"tooltip.muteParticipantAudioModerator": "ऑडियो बंद करो",
 	"tooltip.muteParticipantVideoModerator": "वीडियो बंद करो",
 	"tooltip.muteScreenSharingModerator": "स्क्रीन शेयर बंद करो",
+	"tooltip.startRecording": null,
+	"tooltip.stopRecording": null,
 
 	"label.roomName": "कमरे का नाम",
 	"label.chooseRoomButton": "जारी रखें",
