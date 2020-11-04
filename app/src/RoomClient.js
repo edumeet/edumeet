@@ -18,8 +18,8 @@ import * as notificationActions from './actions/notificationActions';
 import * as transportActions from './actions/transportActions';
 import Spotlights from './Spotlights';
 import { permissions } from './permissions';
-// import { updateIntl } from 'react-intl-redux';
 import * as locales from './translations/locales';
+import { createIntl } from 'react-intl';
 
 let createTorrent;
 
@@ -116,8 +116,6 @@ export default class RoomClient
 	static init(data)
 	{
 		store = data.store;
-		intl = data.intl;
-
 	}
 
 	constructor(
@@ -259,7 +257,7 @@ export default class RoomClient
 
 		this._startDevicesListener();
 
-		this.setLocale(store.getState().intl.locale);
+		this.setLocale();
 
 	}
 
@@ -502,10 +500,11 @@ export default class RoomClient
 		});
 	}
 
-	setLocale(locale)
+	setLocale(locale = null)
 	{
 
 		if (locale === null) locale = locales.detect();
+
 		const one = locales.loadOne(locale);
 
 		store.dispatch(intlActions.updateIntl({
@@ -514,7 +513,13 @@ export default class RoomClient
 			list   	 : locales.getList()
 		}));
 
-		document.documentElement.lang = one.locale[0].toUpperCase();
+		intl = createIntl({
+			locale   : store.getState().intl.locale,
+			messages : store.getState().intl.messages
+		});
+
+		document.documentElement.lang = store.getState().intl.locale.toUpperCase();
+
 	}
 
 	login(roomId = this._roomId)
