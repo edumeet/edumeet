@@ -516,7 +516,7 @@ async function setupAuth()
 				if (!state || !state.peerId || !state.roomId)
 				{
 					res.redirect('/auth/login');
-					logger.debug('Empty state or state.peerId or state.RoomId in auth/callback');
+					logger.debug('Empty state or state.peerId or state.roomId in auth/callback');
 				}
 
 				const { peerId, roomId } = state;
