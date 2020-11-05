@@ -512,6 +512,13 @@ async function setupAuth()
 					if (req.method === 'POST')
 						state = JSON.parse(base64.decode(req.body.state));
 				}
+
+				if (!state || !state.peerId || !state.RoomId)
+				{
+					res.redirect('/auth/login');
+					logger.debug('Empty state or state.peerId or state.RoomId in auth/callback');
+				}
+
 				const { peerId, roomId } = state;
 
 				req.session.peerId = peerId;
