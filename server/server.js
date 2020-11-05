@@ -496,7 +496,7 @@ async function setupAuth()
 	// callback
 	app.all(
 		'/auth/callback',
-		passport.authenticate(authStrategy, { failureRedirect: '/auth/login', failureFlash: true }),
+		passport.authenticate(authStrategy, { failureRedirect: '/auth/login' }),
 		async (req, res, next) =>
 		{
 			try
