@@ -416,6 +416,7 @@ async function setupAuth()
 	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
+		logger.debug('/auth/login');
 		const state = {
 			peerId : req.query.peerId,
 			roomId : req.query.roomId
@@ -444,6 +445,7 @@ async function setupAuth()
 		passport.authenticate('lti', { failureRedirect: '/' }),
 		(req, res) =>
 		{
+			logger.debug('/auth/lti');
 			res.redirect(`/${req.user.room}`);
 		}
 	);
@@ -451,6 +453,7 @@ async function setupAuth()
 	// logout
 	app.get('/auth/logout', (req, res) =>
 	{
+		logger.debug('/auth/logout');
 		const { peerId } = req.session;
 
 		const peer = peers.get(peerId);
@@ -470,6 +473,7 @@ async function setupAuth()
 	// SAML metadata
 	app.get('/auth/metadata', (req, res) =>
 	{
+		logger.debug('/auth/metadata');
 		if (config.auth && config.auth.saml &&
 			config.auth.saml.decryptionCert &&
 			config.auth.saml.signingCert)
@@ -499,6 +503,7 @@ async function setupAuth()
 		passport.authenticate(authStrategy, { failureRedirect: '/auth/login' }),
 		async (req, res, next) =>
 		{
+			logger.debug('/auth/callback');
 			try
 			{
 				let state;
