@@ -513,7 +513,7 @@ async function setupAuth()
 						state = JSON.parse(base64.decode(req.body.state));
 				}
 
-				if (!state || !state.peerId || !state.RoomId)
+				if (!state || !state.peerId || !state.roomId)
 				{
 					res.redirect('/auth/login');
 					logger.debug('Empty state or state.peerId or state.RoomId in auth/callback');
