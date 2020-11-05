@@ -417,14 +417,20 @@ async function setupAuth()
 	app.get('/auth/login', (req, res, next) =>
 	{
 		logger.debug('/auth/login');
-		const state = {
-			peerId : req.query.peerId,
-			roomId : req.query.roomId
-		};
 
-		if (authStrategy== 'saml' || authStrategy=='local')
+		let state;
+
+		if (req.query.peerId && req.query.roomId)
 		{
-			req.session.authState=state;
+			state = {
+				peerId : req.query.peerId,
+				roomId : req.query.roomId
+			};
+
+			if (authStrategy== 'saml' || authStrategy=='local')
+			{
+				req.session.authState=state;
+			}
 		}
 
 		if (authStrategy === 'local' && !(req.user && req.password))
