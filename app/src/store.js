@@ -16,18 +16,24 @@ const migrations =
 	// initial version 0: we will clean up all historical data 
 	// from local storage for the time 
 	// before we began with migration versioning
+	// next version 1 we have to implement like this:
+        // oldValue = undefined; // will remove oldValue from next local storage
+	// new values can be defined from app/public/config.js and go that way to new local storage
+	// redux-persist will save a version number to each local store.
+	// Next time it store is initialized it will check if there are newer versions here in migrations 
+	// and iterate over all defined greater version functions until newest version is reached.
 	0 : (state) =>
 	{
 		state = {};
 
 		return { ...state };
 	}
-// Next version
-//	1 : (state) =>
-//	{
-//		return { ...state };
-//	}
-};
+	// Next version
+	//	1 : (state) =>
+	//	{
+	//		return { ...state };
+	//	}
+	};
 
 const persistConfig =
 {
