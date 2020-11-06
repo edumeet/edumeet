@@ -206,7 +206,7 @@ var config =
 				}
 
 			},
-			MuIconButton :
+			MuiIconButton :
 			{
 				colorPrimary :
 				{
