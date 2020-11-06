@@ -102,27 +102,33 @@ var config =
 		tcp : true
 	},
 	// defaults for audio setting on new clients / can be customized and overruled from client side
-	defaultAudio:
+	defaultAudio :
 	{
 		autoGainControl      : false, // default : false
 		echoCancellation     : true, // default : true 
 		noiseSuppression     : true, // default : true 
-		voiceActivatedUnmute : false, // default : false / Automatically unmute speaking above noisThereshold
-		noiseThreshold       : -60 // default -60 / This is only for voiceActivatedUnmute and audio-indicator
+		// Automatically unmute speaking above noisThereshold
+		voiceActivatedUnmute : false, // default : false 
+		// This is only for voiceActivatedUnmute and audio-indicator
+		noiseThreshold       : -60 // default -60
 	},
 	// Audio options for now only centrally from config file: 
-	centralAudioOptions:
+	centralAudioOptions :
 	{
-		sampleRate          : 96000, // default : 96khz / will not eat that much bandwith thanks to opus
-		channelCount        : 1, // default : 1 / usually mics are mono so this saves bandwidth
-		volume              : 1.0,  // default : 1.0
-		sampleSize          : 16,  // default : 16
-		opusStereo          : false, // default : false / usually mics are mono so this saves bandwidth
-		opusDtx             : true,  // default : true / will save bandwidth 
+		// will not eat that much bandwith thanks to opus
+		sampleRate          : 96000, // default : 96khz 
+		// usually mics are mono so this saves bandwidth
+		channelCount        : 1, // default : 1
+		volume              : 1.0, // default : 1.0
+		sampleSize          : 16, // default : 16
+		// usually mics are mono so this saves bandwidth
+		opusStereo          : false, // default : false
+		opusDtx             : true, // default : true / will save bandwidth 
 		opusFec             : true, // default : true / forward error correction
 		opusPtime           : '20', // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
 		opusMaxPlaybackRate : 96000
 	},
+
 	/**
 	 * Set max number participants in one room that join 
 	 * unmuted. Next participant will join automatically muted
