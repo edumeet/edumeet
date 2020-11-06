@@ -20,7 +20,7 @@ const migrations =
         // oldValue = undefined; // will remove oldValue from next local storage
 	// new values can be defined from app/public/config.js and go that way to new local storage
 	// redux-persist will save a version number to each local store.
-	// Next time it store is initialized it will check if there are newer versions here in migrations 
+	// Next time store is initialized it will check if there are newer versions here in migrations 
 	// and iterate over all defined greater version functions until newest version is reached.
 	0 : (state) =>
 	{
