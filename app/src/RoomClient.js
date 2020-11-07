@@ -2411,6 +2411,7 @@ export default class RoomClient
 
 					case 'signInRequired':
 					{
+						store.dispatch(meActions.loggedIn(false));
 						store.dispatch(roomActions.setSignInRequired(true));
 
 						break;
