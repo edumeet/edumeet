@@ -1545,6 +1545,8 @@ export default class RoomClient
 
 					this.disableWebcam();
 				});
+
+				store.dispatch(settingsActions.setVideoMuted(false));
 			}
 			else if (this._webcamProducer)
 			{
