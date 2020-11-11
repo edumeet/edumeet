@@ -27,9 +27,19 @@ const migrations =
 		state = {};
 
 		return { ...state };
+	},
+	1 : (state) =>
+	{
+		state.settings.sampleRate = undefined;
+		state.settings.channelCount = undefined;
+		state.settings.volume = undefined;
+		state.settings.sampleSize = undefined;
+		state.me = undefined;
+
+		return { ...state };
 	}
 	// Next version
-	//	1 : (state) =>
+	//	2 : (state) =>
 	//	{
 	//		return { ...state };
 	//	}
@@ -41,10 +51,10 @@ const persistConfig =
 	storage         : storage,
 	// migrate will iterate state over all version-functions
 	// from migrations until version is reached
-	version         : 0,
+	version         : 1,
 	migrate         : createMigrate(migrations, { debug: false }),
 	stateReconciler : autoMergeLevel2,
-	whitelist       : [ 'settings', 'intl', 'me' ]
+	whitelist       : [ 'settings', 'intl' ]
 };
 
 const saveSubsetFilter = createFilter(
@@ -97,9 +107,14 @@ export const store = createStore(
 	enhancer
 );
 
+export const persistor = persistStore(store);
+
+/*
+
 export const persistor = persistStore(store, {
 	transforms : [
 		saveSubsetFilter
 	]
 
 });
+*/
