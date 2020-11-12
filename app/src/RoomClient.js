@@ -534,6 +534,14 @@ export default class RoomClient
 		window.open(`/auth/logout?peerId=${this._peerId}&roomId=${roomId}`, 'logoutWindow');
 	}
 
+	setLoggedIn(loggedIn)
+	{
+		logger.debug('setLoggedIn() | [loggedIn: "%s"]', loggedIn);
+
+		store.dispatch(meActions.loggedIn(loggedIn));
+
+	}
+
 	receiveLoginChildWindow(data)
 	{
 		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);

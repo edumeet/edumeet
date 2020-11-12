@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Logger from '../Logger';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
@@ -126,6 +127,8 @@ const styles = (theme) =>
 
 	});
 
+const logger = new Logger('JoinDialog');
+
 const DialogTitle = withStyles((theme) => ({
 	root :
 	{
@@ -174,9 +177,7 @@ const JoinDialog = ({
 
 	displayName = displayName.trimLeft();
 
-	const authTypeDefault = (loggedIn) ? 'auth' : 'guest';
-
-	const [ authType, setAuthType ] = useState(authTypeDefault);
+	const [ authType, setAuthType ] = useState((loggedIn) ? 'auth' : 'guest');
 
 	const [ roomId, setRoomId ] = useState(
 		decodeURIComponent(location.pathname.slice(1)) ||
@@ -285,6 +286,25 @@ const JoinDialog = ({
 				break;
 		}
 	};
+
+	fetch('/auth/check_login_status', {
+		credentials    : 'include',
+		method         : 'GET',
+		cache          : 'no-cache',
+		redirect       : 'follow',
+		referrerPolicy : 'no-referrer' })
+		.then((response) => response.json())
+		.then((json) =>
+		{
+			if (json.loggedIn)
+			{
+				roomClient.setLoggedIn(json.loggedIn);
+			}
+		})
+		.catch((error) =>
+		{
+			logger.error('Error checking login status', error);
+		});
 
 	return (
 		<div className={classes.root}>
