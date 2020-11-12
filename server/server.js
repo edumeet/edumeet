@@ -456,6 +456,19 @@ async function setupAuth()
 		}
 	);
 
+	app.get('/auth/check_login_status', (req, res) =>
+	{
+		let loggedIn = false;
+
+		if (Boolean(req.session.passport) &&
+			Boolean(req.session.passport.user))
+		{
+			loggedIn = true;
+		}
+
+		res.send({ loggedIn: loggedIn });
+	});
+
 	// logout
 	app.get('/auth/logout', (req, res) =>
 	{
