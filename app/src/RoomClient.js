@@ -1248,7 +1248,7 @@ export default class RoomClient
 			}
 
 			const {
-				sampleRate = 96000,
+				sampleRate = 48000,
 				channelCount = 1,
 				volume = 1.0,
 				sampleSize = 16,
@@ -1256,7 +1256,7 @@ export default class RoomClient
 				opusDtx = true,
 				opusFec = true,
 				opusPtime = 20,
-				opusMaxPlaybackRate = 96000
+				opusMaxPlaybackRate = 48000
 			} = window.config.centralAudioOptions;
 
 			if (

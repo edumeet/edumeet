@@ -116,7 +116,7 @@ var config =
 	centralAudioOptions :
 	{
 		// will not eat that much bandwith thanks to opus
-		sampleRate          : 96000, // default : 96khz 
+		sampleRate          : 48000, // default : 48000 and don't go higher
 		// usually mics are mono so this saves bandwidth
 		channelCount        : 1, // default : 1
 		volume              : 1.0, // default : 1.0
@@ -126,7 +126,7 @@ var config =
 		opusDtx             : true, // default : true / will save bandwidth 
 		opusFec             : true, // default : true / forward error correction
 		opusPtime           : '20', // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
-		opusMaxPlaybackRate : 96000
+		opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
 	},
 
 	/**
