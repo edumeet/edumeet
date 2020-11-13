@@ -487,6 +487,9 @@ async function setupAuth()
 		}
 
 		req.logout();
+		req.session.passport = undefined;
+		req.session.touch();
+		req.session.save();
 		req.session.destroy(() => res.send(logoutHelper()));
 	});
 	// SAML metadata
@@ -694,10 +697,10 @@ function isPathAlreadyTaken(actualUrl)
  */
 async function runWebSocketServer()
 {
-	io = require('socket.io')(mainListener);
+	io = require('socket.io')(mainListener, { cookie: false });
 
 	io.use(
-		sharedSession(session, sharedCookieParser, { autoSave: true })
+		sharedSession(session, sharedCookieParser, {})
 	);
 
 	// Handle connections from clients.
@@ -777,6 +780,9 @@ async function runWebSocketServer()
 			}
 
 			room.handlePeer({ peer, returning });
+
+			socket.handshake.session.touch();
+			socket.handshake.session.save();
 
 			statusLog();
 		})
