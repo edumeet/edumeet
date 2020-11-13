@@ -224,7 +224,7 @@
 	"moderator.muteVideo": "Moderator muted your video",
 	"moderator.stopScreenSharing": "Moderator stopped your screen sharing",
 
-	"unsupportedBrowser.titleUsnsupportedBrowser": "Detected unsupported browser!",
+	"unsupportedBrowser.titleUnsupportedBrowser": "Detected unsupported browser!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Required functionality not available in your browser!",
 	"unsupportedBrowser.bodyText": "This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser, or check your settings. Supported browsers:"
 }
