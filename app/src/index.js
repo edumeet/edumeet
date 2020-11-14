@@ -24,12 +24,12 @@ import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistor, store } from './store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
-import { ReactLazyPreload } from './components/Loader/ReactLazyPreload';
+import { LazyPreload } from './components/Loader/LazyPreload';
 import { detectDevice } from 'mediasoup-client';
 
 import './index.css';
 
-const App = ReactLazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
+const App = LazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
 
 // const cache = createIntlCache();
 
