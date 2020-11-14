@@ -17,7 +17,7 @@ import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
 import JoinDialog from './components/JoinDialog';
-import LoginDialog from './components/LoginDialog';
+import LoginDialog from './components/AccessControl/LoginDialog';
 import LoadingView from './components/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
