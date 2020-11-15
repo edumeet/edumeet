@@ -89,14 +89,16 @@ module.exports =
 					username     : 'alice',
 					passwordHash : '$2b$10$PAXXw.6cL3zJLd7ZX.AnL.sFg2nxjQPDmMmGSOQYIJSa0TrZ9azG6',
 					displayName  : 'Alice',
-					emails       : [ { value: 'alice@atlanta.com' } ]
+					emails       : [ { value: 'alice@atlanta.com' } ],
+					meet_roles   : [ ]
 				},
 				{
 					id           : 2,
 					username     : 'bob',
 					passwordHash : '$2b$10$BzAkXcZ54JxhHTqCQcFn8.H6klY/G48t4jDBeTE2d2lZJk/.tvv0G',
 					displayName  : 'Bob',
-					emails       : [ { value: 'bob@biloxi.com' } ]
+					emails       : [ { value: 'bob@biloxi.com' } ],
+					meet_roles   : [ ]
 				}
 			]
 		}
@@ -192,13 +194,13 @@ module.exports =
 	// See examples below.
 	// Examples:
 	/*
-	// All authenicated users will be MODERATOR and AUTHENTICATED
+	// All authenticated users will be MODERATOR and AUTHENTICATED
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		peer.addRole(userRoles.MODERATOR);
 		peer.addRole(userRoles.AUTHENTICATED);
 	},
-	// All authenicated users will be AUTHENTICATED,
+	// All authenticated users will be AUTHENTICATED,
 	// and those with the moderator role set in the userinfo
 	// will also be MODERATOR
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
@@ -238,19 +240,7 @@ module.exports =
 			}
 		}
 	},
-	// All authenicated users will be AUTHENTICATED,
-	// and those with email ending with @example.com
-	// will also be MODERATOR
-	userMapping : async ({ peer, room, roomId, userinfo }) =>
-	{
-		if (userinfo.email && userinfo.email.endsWith('@example.com'))
-		{
-			peer.addRole(userRoles.MODERATOR);
-		}
-
-		peer.addRole(userRoles.AUTHENTICATED);
-	},
-	// All authenicated users will be AUTHENTICATED,
+	// All authenticated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
@@ -356,7 +346,7 @@ module.exports =
 	// action as soon as a peer with the permission joins. In this example
 	// everyone will be able to lock/unlock room until a MODERATOR joins.
 	allowWhenRoleMissing : [ CHANGE_ROOM_LOCK ],
-	// When truthy, the room will be open to all users when as long as there
+	// When true, the room will be open to all users as long as there
 	// are allready users in the room
 	activateOnHostJoin   : true,
 	// When set, maxUsersPerRoom defines how many users can join
@@ -364,7 +354,7 @@ module.exports =
 	// maxUsersPerRoom    : 20,
 	// Room size before spreading to new router
 	routerScaleSize      : 40,
-	// Socket timout value
+	// Socket timeout value
 	requestTimeout       : 20000,
 	// Socket retries when timeout
 	requestRetries       : 3,
