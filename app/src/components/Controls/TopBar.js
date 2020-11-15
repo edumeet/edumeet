@@ -42,6 +42,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
+import html2canvas from 'html2canvas';
+import RecordRTC from 'recordrtc';
+import ReactDOM from 'react-dom';
 
 const styles = (theme) =>
 	({
@@ -562,6 +565,100 @@ const TopBar = (props) =>
 					<Paper>
 						<MenuItem
 							aria-label={recordTooltip}
+							onClick={() =>
+							{
+								handleMenuClose();
+								if (!room.locked)
+								{
+									window.html2canvas = html2canvas;
+
+									/* 
+									ReactDOM.render((<button id='btn-start-recording'>
+									Start Recording</button>), document.getElementById('edumeet'));
+									ReactDOM.render((<button id='btn-stop-recording'
+									 disabled>Stop Recording</button>), document.getElementById('edumeet')); 
+									 document.getElementsByClassName('edumeet')
+									*/
+
+									ReactDOM.render((<p><button id='btn-start-recording'>Start Recording</button>
+										<button id='btn-stop-recording' disabled>Stop Recording</button>
+										<canvas id='background-canvas' /> </p>), document.getElementsByClassName('MuiTouchRipple-root')[0], function()
+									{
+
+										const elementToRecord = document.getElementById('edumeet');
+
+										const canvas2d = document.getElementById('background-canvas');
+
+										console.log(canvas2d);
+
+										const context = canvas2d.getContext('2d');
+
+										canvas2d.width = elementToRecord.clientWidth;
+
+										canvas2d.height = elementToRecord.clientHeight;
+
+										let isRecordingStarted = false;
+
+										let isStoppedRecording = false;
+
+										(function looper()
+										{
+											if (!isRecordingStarted)
+											{
+												return setTimeout(looper, 500);
+											}
+											html2canvas(elementToRecord).then(function(canvas)
+											{
+												context.clearRect(0, 0, canvas2d.width, canvas2d.height);
+												context.drawImage(canvas, 0, 0, canvas2d.width, canvas2d.height);
+												if (isStoppedRecording)
+												{
+													return;
+												}
+												requestAnimationFrame(looper);
+											});
+										})();
+										console.log(canvas2d);
+										const recorder = new RecordRTC(canvas2d, {
+											type : 'canvas'
+										});
+
+										document.getElementById('btn-start-recording').onclick = function()
+										{
+											this.disabled = true;
+											isStoppedRecording =false;
+											isRecordingStarted = true;
+											recorder.startRecording();
+											document.getElementById('btn-stop-recording').disabled = false;
+										};
+										document.getElementById('btn-stop-recording').onclick = function()
+										{
+											this.disabled = true;
+											recorder.stopRecording(function()
+											{
+												isRecordingStarted = false;
+												isStoppedRecording = true;
+
+												const blob = recorder.getBlob();
+												// document.getElementById('preview-video').srcObject = null;
+												// document.getElementById('preview-video').src = URL.createObjectURL(blob);
+												// document.getElementById('preview-video').parentNode.style.display = 'block'; 
+
+												elementToRecord.style.display = 'none';
+
+												window.open(URL.createObjectURL(blob));
+											});
+										};
+									});
+
+									roomClient.startRoomRecord();
+								}
+								else
+								{
+									roomClient.stopRoomRecord();
+								}
+							}
+							}
 						>
 							<Badge
 								color='primary'
@@ -570,7 +667,7 @@ const TopBar = (props) =>
 							</Badge>
 							<p className={classes.moreAction}>
 								<FormattedMessage
-									id='tooltip.recordTooltip'
+									id='tooltip.startRecording'
 									defaultMessage='Record room'
 								/>
 							</p>
@@ -755,7 +852,7 @@ const TopBar = (props) =>
 					</Badge>
 					<p className={classes.moreAction}>
 						<FormattedMessage
-							id='tooltip.recordTooltip'
+							id='tooltip.startRecording'
 							defaultMessage='Record room'
 						/>
 					</p>

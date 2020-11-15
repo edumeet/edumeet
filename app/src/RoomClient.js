@@ -3524,9 +3524,9 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('startRoomRecord');
+			/* await this.sendRequest('startRoomRecord'); */
 
-			/* store.dispatch(roomActions.setRoomLocked()); */
+			/* store.dispatch(roomActions.setRoomRecord()); */
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3546,7 +3546,6 @@ export default class RoomClient
 						defaultMessage : 'Unable to record the room'
 					})
 				}));
-
 			logger.error('startRoomRecord() [error:"%o"]', error);
 		}
 	}

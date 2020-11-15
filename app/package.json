@@ -26,6 +26,7 @@
 		"end-of-stream": "1.4.1",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",
+		"html2canvas": "^1.0.0-rc.7",
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
 		"material-ui-popup-state": "^1.7.0",
@@ -45,6 +46,7 @@
 		"react-router-dom": "^5.1.2",
 		"react-scripts": "^4.0.0",
 		"react-wakelock-react16": "0.0.7",
+		"recordrtc": "^5.6.1",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
 		"redux-persist": "^6.0.0",
@@ -64,7 +66,8 @@
 		"eject": "react-scripts eject",
 		"electron": "electron --no-sandbox .",
 		"dev": "nf start -p 3000",
-		"lint": "eslint -c .eslintrc.json --ext .js src"
+		"lint": "eslint -c .eslintrc.json --ext .js src",
+		"lintf": "eslint -c .eslintrc.json --ext .js src --fix"
 	},
 	"browserslist": [
 		">0.2%",
