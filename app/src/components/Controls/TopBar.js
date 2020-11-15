@@ -44,7 +44,6 @@ import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
 import html2canvas from 'html2canvas';
 import RecordRTC from 'recordrtc';
-import ReactDOM from 'react-dom';
 
 const styles = (theme) =>
 	({
@@ -579,77 +578,57 @@ const TopBar = (props) =>
 									 disabled>Stop Recording</button>), document.getElementById('edumeet')); 
 									 document.getElementsByClassName('edumeet')
 									*/
+									/* displaymediastreamconstraints */
+									const mc = {
+										video : true
+									};
 
-									ReactDOM.render((<p><button id='btn-start-recording'>Start Recording</button>
-										<button id='btn-stop-recording' disabled>Stop Recording</button>
-										<canvas id='background-canvas' /> </p>), document.getElementsByClassName('MuiTouchRipple-root')[0], function()
+									if (navigator.mediaDevices.getDisplayMedia)
 									{
-
-										const elementToRecord = document.getElementById('edumeet');
-
-										const canvas2d = document.getElementById('background-canvas');
-
-										console.log(canvas2d);
-
-										const context = canvas2d.getContext('2d');
-
-										canvas2d.width = elementToRecord.clientWidth;
-
-										canvas2d.height = elementToRecord.clientHeight;
-
-										let isRecordingStarted = false;
-
-										let isStoppedRecording = false;
-
-										(function looper()
+										navigator.mediaDevices.getDisplayMedia(mc).then(async function(stream)
 										{
-											if (!isRecordingStarted)
-											{
-												return setTimeout(looper, 500);
-											}
-											html2canvas(elementToRecord).then(function(canvas)
-											{
-												context.clearRect(0, 0, canvas2d.width, canvas2d.height);
-												context.drawImage(canvas, 0, 0, canvas2d.width, canvas2d.height);
-												if (isStoppedRecording)
-												{
-													return;
-												}
-												requestAnimationFrame(looper);
+											const recorder = RecordRTC(stream, {
+												type : 'video'
 											});
-										})();
-										console.log(canvas2d);
-										const recorder = new RecordRTC(canvas2d, {
-											type : 'canvas'
-										});
 
-										document.getElementById('btn-start-recording').onclick = function()
-										{
-											this.disabled = true;
-											isStoppedRecording =false;
-											isRecordingStarted = true;
 											recorder.startRecording();
-											document.getElementById('btn-stop-recording').disabled = false;
-										};
-										document.getElementById('btn-stop-recording').onclick = function()
-										{
-											this.disabled = true;
+
+											const sleep = (m) => new Promise((r) => setTimeout(r, m));
+
+											await sleep(30000);
+
 											recorder.stopRecording(function()
 											{
-												isRecordingStarted = false;
-												isStoppedRecording = true;
-
 												const blob = recorder.getBlob();
-												// document.getElementById('preview-video').srcObject = null;
-												// document.getElementById('preview-video').src = URL.createObjectURL(blob);
-												// document.getElementById('preview-video').parentNode.style.display = 'block'; 
 
-												elementToRecord.style.display = 'none';
-
-												window.open(URL.createObjectURL(blob));
+												RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
 											});
-										};
-									});
+										});
+
+									}
+									else
+									{
+										navigator.getDisplayMedia(mc).then(async function(stream)
+										{
+											const recorder = RecordRTC(stream, {
+												type : 'video'
+											});
+
+											recorder.startRecording();
+
+											const sleep = (m) => new Promise((r) => setTimeout(r, m));
+
+											await sleep(30000);
+
+											recorder.stopRecording(function()
+											{
+												const blob = recorder.getBlob();
+
+												RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
+											});
+										});
+
+									}
 
 									roomClient.startRoomRecord();
 								}
