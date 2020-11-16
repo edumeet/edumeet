@@ -50,11 +50,23 @@ const styles = (theme) =>
 				width : '90vw'
 			}
 		},
+
+		// logo :
+		// {
+		// display       : 'block',
+		// paddingBottom : '1vh'
+		// },
+
 		logo :
 		{
-			display       : 'block',
-			paddingBottom : '1vh'
+			// height  : '50px',
+			'& img' : {
+				width  : window.config.LoginDialog.logo.width,
+				height : window.config.LoginDialog.logo.height
+
+			}
 		},
+
 		loginButton :
 		{
 			position : 'absolute',
@@ -116,11 +128,17 @@ const ChooseRoom = ({
 			>
 				<DialogTitle>
 
-					{ window.config.logo !=='' ?
-						<img alt='Logo' src={window.config.logo} /> :
-						<Typography variant='h5'> {window.config.title} </Typography>
-					}
-					<hr />
+					<div className={classes.logo}>
+						{ window.config.LoginDialog.logo.show ?
+							<img alt='Logo' src={window.config.LoginDialog.logo.src} /> :
+							<Typography
+								variant='h5'
+							>
+								{window.config.LoginDialog.title}
+							</Typography>
+						}
+						<hr />
+					</div>
 
 				</DialogTitle>
 
