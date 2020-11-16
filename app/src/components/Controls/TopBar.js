@@ -81,9 +81,7 @@ const styles = (theme) =>
 			marginLeft                   : 20,
 			[theme.breakpoints.up('sm')] :
 			{
-				display : 'block',
-				width   : window.config.TopBar.logo.width,
-				height  : window.config.TopBar.logo.height
+				display : 'block'
 			}
 		},
 		divider :
@@ -306,16 +304,16 @@ const TopBar = (props) =>
 							<MenuIcon />
 						</IconButton>
 					</PulsingBadge>
-					{ window.config.TopBar.logo.show ?
+					{ window.config.logo !=='' ?
 						<img alt='Logo'
-							src={window.config.TopBar.logo.src}
+							src={window.config.logo}
 							className={classes.logo}
 						/> :
 						<Typography
 							variant='h6'
 							noWrap color='inherit'
 						>
-							{window.config.TopBar.title}
+							{window.config.title}
 						</Typography>
 					}
 					<div className={classes.grow} />
@@ -518,7 +516,7 @@ const TopBar = (props) =>
 					</div>
 					<div className={classes.divider} />
 
-					{ window.config.TopBar.locale.showSelector &&
+					{ window.config.localeSelector.showInTopBar &&
 					<Button
 						aria-label={locale.split(/[-_]/)[0]}
 						className={classes.actionButton}

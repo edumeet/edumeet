@@ -161,37 +161,14 @@ var config =
 	maxLastN             : 5,
 	// If truthy, users can NOT change number of speakers visible
 	lockLastN            : false,
-
-	TopBar : {
-		// Show title if logo.show is false
-		title : 'edumeet',
-		// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-		logo  : {
-			show   : true,
-			src    : 'images/logo.example.svg',
-			width  : '139px',
-			height : '30px'
-		},
-		locale :
-		{
-			showSelector : true
-		}
+	// Show logo if "logo" is not null, else show title
+	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
+	logo                 : 'images/logo.example.png',
+	title                : 'edumeet',
+	localeSelector       : {
+		showInTopBar     : true,
+		showInJoinDialog : true
 	},
-	JoinDialog : {
-		// Show title if logo.show is false
-		title : 'edumeet',
-		// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-		logo  : {
-			show   : true,
-			src    : 'images/logo.example.svg',
-			width  : '178px',
-			height : '50px'
-		},
-		locale : {
-			showSelector : true
-		}
-	},
-
 	// Service & Support URL
 	// if not set then not displayed on the about modals
 	supportUrl : 'https://support.example.com',
