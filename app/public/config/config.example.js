@@ -239,8 +239,6 @@ var config =
 				}
 
 			},
-
-			/*
 			MuiIconButton :
 			{
 				colorPrimary :
@@ -261,7 +259,7 @@ var config =
 				}
 
 			},
-			*/
+
 			MuiFab :
 			{
 				primary :
