@@ -3,8 +3,8 @@ node_modules/
 /app/build/
 /app/public/config/config.js
 /app/public/images/logo.*
-!/app/public/images/logo.top-bar-example.svg
-!/app/public/images/logo.join-dialog-example.svg
+!/app/public/images/logo.edumeet.svg
+!/app/public/images/logo.edumeet-dialog.svg
 /server/config/
 !/server/config/config.example.js
 /server/public/
