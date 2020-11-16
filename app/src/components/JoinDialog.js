@@ -140,8 +140,9 @@ const logger = new Logger('JoinDialog');
 const DialogTitle = withStyles((theme) => ({
 	root :
 	{
-		margin  : 0,
-		padding : theme.spacing(1)
+		margin        : 0,
+		padding       : theme.spacing(1),
+		paddingBottom : theme.spacing(0)
 	}
 }))(MuiDialogTitle);
 
@@ -149,7 +150,7 @@ const DialogContent = withStyles((theme) => ({
 	root :
 	{
 		padding    : theme.spacing(2),
-		paddingTop : theme.spacing(1)
+		paddingTop : theme.spacing(0)
 	}
 }))(MuiDialogContent);
 
@@ -327,7 +328,7 @@ const JoinDialog = ({
 				}}
 			>
 
-				<DialogTitle disableTypography className={classes.dialogTitle}>
+				<DialogTitle className={classes.dialogTitle}>
 					<Grid
 						container
 						direction='row'
@@ -351,38 +352,50 @@ const JoinDialog = ({
 
 								{/* LOCALE SELECTOR */}
 								<Grid item>
-									<PopupState variant='popover' popupId='demo-popup-menu'>
-										{(popupState) => (
-											<React.Fragment>
-												<Button
-													className={classes.actionButton}
-													aria-label={locale.split(/[-_]/)[0]}
-													color='secondary'
-													disableRipple='true'
-													style={{ backgroundColor: 'transparent' }}
-													{...bindTrigger(popupState)}
-												>
-													{locale.split(/[-_]/)[0]}
-												</Button>
-												<Menu {...bindMenu(popupState)}>
-													{localesList.map((item, index) => (
-														<MenuItem
-															selected={item.locale.includes(locale)}
-															key={index}
-															onClick={() =>
-															{
-																roomClient.setLocale(item.locale[0]);
-																// handleMenuClose();
-															}}
-														>
-															{item.name}
-														</MenuItem>)
-													)}
 
-												</Menu>
-											</React.Fragment>
-										)}
-									</PopupState>
+									<Grid container direction='column' alignItems='center'>
+										<Grid item>
+											<PopupState variant='popover' popupId='demo-popup-menu'>
+												{(popupState) => (
+													<React.Fragment>
+														<Button
+															className={classes.actionButton}
+															aria-label={locale.split(/[-_]/)[0]}
+															color='secondary'
+															disableRipple='true'
+															style={{ backgroundColor: 'transparent' }}
+															{...bindTrigger(popupState)}
+														>
+															{locale.split(/[-_]/)[0]}
+														</Button>
+														<Menu {...bindMenu(popupState)}>
+															{localesList.map((item, index) => (
+																<MenuItem
+																	selected={item.locale.includes(locale)}
+																	key={index}
+																	onClick={() =>
+																	{
+																		roomClient.setLocale(item.locale[0]);
+																		// handleMenuClose();
+																	}}
+																>
+																	{item.name}
+																</MenuItem>)
+															)}
+
+														</Menu>
+													</React.Fragment>
+												)}
+											</PopupState>
+										</Grid>
+
+										{ window.config.loginEnabled &&
+										<Grid item>
+											<div className={classes.loginLabel}>&nbsp;</div>
+										</Grid>
+										}
+
+									</Grid>
 
 								</Grid>
 								{/* /LOCALE SELECTOR */}
