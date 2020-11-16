@@ -39,8 +39,15 @@ const styles = (theme) =>
 		},
 		logo :
 		{
-			marginRight : 'auto'
+			// height  : '50px',
+			'& img' : {
+				width       : window.config.AboutDialog.logo.width,
+				height      : window.config.AboutDialog.logo.height,
+				marginRight : 'auto'
+
+			}
 		},
+
 		link :
 		{
 			display      : 'block',
@@ -120,7 +127,11 @@ const About = ({
 
 			</DialogContent>
 			<DialogActions>
-				{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+				{ window.config.TopBar.logo.show &&
+					<div className={classes.logo}>
+						<img alt='Logo' src={window.config.TopBar.logo.src} />
+					</div>
+				}
 				<Button onClick={() => { handleCloseAbout(false); }} color='primary'>
 					<FormattedMessage
 						id='label.close'
