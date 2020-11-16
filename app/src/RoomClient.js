@@ -506,8 +506,8 @@ export default class RoomClient
 		if (
 			locale === null ||
 			(
-				window.config.localeSelector.showInJoinDialog === false &&
-				window.config.localeSelector.showInTopBar === false
+				window.config.TopBar.locale.showSelector === false &&
+				window.config.JoinDialog.locale.showSelector === false
 			)
 		)
 		{
