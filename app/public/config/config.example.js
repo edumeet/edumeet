@@ -166,7 +166,7 @@ var config =
 		// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
 		logo : {
 			show   : true,
-			src    : 'images/logo.edumeet.svg',
+			src    : 'images/logo.top-bar-example.svg',
 			width  : '139px',
 			height : '30px'
 		},
@@ -181,7 +181,7 @@ var config =
 		// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
 		logo : {
 			show   : true,
-			src    : 'images/logo.edumeet-dialog.svg',
+			src    : 'images/logo.join-dialog-example.svg',
 			width  : '178px',
 			height : '50px'
 		},
