@@ -163,30 +163,30 @@ var config =
 	lockLastN            : false,
 
 	TopBar : {
+		// Show title if logo.show is false
+		title : 'edumeet',
 		// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-		logo : {
+		logo  : {
 			show   : true,
 			src    : 'images/logo.example.svg',
 			width  : '139px',
 			height : '30px'
 		},
-		// Show title if logo.show is false
-		title  : 'edumeet',
 		locale :
 		{
 			showSelector : true
 		}
 	},
 	JoinDialog : {
+		// Show title if logo.show is false
+		title : 'edumeet',
 		// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-		logo : {
+		logo  : {
 			show   : true,
 			src    : 'images/logo.example.svg',
 			width  : '178px',
 			height : '50px'
 		},
-		// Show title if logo.show is false
-		title  : 'edumeet',
 		locale : {
 			showSelector : true
 		}
