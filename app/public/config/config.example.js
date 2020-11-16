@@ -166,6 +166,7 @@ var config =
 	logo                 : 'images/logo.example.png',
 	title                : 'edumeet',
 	localeSelector       : {
+		showInTopBar     : true,
 		showInJoinDialog : true
 	},
 	// Service & Support URL
