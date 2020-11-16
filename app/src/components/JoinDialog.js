@@ -402,12 +402,9 @@ const JoinDialog = ({
 												)}
 											</PopupState>
 										</Grid>
-
-										{ window.config.loginEnabled &&
 										<Grid item>
 											<div className={classes.loginLabel}>&nbsp;</div>
 										</Grid>
-										}
 
 									</Grid>
 
