@@ -351,6 +351,7 @@ const JoinDialog = ({
 							>
 
 								{/* LOCALE SELECTOR */}
+								{ window.config.localeSelector.showInJoinDialog &&
 								<Grid item>
 									<PopupState variant='popover' popupId='demo-popup-menu'>
 										{(popupState) => (
@@ -386,6 +387,7 @@ const JoinDialog = ({
 									</PopupState>
 
 								</Grid>
+								}
 								{/* /LOCALE SELECTOR */}
 
 								{/* LOGIN BUTTON */}

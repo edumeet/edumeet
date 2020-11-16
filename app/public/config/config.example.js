@@ -165,16 +165,19 @@ var config =
 	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
 	logo                 : 'images/logo.example.png',
 	title                : 'edumeet',
+	localeSelector       : {
+		showInJoinDialog : true
+	},
 	// Service & Support URL
 	// if not set then not displayed on the about modals
-	supportUrl           : 'https://support.example.com',
+	supportUrl : 'https://support.example.com',
 	// Privacy and dataprotection URL or path
 	// by default privacy/privacy.html
 	// that is a placeholder for your policies
 	//
 	// but an external url could be also used here	 
-	privacyUrl           : 'privacy/privacy.html',
-	theme                :
+	privacyUrl : 'privacy/privacy.html',
+	theme      :
 	{
 		palette :
 		{
