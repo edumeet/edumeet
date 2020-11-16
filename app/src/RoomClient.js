@@ -503,8 +503,16 @@ export default class RoomClient
 	setLocale(locale)
 	{
 
-		if (locale === null) locale = locales.detect();
-
+		if (
+			locale === null ||
+			(
+				window.config.localeSelector.showInJoinDialog === false &&
+				window.config.localeSelector.showInTopBar === false
+			)
+		)
+		{
+			locale = locales.detect();
+		}
 		const one = locales.loadOne(locale);
 
 		store.dispatch(intlActions.updateIntl({
