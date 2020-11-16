@@ -16,6 +16,9 @@ import Typography from '@material-ui/core/Typography';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import TextField from '@material-ui/core/TextField';
@@ -123,6 +126,11 @@ const styles = (theme) =>
 					backgroundColor : '#f50057'
 				} }
 
+		},
+
+		loginLabel :
+		{
+			fontSize : '12px'
 		}
 
 	});
@@ -165,7 +173,10 @@ const JoinDialog = ({
 	setMediaPerms,
 	classes,
 	setAudioMuted,
-	setVideoMuted
+	setVideoMuted,
+	locale,
+	localesList
+
 }) =>
 {
 
@@ -329,39 +340,97 @@ const JoinDialog = ({
 								<Typography variant='h5'> {window.config.title} </Typography>
 							}
 						</Grid>
-						<Grid item>
-							{ window.config.loginEnabled &&
-							<Tooltip
-								open
-								title={intl.formatMessage({
-									id             : loggedIn ? 'label.logout' : 'label.login',
-									defaultMessage : loggedIn ? 'Logout' : 'Login'
-								})}
-								placement='left'
-							>
-								<IconButton
-									className={classes.accountButton}
-									onClick={
-										loggedIn ?
-											() => roomClient.logout(roomId) :
-											() => roomClient.login(roomId)
-									}
-								>
-									{ myPicture ?
-										<Avatar src={myPicture} className={classes.accountButtonAvatar} />
-										:
-										<AccountCircle
-											className={
-												classnames(
-													classes.accountButtonAvatar, loggedIn ? classes.green : null
-												)
-											}
-										/>
-									}
-								</IconButton>
-							</Tooltip>
-							}
 
+						<Grid item>
+							<Grid
+								container
+								direction='row'
+								justify='flex-end'
+								alignItems='center'
+							>
+
+								{/* LOCALE SELECTOR */}
+								<Grid item>
+									<PopupState variant='popover' popupId='demo-popup-menu'>
+										{(popupState) => (
+											<React.Fragment>
+												<Button
+													className={classes.actionButton}
+													aria-label={locale.split(/[-_]/)[0]}
+													color='secondary'
+													disableRipple='true'
+													style={{ backgroundColor: 'transparent' }}
+													{...bindTrigger(popupState)}
+												>
+													{locale.split(/[-_]/)[0]}
+												</Button>
+												<Menu {...bindMenu(popupState)}>
+													{localesList.map((item, index) => (
+														<MenuItem
+															selected={item.locale.includes(locale)}
+															key={index}
+															onClick={() =>
+															{
+																roomClient.setLocale(item.locale[0]);
+																// handleMenuClose();
+															}}
+														>
+															{item.name}
+														</MenuItem>)
+													)}
+
+												</Menu>
+											</React.Fragment>
+										)}
+									</PopupState>
+
+								</Grid>
+								{/* /LOCALE SELECTOR */}
+
+								{/* LOGIN BUTTON */}
+								{ window.config.loginEnabled &&
+								<Grid item>
+									<Grid container direction='column' alignItems='center'>
+										<Grid item>
+											<IconButton
+												className={classes.accountButton}
+												onClick={
+													loggedIn ?
+														() => roomClient.logout(roomId) :
+														() => roomClient.login(roomId)
+												}
+											>
+												{ myPicture ?
+													<Avatar
+														src={myPicture}
+														className={classes.accountButtonAvatar}
+													/>
+													:
+													<AccountCircle
+														className={
+															classnames(
+																classes.accountButtonAvatar,
+																loggedIn ? classes.green : null
+															)
+														}
+													/>
+												}
+											</IconButton>
+										</Grid>
+										<Grid item>
+											<div className={classes.loginLabel}>
+												<FormattedMessage
+													id={loggedIn ? 'label.logout' : 'label.login'}
+													defaultMessage={loggedIn ? 'Logout' : 'Login'}
+												/>
+											</div>
+										</Grid>
+									</Grid>
+
+								</Grid>
+								}
+								{/* /LOGIN BUTTON */}
+							</Grid>
 						</Grid>
 					</Grid>
 				</DialogTitle>
@@ -706,7 +775,10 @@ JoinDialog.propTypes =
 	classes               : PropTypes.object.isRequired,
 	mediaPerms            : PropTypes.object.isRequired,
 	setAudioMuted         : PropTypes.bool.isRequired,
-	setVideoMuted         : PropTypes.bool.isRequired
+	setVideoMuted         : PropTypes.bool.isRequired,
+	locale                : PropTypes.object.isRequired,
+	localesList           : PropTypes.object.isRequired
+
 };
 
 const mapStateToProps = (state) =>
@@ -718,7 +790,10 @@ const mapStateToProps = (state) =>
 		displayNameInProgress : state.me.displayNameInProgress,
 		loginEnabled          : state.me.loginEnabled,
 		loggedIn              : state.me.loggedIn,
-		myPicture             : state.me.picture
+		myPicture             : state.me.picture,
+		locale                : state.intl.locale,
+		localesList           : state.intl.list
+
 	};
 };
 
@@ -762,7 +837,10 @@ export default withRoomContext(connect(
 				prev.me.displayNameInProgress === next.me.displayNameInProgress &&
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.loggedIn === next.me.loggedIn &&
-				prev.me.picture === next.me.picture
+				prev.me.picture === next.me.picture &&
+				prev.intl.locale === next.intl.locale &&
+				prev.intl.localesList === next.intl.localesList
+
 			);
 		}
 	}
