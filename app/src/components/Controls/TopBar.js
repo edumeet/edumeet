@@ -516,7 +516,6 @@ const TopBar = (props) =>
 					</div>
 					<div className={classes.divider} />
 
-					{ window.config.localeSelector.showInTopBar &&
 					<Button
 						aria-label={locale.split(/[-_]/)[0]}
 						className={classes.actionButton}
@@ -526,7 +525,6 @@ const TopBar = (props) =>
 					>
 						{locale.split(/[-_]/)[0]}
 					</Button>
-					}
 
 					<Button
 						aria-label={intl.formatMessage({
