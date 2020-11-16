@@ -140,9 +140,8 @@ const logger = new Logger('JoinDialog');
 const DialogTitle = withStyles((theme) => ({
 	root :
 	{
-		margin        : 0,
-		padding       : theme.spacing(1),
-		paddingBottom : theme.spacing(0)
+		margin  : 0,
+		padding : theme.spacing(1)
 	}
 }))(MuiDialogTitle);
 
@@ -150,7 +149,7 @@ const DialogContent = withStyles((theme) => ({
 	root :
 	{
 		padding    : theme.spacing(2),
-		paddingTop : theme.spacing(0)
+		paddingTop : theme.spacing(1)
 	}
 }))(MuiDialogContent);
 
@@ -328,7 +327,7 @@ const JoinDialog = ({
 				}}
 			>
 
-				<DialogTitle className={classes.dialogTitle}>
+				<DialogTitle disableTypography className={classes.dialogTitle}>
 					<Grid
 						container
 						direction='row'
