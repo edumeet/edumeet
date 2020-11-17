@@ -223,7 +223,7 @@
 	"moderator.muteVideo": "Модератор отключил ваше видео",
 	"moderator.stopScreenSharing": "Модератор остановил демонстрацию вашего экрана",
 
-	"unsupportedBrowser.titleUsnsupportedBrowser": "Обнаружен неподдерживаемый браузер!",
+	"unsupportedBrowser.titleUnsupportedBrowser": "Обнаружен неподдерживаемый браузер!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Требуемые функции недоступны в вашем браузере!",
 	"unsupportedBrowser.bodyText": "Для этой службы собраний требуется функциональность, не поддерживаемая вашим браузером. Обновите, переключитесь на другой браузер или проверьте свои настройки. Поддерживаемые браузеры:"
 }

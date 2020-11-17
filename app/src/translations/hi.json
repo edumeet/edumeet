@@ -224,7 +224,7 @@
 	"moderator.muteVideo": " प्रबंधक ने आपका वीडिओ स्थगित कर दिया है",
 	"moderator.stopScreenSharing": " प्रबंधक ने आपके स्क्रीन का आदान-प्रदान रोक दिया है",
 
-	"unsupportedBrowser.titleUsnsupportedBrowser": "असमर्थित ब्राउज़र पाया है!",
+	"unsupportedBrowser.titleUnsupportedBrowser": "असमर्थित ब्राउज़र पाया है!",
 	"unsupportedBrowser.titlewebrtcUnavailable": " आवश्यक कार्यक्षमता आपके ब्राउज़र में नहीं है!",
 	"unsupportedBrowser.bodyText": "इस भेंटवार्ता के लिए आवश्यक कार्यक्षमता आपके ब्राउज़र में नहीं है. कृपया नवीनीकरण कीजिए या ब्राउज़र बदलिए, अतः आपकी सेटिंग्स जांचीए. समर्थित ब्राउज़र:"
 }
