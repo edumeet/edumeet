@@ -623,8 +623,6 @@ class Room extends EventEmitter
 
 				peer.socket.handshake.session.token = token;
 
-				peer.socket.handshake.session.save();
-
 				let turnServers;
 
 				if ('turnAPIURI' in config)
