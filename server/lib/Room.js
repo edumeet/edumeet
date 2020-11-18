@@ -205,28 +205,28 @@ class Room extends EventEmitter
 
 		const mediasoupRouters = new Map();
 
+		const audioLevelObservers = new Map();
+
 		for (const worker of mediasoupWorkers)
 		{
 			const router = await worker.createRouter({ mediaCodecs });
 
 			mediasoupRouters.set(router.id, router);
-		}
 
-		const firstRouter = mediasoupRouters.get(Room.getLeastLoadedRouter(
-			mediasoupWorkers, peers, mediasoupRouters));
-
-		// Create a mediasoup AudioLevelObserver on first router
-		const audioLevelObserver = await firstRouter.createAudioLevelObserver(
+			const audioLevelObserver = await router.createAudioLevelObserver(
 			{
 				maxEntries : 1,
 				threshold  : -80,
 				interval   : 800
 			});
 
+			audioLevelObservers.set(router.id, { audioLevelObserver : audioLevelObserver, peerId : null, volume : -1000 });
+		}
+
 		return new Room({
 			roomId,
 			mediasoupRouters,
-			audioLevelObserver,
+			audioLevelObservers,
 			mediasoupWorkers,
 			peers
 		});
@@ -235,7 +235,7 @@ class Room extends EventEmitter
 	constructor({
 		roomId,
 		mediasoupRouters,
-		audioLevelObserver,
+		audioLevelObservers,
 		mediasoupWorkers,
 		peers
 	})
@@ -282,17 +282,20 @@ class Room extends EventEmitter
 
 		this._selfDestructTimeout = null;
 
-		// Array of mediasoup Router instances.
+		// Mediasoup Router instances map.
 		this._mediasoupRouters = mediasoupRouters;
 
-		// mediasoup AudioLevelObserver.
-		this._audioLevelObserver = audioLevelObserver;
+		// Mediasoup AudioLevelObserver instances map.
+		this._audioLevelObservers = audioLevelObservers;
+
+		this._lastActiveSpeakerUpdateTimestamp = 0;
 
 		// Current active speaker.
 		this._currentActiveSpeaker = null;
 
 		this._handleLobby();
-		this._handleAudioLevelObserver();
+
+		this._handleAudioLevelObservers();
 	}
 
 	isLocked()
@@ -335,6 +338,8 @@ class Room extends EventEmitter
 		// Close the mediasoup Routers.
 		for (const router of this._mediasoupRouters.values())
 		{
+			this._audioLevelObservers.get(router.id).audioLevelObserver.close();
+			this._audioLevelObservers.get(router.id).audioLevelObserver = null;
 			router.close();
 		}
 
@@ -342,9 +347,9 @@ class Room extends EventEmitter
 
 		this._mediasoupWorkers = null;
 
-		this._mediasoupRouters.clear();
+		this._audioLevelObservers.clear();
 
-		this._audioLevelObserver = null;
+		this._mediasoupRouters.clear();
 
 		// Emit 'close' event.
 		this.emit('close');
@@ -502,12 +507,31 @@ class Room extends EventEmitter
 		});
 	}
 
-	_handleAudioLevelObserver()
+	_sendActiveSpeakerInfo()
 	{
-		// Set audioLevelObserver events.
-		this._audioLevelObserver.on('volumes', (volumes) =>
+		let peerId = null;
+
+		let maxVolume = -1000;
+
+		let debugRouterId = null;
+
+		this._audioLevelObservers.forEach((audioLevelObject, routerId) => {
+			const tmpPeerId = audioLevelObject.peerId;
+
+			if (tmpPeerId && audioLevelObject.volume > maxVolume)
+			{
+				maxVolume = audioLevelObject.volume;
+				peerId = tmpPeerId;
+				debugRouterId = routerId;
+			}
+		});
+
+		if (!peerId || Date.now() > (this._lastActiveSpeakerUpdateTimestamp + 1000))
 		{
-			const { producer, volume } = volumes[0];
+			if(peerId)
+			{
+				this._lastActiveSpeakerUpdateTimestamp = Date.now();
+			}
 
 			// Notify all Peers.
 			for (const peer of this.getJoinedPeers())
@@ -516,23 +540,36 @@ class Room extends EventEmitter
 					peer.socket,
 					'activeSpeaker',
 					{
-						peerId : producer.appData.peerId,
-						volume : volume
+					peerId : peerId,
+					volume : maxVolume
 					});
 			}
+		}
+	}
+
+	_handleAudioLevelObservers()
+	{
+		this._audioLevelObservers.forEach((audioLevelObject, routerId) => {
+			// Set audioLevelObserver events.
+			audioLevelObject.audioLevelObserver.on('volumes', (volumes) =>
+			{
+				const { producer, volume } = volumes[0];
+
+				const audioLevelObject = this._audioLevelObservers.get(routerId)
+
+				audioLevelObject.peerId = producer.appData.peerId;
+				audioLevelObject.volume = volume;
+				this._sendActiveSpeakerInfo();
 		});
 
-		this._audioLevelObserver.on('silence', () =>
+			audioLevelObject.audioLevelObserver.on('silence', () =>
 		{
-			// Notify all Peers.
-			for (const peer of this.getJoinedPeers())
-			{
-				this._notification(
-					peer.socket,
-					'activeSpeaker',
-					{ peerId: null }
-				);
-			}
+				const audioLevelObject = this._audioLevelObservers.get(routerId)
+
+				audioLevelObject.peerId = null;
+				audioLevelObject.volume = -1000;
+				this._sendActiveSpeakerInfo();
+			});
 		});
 	}
 
@@ -958,7 +995,10 @@ class Room extends EventEmitter
 				if (maxIncomingBitrate)
 				{
 					try { await transport.setMaxIncomingBitrate(maxIncomingBitrate); }
-					catch (error) {}
+					catch(error)
+					{
+						logger.error('CreateWebRtcTransport transport.setMaxIncomingBitrate ERROR [roomId:"%s", maxIncomingBitrate:"%s", transportId:"%s", error:"%o"]', this._roomId, maxIncomingBitrate, transport.id, error);
+					}
 				}
 
 				break;
@@ -1043,9 +1083,18 @@ class Room extends EventEmitter
 				// the 'loudest' event of the audioLevelObserver.
 				appData = { ...appData, peerId: peer.id };
 
-				const producer =
+				let producer = null;
+				try
+				{
+					producer =
 					await transport.produce({ kind, rtpParameters, appData });
-
+				}
+				catch (error)
+				{
+					logger.error(
+						'transport.produce failed: [kind: "%s", rtpParameters: "%o", appData: "%o", error: "%o"]',
+						kind, rtpParameters, appData, error);
+				}
 				const pipeRouters = this._getRoutersToPipeTo(peer.routerId);
 
 				for (const [ routerId, destinationRouter ] of this._mediasoupRouters)
@@ -1091,8 +1140,10 @@ class Room extends EventEmitter
 				// Add into the audioLevelObserver.
 				if (kind === 'audio')
 				{
-					this._audioLevelObserver.addProducer({ producerId: producer.id })
-						.catch(() => {});
+					this._audioLevelObservers.get(peer.routerId).audioLevelObserver.addProducer({ producerId: producer.id })
+						.catch((error) => {
+							logger.error('audioLevelObserver addProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
+							});
 				}
 
 				break;
@@ -1109,6 +1160,11 @@ class Room extends EventEmitter
 
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
+
+				this._audioLevelObservers.get(peer.routerId).audioLevelObserver.removeProducer({ producerId: producer.id })
+					.catch((error) => {
+						logger.error('audioLevelObserver removeProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
+						});
 
 				producer.close();
 
