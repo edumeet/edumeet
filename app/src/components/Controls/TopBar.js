@@ -42,7 +42,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
-import html2canvas from 'html2canvas';
 import RecordRTC from 'recordrtc';
 
 const styles = (theme) =>
@@ -569,18 +568,10 @@ const TopBar = (props) =>
 								handleMenuClose();
 								if (!room.locked)
 								{
-									window.html2canvas = html2canvas;
 
-									/* 
-									ReactDOM.render((<button id='btn-start-recording'>
-									Start Recording</button>), document.getElementById('edumeet'));
-									ReactDOM.render((<button id='btn-stop-recording'
-									 disabled>Stop Recording</button>), document.getElementById('edumeet')); 
-									 document.getElementsByClassName('edumeet')
-									*/
-									/* displaymediastreamconstraints */
 									const mc = {
-										video : true
+										video : true,
+										audio : true
 									};
 
 									if (navigator.mediaDevices.getDisplayMedia)

@@ -26,7 +26,6 @@
 		"end-of-stream": "1.4.1",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",
-		"html2canvas": "^1.0.0-rc.7",
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
 		"material-ui-popup-state": "^1.7.0",
