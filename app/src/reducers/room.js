@@ -4,6 +4,7 @@ const initialState =
 	// new/connecting/connected/disconnected/closed,
 	state                         : 'new',
 	locked                        : false,
+	recording                     : false,
 	inLobby                       : false,
 	signInRequired                : false,
 	overRoomLimit                 : false,
@@ -60,6 +61,16 @@ const room = (state = initialState, action) =>
 				return { ...state, state: roomState };
 			else
 				return { ...state, state: roomState, activeSpeakerId: null };
+		}
+
+		case 'SET_RECORD_START':
+		{
+			return { ...state, recording: true };
+		}
+
+		case 'SET_RECORD_STOP':
+		{
+			return { ...state, recording: false };
 		}
 
 		case 'SET_ROOM_LOCKED':

@@ -18,6 +18,16 @@ export const setRoomActiveSpeaker = (peerId) =>
 		payload : { peerId }
 	});
 
+export const setRecordStarted = () =>
+	({
+		type : 'SET_RECORD_START'
+	});
+
+export const setRecordStoped = () =>
+	({
+		type : 'SET_RECORD_STOP'
+	});
+
 export const setRoomLocked = () =>
 	({
 		type : 'SET_ROOM_LOCKED'

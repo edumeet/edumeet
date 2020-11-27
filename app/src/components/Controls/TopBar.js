@@ -254,7 +254,7 @@ const TopBar = (props) =>
 			defaultMessage : 'Lock room'
 		});
 
-	const recordTooltip = room.record ?
+	const recordTooltip = room.recording ?
 		intl.formatMessage({
 			id             : 'tooltip.startRecording',
 			defaultMessage : 'Start recording.'
@@ -566,7 +566,7 @@ const TopBar = (props) =>
 							onClick={() =>
 							{
 								handleMenuClose();
-								if (!room.locked)
+								if (!room.recording)
 								{
 
 									const mc = {
@@ -586,7 +586,7 @@ const TopBar = (props) =>
 
 											const sleep = (m) => new Promise((r) => setTimeout(r, m));
 
-											await sleep(30000);
+											await sleep(10000);
 
 											recorder.stopRecording(function()
 											{
@@ -595,7 +595,6 @@ const TopBar = (props) =>
 												RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
 											});
 										});
-
 									}
 									else
 									{
@@ -609,7 +608,7 @@ const TopBar = (props) =>
 
 											const sleep = (m) => new Promise((r) => setTimeout(r, m));
 
-											await sleep(30000);
+											await sleep(10000);
 
 											recorder.stopRecording(function()
 											{
@@ -625,6 +624,14 @@ const TopBar = (props) =>
 								}
 								else
 								{
+
+									/* recorder.stopRecording(function()
+									{
+										const blob = recorder.getBlob();
+
+										RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
+									}); */
+
 									roomClient.stopRoomRecord();
 								}
 							}
@@ -635,12 +642,23 @@ const TopBar = (props) =>
 							>
 								<RecordVoiceOverIcon />
 							</Badge>
-							<p className={classes.moreAction}>
-								<FormattedMessage
-									id='tooltip.startRecording'
-									defaultMessage='Record room'
-								/>
-							</p>
+
+							{ room.recording ?
+								<p className={classes.moreAction}>
+									<FormattedMessage
+										id='tooltip.stopRecording'
+										defaultMessage='Room record stopped'
+									/>
+								</p>
+								:
+								<p className={classes.moreAction}>
+									<FormattedMessage
+										id='tooltip.startRecording'
+										defaultMessage='Room record started'
+									/>
+								</p>
+							}
+
 						</MenuItem>
 
 						<MenuItem
@@ -804,12 +822,14 @@ const TopBar = (props) =>
 					onClick={() =>
 					{
 						handleMenuClose();
-						if (!room.locked)
+						if (!room.recording)
 						{
+							console.log('LOLstart');
 							roomClient.startRoomRecord();
 						}
 						else
 						{
+							console.log('LOLstop');
 							roomClient.stopRoomRecord();
 						}
 					}
@@ -820,12 +840,22 @@ const TopBar = (props) =>
 					>
 						<RecordVoiceOverIcon />
 					</Badge>
-					<p className={classes.moreAction}>
-						<FormattedMessage
-							id='tooltip.startRecording'
-							defaultMessage='Record room'
-						/>
-					</p>
+					{ room.recording ?
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.stopRecording'
+								defaultMessage='Room record stopped'
+							/>
+						</p>
+						:
+						<p className={classes.moreAction}>
+							<FormattedMessage
+
+								id='tooltip.startRecording'
+								defaultMessage='Room record started'
+							/>
+						</p>
+					}
 				</MenuItem>
 				<MenuItem
 					aria-label={lockTooltip}

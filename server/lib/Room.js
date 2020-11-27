@@ -1502,6 +1502,42 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'startRoomRecord':
+			{
+				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK)) // todo change permission
+					throw new Error('peer not authorized');
+
+				this._recording = true;
+
+				// Spread to others
+				this._notification(peer.socket, 'startRoomRecord', {
+					peerId : peer.id
+				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'stopRoomRecord':
+			{
+				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK)) // todo change permission
+					throw new Error('peer not authorized');
+
+				this._recording = true;
+
+				// Spread to others
+				this._notification(peer.socket, 'stopRoomRecord', {
+					peerId : peer.id
+				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
 			case 'lockRoom':
 			{
 				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK))

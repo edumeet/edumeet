@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Összes képernyőmegosztás leállítása",
 	"room.hideSelfView": "Saját kamerakép elrejtése",
 	"room.showSelfView": "Saját kamerakép megjelenítése",
+	"room.startRecording": "Lokális felvétel készül",
+	"room.stopRecording": "Lokális felvétel készült",
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 
