@@ -5,13 +5,13 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../actions/toolareaActions';
 import { FormattedMessage } from 'react-intl';
+import Toolbar from '@material-ui/core/Toolbar';
 import AppBar from '@material-ui/core/AppBar';
 import Chat from './Chat/Chat';
 import FileSharing from './FileSharing/FileSharing';
 import ParticipantList from './ParticipantList/ParticipantList';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = (theme) =>
 	({
@@ -25,8 +25,9 @@ const styles = (theme) =>
 		},
 		appBar :
 		{
-			display       : 'flex',
-			flexDirection : 'row'
+			display        : 'flex',
+			flexDirection  : 'row',
+			justifyContent : 'flex-end'
 		},
 		tabsHeader :
 		{
@@ -39,8 +40,7 @@ const MeetingDrawer = (props) =>
 	const {
 		currentToolTab,
 		closeDrawer,
-		classes,
-		theme
+		classes
 	} = props;
 
 	return (
@@ -50,26 +50,10 @@ const MeetingDrawer = (props) =>
 				color='default'
 				className={classes.appBar}
 			>
-				<IconButton onClick={closeDrawer}>
-					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-					{currentToolTab === 'chat' &&
-						<FormattedMessage
-							id='label.chat'
-							defaultMessage='Chat'
-						/>
-					}
-					{currentToolTab === 'files' &&
-						<FormattedMessage
-							id='label.filesharing'
-							defaultMessage='Filesharing'
-						/>
-					}
-					{currentToolTab === 'users' &&
-						<FormattedMessage
-							id='label.participants'
-							defaultMessage='Partecipants'
-						/>
-					}
+				<IconButton
+					onClick={closeDrawer}
+				>
+					<CloseIcon />
 				</IconButton>
 			</AppBar>
 			{currentToolTab === 'chat' && <Chat />}
