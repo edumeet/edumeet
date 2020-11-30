@@ -4,6 +4,7 @@ import { raisedHandsSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../actions/toolareaActions';
+import { FormattedMessage } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
 import Chat from './Chat/Chat';
 import FileSharing from './FileSharing/FileSharing';
@@ -51,6 +52,24 @@ const MeetingDrawer = (props) =>
 			>
 				<IconButton onClick={closeDrawer}>
 					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+					{currentToolTab === 'chat' &&
+						<FormattedMessage
+							id='label.chat'
+							defaultMessage='Chat'
+						/>
+					}
+					{currentToolTab === 'files' &&
+						<FormattedMessage
+							id='label.filesharing'
+							defaultMessage='Filesharing'
+						/>
+					}
+					{currentToolTab === 'users' &&
+						<FormattedMessage
+							id='label.participants'
+							defaultMessage='Partecipants'
+						/>
+					}
 				</IconButton>
 			</AppBar>
 			{currentToolTab === 'chat' && <Chat />}
