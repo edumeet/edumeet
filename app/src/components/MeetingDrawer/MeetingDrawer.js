@@ -4,24 +4,13 @@ import { raisedHandsSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../actions/toolareaActions';
-import { useIntl } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Badge from '@material-ui/core/Badge';
 import Chat from './Chat/Chat';
 import FileSharing from './FileSharing/FileSharing';
 import ParticipantList from './ParticipantList/ParticipantList';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import IconButton from '@material-ui/core/IconButton';
-
-const tabs =
-[
-	'chat',
-	'files',
-	'users'
-];
 
 const styles = (theme) =>
 	({
@@ -46,15 +35,9 @@ const styles = (theme) =>
 
 const MeetingDrawer = (props) =>
 {
-	const intl = useIntl();
-
 	const {
 		currentToolTab,
-		unreadMessages,
-		unreadFiles,
-		raisedHands,
 		closeDrawer,
-		setToolTab,
 		classes,
 		theme
 	} = props;
@@ -66,45 +49,6 @@ const MeetingDrawer = (props) =>
 				color='default'
 				className={classes.appBar}
 			>
-				<Tabs
-					className={classes.tabsHeader}
-					value={tabs.indexOf(currentToolTab)}
-					onChange={(event, value) => setToolTab(tabs[value])}
-					indicatorColor='primary'
-					textColor='primary'
-					variant='fullWidth'
-				>
-					<Tab
-						label={
-							<Badge color='secondary' badgeContent={unreadMessages}>
-								{intl.formatMessage({
-									id             : 'label.chat',
-									defaultMessage : 'Chat'
-								})}
-							</Badge>
-						}
-					/>
-					<Tab
-						label={
-							<Badge color='secondary' badgeContent={unreadFiles}>
-								{intl.formatMessage({
-									id             : 'label.filesharing',
-									defaultMessage : 'File sharing'
-								})}
-							</Badge>
-						}
-					/>
-					<Tab
-						label={
-							<Badge color='secondary' badgeContent={raisedHands}>
-								{intl.formatMessage({
-									id             : 'label.participants',
-									defaultMessage : 'Participants'
-								})}
-							</Badge>
-						}
-					/>
-				</Tabs>
 				<IconButton onClick={closeDrawer}>
 					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 				</IconButton>
