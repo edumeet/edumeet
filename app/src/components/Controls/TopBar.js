@@ -249,17 +249,6 @@ const TopBar = (props) =>
 	const isMenuOpen = Boolean(anchorEl);
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-	const lockTooltip = room.locked ?
-		intl.formatMessage({
-			id             : 'tooltip.unLockRoom',
-			defaultMessage : 'Unlock room'
-		})
-		:
-		intl.formatMessage({
-			id             : 'tooltip.lockRoom',
-			defaultMessage : 'Lock room'
-		});
-
 	const loginTooltip = loggedIn ?
 		intl.formatMessage({
 			id             : 'tooltip.logout',
@@ -458,6 +447,96 @@ const TopBar = (props) =>
 						</Tooltip>
 					</div>
 					<div className={classes.sectionMobile}>
+						{ raisedHands ?
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'tooltip.raisedHand',
+									defaultMessage : 'Raised Hand'
+								})}
+							>
+								<IconButton
+									aria-label={intl.formatMessage({
+										id             : 'tooltip.raisedHand',
+										defaultMessage : 'Raised Hand'
+									})}
+									color='inherit'
+								>
+									<PulsingBadge
+										color='primary'
+										badgeContent=''
+									>
+										<HandIcon />
+									</PulsingBadge>
+								</IconButton>
+							</Tooltip>
+							: null
+						}
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'label.chat',
+								defaultMessage : 'Show Chat'
+							})}
+						>
+							<IconButton
+								aria-label={intl.formatMessage({
+									id             : 'label.chat',
+									defaultMessage : 'Show Chat'
+								})}
+								color='inherit'
+								onClick={() => openChatTab()}
+							>
+								<Badge
+									color='primary'
+									badgeContent={unread}
+								>
+									<ChatIcon />
+								</Badge>
+							</IconButton>
+						</Tooltip>
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'label.filesharing',
+								defaultMessage : 'Show Files'
+							})}
+						>
+							<IconButton
+								aria-label={intl.formatMessage({
+									id             : 'label.filesharing',
+									defaultMessage : 'Show Files'
+								})}
+								color='inherit'
+								onClick={() => openFilesTab()}
+							>
+								<Badge
+									color='primary'
+									badgeContent={newFiles}
+								>
+									<FileSharingIcon />
+								</Badge>
+							</IconButton>
+						</Tooltip>
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'tooltip.participants',
+								defaultMessage : 'Show participants'
+							})}
+						>
+							<IconButton
+								aria-label={intl.formatMessage({
+									id             : 'tooltip.participants',
+									defaultMessage : 'Show participants'
+								})}
+								color='inherit'
+								onClick={() => openUsersTab()}
+							>
+								<Badge
+									color='primary'
+									badgeContent={peersLength + 1}
+								>
+									<PeopleIcon />
+								</Badge>
+							</IconButton>
+						</Tooltip>
 						{ lobbyPeers.length > 0 &&
 						<Tooltip
 							title={intl.formatMessage({
@@ -763,12 +842,9 @@ const TopBar = (props) =>
 					</MenuItem>
 				}
 				<MenuItem
-					aria-label={lockTooltip}
 					disabled={!canLock}
 					onClick={() =>
 					{
-						handleMenuClose();
-
 						if (room.locked)
 						{
 							roomClient.unlockRoom();
@@ -784,10 +860,11 @@ const TopBar = (props) =>
 						:
 						<LockOpenIcon />
 					}
+
 					{ room.locked ?
 						<p className={classes.moreAction}>
 							<FormattedMessage
-								id='tooltip.unLockRoom'
+								id='tooltip.unlockRoom'
 								defaultMessage='Unlock room'
 							/>
 						</p>
@@ -799,72 +876,26 @@ const TopBar = (props) =>
 							/>
 						</p>
 					}
-				</MenuItem>
-				<MenuItem
-					aria-label={intl.formatMessage({
-						id             : 'tooltip.settings',
-						defaultMessage : 'Show settings'
-					})}
-					onClick={() =>
-					{
-						handleMenuClose();
-						setSettingsOpen(!room.settingsOpen);
-					}}
-				>
-					<SettingsIcon />
-					<p className={classes.moreAction}>
-						<FormattedMessage
-							id='tooltip.settings'
-							defaultMessage='Show settings'
-						/>
-					</p>
-				</MenuItem>
-				<MenuItem
-					aria-label={intl.formatMessage({
-						id             : 'tooltip.participants',
-						defaultMessage : 'Show participants'
-					})}
-					onClick={() =>
-					{
-						handleMenuClose();
-						openUsersTab();
-					}}
-				>
-					<Badge
-						color='primary'
-						badgeContent={peersLength + 1}
-					>
-						<PeopleIcon />
-					</Badge>
-					<p className={classes.moreAction}>
-						<FormattedMessage
-							id='tooltip.participants'
-							defaultMessage='Show participants'
-						/>
-					</p>
+
 				</MenuItem>
 				{ fullscreenEnabled &&
 					<MenuItem
-						aria-label={intl.formatMessage({
-							id             : 'tooltip.enterFullscreen',
-							defaultMessage : 'Enter fullscreen'
-						})}
-						onClick={() =>
-						{
-							handleMenuClose();
-							onFullscreen();
-						}}
+						onClick={onFullscreen}
 					>
-						{ fullscreen ?
-							<FullScreenExitIcon />
-							:
-							<FullScreenIcon />
-						}
+						{ fullscreen ? <FullScreenExitIcon /> : <FullScreenIcon /> }
+
 						<p className={classes.moreAction}>
-							<FormattedMessage
-								id='tooltip.enterFullscreen'
-								defaultMessage='Enter fullscreen'
-							/>
+							{ fullscreen ?
+								<FormattedMessage
+									id='tooltip.exitFullscreen'
+									defaultMessage='Exit fullscreen'
+								/>
+								:
+								<FormattedMessage
+									id='tooltip.enterFullscreen'
+									defaultMessage='Enter fullscreen'
+								/>
+							}
 						</p>
 					</MenuItem>
 				}
@@ -926,6 +957,28 @@ const TopBar = (props) =>
 							/>
 						</p>
 					}
+				</MenuItem>
+				<MenuItem
+					onClick={(event) => handleMenuOpen(event, 'localeMenu')}
+				>
+					<LanguageIcon />
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='tooltip.language'
+							defaultMessage='Language'
+						/>
+					</p>
+				</MenuItem>
+				<MenuItem
+					onClick={() => setSettingsOpen(!room.settingsOpen)}
+				>
+					<SettingsIcon />
+					<p className={classes.moreAction}>
+						<FormattedMessage
+							id='tooltip.settings'
+							defaultMessage='Show settings'
+						/>
+					</p>
 				</MenuItem>
 				<MenuItem
 					onClick={() =>
