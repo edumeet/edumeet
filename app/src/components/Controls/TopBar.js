@@ -45,6 +45,7 @@ import ChatIcon from '@material-ui/icons/Chat';
 import FileSharingIcon from '@material-ui/icons/FolderShared';
 import HandIcon from '@material-ui/icons/PanTool';
 import LanguageIcon from '@material-ui/icons/Language';
+import CallEndIcon from '@material-ui/icons/CallEnd';
 
 const styles = (theme) =>
 	({
@@ -574,13 +575,13 @@ const TopBar = (props) =>
 						</IconButton>
 					</div>
 					<Button
-						aria-label={intl.formatMessage({
-							id             : 'label.leave',
-							defaultMessage : 'Leave'
-						})}
-						className={classes.actionButton}
 						variant='contained'
 						color='secondary'
+						size='small'
+						startIcon={<CallEndIcon />}
+						className={classes.button}
+						style={{ borderRadius: 100 }}
+
 						onClick={() => roomClient.close()}
 					>
 						<FormattedMessage
