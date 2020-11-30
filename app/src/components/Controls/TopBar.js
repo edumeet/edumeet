@@ -52,26 +52,26 @@ const styles = (theme) =>
 		persistentDrawerOpen :
 		{
 			width                          : 'calc(100% - 30vw)',
-			marginLeft                     : '30vw',
+			marginRight                    : '30vw',
 			[theme.breakpoints.down('lg')] :
 			{
-				width      : 'calc(100% - 40vw)',
-				marginLeft : '40vw'
+				width       : 'calc(100% - 40vw)',
+				marginRight : '40vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width      : 'calc(100% - 50vw)',
-				marginLeft : '50vw'
+				width       : 'calc(100% - 50vw)',
+				marginRight : '50vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width      : 'calc(100% - 70vw)',
-				marginLeft : '70vw'
+				width       : 'calc(100% - 70vw)',
+				marginRight : '70vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width      : 'calc(100% - 90vw)',
-				marginLeft : '90vw'
+				width       : 'calc(100% - 90vw)',
+				marginRight : '90vw'
 			}
 		},
 		menuButton :
