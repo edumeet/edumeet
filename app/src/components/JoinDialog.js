@@ -304,7 +304,7 @@ const JoinDialog = ({
 						alignItems='center'
 					>
 						<Grid item>
-							{ window.config.logo !=='' ?
+							{ window.config.logo !== undefined ?
 								<img alt='Logo' src={window.config.logo} /> :
 								<Typography variant='h5'> {window.config.title} </Typography>
 							}

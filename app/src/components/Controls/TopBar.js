@@ -273,14 +273,14 @@ const TopBar = (props) =>
 				)}
 			>
 				<Toolbar>
-					{ window.config.logo !== '' ?
+					{ window.config.logo !== undefined ?
 						<img alt='Logo'
 							src={window.config.logo}
 							className={classes.logo}
 						/> :
 						<Typography
 							variant='h6'
-							noWrap color='inherit'
+							noWrap color='secondary'
 						>
 							{window.config.title}
 						</Typography>
@@ -299,7 +299,7 @@ const TopBar = (props) =>
 										id             : 'tooltip.raisedHand',
 										defaultMessage : 'Raised Hand'
 									})}
-									color='inherit'
+									color='secondary'
 								>
 									<PulsingBadge
 										color='primary'
@@ -322,7 +322,7 @@ const TopBar = (props) =>
 									id             : 'label.chat',
 									defaultMessage : 'Show Chat'
 								})}
-								color='inherit'
+								color='secondary'
 								onClick={() => openChatTab()}
 							>
 								<Badge
@@ -344,7 +344,7 @@ const TopBar = (props) =>
 									id             : 'label.filesharing',
 									defaultMessage : 'Show Files'
 								})}
-								color='inherit'
+								color='secondary'
 								onClick={() => openFilesTab()}
 							>
 								<Badge
@@ -366,7 +366,7 @@ const TopBar = (props) =>
 									id             : 'tooltip.participants',
 									defaultMessage : 'Show participants'
 								})}
-								color='inherit'
+								color='secondary'
 								onClick={() => openUsersTab()}
 							>
 								<Badge
@@ -391,7 +391,7 @@ const TopBar = (props) =>
 											defaultMessage : 'Show lobby'
 										})}
 										className={classes.actionButton}
-										color='inherit'
+										color='secondary'
 										disabled={!canPromote}
 										onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
 									>
@@ -413,7 +413,7 @@ const TopBar = (props) =>
 										defaultMessage : 'Log in'
 									})}
 									className={classes.actionButton}
-									color='inherit'
+									color='secondary'
 									onClick={() =>
 									{
 										loggedIn ? roomClient.logout() : roomClient.login();
@@ -441,7 +441,7 @@ const TopBar = (props) =>
 								}
 								aria-haspopup
 								onClick={(event) => handleMenuOpen(event, 'moreActions')}
-								color='inherit'
+								color='secondary'
 							>
 								<MoreIcon />
 							</IconButton>
@@ -460,7 +460,7 @@ const TopBar = (props) =>
 										id             : 'tooltip.raisedHand',
 										defaultMessage : 'Raised Hand'
 									})}
-									color='inherit'
+									color='secondary'
 								>
 									<PulsingBadge
 										color='primary'
@@ -483,7 +483,7 @@ const TopBar = (props) =>
 									id             : 'label.chat',
 									defaultMessage : 'Show Chat'
 								})}
-								color='inherit'
+								color='secondary'
 								onClick={() => openChatTab()}
 							>
 								<Badge
@@ -505,7 +505,7 @@ const TopBar = (props) =>
 									id             : 'label.filesharing',
 									defaultMessage : 'Show Files'
 								})}
-								color='inherit'
+								color='secondary'
 								onClick={() => openFilesTab()}
 							>
 								<Badge
@@ -527,7 +527,7 @@ const TopBar = (props) =>
 									id             : 'tooltip.participants',
 									defaultMessage : 'Show participants'
 								})}
-								color='inherit'
+								color='secondary'
 								onClick={() => openUsersTab()}
 							>
 								<Badge
@@ -552,7 +552,7 @@ const TopBar = (props) =>
 										defaultMessage : 'Show lobby'
 									})}
 									className={classes.actionButton}
-									color='inherit'
+									color='secondary'
 									disabled={!canPromote}
 									onClick={() => setLockDialogOpen(!room.lockDialogOpen)}
 								>
@@ -569,7 +569,7 @@ const TopBar = (props) =>
 						<IconButton
 							aria-haspopup
 							onClick={handleMobileMenuOpen}
-							color='inherit'
+							color='secondary'
 						>
 							<MoreIcon />
 						</IconButton>
