@@ -142,7 +142,7 @@ const styles = (theme) =>
 			fontWeight      : 400,
 			color           : 'rgba(255, 255, 255, 0.85)',
 			border          : 'none',
-			borderBottom    : '1px solid #aeff00',
+			borderBottom    : '1px solid var(--primary-color)',
 			backgroundColor : 'transparent'
 		},
 		displayNameStatic :
@@ -151,11 +151,7 @@ const styles = (theme) =>
 			cursor     : 'text',
 			fontSize   : 14,
 			fontWeight : 400,
-			color      : 'rgba(255, 255, 255, 0.85)',
-			'&:hover'  :
-			{
-				backgroundColor : 'rgb(174, 255, 0, 0.25)'
-			}
+			color      : 'rgba(255, 255, 255, 0.85)'
 		}
 	});
 

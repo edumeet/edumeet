@@ -214,7 +214,7 @@ const ButtonControlBar = (props) =>
 					}}
 				>
 					{ micState === 'on' ?
-						<MicIcon />
+						<MicIcon color='secondary' />
 						:
 						<MicOffIcon />
 					}
@@ -238,7 +238,7 @@ const ButtonControlBar = (props) =>
 					}}
 				>
 					{ webcamState === 'on' ?
-						<VideoIcon />
+						<VideoIcon color='secondary' />
 						:
 						<VideoOffIcon />
 					}
@@ -263,7 +263,7 @@ const ButtonControlBar = (props) =>
 								roomClient.disableScreenSharing();
 						}}
 					>
-						<ScreenIcon/>
+						<ScreenIcon color={screenState === 'on' ? 'secondary' : ''} />
 					</Fab>
 				</Tooltip>
 			}
