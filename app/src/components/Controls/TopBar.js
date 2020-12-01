@@ -140,6 +140,10 @@ const styles = (theme) =>
 		{
 			color : 'rgba(0, 153, 0, 1)'
 		},
+		warning :
+		{
+			color : 'var(--warning-color)'
+		},
 		moreAction :
 		{
 			margin : theme.spacing(0.5, 0, 0.5, 1.5)
@@ -150,7 +154,7 @@ const PulsingBadge = withStyles((theme) =>
 	({
 		badge :
 		{
-			backgroundColor : theme.palette.secondary.main,
+			backgroundColor : 'var(--warning-color)',
 			'&::after'      :
 			{
 				position     : 'absolute',
@@ -158,7 +162,7 @@ const PulsingBadge = withStyles((theme) =>
 				height       : '100%',
 				borderRadius : '50%',
 				animation    : '$ripple 1.2s infinite ease-in-out',
-				border       : `3px solid ${theme.palette.secondary.main}`,
+				border       : '3px solid var(--warning-color)',
 				content      : '""'
 			}
 		},
