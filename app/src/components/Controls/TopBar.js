@@ -42,7 +42,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
-import RecordRTC from 'recordrtc';
 
 const styles = (theme) =>
 	({
@@ -568,70 +567,10 @@ const TopBar = (props) =>
 								handleMenuClose();
 								if (!room.recording)
 								{
-
-									const mc = {
-										video : true,
-										audio : true
-									};
-
-									if (navigator.mediaDevices.getDisplayMedia)
-									{
-										navigator.mediaDevices.getDisplayMedia(mc).then(async function(stream)
-										{
-											const recorder = RecordRTC(stream, {
-												type : 'video'
-											});
-
-											recorder.startRecording();
-
-											const sleep = (m) => new Promise((r) => setTimeout(r, m));
-
-											await sleep(10000);
-
-											recorder.stopRecording(function()
-											{
-												const blob = recorder.getBlob();
-
-												RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
-											});
-										});
-									}
-									else
-									{
-										navigator.getDisplayMedia(mc).then(async function(stream)
-										{
-											const recorder = RecordRTC(stream, {
-												type : 'video'
-											});
-
-											recorder.startRecording();
-
-											const sleep = (m) => new Promise((r) => setTimeout(r, m));
-
-											await sleep(10000);
-
-											recorder.stopRecording(function()
-											{
-												const blob = recorder.getBlob();
-
-												RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
-											});
-										});
-
-									}
-
 									roomClient.startRoomRecord();
 								}
 								else
 								{
-
-									/* recorder.stopRecording(function()
-									{
-										const blob = recorder.getBlob();
-
-										RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
-									}); */
-
 									roomClient.stopRoomRecord();
 								}
 							}
@@ -824,12 +763,10 @@ const TopBar = (props) =>
 						handleMenuClose();
 						if (!room.recording)
 						{
-							console.log('LOLstart');
 							roomClient.startRoomRecord();
 						}
 						else
 						{
-							console.log('LOLstop');
 							roomClient.stopRoomRecord();
 						}
 					}

@@ -20,6 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
+import RecordRTC from 'recordrtc';
 
 let createTorrent;
 
@@ -32,6 +33,8 @@ let mediasoupClient;
 let io;
 
 let ScreenShare;
+
+let recorder;
 
 let requestTimeout,
 	lastN,
@@ -3554,6 +3557,37 @@ export default class RoomClient
 	{
 		logger.debug('startRoomRecord()');
 
+		const mc = {
+			video : true,
+			audio : true
+		};
+
+		if (navigator.mediaDevices.getDisplayMedia)
+		{
+			navigator.mediaDevices.getDisplayMedia(mc).then(async function(stream)
+			{
+				recorder = RecordRTC(stream, {
+					type : 'video'
+				});
+
+				recorder.startRecording();
+
+			});
+		}
+		else
+		{
+			navigator.getDisplayMedia(mc).then(async function(stream)
+			{
+				recorder = RecordRTC(stream, {
+					type : 'video'
+				});
+
+				recorder.startRecording();
+
+			});
+
+		}
+
 		try
 		{
 			await this.sendRequest('startRoomRecord');
@@ -3585,11 +3619,19 @@ export default class RoomClient
 	{
 		logger.debug('stopRoomRecord()');
 
+		recorder.stopRecording(function()
+		{
+			const blob = recorder.getBlob();
+
+			RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
+		});
+
 		try
 		{
 			await this.sendRequest('stopRoomRecord');
 
 			store.dispatch(roomActions.setRecordStoped());
+
 			store.dispatch(requestActions.notify(
 				{
 					text : intl.formatMessage({
