@@ -4,8 +4,6 @@ import { raisedHandsSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../actions/toolareaActions';
-import { FormattedMessage } from 'react-intl';
-import Toolbar from '@material-ui/core/Toolbar';
 import AppBar from '@material-ui/core/AppBar';
 import Chat from './Chat/Chat';
 import FileSharing from './FileSharing/FileSharing';
