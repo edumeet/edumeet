@@ -204,7 +204,7 @@ const ListPeer = (props) =>
 						id             : 'tooltip.muteParticipant',
 						defaultMessage : 'Mute audio'
 					})}
-					color={micEnabled ? 'primary' : 'secondary'}
+					color='secondary'
 					disabled={peer.peerAudioInProgress}
 					className={classes.buttons}
 					onClick={() =>

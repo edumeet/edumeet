@@ -24,8 +24,10 @@ const styles = (theme) =>
 		root :
 		{
 			flex               : '0 0 auto',
+			overflow           : 'hidden',
 			boxShadow          : 'var(--peer-shadow)',
 			border             : 'var(--peer-border)',
+			borderRadius       : 'var(--border-radius)',
 			touchAction        : 'none',
 			backgroundColor    : 'var(--peer-bg-color)',
 			backgroundImage    : 'var(--peer-empty-avatar)',

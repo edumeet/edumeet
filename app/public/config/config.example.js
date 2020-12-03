@@ -234,13 +234,5 @@ var config =
 	typography:
 	{
 		useNextVariants: true,
-		fontFamily: [
-			'"Kumbh Sans"',
-			'Nunito',
-			'Roboto',
-			'"Helvetica Neue"',
-			'Arial',
-			'sans-serif'
-		].join(','),
 	}
 };
