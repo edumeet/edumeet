@@ -150,7 +150,7 @@ const styles = (theme) =>
 		}
 	});
 
-const PulsingBadge = withStyles((theme) =>
+const PulsingBadge = withStyles(() =>
 	({
 		badge :
 		{

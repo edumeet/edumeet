@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
-import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../../appPropTypes';
 import { useIntl } from 'react-intl';
