@@ -620,20 +620,7 @@ async function runHttpsServer()
 				res.redirect(ltiURL);
 			}
 			else
-			{
-				const specialChars = "<>@!^*()[]{}:;|'\"\\,~`";
-
-				for (let i = 0; i < specialChars.length; i++)
-				{
-					if (req.url.substring(1).indexOf(specialChars[i]) > -1)
-					{
-						req.url = `/${encodeURIComponent(encodeURI(req.url.substring(1)))}`;
-						res.redirect(`${req.url}`);
-					}
-				}
-
 				return next();
-			}
 		}
 		else
 			res.redirect(`https://${req.hostname}${req.url}`);
