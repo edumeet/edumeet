@@ -239,7 +239,7 @@ const JoinDialog = ({
 
 		setVideoMuted(false);
 
-		_askForPerms();
+		// _askForPerms();
 
 		const encodedRoomId = encodeURIComponent(roomId);
 
