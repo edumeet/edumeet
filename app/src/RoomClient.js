@@ -36,6 +36,12 @@ let ScreenShare;
 
 let recorder;
 
+const recordingData = [];
+
+let gumStream, gdmStream;
+
+let recorderStream;
+
 let requestTimeout,
 	lastN,
 	mobileLastN,
@@ -3557,36 +3563,52 @@ export default class RoomClient
 	{
 		logger.debug('startRoomRecord()');
 
-		const mc = {
-			video : true,
-			audio : true
+		function mixer(stream1, stream2)
+		{
+			const ctx = new AudioContext();
+			const dest = ctx.createMediaStreamDestination();
+
+			if (stream1.getAudioTracks().length > 0)
+				ctx.createMediaStreamSource(stream1).connect(dest);
+
+			if (stream2.getAudioTracks().length > 0)
+				ctx.createMediaStreamSource(stream2).connect(dest);
+
+			let tracks = dest.stream.getTracks();
+
+			tracks = tracks.concat(stream1.getVideoTracks()).concat(stream2.getVideoTracks());
+
+			return new MediaStream(tracks);
+
+		}
+
+		try
+		{
+			gumStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			gdmStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' }, audio: true });
+
+		}
+		catch (e)
+		{
+			console.error('capture failure', e);
+
+			return;
+		}
+
+		recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
+
+		recorder = new RecordRTC(recorderStream, {
+			type : 'video'
+		});
+		recorder.ondataavailable = (e) =>
+		{
+			if (e.data && e.data.size > 0)
+			{
+				recordingData.push(e.data);
+			}
 		};
 
-		if (navigator.mediaDevices.getDisplayMedia)
-		{
-			navigator.mediaDevices.getDisplayMedia(mc).then(async function(stream)
-			{
-				recorder = RecordRTC(stream, {
-					type : 'video'
-				});
-
-				recorder.startRecording();
-
-			});
-		}
-		else
-		{
-			navigator.getDisplayMedia(mc).then(async function(stream)
-			{
-				recorder = RecordRTC(stream, {
-					type : 'video'
-				});
-
-				recorder.startRecording();
-
-			});
-
-		}
+		recorder.startRecording();
 
 		try
 		{
@@ -3619,12 +3641,26 @@ export default class RoomClient
 	{
 		logger.debug('stopRoomRecord()');
 
-		recorder.stopRecording(function()
+		try
 		{
-			const blob = recorder.getBlob();
+			recorder.stopRecording(function()
+			{
+				const blob = recorder.getBlob();
 
-			RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
-		});
+				/* Stop all used video/audio tracks */
+				recorderStream.getTracks().forEach((track) => track.stop());
+				gumStream.getTracks().forEach((track) => track.stop());
+				gdmStream.getTracks().forEach((track) => track.stop());
+
+				RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
+			});
+		}
+		catch (e)
+		{
+			console.error('capture failure', e);
+
+			return;
+		}
 
 		try
 		{
