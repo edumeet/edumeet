@@ -54,6 +54,8 @@ var config =
 	notificationPosition : 'right',
 	// Timeout for autohiding topbar and button control bar
 	hideTimeout          : 3000,
+	// Disable the notification when a user joins the room
+	disableNotification  : false,
 
 	// Settings hidden from UI
 	hiddenSettings: {

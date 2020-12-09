@@ -2849,17 +2849,20 @@ export default class RoomClient
 
 						this._spotlights.newPeer(id);
 
-						this._soundNotification();
+						if (window.config.disableJoinNotification)
+						{
+							this._soundNotification();
 
-						store.dispatch(requestActions.notify(
-							{
-								text : intl.formatMessage({
-									id             : 'room.newPeer',
-									defaultMessage : '{displayName} joined the room'
-								}, {
-									displayName
-								})
-							}));
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'room.newPeer',
+										defaultMessage : '{displayName} joined the room'
+									}, {
+										displayName
+									})
+								}));
+						}
 
 						break;
 					}
