@@ -62,7 +62,7 @@ const AdvancedSettings = ({
 					defaultMessage : 'Notification sounds'
 				})}
 			/>
-			{ !window.config.lockLastN &&
+			{ !window.config.hiddenSettings.lastN &&
 				<form className={classes.setting} autoComplete='off'>
 					<FormControl className={classes.formControl}>
 						<Select

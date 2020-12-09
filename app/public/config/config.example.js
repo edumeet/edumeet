@@ -49,13 +49,26 @@ var config =
 	mobileLastN          : 1,
 	// Highest number of lastN the user can select manually in UI
 	maxLastN             : 5,
-	// If truthy, users can NOT change number of speakers visible
-	lockLastN            : false,
 
 	// Position of notifications
 	notificationPosition : 'right',
 	// Timeout for autohiding topbar and button control bar
 	hideTimeout          : 3000,
+
+	// Settings hidden from UI
+	hiddenSettings: {
+		videoResolution   : false,
+		lastN             : false,
+		aspectRatio       : false,
+		advancedAudio     : false,
+		mirrorOwnVideo    : false,
+		permanentTopBar   : false,
+		hideMediaCtrl     : false,
+		separateMediaCtrl : false,
+		drawerOverContent : false,
+		showNotifications : false,
+		advancedTab       : false,
+	},
 
 	/**
 	 * Resolutions:
