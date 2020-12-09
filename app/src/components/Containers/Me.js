@@ -511,7 +511,7 @@ const Me = (props) =>
 														</React.Fragment>
 														: <MicOffIcon />
 													: micState === 'on' ?
-														<MicIcon />
+														<MicIcon color='secondary' />
 														:
 														<MicOffIcon />
 												}
@@ -574,7 +574,7 @@ const Me = (props) =>
 														</React.Fragment>
 														: <MicOffIcon />
 													: micState === 'on' ?
-														<MicIcon />
+														<MicIcon color='secondary' />
 														:
 														<MicOffIcon />
 												}
@@ -606,7 +606,7 @@ const Me = (props) =>
 												}}
 											>
 												{ webcamState === 'on' ?
-													<VideoIcon />
+													<VideoIcon color='secondary' />
 													:
 													<VideoOffIcon />
 												}
@@ -635,7 +635,7 @@ const Me = (props) =>
 												}}
 											>
 												{ webcamState === 'on' ?
-													<VideoIcon />
+													<VideoIcon color='secondary' />
 													:
 													<VideoOffIcon />
 												}
