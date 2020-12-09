@@ -84,39 +84,6 @@ const AppearanceSettings = (props) =>
 
 			<FormControl className={classes.setting}>
 				<Select
-					value={locale || ''}
-					onChange={(event) =>
-					{
-						if (event.target.value)
-							roomClient.setLocale(event.target.value);
-					}
-					}
-					name={intl.formatMessage({
-						id             : 'settings.language',
-						defaultMessage : 'Language'
-					})}
-					autoWidth
-					className={classes.selectEmpty}
-				>
-					{ localesList.map((item, index) =>
-					{
-						return (
-							<MenuItem key={index} value={item.locale[0]}>
-								{item.name}
-							</MenuItem>
-						);
-					})}
-				</Select>
-				<FormHelperText>
-					<FormattedMessage
-						id='settings.language'
-						defaultMessage='Select language'
-					/>
-				</FormHelperText>
-			</FormControl>
-
-			<FormControl className={classes.setting}>
-				<Select
 					value={room.mode || ''}
 					onChange={(event) =>
 					{
