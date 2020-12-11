@@ -261,7 +261,7 @@ class Room extends EventEmitter
 		this._queue = new AwaitQueue();
 
 		// Locked flag.
-		this._locked = false;
+		this._locked = config.roomsUnlocked && Array.isArray(config.roomsUnlocked) && !config.roomsUnlocked.includes(roomId)
 
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;

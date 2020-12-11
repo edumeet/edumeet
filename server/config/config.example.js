@@ -349,6 +349,12 @@ module.exports =
 	// When true, the room will be open to all users as long as there
 	// are allready users in the room
 	activateOnHostJoin   : true,
+	// roomsUnlocked is an array of rooms users can enter without waiting
+	// in the lobby.  If the array is undefined or null, users can enter
+	// any room without waiting in the lobby.  This is the default.  The
+	// aim of roomsUnlocked is to enforce moderated access to all rooms
+	// with the exception of the rooms defined in the array.
+	// roomsUnlocked        : [ 'unlocked1', 'unlocked2', 'unlocked3' ],
 	// When set, maxUsersPerRoom defines how many users can join
 	// a single room. If not set, there is no limit.
 	// maxUsersPerRoom    : 20,
