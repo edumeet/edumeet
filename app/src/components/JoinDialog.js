@@ -86,7 +86,7 @@ const styles = (theme) =>
 
 		green :
 		{
-			color : '#5F9B2D'
+			color : '#094E98'
 		},
 		red :
 		{
@@ -94,22 +94,22 @@ const styles = (theme) =>
 		},
 		joinButton :
 		{
-			background : '#2e7031',
+			background : '#094E98',
 			color      : 'white',
 			'&:hover'  : {
-				backgroundColor : '#2e7031'
+				backgroundColor : '#094E98'
 			}
 		},
 		mediaDevicesAnySelectedButton :
 		{
 			'& .Mui-selected' : {
 				color           : 'white',
-				backgroundColor : '#5F9B2D',
+				backgroundColor : '#195E91',
 				'&:hover'       : {
 					color           : 'white',
-					backgroundColor : '#5F9B2D'
-				} }
-
+					backgroundColor : '#195E91'
+				}
+			}
 		},
 
 		mediaDevicesNoneSelectedButton :
