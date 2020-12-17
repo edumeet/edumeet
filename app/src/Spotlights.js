@@ -135,6 +135,8 @@ export default class Spotlights
 		{
 			logger.debug('_spotlightsUpdated() | spotlights not updated');
 		}
+
+		this._roomClient.handleConsumerPreferredLayers();
 	}
 
 	_arraysEqual(arr1, arr2)

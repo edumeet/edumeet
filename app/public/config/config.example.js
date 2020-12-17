@@ -158,7 +158,14 @@ var config =
 	mobileLastN          : 1,
 	// Highest number of lastN the user can select manually in 
 	// userinteface
-	maxLastN             : 5,
+	maxLastN             : 20,
+	// This values (desktop, mobile) are the limit of visible remote video streams
+	// with full quality. If the number of visible remote video streams is higher
+	// than this value the preferred quality will be decreased, except for
+	// the active speaker, peers pinned to spotlights, videos in new window or videos
+	// in full screen mode. This allows for having up to 20 video windows.
+	qualityDecMaxN       : 3,
+	qualityDecMobileMaxN : 1,
 	// If truthy, users can NOT change number of speakers visible
 	lockLastN            : false,
 	// Show logo if "logo" is not null, else show title

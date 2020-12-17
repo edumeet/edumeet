@@ -322,6 +322,7 @@ const Peer = (props) =>
 										onClick={() =>
 										{
 											toggleConsumerWindow(webcamConsumer);
+											roomClient.handleConsumerPreferredLayers();
 										}}
 									>
 										<NewWindowIcon />
@@ -341,6 +342,7 @@ const Peer = (props) =>
 										onClick={() =>
 										{
 											toggleConsumerWindow(webcamConsumer);
+											roomClient.handleConsumerPreferredLayers();
 										}}
 									>
 										<NewWindowIcon />
@@ -369,6 +371,7 @@ const Peer = (props) =>
 									onClick={() =>
 									{
 										toggleConsumerFullscreen(webcamConsumer);
+										roomClient.handleConsumerPreferredLayers();
 									}}
 								>
 									<FullScreenIcon />
@@ -385,6 +388,7 @@ const Peer = (props) =>
 									onClick={() =>
 									{
 										toggleConsumerFullscreen(webcamConsumer);
+										roomClient.handleConsumerPreferredLayers();
 									}}
 								>
 									<FullScreenIcon />
@@ -518,6 +522,7 @@ const Peer = (props) =>
 												onClick={() =>
 												{
 													toggleConsumerWindow(consumer);
+													roomClient.handleConsumerPreferredLayers();
 												}}
 											>
 												<NewWindowIcon />
@@ -537,6 +542,7 @@ const Peer = (props) =>
 												onClick={() =>
 												{
 													toggleConsumerWindow(consumer);
+													roomClient.handleConsumerPreferredLayers();
 												}}
 											>
 												<NewWindowIcon />
@@ -565,6 +571,7 @@ const Peer = (props) =>
 											onClick={() =>
 											{
 												toggleConsumerFullscreen(consumer);
+												roomClient.handleConsumerPreferredLayers();
 											}}
 										>
 											<FullScreenIcon />
@@ -581,6 +588,7 @@ const Peer = (props) =>
 											onClick={() =>
 											{
 												toggleConsumerFullscreen(consumer);
+												roomClient.handleConsumerPreferredLayers();
 											}}
 										>
 											<FullScreenIcon />
@@ -700,6 +708,7 @@ const Peer = (props) =>
 										onClick={() =>
 										{
 											toggleConsumerWindow(screenConsumer);
+											roomClient.handleConsumerPreferredLayers();
 										}}
 									>
 										<NewWindowIcon />
@@ -725,6 +734,7 @@ const Peer = (props) =>
 									onClick={() =>
 									{
 										toggleConsumerFullscreen(screenConsumer);
+										roomClient.handleConsumerPreferredLayers();
 									}}
 								>
 									<FullScreenIcon />

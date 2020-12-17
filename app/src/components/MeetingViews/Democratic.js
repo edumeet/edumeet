@@ -13,7 +13,7 @@ import Me from '../Containers/Me';
 const PADDING_V = 64;
 const PADDING_H = 50;
 
-const FILL_RATE = 0.95;
+const FILL_RATE = 0.97;
 
 const styles = (theme) =>
 	({
@@ -89,17 +89,21 @@ class Democratic extends React.PureComponent
 		const height =
 			current.clientHeight - (toolbarsVisible || permanentTopBar ? PADDING_V : 0);
 
-		let x, y, space;
+		let x, xm, y, ym, space;
 
 		for (let rows = 1; rows <= boxes; rows = rows + 1)
 		{
-			x = width / Math.ceil(n / rows);
-			y = x / aspectRatio;
+			xm = width / Math.ceil(n / rows);
+			ym = xm / aspectRatio;
+			x = xm - 2 * 6;
+			y = ym - 2 * 6;
 
 			if (height < (y * rows))
 			{
-				y = height / rows;
-				x = aspectRatio * y;
+				ym = height / rows;
+				xm = aspectRatio * ym;
+				y = ym - 2 * 6;
+				x = xm - 2 * 6;
 
 				break;
 			}
@@ -107,7 +111,17 @@ class Democratic extends React.PureComponent
 			space = height - (y * (rows));
 
 			if (space < y)
+			{
+				if (space < 0)
+				{
+					ym = height / rows;
+					xm = aspectRatio * ym;
+					y = ym - 2 * 6;
+					x = xm - 2 * 6;
+				}
+
 				break;
+		}
 		}
 
 		if (

@@ -77,7 +77,7 @@ const AdvancedSettings = ({
 							className={classes.selectEmpty}
 						>
 							{ Array.from(
-								{ length: window.config.maxLastN || 10 },
+								{ length: window.config.maxLastN || 20 },
 								(_, i) => i + 1
 							).map((lastN) =>
 							{

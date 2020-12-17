@@ -1064,7 +1064,9 @@ export default class RoomClient
 				if (consumer.kind === 'video')
 				{
 					if (spotlights.includes(consumer.appData.peerId))
+					{
 						await this._resumeConsumer(consumer);
+					}
 					else
 					{
 						await this._pauseConsumer(consumer);
@@ -1979,6 +1981,56 @@ export default class RoomClient
 		}
 	}
 
+	handleConsumerPreferredLayers()
+	{
+		let limit;
+
+		if (this._device.platform === 'desktop')
+		{
+			limit = window.config.qualityDecMaxN?window.config.qualityDecMaxN:3;
+		}
+		else
+		{
+			limit = window.config.qualityDecMobileMaxN?window.config.qualityDecMobileMaxN:1;
+		}
+
+		const activeVideoConsumers = new Array();
+
+		for (const consumer of this._consumers.values())
+		{
+			if (consumer.kind === 'video' && !consumer.paused && !consumer.closed &&
+				this._spotlights.peerInSpotlights(consumer.appData.peerId))
+			{
+				activeVideoConsumers.push(consumer);
+			}
+		}
+
+		activeVideoConsumers.forEach((consumer) =>
+		{
+			let spatialLayer = 100;
+
+			let temporalLayer = 100;
+
+			if (activeVideoConsumers.length > limit &&
+				store.getState().room.activeSpeakerId !== consumer.appData.peerId &&
+				store.getState().room.fullScreenConsumer !== consumer.id &&
+				store.getState().room.windowConsumer !== consumer.id)
+			{
+				spatialLayer = 0;
+				temporalLayer = 0;
+			}
+
+			try
+			{
+				this.setConsumerPreferredLayers(consumer, spatialLayer, temporalLayer);
+			}
+			catch (error)
+			{
+				logger.error('handleConsumerPreferredLayers() [error:"%o"]', error);
+			}
+		});
+	}
+
 	async _resumeConsumer(consumer)
 	{
 		logger.debug('_resumeConsumer() [consumer:"%o"]', consumer);
@@ -2064,8 +2116,20 @@ export default class RoomClient
 		}
 	}
 
-	async setConsumerPreferredLayers(consumerId, spatialLayer, temporalLayer)
+	async setConsumerPreferredLayers(consumer, spatialLayer, temporalLayer)
 	{
+		const consumerId = consumer.id;
+
+		if (consumer.preferredSpatialLayer === spatialLayer &&
+			consumer.preferredTemporalLayer === temporalLayer)
+	{
+		logger.debug(
+				'setConsumerPreferredLayers() not setting, old values the same [consumerId:"%s", spatialLayer:"%s", temporalLayer:"%s"]',
+				consumerId, spatialLayer, temporalLayer);
+
+			return;
+		}
+
 		logger.debug(
 			'setConsumerPreferredLayers() [consumerId:"%s", spatialLayer:"%s", temporalLayer:"%s"]',
 			consumerId, spatialLayer, temporalLayer);
@@ -2346,8 +2410,8 @@ export default class RoomClient
 							source                 : consumer.appData.source,
 							spatialLayers          : spatialLayers,
 							temporalLayers         : temporalLayers,
-							preferredSpatialLayer  : spatialLayers - 1,
-							preferredTemporalLayer : temporalLayers - 1,
+							preferredSpatialLayer  : 0,
+							preferredTemporalLayer : 0,
 							priority               : 1,
 							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
 							track                  : consumer.track
@@ -2357,6 +2421,8 @@ export default class RoomClient
 					// We are ready. Answer the request so the server will
 					// resume this Consumer (which was paused for now).
 					cb(null);
+
+					this.handleConsumerPreferredLayers();
 
 					if (kind === 'audio')
 					{
@@ -2907,6 +2973,8 @@ export default class RoomClient
 						store.dispatch(
 							consumerActions.removeConsumer(consumerId, peerId));
 
+						this.handleConsumerPreferredLayers();
+
 						break;
 					}
 
@@ -2921,6 +2989,8 @@ export default class RoomClient
 						store.dispatch(
 							consumerActions.setConsumerPaused(consumerId, 'remote'));
 
+						this.handleConsumerPreferredLayers();
+
 						break;
 					}
 
@@ -2934,6 +3004,8 @@ export default class RoomClient
 
 						store.dispatch(
 							consumerActions.setConsumerResumed(consumerId, 'remote'));
+
+						this.handleConsumerPreferredLayers();
 
 						break;
 					}
