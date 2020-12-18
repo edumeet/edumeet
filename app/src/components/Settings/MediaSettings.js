@@ -23,9 +23,6 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Switch from '@material-ui/core/Switch';
 import ImageUploader from 'react-images-upload';
 import Resizer from 'react-image-file-resizer';
-import Logger from '../../Logger';
-
-const logger = new Logger('MediaSettings');
 
 const NoiseSlider = withStyles(
 	{
