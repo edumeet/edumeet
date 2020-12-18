@@ -119,7 +119,7 @@ const styles = (theme) =>
 			{
 				opacity : 1
 			},
-			'& p'           :
+			'& p' :
 			{
 				padding       : '6px 12px',
 				borderRadius  : 6,
