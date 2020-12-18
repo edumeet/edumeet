@@ -468,11 +468,7 @@ const TopBar = (props) =>
 										loggedIn ? roomClient.logout() : roomClient.login();
 									}}
 								>
-									{ myPicture ?
-										<Avatar src={myPicture} />
-										:
-										<AccountCircle className={loggedIn ? classes.green : null} />
-									}
+									<AccountCircle className={loggedIn ? classes.green : null} />
 								</IconButton>
 							</Tooltip>
 						}
@@ -692,11 +688,7 @@ const TopBar = (props) =>
 							loggedIn ? roomClient.logout() : roomClient.login();
 						}}
 					>
-						{ myPicture ?
-							<Avatar src={myPicture} />
-							:
-							<AccountCircle className={loggedIn ? classes.green : null} />
-						}
+						<AccountCircle className={loggedIn ? classes.green : null} />
 						{ loggedIn ?
 							<p className={classes.moreAction}>
 								<FormattedMessage

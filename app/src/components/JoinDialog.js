@@ -413,21 +413,14 @@ const JoinDialog = ({
 														() => roomClient.login(roomId)
 												}
 											>
-												{ myPicture ?
-													<Avatar
-														src={myPicture}
-														className={classes.accountButtonAvatar}
-													/>
-													:
-													<AccountCircle
-														className={
-															classnames(
-																classes.accountButtonAvatar,
-																loggedIn ? classes.green : null
-															)
-														}
-													/>
-												}
+												<AccountCircle
+													className={
+														classnames(
+															classes.accountButtonAvatar,
+															loggedIn ? classes.green : null
+														)
+													}
+												/>
 											</IconButton>
 										</Grid>
 										<Grid item>
