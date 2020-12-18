@@ -1372,7 +1372,7 @@ class Room extends EventEmitter
 				break;
 			}
 
-			/* case 'changePicture':
+			case 'changePicture':
 			{
 				// Ensure the Peer is joined.
 				if (!peer.joined)
@@ -1392,7 +1392,7 @@ class Room extends EventEmitter
 				cb();
 
 				break;
-			} */
+			}
 
 			case 'chatMessage':
 			{
