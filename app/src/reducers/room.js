@@ -23,6 +23,7 @@ const initialState =
 	spotlights                    : [],
 	rolesManagerPeer              : null, // peerId
 	settingsOpen                  : false,
+	roomRecordOpen                : false,
 	extraVideoOpen                : false,
 	hideSelfView                  : false,
 	rolesManagerOpen              : false,
@@ -128,6 +129,13 @@ const room = (state = initialState, action) =>
 			const { settingsOpen } = action.payload;
 
 			return { ...state, settingsOpen };
+		}
+
+		case 'SET_ROOMRECORD_OPEN':
+		{
+			const { roomRecordOpen } = action.payload;
+
+			return { ...state, roomRecordOpen };
 		}
 
 		case 'SET_EXTRA_VIDEO_OPEN':

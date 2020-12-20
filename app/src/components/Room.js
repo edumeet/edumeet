@@ -26,6 +26,7 @@ import Settings from './Settings/Settings';
 import TopBar from './Controls/TopBar';
 import WakeLock from 'react-wakelock-react16';
 import ExtraVideo from './Controls/ExtraVideo';
+import RoomRecord from './Controls/RoomRecord';
 import ButtonControlBar from './Controls/ButtonControlBar';
 import Help from './Controls/Help';
 import About from './Controls/About';
@@ -278,6 +279,9 @@ class Room extends React.PureComponent
 					<Settings />
 				}
 
+				{ room.roomRecordOpen &&
+					<RoomRecord />
+				}
 				{ room.extraVideoOpen &&
 					<ExtraVideo />
 				}

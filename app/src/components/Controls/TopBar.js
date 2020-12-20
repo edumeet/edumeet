@@ -223,6 +223,7 @@ const TopBar = (props) =>
 		fullscreen,
 		onFullscreen,
 		setSettingsOpen,
+		setRoomRecordOpen,
 		setExtraVideoOpen,
 		setHelpOpen,
 		setAboutOpen,
@@ -567,7 +568,11 @@ const TopBar = (props) =>
 								handleMenuClose();
 								if (!room.recording)
 								{
-									roomClient.startRoomRecord();
+									// setExtraVideoOpen(!room.extraVideoOpen);
+
+									setRoomRecordOpen(true);
+
+									// roomClient.startRoomRecord(); !room.roomRecordOpen
 								}
 								else
 								{
@@ -1021,6 +1026,7 @@ TopBar.propTypes =
 	onFullscreen         : PropTypes.func.isRequired,
 	setToolbarsVisible   : PropTypes.func.isRequired,
 	setSettingsOpen      : PropTypes.func.isRequired,
+	setRoomRecordOpen    : PropTypes.func.isRequired,
 	setExtraVideoOpen    : PropTypes.func.isRequired,
 	setHelpOpen          : PropTypes.func.isRequired,
 	setAboutOpen         : PropTypes.func.isRequired,
@@ -1082,6 +1088,10 @@ const mapDispatchToProps = (dispatch) =>
 		setSettingsOpen : (settingsOpen) =>
 		{
 			dispatch(roomActions.setSettingsOpen(settingsOpen));
+		},
+		setRoomRecordOpen : (roomRecordOpen) =>
+		{
+			dispatch(roomActions.setRoomRecordOpen(roomRecordOpen));
 		},
 		setExtraVideoOpen : (extraVideoOpen) =>
 		{

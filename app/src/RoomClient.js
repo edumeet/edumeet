@@ -3563,6 +3563,13 @@ export default class RoomClient
 	{
 		logger.debug('startRoomRecord()');
 
+		/* store.dispatch(
+			roomActions.setRoomRecordOpen(true)); */
+
+		/* roomActions.setExtraVideoOpen(true)); */
+
+		return;
+
 		function mixer(stream1, stream2)
 		{
 			const ctx = new AudioContext();

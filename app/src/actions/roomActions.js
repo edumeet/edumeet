@@ -74,6 +74,12 @@ export const setSettingsOpen = (settingsOpen) =>
 		payload : { settingsOpen }
 	});
 
+export const setRoomRecordOpen = (roomRecordOpen) =>
+	({
+		type    : 'SET_ROOMRECORD_OPEN',
+		payload : { roomRecordOpen }
+	});
+
 export const setExtraVideoOpen = (extraVideoOpen) =>
 	({
 		type    : 'SET_EXTRA_VIDEO_OPEN',
