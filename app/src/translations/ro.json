@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": null,
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.startRecording": null,
+	"room.stopRecording": null,
+	"room.roomRecordCodecs": null,
+	"room.cantRoomRecordCodecs": null,
+	"room.roomRecord": null,
+	"room.youStartedRoomRecording": null,
+	"room.unableToRoomRecord": null,
+	"room.cantStartRoomRecord": null,
+	"room.youStoppedRoomRecording": null,
 
 	"me.mutedPTT": null,
 
@@ -137,6 +146,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.startRoomRecord": null,
 
 	"settings.settings": "Setări",
 	"settings.camera": "Cameră video",
@@ -177,6 +187,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Încercarea de a salva fișierul a eșuat",
 	"filesharing.startingFileShare": "Partajarea fișierului",

@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "Přerušit všem sdílení obrazovky",
 	"room.hideSelfView": "Schovat své video",
 	"room.showSelfView": "Ukázat své video",
+	"room.startRecording": null,
+	"room.stopRecording": null,
+	"room.roomRecordCodecs": null,
+	"room.cantRoomRecordCodecs": null,
+	"room.roomRecord": null,
+	"room.youStartedRoomRecording": null,
+	"room.unableToRoomRecord": null,
+	"room.cantStartRoomRecord": null,
+	"room.youStoppedRoomRecording": null,
 
 	"me.mutedPTT": "Jste ztišen, chcete-li mluvit, podržte mezerník",
 
@@ -77,6 +86,7 @@
 	"tooltip.login": "Přihlásit",
 	"tooltip.logout": "Odhlásit",
 	"tooltip.admitFromLobby": "Povolit uživatele z přijímací místnosti",
+
 	"tooltip.lockRoom": "Uzamknout místnost",
 	"tooltip.unLockRoom": "Odemknout místnost",
 	"tooltip.enterFullscreen": "Zapnout režim celé obrazovky (fullscreen)",
@@ -137,6 +147,7 @@
 	"label.login": "Přihlásit",
 	"label.logout": "Odhlásit",
 	"label.join": "Připojit",
+	"label.startRoomRecord": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",
@@ -177,6 +188,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",

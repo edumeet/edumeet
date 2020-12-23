@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "Alle Bildschirmfreigaben stoppen",
 	"room.hideSelfView": "Selbstansicht-Video ausblenden",
 	"room.showSelfView": "Selbstansicht-Video anzeigen",
+	"room.startRecording": null,
+	"room.stopRecording": null,
+	"room.roomRecordCodecs": null,
+	"room.cantRoomRecordCodecs": null,
+	"room.roomRecord": null,
+	"room.youStartedRoomRecording": null,
+	"room.unableToRoomRecord": null,
+	"room.cantStartRoomRecord": null,
+	"room.youStoppedRoomRecording": null,
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 
@@ -137,6 +146,7 @@
 	"label.login": "Anmelden",
 	"label.logout": "Abmelden",
 	"label.join": "Eintreten",
+	"label.startRoomRecord": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",
@@ -177,6 +187,7 @@
 	"settings.myPhotoLabel": "Maximale Dateigröße: 5MB, akzeptiert: jpg, jpeg, png",
 	"settings.myPhotoSizeError": " Datei ist zu groß",
 	"settings.myPhotoTypeError": " ist keine unterstützte Dateierweiterung",
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",

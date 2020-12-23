@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "Stop all screen sharing",
 	"room.hideSelfView": "Hide self view video",
 	"room.showSelfView": "Show self view video",
+	"room.startRecording": "Start Room Recording",
+	"room.stopRecording": "Stop room recording",
+	"room.roomRecordCodecs": "Choose codecs",
+	"room.cantRoomRecordCodecs": "Can't choose codecs",
+	"room.roomRecord": "Room record",
+	"room.youStartedRoomRecording": "You started room recording",
+	"room.unableToRoomRecord": "Unable to start room recording",
+	"room.cantStartRoomRecord": "Can't start room recording",
+	"room.youStoppedRoomRecording": "You stopped room recording",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -137,6 +146,7 @@
 	"label.login": "Login",
 	"label.logout": "Logout",
 	"label.join": "Join",
+	"label.startRoomRecord": "Room recording",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
@@ -177,6 +187,7 @@
 	"settings.myPhotoLabel": "Max. file size: 5MB, accepted: jpg, jpeg, png",
 	"settings.myPhotoSizeError": " file is too large",
 	"settings.myPhotoTypeError": " is not a supported file extension",
+	"settings.codecs": "Codecs",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "Stopp all skjermdeling",
 	"room.hideSelfView": "Skjule eget bilde",
 	"room.showSelfView": "Vis eget bilde",
+	"room.startRecording": null,
+	"room.stopRecording": null,
+	"room.roomRecordCodecs": null,
+	"room.cantRoomRecordCodecs": null,
+	"room.roomRecord": null,
+	"room.youStartedRoomRecording": null,
+	"room.unableToRoomRecord": null,
+	"room.cantStartRoomRecord": null,
+	"room.youStoppedRoomRecording": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -137,6 +146,7 @@
 	"label.login": "Logg på",
 	"label.logout": "Logg av",
 	"label.join": "Gå inn",
+	"label.startRoomRecord": null,
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
@@ -177,6 +187,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

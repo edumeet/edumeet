@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "Ferma tutte le condivisioni schermo",
 	"room.hideSelfView": "Nascondi il tuo box video",
 	"room.showSelfView": "Visualizza il tuo box video",
+	"room.startRecording": null,
+	"room.stopRecording": null,
+	"room.roomRecordCodecs": null,
+	"room.cantRoomRecordCodecs": null,
+	"room.roomRecord": null,
+	"room.youStartedRoomRecording": null,
+	"room.unableToRoomRecord": null,
+	"room.cantStartRoomRecord": null,
+	"room.youStoppedRoomRecording": null,
 
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
@@ -137,6 +146,7 @@
 	"label.login": "Accesso",
 	"label.logout": "Uscita",
 	"label.join": "Entra",
+	"label.startRoomRecord": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",
@@ -177,6 +187,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",

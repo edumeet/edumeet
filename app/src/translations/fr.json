@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": null,
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.startRecording": null,
+	"room.stopRecording": null,
+	"room.roomRecordCodecs": null,
+	"room.cantRoomRecordCodecs": null,
+	"room.roomRecord": null,
+	"room.youStartedRoomRecording": null,
+	"room.unableToRoomRecord": null,
+	"room.cantStartRoomRecord": null,
+	"room.youStoppedRoomRecording": null,
 
 	"me.mutedPTT": null,
 
@@ -137,6 +146,7 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
+	"label.startRoomRecord": null,
 
 	"settings.settings": "Paramètres",
 	"settings.camera": "Caméra",
@@ -177,6 +187,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Impossible d'enregistrer le fichier",
 	"filesharing.startingFileShare": "Début du transfert de fichier",

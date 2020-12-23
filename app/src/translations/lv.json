@@ -67,6 +67,15 @@
 	"room.stopAllScreenSharing": null,
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.startRecording": null,
+	"room.stopRecording": null,
+	"room.roomRecordCodecs": null,
+	"room.cantRoomRecordCodecs": null,
+	"room.roomRecord": null,
+	"room.youStartedRoomRecording": null,
+	"room.unableToRoomRecord": null,
+	"room.cantStartRoomRecord": null,
+	"room.youStoppedRoomRecording": null,
 
 	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
 
@@ -134,6 +143,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.startRoomRecord": null,
 
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",
@@ -171,6 +181,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",
