@@ -568,11 +568,7 @@ const TopBar = (props) =>
 								handleMenuClose();
 								if (!room.recording)
 								{
-									// setExtraVideoOpen(!room.extraVideoOpen);
-
-									setRoomRecordOpen(true);
-
-									// roomClient.startRoomRecord(); !room.roomRecordOpen
+									setRoomRecordOpen(!room.roomRecordOpen);
 								}
 								else
 								{
@@ -768,7 +764,7 @@ const TopBar = (props) =>
 						handleMenuClose();
 						if (!room.recording)
 						{
-							roomClient.startRoomRecord();
+							setRoomRecordOpen(!room.roomRecordOpen);
 						}
 						else
 						{
