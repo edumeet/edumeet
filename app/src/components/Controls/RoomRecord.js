@@ -49,26 +49,50 @@ const styles = (theme) =>
 const RoomRecord = ({
 	roomClient,
 	roomRecordOpen,
-	webcamDevices,
 	handleCloseRoomRecord,
 	classes
 }) =>
 {
 	const intl = useIntl();
 
-	const [ videoDevice, setVideoDevice ] = React.useState('');
+	const [ mimeType, setMimeType ] = React.useState('');
 
 	const handleChange = (event) =>
 	{
-		setVideoDevice(event.target.value);
+		setMimeType(event.target.value);
 	};
 
-	let videoDevices;
+	const mimeTypes = [];
 
-	if (webcamDevices)
-		videoDevices = Object.values(webcamDevices);
-	else
-		videoDevices = [];
+	const mimeTypeCapability = [
+		[ 'video/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+		[ 'video/mp4', [] ],
+		[ 'video/mpeg', [] ],
+		[ 'audio/wav', [] ],
+		[ 'audio/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+		[ 'audio/ogg', [ 'Firefox' ] ],
+		[ 'video/webm;codecs=vp8', [ 'Chrome', 'Firefox', 'Safari' ] ],
+		[ 'video/webm;codecs=vp9', [ 'Chrome' ] ],
+		[ 'video/webm;codecs=h264', [ 'Chrome' ] ],
+		[ 'video/x-matroska;codecs=avc1', [ 'Chrome' ] ]
+	];
+
+	if (typeof MediaRecorder === 'undefined')
+	{
+		window.MediaRecorder = {
+			isTypeSupported : function()
+			{
+				return false;
+			}
+		};
+	}
+	mimeTypeCapability.forEach((item) =>
+	{
+		if (MediaRecorder.isTypeSupported(item[0]) && !mimeTypes.includes(item[0]))
+		{
+			mimeTypes.push(item[0]);
+		}
+	});
 
 	return (
 		<Dialog
@@ -80,51 +104,52 @@ const RoomRecord = ({
 		>
 			<DialogTitle id='form-dialog-title'>
 				<FormattedMessage
-					id='room.extraVideo'
-					defaultMessage='Extra video'
+					id='room.roomRecord'
+					defaultMessage='Room Record'
 				/>
 			</DialogTitle>
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
 					<Select
-						value={videoDevice}
+						value={mimeType}
 						displayEmpty
 						name={intl.formatMessage({
-							id             : 'settings.camera',
-							defaultMessage : 'Camera'
+							id             : 'settings.codecs',
+							defaultMessage : 'Codecs'
 						})}
 						autoWidth
 						className={classes.selectEmpty}
-						disabled={videoDevices.length === 0}
+						disabled={mimeTypes.length === 0}
 						onChange={handleChange}
 					>
-						{ videoDevices.map((webcam, index) =>
+						{ mimeTypes.map((mime) =>
 						{
 							return (
-								<MenuItem key={index} value={webcam.deviceId}>{webcam.label}</MenuItem>
+								<MenuItem key={mime} value={mime}>{mime}</MenuItem>
 							);
 						})}
 					</Select>
+
 					<FormHelperText>
-						{ videoDevices.length > 0 ?
+						{ mimeTypes.length > 0 ?
 							intl.formatMessage({
-								id             : 'settings.selectCamera',
-								defaultMessage : 'Select video device'
+								id             : 'room.roomRecordCodecs',
+								defaultMessage : 'Select codecs for recording'
 							})
 							:
 							intl.formatMessage({
-								id             : 'settings.cantSelectCamera',
-								defaultMessage : 'Unable to select video device'
+								id             : 'room.cantRoomRecordCodecs',
+								defaultMessage : 'Unable to select codecs'
 							})
 						}
 					</FormHelperText>
 				</FormControl>
 			</form>
 			<DialogActions>
-				<Button onClick={() => roomClient.addExtraVideo(videoDevice)} color='primary'>
+				<Button onClick={() => roomClient.startRoomRecord(mimeType)} color='primary'>
 					<FormattedMessage
-						id='label.addVideo'
-						defaultMessage='Add video'
+						id='label.startRoomRecord'
+						defaultMessage='Start Room Record'
 					/>
 				</Button>
 			</DialogActions>
@@ -136,14 +161,12 @@ RoomRecord.propTypes =
 {
 	roomClient            : PropTypes.object.isRequired,
 	roomRecordOpen        : PropTypes.bool.isRequired,
-	webcamDevices         : PropTypes.object,
 	handleCloseRoomRecord : PropTypes.func.isRequired,
 	classes               : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
-		webcamDevices  : state.me.webcamDevices,
 		roomRecordOpen : state.room.roomRecordOpen
 	});
 
@@ -159,7 +182,6 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.me.webcamDevices === next.me.webcamDevices &&
 				prev.room.roomRecordOpen === next.room.roomRecordOpen
 			);
 		}

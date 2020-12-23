@@ -3559,16 +3559,12 @@ export default class RoomClient
 		}
 	}
 
-	async startRoomRecord()
+	async startRoomRecord(mimeType)
 	{
 		logger.debug('startRoomRecord()');
 
-		/* store.dispatch(
-			roomActions.setRoomRecordOpen(true)); */
-
-		/* roomActions.setExtraVideoOpen(true)); */
-
-		return;
+		store.dispatch(
+			roomActions.setRoomRecordOpen(false));
 
 		function mixer(stream1, stream2)
 		{
@@ -3596,7 +3592,7 @@ export default class RoomClient
 		{
 			gumStream = this._micProducer.track;
 			gdmStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' }, audio: true });
-
+			recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
 		}
 		catch (error)
 		{
@@ -3611,11 +3607,11 @@ export default class RoomClient
 			logger.error('startRoomRecord() [error:"%o"]', error);
 		}
 
-		recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
-
 		recorder = new RecordRTC(recorderStream, {
-			type : 'video'
+			type     : 'video',
+			mimeType : mimeType
 		});
+
 		recorder.ondataavailable = (e) =>
 		{
 			if (e.data && e.data.size > 0)
@@ -3635,8 +3631,8 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					text : intl.formatMessage({
-						id             : 'room.youstartedrecording',
-						defaultMessage : 'You started recording the room2'
+						id             : 'room.youStartedRoomRecording',
+						defaultMessage : 'You started recording the room'
 					})
 				}));
 		}
@@ -3646,7 +3642,7 @@ export default class RoomClient
 				{
 					type : 'error',
 					text : intl.formatMessage({
-						id             : 'room.cantRecord',
+						id             : 'room.cantStartRoomRecord',
 						defaultMessage : 'Unable to record the room'
 					})
 				}));
@@ -3677,7 +3673,7 @@ export default class RoomClient
 				{
 					type : 'error',
 					text : intl.formatMessage({
-						id             : 'room.cantRecord',
+						id             : 'room.cantStartRoomRecord',
 						defaultMessage : 'Unable to record the room'
 					})
 				}));
@@ -3694,7 +3690,7 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					text : intl.formatMessage({
-						id             : 'room.youstoppedrecording',
+						id             : 'room.youStoppedRoomRecording',
 						defaultMessage : 'You stopped recording the room'
 					})
 				}));
@@ -3705,7 +3701,7 @@ export default class RoomClient
 				{
 					type : 'error',
 					text : intl.formatMessage({
-						id             : 'room.cantRecord',
+						id             : 'room.unableToRoomRecord',
 						defaultMessage : 'Unable to record the room'
 					})
 				}));
