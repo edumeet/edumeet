@@ -3377,8 +3377,10 @@ export default class RoomClient
 						{
 							autoMuteThreshold = window.config.autoMuteThreshold;
 						}
-						if (autoMuteThreshold && peers.length >= autoMuteThreshold)
+						if (autoMuteThreshold >= 0 && peers.length >= autoMuteThreshold)
+						{
 							this.muteMic();
+						}
 					}
 			}
 
