@@ -121,7 +121,7 @@ class Democratic extends React.PureComponent
 				}
 
 				break;
-		}
+			}
 		}
 
 		if (

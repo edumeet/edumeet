@@ -2122,8 +2122,8 @@ export default class RoomClient
 
 		if (consumer.preferredSpatialLayer === spatialLayer &&
 			consumer.preferredTemporalLayer === temporalLayer)
-	{
-		logger.debug(
+		{
+			logger.debug(
 				'setConsumerPreferredLayers() not setting, old values the same [consumerId:"%s", spatialLayer:"%s", temporalLayer:"%s"]',
 				consumerId, spatialLayer, temporalLayer);
 
