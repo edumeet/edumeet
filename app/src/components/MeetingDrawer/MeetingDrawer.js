@@ -76,7 +76,10 @@ const MeetingDrawer = (props) =>
 				>
 					<Tab
 						label={
-							<Badge color='secondary' badgeContent={unreadMessages}>
+							<Badge
+								color='secondary'
+								badgeContent={unreadMessages+unreadFiles}
+							>
 								{intl.formatMessage({
 									id             : 'label.chat',
 									defaultMessage : 'Chat'

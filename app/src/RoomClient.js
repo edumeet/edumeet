@@ -2784,7 +2784,7 @@ export default class RoomClient
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
 							(store.getState().toolarea.toolAreaOpen &&
-							store.getState().toolarea.currentToolTab !== 'files')
+							store.getState().toolarea.currentToolTab !== 'chat')
 						) // Make sound
 						{
 							store.dispatch(
