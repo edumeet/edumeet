@@ -35,12 +35,22 @@ const ChatModerator = (props) =>
 	const {
 		roomClient,
 		isChatModerator,
+		isFileSharingModerator,
 		room,
 		classes
 	} = props;
 
 	if (!isChatModerator)
 		return null;
+
+	if (!isFileSharingModerator)
+		return null;
+
+	const handleClearChat = () =>
+	{
+		roomClient.clearChat();
+		roomClient.clearFileSharing();
+	};
 
 	return (
 		<ul className={classes.root}>
@@ -59,23 +69,43 @@ const ChatModerator = (props) =>
 				variant='contained'
 				color='secondary'
 				disabled={room.clearChatInProgress}
-				onClick={() => roomClient.clearChat()}
+				onClick={handleClearChat}
 			>
 				<FormattedMessage
 					id='room.clearChat'
 					defaultMessage='Clear chat'
 				/>
 			</Button>
+			{/*
+			<Button
+				aria-label={intl.formatMessage({
+					id             : 'room.clearFileSharing',
+					defaultMessage : 'Clear files'
+				})}
+				className={classes.actionButton}
+				variant='contained'
+				color='secondary'
+				disabled={room.clearFileSharingInProgress}
+				onClick={() => roomClient.clearFileSharing()}
+			>
+				<FormattedMessage
+					id='room.clearFileSharing'
+					defaultMessage='Clear files'
+				/>
+			</Button>
+			*/}
+
 		</ul>
 	);
 };
 
 ChatModerator.propTypes =
 {
-	roomClient      : PropTypes.any.isRequired,
-	isChatModerator : PropTypes.bool,
-	room            : PropTypes.object,
-	classes         : PropTypes.object.isRequired
+	roomClient             : PropTypes.any.isRequired,
+	isFileSharingModerator : PropTypes.bool,
+	isChatModerator        : PropTypes.bool,
+	room                   : PropTypes.object,
+	classes                : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -84,8 +114,9 @@ const makeMapStateToProps = () =>
 
 	const mapStateToProps = (state) =>
 		({
-			isChatModerator : hasPermission(state),
-			room            : state.room
+			isChatModerator        : hasPermission(state),
+			isFileSharingModerator : hasPermission(state),
+			room                   : state.room
 		});
 
 	return mapStateToProps;
