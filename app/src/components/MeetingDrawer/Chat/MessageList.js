@@ -38,8 +38,13 @@ class MessageList extends React.Component
 
 	shouldComponentUpdate(nextProps)
 	{
-		if (nextProps.chat.length !== this.props.chat.length)
+		if (
+			nextProps.chat.length !== this.props.chat.length ||
+			nextProps.files !== this.props.files
+		)
+		{
 			return true;
+		}
 
 		return false;
 	}
@@ -63,67 +68,30 @@ class MessageList extends React.Component
 			chat,
 			myPicture,
 			classes,
-
 			files,
 			me,
 			peers,
 			intl
 		} = this.props;
 
-		// console.log('Chat1:', chat);
-		// console.log('Files1:', files);
+		const items = [ ...chat, ...Object.values(files) ];
 
-		const chatNew = [];
-
-		const filesNew = [];
-
-		chat.map((message, index) => { chatNew[message.time] = message; });
-
-		// { Object.entries(files).map(([ magnetUri, file ]) => { filesNew[file[magnetUri][time]] = file })}
-		// { Object.entries(files).map(([ magnetUri, file ]) => { filesNew[file.time] = file })}
-		{ Object.entries(files)
-			.map(([ magnetUri, file ]) => { filesNew[file.time] = file; }); }
-
-		// allNew = chatNew.concat(filesNew)
-
-		// console.log("chatNew", chatNew)
-
-		// console.log("filesNew", filesNew)
-
-		// var allNew = [...chatNew, ...filesNew];
-
-		const allNew = { ...chatNew, ...filesNew };
-
-		const ordered = {};
-
-		Object.keys(allNew).sort()
-			.forEach(function(key)
-			{
-				ordered[key] = allNew[key];
-			});
-
-		// console.log('ordered1', ordered);
-
-		// console.log("isArr", Array.isArray(chatNew) )
-		// console.log("Files1", files)
+		items.sort((a, b) => (a.time < b.time ? -1: 1));
 
 		return (
 			<React.Fragment>
 				<div className={classes.root} ref={(node) => { this.node = node; }}>
 					{
-						Object.entries(ordered).map(([ index, item ]) =>
+						items.map((item) =>
 						{
-						// console.log("Item1", item)
-
 							if (item.type === 'message')
 							{
-
 								const picture = (item.sender === 'response' ?
 									item.picture : myPicture) || EmptyAvatar;
 
 								return (
 									<Message
-										key={index}
+										key={item.time}
 										self={item.sender === 'client'}
 										picture={picture}
 										text={item.text}
@@ -163,7 +131,7 @@ class MessageList extends React.Component
 
 								return (
 									<File
-										key={item.magnetUri}
+										key={item.time}
 										magnetUri={item.magnetUri}
 										displayName={displayName}
 										picture={filePicture || EmptyAvatar}
@@ -175,61 +143,6 @@ class MessageList extends React.Component
 						})
 					}
 
-					{/* {
-					chat.map((message, index) =>
-					{
-						const picture = (message.sender === 'response' ?
-							message.picture : myPicture) || EmptyAvatar;
-
-						return (
-							<Message
-								key={index}
-								self={message.sender === 'client'}
-								picture={picture}
-								text={message.text}
-								time={this.getTimeString(message.time)}
-								name={message.name}
-							/>
-						);
-					})
-				} */}
-
-					{/* { Object.entries(files).map(([ magnetUri, file ]) =>
-				{
-					let displayName;
-
-					let filePicture;
-
-					if (me.id === file.peerId)
-					{
-						displayName = intl.formatMessage({
-							id             : 'room.me',
-							defaultMessage : 'Me'
-						});
-						filePicture = me.picture;
-					}
-					else if (peers[file.peerId])
-					{
-						displayName = peers[file.peerId].displayName;
-						filePicture = peers[file.peerId].picture;
-					}
-					else
-					{
-						displayName = intl.formatMessage({
-							id             : 'label.unknown',
-							defaultMessage : 'Unknown'
-						});
-					}
-
-					return (
-						<File
-							key={magnetUri}
-							magnetUri={magnetUri}
-							displayName={displayName}
-							picture={filePicture || EmptyAvatar}
-						/>
-					);
-				})} */}
 				</div>
 			</React.Fragment>
 		);
@@ -253,10 +166,9 @@ const mapStateToProps = (state) =>
 	({
 		chat      : state.chat,
 		myPicture : state.me.picture,
-
-		files : state.files,
-		me    : state.me,
-		peers : state.peers
+		me        : state.me,
+		peers     : state.peers,
+		files     : state.files
 
 	});
 
@@ -269,9 +181,8 @@ export default connect(
 		{
 			return (
 				prev.chat === next.chat &&
-				prev.me.picture === next.me.picture &&
-
 				prev.files === next.files &&
+				prev.me.picture === next.me.picture &&
 				prev.me === next.me &&
 				prev.peers === next.peers
 			);
