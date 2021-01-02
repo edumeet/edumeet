@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
+import AttachFileIcon from '@material-ui/icons/AttachFile';
 
 const styles = (theme) =>
 	({
@@ -22,8 +23,11 @@ const styles = (theme) =>
 		},
 		input :
 		{
-			marginLeft : 8,
-			flex       : 1
+			marginLeft     : 8,
+			flex           : 1,
+			'&[type=file]' : {
+				display : 'none'
+			}
 		},
 		iconButton :
 		{
@@ -52,11 +56,20 @@ const ChatInput = (props) =>
 		setMessage(e.target.value);
 	};
 
+	const handleFileChange = async (event) =>
+	{
+		if (event.target.files.length > 0)
+		{
+			await props.roomClient.shareFiles(event.target.files);
+		}
+	};
+
 	const {
 		roomClient,
 		displayName,
 		picture,
 		canChat,
+		canShare,
 		classes
 	} = props;
 
@@ -89,6 +102,38 @@ const ChatInput = (props) =>
 				}}
 				autoFocus
 			/>
+
+			<IconButton
+				className={classes.iconButton}
+				color='primary'
+				aria-label='Share file'
+				onChange={handleFileChange}
+				disabled={!canShare}
+				// onClick={(e) => (e.target.value = null)}
+			>
+				<input
+					id='contained-button-file'
+					className={classes.input}
+					type='file'
+					multiple
+				/>
+				<label htmlFor='contained-button-file'>
+					<AttachFileIcon />
+				</label>
+
+				{/*
+				<input
+					className={classes.input}
+					type='file'
+					disabled={!canShare}
+					onChange={handleFileChange}
+					// Need to reset to be able to share same file twice
+					onClick={(e) => (e.target.value = null)}
+					id='share-files-button'
+				/>
+				*/}
+			</IconButton>
+
 			<IconButton
 				color='primary'
 				className={classes.iconButton}
@@ -108,6 +153,7 @@ const ChatInput = (props) =>
 			>
 				<SendIcon />
 			</IconButton>
+
 		</Paper>
 	);
 };
@@ -118,6 +164,7 @@ ChatInput.propTypes =
 	displayName : PropTypes.string,
 	picture     : PropTypes.string,
 	canChat     : PropTypes.bool.isRequired,
+	canShare    : PropTypes.bool.isRequired,
 	classes     : PropTypes.object.isRequired
 };
 
@@ -129,7 +176,8 @@ const makeMapStateToProps = () =>
 		({
 			displayName : state.settings.displayName,
 			picture     : state.me.picture,
-			canChat     : hasPermission(state)
+			canChat     : hasPermission(state),
+			canShare    : hasPermission(state)
 		});
 
 	return mapStateToProps;
