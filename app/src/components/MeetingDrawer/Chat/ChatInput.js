@@ -51,12 +51,12 @@ const ChatInput = (props) =>
 			picture
 		});
 
-	const handleChange = (e) =>
+	const handleMessage = (e) =>
 	{
 		setMessage(e.target.value);
 	};
 
-	const handleFileChange = async (event) =>
+	const handleFile = async (event) =>
 	{
 		if (event.target.files.length > 0)
 		{
@@ -83,7 +83,7 @@ const ChatInput = (props) =>
 				})}
 				value={message || ''}
 				disabled={!canChat}
-				onChange={handleChange}
+				onChange={handleMessage}
 				onKeyPress={(ev) =>
 				{
 					if (ev.key === 'Enter')
@@ -107,7 +107,7 @@ const ChatInput = (props) =>
 				className={classes.iconButton}
 				color='primary'
 				aria-label='Share file'
-				onChange={handleFileChange}
+				onChange={handleFile}
 				disabled={!canShare}
 				// onClick={(e) => (e.target.value = null)}
 			>
@@ -126,7 +126,7 @@ const ChatInput = (props) =>
 					className={classes.input}
 					type='file'
 					disabled={!canShare}
-					onChange={handleFileChange}
+					onChange={handleFile}
 					// Need to reset to be able to share same file twice
 					onClick={(e) => (e.target.value = null)}
 					id='share-files-button'
