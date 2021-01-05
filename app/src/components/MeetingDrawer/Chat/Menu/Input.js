@@ -124,18 +124,6 @@ const ChatInput = (props) =>
 				</IconButton>
 			</label>
 
-			{/*
-				<input
-					className={classes.input}
-					type='file'
-					disabled={!canShare}
-					onChange={handleFile}
-					// Need to reset to be able to share same file twice
-					onClick={(e) => (e.target.value = null)}
-					id='share-files-button'
-				/>
-				*/}
-
 			<IconButton
 				color='primary'
 				className={classes.iconButton}
