@@ -8,7 +8,7 @@ import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 
 import * as appPropTypes from '../../appPropTypes';
 
-import File from '../FileSharing/File';
+import File from './File';
 
 const styles = (theme) =>
 	({
