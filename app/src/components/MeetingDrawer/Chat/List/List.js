@@ -3,12 +3,11 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { FormattedTime, injectIntl } from 'react-intl';
-import Message from './Message';
-import EmptyAvatar from '../../../images/avatar-empty.jpeg';
+import * as appPropTypes from '../../../appPropTypes';
 
-import * as appPropTypes from '../../appPropTypes';
-
-import File from './File';
+import Message from './Item/Message';
+import File from './Item/File';
+import EmptyAvatar from '../../../../images/avatar-empty.jpeg';
 
 const styles = (theme) =>
 	({

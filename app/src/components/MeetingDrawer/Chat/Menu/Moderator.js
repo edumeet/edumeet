@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { withRoomContext } from '../../../RoomContext';
+import { withRoomContext } from '../../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
-import { permissions } from '../../../permissions';
-import { makePermissionSelector } from '../../Selectors';
+import { permissions } from '../../../../permissions';
+import { makePermissionSelector } from '../../../Selectors';
 import Button from '@material-ui/core/Button';
 
 const styles = (theme) =>
