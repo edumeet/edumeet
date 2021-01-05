@@ -103,25 +103,28 @@ const ChatInput = (props) =>
 				autoFocus
 			/>
 
-			<IconButton
-				className={classes.iconButton}
-				color='primary'
-				aria-label='Share file'
+			<input
+				id='contained-button-file'
+				className={classes.input}
+				type='file'
+				multiple
 				onChange={handleFile}
-				disabled={!canShare}
-				// onClick={(e) => (e.target.value = null)}
-			>
-				<input
-					id='contained-button-file'
-					className={classes.input}
-					type='file'
-					multiple
-				/>
-				<label htmlFor='contained-button-file'>
-					<AttachFileIcon />
-				</label>
+			/>
 
-				{/*
+			<label htmlFor='contained-button-file'>
+				<IconButton
+					className={classes.iconButton}
+					color='primary'
+					aria-label='Share file'
+					disabled={!canShare}
+					component='span'
+					// onClick={(e) => (e.target.value = null)}
+				>
+					<AttachFileIcon />
+				</IconButton>
+			</label>
+
+			{/*
 				<input
 					className={classes.input}
 					type='file'
@@ -132,7 +135,6 @@ const ChatInput = (props) =>
 					id='share-files-button'
 				/>
 				*/}
-			</IconButton>
 
 			<IconButton
 				color='primary'
