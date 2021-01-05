@@ -939,7 +939,9 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('sendFile', { magnetUri });
+			const time = store.getState().files[magnetUri].time;
+
+			await this.sendRequest('sendFile', { magnetUri, time });
 		}
 		catch (error)
 		{
@@ -2769,9 +2771,9 @@ export default class RoomClient
 
 					case 'sendFile':
 					{
-						const { peerId, magnetUri } = notification.data;
+						const { peerId, magnetUri, time } = notification.data;
 
-						store.dispatch(fileActions.addFile(peerId, magnetUri));
+						store.dispatch(fileActions.addFile(peerId, magnetUri, time));
 
 						store.dispatch(requestActions.notify(
 							{

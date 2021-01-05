@@ -4,7 +4,7 @@ const files = (state = {}, action) =>
 	{
 		case 'ADD_FILE':
 		{
-			const { peerId, magnetUri } = action.payload;
+			const { peerId, magnetUri, time } = action.payload;
 
 			const newFile = {
 				active    : false,
@@ -13,7 +13,7 @@ const files = (state = {}, action) =>
 				files     : null,
 				peerId    : peerId,
 				magnetUri : magnetUri,
-				time      : Date.now()
+				time      : time ? time : Date.now()
 			};
 
 			return { ...state, [magnetUri]: newFile };
@@ -32,7 +32,6 @@ const files = (state = {}, action) =>
 				{
 					active   : false,
 					type     : 'file',
-					time     : Date.now(),
 					progress : 0,
 					files    : null,
 					...file

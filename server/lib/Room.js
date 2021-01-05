@@ -1542,14 +1542,15 @@ class Room extends EventEmitter
 				if (!this._hasPermission(peer, SHARE_FILE))
 					throw new Error('peer not authorized');
 
-				const { magnetUri } = request.data;
+				const { magnetUri, time } = request.data;
 
-				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
+				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri, time: time });
 
 				// Spread to others
 				this._notification(peer.socket, 'sendFile', {
 					peerId    : peer.id,
-					magnetUri : magnetUri
+					magnetUri : magnetUri,
+					time      : time
 				}, true);
 
 				// Return no error
