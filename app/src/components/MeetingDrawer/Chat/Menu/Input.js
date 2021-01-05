@@ -79,6 +79,7 @@ const ChatInput = (props) =>
 
 	return (
 		<Paper className={classes.root}>
+			{/* Input message field */}
 			<InputBase
 				className={classes.input}
 				placeholder={intl.formatMessage({
@@ -107,25 +108,29 @@ const ChatInput = (props) =>
 				autoFocus
 			/>
 
-			<input
-				id='contained-button-file'
-				className={classes.input}
-				type='file'
-				multiple
-				onChange={handleFile}
-			/>
-			<label htmlFor='contained-button-file'>
-				<IconButton
-					className={classes.iconButton}
-					color='primary'
-					aria-label='Share file'
+			{/* Button for file sharing */}
+			<React.Fragment>
+				<input
+					id='contained-button-file'
+					className={classes.input}
 					disabled={!canShare}
-					component='span'
+					type='file'
+					multiple
+					onChange={handleFile}
+				/>
+				<label htmlFor='contained-button-file'>
+					<IconButton
+						className={classes.iconButton}
+						color='primary'
+						aria-label='Share file'
+						disabled={!canShareFiles || !canShare}
+						component='span'
 					// onClick={(e) => (e.target.value = null)}
-				>
-					<AttachFileIcon />
-				</IconButton>
-			</label>
+					>
+						<AttachFileIcon />
+					</IconButton>
+				</label>
+			</React.Fragment>
 
 			{/* Button for gallery file sharing (mobile) */}
 			{(browser.platform === 'mobile') && canShareFiles && canShare &&
@@ -153,6 +158,7 @@ const ChatInput = (props) =>
 			</React.Fragment>
 			}
 
+			{/* Button send message */}
 			<IconButton
 				color='primary'
 				className={classes.iconButton}
