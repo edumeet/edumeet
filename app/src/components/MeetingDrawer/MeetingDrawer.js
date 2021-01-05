@@ -10,7 +10,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Badge from '@material-ui/core/Badge';
 import Chat from './Chat/Chat';
-import FileSharing from './FileSharing/FileSharing';
+// import FileSharing from './FileSharing/FileSharing';
 import ParticipantList from './ParticipantList/ParticipantList';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -19,7 +19,8 @@ import IconButton from '@material-ui/core/IconButton';
 const tabs =
 [
 	'chat',
-	'files',
+
+	// 'files',
 	'users'
 ];
 
@@ -87,6 +88,7 @@ const MeetingDrawer = (props) =>
 							</Badge>
 						}
 					/>
+					{/*
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={unreadFiles}>
@@ -97,7 +99,7 @@ const MeetingDrawer = (props) =>
 							</Badge>
 						}
 					/>
-
+					*/}
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={raisedHands}>
@@ -114,7 +116,7 @@ const MeetingDrawer = (props) =>
 				</IconButton>
 			</AppBar>
 			{currentToolTab === 'chat' && <Chat />}
-			{currentToolTab === 'files' && <FileSharing />}
+			{/* currentToolTab === 'files' && <FileSharing /> */}
 			{currentToolTab === 'users' && <ParticipantList />}
 		</div>
 	);
