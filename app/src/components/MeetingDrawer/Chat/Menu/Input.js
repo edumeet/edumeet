@@ -11,6 +11,7 @@ import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
+import PhotoCamera from '@material-ui/icons/PhotoCamera';
 
 const styles = (theme) =>
 	({
@@ -70,7 +71,10 @@ const ChatInput = (props) =>
 		picture,
 		canChat,
 		canShare,
-		classes
+		classes,
+		browser,
+		canShareFiles
+
 	} = props;
 
 	return (
@@ -110,7 +114,6 @@ const ChatInput = (props) =>
 				multiple
 				onChange={handleFile}
 			/>
-
 			<label htmlFor='contained-button-file'>
 				<IconButton
 					className={classes.iconButton}
@@ -123,6 +126,32 @@ const ChatInput = (props) =>
 					<AttachFileIcon />
 				</IconButton>
 			</label>
+
+			{/* Button for gallery file sharing (mobile) */}
+			{(browser.platform === 'mobile') && canShareFiles && canShare &&
+			<React.Fragment>
+				<input
+					className={classes.input}
+					type='file'
+					disabled={!canShare}
+					onChange={handleFile}
+					accept='image/*'
+					id='share-files-gallery-button'
+				/>
+
+				<label htmlFor='share-files-gallery-button'>
+
+					<IconButton
+						className={classes.IconButton}
+						disabled={!canShareFiles || !canShare}
+						aria-label='Share gallery file'
+						component='span'
+					>
+						<PhotoCamera />
+					</IconButton>
+				</label>
+			</React.Fragment>
+			}
 
 			<IconButton
 				color='primary'
@@ -150,12 +179,14 @@ const ChatInput = (props) =>
 
 ChatInput.propTypes =
 {
-	roomClient  : PropTypes.object.isRequired,
-	displayName : PropTypes.string,
-	picture     : PropTypes.string,
-	canChat     : PropTypes.bool.isRequired,
-	canShare    : PropTypes.bool.isRequired,
-	classes     : PropTypes.object.isRequired
+	roomClient    : PropTypes.object.isRequired,
+	displayName   : PropTypes.string,
+	picture       : PropTypes.string,
+	canChat       : PropTypes.bool.isRequired,
+	canShare      : PropTypes.bool.isRequired,
+	classes       : PropTypes.object.isRequired,
+	browser       : PropTypes.object.isRequired,
+	canShareFiles : PropTypes.bool.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -164,10 +195,12 @@ const makeMapStateToProps = () =>
 
 	const mapStateToProps = (state) =>
 		({
-			displayName : state.settings.displayName,
-			picture     : state.me.picture,
-			canChat     : hasPermission(state),
-			canShare    : hasPermission(state)
+			displayName   : state.settings.displayName,
+			picture       : state.me.picture,
+			canChat       : hasPermission(state),
+			canShare      : hasPermission(state),
+			browser       : state.me.browser,
+			canShareFiles : state.me.canShareFiles
 		});
 
 	return mapStateToProps;
@@ -183,7 +216,9 @@ export default withRoomContext(
 			{
 				return (
 					prev.room === next.room &&
+					prev.me.browser === next.me.browser &&
 					prev.me.roles === next.me.roles &&
+					prev.me.canShareFiles === next.me.canShareFiles &&
 					prev.peers === next.peers &&
 					prev.settings.displayName === next.settings.displayName &&
 					prev.me.picture === next.me.picture
