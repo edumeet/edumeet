@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import magnet from 'magnet-uri';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import DescriptionIcon from '@material-ui/icons/Description';
 
 const styles = (theme) =>
 	({
@@ -14,6 +15,7 @@ const styles = (theme) =>
 		{
 			display              : 'flex',
 			alignItems           : 'center',
+			justifyContent       : 'space-between',
 			width                : '100%',
 			padding              : theme.spacing(1),
 			boxShadow            : '0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12)',
@@ -22,6 +24,12 @@ const styles = (theme) =>
 				marginBottom : theme.spacing(1)
 			}
 		},
+		participant :
+		{
+			display    : 'flex',
+			alignItems : 'center'
+		},
+
 		avatar :
 		{
 			borderRadius : '50%',
@@ -36,6 +44,7 @@ const styles = (theme) =>
 		{
 			display    : 'flex',
 			alignItems : 'center'
+
 		},
 		fileInfo :
 		{
@@ -66,20 +75,24 @@ class File extends React.PureComponent
 
 		return (
 			<div className={classes.root}>
-				<img alt='Avatar' className={classes.avatar} src={picture} />
-
+				<div className={classes.participant}>
+					<img alt='Avatar' className={classes.avatar} src={picture} />
+					<span>&nbsp;{displayName}</span>
+				</div>
 				<div className={classes.fileContent}>
 					{ file.files &&
 						<Fragment>
+							{/*
 							<Typography className={classes.text}>
 								<FormattedMessage
 									id='filesharing.finished'
 									defaultMessage='File finished downloading'
 								/>
 							</Typography>
-
+							*/}
 							{ file.files.map((sharedFile, i) => (
 								<div className={classes.fileInfo} key={i}>
+									<DescriptionIcon />
 									<Typography className={classes.text}>
 										{sharedFile.name}
 									</Typography>
@@ -102,6 +115,7 @@ class File extends React.PureComponent
 						</Fragment>
 					}
 					<Typography className={classes.text}>
+						{/*
 						<FormattedMessage
 							id='filesharing.sharedFile'
 							defaultMessage='{displayName} shared a file'
@@ -109,10 +123,12 @@ class File extends React.PureComponent
 								displayName
 							}}
 						/>
+						*/}
 					</Typography>
 
 					{ (!file.active && !file.files) &&
 						<div className={classes.fileInfo}>
+							<DescriptionIcon />
 							<Typography className={classes.text}>
 								{ magnet.decode(magnetUri).dn }
 							</Typography>
