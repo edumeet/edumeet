@@ -253,7 +253,7 @@ const AppearanceSettings = (props) =>
 
 AppearanceSettings.propTypes =
 {
-roomClient                      : PropTypes.any.isRequired,
+	roomClient                      : PropTypes.any.isRequired,
 	isMobile                        : PropTypes.bool.isRequired,
 	room                            : appPropTypes.Room.isRequired,
 	settings                        : PropTypes.object.isRequired,
