@@ -13,9 +13,11 @@ import Badge from '@material-ui/core/Badge';
 import Chat from './Chat/Chat';
 // import FileSharing from './FileSharing/FileSharing';
 import ParticipantList from './ParticipantList/ParticipantList';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+// import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+// import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import IconButton from '@material-ui/core/IconButton';
+import ChatIcon from '@material-ui/icons/Chat';
+import GroupIcon from '@material-ui/icons/Group';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import LockIcon from '@material-ui/icons/Lock';
 
@@ -86,6 +88,7 @@ const MeetingDrawer = (props) =>
 								color='secondary'
 								badgeContent={unreadMessages+unreadFiles}
 							>
+								<ChatIcon />&nbsp;
 								{intl.formatMessage({
 									id             : 'label.chat',
 									defaultMessage : 'Chat'
@@ -108,6 +111,7 @@ const MeetingDrawer = (props) =>
 					<Tab
 						label={
 							<Badge color='secondary' badgeContent={raisedHands}>
+								<GroupIcon />&nbsp;
 								{intl.formatMessage({
 									id             : 'label.participants',
 									defaultMessage : 'Participants'
