@@ -21,6 +21,7 @@
 * Promote all peers from lobby when a peer joins with the PROMOTE_PEER permission and activateOnHostJoin is true in config
 * Make menus more intuitive on mobile
 * Simplify electron screenshare check
+* Logo support
 * Improve autoMute mic-indicators, Improve audio level scaling
 * Clean up participant list
 * Add indicator for peers in focus. Ref #360
@@ -43,7 +44,14 @@
 * Add joinAudio capability
 * Standardize Auth button
 
-### upgrade depencies
+### Migration
+
+from last master version:
+* Copy paste defaultAudio and centralAudioOtions from config.example.js to config.js 
+* Copy paste whole theme from config.example.js to config
+* Configure logo in config.js
+
+### Upgrade depencies
 
 * webtorrent from 0.107.17 to 0.108.1 …
 * Upgrade React-scripts
@@ -57,6 +65,9 @@
 
 * Hopefully fix to silent peer issue, ref #256
 * Set timeout for TURN API request, fixes #484
+* Possible fix for #582 Crackling sound
+* Fix for #444 Settings persistence
+* Fix Audio settings from config.js take no effect
 * Fix only firefox handles applyConstraints to audio tracks correctly
 * Fix (autoMuted) mic too big click area
 * Fix userRoles check

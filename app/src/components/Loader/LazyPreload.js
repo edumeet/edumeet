@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const ReactLazyPreload = (importStatement) =>
+export const LazyPreload = (importStatement) =>
 {
 	const Component = React.lazy(importStatement);
 

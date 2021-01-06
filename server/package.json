@@ -1,9 +1,16 @@
 {
 	"name": "edumeet-server",
-	"version": "3.3.0",
+	"version": "3.3.4",
 	"private": true,
 	"description": "edumeet server",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
+	"contributors": [
+		"Stefan Otto",
+		"Mészáros Mihály",
+		"Roman Drozd",
+		"Rémai Gábor László",
+		"Piotr Pawałowski"
+	],
 	"license": "MIT",
 	"main": "lib/index.js",
 	"scripts": {

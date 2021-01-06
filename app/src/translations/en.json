@@ -38,8 +38,8 @@
 	"room.setYourName": "Set your name for participation, and choose how you want to join:",
 	"room.audioOnly": "Audio only",
 	"room.audioVideo": "Audio and Video",
-	"room.youAreReady": "Ok, you are ready",
-	"room.emptyRequireLogin": "The room is empty! You can Log In to start the meeting or wait until the host joins",
+	"room.youAreReady": "Everything is ready",
+	"room.emptyRequireLogin": "If you are the host, you can Log In to start the meeting. If not, please wait until the host lets you in.",
 	"room.locketWait": "The room is locked - hang on until somebody lets you in ...",
 	"room.lobbyAdministration": "Lobby administration",
 	"room.peersInLobby": "Participants in Lobby",
@@ -51,7 +51,7 @@
 	"room.videoPaused": "This video is paused",
 	"room.muteAll": "Mute all",
 	"room.stopAllVideo": "Stop all video",
-	"room.closeMeeting": "Close meeting",
+	"room.closeMeeting": "Close meeting for all",
 	"room.clearChat": "Clear chat",
 	"room.clearFileSharing": "Clear files",
 	"room.speechUnsupported": "Your browser does not support speech recognition",
@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} raised their hand",
 	"room.loweredHand": "{displayName} put their hand down",
 	"room.extraVideo": "Extra video",
+	"room.extraVideoDuplication": "The video source is already in use.",
 	"room.overRoomLimit": "The room is full, retry after some time.",
 	"room.help": "Help",
 	"room.about": "About",
@@ -132,6 +133,8 @@
 	"label.username": "Username",
 	"label.password": "Password",
 	"label.login": "Login",
+	"label.logout": "Logout",
+	"label.join": "Join",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
@@ -167,6 +170,7 @@
 	"settings.voiceActivatedUnmute": "Voice activated unmute",
 	"settings.noiseThreshold": "Noise threshold",
 	"settings.mirrorOwnVideo": "Mirror view of own video",
+	"settings.language": "Select language",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",
@@ -181,11 +185,13 @@
 
 	"devices.devicesChanged": "Your devices changed, configure your devices in the settings dialog",
 
+	"devices.enableOnlyMicrophone": "Enable only Microphone",
 	"device.audioUnsupported": "Audio unsupported",
 	"device.activateAudio": "Activate audio",
 	"device.muteAudio": "Mute audio",
 	"device.unMuteAudio": "Unmute audio",
 
+	"devices.enableOnlyCamera": "Enable only Camera",
 	"device.videoUnsupported": "Video unsupported",
 	"device.startVideo": "Start video",
 	"device.stopVideo": "Stop video",
@@ -202,20 +208,24 @@
 	"devices.microphoneMuteError": "Unable to mute your microphone",
 	"devices.microphoneUnMuteError": "Unable to unmute your microphone",
 
-	"devices.screenSharingDisconnected" : "Screen sharing disconnected",
+	"devices.screenSharingDisconnected": "Screen sharing disconnected",
 	"devices.screenSharingError": "An error occured while accessing your screen",
 
 	"devices.cameraDisconnected": "Camera disconnected",
 	"devices.cameraError": "An error occured while accessing your camera",
 
+	"devices.enableBothMicrophoneAndCamera": "Enable both Microphone and Camera",
+	"devices.disableBothMicrophoneAndCamera": "Disable both Microphone and Camera",
+	"devices.chooseMedia": "Choose Media",
+
 	"moderator.clearChat": "Moderator cleared the chat",
 	"moderator.clearFiles": "Moderator cleared the files",
 	"moderator.muteAudio": "Moderator muted your audio",
 	"moderator.modifyPeerRoles": "Change roles",
-	"moderator.muteVideo": "Moderator muted your video",
+	"moderator.muteVideo": "Moderator stopped your video",
 	"moderator.stopScreenSharing": "Moderator stopped your screen sharing",
 
-	"unsupportedBrowser.titleUsnsupportedBrowser": "Detected unsupported browser!",
+	"unsupportedBrowser.titleUnsupportedBrowser": "Detected unsupported browser!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Required functionality not available in your browser!",
 	"unsupportedBrowser.bodyText": "This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser, or check your settings. Supported browsers:"
 }

@@ -18,8 +18,8 @@ import * as notificationActions from './actions/notificationActions';
 import * as transportActions from './actions/transportActions';
 import Spotlights from './Spotlights';
 import { permissions } from './permissions';
-// import { updateIntl } from 'react-intl-redux';
 import * as locales from './translations/locales';
+import { createIntl } from 'react-intl';
 
 let createTorrent;
 
@@ -116,8 +116,6 @@ export default class RoomClient
 	static init(data)
 	{
 		store = data.store;
-		intl = data.intl;
-
 	}
 
 	constructor(
@@ -506,6 +504,7 @@ export default class RoomClient
 	{
 
 		if (locale === null) locale = locales.detect();
+
 		const one = locales.loadOne(locale);
 
 		store.dispatch(intlActions.updateIntl({
@@ -514,7 +513,13 @@ export default class RoomClient
 			list   	 : locales.getList()
 		}));
 
-		document.documentElement.lang = one.locale[0].toUpperCase();
+		intl = createIntl({
+			locale   : store.getState().intl.locale,
+			messages : store.getState().intl.messages
+		});
+
+		document.documentElement.lang = store.getState().intl.locale.toUpperCase();
+
 	}
 
 	login(roomId = this._roomId)
@@ -527,6 +532,14 @@ export default class RoomClient
 	logout(roomId = this._roomId)
 	{
 		window.open(`/auth/logout?peerId=${this._peerId}&roomId=${roomId}`, 'logoutWindow');
+	}
+
+	setLoggedIn(loggedIn)
+	{
+		logger.debug('setLoggedIn() | [loggedIn: "%s"]', loggedIn);
+
+		store.dispatch(meActions.loggedIn(loggedIn));
+
 	}
 
 	receiveLoginChildWindow(data)
@@ -1242,14 +1255,29 @@ export default class RoomClient
 				throw new Error('no audio devices');
 
 			const {
-				sampleRate,
-				channelCount,
-				volume,
 				autoGainControl,
 				echoCancellation,
-				noiseSuppression,
-				sampleSize
+				noiseSuppression
 			} = store.getState().settings;
+
+			if (!window.config.centralAudioOptions)
+			{
+				throw new Error(
+					'Missing centralAudioOptions from app config! (See it in example config.)'
+				);
+			}
+
+			const {
+				sampleRate = 48000,
+				channelCount = 1,
+				volume = 1.0,
+				sampleSize = 16,
+				opusStereo = false,
+				opusDtx = true,
+				opusFec = true,
+				opusPtime = 20,
+				opusMaxPlaybackRate = 48000
+			} = window.config.centralAudioOptions;
 
 			if (
 				(restart && this._micProducer) ||
@@ -1287,11 +1315,11 @@ export default class RoomClient
 						track,
 						codecOptions :
 						{
-							opusStereo          : false,
-							opusDtx             : true,
-							opusFec             : true,
-							opusPtime           : '3',
-							opusMaxPlaybackRate	: 48000
+							opusStereo,
+							opusDtx,
+							opusFec,
+							opusPtime,
+							opusMaxPlaybackRate
 						},
 						appData :
 						{ source: 'mic' }
@@ -1537,6 +1565,8 @@ export default class RoomClient
 
 					this.disableWebcam();
 				});
+
+				store.dispatch(settingsActions.setVideoMuted(false));
 			}
 			else if (this._webcamProducer)
 			{
@@ -2403,6 +2433,7 @@ export default class RoomClient
 
 					case 'signInRequired':
 					{
+						store.dispatch(meActions.loggedIn(false));
 						store.dispatch(roomActions.setSignInRequired(true));
 
 						break;
@@ -3358,8 +3389,10 @@ export default class RoomClient
 						{
 							autoMuteThreshold = window.config.autoMuteThreshold;
 						}
-						if (autoMuteThreshold && peers.length >= autoMuteThreshold)
+						if (autoMuteThreshold >= 0 && peers.length >= autoMuteThreshold)
+						{
 							this.muteMic();
+						}
 					}
 			}
 
@@ -3580,90 +3613,117 @@ export default class RoomClient
 
 			([ track ] = stream.getVideoTracks());
 
-			let producer;
+			let exists = false;
 
-			if (this._useSimulcast)
+			this._extraVideoProducers.forEach(function(value)
 			{
-				// If VP9 is the only available video codec then use SVC.
-				const firstVideoCodec = this._mediasoupDevice
-					.rtpCapabilities
-					.codecs
-					.find((c) => c.kind === 'video');
+				if (value._track.label===track.label)
+				{
+					exists=true;
+				}
+			});
 
-				let encodings;
+			if (!exists)
+			{
 
-				if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-					encodings = VIDEO_KSVC_ENCODINGS;
-				else if ('simulcastEncodings' in window.config)
-					encodings = window.config.simulcastEncodings;
-				else
-					encodings = VIDEO_SIMULCAST_ENCODINGS;
+				let producer;
 
-				producer = await this._sendTransport.produce(
-					{
-						track,
-						encodings,
-						codecOptions :
+				if (this._useSimulcast)
+				{
+					// If VP9 is the only available video codec then use SVC.
+					const firstVideoCodec = this._mediasoupDevice
+						.rtpCapabilities
+						.codecs
+						.find((c) => c.kind === 'video');
+
+					let encodings;
+
+					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+						encodings = VIDEO_KSVC_ENCODINGS;
+					else if ('simulcastEncodings' in window.config)
+						encodings = window.config.simulcastEncodings;
+					else
+						encodings = VIDEO_SIMULCAST_ENCODINGS;
+
+					producer = await this._sendTransport.produce(
 						{
-							videoGoogleStartBitrate : 1000
-						},
+							track,
+							encodings,
+							codecOptions :
+							{
+								videoGoogleStartBitrate : 1000
+							},
+							appData :
+							{
+								source : 'extravideo'
+							}
+						});
+				}
+				else
+				{
+					producer = await this._sendTransport.produce({
+						track,
 						appData :
 						{
 							source : 'extravideo'
 						}
 					});
+				}
+
+				this._extraVideoProducers.set(producer.id, producer);
+
+				store.dispatch(producerActions.addProducer(
+					{
+						id            : producer.id,
+						deviceLabel   : device.label,
+						source        : 'extravideo',
+						paused        : producer.paused,
+						track         : producer.track,
+						rtpParameters : producer.rtpParameters,
+						codec         : producer.rtpParameters.codecs[0].mimeType.split('/')[1]
+					}));
+
+				// store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
+
+				await this._updateWebcams();
+
+				producer.on('transportclose', () =>
+				{
+					this._extraVideoProducers.delete(producer.id);
+
+					producer = null;
+				});
+
+				producer.on('trackended', () =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							type : 'error',
+							text : intl.formatMessage({
+								id             : 'devices.cameraDisconnected',
+								defaultMessage : 'Camera disconnected'
+							})
+						}));
+
+					this.disableExtraVideo(producer.id)
+						.catch(() => {});
+				});
+
+				logger.debug('addExtraVideo() succeeded');
+
 			}
 			else
 			{
-				producer = await this._sendTransport.produce({
-					track,
-					appData :
-					{
-						source : 'extravideo'
-					}
-				});
-			}
-
-			this._extraVideoProducers.set(producer.id, producer);
-
-			store.dispatch(producerActions.addProducer(
-				{
-					id            : producer.id,
-					deviceLabel   : device.label,
-					source        : 'extravideo',
-					paused        : producer.paused,
-					track         : producer.track,
-					rtpParameters : producer.rtpParameters,
-					codec         : producer.rtpParameters.codecs[0].mimeType.split('/')[1]
-				}));
-
-			// store.dispatch(settingsActions.setSelectedWebcamDevice(deviceId));
-
-			await this._updateWebcams();
-
-			producer.on('transportclose', () =>
-			{
-				this._extraVideoProducers.delete(producer.id);
-
-				producer = null;
-			});
-
-			producer.on('trackended', () =>
-			{
+				logger.error('addExtraVideo() duplicate');
 				store.dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : intl.formatMessage({
-							id             : 'devices.cameraDisconnected',
-							defaultMessage : 'Camera disconnected'
+							id             : 'room.extraVideoDuplication',
+							defaultMessage : 'Extra videodevice duplication errordefault'
 						})
 					}));
-
-				this.disableExtraVideo(producer.id)
-					.catch(() => {});
-			});
-
-			logger.debug('addExtraVideo() succeeded');
+			}
 		}
 		catch (error)
 		{

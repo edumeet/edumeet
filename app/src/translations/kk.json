@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} қолын көтерді",
 	"room.loweredHand": "{displayName} қолын түсірді",
 	"room.extraVideo": "Қосымша бейне",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Бейнеконференция толды, біраз уақыттан кейін қайталап көріңіз.",
 	"room.help": "Көмек",
 	"room.about": "Біз туралы",
@@ -130,6 +131,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Параметрлер",
 	"settings.camera": "Камера",
@@ -164,6 +167,8 @@
 	"settings.drawerOverlayed": "Оңжақ панель үстінде",
 	"settings.voiceActivatedUnmute": "Дауыспен активтендіруді қосу",
 	"settings.noiseThreshold": "Шу деңгейі",
+	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Файлды сақтау мүмкін емес",
 	"filesharing.startingFileShare": "Файлды бөлісу әрекеті",
@@ -178,11 +183,13 @@
 
 	"devices.devicesChanged": "Сіздің құрылғыларыңыз өзгерді, оларды параметрлер диалогында дұрыстаңыз",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Аудиоға қолдау көрсетілмейді»",
 	"device.activateAudio": "Аудионы іске қосу",
 	"device.muteAudio": "Дыбысты өшіру",
 	"device.unMuteAudio": "Дыбысты қосу",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Бейнеге қолдау көрсетілмейді",
 	"device.startVideo": "Бейнені бастау",
 	"device.stopVideo": "Бейнені тоқтату",
@@ -199,11 +206,15 @@
 	"devices.microphoneMuteError": "Микрофонды өшіру мүмкін емес",
 	"devices.microphoneUnMuteError": "Микрофонды қосу мүмкін емес",
 
-	"devices.screenSharingDisconnected" : "Экранды бөлісу ажыратылды",
+	"devices.screenSharingDisconnected": "Экранды бөлісу ажыратылды",
 	"devices.screenSharingError": "Экраныңызға қосылу кезінде қате пайда болды",
 
 	"devices.cameraDisconnected": "Камера ажыратылды",
 	"devices.cameraError": "Камераға қосылу кезінде қате пайда болды",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": "Модератор чатты тазалады",
 	"moderator.clearFiles": "Модератор файлдарды өшірді",

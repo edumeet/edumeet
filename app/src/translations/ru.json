@@ -59,6 +59,7 @@
 	"room.raisedHand": "{displayName} поднял(а) руку",
 	"room.loweredHand": "{displayName} опустил(а) руку",
 	"room.extraVideo": "Дополнительное видео",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Видеоконференция заполнена, повторите попытку через некоторое время.",
 	"room.help": "Помощь",
 	"room.about": "О нас",
@@ -130,6 +131,8 @@
 	"label.username": null,
 	"label.password": null,
 	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Настройки",
 	"settings.camera": "Камера",
@@ -164,6 +167,8 @@
 	"settings.drawerOverlayed": "Боковая панель поверх содержимого",
 	"settings.voiceActivatedUnmute": "Активирован звук включен",
 	"settings.noiseThreshold": "Порог шума",
+	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
 
 	"filesharing.saveFileError": "Невозможно сохранить файл",
 	"filesharing.startingFileShare": "Попытка поделиться файлом",
@@ -178,11 +183,13 @@
 
 	"devices.devicesChanged": "Ваши устройства изменены, настройте их в диалоговом окне настроек",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Аудио не поддерживается",
 	"device.activateAudio": "Активировать аудио",
 	"device.muteAudio": "Отключить звук",
 	"device.unMuteAudio": "Включить звук",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Видео не поддерживается",
 	"device.startVideo": "Начать видео",
 	"device.stopVideo": "Остановить видео",
@@ -199,11 +206,15 @@
 	"devices.microphoneMuteError": "Невозможно отключить микрофон",
 	"devices.microphoneUnMuteError": "Невозможно включить микрофон",
 
-	"devices.screenSharingDisconnected" : "Совместное использование экрана отключено",
+	"devices.screenSharingDisconnected": "Совместное использование экрана отключено",
 	"devices.screenSharingError": "Произошла ошибка при доступе к вашему экрану",
 
 	"devices.cameraDisconnected": "Камера отключена",
 	"devices.cameraError": "Произошла ошибка при доступе к вашей камере",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": "Модератор очистил чат",
 	"moderator.clearFiles": "Модератор очистил файлы",

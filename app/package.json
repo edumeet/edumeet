@@ -1,9 +1,16 @@
 {
 	"name": "edumeet",
-	"version": "3.3.0",
+	"version": "3.4.0",
 	"private": true,
 	"description": "edumeet meeting service",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
+	"contributors": [
+		"Stefan Otto",
+		"Mészáros Mihály",
+		"Roman Drozd",
+		"Rémai Gábor László",
+		"Piotr Pawałowski"
+	],
 	"license": "MIT",
 	"homepage": "./",
 	"main": "src/electron-starter.js",
@@ -21,6 +28,7 @@
 		"hark": "^1.2.3",
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
+		"material-ui-popup-state": "^1.7.0",
 		"mediasoup-client": "^3.6.5",
 		"notistack": "^0.9.5",
 		"prop-types": "^15.7.2",
