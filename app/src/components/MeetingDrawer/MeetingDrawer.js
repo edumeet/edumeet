@@ -23,10 +23,9 @@ import LockIcon from '@material-ui/icons/Lock';
 
 const tabs =
 [
-	'chat',
-
+	'users',
+	'chat'
 	// 'files',
-	'users'
 ];
 
 const styles = (theme) =>
@@ -84,6 +83,17 @@ const MeetingDrawer = (props) =>
 				>
 					<Tab
 						label={
+							<Badge color='secondary' badgeContent={raisedHands}>
+								<GroupIcon />&nbsp;
+								{intl.formatMessage({
+									id             : 'label.participants',
+									defaultMessage : 'Participants'
+								})}
+							</Badge>
+						}
+					/>
+					<Tab
+						label={
 							<Badge
 								color='secondary'
 								badgeContent={unreadMessages+unreadFiles}
@@ -108,17 +118,6 @@ const MeetingDrawer = (props) =>
 						}
 					/>
 					*/}
-					<Tab
-						label={
-							<Badge color='secondary' badgeContent={raisedHands}>
-								<GroupIcon />&nbsp;
-								{intl.formatMessage({
-									id             : 'label.participants',
-									defaultMessage : 'Participants'
-								})}
-							</Badge>
-						}
-					/>
 				</Tabs>
 				<IconButton onClick={toggleDrawerOverlayed}>
 					{drawerOverlayed ? <LockOpenIcon /> : <LockIcon />}
