@@ -12,6 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
+import SaveIcon from '@material-ui/icons/Save';
 
 const styles = (theme) =>
 	({
@@ -107,6 +108,30 @@ const ChatInput = (props) =>
 				}}
 				autoFocus
 			/>
+
+			{/* Button save chat */}
+			<React.Fragment>
+				<input
+					className={classes.input}
+					type='file'
+					disabled={!canShare}
+					onChange={handleFile}
+					accept='image/*'
+					id='save-chat-button'
+				/>
+
+				<label htmlFor='save-chat-button'>
+
+					<IconButton
+						className={classes.IconButton}
+						disabled={!canShareFiles || !canShare}
+						aria-label='Share gallery file'
+						component='span'
+					>
+						<SaveIcon />
+					</IconButton>
+				</label>
+			</React.Fragment>
 
 			{/* Button for file sharing */}
 			<React.Fragment>
