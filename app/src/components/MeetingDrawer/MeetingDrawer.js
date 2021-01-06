@@ -4,6 +4,7 @@ import { raisedHandsSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../actions/toolareaActions';
+import * as settingsActions from '../../actions/settingsActions';
 import { useIntl } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -15,6 +16,8 @@ import ParticipantList from './ParticipantList/ParticipantList';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import IconButton from '@material-ui/core/IconButton';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
+import LockIcon from '@material-ui/icons/Lock';
 
 const tabs =
 [
@@ -54,10 +57,12 @@ const MeetingDrawer = (props) =>
 		unreadMessages,
 		unreadFiles,
 		raisedHands,
-		closeDrawer,
+		// closeDrawer,
 		setToolTab,
 		classes,
-		theme
+		// theme,
+		drawerOverlayed,
+		toggleDrawerOverlayed
 	} = props;
 
 	return (
@@ -111,9 +116,14 @@ const MeetingDrawer = (props) =>
 						}
 					/>
 				</Tabs>
+				<IconButton onClick={toggleDrawerOverlayed}>
+					{drawerOverlayed ? <LockOpenIcon /> : <LockIcon />}
+				</IconButton>
+				{/*
 				<IconButton onClick={closeDrawer}>
 					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 				</IconButton>
+				*/}
 			</AppBar>
 			{currentToolTab === 'chat' && <Chat />}
 			{/* currentToolTab === 'files' && <FileSharing /> */}
@@ -124,28 +134,32 @@ const MeetingDrawer = (props) =>
 
 MeetingDrawer.propTypes =
 {
-	currentToolTab : PropTypes.string.isRequired,
-	setToolTab     : PropTypes.func.isRequired,
-	unreadMessages : PropTypes.number.isRequired,
-	unreadFiles    : PropTypes.number.isRequired,
-	raisedHands    : PropTypes.number.isRequired,
-	closeDrawer    : PropTypes.func.isRequired,
-	classes        : PropTypes.object.isRequired,
-	theme          : PropTypes.object.isRequired
+	currentToolTab        : PropTypes.string.isRequired,
+	setToolTab            : PropTypes.func.isRequired,
+	unreadMessages        : PropTypes.number.isRequired,
+	unreadFiles           : PropTypes.number.isRequired,
+	raisedHands           : PropTypes.number.isRequired,
+	closeDrawer           : PropTypes.func.isRequired,
+	classes               : PropTypes.object.isRequired,
+	theme                 : PropTypes.object.isRequired,
+	drawerOverlayed       : PropTypes.bool.isRequired,
+	toggleDrawerOverlayed : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
 {
 	return {
-		currentToolTab : state.toolarea.currentToolTab,
-		unreadMessages : state.toolarea.unreadMessages,
-		unreadFiles    : state.toolarea.unreadFiles,
-		raisedHands    : raisedHandsSelector(state)
+		currentToolTab  : state.toolarea.currentToolTab,
+		unreadMessages  : state.toolarea.unreadMessages,
+		unreadFiles     : state.toolarea.unreadFiles,
+		raisedHands     : raisedHandsSelector(state),
+		drawerOverlayed : state.settings.drawerOverlayed
 	};
 };
 
 const mapDispatchToProps = {
-	setToolTab : toolareaActions.setToolTab
+	setToolTab            : toolareaActions.setToolTab,
+	toggleDrawerOverlayed : settingsActions.toggleDrawerOverlayed
 };
 
 export default connect(
@@ -158,6 +172,7 @@ export default connect(
 			return (
 				prev.toolarea.currentToolTab === next.toolarea.currentToolTab &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
+				prev.toolarea.drawerOverlayed === next.toolarea.drawerOverlayed &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.peers === next.peers
 			);
