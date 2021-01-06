@@ -63,7 +63,9 @@ const MeetingDrawer = (props) =>
 		classes,
 		// theme,
 		drawerOverlayed,
-		toggleDrawerOverlayed
+		toggleDrawerOverlayed,
+		browser
+
 	} = props;
 
 	return (
@@ -85,7 +87,7 @@ const MeetingDrawer = (props) =>
 						label={
 							<Badge color='secondary' badgeContent={raisedHands}>
 								<GroupIcon />&nbsp;
-								{intl.formatMessage({
+								{(browser.platform !== 'mobile') && intl.formatMessage({
 									id             : 'label.participants',
 									defaultMessage : 'Participants'
 								})}
@@ -99,7 +101,7 @@ const MeetingDrawer = (props) =>
 								badgeContent={unreadMessages+unreadFiles}
 							>
 								<ChatIcon />&nbsp;
-								{intl.formatMessage({
+								{(browser.platform !== 'mobile') && intl.formatMessage({
 									id             : 'label.chat',
 									defaultMessage : 'Chat'
 								})}
@@ -146,7 +148,8 @@ MeetingDrawer.propTypes =
 	classes               : PropTypes.object.isRequired,
 	theme                 : PropTypes.object.isRequired,
 	drawerOverlayed       : PropTypes.bool.isRequired,
-	toggleDrawerOverlayed : PropTypes.func.isRequired
+	toggleDrawerOverlayed : PropTypes.func.isRequired,
+	browser               : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -156,7 +159,9 @@ const mapStateToProps = (state) =>
 		unreadMessages  : state.toolarea.unreadMessages,
 		unreadFiles     : state.toolarea.unreadFiles,
 		raisedHands     : raisedHandsSelector(state),
-		drawerOverlayed : state.settings.drawerOverlayed
+		drawerOverlayed : state.settings.drawerOverlayed,
+		browser         : state.me.browser
+
 	};
 };
 
@@ -177,7 +182,9 @@ export default connect(
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.drawerOverlayed === next.toolarea.drawerOverlayed &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
-				prev.peers === next.peers
+				prev.peers === next.peers &&
+				prev.me.browser === next.me.browser
+
 			);
 		}
 	}
