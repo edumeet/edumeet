@@ -899,12 +899,15 @@ export default class RoomClient
 						})
 					}));
 
+				const time = Date.now();
+
 				store.dispatch(fileActions.addFile(
 					this._peerId,
-					existingTorrent.magnetURI
+					existingTorrent.magnetURI,
+					time
 				));
 
-				this._sendFile(existingTorrent.magnetURI);
+				this._sendFile(time, existingTorrent.magnetURI);
 
 				return;
 			}
@@ -922,24 +925,31 @@ export default class RoomClient
 							})
 						}));
 
+					const time = Date.now();
+
 					store.dispatch(fileActions.addFile(
 						this._peerId,
-						newTorrent.magnetURI
+						newTorrent.magnetURI,
+						time
 					));
 
-					this._sendFile(newTorrent.magnetURI);
+					this._sendFile(time, newTorrent.magnetURI);
 				});
 		});
 	}
 
 	// { file, name, picture }
-	async _sendFile(magnetUri)
+	async _sendFile(time, magnetUri)
 	{
 		logger.debug('sendFile() [magnetUri:"%o"]', magnetUri);
 
 		try
 		{
-			const time = store.getState().files[magnetUri].time;
+			/*
+			const time = store.getState().files.filter(
+				(item) => item.magnetUri === magnetUri
+			)[0].time;
+			*/
 
 			await this.sendRequest('sendFile', { magnetUri, time });
 		}

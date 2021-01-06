@@ -59,6 +59,7 @@ class File extends React.PureComponent
 			picture,
 			canShareFiles,
 			magnetUri,
+			time,
 			file,
 			classes
 		} = this.props;
@@ -166,6 +167,7 @@ class File extends React.PureComponent
 File.propTypes = {
 	roomClient    : PropTypes.object.isRequired,
 	magnetUri     : PropTypes.string.isRequired,
+	time          : PropTypes.string.isRequired,
 	displayName   : PropTypes.string.isRequired,
 	picture       : PropTypes.string,
 	canShareFiles : PropTypes.bool.isRequired,
@@ -173,10 +175,10 @@ File.propTypes = {
 	classes       : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state, { magnetUri }) =>
+const mapStateToProps = (state, { time, magnetUri }) =>
 {
 	return {
-		file          : state.files[magnetUri],
+		file          : state.files.filter((item) => item.time === time)[0],
 		canShareFiles : state.me.canShareFiles
 	};
 };

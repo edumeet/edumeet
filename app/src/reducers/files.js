@@ -1,4 +1,4 @@
-const files = (state = {}, action) =>
+const files = (state = [], action) =>
 {
 	switch (action.type)
 	{
@@ -7,27 +7,26 @@ const files = (state = {}, action) =>
 			const { peerId, magnetUri, time } = action.payload;
 
 			const newFile = {
-				active    : false,
 				type      : 'file',
+				time      : time ? time : Date.now(),
+				active    : false,
 				progress  : 0,
 				files     : null,
 				peerId    : peerId,
-				magnetUri : magnetUri,
-				time      : time ? time : Date.now()
+				magnetUri : magnetUri
 			};
 
-			return { ...state, [magnetUri]: newFile };
+			return [ ...state, newFile ];
 		}
 
 		case 'ADD_FILE_HISTORY':
 		{
 			const { fileHistory } = action.payload;
-			const newFileHistory = {};
 
-			// eslint-disable-next-line
-			fileHistory.map((file) =>
+			const newFileHistory = [];
+
+			fileHistory.forEach((file) =>
 			{
-				// console.log('ADD1', fileHistory);
 				const newFile =
 				{
 					active   : false,
@@ -37,62 +36,83 @@ const files = (state = {}, action) =>
 					...file
 				};
 
-				newFileHistory[file.magnetUri] = newFile;
+				newFileHistory.push(newFile);
 			});
 
-			return { ...state, ...newFileHistory };
+			return [ ...state, ...newFileHistory ];
 		}
 
 		case 'SET_FILE_ACTIVE':
 		{
 			const { magnetUri } = action.payload;
-			const file = state[magnetUri];
 
-			const newFile = { ...file, active: true };
+			state.forEach((item, index) =>
+			{
+				if (item.magnetUri === magnetUri)
+				{
+					state[index] = { ...item, active: true };
 
-			return { ...state, [magnetUri]: newFile };
+				}
+			});
+
+			return [ ...state ];
 		}
 
 		case 'SET_FILE_INACTIVE':
 		{
 			const { magnetUri } = action.payload;
-			const file = state[magnetUri];
 
-			const newFile = { ...file, active: false };
+			state.forEach((item, index) =>
+			{
+				if (item.magnetUri === magnetUri)
+				{
+					state[index] = { ...item, active: false };
+				}
+			});
 
-			return { ...state, [magnetUri]: newFile };
+			return [ ...state ];
 		}
 
 		case 'SET_FILE_PROGRESS':
 		{
 			const { magnetUri, progress } = action.payload;
-			const file = state[magnetUri];
 
-			const newFile = { ...file, progress: progress };
+			state.forEach((item, index) =>
+			{
+				if (item.magnetUri === magnetUri)
+				{
+					state[index] = { ...item, progress: progress };
+				}
+			});
 
-			return { ...state, [magnetUri]: newFile };
+			return [ ...state ];
 		}
 
 		case 'SET_FILE_DONE':
 		{
 			const { magnetUri, sharedFiles } = action.payload;
-			const file = state[magnetUri];
 
-			const newFile = {
-				...file,
-				files    : sharedFiles,
-				progress : 1,
-				// type : 'file',
-				// time : Date.now(),
-				active   : false,
-				timeout  : false
-			};
+			state.forEach((item, index) =>
+			{
+				if (item.magnetUri === magnetUri)
+				{
+					state[index] = {
+						...item,
+						files    : sharedFiles,
+						progress : 1,
+						// type : 'file',
+						// time : Date.now(),
+						active   : false,
+						timeout  : false
+					};
+				}
+			});
 
-			return { ...state, [magnetUri]: newFile };
+			return [ ...state ];
 		}
 
 		case 'CLEAR_FILES':
-			return {};
+			return [];
 
 		default:
 			return state;

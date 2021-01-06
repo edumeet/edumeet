@@ -73,7 +73,7 @@ class MessageList extends React.Component
 			intl
 		} = this.props;
 
-		const items = [ ...chat, ...Object.values(files) ];
+		const items = [ ...chat, ...files ];
 
 		items.sort((a, b) => (a.time < b.time ? -1: 1));
 
@@ -131,6 +131,7 @@ class MessageList extends React.Component
 								return (
 									<File
 										key={item.time}
+										time={item.time}
 										magnetUri={item.magnetUri}
 										displayName={displayName}
 										picture={filePicture || EmptyAvatar}
