@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": "Zajszint",
 	"settings.mirrorOwnVideo": "Saját videókép tükrözése",
 	"settings.language": "Nyelv",
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

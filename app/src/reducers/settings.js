@@ -22,6 +22,7 @@ const initialState =
 	showNotifications       : true,
 	notificationSounds      : true,
 	mirrorOwnVideo          : true,
+	hideNoVideoParticipants : false,
 	buttonControlBar        : window.config.buttonControlBar || false,
 	drawerOverlayed         : window.config.drawerOverlayed || true,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
@@ -221,6 +222,13 @@ const settings = (state = initialState, action) =>
 			const mirrorOwnVideo = !state.mirrorOwnVideo;
 
 			return { ...state, mirrorOwnVideo };
+		}
+
+		case 'TOGGLE_HIDE_NO_VIDEO_PARTICIPANTS':
+		{
+			const hideNoVideoParticipants = !state.hideNoVideoParticipants;
+
+			return { ...state, hideNoVideoParticipants };
 		}
 
 		case 'SET_MEDIA_PERMS':

@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "无法保存文件",
 	"filesharing.startingFileShare": "正在尝试共享文件",

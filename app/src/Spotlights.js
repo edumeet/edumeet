@@ -1,4 +1,5 @@
 import Logger from './Logger';
+import { makePeerConsumerSelector } from './components/Selectors';
 
 const logger = new Logger('Spotlight');
 
@@ -11,6 +12,8 @@ export default class Spotlights
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
 		this._roomClient = roomClient;
+		this._consumersStoreUnsubscriber = null;
+		this._hideNoVideoParticipantsStoreUnsubscriber = null;
 	}
 
 	addPeers(peers)
@@ -103,11 +106,53 @@ export default class Spotlights
 		}
 	}
 
+	_hasVideoContent(state, getPeerConsumers)
+	{
+		return function(peerId, index, array)
+		{
+			const peer = state.peers[peerId];
+
+			if (peer)
+			{
+				const consumers = { ...getPeerConsumers(state, peerId) };
+
+				const videoVisible = (
+					Boolean(consumers.webcamConsumer) &&
+					!consumers.webcamConsumer.remotelyPaused
+				);
+
+				const screenVisible = (
+					Boolean(consumers.screenConsumer) &&
+					!consumers.screenConsumer.remotelyPaused
+				);
+
+				if (videoVisible || screenVisible)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		};
+	}
+
 	_spotlightsUpdated()
 	{
+		const getPeerConsumers = makePeerConsumerSelector();
+
+		const state = this._roomClient.getState();
+
 		let spotlights;
 
-		const maxSpotlights = this._maxSpotlights;
+		if (state.settings.hideNoVideoParticipants)
+		{
+			spotlights = this._peerList.filter(
+				this._hasVideoContent(state, getPeerConsumers));
+		}
+		else
+		{
+			spotlights = this._peerList;
+		}
 
 		while (this._selectedSpotlights.length > this._maxSpotlights)
 		{
@@ -116,19 +161,15 @@ export default class Spotlights
 
 		if (this._selectedSpotlights.length > 0)
 		{
-			spotlights = [ ...new Set([ ...this._selectedSpotlights, ...this._peerList ]) ];
-		}
-		else
-		{
-			spotlights = this._peerList;
+			spotlights = [ ...new Set([ ...this._selectedSpotlights, ...spotlights ]) ];
 		}
 
 		if (!this._arraysEqual(
-			this._currentSpotlights, spotlights.slice(0, maxSpotlights)))
+			this._currentSpotlights, spotlights.slice(0, this._maxSpotlights)))
 		{
 			logger.debug('_spotlightsUpdated() | spotlights updated, emitting');
 
-			this._currentSpotlights = spotlights.slice(0, maxSpotlights);
+			this._currentSpotlights = spotlights.slice(0, this._maxSpotlights);
 			this._roomClient.updateSpotlights(this._currentSpotlights);
 		}
 		else
@@ -165,4 +206,40 @@ export default class Spotlights
 		if (oldMaxSpotlights !== this._maxSpotlights)
 			this._spotlightsUpdated();
 	}
+
+	onStoreChanged(that, newVal, oldVal, objectPath)
+	{
+		switch (objectPath)
+		{
+			case 'consumers':
+			case 'settings.hideNoVideoParticipants':
+			{
+				that._spotlightsUpdated();
+				break;
+			}
+		}
+	}
+
+	createStoreSubscribers()
+	{
+		this.removeStoreSubscribers();
+		this._consumersStoreUnsubscriber = this._roomClient.subscribeStoreWatch(
+			'consumers', this);
+		this._hideNoVideoParticipantsStoreUnsubscriber = this._roomClient.subscribeStoreWatch(
+			'settings.hideNoVideoParticipants', this);
+	}
+
+	removeStoreSubscribers()
+	{
+		if (this._consumersStoreUnsubscriber)
+		{
+			this._consumersStoreUnsubscriber();
+		}
+
+		if (this._hideNoVideoParticipantsStoreUnsubscriber)
+		{
+			this._hideNoVideoParticipantsStoreUnsubscriber();
+		}
+	}
+
 }

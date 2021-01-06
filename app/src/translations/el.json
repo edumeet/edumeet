@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "Αδυναμία αποθήκευσης του αρχείου",
 	"filesharing.startingFileShare": "Προσπάθεια διαμοιρασμού αρχείου",

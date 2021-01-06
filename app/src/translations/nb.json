@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": "Støyterskel",
 	"settings.mirrorOwnVideo": "Vis eget bilde speilet for deg",
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

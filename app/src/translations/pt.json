@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "Impossível de gravar o ficheiro",
 	"filesharing.startingFileShare": "Tentando partilha de ficheiro",

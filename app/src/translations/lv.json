@@ -165,6 +165,7 @@
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",

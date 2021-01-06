@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": "Mezní hodnota hluku",
 	"settings.mirrorOwnVideo": "Zrcadlové zobrazení vlastního videa",
 	"settings.language": "Vyberte jazyk",
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",

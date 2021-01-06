@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "Nije moguće spremiti datoteku",
 	"filesharing.startingFileShare": "Pokušaj dijeljenja datoteke",

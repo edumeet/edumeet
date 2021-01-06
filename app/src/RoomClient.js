@@ -20,6 +20,8 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
+import watch from 'redux-watch';
+import isEqual from 'is-equal';
 
 let createTorrent;
 
@@ -3410,6 +3412,8 @@ export default class RoomClient
 					})
 				}));
 
+			this._spotlights.createStoreSubscribers();
+
 			this._spotlights.addPeers(peers);
 
 			if (lastNHistory.length > 0)
@@ -4202,5 +4206,20 @@ export default class RoomClient
 			return true;
 
 		return false;
+	}
+
+	getState()
+	{
+		return store.getState();
+	}
+
+	subscribeStoreWatch(path, that)
+	{
+		const w = watch(store.getState, path, isEqual);
+
+		return store.subscribe(w((newVal, oldVal, objectPath) =>
+		{
+			that.onStoreChanged(that, newVal, oldVal, objectPath);
+		}));
 	}
 }

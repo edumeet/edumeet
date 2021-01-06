@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": "Soglia di rumore",
 	"settings.mirrorOwnVideo": "Specchiare il proprio video",
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",
