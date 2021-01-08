@@ -52,8 +52,9 @@ const styles = (theme) =>
 		},
 		logo :
 		{
-			display       : 'block',
-			paddingBottom : '1vh'
+			width   : '139px',
+			height  : '30px',
+			display : 'block'
 		},
 		loginButton :
 		{
@@ -117,7 +118,7 @@ const ChooseRoom = ({
 				<DialogTitle>
 
 					{ window.config.logo !=='' ?
-						<img alt='Logo' src={window.config.logo} /> :
+						<img className={classes.logo} alt='Logo' src={window.config.logo} /> :
 						<Typography variant='h5'> {window.config.title} </Typography>
 					}
 					<hr />
