@@ -77,6 +77,8 @@ const styles = (theme) =>
 		},
 		logo :
 		{
+			width                        : '139px',
+			height                       : '30px',
 			display                      : 'none',
 			marginLeft                   : 20,
 			[theme.breakpoints.up('sm')] :
