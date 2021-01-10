@@ -131,11 +131,6 @@ const styles = (theme) =>
 		loginLabel :
 		{
 			fontSize : '12px'
-		},
-		logo :
-		{
-			width  : '139px',
-			height : '30px'
 		}
 
 	});
@@ -342,7 +337,7 @@ const JoinDialog = ({
 					>
 						<Grid item>
 							{ window.config.logo !=='' ?
-								<img className={classes.logo} alt='Logo' src={window.config.logo} /> :
+								<img alt='Logo' src={window.config.logo} /> :
 								<Typography variant='h5'> {window.config.title} </Typography>
 							}
 						</Grid>

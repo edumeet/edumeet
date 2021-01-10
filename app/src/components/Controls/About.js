@@ -39,8 +39,6 @@ const styles = (theme) =>
 		},
 		logo :
 		{
-			width       : '139px',
-			height      : '30px',
 			marginRight : 'auto'
 		},
 		link :
