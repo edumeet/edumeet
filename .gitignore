@@ -3,7 +3,7 @@ node_modules/
 /app/build/
 /app/public/config/config.js
 /app/public/images/logo.*
-!/app/public/images/logo.example.svg
+!/app/public/images/logo.edumeet.svg
 /server/config/
 !/server/config/config.example.js
 /server/public/

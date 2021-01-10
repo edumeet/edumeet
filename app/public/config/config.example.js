@@ -163,7 +163,7 @@ var config =
 	lockLastN            : false,
 	// Show logo if "logo" is not null, else show title
 	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-	logo                 : 'images/logo.example.svg',
+	logo                 : 'images/logo.edumeet.svg',
 	title                : 'edumeet',
 	// Service & Support URL
 	// if not set then not displayed on the about modals
