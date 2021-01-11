@@ -5,6 +5,13 @@ const list = [
 		locale : [ 'en', 'en-en' ]
 	},
 	{
+		name   : 'Tiếng việt',
+		file   : 'vn',
+		locale : [ 'vn', 'vn-vn' ]
+	}
+
+	/*	,
+	{
 		name   : 'Czech',
 		file   : 'cs',
 		locale : [ 'cs', 'cs-cs' ]
@@ -108,7 +115,7 @@ const list = [
 		name   : 'Ukrainian',
 		file   : 'uk',
 		locale : [ 'uk', 'uk-uk' ]
-	}
+	} */
 ];
 
 export const detect = () =>
