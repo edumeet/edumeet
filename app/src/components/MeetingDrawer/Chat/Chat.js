@@ -28,7 +28,7 @@ const Chat = (props) =>
 		<Paper className={classes.root}>
 			<Moderator />
 			<List />
-			<Input />
+			<Input list={<List />}/>
 		</Paper>
 	);
 };

@@ -79,7 +79,7 @@ class MessageList extends React.Component
 
 		return (
 			<React.Fragment>
-				<div className={classes.root} ref={(node) => { this.node = node; }}>
+				<div id='chatList' className={classes.root} ref={(node) => { this.node = node; }}>
 					{
 						items.map((item) =>
 						{

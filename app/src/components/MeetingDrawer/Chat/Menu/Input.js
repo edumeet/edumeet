@@ -74,7 +74,8 @@ const ChatInput = (props) =>
 		canShare,
 		classes,
 		browser,
-		canShareFiles
+		canShareFiles,
+		list
 
 	} = props;
 
@@ -111,26 +112,17 @@ const ChatInput = (props) =>
 
 			{/* Button save chat */}
 			<React.Fragment>
-				<input
-					className={classes.input}
-					type='file'
-					disabled={!canShare}
-					onChange={handleFile}
-					accept='image/*'
-					id='save-chat-button'
-				/>
-
-				<label htmlFor='save-chat-button'>
-
-					<IconButton
-						className={classes.IconButton}
-						disabled={!canShareFiles || !canShare}
-						aria-label='Share gallery file'
-						component='span'
-					>
-						<SaveIcon />
-					</IconButton>
-				</label>
+				<IconButton
+					className={classes.IconButton}
+					disabled={!canShareFiles || !canShare}
+					aria-label='Share gallery file'
+					component='span'
+					// onClick={() => roomClient.saveChat(List2)}
+					onClick={() => roomClient.saveChat()
+					}
+				>
+					<SaveIcon />
+				</IconButton>
 			</React.Fragment>
 
 			{/* Button for file sharing */}
@@ -217,7 +209,8 @@ ChatInput.propTypes =
 	canShare      : PropTypes.bool.isRequired,
 	classes       : PropTypes.object.isRequired,
 	browser       : PropTypes.object.isRequired,
-	canShareFiles : PropTypes.bool.isRequired
+	canShareFiles : PropTypes.bool.isRequired,
+	list          : PropTypes.isRequired
 };
 
 const makeMapStateToProps = () =>

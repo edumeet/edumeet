@@ -815,6 +815,41 @@ export default class RoomClient
 		});
 	}
 
+	async saveChat()
+	{
+		const content = window.document.getElementsByTagName('html')[0].cloneNode(true);
+
+		for await (const img of content.querySelectorAll('img'))
+		{
+			img.src = `${img.src}`;
+
+			await fetch(img.src)
+
+				.then((response) => response.blob())
+				.then((data) =>
+				{
+					const reader = new FileReader();
+
+					reader.readAsDataURL(data);
+
+					reader.onloadend = function()
+					{
+						const base64data = reader.result;
+
+						img.src = base64data;
+					};
+				});
+		}
+
+		const chatList = content.querySelector('#chatList');
+
+		content.querySelector('body').replaceChildren(chatList);
+
+		const blob = new Blob([ content.innerHTML ], { type: 'text/html;charset=utf-8' });
+
+		saveAs(blob, 'chat.html');
+	}
+
 	handleDownload(magnetUri)
 	{
 		store.dispatch(
