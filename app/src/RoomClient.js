@@ -819,6 +819,18 @@ export default class RoomClient
 	{
 		const content = window.document.getElementsByTagName('html')[0].cloneNode(true);
 
+		// remove unused tags
+		[ 'script', 'link' ].forEach((element) =>
+		{
+			const el = content.getElementsByTagName(element);
+
+			let i = el.length;
+
+			while (i--) el[i].parentNode.removeChild(el[i]);
+
+		});
+
+		// embed images
 		for await (const img of content.querySelectorAll('img'))
 		{
 			img.src = `${img.src}`;
