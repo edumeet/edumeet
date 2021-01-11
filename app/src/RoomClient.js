@@ -832,12 +832,7 @@ export default class RoomClient
 
 					reader.readAsDataURL(data);
 
-					reader.onloadend = function()
-					{
-						const base64data = reader.result;
-
-						img.src = base64data;
-					};
+					reader.onloadend = () => { img.src = reader.result; };
 				});
 		}
 
