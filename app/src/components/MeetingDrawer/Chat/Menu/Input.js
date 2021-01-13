@@ -75,9 +75,13 @@ const ChatInput = (props) =>
 		classes,
 		browser,
 		canShareFiles,
-		list
+		list,
+		chat,
+		files
 
 	} = props;
+
+	const chatItemsLength = files.length + chat.length;
 
 	return (
 		<Paper className={classes.root}>
@@ -114,7 +118,7 @@ const ChatInput = (props) =>
 			<React.Fragment>
 				<IconButton
 					className={classes.IconButton}
-					disabled={!canShareFiles || !canShare}
+					disabled={!canShareFiles || !canShare || chatItemsLength === 0}
 					aria-label='Share gallery file'
 					component='span'
 					// onClick={() => roomClient.saveChat(List2)}
@@ -210,7 +214,9 @@ ChatInput.propTypes =
 	classes       : PropTypes.object.isRequired,
 	browser       : PropTypes.object.isRequired,
 	canShareFiles : PropTypes.bool.isRequired,
-	list          : PropTypes.isRequired
+	list          : PropTypes.isRequired,
+	chat          : PropTypes.isRequired,
+	files         : PropTypes.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -224,7 +230,9 @@ const makeMapStateToProps = () =>
 			canChat       : hasPermission(state),
 			canShare      : hasPermission(state),
 			browser       : state.me.browser,
-			canShareFiles : state.me.canShareFiles
+			canShareFiles : state.me.canShareFiles,
+			chat          : state.chat,
+			files         : state.files
 		});
 
 	return mapStateToProps;
@@ -245,7 +253,9 @@ export default withRoomContext(
 					prev.me.canShareFiles === next.me.canShareFiles &&
 					prev.peers === next.peers &&
 					prev.settings.displayName === next.settings.displayName &&
-					prev.me.picture === next.me.picture
+					prev.me.picture === next.me.picture &&
+					prev.chat === next.chat &&
+					prev.files === next.files
 				);
 			}
 		}
