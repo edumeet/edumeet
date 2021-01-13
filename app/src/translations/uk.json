@@ -108,6 +108,7 @@
 	"label.leave": "Залишити",
 	"label.chatInput": "Введіть повідомлення чату ...",
 	"label.chat": "Чат",
+	"label.chatNoMessages": null,
 	"label.filesharing": "Обмін файлами",
 	"label.participants": "Учасники",
 	"label.shareFile": "Надіслати файл",

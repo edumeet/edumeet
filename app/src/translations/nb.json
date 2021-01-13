@@ -109,6 +109,7 @@
 	"label.leave": "Avslutt",
 	"label.chatInput": "Skriv melding...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
 	"label.filesharing": "Fildeling",
 	"label.participants": "Deltakere",
 	"label.shareFile": "Del fil",

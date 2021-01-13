@@ -109,6 +109,7 @@
 	"label.leave": "Verlassen",
 	"label.chatInput": "Schreibe eine Nachricht...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
 	"label.filesharing": "Dateien",
 	"label.participants": "Teilnehmer",
 	"label.shareFile": "Datei hochladen",

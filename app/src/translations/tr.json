@@ -109,6 +109,7 @@
 	"label.leave": "Ayrıl",
 	"label.chatInput": "Sohbet mesajı gir...",
 	"label.chat": "Sohbet",
+	"label.chatNoMessages": null,
 	"label.filesharing": "Dosya paylaşım",
 	"label.participants": "Katılımcılar",
 	"label.shareFile": "Dosya paylaş",

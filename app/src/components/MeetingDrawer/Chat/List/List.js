@@ -80,7 +80,18 @@ class MessageList extends React.Component
 		return (
 			<React.Fragment>
 				<div id='chatList' className={classes.root} ref={(node) => { this.node = node; }}>
+					{items.length === 0
+						? (<div>
+							{intl.formatMessage({
+								id             : 'label.chatNoMessages',
+								defaultMessage : 'No messages'
+							})}
+
+						</div>)
+						: ''
+					}
 					{
+
 						items.map((item) =>
 						{
 							if (item.type === 'message')

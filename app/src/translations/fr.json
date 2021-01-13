@@ -114,6 +114,7 @@
 	"label.leave": "Quitter",
 	"label.chatInput": "Entrer un message",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
 	"label.filesharing": "Partage de fichier",
 	"label.participants": "Participants",
 	"label.shareFile": "Partager un fichier",

@@ -109,6 +109,7 @@
 	"label.leave": "Αποχώρηση",
 	"label.chatInput": "Γράψτε το μήνυμά σας...",
 	"label.chat": "Συνομολία",
+	"label.chatNoMessages": null,
 	"label.filesharing": "Διαμοιρασμοός αρχείου",
 	"label.participants": "Συμμετέχοντες",
 	"label.shareFile": "Διαμοιραστείτε ένα αρχείο",

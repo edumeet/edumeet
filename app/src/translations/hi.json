@@ -109,6 +109,7 @@
 	"label.leave": "बाहर जाईये",
 	"label.chatInput": "चैट संदेश दर्ज करें ...",
 	"label.chat": "चैट",
+	"label.chatNoMessages": null,
 	"label.filesharing": "फ़ाइल का आदान-प्रदान",
 	"label.participants": "प्रतिभागि",
 	"label.shareFile": "फ़ाइल का आदान-प्रदान",

@@ -109,6 +109,7 @@
 	"label.leave": "Kilépés",
 	"label.chatInput": "Chat üzenet ...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
 	"label.filesharing": "Fájl megosztás",
 	"label.participants": "Résztvevők",
 	"label.shareFile": "Fájl megosztása",

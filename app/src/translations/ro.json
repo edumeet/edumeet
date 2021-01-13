@@ -109,6 +109,7 @@
 	"label.leave": "Deconectare",
 	"label.chatInput": "Introduce mesajul de chat...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
 	"label.filesharing": "Partajarea fișierelor",
 	"label.participants": "Participanți",
 	"label.shareFile": "Partajează fișierul",
