@@ -817,21 +817,26 @@ export default class RoomClient
 
 	async saveChat()
 	{
-		const content = window.document.getElementsByTagName('html')[0].cloneNode(true);
+		const html = window.document.getElementsByTagName('html')[0].cloneNode(true);
+
+		const chatEl = html.querySelector('#chatList');
+
+		html.querySelector('body').replaceChildren(chatEl);
+
+		const fileName= 'chat.html';
 
 		// remove unused tags
 		[ 'script', 'link' ].forEach((element) =>
 		{
-			const el = content.getElementsByTagName(element);
+			const el = html.getElementsByTagName(element);
 
 			let i = el.length;
 
 			while (i--) el[i].parentNode.removeChild(el[i]);
-
 		});
 
 		// embed images
-		for await (const img of content.querySelectorAll('img'))
+		for await (const img of html.querySelectorAll('img'))
 		{
 			img.src = `${img.src}`;
 
@@ -848,13 +853,9 @@ export default class RoomClient
 				});
 		}
 
-		const chatList = content.querySelector('#chatList');
+		const blob = new Blob([ html.innerHTML ], { type: 'text/html;charset=utf-8' });
 
-		content.querySelector('body').replaceChildren(chatList);
-
-		const blob = new Blob([ content.innerHTML ], { type: 'text/html;charset=utf-8' });
-
-		saveAs(blob, 'chat.html');
+		saveAs(blob, fileName);
 	}
 
 	handleDownload(magnetUri)
