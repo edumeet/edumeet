@@ -184,7 +184,7 @@ const ChatInput = (props) =>
 				color='primary'
 				className={classes.iconButton}
 				aria-label='Send'
-				disabled={!canChat}
+				disabled={!canChat || !message}
 				onClick={() =>
 				{
 					if (message && message !== '')
