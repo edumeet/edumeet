@@ -3608,9 +3608,58 @@ export default class RoomClient
 		}
 
 		recorder = new RecordRTC(recorderStream, {
-			type     : 'video',
-			mimeType : mimeType
+			type      : 'video',
+			mimeType  : mimeType,
+			timeSlice : 1000
 		});
+
+		(function looper()
+		{
+
+			let stop = false;
+
+			if (!recorder || stop)
+			{
+				return;
+			}
+			const internal = recorder.getInternalRecorder();
+
+			if (internal && internal.getArrayOfBlobs)
+			{
+				const blob = new Blob(internal.getArrayOfBlobs(), {
+					type : 'video/webm'
+				});
+
+				console.log('Recording length: ');
+				console.log(RecordRTC.bytesToSize(blob.size));
+
+				const x = 5;
+
+				if (blob.size > x * 1000000)
+				{ // if blob is greater than x MB
+					stop = true;
+
+					blob.getDataURL = recorder.getDataURL;
+
+					RecordRTC.writeToDisk({
+						video : blob,
+						audio : null,
+						gif   : null
+					});
+					recorder.pauseRecording();
+
+					store.dispatch(requestActions.notify(
+						{
+							text : intl.formatMessage({
+								id             : 'room.limitPausedRoomRecording',
+								defaultMessage : 'You reached the memory limit set to the recording'
+							})
+						}));
+				}
+			}
+			if (!stop)
+				setTimeout(looper, 1000);
+		})();
 
 		recorder.ondataavailable = (e) =>
 		{
@@ -3665,7 +3714,9 @@ export default class RoomClient
 				gdmStream.getTracks().forEach((track) => track.stop());
 
 				RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
+				recorder = null;
 			});
+
 		}
 		catch (error)
 		{
@@ -3673,7 +3724,7 @@ export default class RoomClient
 				{
 					type : 'error',
 					text : intl.formatMessage({
-						id             : 'room.cantStartRoomRecord',
+						id             : 'room.unableToRoomRecord',
 						defaultMessage : 'Unable to record the room'
 					})
 				}));
