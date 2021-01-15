@@ -1884,6 +1884,8 @@ class Room extends EventEmitter
 		{
 			// Remove from its map.
 			consumerPeer.removeConsumer(consumer.id);
+
+			this._notification(consumerPeer.socket, 'consumerClosed', { consumerId: consumer.id });
 		});
 
 		consumer.on('producerclose', () =>
