@@ -13,8 +13,8 @@ import Badge from '@material-ui/core/Badge';
 import Chat from './Chat/Chat';
 // import FileSharing from './FileSharing/FileSharing';
 import ParticipantList from './ParticipantList/ParticipantList';
-// import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-// import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import IconButton from '@material-ui/core/IconButton';
 import ChatIcon from '@material-ui/icons/Chat';
 import GroupIcon from '@material-ui/icons/Group';
@@ -58,10 +58,10 @@ const MeetingDrawer = (props) =>
 		unreadMessages,
 		unreadFiles,
 		raisedHands,
-		// closeDrawer,
+		closeDrawer,
 		setToolTab,
 		classes,
-		// theme,
+		theme,
 		drawerOverlayed,
 		toggleDrawerOverlayed,
 		browser
@@ -124,11 +124,9 @@ const MeetingDrawer = (props) =>
 				<IconButton onClick={toggleDrawerOverlayed}>
 					{drawerOverlayed ? <LockOpenIcon /> : <LockIcon />}
 				</IconButton>
-				{/*
 				<IconButton onClick={closeDrawer}>
 					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 				</IconButton>
-				*/}
 			</AppBar>
 			{currentToolTab === 'chat' && <Chat />}
 			{/* currentToolTab === 'files' && <FileSharing /> */}
