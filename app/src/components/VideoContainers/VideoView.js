@@ -143,16 +143,19 @@ const styles = (theme) =>
 			color           : 'rgba(255, 255, 255, 0.85)',
 			border          : 'none',
 			borderBottom    : '1px solid #aeff00',
-			backgroundColor : 'transparent'
+			backgroundColor : 'rgba(0, 0, 0, 0.25)',
+			padding         : theme.spacing(0.6)
 		},
 		displayNameStatic :
 		{
-			userSelect : 'none',
-			cursor     : 'text',
-			fontSize   : 14,
-			fontWeight : 400,
-			color      : 'rgba(255, 255, 255, 0.85)',
-			'&:hover'  :
+			userSelect      : 'none',
+			cursor          : 'text',
+			fontSize        : 14,
+			fontWeight      : 400,
+			color           : 'rgba(255, 255, 255, 0.85)',
+			backgroundColor : 'rgba(0, 0, 0, 0.25)',
+			padding         : theme.spacing(0.6),
+			'&:hover'       :
 			{
 				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
