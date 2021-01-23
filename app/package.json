@@ -26,6 +26,7 @@
 		"end-of-stream": "1.4.1",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",
+		"idb": "^6.0.0",
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
 		"material-ui-popup-state": "^1.7.0",
