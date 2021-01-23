@@ -145,8 +145,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "設置",
 	"settings.camera": "視訊來源",
 	"settings.selectCamera": "選擇視訊來源",

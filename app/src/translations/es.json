@@ -146,8 +146,7 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "Ajustes",
 	"settings.camera": "Cámara",
 	"settings.selectCamera": "Seleccionar dispositivo de vídeo",

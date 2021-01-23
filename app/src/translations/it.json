@@ -146,8 +146,7 @@
 	"label.login": "Accesso",
 	"label.logout": "Uscita",
 	"label.join": "Entra",
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",
 	"settings.selectCamera": "Seleziona dispositivo video",

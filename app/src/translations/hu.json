@@ -146,8 +146,7 @@
 	"label.login": "Bejelentkezés",
 	"label.logout": "Kijelentkezés",
 	"label.join": "Kapcsolódás",
-	"label.startRoomRecord": "A szoba rögzítése",
-
+	
 	"settings.settings": "Beállítások",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Válassz videoeszközt",
@@ -188,6 +187,7 @@
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
 	"settings.codecs": "Kodek",
+	"settings.recordingsPreferredMimeType": "Válaszd ki felvételhez használandó média típust",
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",

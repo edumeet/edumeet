@@ -146,8 +146,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "सेटिंग",
 	"settings.camera": "कैमरा",
 	"settings.selectCamera": "कैमरे का चयन करें",

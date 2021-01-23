@@ -20,7 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-import RecordRTC from 'recordrtc';
+import { openDB, deleteDB } from 'idb';
 
 let createTorrent;
 
@@ -36,7 +36,17 @@ let ScreenShare;
 
 let recorder;
 
-const recordingData = [];
+let recordingMimeType;
+
+// by default save temp data to Indexed DB
+let logToIDB = true;
+
+// only use recordingsData array as temp if IDB has been not supported by the browser
+let recordingData = [];
+
+const idbStoreName = 'chunks';
+
+let idbName;
 
 let gumStream, gdmStream;
 
@@ -87,6 +97,24 @@ const VIDEO_CONSTRAINS =
 		aspectRatio : videoAspectRatio
 	}
 };
+
+const RECORDING_CONSTRAINTS =
+{
+	videoBitsPerSecond : 8000000,
+	video              :
+	{
+		displaySurface : 'browser',
+		width          : { ideal: 1920 }
+	},
+	audio    : true,
+	advanced : [
+		{ width: 1920, height: 1080 },
+		{ width: 1280, height: 720 }
+	]
+};
+
+// 10 sec
+const RECORDING_SLICE_SIZE=10000;
 
 const PC_PROPRIETARY_CONSTRAINTS =
 {
@@ -272,6 +300,10 @@ export default class RoomClient
 		{
 			store.dispatch(meActions.setPicture(store.getState().settings.localPicture));
 		}
+		store.dispatch(
+			settingsActions.setRecorderSupportedMimeTypes(this.getRecorderSupportedMimeTypes())
+		);
+
 	}
 
 	close()
@@ -2514,38 +2546,6 @@ export default class RoomClient
 						break;
 					}
 
-					case 'startRoomRecord':
-					{
-						store.dispatch(
-							roomActions.setRecordStarted());
-
-						store.dispatch(requestActions.notify(
-							{
-								text : intl.formatMessage({
-									id             : 'room.startRecording',
-									defaultMessage : ''
-								})
-							}));
-
-						break;
-					}
-
-					case 'stopRoomRecord':
-					{
-						store.dispatch(
-							roomActions.setRecordStoped());
-
-						store.dispatch(requestActions.notify(
-							{
-								text : intl.formatMessage({
-									id             : 'room.stopRecording',
-									defaultMessage : ''
-								})
-							}));
-
-						break;
-					}
-
 					case 'lockRoom':
 					{
 						store.dispatch(
@@ -3559,12 +3559,116 @@ export default class RoomClient
 		}
 	}
 
-	async startRoomRecord(mimeType)
+	getRecorderSupportedMimeTypes()
+	{
+		const mimeTypes = [];
+
+		const mimeTypeCapability = [
+
+			/* audio codecs
+			[ 'audio/wav', [] ],
+			[ 'audio/pcm', [] ],
+			[ 'audio/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'audio/ogg', [ 'Firefox' ] ],
+			[ 'audio/opus', [] ],
+			*/
+			[ 'video/webm;codecs=vp8', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs=vp9', [ 'Chrome' ] ],
+			[ 'video/webm;codecs=h264', [ 'Chrome' ] ],
+			[ 'video/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/mp4', [] ],
+			[ 'video/mpeg', [] ],
+			[ 'video/x-matroska;codecs=avc1', [ 'Chrome' ] ]
+		];
+
+		if (typeof MediaRecorder === 'undefined')
+		{
+			window.MediaRecorder = {
+				isTypeSupported : function()
+				{
+					return false;
+				}
+			};
+		}
+		mimeTypeCapability.forEach((item) =>
+		{
+			if (MediaRecorder.isTypeSupported(item[0]) && !mimeTypes.includes(item[0]))
+			{
+				mimeTypes.push(item[0]);
+			}
+		});
+
+		return mimeTypes;
+	}
+
+	async startRoomRecord()
 	{
 		logger.debug('startRoomRecord()');
 
-		store.dispatch(
-			roomActions.setRoomRecordOpen(false));
+		recordingMimeType = store.getState().settings.recorderPreferredMimeType;
+
+		let idbDB=null;
+
+		// Check
+		if (typeof MediaRecorder === undefined)
+		{
+			throw new Error('Unsupported media recording API');
+		}
+
+		// Check mimetype is supported by the browser
+		if (MediaRecorder.isTypeSupported(recordingMimeType) === false)
+		{
+
+			throw new Error('Unsupported media recording format %O', recordingMimeType);
+		}
+
+		function invokeSaveAsDialog(blob, fileName)
+		{
+			const link = document.createElement('a');
+
+			link.style = 'display:none;opacity:0;color:transparent;';
+			link.href = URL.createObjectURL(blob);
+			link.download = fileName;
+
+			(document.body || document.documentElement).appendChild(link);
+			if (typeof link.click === 'function')
+			{
+				link.click();
+			}
+			else
+			{
+				link.target = '_blank';
+				link.dispatchEvent(new MouseEvent('click',
+					{
+						view       : window,
+						bubbles    : true,
+						cancelable : true
+					}));
+			}
+			URL.revokeObjectURL(link.href);
+		}
+
+		// save recording and destroy
+		function saveRecordingAndCleanup(blobs)
+		{
+			// merge blob
+			const blob = new Blob(blobs, { type: recordingMimeType });
+
+			// Stop all used video/audio tracks
+			recorderStream.getTracks().forEach((track) => track.stop());
+
+			gdmStream.getTracks().forEach((track) => track.stop());
+
+			// save as
+			invokeSaveAsDialog(blob, `${idbName}.webm`);
+
+			// destroy
+			idbDB.close();
+			deleteDB(idbName);
+			recordingMimeType=null;
+			recordingData=[];
+			recorder = null;
+		}
 
 		function mixer(stream1, stream2)
 		{
@@ -3591,7 +3695,8 @@ export default class RoomClient
 		try
 		{
 			gumStream = this._micProducer.track;
-			gdmStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' }, audio: true });
+
+			gdmStream = await navigator.mediaDevices.getDisplayMedia(RECORDING_CONSTRAINTS);
 			recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
 		}
 		catch (error)
@@ -3606,76 +3711,94 @@ export default class RoomClient
 				}));
 			logger.error('startRoomRecord() [error:"%o"]', error);
 		}
+		recorder = new MediaRecorder(recorderStream, { mimeType: recordingMimeType });
 
-		recorder = new RecordRTC(recorderStream, {
-			type      : 'video',
-			mimeType  : mimeType,
-			timeSlice : 1000
-		});
-
-		(function looper()
+		if (typeof indexedDB === 'undefined' || typeof indexedDB.open === 'undefined')
 		{
-
-			let stop = false;
-
-			if (!recorder || stop)
-			{
-				return;
-			}
-			const internal = recorder.getInternalRecorder();
-
-			if (internal && internal.getArrayOfBlobs)
-			{
-				const blob = new Blob(internal.getArrayOfBlobs(), {
-					type : 'video/webm'
-				});
-
-				console.log('Recording length: ');
-				console.log(RecordRTC.bytesToSize(blob.size));
-
-				const x = 5;
-
-				if (blob.size > x * 1000000)
-				{ // if blob is greater than x MB
-					stop = true;
-
-					blob.getDataURL = recorder.getDataURL;
-
-					RecordRTC.writeToDisk({
-						video : blob,
-						audio : null,
-						gif   : null
-					});
-					recorder.pauseRecording();
-
-					store.dispatch(requestActions.notify(
-						{
-							text : intl.formatMessage({
-								id             : 'room.limitPausedRoomRecording',
-								defaultMessage : 'You reached the memory limit set to the recording'
-							})
-						}));
+			logger.warn('IndexedDB API is not available in this browser. Fallback to ');
+			logToIDB=false;
+		}
+		else
+		{
+			idbName=Date.now();
+			idbDB = await openDB(idbName, 1,
+				{
+					upgrade(db)
+					{
+						db.createObjectStore(idbStoreName);
+					}
 				}
-			}
-			if (!stop)
-				setTimeout(looper, 1000);
-		})();
+			);
+		}
+
+		let chunkCounter=0;
+
+		// Save a recorded chunk (blob) to indexedDB
+		const saveToDB = async function(data)
+		{
+			return await idbDB.put(idbStoreName, data, Date.now());
+		};
 
 		recorder.ondataavailable = (e) =>
 		{
 			if (e.data && e.data.size > 0)
 			{
-				recordingData.push(e.data);
+				chunkCounter++;
+				logger.debug(`put chunk: ${chunkCounter}`);
+				if (logToIDB)
+				{
+					try
+					{
+						saveToDB(e.data);
+					}
+					catch (error)
+					{
+						logger.error('Error during saving data chunk to IndexedDB! error:%O', error);
+					}
+				}
+				else
+				{
+					recordingData.push(e.data);
+				}
 			}
 		};
 
-		recorder.startRecording();
+		recorder.onstop = (e) =>
+		{
+			logger.debug(`Logger stopped event: ${e}`);
+
+			if (logToIDB)
+			{
+				try
+				{
+					idbDB.getAll(idbStoreName).then((blobs) =>
+					{
+
+						saveRecordingAndCleanup(blobs);
+
+					});
+
+				}
+				catch (error)
+				{
+					logger.error('Error during getting all data chunks from IndexedDB! error: %O', error);
+				}
+
+			}
+			else
+			{
+				saveRecordingAndCleanup(recordingData);
+			}
+
+		};
+
+		recorder.start(RECORDING_SLICE_SIZE);
 
 		try
 		{
 			await this.sendRequest('startRoomRecord');
 
-			store.dispatch(roomActions.setRecordStarted());
+			store.dispatch(roomActions.toggleRecordedLocally());
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3704,19 +3827,7 @@ export default class RoomClient
 
 		try
 		{
-			recorder.stopRecording(function()
-			{
-				const blob = recorder.getBlob();
-
-				/* Stop all used video/audio tracks */
-				recorderStream.getTracks().forEach((track) => track.stop());
-
-				gdmStream.getTracks().forEach((track) => track.stop());
-
-				RecordRTC.invokeSaveAsDialog(blob, 'save.mp4');
-				recorder = null;
-			});
-
+			recorder.stop();
 		}
 		catch (error)
 		{
@@ -3736,7 +3847,7 @@ export default class RoomClient
 		{
 			await this.sendRequest('stopRoomRecord');
 
-			store.dispatch(roomActions.setRecordStoped());
+			store.dispatch(roomActions.toggleRecordedLocally());
 
 			store.dispatch(requestActions.notify(
 				{
@@ -4084,6 +4195,14 @@ export default class RoomClient
 		this._micProducer = null;
 
 		store.dispatch(meActions.setAudioInProgress(false));
+	}
+	async updateRecorderPreferredMimeType({ recorderPreferredMimeType = null } = {})
+	{
+		logger.debug('updateRecorderPreferredMimeType [mime-type: "%s"]',
+			recorderPreferredMimeType
+		);
+		store.dispatch(
+			settingsActions.setRecorderPreferredMimeType(recorderPreferredMimeType));
 	}
 
 	async updateScreenSharing({

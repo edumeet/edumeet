@@ -146,8 +146,7 @@
 	"label.login": "Anmelden",
 	"label.logout": "Abmelden",
 	"label.join": "Eintreten",
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Wähle ein Videogerät",

@@ -146,8 +146,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Video aygıtını seç",

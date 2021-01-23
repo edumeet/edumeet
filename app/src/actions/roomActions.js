@@ -18,14 +18,9 @@ export const setRoomActiveSpeaker = (peerId) =>
 		payload : { peerId }
 	});
 
-export const setRecordStarted = () =>
+export const toggleRecordedLocally = () =>
 	({
-		type : 'SET_RECORD_START'
-	});
-
-export const setRecordStoped = () =>
-	({
-		type : 'SET_RECORD_STOP'
+		type : 'TOGGLE_RECORDED_LOCALLY'
 	});
 
 export const setRoomLocked = () =>
@@ -72,12 +67,6 @@ export const setSettingsOpen = (settingsOpen) =>
 	({
 		type    : 'SET_SETTINGS_OPEN',
 		payload : { settingsOpen }
-	});
-
-export const setRoomRecordOpen = (roomRecordOpen) =>
-	({
-		type    : 'SET_ROOMRECORD_OPEN',
-		payload : { roomRecordOpen }
 	});
 
 export const setExtraVideoOpen = (extraVideoOpen) =>

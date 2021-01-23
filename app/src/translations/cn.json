@@ -146,8 +146,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",
 	"settings.selectCamera": "选择视频设备",

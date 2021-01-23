@@ -146,8 +146,7 @@
 	"label.login": "Logg på",
 	"label.logout": "Logg av",
 	"label.join": "Gå inn",
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Velg videoenhet",

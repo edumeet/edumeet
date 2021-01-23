@@ -4,7 +4,7 @@ const initialState =
 	// new/connecting/connected/disconnected/closed,
 	state                         : 'new',
 	locked                        : false,
-	recording                     : false,
+	recordedLocally               : false,
 	inLobby                       : false,
 	signInRequired                : false,
 	overRoomLimit                 : false,
@@ -23,7 +23,6 @@ const initialState =
 	spotlights                    : [],
 	rolesManagerPeer              : null, // peerId
 	settingsOpen                  : false,
-	roomRecordOpen                : false,
 	extraVideoOpen                : false,
 	hideSelfView                  : false,
 	rolesManagerOpen              : false,
@@ -64,14 +63,11 @@ const room = (state = initialState, action) =>
 				return { ...state, state: roomState, activeSpeakerId: null };
 		}
 
-		case 'SET_RECORD_START':
+		case 'TOGGLE_RECORDED_LOCALLY':
 		{
-			return { ...state, recording: true };
-		}
+			const recordedLocally = !state.recordedLocally;
 
-		case 'SET_RECORD_STOP':
-		{
-			return { ...state, recording: false };
+			return { ...state, recordedLocally };
 		}
 
 		case 'SET_ROOM_LOCKED':
@@ -129,13 +125,6 @@ const room = (state = initialState, action) =>
 			const { settingsOpen } = action.payload;
 
 			return { ...state, settingsOpen };
-		}
-
-		case 'SET_ROOMRECORD_OPEN':
-		{
-			const { roomRecordOpen } = action.payload;
-
-			return { ...state, roomRecordOpen };
 		}
 
 		case 'SET_EXTRA_VIDEO_OPEN':

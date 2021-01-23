@@ -147,8 +147,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "Настройки",
 	"settings.camera": "Камера",
 	"settings.selectCamera": "Выбрать видеоустройство",

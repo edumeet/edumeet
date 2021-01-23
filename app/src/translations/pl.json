@@ -146,8 +146,7 @@
 	"label.login": "Zaloguj",
 	"label.logout": "Wyloguj",
 	"label.join": "Dołącz",
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Urządzenie wideo",

@@ -144,8 +144,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
-	"label.startRoomRecord": null,
-
+	
 	"settings.settings": "Параметрлер",
 	"settings.camera": "Камера",
 	"settings.selectCamera": "Бейне құрылғыны таңдаңыз",
