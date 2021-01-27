@@ -3622,54 +3622,6 @@ export default class RoomClient
 			throw new Error('Unsupported media recording format %O', recordingMimeType);
 		}
 
-		function invokeSaveAsDialog(blob, fileName)
-		{
-			const link = document.createElement('a');
-
-			link.style = 'display:none;opacity:0;color:transparent;';
-			link.href = URL.createObjectURL(blob);
-			link.download = fileName;
-
-			(document.body || document.documentElement).appendChild(link);
-			if (typeof link.click === 'function')
-			{
-				link.click();
-			}
-			else
-			{
-				link.target = '_blank';
-				link.dispatchEvent(new MouseEvent('click',
-					{
-						view       : window,
-						bubbles    : true,
-						cancelable : true
-					}));
-			}
-			URL.revokeObjectURL(link.href);
-		}
-
-		// save recording and destroy
-		function saveRecordingAndCleanup(blobs)
-		{
-			// merge blob
-			const blob = new Blob(blobs, { type: recordingMimeType });
-
-			// Stop all used video/audio tracks
-			recorderStream.getTracks().forEach((track) => track.stop());
-
-			gdmStream.getTracks().forEach((track) => track.stop());
-
-			// save as
-			invokeSaveAsDialog(blob, `${idbName}.webm`);
-
-			// destroy
-			idbDB.close();
-			deleteDB(idbName);
-			recordingMimeType=null;
-			recordingData=[];
-			recorder = null;
-		}
-
 		function mixer(stream1, stream2)
 		{
 			const ctx = new AudioContext();
@@ -3774,7 +3726,7 @@ export default class RoomClient
 					idbDB.getAll(idbStoreName).then((blobs) =>
 					{
 
-						saveRecordingAndCleanup(blobs);
+						this.saveRecordingAndCleanup(blobs, idbDB, idbName);
 
 					});
 
@@ -3787,7 +3739,7 @@ export default class RoomClient
 			}
 			else
 			{
-				saveRecordingAndCleanup(recordingData);
+				this.saveRecordingAndCleanup(recordingData, idbDB, idbName);
 			}
 
 		};
@@ -3869,6 +3821,77 @@ export default class RoomClient
 				}));
 
 			logger.error('stopRoomRecord() [error:"%o"]', error);
+		}
+	}
+
+	invokeSaveAsDialog(blob, fileName)
+	{
+		const link = document.createElement('a');
+
+		link.style = 'display:none;opacity:0;color:transparent;';
+		link.href = URL.createObjectURL(blob);
+		link.download = fileName;
+
+		(document.body || document.documentElement).appendChild(link);
+		if (typeof link.click === 'function')
+		{
+			link.click();
+		}
+		else
+		{
+			link.target = '_blank';
+			link.dispatchEvent(new MouseEvent('click',
+				{
+					view       : window,
+					bubbles    : true,
+					cancelable : true
+				}));
+		}
+		URL.revokeObjectURL(link.href);
+	}
+
+	// save recording and destroy
+	saveRecordingAndCleanup(blobs, db, dbName)
+	{
+		// merge blob
+		const blob = new Blob(blobs, { type: recordingMimeType });
+
+		// Stop all used video/audio tracks
+		if (recorderStream && recorderStream.getTracks().length > 0)
+			recorderStream.getTracks().forEach((track) => track.stop());
+
+		if (gdmStream && gdmStream.getTracks().length > 0)
+			gdmStream.getTracks().forEach((track) => track.stop());
+
+		// save as
+		this.invokeSaveAsDialog(blob, `${dbName}.webm`);
+
+		// destroy
+		db.close();
+		deleteDB(dbName);
+		recordingMimeType=null;
+		recordingData=[];
+		recorder = null;
+	}
+
+	// Emergency recovery you need the date from indexDB as parameter.
+	recoverRecording(dbName)
+	{
+		try
+		{
+			openDB(dbName, 1).then((db) =>
+			{
+				db.getAll(idbStoreName).then((blobs) =>
+				{
+					this.saveRecordingAndCleanup(blobs, db, dbName);
+				});
+			}
+
+			);
+		}
+		catch (error)
+		{
+			logger.error('Error during save recovered recording error: %O', error);
 		}
 	}
 
