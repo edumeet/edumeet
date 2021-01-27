@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.5.0
+
+### Added
+
+* Local Recording
+  * IndexedDB and fallback to memory (array of blobs)
+  * CLIENT.recoverRecording(`DB_NAME`)
+
 ## 3.4.0
 
 ### Added
