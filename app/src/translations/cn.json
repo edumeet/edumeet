@@ -146,6 +146,8 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.recordingInProgress": null,
+
 
 	"settings.settings": "设置",
 	"settings.camera": "视频设备",

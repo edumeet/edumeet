@@ -146,6 +146,7 @@
 	"label.login": "Logg på",
 	"label.logout": "Logg av",
 	"label.join": "Gå inn",
+	"label.recordingInProgress": null,
 	
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",

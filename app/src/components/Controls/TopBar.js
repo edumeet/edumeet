@@ -42,7 +42,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 const styles = (theme) =>
 	({
@@ -329,7 +329,27 @@ const TopBar = (props) =>
 					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						{room.recordedLocally && <CircularProgress color='secondary' />}
+						{room.recordedLocally &&
+						<PulsingBadge
+							color='secondary'
+							badgeContent='REC'
+							overlap='circle'
+						>
+							<IconButton
+								disabled
+								color='inherit'
+								aria-label={intl.formatMessage(
+									{
+										id             : 'label.recordingInProgress',
+										defaultMessage : 'Recording in Progress..'
+									})}
+								className={classes.menuButton}
+							>
+								<FiberManualRecordIcon color='secondary'/>
+							</IconButton>
+						</PulsingBadge>
+						}
+						<div className={classes.divider} />
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',

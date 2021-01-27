@@ -148,6 +148,7 @@
 	"label.logout": "Odhlásit",
 	"label.join": "Připojit",
 	"label.startRoomRecord": null,
+	"label.recordingInProgress": null,
 	
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",

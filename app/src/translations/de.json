@@ -146,6 +146,7 @@
 	"label.login": "Anmelden",
 	"label.logout": "Abmelden",
 	"label.join": "Eintreten",
+	"label.recordingInProgress": null,
 	
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",

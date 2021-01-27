@@ -146,6 +146,7 @@
 	"label.login": "Accesso",
 	"label.logout": "Uscita",
 	"label.join": "Entra",
+	"label.recordingInProgress": null,
 	
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",

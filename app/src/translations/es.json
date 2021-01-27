@@ -146,6 +146,7 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
+	"label.recordingInProgress": null,
 	
 	"settings.settings": "Ajustes",
 	"settings.camera": "Cámara",

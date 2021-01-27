@@ -146,6 +146,7 @@
 	"label.login": "Bejelentkezés",
 	"label.logout": "Kijelentkezés",
 	"label.join": "Kapcsolódás",
+	"label.recordingInProgress": "Felvétel készül..",
 	
 	"settings.settings": "Beállítások",
 	"settings.camera": "Kamera",

@@ -144,6 +144,7 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.recordingInProgress": null,
 	
 	"settings.settings": "Параметрлер",
 	"settings.camera": "Камера",
