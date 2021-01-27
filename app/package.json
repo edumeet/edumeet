@@ -46,7 +46,6 @@
 		"react-router-dom": "^5.1.2",
 		"react-scripts": "^4.0.0",
 		"react-wakelock-react16": "0.0.7",
-		"recordrtc": "^5.6.1",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
 		"redux-persist": "^6.0.0",
