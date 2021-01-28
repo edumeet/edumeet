@@ -25,7 +25,8 @@ const permissions = require('../permissions'), {
 	EXTRA_VIDEO,
 	SHARE_FILE,
 	MODERATE_FILES,
-	MODERATE_ROOM
+	MODERATE_ROOM,
+	LOCAL_RECORD_ROOM
 } = permissions;
 
 const config = require('../config/config');
@@ -42,24 +43,31 @@ const roomAccess =
 
 const roomPermissions =
 {
-	[CHANGE_ROOM_LOCK] : [ userRoles.NORMAL ],
-	[PROMOTE_PEER]     : [ userRoles.NORMAL ],
-	[MODIFY_ROLE]      : [ userRoles.MODERATOR ],
-	[SEND_CHAT]        : [ userRoles.NORMAL ],
-	[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
-	[SHARE_AUDIO]      : [ userRoles.NORMAL ],
-	[SHARE_VIDEO]      : [ userRoles.NORMAL ],
-	[SHARE_SCREEN]     : [ userRoles.NORMAL ],
-	[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
-	[SHARE_FILE]       : [ userRoles.NORMAL ],
-	[MODERATE_FILES]   : [ userRoles.MODERATOR ],
-	[MODERATE_ROOM]    : [ userRoles.MODERATOR ],
+	[CHANGE_ROOM_LOCK]  : [ userRoles.NORMAL ],
+	[PROMOTE_PEER]      : [ userRoles.NORMAL ],
+	[MODIFY_ROLE]       : [ userRoles.MODERATOR ],
+	[SEND_CHAT]         : [ userRoles.NORMAL ],
+	[MODERATE_CHAT]     : [ userRoles.MODERATOR ],
+	[SHARE_AUDIO]       : [ userRoles.NORMAL ],
+	[SHARE_VIDEO]       : [ userRoles.NORMAL ],
+	[SHARE_SCREEN]      : [ userRoles.NORMAL ],
+	[EXTRA_VIDEO]       : [ userRoles.NORMAL ],
+	[SHARE_FILE]        : [ userRoles.NORMAL ],
+	[MODERATE_FILES]    : [ userRoles.MODERATOR ],
+	[MODERATE_ROOM]     : [ userRoles.MODERATOR ],
+	[LOCAL_RECORD_ROOM] : [ userRoles.NORMAL ],
 	...config.permissionsFromRoles
 };
 
 const roomAllowWhenRoleMissing = config.allowWhenRoleMissing || [];
 
 const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
+
+// Recoding STATE
+const RECORDING_STOP='stop';
+const RECORDING_START='start';
+const RECORDING_PAUSE='pause';
+const RECORDING_RESUME='resume';
 
 class Room extends EventEmitter
 {
@@ -279,6 +287,8 @@ class Room extends EventEmitter
 		this._lastN = [];
 
 		this._peers = {};
+
+		this._localRecordingPeerIds = [];
 
 		this._selfDestructTimeout = null;
 
@@ -1502,35 +1512,48 @@ class Room extends EventEmitter
 				break;
 			}
 
-			case 'startRoomRecord':
+			case 'setLocalRecording':
 			{
-				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK)) // todo change permission
+				if (!this._hasPermission(peer, LOCAL_RECORD_ROOM)) // todo change permission
 					throw new Error('peer not authorized');
 
-				this._recording = true;
+				const { state } = request.data;
 
-				// Spread to others
-				this._notification(peer.socket, 'startRoomRecord', {
-					peerId : peer.id
-				}, true);
+				switch (state)
+				{
+					case RECORDING_RESUME:
+					case RECORDING_START:
+						if (!this._localRecordingPeerIds.includes(peer.id))
+							this._localRecordingPeerIds.push(peer.id);
+						break;
+					case RECORDING_PAUSE:
+					case RECORDING_STOP:
+						if (this._localRecordingPeerIds.length > 0)
+						{
+							this.localRecordingPeerIds.pop(peer.id);
+						}
+						break;
 
-				// Return no error
-				cb();
+					default:
+						break;
+				}
+				if (this._localRecordingPeerIds.length > 0)
+				{
+					try
+					{
+						// Spread to others
+						this.notification(peer.socket, 'setLocalRecording', {
+							peerId                : peer.id,
+							state                 : state,
+							localRecordingPeerIds : this._localRecordingPeerIds
+						}, true);
+					}
+					catch (error)
+					{
+						logger.error('Unable to send setLocalRecording notification %O', error);
+					}
 
-				break;
-			}
-
-			case 'stopRoomRecord':
-			{
-				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK)) // todo change permission
-					throw new Error('peer not authorized');
-
-				this._recording = true;
-
-				// Spread to others
-				this._notification(peer.socket, 'stopRoomRecord', {
-					peerId : peer.id
-				}, true);
+				}
 
 				// Return no error
 				cb();

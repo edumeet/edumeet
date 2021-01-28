@@ -254,7 +254,7 @@ const TopBar = (props) =>
 			defaultMessage : 'Lock room'
 		});
 
-	const recordTooltip = room.recordedLocally ?
+	const recordTooltip = room.localRecordingInProgress ?
 		intl.formatMessage({
 			id             : 'tooltip.stopRecording',
 			defaultMessage : 'Stop recording'
@@ -329,7 +329,7 @@ const TopBar = (props) =>
 					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						{room.recordedLocally &&
+						{room.recordingInProgress &&
 						<PulsingBadge
 							color='secondary'
 							badgeContent='REC'
@@ -587,13 +587,13 @@ const TopBar = (props) =>
 							onClick={() =>
 							{
 								handleMenuClose();
-								if (room.recordedLocally)
+								if (room.localRecordingInProgress)
 								{
-									roomClient.stopRoomRecord();
+									roomClient.stopLocalRecording();
 								}
 								else
 								{
-									roomClient.startRoomRecord();
+									roomClient.startLocalRecording();
 								}
 							}
 							}
@@ -604,7 +604,7 @@ const TopBar = (props) =>
 								<RecordVoiceOverIcon />
 							</Badge>
 
-							{ room.recordedLocally ?
+							{ room.localRecordingInProgress ?
 								<p className={classes.moreAction}>
 									<FormattedMessage
 										id='tooltip.stopRecording'
@@ -783,13 +783,13 @@ const TopBar = (props) =>
 					onClick={() =>
 					{
 						handleMenuClose();
-						if (room.recordedLocally)
+						if (room.localRecordingInProgress)
 						{
-							roomClient.stopRoomRecord();
+							roomClient.stopLocalRecording();
 						}
 						else
 						{
-							roomClient.startRoomRecord();
+							roomClient.startLocalRecording();
 						}
 					}
 					}
@@ -799,7 +799,7 @@ const TopBar = (props) =>
 					>
 						<RecordVoiceOverIcon />
 					</Badge>
-					{ room.recordedLocally ?
+					{ room.localeRecordingInProgress ?
 						<p className={classes.moreAction}>
 							<FormattedMessage
 								id='tooltip.stopRecording'

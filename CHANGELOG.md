@@ -7,6 +7,7 @@
 * Local Recording
   * IndexedDB and fallback to memory (array of blobs)
   * CLIENT.recoverRecording(`DB_NAME`)
+  * Add new permission LOCAL_RECORD_ROOM
 
 ## 3.4.0
 

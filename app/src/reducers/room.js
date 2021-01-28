@@ -4,7 +4,8 @@ const initialState =
 	// new/connecting/connected/disconnected/closed,
 	state                         : 'new',
 	locked                        : false,
-	recordedLocally               : false,
+	recordingInProgress           : false,
+	localRecordingInProgress      : false,
 	inLobby                       : false,
 	signInRequired                : false,
 	overRoomLimit                 : false,
@@ -63,11 +64,18 @@ const room = (state = initialState, action) =>
 				return { ...state, state: roomState, activeSpeakerId: null };
 		}
 
-		case 'TOGGLE_RECORDED_LOCALLY':
+		case 'SET_RECORDING_IN_PROGRESS':
 		{
-			const recordedLocally = !state.recordedLocally;
+			const recordingInProgress = state.recordingInProgress;
 
-			return { ...state, recordedLocally };
+			return { ...state, recordingInProgress };
+		}
+
+		case 'SET_LOCAL_RECORDING_IN_PROGRESS':
+		{
+			const localRecordingInProgress = !state.localRecordingInProgress;
+
+			return { ...state, localRecordingInProgress };
 		}
 
 		case 'SET_ROOM_LOCKED':

@@ -139,6 +139,12 @@ const VIDEO_SVC_ENCODINGS =
 	{ scalabilityMode: 'S3T3', dtx: true }
 ];
 
+// Recoding STATE
+const RECORDING_STOP='stop';
+const RECORDING_START='start';
+const RECORDING_PAUSE='pause';
+const RECORDING_RESUME='resume';
+
 let store;
 
 let intl;
@@ -3168,6 +3174,40 @@ export default class RoomClient
 						break;
 					}
 
+					case 'setLocalRecording':
+					{
+						const { peerId, status, localRecordingPeerIds } = notification.data;
+
+						switch (status)
+						{
+							case RECORDING_RESUME:
+							case RECORDING_START:
+								store.dispatch(
+									roomActions.setRecordingInProgress(true));
+								break;
+							case RECORDING_PAUSE:
+							case RECORDING_STOP:
+								if (localRecordingPeerIds.length === 0)
+									store.dispatch(
+										roomActions.setRecordingInProgress(true));
+
+								break;
+							default:
+								break;
+						}
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'notify.localRecording',
+									defaultMessage : '{displayName} {status} local recording'
+								}, {
+									status      : status, // TODO: Add localized label to the status
+									displayName : this.peers[peerId].displayName
+								})
+							}));
+						break;
+					}
+
 					default:
 					{
 						logger.error(
@@ -3601,9 +3641,9 @@ export default class RoomClient
 		return mimeTypes;
 	}
 
-	async startRoomRecord()
+	async startLocalRecording()
 	{
-		logger.debug('startRoomRecord()');
+		logger.debug('startLocalRecording()');
 
 		recordingMimeType = store.getState().settings.recorderPreferredMimeType;
 
@@ -3661,7 +3701,7 @@ export default class RoomClient
 						defaultMessage : 'Unable to record the room'
 					})
 				}));
-			logger.error('startRoomRecord() [error:"%o"]', error);
+			logger.error('startLocalRecording() [error:"%o"]', error);
 		}
 		recorder = new MediaRecorder(recorderStream, { mimeType: recordingMimeType });
 
@@ -3748,9 +3788,9 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('startRoomRecord');
+			await this.sendRequest('setLocalRecording', { state: RECORDING_START });
 
-			store.dispatch(roomActions.toggleRecordedLocally());
+			store.dispatch(roomActions.setLocalRecordingInProgress(true));
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3773,33 +3813,12 @@ export default class RoomClient
 			logger.error('startRoomRecord() [error:"%o"]', error);
 		}
 	}
-	async stopRoomRecord()
+	async stopLocalRecording()
 	{
-		logger.debug('stopRoomRecord()');
-
+		logger.debug('stopLocalRecording()');
 		try
 		{
-			recorder.stop();
-		}
-		catch (error)
-		{
-			store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : intl.formatMessage({
-						id             : 'room.unableToRoomRecord',
-						defaultMessage : 'Unable to record the room'
-					})
-				}));
-
-			logger.error('stopRoomRecord() [error:"%o"]', error);
-		}
-
-		try
-		{
-			await this.sendRequest('stopRoomRecord');
-
-			store.dispatch(roomActions.toggleRecordedLocally());
+			await this.sendRequest('setLocalRecording', { state: RECORDING_STOP });
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3808,6 +3827,10 @@ export default class RoomClient
 						defaultMessage : 'You stopped recording the room'
 					})
 				}));
+
+			recorder.stop();
+			store.dispatch(roomActions.setLocalRecordingInProgress(false));
+
 		}
 		catch (error)
 		{
@@ -3820,8 +3843,9 @@ export default class RoomClient
 					})
 				}));
 
-			logger.error('stopRoomRecord() [error:"%o"]', error);
+			logger.error('stopLocalRecording() [error:"%o"]', error);
 		}
+
 	}
 
 	invokeSaveAsDialog(blob, fileName)

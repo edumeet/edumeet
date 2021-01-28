@@ -18,9 +18,16 @@ export const setRoomActiveSpeaker = (peerId) =>
 		payload : { peerId }
 	});
 
-export const toggleRecordedLocally = () =>
+export const setRecordingInProgress = (recordingInProgress) =>
 	({
-		type : 'TOGGLE_RECORDED_LOCALLY'
+		type    : 'SET_RECORDING_IN_PROGRESS',
+		payload : { recordingInProgress }
+	});
+
+export const setLocalRecordingInProgress = (localRecordingInProgress) =>
+	({
+		type    : 'SET_LOCAL_RECORDING_IN_PROGRESS',
+		payload : { localRecordingInProgress }
 	});
 
 export const setRoomLocked = () =>
