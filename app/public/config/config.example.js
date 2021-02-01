@@ -4,6 +4,9 @@ var config =
 	loginEnabled    : false,
 	developmentPort : 3443,
 	productionPort  : 443,
+	// of the server component runs on a different host than the app
+	// you can uncomment the following line and specify the host name.
+	// serverHostname  : 'external-server.com',
 
 	/**
 	 * Supported browsers version 
