@@ -2084,6 +2084,38 @@ export default class RoomClient
 		}
 	}
 
+	async restartIce()
+	{
+		logger.debug('restartIce()');
+
+		try
+		{
+			if (this._sendTransport)
+			{
+				const iceParameters = await this.sendRequest(
+					'restartIce',
+					{ transportId: this._sendTransport.id });
+
+				await this._sendTransport.restartIce({ iceParameters });
+			}
+
+			if (this._recvTransport)
+			{
+				const iceParameters = await this.sendRequest(
+					'restartIce',
+					{ transportId: this._recvTransport.id });
+
+				await this._recvTransport.restartIce({ iceParameters });
+			}
+
+			logger.debug('ICE restarted');
+		}
+		catch (error)
+		{
+			logger.error('restartIce() | failed:%o', error);
+		}
+	}
+
 	async setConsumerPriority(consumerId, priority)
 	{
 		logger.debug(
@@ -3187,6 +3219,21 @@ export default class RoomClient
 					});
 
 				this._sendTransport.on(
+					'connectionstatechange', (connectState) =>
+					{
+						switch (connectState)
+						{
+							case 'disconnected':
+							case 'failed':
+								this.restartIce();
+								break;
+
+							default:
+								break;
+						}
+					});
+
+				this._sendTransport.on(
 					'produce', async ({ kind, rtpParameters, appData }, callback, errback) =>
 					{
 						try
@@ -3247,6 +3294,21 @@ export default class RoomClient
 						})
 						.then(callback)
 						.catch(errback);
+				});
+
+			this._recvTransport.on(
+				'connectionstatechange', (connectState) =>
+				{
+					switch (connectState)
+					{
+						case 'disconnected':
+						case 'failed':
+							this.restartIce();
+							break;
+
+						default:
+							break;
+					}
 				});
 
 			// Set our media capabilities.
