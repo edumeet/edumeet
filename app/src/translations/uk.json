@@ -170,6 +170,10 @@
 	"settings.noiseThreshold": "Поріг шуму",
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",

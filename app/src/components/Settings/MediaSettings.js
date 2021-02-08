@@ -21,6 +21,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Switch from '@material-ui/core/Switch';
+import ImageUploader from 'react-images-upload';
+import Resizer from 'react-image-file-resizer';
 
 const NoiseSlider = withStyles(
 	{
@@ -98,6 +100,30 @@ const MediaSettings = ({
 	const [ audioSettingsOpen, setAudioSettingsOpen ] = React.useState(false);
 	const [ videoSettingsOpen, setVideoSettingsOpen ] = React.useState(false);
 
+	const onDrop = (picture) =>
+	{
+		if (picture.length > 0)
+		{
+			Resizer.imageFileResizer(picture[0], 1280, 720, 'JPEG', 99, 0,
+				(uri) =>
+				{
+					const reader = new FileReader();
+
+					reader.addEventListener('load', () =>
+					{
+						roomClient.setPicture(reader.result);
+					});
+
+					reader.readAsDataURL(uri);
+				},
+				'blob');
+		}
+		else
+		{
+			roomClient.setPicture(null);
+		}
+	};
+
 	const resolutions = [ {
 		value : 'low',
 		label : intl.formatMessage({
@@ -159,6 +185,32 @@ const MediaSettings = ({
 		<React.Fragment>
 			<form className={classes.setting} autoComplete='off'>
 				<FormControl className={classes.formControl}>
+					<ImageUploader
+						withIcon
+						onChange={onDrop}
+						imgExtension={[ '.jpg', '.jpeg', '.png' ]}
+						maxFileSize={5242880}
+						singleImage
+						withPreview
+						defaultImages={settings.localPicture?[ settings.localPicture ]:[]}
+						buttonType='button'
+						buttonText={intl.formatMessage({
+							id             : 'settings.myPhotoButton',
+							defaultMessage : 'Set my photo'
+						})}
+						label={intl.formatMessage({
+							id             : 'settings.myPhotoLabel',
+							defaultMessage : 'Max. file size: 5MB, accepted: jpg, jpeg, png'
+						})}
+						fileSizeError={intl.formatMessage({
+							id             : 'settings.myPhotoSizeError',
+							defaultMessage : ' file is too large'
+						})}
+						fileTypeError={intl.formatMessage({
+							id             : 'settings.myPhotoTypeError',
+							defaultMessage : ' is not a supported file extension'
+						})}
+					/>
 					<Select
 						value={settings.selectedWebcam || ''}
 						onChange={(event) =>
@@ -199,6 +251,34 @@ const MediaSettings = ({
 								defaultMessage : 'Unable to select video device'
 							})
 						}
+					</FormHelperText>
+				</FormControl>
+				<FormControl className={classes.formControl}>
+					<Select
+						value={settings.resolution || ''}
+						onChange={(event) =>
+						{
+							if (event.target.value)
+								roomClient.updateWebcam({ newResolution: event.target.value });
+						}}
+						name='Video resolution'
+						autoWidth
+						className={classes.selectEmpty}
+					>
+						{resolutions.map((resolution, index) =>
+						{
+							return (
+								<MenuItem key={index} value={resolution.value}>
+									{resolution.label}
+								</MenuItem>
+							);
+						})}
+					</Select>
+					<FormHelperText>
+						<FormattedMessage
+							id='settings.resolution'
+							defaultMessage='Select your video resolution'
+						/>
 					</FormHelperText>
 				</FormControl>
 				<List className={classes.root} component='nav'>

@@ -259,6 +259,10 @@ export default class RoomClient
 
 		this.setLocale(store.getState().intl.locale);
 
+		if (store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(store.getState().settings.localPicture));
+		}
 	}
 
 	close()
@@ -542,6 +546,13 @@ export default class RoomClient
 
 	}
 
+	setPicture(picture)
+	{
+		store.dispatch(settingsActions.setLocalPicture(picture));
+		store.dispatch(meActions.setPicture(picture));
+		this.changePicture(picture);
+	}
+
 	receiveLoginChildWindow(data)
 	{
 		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);
@@ -549,7 +560,11 @@ export default class RoomClient
 		const { displayName, picture } = data;
 
 		store.dispatch(settingsActions.setDisplayName(displayName));
-		store.dispatch(meActions.setPicture(picture));
+
+		if (!store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(picture));
+		}
 
 		store.dispatch(meActions.loggedIn(true));
 
@@ -566,7 +581,10 @@ export default class RoomClient
 	{
 		logger.debug('receiveLogoutChildWindow()');
 
-		store.dispatch(meActions.setPicture(null));
+		if (!store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(null));
+		}
 
 		store.dispatch(meActions.loggedIn(false));
 

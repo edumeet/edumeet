@@ -316,6 +316,12 @@ const Me = (props) =>
 		'margin' : spacing
 	};
 
+	if (me.picture)
+	{
+		spacingStyle.backgroundImage = `url(${me.picture})`;
+		spacingStyle.backgroundSize = 'auto 100%';
+	}
+
 	let audioScore = null;
 
 	if (micProducer && micProducer.score)

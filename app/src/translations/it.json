@@ -171,6 +171,10 @@
 	"settings.noiseThreshold": "Soglia di rumore",
 	"settings.mirrorOwnVideo": "Specchiare il proprio video",
 	"settings.language": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Impossibile salvare file",
 	"filesharing.startingFileShare": "Tentativo di condivisione file",

@@ -171,6 +171,10 @@
 	"settings.noiseThreshold": "Mezní hodnota hluku",
 	"settings.mirrorOwnVideo": "Zrcadlové zobrazení vlastního videa",
 	"settings.language": "Vyberte jazyk",
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Není možné uložit soubor",
 	"filesharing.startingFileShare": "Pokouším se sdílet soubor",

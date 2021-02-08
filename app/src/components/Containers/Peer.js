@@ -110,7 +110,16 @@ const styles = (theme) =>
 			alignItems      : 'center',
 			padding         : theme.spacing(1),
 			zIndex          : 20,
-			'& p'           :
+			'&.hide'        :
+			{
+				transition : 'opacity 0.1s ease-in-out',
+				opacity    : 0
+			},
+			'&.hover' :
+			{
+				opacity : 1
+			},
+			'& p' :
 			{
 				padding       : '6px 12px',
 				borderRadius  : 6,
@@ -176,6 +185,12 @@ const Peer = (props) =>
 		...style
 	};
 
+	if (peer.picture)
+	{
+		rootStyle.backgroundImage = `url(${peer.picture})`;
+		rootStyle.backgroundSize = 'auto 100%';
+	}
+
 	return (
 		<React.Fragment>
 			<div
@@ -210,7 +225,12 @@ const Peer = (props) =>
 			>
 				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible &&
-						<div className={classes.videoInfo}>
+						<div className={classnames(
+							classes.videoInfo,
+							'hide',
+							hover ? 'hover' : null
+						)}
+						>
 							<p>
 								<FormattedMessage
 									id='room.videoPaused'
