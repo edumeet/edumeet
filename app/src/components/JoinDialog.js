@@ -779,8 +779,8 @@ JoinDialog.propTypes =
 	mediaPerms            : PropTypes.object.isRequired,
 	setAudioMuted         : PropTypes.func.isRequired,
 	setVideoMuted         : PropTypes.func.isRequired,
-	locale                : PropTypes.object.isRequired,
-	localesList           : PropTypes.object.isRequired
+	locale                : PropTypes.string.isRequired,
+	localesList           : PropTypes.array.isRequired
 };
 
 const mapStateToProps = (state) =>
