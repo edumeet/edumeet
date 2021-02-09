@@ -1,5 +1,6 @@
 const os = require('os');
 // const fs = require('fs');
+// const tunnel = require('tunnel');
 
 const userRoles = require('../userRoles');
 
@@ -64,8 +65,22 @@ module.exports =
 				scope       		: 'openid email profile',
 				// where client.example.com is your edumeet server
 				redirect_uri  : 'https://client.example.com/auth/callback'
+			},
+			/*
+			HttpOptions   :
+			{
+  				timeout: 5000,
+				agent: 
+				{
+                	https:tunnel.httpsOverHttp({
+                           proxy: {
+                                host: 'proxy',
+                               port: 3128
+                           }
+                 	})
+  				}
 			}
-
+			*//*
 		},
 		saml :
 		{

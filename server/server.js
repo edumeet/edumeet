@@ -31,7 +31,7 @@ const SAMLStrategy = require('passport-saml').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const redis = require('redis');
 const redisClient = redis.createClient(config.redisOptions);
-const { Issuer, Strategy } = require('openid-client');
+const { Issuer, Strategy, custom } = require('openid-client');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
@@ -374,6 +374,12 @@ async function setupAuth()
 		typeof (config.auth.oidc.clientOptions) !== 'undefined'
 	)
 	{
+		if (config.auth.oidc.HttpOptions)
+		{
+			// Set http options to allow e.g. http proxy
+			custom.setHttpOptionsDefaults(config.auth.oidc.HttpOptions);
+		}
+
 		const oidcIssuer = await Issuer.discover(config.auth.oidc.issuerURL);
 
 		// Setup authentication
