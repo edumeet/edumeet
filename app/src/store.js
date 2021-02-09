@@ -45,6 +45,11 @@ const migrations =
 	//	}
 };
 
+const saveSubsetFilter = createFilter(
+	'me',
+	[ 'loggedIn' ]
+);
+
 const persistConfig =
 {
 	key             : 'root',
@@ -54,13 +59,11 @@ const persistConfig =
 	version         : 1,
 	migrate         : createMigrate(migrations, { debug: false }),
 	stateReconciler : autoMergeLevel2,
-	whitelist       : [ 'settings', 'intl' ]
+	whitelist       : [ 'settings', 'intl' ],
+	transforms      : [
+		saveSubsetFilter
+	]
 };
-
-const saveSubsetFilter = createFilter(
-	'me',
-	[ 'loggedIn' ]
-);
 
 const reduxMiddlewares =
 [
@@ -114,13 +117,3 @@ export const store = createStore(
 );
 
 export const persistor = persistStore(store);
-
-/*
-
-export const persistor = persistStore(store, {
-	transforms : [
-		saveSubsetFilter
-	]
-
-});
-*/
