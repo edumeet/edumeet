@@ -21,6 +21,9 @@ import GroupIcon from '@material-ui/icons/Group';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import LockIcon from '@material-ui/icons/Lock';
 
+import { ReactComponent as PinIcon } from '../../images/pin-icon-baseline.svg';
+import { ReactComponent as UnpinIcon } from '../../images/pin-icon-outline.svg';
+
 const tabs =
 [
 	'users',
@@ -122,7 +125,7 @@ const MeetingDrawer = (props) =>
 					*/}
 				</Tabs>
 				<IconButton onClick={toggleDrawerOverlayed}>
-					{drawerOverlayed ? <LockOpenIcon /> : <LockIcon />}
+					{ drawerOverlayed ? <UnpinIcon /> : <PinIcon /> }
 				</IconButton>
 				<IconButton onClick={closeDrawer}>
 					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
