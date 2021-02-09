@@ -29,7 +29,7 @@
 		"idb": "^6.0.0",
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
-		"material-ui-popup-state": "^1.7.0",
+		"material-ui-popup-state": "^1.7.1",
 		"mediasoup-client": "^3.6.21",
 		"notistack": "^0.9.5",
 		"prop-types": "^15.7.2",
