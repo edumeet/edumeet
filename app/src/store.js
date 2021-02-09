@@ -75,7 +75,7 @@ if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production'
 			predicate : (getState, action) => !(action.type === 'SET_PEER_VOLUME'),
 			duration  : true,
 			timestamp : false,
-			level     : 'log',
+			level     : 'info',
 			logErrors : true
 		});
 
