@@ -68,15 +68,14 @@
 	"room.stopAllScreenSharing": "Stopp all skjermdeling",
 	"room.hideSelfView": "Skjule eget bilde",
 	"room.showSelfView": "Vis eget bilde",
-	"room.startRecording": null,
-	"room.stopRecording": null,
-	"room.roomRecordCodecs": null,
-	"room.cantRoomRecordCodecs": null,
-	"room.roomRecord": null,
-	"room.youStartedRoomRecording": null,
-	"room.unableToRoomRecord": null,
-	"room.cantStartRoomRecord": null,
-	"room.youStoppedRoomRecording": null,
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -108,8 +107,10 @@
 	"tooltip.muteParticipantAudioModerator": "Stopp lyd",
 	"tooltip.muteParticipantVideoModerator": "Stopp video",
 	"tooltip.muteScreenSharingModerator": "Stopp skjermdeling",
-	"tooltip.startRecording": null,
-	"tooltip.stopRecording": null,
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",
@@ -244,5 +245,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Nettleser ikke støttet",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Funksjonalitet som kreves er ikke tilgjengelig i denne nettleseren",
-	"unsupportedBrowser.bodyText": "Denne møtetjenesten krever funksjonalitet som ikke er støttet i denne nettleseren. Vennligst oppgrader, bytt til en annen nettleser, eller sjekk innstillinger. Støttede nettlesere:"
+	"unsupportedBrowser.bodyText": "Denne møtetjenesten krever funksjonalitet som ikke er støttet i denne nettleseren. Vennligst oppgrader, bytt til en annen nettleser eller sjekk innstillinger. Støttede nettlesere:"
 }

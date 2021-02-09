@@ -30,6 +30,12 @@ export const setLocalRecordingInProgress = (localRecordingInProgress) =>
 		payload : { localRecordingInProgress }
 	});
 
+export const setLocalRecordingPaused = (localRecordingPaused) =>
+	({
+		type    : 'SET_LOCAL_RECORDING_PAUSED',
+		payload : { localRecordingPaused }
+	});
+
 export const setRoomLocked = () =>
 	({
 		type : 'SET_ROOM_LOCKED'

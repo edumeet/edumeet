@@ -68,16 +68,14 @@
 	"room.stopAllScreenSharing": "Прекратить все совместные использования экрана",
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
-	"room.startRecording": null,
-	"room.stopRecording": null,
-	"room.roomRecordCodecs": null,
-	"room.cantRoomRecordCodecs": null,
-	"room.roomRecord": null,
-	"room.youStartedRoomRecording": null,
-	"room.unableToRoomRecord": null,
-	"room.cantStartRoomRecord": null,
-	"room.youStoppedRoomRecording": null,
-
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
 
 	"me.mutedPTT": "Вы отключены, удерживайте ПРОБЕЛ, чтобы говорить",
 
@@ -109,8 +107,10 @@
 	"tooltip.muteParticipantAudioModerator": "Везде отключить звук участника",
 	"tooltip.muteParticipantVideoModerator": "Везде отключить видео участника",
 	"tooltip.muteScreenSharingModerator": "Везде отключить совместные использования экрана участника",
-	"tooltip.startRecording": null,
-	"tooltip.stopRecording": null,
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "ID видеоконференции",
 	"label.chooseRoomButton": "Продолжить",
@@ -245,5 +245,5 @@
 
 	"unsupportedBrowser.titleUsnsupportedBrowser": "Обнаружен неподдерживаемый браузер!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Требуемые функции недоступны в вашем браузере!",
-	"unsupportedBrowser.bodyText": "Для этой службы собраний требуется функциональность, не поддерживаемая вашим браузером. Обновите, переключитесь на другой браузер или проверьте свои настройки. Поддерживаемые браузеры:"
+	"unsupportedBrowser.bodyText": "Для этой службы собраний требуется функциональность, не поддерживаемая вашим браузером. Обновите переключитесь на другой браузер или проверьте свои настройки. Поддерживаемые браузеры:"
 }

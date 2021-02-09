@@ -68,15 +68,14 @@
 	"room.stopAllScreenSharing": "Зупинити спільне використання екрану",
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
-	"room.startRecording": null,
-	"room.stopRecording": null,
-	"room.roomRecordCodecs": null,
-	"room.cantRoomRecordCodecs": null,
-	"room.roomRecord": null,
-	"room.youStartedRoomRecording": null,
-	"room.unableToRoomRecord": null,
-	"room.cantStartRoomRecord": null,
-	"room.youStoppedRoomRecording": null,
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
 
 	"me.mutedPTT": " У вас вимкнено звук, утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
 	"roles.gotRole": "Ви отримали роль {role}",
@@ -107,8 +106,10 @@
 	"tooltip.muteParticipantAudioModerator": "Відключення звуку учасника глобально",
 	"tooltip.muteParticipantVideoModerator": "Відключення відео учасника глобально",
 	"tooltip.muteScreenSharingModerator": "Відключення спільного використання екрану учаснику глобально",
-	"tooltip.startRecording": null,
-	"tooltip.stopRecording": null,
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Назва кімнати",
 	"label.chooseRoomButton": "Продовжити",
@@ -243,5 +244,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Виявлено браузер, що не підтримується",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Необхідна функціональність недоступна у вашому браузері",
-	"unsupportedBrowser.bodyText": "Цей сервіс зустрічей  вимагає функціональності, яка не підтримується вашим браузером. Оновіть або переключіться на інший браузер або перевірте свої налаштування. Браузери, що підтримуються: "
+	"unsupportedBrowser.bodyText": "Цей сервіс зустрічей  вимагає функціональності, яка не підтримується вашим браузером. Оновіть або переключіться на інший браузер або перевірте свої налаштування. Браузери що підтримуються: "
 }

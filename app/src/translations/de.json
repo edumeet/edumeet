@@ -68,15 +68,14 @@
 	"room.stopAllScreenSharing": "Alle Bildschirmfreigaben stoppen",
 	"room.hideSelfView": "Selbstansicht-Video ausblenden",
 	"room.showSelfView": "Selbstansicht-Video anzeigen",
-	"room.startRecording": null,
-	"room.stopRecording": null,
-	"room.roomRecordCodecs": null,
-	"room.cantRoomRecordCodecs": null,
-	"room.roomRecord": null,
-	"room.youStartedRoomRecording": null,
-	"room.unableToRoomRecord": null,
-	"room.cantStartRoomRecord": null,
-	"room.youStoppedRoomRecording": null,
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 
@@ -108,8 +107,10 @@
 	"tooltip.muteParticipantAudioModerator": "Teilnehmer-Audio für alle stummschalten",
 	"tooltip.muteParticipantVideoModerator": "Teilnehmer-Video für alle beenden",
 	"tooltip.muteScreenSharingModerator": "Teilnehmer-Bildschirmfreigabe für alle beenden",
-	"tooltip.startRecording": null,
-	"tooltip.stopRecording": null,
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Name des Raums",
 	"label.chooseRoomButton": "Weiter",
@@ -244,5 +245,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Ihr Browser wird nicht unterstützt!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Benötigte Funktionen sind in Ihrem Browser nicht verfügbar!",
-	"unsupportedBrowser.bodyText": "Dieser Konferenz-Dienst erfordert Funktionen die von Ihrem Browser nicht unterstützt werden. Bitte aktualisieren Sie Ihren Browser, wechseln Sie zu einem anderen Browser oder überprüfen Sie Ihre Browser-Einstellungen. Unterstützte Browser:"
+	"unsupportedBrowser.bodyText": "Dieser Konferenz-Dienst erfordert Funktionen die von Ihrem Browser nicht unterstützt werden. Bitte aktualisieren Sie Ihren Browser wechseln Sie zu einem anderen Browser oder überprüfen Sie Ihre Browser-Einstellungen. Unterstützte Browser:"
 }

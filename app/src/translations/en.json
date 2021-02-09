@@ -68,15 +68,14 @@
 	"room.stopAllScreenSharing": "Stop all screen sharing",
 	"room.hideSelfView": "Hide self view video",
 	"room.showSelfView": "Show self view video",
-	"room.startRecording": "Start Room Recording",
-	"room.stopRecording": "Stop room recording",
-	"room.roomRecordCodecs": "Choose codecs",
-	"room.cantRoomRecordCodecs": "Can't choose codecs",
-	"room.roomRecord": "Room record",
-	"room.youStartedRoomRecording": "You started room recording",
-	"room.unableToRoomRecord": "Unable to start room recording",
-	"room.cantStartRoomRecord": "Can't start room recording",
-	"room.youStoppedRoomRecording": "You stopped room recording",
+	"unexpectedErrorDuringLocalRecording": "Unexpected error ocurred during local recording",
+	"room.youStartedLocalRecording": "You started local recording",
+	"room.youStoppedLocalRecording": "You stopped local recording",
+	"room.localRecordingStarted": "{displayName} started local recording",
+	"room.localRecordingPaused": "{displayName} paused local recording",
+	"room.localRecordingResumed": "{displayName} resumed local recording",
+	"room.localRecordingStopped": "{displayName} stopped local recording",
+	"room.recordingConsent": "When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming.",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -108,8 +107,10 @@
 	"tooltip.muteParticipantAudioModerator": "Stop audio",
 	"tooltip.muteParticipantVideoModerator": "Stop video",
 	"tooltip.muteScreenSharingModerator": "Stop screen share",
-	"tooltip.startRecording": "Start recording the room",
-	"tooltip.stopRecording": "Stop recording the room",
+	"tooltip.startLocalRecording": "Start local recording",
+	"tooltip.stopLocalRecording": "Stop local recording",
+	"tooltip.pauseLocalRecording": "Pause local recording",
+	"tooltip.resumeLocalRecording": "Resume paused local recording",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -245,5 +246,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Detected unsupported browser!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Required functionality not available in your browser!",
-	"unsupportedBrowser.bodyText": "This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser, or check your settings. Supported browsers:"
+	"unsupportedBrowser.bodyText": "This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser or check your settings. Supported browsers:"
 }

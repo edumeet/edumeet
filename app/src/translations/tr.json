@@ -68,15 +68,14 @@
 	"room.stopAllScreenSharing": "Tüm ekran paylaşımlarını durdur",
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
-	"room.startRecording": null,
-	"room.stopRecording": null,
-	"room.roomRecordCodecs": null,
-	"room.cantRoomRecordCodecs": null,
-	"room.roomRecord": null,
-	"room.youStartedRoomRecording": null,
-	"room.unableToRoomRecord": null,
-	"room.cantStartRoomRecord": null,
-	"room.youStoppedRoomRecording": null,
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
 
 	"me.mutedPTT": "Sesiniz kapalı, konuşmak için SPACE tuşuna basılı tutun",
 
@@ -108,8 +107,10 @@
 	"tooltip.muteParticipantAudioModerator": "Katılımcı sesini herkesde kıs",
 	"tooltip.muteParticipantVideoModerator": "Katılımcı videosunu herkesde kapat",
 	"tooltip.muteScreenSharingModerator": "Katılımcı ekran paylaşımını herkesde durdur",
-	"tooltip.startRecording": null,
-	"tooltip.stopRecording": null,
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Oda adı",
 	"label.chooseRoomButton": "Devam",
@@ -244,5 +245,5 @@
 
 	"unsupportedBrowser.titleUsnsupportedBrowser": "Desteklenmeyen tarayıcı!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Gerekli işlevler tarayıcınızda yok!",
-	"unsupportedBrowser.bodyText": "Bu toplantı servisi, tarayıcınız tarafından desteklenmeyen bir işlev gerektiriyor. Lütfen yeni sürüme geçin veya farklı bir tarayıcıya geçin veya ayarlarınızı kontrol edin. Desteklenen tarayıcılar:"
+	"unsupportedBrowser.bodyText": "Bu toplantı servisi tarayıcınız tarafından desteklenmeyen bir işlev gerektiriyor. Lütfen yeni sürüme geçin veya farklı bir tarayıcıya geçin veya ayarlarınızı kontrol edin. Desteklenen tarayıcılar:"
 }

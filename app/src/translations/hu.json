@@ -68,15 +68,14 @@
 	"room.stopAllScreenSharing": "Összes képernyőmegosztás leállítása",
 	"room.hideSelfView": "Saját kamerakép elrejtése",
 	"room.showSelfView": "Saját kamerakép megjelenítése",
-	"room.startRecording": "Lokális felvétel készül",
-	"room.stopRecording": "Lokális felvétel készült",
-	"room.roomRecordCodecs": "Kodek választása",
-	"room.cantRoomRecordCodecs": "Kodek nem válsztható",
-	"room.roomRecord": "Szoba rögzítése",
-	"room.youStartedRoomRecording": "A szoba rögzítése elkezdődőtt",
-	"room.unableToRoomRecord": "A szoba rögzítése meghíúsult",
-	"room.cantStartRoomRecord": "A szoba rögzítése nem indítható",
-	"room.youStoppedRoomRecording": "A szoba rögzítése befejeződött",
+	"room.unexpectedErrorDuringLocalRecording": "Nem várt hiba történt a helyi felvétel során",
+	"room.youStartedLocalRecording": "A szoba helyi rögzítése elkezdődött",
+	"room.youStoppedLocalRecording": "A szoba helyi rögzítése befejeződött",
+	"room.localRecordingStarted": "{displayName} helyi rögzítést indított",
+	"room.localRecordingPaused": "{displayName} átmenetileg megállította a helyi rögzítést",
+	"room.localRecordingResumed": "{displayName} visszaindította a helyi rögzítést",
+	"room.localRecordingStopped": "{displayName} leállította a helyi rögzítést",
+	"room.recordingConsent": "A konferencián való részvételeddel beleegyezésed adod hogy a konferenciáról hang és videó felvétel, és/vagy élő közvetítés készüljön!",
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 
@@ -108,8 +107,10 @@
 	"tooltip.muteParticipantAudioModerator": "Résztvevő hangjának némítása mindenkinél",
 	"tooltip.muteParticipantVideoModerator": "Résztvevő videójának némítása mindenkinél",
 	"tooltip.muteScreenSharingModerator": "Résztvevő képernyőmegosztásának leállítása mindenkinél",
-	"tooltip.startRecording": "Lokális felvétel készítés",
-	"tooltip.stopRecording": "Lokális felvétel készítés leállítása",
+	"tooltip.startLocalRecording": "Helyi felvétel indítása",
+	"tooltip.stopLocalRecording": "Helyi felvétel leállítása",
+	"tooltip.pauseLocalRecording": "Helyi felvétel megállítása",
+	"tooltip.resumeLocalRecording": "Megállított helyi felvétel újraindítása",
 
 	"label.roomName": "Konferencia",
 	"label.chooseRoomButton": "Tovább",
@@ -245,5 +246,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "A böngésző verziód sajnos nem támogatott! :-(",
 	"unsupportedBrowser.titlewebrtcUnavailable": "A böngésződ egy szükséges funkciója nem elérhető!",
-	"unsupportedBrowser.bodyText": "Kérlek frissítsd a böngésződ, válts másik böngészőre, vagy ellenőrizd a böngésződ beállításait! Támogatott böngészők:"
+	"unsupportedBrowser.bodyText": "Kérlek frissítsd a böngésződ, válts másik böngészőre vagy ellenőrizd a böngésződ beállításait! Támogatott böngészők:"
 }

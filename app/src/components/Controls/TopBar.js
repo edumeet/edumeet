@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
@@ -13,6 +13,7 @@ import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../actions/roomActions';
 import * as toolareaActions from '../../actions/toolareaActions';
+import * as notificationActions from '../../actions/notificationActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import AppBar from '@material-ui/core/AppBar';
@@ -43,6 +44,9 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
+import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
+import randomString from 'random-string';
 
 const styles = (theme) =>
 	({
@@ -180,6 +184,8 @@ const TopBar = (props) =>
 	const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
 	const [ anchorEl, setAnchorEl ] = useState(null);
 	const [ currentMenu, setCurrentMenu ] = useState(null);
+	const [ recordingConsentNotificationId,
+		setRecordingConsentNotificationId ] = useState(null);
 
 	const handleExited = () =>
 	{
@@ -231,6 +237,8 @@ const TopBar = (props) =>
 		setHideSelfView,
 		toggleToolArea,
 		openUsersTab,
+		addNotification,
+		closeNotification,
 		unread,
 		canProduceExtraVideo,
 		canLock,
@@ -239,6 +247,39 @@ const TopBar = (props) =>
 		locale,
 		localesList
 	} = props;
+
+	useEffect(() =>
+	{
+		if (room.recordingInProgress && !recordingConsentNotificationId)
+		{
+			const notificationId = randomString({ length: 6 }).toLowerCase();
+
+			setRecordingConsentNotificationId(notificationId);
+			addNotification(
+				{
+					id   : notificationId,
+					type : 'warning',
+					text :
+					intl.formatMessage(
+						{
+							id             : 'room.recordingConsent',
+							defaultMessage : 'When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming'
+						}
+					),
+					persist : true
+				}
+			);
+		}
+		if (!room.recordingInProgress && recordingConsentNotificationId)
+		{
+			closeNotification(recordingConsentNotificationId);
+			setRecordingConsentNotificationId(null);
+		}
+	},
+	[
+		room.recordingInProgress, recordingConsentNotificationId,
+		addNotification, closeNotification, intl
+	]);
 
 	const isMenuOpen = Boolean(anchorEl);
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -254,15 +295,26 @@ const TopBar = (props) =>
 			defaultMessage : 'Lock room'
 		});
 
-	const recordTooltip = room.localRecordingInProgress ?
+	const recordingTooltip = room.localRecordingInProgress ?
 		intl.formatMessage({
-			id             : 'tooltip.stopRecording',
-			defaultMessage : 'Stop recording'
+			id             : 'tooltip.stopLocalRecording',
+			defaultMessage : 'Stop local recording'
 		})
 		:
 		intl.formatMessage({
-			id             : 'tooltip.startRecording',
-			defaultMessage : 'Start recording.'
+			id             : 'tooltip.startLocalRecording',
+			defaultMessage : 'Start local recording'
+		});
+
+	const recordingPausedTooltip = room.localRecordingPaused ?
+		intl.formatMessage({
+			id             : 'tooltip.resumeLocalRecording',
+			defaultMessage : 'Resume local recording'
+		})
+		:
+		intl.formatMessage({
+			id             : 'tooltip.pauseLocalRecording',
+			defaultMessage : 'Pause local recording.'
 		});
 
 	const fullscreenTooltip = fullscreen ?
@@ -329,7 +381,7 @@ const TopBar = (props) =>
 					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
-						{room.recordingInProgress &&
+						{ room.recordingInProgress &&
 						<PulsingBadge
 							color='secondary'
 							badgeContent='REC'
@@ -548,7 +600,7 @@ const TopBar = (props) =>
 						aria-label={locale.split(/[-_]/)[0]}
 						className={classes.actionButton}
 						color='secondary'
-						disableRipple='true'
+						disableRipple
 						onClick={(event) => handleMenuOpen(event, 'localeMenu')}
 					>
 						{locale.split(/[-_]/)[0]}
@@ -582,8 +634,56 @@ const TopBar = (props) =>
 			>
 				{ currentMenu === 'moreActions' &&
 					<Paper>
+						{ room.localRecordingInProgress &&
 						<MenuItem
-							aria-label={recordTooltip}
+							aria-label={recordingPausedTooltip}
+							onClick={() =>
+							{
+								handleMenuClose();
+								if (room.localRecordingPaused)
+								{
+									roomClient.resumeLocalRecording();
+								}
+								else
+								{
+									roomClient.pauseLocalRecording();
+								}
+							}
+							}
+						>
+							{ room.localRecordingPaused ?
+								<Badge
+									color='primary'
+								>
+									<PauseCircleFilledIcon />
+								</Badge>
+								:
+								<Badge
+									color='primary'
+								>
+									<PauseCircleOutlineIcon />
+								</Badge>
+							}
+							{ room.localRecordingPaused ?
+								<p className={classes.moreAction}>
+									<FormattedMessage
+										id='tooltip.resumeLocalRecording'
+										defaultMessage='Resume local recording'
+									/>
+								</p>
+								:
+								<p className={classes.moreAction}>
+									<FormattedMessage
+										id='tooltip.pauseLocalRecording'
+										defaultMessage='Pause local recording'
+									/>
+								</p>
+							}
+
+						</MenuItem>
+						}
+						<MenuItem
+							aria-label={recordingTooltip}
 							onClick={() =>
 							{
 								handleMenuClose();
@@ -607,21 +707,20 @@ const TopBar = (props) =>
 							{ room.localRecordingInProgress ?
 								<p className={classes.moreAction}>
 									<FormattedMessage
-										id='tooltip.stopRecording'
-										defaultMessage='Room record stopped'
+										id='tooltip.stopLocalRecording'
+										defaultMessage='Stop local recording'
 									/>
 								</p>
 								:
 								<p className={classes.moreAction}>
 									<FormattedMessage
-										id='tooltip.startRecording'
-										defaultMessage='Room record started'
+										id='tooltip.startLocalRecording'
+										defaultMessage='Start local recording'
 									/>
 								</p>
 							}
 
 						</MenuItem>
-
 						<MenuItem
 							disabled={!canProduceExtraVideo}
 							onClick={() =>
@@ -778,8 +877,57 @@ const TopBar = (props) =>
 						}
 					</MenuItem>
 				}
+				{ room.localRecordingInProgress &&
 				<MenuItem
-					aria-label={recordTooltip}
+					aria-label={recordingPausedTooltip}
+					onClick={() =>
+					{
+						handleMenuClose();
+						if (room.localRecordingPaused)
+						{
+							roomClient.resumeLocalRecording();
+						}
+						else
+						{
+							roomClient.pauseLocalRecording();
+						}
+					}
+					}
+				>
+					{ room.localRecordingPaused ?
+						<Badge
+							color='primary'
+						>
+							<PauseCircleFilledIcon />
+						</Badge>
+						:
+						<Badge
+							color='primary'
+						>
+							<PauseCircleOutlineIcon />
+						</Badge>
+					}
+
+					{ room.localRecordingPaused ?
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.resumeLocalRecording'
+								defaultMessage='Resume local recording'
+							/>
+						</p>
+						:
+						<p className={classes.moreAction}>
+							<FormattedMessage
+								id='tooltip.pauseLocalRecording'
+								defaultMessage='Pause local recording'
+							/>
+						</p>
+					}
+
+				</MenuItem>
+				}
+				<MenuItem
+					aria-label={recordingTooltip}
 					onClick={() =>
 					{
 						handleMenuClose();
@@ -802,15 +950,15 @@ const TopBar = (props) =>
 					{ room.localeRecordingInProgress ?
 						<p className={classes.moreAction}>
 							<FormattedMessage
-								id='tooltip.stopRecording'
-								defaultMessage='Room record stopped'
+								id='tooltip.stopLocalRecording'
+								defaultMessage='Stop local recording'
 							/>
 						</p>
 						:
 						<p className={classes.moreAction}>
 							<FormattedMessage
-								id='tooltip.startRecording'
-								defaultMessage='Room record started'
+								id='tooltip.startLocalRecording'
+								defaultMessage='Start local recording'
 							/>
 						</p>
 					}
@@ -1049,15 +1197,17 @@ TopBar.propTypes =
 	setHideSelfView      : PropTypes.func.isRequired,
 	toggleToolArea       : PropTypes.func.isRequired,
 	openUsersTab         : PropTypes.func.isRequired,
+	addNotification      : PropTypes.func.isRequired,
+	closeNotification    : PropTypes.func.isRequired,
 	unread               : PropTypes.number.isRequired,
 	canProduceExtraVideo : PropTypes.bool.isRequired,
 	canLock              : PropTypes.bool.isRequired,
 	canPromote           : PropTypes.bool.isRequired,
 	classes              : PropTypes.object.isRequired,
 	theme                : PropTypes.object.isRequired,
-	intl                 : PropTypes.object.isRequired,
-	locale               : PropTypes.object.isRequired,
-	localesList          : PropTypes.object.isRequired
+	intl                 : PropTypes.object,
+	locale               : PropTypes.string,
+	localesList          : PropTypes.array
 };
 
 const makeMapStateToProps = () =>
@@ -1132,6 +1282,14 @@ const mapDispatchToProps = (dispatch) =>
 		{
 			dispatch(toolareaActions.openToolArea());
 			dispatch(toolareaActions.setToolTab('users'));
+		},
+		addNotification : (notification) =>
+		{
+			dispatch(notificationActions.addNotification(notification));
+		},
+		closeNotification : (notificationId) =>
+		{
+			dispatch(notificationActions.closeNotification(notificationId));
 		}
 	});
 

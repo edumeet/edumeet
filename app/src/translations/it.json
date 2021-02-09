@@ -68,15 +68,14 @@
 	"room.stopAllScreenSharing": "Ferma tutte le condivisioni schermo",
 	"room.hideSelfView": "Nascondi il tuo box video",
 	"room.showSelfView": "Visualizza il tuo box video",
-	"room.startRecording": null,
-	"room.stopRecording": null,
-	"room.roomRecordCodecs": null,
-	"room.cantRoomRecordCodecs": null,
-	"room.roomRecord": null,
-	"room.youStartedRoomRecording": null,
-	"room.unableToRoomRecord": null,
-	"room.cantStartRoomRecord": null,
-	"room.youStoppedRoomRecording": null,
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
 
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
@@ -108,8 +107,10 @@
 	"tooltip.muteParticipantAudioModerator": "Sospendi audio globale",
 	"tooltip.muteParticipantVideoModerator": "Sospendi video globale",
 	"tooltip.muteScreenSharingModerator": "Sospendi condivisione schermo globale",
-	"tooltip.startRecording": null,
-	"tooltip.stopRecording": null,
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Nome della stanza",
 	"label.chooseRoomButton": "Continua",
@@ -244,5 +245,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Rilevato browser non supportato!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "La funzionalità richiesta non è supportata dal tuo browser!",
-	"unsupportedBrowser.bodyText": "Questo servizio di meeting richiede una funzionalità non supportata dal tuo browser. Ti invitiamo ad aggiornare il tuo browser, utilizzarne un altro oppure controllare le tue impostazioni. I browser supportati sono:"
+	"unsupportedBrowser.bodyText": "Questo servizio di meeting richiede una funzionalità non supportata dal tuo browser. Ti invitiamo ad aggiornare il tuo browser utilizzarne un altro oppure controllare le tue impostazioni. I browser supportati sono:"
 }

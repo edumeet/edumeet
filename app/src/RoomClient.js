@@ -3176,35 +3176,79 @@ export default class RoomClient
 
 					case 'setLocalRecording':
 					{
-						const { peerId, status, localRecordingPeerIds } = notification.data;
+						const { peerId, state, localRecordingPeerIds } = notification.data;
 
-						switch (status)
+						let displayNameOfRecorder;
+						const meId = store.getState().me.id;
+
+						if (peerId === meId)
 						{
-							case RECORDING_RESUME:
+							displayNameOfRecorder = store.getState().settings.displayName;
+						}
+						else if (store.getState().peers[peerId])
+							displayNameOfRecorder = store.getState().peers[peerId].displayName;
+						else
+							return;
+
+						switch (state)
+						{
 							case RECORDING_START:
 								store.dispatch(
 									roomActions.setRecordingInProgress(true));
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingStarted',
+											defaultMessage : '{displayName} started local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							case RECORDING_RESUME:
+								store.dispatch(
+									roomActions.setRecordingInProgress(true));
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingResumed',
+											defaultMessage : '{displayName} resumed local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
 								break;
 							case RECORDING_PAUSE:
+								if (localRecordingPeerIds.length === 0)
+									store.dispatch(
+										roomActions.setRecordingInProgress(false));
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingPaused',
+											defaultMessage : '{displayName} paused local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
 							case RECORDING_STOP:
 								if (localRecordingPeerIds.length === 0)
 									store.dispatch(
-										roomActions.setRecordingInProgress(true));
-
+										roomActions.setRecordingInProgress(false));
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingStopped',
+											defaultMessage : '{displayName} stopped local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
 								break;
 							default:
 								break;
 						}
-						store.dispatch(requestActions.notify(
-							{
-								text : intl.formatMessage({
-									id             : 'notify.localRecording',
-									defaultMessage : '{displayName} {status} local recording'
-								}, {
-									status      : status, // TODO: Add localized label to the status
-									displayName : this.peers[peerId].displayName
-								})
-							}));
 						break;
 					}
 
@@ -3612,10 +3656,10 @@ export default class RoomClient
 			[ 'audio/ogg', [ 'Firefox' ] ],
 			[ 'audio/opus', [] ],
 			*/
-			[ 'video/webm;codecs=vp8', [ 'Chrome', 'Firefox', 'Safari' ] ],
-			[ 'video/webm;codecs=vp9', [ 'Chrome' ] ],
-			[ 'video/webm;codecs=h264', [ 'Chrome' ] ],
 			[ 'video/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs="vp8, opus"', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs="vp9, opus"', [ 'Chrome' ] ],
+			[ 'video/webm;codecs="h264, opus"', [ 'Chrome' ] ],
 			[ 'video/mp4', [] ],
 			[ 'video/mpeg', [] ],
 			[ 'video/x-matroska;codecs=avc1', [ 'Chrome' ] ]
@@ -3690,6 +3734,98 @@ export default class RoomClient
 
 			gdmStream = await navigator.mediaDevices.getDisplayMedia(RECORDING_CONSTRAINTS);
 			recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
+			recorder = new MediaRecorder(recorderStream, { mimeType: recordingMimeType });
+
+			if (typeof indexedDB === 'undefined' || typeof indexedDB.open === 'undefined')
+			{
+				logger.warn('IndexedDB API is not available in this browser. Fallback to ');
+				logToIDB=false;
+			}
+			else
+			{
+				idbName=Date.now();
+				idbDB = await openDB(idbName, 1,
+					{
+						upgrade(db)
+						{
+							db.createObjectStore(idbStoreName);
+						}
+					}
+				);
+			}
+
+			let chunkCounter=0;
+
+			// Save a recorded chunk (blob) to indexedDB
+			const saveToDB = async function(data)
+			{
+				return await idbDB.put(idbStoreName, data, Date.now());
+			};
+
+			if (recorder)
+			{
+				recorder.ondataavailable = (e) =>
+				{
+					if (e.data && e.data.size > 0)
+					{
+						chunkCounter++;
+						logger.debug(`put chunk: ${chunkCounter}`);
+						if (logToIDB)
+						{
+							try
+							{
+								saveToDB(e.data);
+							}
+							catch (error)
+							{
+								logger.error('Error during saving data chunk to IndexedDB! error:%O', error);
+							}
+						}
+						else
+						{
+							recordingData.push(e.data);
+						}
+					}
+				};
+
+				recorder.onerror = (e) =>
+				{
+					logger.err(e);
+					recorder.stop();
+				};
+
+				recorder.onstop = (e) =>
+				{
+					logger.debug(`Logger stopped event: ${e}`);
+
+					if (logToIDB)
+					{
+						try
+						{
+							idbDB.getAll(idbStoreName).then((blobs) =>
+							{
+
+								this.saveRecordingAndCleanup(blobs, idbDB, idbName);
+
+							});
+
+						}
+						catch (error)
+						{
+							logger.error('Error during getting all data chunks from IndexedDB! error: %O', error);
+						}
+
+					}
+					else
+					{
+						this.saveRecordingAndCleanup(recordingData, idbDB, idbName);
+					}
+
+				};
+
+				recorder.start(RECORDING_SLICE_SIZE);
+
+			}
 		}
 		catch (error)
 		{
@@ -3697,94 +3833,14 @@ export default class RoomClient
 				{
 					type : 'error',
 					text : intl.formatMessage({
-						id             : 'room.cantRecord',
-						defaultMessage : 'Unable to record the room'
+						id             : 'room.unexpectedErrorDuringLocalRecording',
+						defaultMessage : 'Unexpected error ocurred during local recording'
 					})
 				}));
 			logger.error('startLocalRecording() [error:"%o"]', error);
+
+			return -1;
 		}
-		recorder = new MediaRecorder(recorderStream, { mimeType: recordingMimeType });
-
-		if (typeof indexedDB === 'undefined' || typeof indexedDB.open === 'undefined')
-		{
-			logger.warn('IndexedDB API is not available in this browser. Fallback to ');
-			logToIDB=false;
-		}
-		else
-		{
-			idbName=Date.now();
-			idbDB = await openDB(idbName, 1,
-				{
-					upgrade(db)
-					{
-						db.createObjectStore(idbStoreName);
-					}
-				}
-			);
-		}
-
-		let chunkCounter=0;
-
-		// Save a recorded chunk (blob) to indexedDB
-		const saveToDB = async function(data)
-		{
-			return await idbDB.put(idbStoreName, data, Date.now());
-		};
-
-		recorder.ondataavailable = (e) =>
-		{
-			if (e.data && e.data.size > 0)
-			{
-				chunkCounter++;
-				logger.debug(`put chunk: ${chunkCounter}`);
-				if (logToIDB)
-				{
-					try
-					{
-						saveToDB(e.data);
-					}
-					catch (error)
-					{
-						logger.error('Error during saving data chunk to IndexedDB! error:%O', error);
-					}
-				}
-				else
-				{
-					recordingData.push(e.data);
-				}
-			}
-		};
-
-		recorder.onstop = (e) =>
-		{
-			logger.debug(`Logger stopped event: ${e}`);
-
-			if (logToIDB)
-			{
-				try
-				{
-					idbDB.getAll(idbStoreName).then((blobs) =>
-					{
-
-						this.saveRecordingAndCleanup(blobs, idbDB, idbName);
-
-					});
-
-				}
-				catch (error)
-				{
-					logger.error('Error during getting all data chunks from IndexedDB! error: %O', error);
-				}
-
-			}
-			else
-			{
-				this.saveRecordingAndCleanup(recordingData, idbDB, idbName);
-			}
-
-		};
-
-		recorder.start(RECORDING_SLICE_SIZE);
 
 		try
 		{
@@ -3795,8 +3851,8 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					text : intl.formatMessage({
-						id             : 'room.youStartedRoomRecording',
-						defaultMessage : 'You started recording the room'
+						id             : 'room.youStartedLocalRecording',
+						defaultMessage : 'You started local recording'
 					})
 				}));
 		}
@@ -3806,11 +3862,11 @@ export default class RoomClient
 				{
 					type : 'error',
 					text : intl.formatMessage({
-						id             : 'room.cantStartRoomRecord',
-						defaultMessage : 'Unable to record the room'
+						id             : 'room.unexpectedErrorDuringLocalRecording',
+						defaultMessage : 'Unexpected error ocurred during local recording'
 					})
 				}));
-			logger.error('startRoomRecord() [error:"%o"]', error);
+			logger.error('startLocalRecord() [error:"%o"]', error);
 		}
 	}
 	async stopLocalRecording()
@@ -3823,8 +3879,8 @@ export default class RoomClient
 			store.dispatch(requestActions.notify(
 				{
 					text : intl.formatMessage({
-						id             : 'room.youStoppedRoomRecording',
-						defaultMessage : 'You stopped recording the room'
+						id             : 'room.youStoppedLocalRecording',
+						defaultMessage : 'You stopped local recording'
 					})
 				}));
 
@@ -3838,14 +3894,28 @@ export default class RoomClient
 				{
 					type : 'error',
 					text : intl.formatMessage({
-						id             : 'room.unableToRoomRecord',
-						defaultMessage : 'Unable to record the room'
+						id             : 'room.unexpectedErrorDuringLocalRecording',
+						defaultMessage : 'Unexpected error ocurred during local recording'
 					})
 				}));
 
 			logger.error('stopLocalRecording() [error:"%o"]', error);
 		}
 
+	}
+
+	async pauseLocalRecording()
+	{
+		recorder.pause();
+		store.dispatch(roomActions.setLocalRecordingPaused(true));
+		await this.sendRequest('setLocalRecording', { state: RECORDING_PAUSE });
+	}
+
+	async resumeLocalRecording()
+	{
+		recorder.resume();
+		store.dispatch(roomActions.setLocalRecordingPaused(false));
+		await this.sendRequest('setLocalRecording', { state: RECORDING_RESUME });
 	}
 
 	invokeSaveAsDialog(blob, fileName)

@@ -6,6 +6,7 @@ const initialState =
 	locked                        : false,
 	recordingInProgress           : false,
 	localRecordingInProgress      : false,
+	localRecordingPaused          : false,
 	inLobby                       : false,
 	signInRequired                : false,
 	overRoomLimit                 : false,
@@ -66,16 +67,23 @@ const room = (state = initialState, action) =>
 
 		case 'SET_RECORDING_IN_PROGRESS':
 		{
-			const recordingInProgress = state.recordingInProgress;
+			const { recordingInProgress } = action.payload;
 
 			return { ...state, recordingInProgress };
 		}
 
 		case 'SET_LOCAL_RECORDING_IN_PROGRESS':
 		{
-			const localRecordingInProgress = !state.localRecordingInProgress;
+			const { localRecordingInProgress } = action.payload;
 
 			return { ...state, localRecordingInProgress };
+		}
+
+		case 'SET_LOCAL_RECORDING_PAUSED':
+		{
+			const { localRecordingPaused } = action.payload;
+
+			return { ...state, localRecordingPaused };
 		}
 
 		case 'SET_ROOM_LOCKED':

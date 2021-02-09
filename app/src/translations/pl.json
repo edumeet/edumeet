@@ -68,15 +68,14 @@
 	"room.stopAllScreenSharing": "Zatrzymaj wszystkie współdzielone ekrany",
 	"room.hideSelfView": "Ukryj pogląd swojego wideo",
 	"room.showSelfView": "Pokaż pogląd swojego wideo",
-	"room.startRecording": null,
-	"room.stopRecording": null,
-	"room.roomRecordCodecs": null,
-	"room.cantRoomRecordCodecs": null,
-	"room.roomRecord": null,
-	"room.youStartedRoomRecording": null,
-	"room.unableToRoomRecord": null,
-	"room.cantStartRoomRecord": null,
-	"room.youStoppedRoomRecording": null,
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
 
 	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj SPACJĘ, aby mówić.",
 
@@ -108,8 +107,10 @@
 	"tooltip.muteParticipantAudioModerator": "Wycisz uczestnika dla wszystkich",
 	"tooltip.muteParticipantVideoModerator": "Wyłącz wideo uczestnika dla wszystkich",
 	"tooltip.muteScreenSharingModerator": "Wyłącz współdzielenie ekranu przez uczestnika dla wszystkich",
-	"tooltip.startRecording": null,
-	"tooltip.stopRecording": null,
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Nazwa pokoju",
 	"label.chooseRoomButton": "Kontynuuj",
@@ -244,5 +245,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Wykryto niekompatybilną przeglądarkę!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Twoja przeglądarka nie wspiera wymaganej funkcjonalności!",
-	"unsupportedBrowser.bodyText": "Usługa wideokonferencji wymaga funkcjonalności, która nie jest wspierana przez Twoją przeglądarkę. Zaktualizuj przeglądarkę, zmień ją lub sprawdź jej ustawienia. Wspierane przeglądarki:"
+	"unsupportedBrowser.bodyText": "Usługa wideokonferencji wymaga funkcjonalności, która nie jest wspierana przez Twoją przeglądarkę. Zaktualizuj przeglądarkę zmień ją lub sprawdź jej ustawienia. Wspierane przeglądarki:"
 }

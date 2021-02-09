@@ -841,6 +841,13 @@ class Room extends EventEmitter
 			roomPermissions[PROMOTE_PEER].some((roomRole) => role.id === roomRole.id)
 		);
 
+		// Remove from local recorder list
+		const localRecordingIndex = this._localRecordingPeerIds.findIndex(
+			(e) => e === peer.id);
+
+		if (localRecordingIndex)
+			this._localRecordingPeerIds.splice(localRecordingIndex, 1);
+
 		delete this._peers[peer.id];
 
 		// No peers left with PROMOTE_PEER, might need to give
@@ -958,6 +965,25 @@ class Room extends EventEmitter
 						'newPeer',
 						peer.peerInfo
 					);
+				}
+
+				// notify about in progress recordings
+				try
+				{
+					this._localRecordingPeerIds.forEach((peerId) =>
+					{
+						// Spread to others
+						this._notification(peer.socket, 'setLocalRecording', {
+							peerId,
+							state                 : 'start',
+							localRecordingPeerIds : this._localRecordingPeerIds
+						}, true, true);
+
+					});
+				}
+				catch (error)
+				{
+					logger.error('Unable to send setLocalRecording notification %O', error);
 				}
 
 				logger.debug(
@@ -1530,29 +1556,27 @@ class Room extends EventEmitter
 					case RECORDING_STOP:
 						if (this._localRecordingPeerIds.length > 0)
 						{
-							this.localRecordingPeerIds.pop(peer.id);
+							this._localRecordingPeerIds.pop(peer.id);
 						}
 						break;
 
 					default:
 						break;
 				}
-				if (this._localRecordingPeerIds.length > 0)
-				{
-					try
-					{
-						// Spread to others
-						this.notification(peer.socket, 'setLocalRecording', {
-							peerId                : peer.id,
-							state                 : state,
-							localRecordingPeerIds : this._localRecordingPeerIds
-						}, true);
-					}
-					catch (error)
-					{
-						logger.error('Unable to send setLocalRecording notification %O', error);
-					}
+				logger.debug(this._localRecordingPeerIds);
 
+				try
+				{
+					// Spread to others
+					this._notification(peer.socket, 'setLocalRecording', {
+						peerId                : peer.id,
+						state                 : state,
+						localRecordingPeerIds : this._localRecordingPeerIds
+					}, true, true);
+				}
+				catch (error)
+				{
+					logger.error('Unable to send setLocalRecording notification %O', error);
 				}
 
 				// Return no error
