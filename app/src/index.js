@@ -46,7 +46,7 @@ const supportedBrowsers={
 	'samsung internet for android' : '>=11.1.1.52'
 };
 
-const intl = createIntl();
+const intl = createIntl({ locale: 'en', defaultLocale: 'en' });
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
@@ -141,7 +141,7 @@ function run()
 	{
 		render(
 			<MuiThemeProvider theme={theme}>
-				<IntlProvider value={intl}>
+				<IntlProvider value={intl} defaultLocale='en'>
 					<UnsupportedBrowser
 						webrtcUnavailable={webrtcUnavailable}
 						platform={device.platform}
