@@ -123,6 +123,20 @@ module.exports =
 	// URI and key for requesting geoip-based TURN server closest to the client
 	turnAPIKey    : 'examplekey',
 	turnAPIURI    : 'https://example.com/api/turn',
+
+	/*
+	// Add http proxy options
+	turnAPIProxy  : 
+		{
+			protocol: 'https',
+			host: '127.0.0.1',
+			port: 9000,
+			auth: {
+			username: 'user',
+			password: 'passwd'
+		}
+	*/
+
 	turnAPIparams : {
 		'uri_schema' 	: 'turn',
 		'transport' 		: 'tcp',

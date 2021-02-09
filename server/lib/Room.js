@@ -687,7 +687,9 @@ class Room extends EventEmitter
 							config.turnAPIURI,
 							{
 								timeout : config.turnAPITimeout || 2000,
-								params  : {
+								proxy   : config.turnAPIProxy ? config.turnAPIProxy : null,
+								params  :
+								{
 									...config.turnAPIparams,
 									'api_key' : config.turnAPIKey,
 									'ip'      : peer.socket.request.connection.remoteAddress
