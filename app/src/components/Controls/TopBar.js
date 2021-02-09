@@ -367,7 +367,7 @@ const TopBar = (props) =>
 							<MenuIcon />
 						</IconButton>
 					</PulsingBadge>
-					{ window.config.logo !=='' ?
+					{ window.config.logo !== null ?
 						<img alt='Logo'
 							src={window.config.logo}
 							className={classes.logo}
