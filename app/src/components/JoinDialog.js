@@ -360,7 +360,7 @@ const JoinDialog = ({
 															className={classes.actionButton}
 															aria-label={locale.split(/[-_]/)[0]}
 															color='secondary'
-															disableRipple='true'
+															disableRipple
 															style={{ backgroundColor: 'transparent' }}
 															{...bindTrigger(popupState)}
 														>
