@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -697,7 +698,7 @@ const TopBar = (props) =>
 							<Badge
 								color='primary'
 							>
-								{ room.localeRecordingInProgress ?
+								{ room.localRecordingInProgress ?
 									<StopIcon />
 									:
 									<FiberManualRecordIcon />
@@ -941,13 +942,13 @@ const TopBar = (props) =>
 					<Badge
 						color='primary'
 					>
-						{ room.localeRecordingInProgress ?
+						{ room.localRecordingInProgress ?
 							<StopIcon />
 							:
 							<FiberManualRecordIcon />
 						}
 					</Badge>
-					{ room.localeRecordingInProgress ?
+					{ room.localRecordingInProgress ?
 						<p className={classes.moreAction}>
 							<FormattedMessage
 								id='tooltip.stopLocalRecording'
