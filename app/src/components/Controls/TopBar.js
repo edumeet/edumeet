@@ -23,7 +23,6 @@ import Menu from '@material-ui/core/Menu';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
-import RecordVoiceOverIcon from '@material-ui/icons/RecordVoiceOver';
 import MenuIcon from '@material-ui/icons/Menu';
 import Badge from '@material-ui/core/Badge';
 import Paper from '@material-ui/core/Paper';
@@ -46,6 +45,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
+import StopIcon from '@material-ui/icons/Stop';
 import randomString from 'random-string';
 
 const styles = (theme) =>
@@ -651,19 +651,15 @@ const TopBar = (props) =>
 							}
 							}
 						>
-							{ room.localRecordingPaused ?
-								<Badge
-									color='primary'
-								>
+							<Badge
+								color='primary'
+							>
+								{ room.localRecordingPaused ?
 									<PauseCircleFilledIcon />
-								</Badge>
-								:
-								<Badge
-									color='primary'
-								>
+									:
 									<PauseCircleOutlineIcon />
-								</Badge>
-							}
+								}
+							</Badge>
 							{ room.localRecordingPaused ?
 								<p className={classes.moreAction}>
 									<FormattedMessage
@@ -701,7 +697,11 @@ const TopBar = (props) =>
 							<Badge
 								color='primary'
 							>
-								<RecordVoiceOverIcon />
+								{ room.localeRecordingInProgress ?
+									<StopIcon />
+									:
+									<FiberManualRecordIcon />
+								}
 							</Badge>
 
 							{ room.localRecordingInProgress ?
@@ -894,19 +894,15 @@ const TopBar = (props) =>
 					}
 					}
 				>
-					{ room.localRecordingPaused ?
-						<Badge
-							color='primary'
-						>
+					<Badge
+						color='primary'
+					>
+						{ room.localRecordingPaused ?
 							<PauseCircleFilledIcon />
-						</Badge>
-						:
-						<Badge
-							color='primary'
-						>
+							:
 							<PauseCircleOutlineIcon />
-						</Badge>
-					}
+						}
+					</Badge>
 
 					{ room.localRecordingPaused ?
 						<p className={classes.moreAction}>
@@ -945,7 +941,11 @@ const TopBar = (props) =>
 					<Badge
 						color='primary'
 					>
-						<RecordVoiceOverIcon />
+						{ room.localeRecordingInProgress ?
+							<StopIcon />
+							:
+							<FiberManualRecordIcon />
+						}
 					</Badge>
 					{ room.localeRecordingInProgress ?
 						<p className={classes.moreAction}>
