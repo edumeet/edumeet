@@ -109,7 +109,7 @@
 	"tooltip.muteScreenSharingModerator": "Résztvevő képernyőmegosztásának leállítása mindenkinél",
 	"tooltip.startLocalRecording": "Helyi felvétel indítása",
 	"tooltip.stopLocalRecording": "Helyi felvétel leállítása",
-	"tooltip.pauseLocalRecording": "Helyi felvétel megállítása",
+	"tooltip.pauseLocalRecording": "Helyi felvétel pillanatnyi megállítása",
 	"tooltip.resumeLocalRecording": "Megállított helyi felvétel újraindítása",
 
 	"label.roomName": "Konferencia",
