@@ -1497,7 +1497,7 @@ export default class RoomClient
 
 				([ track ] = stream.getVideoTracks());
 
-				const { deviceId: trackDeviceId } = track.getSettings();
+				const { deviceId: trackDeviceId, width, height } = track.getSettings();
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
@@ -1528,7 +1528,9 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'webcam'
+								source : 'webcam',
+								width,
+								height
 							}
 						});
 				}
@@ -1538,7 +1540,9 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'webcam'
+							source : 'webcam',
+							width,
+							height
 						}
 					});
 				}
@@ -2134,6 +2138,82 @@ export default class RoomClient
 		}
 	}
 
+	setConsumerPreferredLayersMax(consumer)
+	{
+		if (consumer.type === 'simple')
+		{
+			return;
+		}
+
+		logger.debug(
+			'setConsumerPreferredLayersMax() [consumerId:"%s"]', consumer.id);
+
+		if (consumer.preferredSpatialLayer !== consumer.spatialLayers -1 ||
+			consumer.preferredTemporalLayer !== consumer.temporalLayers -1)
+		{
+			return this.setConsumerPreferredLayers(consumer.id,
+				consumer.spatialLayers - 1, consumer.temporalLayers - 1);
+		}
+	}
+
+	adaptConsumerPreferredLayers(consumer, viewportWidth, viewportHeight)
+	{
+		if (consumer.type === 'simple')
+		{
+			return;
+		}
+
+		if (!viewportWidth || !viewportHeight)
+		{
+			return;
+		}
+
+		const { id, preferredSpatialLayer, preferredTemporalLayer, width, height } = consumer;
+		const availableArea = Math.round(viewportWidth * viewportHeight);
+
+		logger.debug(
+			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" viewportWidth:"%d", viewportHeight:"%d"]',
+			consumer.id, width, height, viewportWidth, viewportHeight);
+
+		let spatialLayer = 0;
+
+		for (let i = 0; i < window.config.simulcastEncodings.length; i++)
+		{
+			const levelArea = width * height /
+				(window.config.simulcastEncodings[i].scaleResolutionDownBy ** 2);
+
+			if (availableArea >= levelArea)
+			{
+				spatialLayer = i;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		let temporalLayer = 2;
+
+		if (spatialLayer === 0)
+		{
+			if (viewportWidth < width * 0.5)
+			{
+				temporalLayer = 1;
+			}
+			if (viewportWidth < width * 0.25)
+			{
+				temporalLayer = 0;
+			}
+		}
+
+		if (preferredSpatialLayer !== spatialLayer ||
+			preferredTemporalLayer !== temporalLayer)
+		{
+			return this.setConsumerPreferredLayers(id, spatialLayer, temporalLayer);
+		}
+
+	}
+
 	async setConsumerPriority(consumerId, priority)
 	{
 		logger.debug(
@@ -2394,6 +2474,8 @@ export default class RoomClient
 							remotelyPaused         : producerPaused,
 							rtpParameters          : consumer.rtpParameters,
 							source                 : consumer.appData.source,
+							width                  : consumer.appData.width,
+							height                 : consumer.appData.height,
 							spatialLayers          : spatialLayers,
 							temporalLayers         : temporalLayers,
 							preferredSpatialLayer  : spatialLayers - 1,
