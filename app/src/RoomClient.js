@@ -2192,15 +2192,18 @@ export default class RoomClient
 			}
 		}
 
-		let temporalLayer = 2;
+		let temporalLayer = consumer.temporalLayers - 1;
 
 		if (spatialLayer === 0)
 		{
-			if (viewportWidth < width * 0.5)
+			const lowestLevelArea = width * height /
+				(window.config.simulcastEncodings[0].scaleResolutionDownBy ** 2);
+
+			if (availableArea < lowestLevelArea * 0.5)
 			{
 				temporalLayer = 1;
 			}
-			if (viewportWidth < width * 0.25)
+			if (availableArea < lowestLevelArea * 0.25)
 			{
 				temporalLayer = 0;
 			}
