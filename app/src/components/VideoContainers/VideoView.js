@@ -89,7 +89,8 @@ const styles = (theme) =>
 
 					// eslint-disable-next-line
 					gridTemplateAreas : '\
-				"AcodL		Acod	Acod	Acod	Acod" \
+					"AuaL		Aua 	Aua 	Aua 	Aua" \
+					"AcodL		Acod	Acod	Acod	Acod" \
 					"VcodL		Vcod	Vcod	Vcod	Vcod" \
 					"ResL		Res		Res		Res		Res" \
 					"RecvL		RecvBps RecvBps RecvSum RecvSum" \
@@ -99,6 +100,8 @@ const styles = (theme) =>
 					"STLcurrL	STLcurr	STLcurr STLcurr STLcurr" \
 					"STLprefL	STLpref STLpref STLpref STLpref"',
 
+					'& .AuaL'     : { gridArea: 'AuaL' },
+					'& .Aua'      : { gridArea: 'Aua', fontSize: '0.8em', maxWidth: '20em' },
 					'& .AcodL'    : { gridArea: 'AcodL' },
 					'& .Acod'     : { gridArea: 'Acod' },
 					'& .VcodL'    : { gridArea: 'VcodL' },
@@ -118,8 +121,11 @@ const styles = (theme) =>
 					'& .STLcurrL' : { gridArea: 'STLcurrL' },
 					'& .STLcurr'  : { gridArea: 'STLcurr' },
 					'& .STLprefL' : { gridArea: 'STLprefL' },
-					'& .STLpref'  : { gridArea: 'STLpref' }
-
+					'& .STLpref'  : { gridArea: 'STLpref' },
+					'&:hover'     :
+					{
+						backgroundColor : 'rgb(0, 0, 0, 0.75)'
+					}
 				},
 			'&.right' :
 			{
@@ -207,7 +213,8 @@ class VideoView extends React.PureComponent
 			onChangeDisplayName,
 			children,
 			classes,
-			netInfo
+			netInfo,
+			userAgent
 		} = this.props;
 
 		const {
@@ -281,6 +288,15 @@ class VideoView extends React.PureComponent
 				<div className={classes.info}>
 					<div className={classes.media}>
 						<div className={classnames(classes.box, 'left', { hidden: !advancedMode })}>
+							{ userAgent &&
+								<React.Fragment>
+									<span className={'AuaL'}>UAgent: </span>
+									<span className={'Aua'}>
+										{userAgent}
+									</span>
+								</React.Fragment>
+							}
+
 							{ audioCodec &&
 								<React.Fragment>
 									<span className={'AcodL'}>Acod: </span>
@@ -528,7 +544,8 @@ VideoView.propTypes =
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
 	classes                        : PropTypes.object.isRequired,
-	netInfo                        : PropTypes.object
+	netInfo                        : PropTypes.object,
+	userAgent                      : PropTypes.string
 };
 
 export default withStyles(styles)(VideoView);

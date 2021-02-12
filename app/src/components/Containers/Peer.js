@@ -441,6 +441,7 @@ const Peer = (props) =>
 						videoCodec={webcamConsumer && webcamConsumer.codec}
 						audioScore={micConsumer ? micConsumer.score : null}
 						videoScore={webcamConsumer ? webcamConsumer.score : null}
+						userAgent={webcamConsumer ? webcamConsumer.userAgent : null}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -634,6 +635,7 @@ const Peer = (props) =>
 								videoVisible={videoVisible}
 								videoCodec={consumer && consumer.codec}
 								videoScore={consumer ? consumer.score : null}
+								userAgent={consumer ? consumer.userAgent : null}
 							/>
 						</div>
 					</div>
@@ -778,6 +780,7 @@ const Peer = (props) =>
 							videoVisible={screenVisible}
 							videoCodec={screenConsumer && screenConsumer.codec}
 							videoScore={screenConsumer ? screenConsumer.score : null}
+							userAgent={screenConsumer ? screenConsumer.userAgent : null}
 						/>
 					</div>
 				</div>

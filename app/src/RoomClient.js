@@ -1328,7 +1328,10 @@ export default class RoomClient
 							opusMaxPlaybackRate
 						},
 						appData :
-						{ source: 'mic' }
+						{
+							source    : 'mic',
+							userAgent : navigator.userAgent
+						}
 					});
 
 				store.dispatch(producerActions.addProducer(
@@ -1528,7 +1531,8 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'webcam'
+								source    : 'webcam',
+								userAgent : navigator.userAgent
 							}
 						});
 				}
@@ -1538,7 +1542,8 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'webcam'
+							source    : 'webcam',
+							userAgent : navigator.userAgent
 						}
 					});
 				}
@@ -2394,6 +2399,7 @@ export default class RoomClient
 							remotelyPaused         : producerPaused,
 							rtpParameters          : consumer.rtpParameters,
 							source                 : consumer.appData.source,
+							userAgent              : consumer.appData.userAgent,
 							spatialLayers          : spatialLayers,
 							temporalLayers         : temporalLayers,
 							preferredSpatialLayer  : spatialLayers - 1,
@@ -3723,7 +3729,8 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'extravideo'
+								source    : 'extravideo',
+								userAgent : navigator.userAgent
 							}
 						});
 				}
@@ -3733,7 +3740,8 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'extravideo'
+							source    : 'extravideo',
+							userAgent : navigator.userAgent
 						}
 					});
 				}
@@ -3920,7 +3928,8 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'screen'
+								source    : 'screen',
+								userAgent : navigator.userAgent
 							}
 						});
 				}
@@ -3930,7 +3939,8 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'screen'
+							source    : 'screen',
+							userAgent : navigator.userAgent
 						}
 					});
 				}
