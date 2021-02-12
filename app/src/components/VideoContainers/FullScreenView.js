@@ -2,11 +2,22 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import { permissions } from '../../permissions';
 import { withStyles } from '@material-ui/core/styles';
 import * as appPropTypes from '../appPropTypes';
 import * as roomActions from '../../actions/roomActions';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import VideoView from './VideoView';
+import { useIntl } from 'react-intl';
+import MicIcon from '@material-ui/icons/Mic';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import Tooltip from '@material-ui/core/Tooltip';
+import Fab from '@material-ui/core/Fab';
+import {
+	meProducersSelector,
+	makePermissionSelector
+} from '../Selectors';
+import IconButton from '@material-ui/core/IconButton';
 
 const styles = (theme) =>
 	({
@@ -42,7 +53,7 @@ const styles = (theme) =>
 			transitionDuration : '0.15s',
 			width              : '5vmin',
 			height             : '5vmin',
-			opacity            : 0,
+			opacity            : 1,
 			'&.visible'        :
 			{
 				opacity : 1
@@ -79,13 +90,22 @@ const styles = (theme) =>
 const FullScreenView = (props) =>
 {
 	const {
+		roomClient,
 		advancedMode,
 		consumer,
 		toggleConsumerFullscreen,
 		toolbarsVisible,
 		permanentTopBar,
-		classes
+		classes,
+		settings,
+		me,
+		micProducer,
+		hasAudioPermission,
+		smallContainer,
+		noiseVolume
 	} = props;
+
+	const intl = useIntl();
 
 	if (!consumer)
 		return null;
@@ -96,9 +116,184 @@ const FullScreenView = (props) =>
 		!consumer.remotelyPaused
 	);
 
+	let micState;
+
+	let micTip;
+
+	if (!me.canSendMic || !hasAudioPermission)
+	{
+		micState = 'unsupported';
+		micTip = intl.formatMessage({
+			id             : 'device.audioUnsupported',
+			defaultMessage : 'Audio unsupported'
+		});
+	}
+	else if (!micProducer)
+	{
+		micState = 'off';
+		micTip = intl.formatMessage({
+			id             : 'device.activateAudio',
+			defaultMessage : 'Activate audio'
+		});
+	}
+	else if (!micProducer.locallyPaused &&
+		!micProducer.remotelyPaused &&
+		!settings.audioMuted)
+	{
+		micState = 'on';
+		micTip = intl.formatMessage({
+			id             : 'device.muteAudio',
+			defaultMessage : 'Mute audio'
+		});
+	}
+	else
+	{
+		micState = 'muted';
+		micTip = intl.formatMessage({
+			id             : 'device.unMuteAudio',
+			defaultMessage : 'Unmute audio'
+		});
+	}
+
+	console.log('stefka');
+
 	return (
 		<div className={classes.root}>
 			<div className={classes.controls}>
+				<div className={classes.button} >
+					<React.Fragment>
+						<Tooltip title={micTip} placement='left'>
+							{ smallContainer ?
+								<div>
+									<IconButton
+										aria-label={intl.formatMessage({
+											id             : 'device.muteAudio',
+											defaultMessage : 'Mute audio'
+										})}
+										className={classes.smallContainer}
+										disabled={
+											!me.canSendMic ||
+											!hasAudioPermission ||
+											me.audioInProgress
+										}
+										color={micState === 'on' ?
+											settings.voiceActivatedUnmute ?
+												me.isAutoMuted ? 'secondary'
+													: 'primary'
+												: 'default'
+											: 'secondary'
+										}
+										size='small'
+										onClick={() =>
+										{
+											if (micState === 'off')
+												roomClient.updateMic({ start: true });
+											else if (micState === 'on')
+												roomClient.muteMic();
+											else
+												roomClient.unmuteMic();
+										}}
+									>
+										{settings.voiceActivatedUnmute ?
+											micState === 'on' ?
+												<React.Fragment>
+													<svg style={{ 'position': 'absolute' }}>
+														<defs>
+															<clipPath id='cut-off-indicator'>
+																<rect x='0' y='0' width='24' height={24 - 2.4 * noiseVolume} />
+															</clipPath>
+														</defs>
+													</svg>
+													<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+														color={'default'}
+													/>
+													<SettingsVoiceIcon
+														clip-path='url(#cut-off-indicator)'
+														style={
+															(
+																{ 'position': 'absolute' },
+																{ 'opacity': '0.6' }
+															)
+														}
+														color={me.isAutoMuted ?
+															'primary' : 'default'}
+													/>
+												</React.Fragment>
+												: <MicOffIcon />
+											: micState === 'on' ?
+												<MicIcon />
+												:
+												<MicOffIcon />
+										}
+									</IconButton>
+								</div>
+								:
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'device.muteAudio',
+											defaultMessage : 'Mute audio'
+										})}
+										className={classes.fab}
+										disabled={
+											!me.canSendMic ||
+											!hasAudioPermission ||
+											me.audioInProgress
+										}
+										color={micState === 'on' ?
+											settings.voiceActivatedUnmute ?
+												me.isAutoMuted ? 'secondary' : 'primary'
+												: 'primary'
+											: 'secondary'
+										}
+										size='large'
+										onClick={() =>
+										{
+											if (micState === 'off')
+												roomClient.updateMic({ start: true });
+											else if (micState === 'on')
+												roomClient.muteMic();
+											else
+												roomClient.unmuteMic();
+										}}
+									>
+										{ settings.voiceActivatedUnmute ?
+											micState === 'on' ?
+												<React.Fragment>
+													<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
+														<defs>
+															<clipPath id='cut-off-indicator'>
+																<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
+															</clipPath>
+														</defs>
+													</svg>
+													<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+														color={'default'}
+													/>
+													<SettingsVoiceIcon
+														clip-path='url(#cut-off-indicator)'
+														style={
+															(
+																{ 'position': 'absolute' },
+																{ 'opacity': '0.6' }
+															)
+														}
+														color={me.isAutoMuted ?
+															'primary' : 'default'}
+													/>
+												</React.Fragment>
+												: <MicOffIcon />
+											: micState === 'on' ?
+												<MicIcon />
+												:
+												<MicOffIcon />
+										}
+									</Fab>
+								</div>
+							}
+						</Tooltip>
+					</React.Fragment>
+				</div>
 				<div
 					className={classnames(classes.button, {
 						visible : toolbarsVisible || permanentTopBar
@@ -142,20 +337,49 @@ const FullScreenView = (props) =>
 
 FullScreenView.propTypes =
 {
+	roomClient               : PropTypes.any.isRequired,
 	advancedMode             : PropTypes.bool,
 	consumer                 : appPropTypes.Consumer,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toolbarsVisible          : PropTypes.bool,
 	permanentTopBar          : PropTypes.bool,
-	classes                  : PropTypes.object.isRequired
+	classes                  : PropTypes.object.isRequired.button,
+	settings                 : PropTypes.object,
+	me                       : appPropTypes.Me.isRequired,
+	micProducer              : appPropTypes.Producer,
+	hasAudioPermission       : PropTypes.bool.isRequired,
+	smallContainer           : PropTypes.bool,
+	noiseVolume              : PropTypes.number
 };
 
+const canShareAudio = makePermissionSelector(permissions.SHARE_AUDIO);
+
 const mapStateToProps = (state) =>
-	({
-		consumer        : state.consumers[state.room.fullScreenConsumer],
-		toolbarsVisible : state.room.toolbarsVisible,
-		permanentTopBar : state.settings.permanentTopBar
-	});
+{
+	let noise;
+
+	// noise = volume under threshold
+	if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold)
+	{
+		// noise mapped to range 0 ... 10 
+		noise = Math.round((100 + state.peerVolumes[state.me.id]) /
+			(100 + state.settings.noiseThreshold)*10);
+	}
+	// noiseVolume over threshold: no noise but voice
+	else { noise = 10; }
+
+	return {
+		consumer           : state.consumers[state.room.fullScreenConsumer],
+		toolbarsVisible    : state.room.toolbarsVisible,
+		permanentTopBar    : state.settings.permanentTopBar,
+		me                 : state.me,
+		...meProducersSelector(state),
+		settings           : state.settings,
+		noiseVolume        : noise,
+		roomClient         : global.CLIENT,
+		hasAudioPermission : canShareAudio(state)
+	};
+};
 
 const mapDispatchToProps = (dispatch) =>
 	({
@@ -177,7 +401,8 @@ export default connect(
 				prev.consumers[prev.room.fullScreenConsumer] ===
 					next.consumers[next.room.fullScreenConsumer] &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
-				prev.settings.permanentTopBar === next.settings.permanentTopBar
+				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
+				prev.settings.audioMuted === next.settings.audioMuted
 			);
 		}
 	}
