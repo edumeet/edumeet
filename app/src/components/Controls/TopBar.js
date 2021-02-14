@@ -179,6 +179,36 @@ const PulsingBadge = withStyles((theme) =>
 		}
 	}))(Badge);
 
+const PulsingIcon = withStyles((theme) =>
+	({
+		root :
+		{
+			// backgroundColor : theme.palette.secondary.main,
+			'&::after' :
+			{
+				position     : 'absolute',
+				borderRadius : '50%',
+				width        : '100%',
+				height       : '100%',
+				animation    : '$pulse 1.2s infinite ease-in-out',
+				border       : `3px solid ${theme.palette.secondary.main}`
+			}
+		},
+		'@keyframes pulse' :
+		{
+			'0%' :
+			{
+				transform : 'scale(.8)',
+				opacity   : 1
+			},
+			'100%' :
+			{
+				transform : 'scale(1.4)',
+				opacity   : 0
+			}
+		}
+	}))(FiberManualRecordIcon);
+
 const TopBar = (props) =>
 {
 	const intl = useIntl();
@@ -383,24 +413,18 @@ const TopBar = (props) =>
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
 						{ room.recordingInProgress &&
-						<PulsingBadge
-							color='secondary'
-							badgeContent='REC'
-							overlap='circle'
+						<IconButton
+							disabled
+							color='inherit'
+							aria-label={intl.formatMessage(
+								{
+									id             : 'label.recordingInProgress',
+									defaultMessage : 'Recording in Progress..'
+								})}
+							className={classes.menuButton}
 						>
-							<IconButton
-								disabled
-								color='inherit'
-								aria-label={intl.formatMessage(
-									{
-										id             : 'label.recordingInProgress',
-										defaultMessage : 'Recording in Progress..'
-									})}
-								className={classes.menuButton}
-							>
-								<FiberManualRecordIcon color='secondary'/>
-							</IconButton>
-						</PulsingBadge>
+							<PulsingIcon color='secondary'/>
+						</IconButton>
 						}
 						<div className={classes.divider} />
 						<Tooltip
