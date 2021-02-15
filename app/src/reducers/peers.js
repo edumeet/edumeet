@@ -90,6 +90,13 @@ const peer = (state = initialState, action) =>
 				...state,
 				stopPeerScreenSharingInProgress : action.payload.flag
 			};
+
+		case 'SET_PEER_LOCAL_RECORDING_STATE':
+			return {
+				...state,
+				localRecordingState : action.payload.localRecordingState
+			};
+
 		default:
 			return state;
 	}
@@ -130,6 +137,7 @@ const peers = (state = initialState, action) =>
 		case 'SET_PEER_KICK_IN_PROGRESS':
 		case 'SET_PEER_MODIFY_ROLES_IN_PROGRESS':
 		case 'REMOVE_CONSUMER':
+		case 'SET_PEER_LOCAL_RECORDING_STATE':
 		{
 			const oldPeer = state[action.payload.peerId];
 

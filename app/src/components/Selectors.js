@@ -299,3 +299,10 @@ export const makePermissionSelector = (permission) =>
 		}
 	);
 };
+
+/*
+export const localRecordingSelector = createSelector(
+	peersSelector,
+	(peers) => peers.reduce((acc, elem) => elem.localRecording, 0)
+);
+*/

@@ -98,3 +98,9 @@ export const setStopPeerScreenSharingInProgress = (peerId, flag) =>
 		type    : 'STOP_PEER_SCREEN_SHARING_IN_PROGRESS',
 		payload : { peerId, flag }
 	});
+
+export const setPeerLocalRecordingState = (peerId, localRecordingState) =>
+	({
+		type    : 'SET_PEER_LOCAL_RECORDING_STATE',
+		payload : { peerId, localRecordingState }
+	});

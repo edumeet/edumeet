@@ -63,12 +63,6 @@ const roomAllowWhenRoleMissing = config.allowWhenRoleMissing || [];
 
 const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 
-// Recoding STATE
-const RECORDING_STOP='stop';
-const RECORDING_START='start';
-const RECORDING_PAUSE='pause';
-const RECORDING_RESUME='resume';
-
 class Room extends EventEmitter
 {
 
@@ -222,13 +216,15 @@ class Room extends EventEmitter
 			mediasoupRouters.set(router.id, router);
 
 			const audioLevelObserver = await router.createAudioLevelObserver(
-			{
-				maxEntries : 1,
-				threshold  : -80,
-				interval   : 800
-			});
+				{
+					maxEntries : 1,
+					threshold  : -80,
+					interval   : 800
+				});
 
-			audioLevelObservers.set(router.id, { audioLevelObserver : audioLevelObserver, peerId : null, volume : -1000 });
+			audioLevelObservers.set(
+				router.id, { audioLevelObserver: audioLevelObserver, peerId: null, volume: -1000 }
+			);
 		}
 
 		return new Room({
@@ -269,7 +265,8 @@ class Room extends EventEmitter
 		this._queue = new AwaitQueue();
 
 		// Locked flag.
-		this._locked = config.roomsUnlocked && Array.isArray(config.roomsUnlocked) && !config.roomsUnlocked.includes(roomId)
+		this._locked = config.roomsUnlocked &&
+			Array.isArray(config.roomsUnlocked) && !config.roomsUnlocked.includes(roomId);
 
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;
@@ -287,8 +284,6 @@ class Room extends EventEmitter
 		this._lastN = [];
 
 		this._peers = {};
-
-		this._localRecordingPeerIds = [];
 
 		this._selfDestructTimeout = null;
 
@@ -523,22 +518,20 @@ class Room extends EventEmitter
 
 		let maxVolume = -1000;
 
-		let debugRouterId = null;
-
-		this._audioLevelObservers.forEach((audioLevelObject, routerId) => {
+		this._audioLevelObservers.forEach((audioLevelObject) =>
+		{
 			const tmpPeerId = audioLevelObject.peerId;
 
 			if (tmpPeerId && audioLevelObject.volume > maxVolume)
 			{
 				maxVolume = audioLevelObject.volume;
 				peerId = tmpPeerId;
-				debugRouterId = routerId;
 			}
 		});
 
 		if (!peerId || Date.now() > (this._lastActiveSpeakerUpdateTimestamp + 1000))
 		{
-			if(peerId)
+			if (peerId)
 			{
 				this._lastActiveSpeakerUpdateTimestamp = Date.now();
 			}
@@ -550,8 +543,8 @@ class Room extends EventEmitter
 					peer.socket,
 					'activeSpeaker',
 					{
-					peerId : peerId,
-					volume : maxVolume
+						peerId : peerId,
+						volume : maxVolume
 					});
 			}
 		}
@@ -559,22 +552,23 @@ class Room extends EventEmitter
 
 	_handleAudioLevelObservers()
 	{
-		this._audioLevelObservers.forEach((audioLevelObject, routerId) => {
+		this._audioLevelObservers.forEach((audioLevelObject, routerId) =>
+		{
 			// Set audioLevelObserver events.
 			audioLevelObject.audioLevelObserver.on('volumes', (volumes) =>
 			{
 				const { producer, volume } = volumes[0];
 
-				const audioLevelObject = this._audioLevelObservers.get(routerId)
+				const audioLevelObject = this._audioLevelObservers.get(routerId);
 
 				audioLevelObject.peerId = producer.appData.peerId;
 				audioLevelObject.volume = volume;
 				this._sendActiveSpeakerInfo();
-		});
+			});
 
 			audioLevelObject.audioLevelObserver.on('silence', () =>
-		{
-				const audioLevelObject = this._audioLevelObservers.get(routerId)
+			{
+				const audioLevelObject = this._audioLevelObservers.get(routerId);
 
 				audioLevelObject.peerId = null;
 				audioLevelObject.volume = -1000;
@@ -624,11 +618,12 @@ class Room extends EventEmitter
 					this._roomId);
 				this.close();
 			}
-			else if(this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked()){
+			else if (this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked())
+			{
 				logger.info(
 					'Room deserted for some time, closing the room [roomId:"%s"] and kick peers from the lobby',
 					this._roomId);
-				
+
 				this.close();
 			}
 			else
@@ -843,15 +838,6 @@ class Room extends EventEmitter
 			roomPermissions[PROMOTE_PEER].some((roomRole) => role.id === roomRole.id)
 		);
 
-		// Remove from local recorder list
-		const localRecordingIndex = this._localRecordingPeerIds.findIndex(
-			(e) => e === peer.id);
-
-		if (localRecordingIndex)
-			this._localRecordingPeerIds.splice(localRecordingIndex, 1);
-
-		delete this._peers[peer.id];
-
 		// No peers left with PROMOTE_PEER, might need to give
 		// lobbyPeers to peers that are left.
 		if (
@@ -876,7 +862,8 @@ class Room extends EventEmitter
 		// If this is the last Peer in the room,
 		// lobby is not empty and room is locked, 
 		// close the room after a while.
-		else if(this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked()){
+		else if (this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked())
+		{
 			this.selfDestructCountdown();
 		}
 	}
@@ -969,25 +956,6 @@ class Room extends EventEmitter
 					);
 				}
 
-				// notify about in progress recordings
-				try
-				{
-					this._localRecordingPeerIds.forEach((peerId) =>
-					{
-						// Spread to others
-						this._notification(peer.socket, 'setLocalRecording', {
-							peerId,
-							state                 : 'start',
-							localRecordingPeerIds : this._localRecordingPeerIds
-						}, true, true);
-
-					});
-				}
-				catch (error)
-				{
-					logger.error('Unable to send setLocalRecording notification %O', error);
-				}
-
 				logger.debug(
 					'peer joined [peer: "%s", displayName: "%s", picture: "%s"]',
 					peer.id, displayName, picture);
@@ -1046,7 +1014,7 @@ class Room extends EventEmitter
 				if (maxIncomingBitrate)
 				{
 					try { await transport.setMaxIncomingBitrate(maxIncomingBitrate); }
-					catch(error)
+					catch (error)
 					{
 						logger.error('CreateWebRtcTransport transport.setMaxIncomingBitrate ERROR [roomId:"%s", maxIncomingBitrate:"%s", transportId:"%s", error:"%o"]', this._roomId, maxIncomingBitrate, transport.id, error);
 					}
@@ -1135,6 +1103,7 @@ class Room extends EventEmitter
 				appData = { ...appData, peerId: peer.id };
 
 				let producer = null;
+
 				try
 				{
 					producer =
@@ -1191,10 +1160,13 @@ class Room extends EventEmitter
 				// Add into the audioLevelObserver.
 				if (kind === 'audio')
 				{
-					this._audioLevelObservers.get(peer.routerId).audioLevelObserver.addProducer({ producerId: producer.id })
-						.catch((error) => {
+					this._audioLevelObservers.get(peer.routerId).audioLevelObserver.addProducer(
+						{ producerId: producer.id }
+					)
+						.catch((error) =>
+						{
 							logger.error('audioLevelObserver addProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
-							});
+						});
 				}
 
 				break;
@@ -1212,10 +1184,13 @@ class Room extends EventEmitter
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
 
-				this._audioLevelObservers.get(peer.routerId).audioLevelObserver.removeProducer({ producerId: producer.id })
-					.catch((error) => {
+				this._audioLevelObservers.get(peer.routerId).audioLevelObserver.removeProducer(
+					{ producerId: producer.id }
+				)
+					.catch((error) =>
+					{
 						logger.error('audioLevelObserver removeProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
-						});
+					});
 
 				producer.close();
 
@@ -1542,39 +1517,22 @@ class Room extends EventEmitter
 
 			case 'setLocalRecording':
 			{
-				if (!this._hasPermission(peer, LOCAL_RECORD_ROOM)) // todo change permission
+				if (!this._hasPermission(peer, LOCAL_RECORD_ROOM))
 					throw new Error('peer not authorized');
 
-				const { state } = request.data;
+				const { localRecordingState } = request.data;
 
-				switch (state)
-				{
-					case RECORDING_RESUME:
-					case RECORDING_START:
-						if (!this._localRecordingPeerIds.includes(peer.id))
-							this._localRecordingPeerIds.push(peer.id);
-						break;
-					case RECORDING_PAUSE:
-					case RECORDING_STOP:
-						if (this._localRecordingPeerIds.length > 0)
-						{
-							this._localRecordingPeerIds.pop(peer.id);
-						}
-						break;
+				logger.debug('Recoding State changed to state: %O', localRecordingState);
 
-					default:
-						break;
-				}
-				logger.debug(this._localRecordingPeerIds);
+				peer.localRecordingState = localRecordingState;
 
 				try
 				{
 					// Spread to others
 					this._notification(peer.socket, 'setLocalRecording', {
-						peerId                : peer.id,
-						state                 : state,
-						localRecordingPeerIds : this._localRecordingPeerIds
-					}, true, true);
+						peerId : peer.id,
+						localRecordingState
+					}, true);
 				}
 				catch (error)
 				{

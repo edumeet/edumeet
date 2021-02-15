@@ -47,6 +47,10 @@ class Peer extends EventEmitter
 
 		this._raisedHandTimestamp = null;
 
+		this._localRecordingState = null;
+
+		this._localRecordingStateHistory = [];
+
 		this._transports = new Map();
 
 		this._producers = new Map();
@@ -294,6 +298,26 @@ class Peer extends EventEmitter
 		return this._consumers;
 	}
 
+	get localRecordingState()
+	{
+		return this._localRecordingState;
+	}
+
+	get localRecordingStateHistory()
+	{
+		return this._localRecordingStateHistory;
+	}
+
+	set localRecordingState(localRecordingState)
+	{
+		this.localRecordingStateHistory.push({
+			timestamp : Date.now(),
+			localRecordingState
+		});
+
+		this._localRecordingState=localRecordingState;
+	}
+
 	addRole(newRole)
 	{
 		if (
@@ -384,12 +408,14 @@ class Peer extends EventEmitter
 	{
 		const peerInfo =
 		{
-			id                  : this.id,
-			displayName         : this.displayName,
-			picture             : this.picture,
-			roles               : this.roles.map((role) => role.id),
-			raisedHand          : this.raisedHand,
-			raisedHandTimestamp : this.raisedHandTimestamp
+			id                         : this.id,
+			displayName                : this.displayName,
+			picture                    : this.picture,
+			roles                      : this.roles.map((role) => role.id),
+			raisedHand                 : this.raisedHand,
+			raisedHandTimestamp        : this.raisedHandTimestamp,
+			localRecordingState        : this.localRecordingState,
+			localRecordingStateHistory : this.localRecordingStateHistory
 		};
 
 		return peerInfo;

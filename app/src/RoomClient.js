@@ -3176,25 +3176,27 @@ export default class RoomClient
 
 					case 'setLocalRecording':
 					{
-						const { peerId, state, localRecordingPeerIds } = notification.data;
+						const { peerId, localRecordingState } = notification.data;
+						const { me, peers } = store.getState();
 
 						let displayNameOfRecorder;
-						const meId = store.getState().me.id;
 
-						if (peerId === meId)
+						if (peerId === me.id)
 						{
 							displayNameOfRecorder = store.getState().settings.displayName;
 						}
-						else if (store.getState().peers[peerId])
+						else if (peers[peerId])
 							displayNameOfRecorder = store.getState().peers[peerId].displayName;
 						else
 							return;
 
-						switch (state)
+						// Save state to peer
+						store.dispatch(
+							peerActions.setPeerLocalRecordingState(peerId, localRecordingState));
+
+						switch (localRecordingState)
 						{
 							case RECORDING_START:
-								store.dispatch(
-									roomActions.setRecordingInProgress(true));
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -3206,8 +3208,6 @@ export default class RoomClient
 									}));
 								break;
 							case RECORDING_RESUME:
-								store.dispatch(
-									roomActions.setRecordingInProgress(true));
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -3219,9 +3219,7 @@ export default class RoomClient
 									}));
 								break;
 							case RECORDING_PAUSE:
-								if (localRecordingPeerIds.length === 0)
-									store.dispatch(
-										roomActions.setRecordingInProgress(false));
+							{
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -3232,10 +3230,8 @@ export default class RoomClient
 										})
 									}));
 								break;
+							}
 							case RECORDING_STOP:
-								if (localRecordingPeerIds.length === 0)
-									store.dispatch(
-										roomActions.setRecordingInProgress(false));
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -3792,6 +3788,7 @@ export default class RoomClient
 				{
 					logger.err(e);
 					recorder.stop();
+					store.dispatch(roomActions.setLocalRecordingInProgress(false));
 				};
 
 				recorder.onstop = (e) =>
@@ -3844,9 +3841,10 @@ export default class RoomClient
 
 		try
 		{
-			await this.sendRequest('setLocalRecording', { state: RECORDING_START });
+			await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
 
 			store.dispatch(roomActions.setLocalRecordingInProgress(true));
+			store.dispatch(roomActions.setRecordingInProgress(true));
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3874,7 +3872,7 @@ export default class RoomClient
 		logger.debug('stopLocalRecording()');
 		try
 		{
-			await this.sendRequest('setLocalRecording', { state: RECORDING_STOP });
+			await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3908,14 +3906,14 @@ export default class RoomClient
 	{
 		recorder.pause();
 		store.dispatch(roomActions.setLocalRecordingPaused(true));
-		await this.sendRequest('setLocalRecording', { state: RECORDING_PAUSE });
+		await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_PAUSE });
 	}
 
 	async resumeLocalRecording()
 	{
 		recorder.resume();
 		store.dispatch(roomActions.setLocalRecordingPaused(false));
-		await this.sendRequest('setLocalRecording', { state: RECORDING_RESUME });
+		await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_RESUME });
 	}
 
 	invokeSaveAsDialog(blob, fileName)

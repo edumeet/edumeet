@@ -179,20 +179,11 @@ const PulsingBadge = withStyles((theme) =>
 		}
 	}))(Badge);
 
-const PulsingIcon = withStyles((theme) =>
+const RecIcon = withStyles((theme) =>
 	({
 		root :
 		{
-			// backgroundColor : theme.palette.secondary.main,
-			'&::after' :
-			{
-				position     : 'absolute',
-				borderRadius : '50%',
-				width        : '100%',
-				height       : '100%',
-				animation    : '$pulse 1.2s infinite ease-in-out',
-				border       : `3px solid ${theme.palette.secondary.main}`
-			}
+			animation : '$pulse 2s infinite ease-in-out'
 		},
 		'@keyframes pulse' :
 		{
@@ -203,7 +194,7 @@ const PulsingIcon = withStyles((theme) =>
 			},
 			'100%' :
 			{
-				transform : 'scale(1.4)',
+				transform : 'scale(1.2)',
 				opacity   : 0
 			}
 		}
@@ -423,7 +414,7 @@ const TopBar = (props) =>
 								})}
 							className={classes.menuButton}
 						>
-							<PulsingIcon color='secondary'/>
+							<RecIcon color='secondary' />
 						</IconButton>
 						}
 						<div className={classes.divider} />
