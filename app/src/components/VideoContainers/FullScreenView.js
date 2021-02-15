@@ -28,12 +28,12 @@ const styles = (theme) =>
 			left     : 0,
 			height   : '100%',
 			width    : '100%',
-			zIndex   : 20000
+			zIndex   : 1499
 		},
 		controls :
 		{
 			position       : 'absolute',
-			zIndex         : 20020,
+			zIndex         : 1520,
 			right          : 0,
 			top            : 0,
 			display        : 'flex',
@@ -45,7 +45,7 @@ const styles = (theme) =>
 		button :
 		{
 			flex               : '0 0 auto',
-			margin             : '0.2vmin',
+			margin             : '0.3vmin',
 			borderRadius       : 2,
 			backgroundColor    : 'rgba(255, 255, 255, 0.7)',
 			cursor             : 'pointer',
@@ -59,6 +59,15 @@ const styles = (theme) =>
 				opacity : 1
 			}
 		},
+		micButton :
+		{
+			flex         : '0 0 auto',
+			borderRadius : 2,
+			width        : '5vmin',
+			height       : '5vmin',
+			minHeight    : 'auto',
+			opacity      : 1
+		},
 		icon :
 		{
 			fontSize : '5vmin'
@@ -66,7 +75,7 @@ const styles = (theme) =>
 		incompatibleVideo :
 		{
 			position       : 'absolute',
-			zIndex         : 20010,
+			zIndex         : 1510,
 			top            : 0,
 			bottom         : 0,
 			left           : 0,
@@ -162,7 +171,7 @@ const FullScreenView = (props) =>
 			<div className={classes.controls}>
 				<div className={classes.button} >
 					<React.Fragment>
-						<Tooltip title={micTip} placement='left'>
+						<Tooltip title={micTip} placement='bottom' arrow>
 							{ smallContainer ?
 								<div>
 									<IconButton
@@ -170,7 +179,7 @@ const FullScreenView = (props) =>
 											id             : 'device.muteAudio',
 											defaultMessage : 'Mute audio'
 										})}
-										className={classes.smallContainer}
+										className={classnames(classes.smallContainer, classes.micButton)}
 										disabled={
 											!me.canSendMic ||
 											!hasAudioPermission ||
@@ -194,36 +203,10 @@ const FullScreenView = (props) =>
 												roomClient.unmuteMic();
 										}}
 									>
-										{settings.voiceActivatedUnmute ?
-											micState === 'on' ?
-												<React.Fragment>
-													<svg style={{ 'position': 'absolute' }}>
-														<defs>
-															<clipPath id='cut-off-indicator'>
-																<rect x='0' y='0' width='24' height={24 - 2.4 * noiseVolume} />
-															</clipPath>
-														</defs>
-													</svg>
-													<SettingsVoiceIcon style={{ 'position': 'absolute' }}
-														color={'default'}
-													/>
-													<SettingsVoiceIcon
-														clip-path='url(#cut-off-indicator)'
-														style={
-															(
-																{ 'position': 'absolute' },
-																{ 'opacity': '0.6' }
-															)
-														}
-														color={me.isAutoMuted ?
-															'primary' : 'default'}
-													/>
-												</React.Fragment>
-												: <MicOffIcon />
-											: micState === 'on' ?
-												<MicIcon />
-												:
-												<MicOffIcon />
+										{ (settings.voiceActivatedUnmute && micState === 'on') ?
+											<MicIcon />
+											:
+											<MicOffIcon />
 										}
 									</IconButton>
 								</div>
@@ -234,7 +217,7 @@ const FullScreenView = (props) =>
 											id             : 'device.muteAudio',
 											defaultMessage : 'Mute audio'
 										})}
-										className={classes.fab}
+										className={classnames(classes.fab, classes.micButton)}
 										disabled={
 											!me.canSendMic ||
 											!hasAudioPermission ||
@@ -257,36 +240,10 @@ const FullScreenView = (props) =>
 												roomClient.unmuteMic();
 										}}
 									>
-										{ settings.voiceActivatedUnmute ?
-											micState === 'on' ?
-												<React.Fragment>
-													<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
-														<defs>
-															<clipPath id='cut-off-indicator'>
-																<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
-															</clipPath>
-														</defs>
-													</svg>
-													<SettingsVoiceIcon style={{ 'position': 'absolute' }}
-														color={'default'}
-													/>
-													<SettingsVoiceIcon
-														clip-path='url(#cut-off-indicator)'
-														style={
-															(
-																{ 'position': 'absolute' },
-																{ 'opacity': '0.6' }
-															)
-														}
-														color={me.isAutoMuted ?
-															'primary' : 'default'}
-													/>
-												</React.Fragment>
-												: <MicOffIcon />
-											: micState === 'on' ?
-												<MicIcon />
-												:
-												<MicOffIcon />
+										{ (settings.voiceActivatedUnmute && micState === 'on') ?
+											<MicIcon />
+											:
+											<MicOffIcon />
 										}
 									</Fab>
 								</div>
