@@ -15,6 +15,7 @@
 	"main": "lib/index.js",
 	"scripts": {
 		"start": "node server.js",
+		"debug": "DEBUG=edumeet* node server.js",
 		"connect": "node connect.js",
 		"lint": "eslint -c .eslintrc.json --ext .js *.js lib/"
 	},
