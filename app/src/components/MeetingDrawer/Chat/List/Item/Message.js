@@ -86,7 +86,11 @@ const Message = (props) =>
 							{ renderer: linkRenderer }
 						),
 						{
-							ALLOWED_TAGS : [ 'a' ],
+							ALLOWED_TAGS : [
+								'a', 'b', 'strong', 'i',
+								'em', 'u', 'strike', 'p',
+								'br'
+							],
 							ALLOWED_ATTR : [ 'href', 'target', 'title' ]
 						}
 					) }}

@@ -23,6 +23,8 @@
 		"create-torrent": "^4.4.1",
 		"dompurify": "^2.0.7",
 		"domready": "^1.0.8",
+		"draft-js": "^0.11.7",
+		"draft-js-export-html": "^1.4.1",
 		"end-of-stream": "1.4.1",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",

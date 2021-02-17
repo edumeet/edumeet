@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -7,12 +7,21 @@ import { useIntl } from 'react-intl';
 import { permissions } from '../../../../permissions';
 import { makePermissionSelector } from '../../../Selectors';
 import Paper from '@material-ui/core/Paper';
+import { Grid } from '@material-ui/core';
+import { Editor, EditorState, RichUtils, ContentState } from 'draft-js';
+import { stateToHTML } from 'draft-js-export-html';
+import 'draft-js/dist/Draft.css';
 import InputBase from '@material-ui/core/InputBase';
+import Divider from '@material-ui/core/Divider';
+
 import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
 import SaveIcon from '@material-ui/icons/Save';
+import FormatBoldIcon from '@material-ui/icons/FormatBold';
+import FormatItalicIcon from '@material-ui/icons/FormatItalic';
+import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined';
 
 const styles = (theme) =>
 	({
@@ -25,23 +34,31 @@ const styles = (theme) =>
 		},
 		input :
 		{
-			marginLeft     : 8,
+			// marginLeft     : 8,
 			flex           : 1,
 			'&[type=file]' : {
 				display : 'none'
-			}
+			},
+			padding         : '8px 4px',
+			'line-height'   : '20px',
+			'font-size'     : '16px',
+			'width'         : '50px',
+			'overflow-wrap' : 'break-word'
 		},
-		iconButton :
-		{
-			padding : 10
+		icon : {
+			padding : theme.spacing(1)
 		}
 	});
 
 const ChatInput = (props) =>
 {
+	const intl = useIntl();
+
 	const [ message, setMessage ] = useState('');
 
-	const intl = useIntl();
+	const [ editorState, setEditorState ] = React.useState(
+		() => EditorState.createEmpty()
+	);
 
 	const createNewMessage = (text, sender, name, picture) =>
 		({
@@ -53,18 +70,36 @@ const ChatInput = (props) =>
 			picture
 		});
 
+	/* 
 	const handleMessage = (e) =>
+		setMessage(e);
+	 */
+
+	const handleKeyCommand = (command) =>
 	{
-		setMessage(e.target.value);
+		const newState = RichUtils.handleKeyCommand(editorState, command);
+
+		if (newState)
+		{
+			setEditorState(newState);
+
+			return 'handled';
+		}
+
+		return 'not-handled';
 	};
 
-	const handleFile = async (event) =>
-	{
-		if (event.target.files.length > 0)
-		{
-			await props.roomClient.shareFiles(event.target.files);
-		}
-	};
+	const handleUnderlineClick = () =>
+		setEditorState(RichUtils.toggleInlineStyle(editorState, 'UNDERLINE'));
+
+	const handleBoldClick = () =>
+		setEditorState(RichUtils.toggleInlineStyle(editorState, 'BOLD'));
+
+	const handleItalicClick = () =>
+		setEditorState(RichUtils.toggleInlineStyle(editorState, 'ITALIC'));
+
+	const handleClearInput = () =>
+		setEditorState(EditorState.push(editorState, ContentState.createFromText('')));
 
 	const {
 		roomClient,
@@ -81,11 +116,42 @@ const ChatInput = (props) =>
 
 	} = props;
 
+	const handleSendMessage = () =>
+	{
+		if (message && message !== '')
+		{
+			const sendMessage = createNewMessage(message, 'response', displayName, picture);
+
+			roomClient.sendChatMessage(sendMessage);
+
+			setMessage('');
+
+			handleClearInput();
+		}
+	};
+
+	useEffect(() =>
+	{
+		const res = stateToHTML(editorState.getCurrentContent(), {
+			defaultBlockTag : null
+		});
+
+		setMessage(res);
+
+	}, [ editorState ]);
+
+	const handleFile = async (event) =>
+	{
+		if (event.target.files.length > 0)
+			await props.roomClient.shareFiles(event.target.files);
+	};
+
 	const chatItemsLength = files.length + chat.length;
 
 	return (
 		<Paper className={classes.root}>
 			{/* Input message field */}
+			{/*
 			<InputBase
 				className={classes.input}
 				placeholder={intl.formatMessage({
@@ -113,92 +179,157 @@ const ChatInput = (props) =>
 				}}
 				autoFocus
 			/>
+			*/}
 
-			{/* Button save chat */}
-			<React.Fragment>
-				<IconButton
-					className={classes.IconButton}
-					disabled={!canShareFiles || !canShare || chatItemsLength === 0}
-					aria-label='Share gallery file'
-					component='span'
-					// onClick={() => roomClient.saveChat(List2)}
-					onClick={() => roomClient.saveChat()
-					}
-				>
-					<SaveIcon />
-				</IconButton>
-			</React.Fragment>
+			<Grid container direction='column'>
 
-			{/* Button for file sharing */}
-			<React.Fragment>
-				<input
-					id='contained-button-file'
-					className={classes.input}
-					disabled={!canShare}
-					type='file'
-					multiple
-					onChange={handleFile}
-				/>
-				<label htmlFor='contained-button-file'>
+				<Grid item container direction='row' alignItems='center'>
+					{/* Input field */}
+					<div className={classes.input}>
+						<Editor
+							placeholder={intl.formatMessage({
+								id             : 'label.chatInput',
+								defaultMessage : 'Enter chat message...'
+							})}
+							editorState={editorState}
+							// eslint-disable-next-line
+							handleKeyCommand={handleKeyCommand}
+							onChange={setEditorState}
+							// autoFocus
+						/>
+					</div>
+
+					{/* Button send message */}
 					<IconButton
-						className={classes.iconButton}
+						size='small'
+						classes={{ sizeSmall: classes.icon }}
 						color='primary'
-						aria-label='Share file'
-						disabled={!canShareFiles || !canShare}
-						component='span'
-					// onClick={(e) => (e.target.value = null)}
+						aria-label='Send'
+						// disabled={!canChat || !message}
+						onClick={handleSendMessage}
 					>
-						<AttachFileIcon />
+						<SendIcon />
 					</IconButton>
-				</label>
-			</React.Fragment>
+					{/* /Button send message */}
 
-			{/* Button for gallery file sharing (mobile) */}
-			{(browser.platform === 'mobile') && canShareFiles && canShare &&
-			<React.Fragment>
-				<input
-					className={classes.input}
-					type='file'
-					disabled={!canShare}
-					onChange={handleFile}
-					accept='image/*'
-					id='share-files-gallery-button'
-				/>
+				</Grid>
 
-				<label htmlFor='share-files-gallery-button'>
+				<Grid item>
+					<Divider orientation='horizontal'/>
+				</Grid>
 
-					<IconButton
-						className={classes.IconButton}
-						disabled={!canShareFiles || !canShare}
-						aria-label='Share gallery file'
-						component='span'
-					>
-						<PhotoCamera />
-					</IconButton>
-				</label>
-			</React.Fragment>
-			}
+				{/* Format buttons */}
+				<Grid item container justify='space-between'>
+					<Grid item>
+						<IconButton
+							size='small'
+							classes={{ sizeSmall: classes.icon }}
+							// disabled={disabled}
+							// aria-label='Share gallery file'
+							component='span'
+							onClick={handleBoldClick}
+						>
+							<FormatBoldIcon />
+						</IconButton>
+						<IconButton
+							size='small'
+							classes={{ sizeSmall: classes.icon }}
+							// disabled={disabled}
+							// aria-label='Share gallery file'
+							component='span'
+							onClick={handleItalicClick}
+						>
+							<FormatItalicIcon />
+						</IconButton>
+						<IconButton
+							size='small'
+							classes={{ sizeSmall: classes.icon }}
+							// disabled={disabled}
+							// aria-label='Share gallery file'
+							component='span'
+							onClick={handleUnderlineClick}
+						>
+							<FormatUnderlinedIcon />
+						</IconButton>
+						{/* /Format buttons */}
+					</Grid>
+					<Grid item>
 
-			{/* Button send message */}
-			<IconButton
-				color='primary'
-				className={classes.iconButton}
-				aria-label='Send'
-				disabled={!canChat || !message}
-				onClick={() =>
-				{
-					if (message && message !== '')
-					{
-						const sendMessage = createNewMessage(message, 'response', displayName, picture);
+						{/* Button save chat */}
+						<React.Fragment>
+							<IconButton
+								size='small'
+								classes={{ sizeSmall: classes.icon }}
+								disabled={!canShareFiles || !canShare || chatItemsLength === 0}
+								aria-label='Share gallery file'
+								component='span'
+								onClick={() => roomClient.saveChat()
+								}
+							>
+								<SaveIcon />
 
-						roomClient.sendChatMessage(sendMessage);
+							</IconButton>
+						</React.Fragment>
 
-						setMessage('');
-					}
-				}}
-			>
-				<SendIcon />
-			</IconButton>
+						{/* Button for file sharing */}
+						<React.Fragment>
+							<input
+								id='contained-button-file'
+								className={classes.input}
+								disabled={!canShare}
+								type='file'
+								multiple
+								onChange={handleFile}
+							/>
+							<label htmlFor='contained-button-file'>
+								<IconButton
+									size='small'
+									classes={{ sizeSmall: classes.icon }}
+									color='primary'
+									aria-label='Share file'
+									disabled={!canShareFiles || !canShare}
+									component='span'
+								// onClick={(e) => (e.target.value = null)}
+								>
+									<AttachFileIcon
+										size='small'
+									/>
+								</IconButton>
+							</label>
+						</React.Fragment>
+
+						{/* Button for gallery file sharing (mobile) */}
+						{(browser.platform === 'mobile') && canShareFiles && canShare &&
+						<React.Fragment>
+							<input
+								className={classes.input}
+								type='file'
+								disabled={!canShare}
+								onChange={handleFile}
+								accept='image/*'
+								id='share-files-gallery-button'
+							/>
+
+							<label htmlFor='share-files-gallery-button'>
+
+								<IconButton
+									size='small'
+									classes={{ sizeSmall: classes.icon }}
+									disabled={!canShareFiles || !canShare}
+									aria-label='Share gallery file'
+									component='span'
+								>
+									<PhotoCamera />
+								</IconButton>
+							</label>
+						</React.Fragment>
+
+						}
+					</Grid>
+
+				</Grid>
+
+			</Grid>
 
 		</Paper>
 	);

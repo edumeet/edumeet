@@ -294,7 +294,7 @@ export default class RoomClient
 
 			const source = event.target;
 
-			const exclude = [ 'input', 'textarea' ];
+			const exclude = [ 'input', 'textarea', 'div' ];
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
@@ -449,7 +449,7 @@ export default class RoomClient
 
 			const source = event.target;
 
-			const exclude = [ 'input', 'textarea' ];
+			const exclude = [ 'input', 'textarea', 'div' ];
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
