@@ -2,22 +2,19 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { permissions } from '../../permissions';
 import { withStyles } from '@material-ui/core/styles';
 import * as appPropTypes from '../appPropTypes';
 import * as roomActions from '../../actions/roomActions';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import VideoView from './VideoView';
-import { useIntl } from 'react-intl';
-import MicIcon from '@material-ui/icons/Mic';
-import MicOffIcon from '@material-ui/icons/MicOff';
-import Tooltip from '@material-ui/core/Tooltip';
-import Fab from '@material-ui/core/Fab';
-import {
-	meProducersSelector,
-	makePermissionSelector
-} from '../Selectors';
+import ButtonControlBar from '../Controls/ButtonControlBar';
 import IconButton from '@material-ui/core/IconButton';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Collapse from '@material-ui/core/Collapse';
 
 const styles = (theme) =>
 	({
@@ -45,7 +42,7 @@ const styles = (theme) =>
 		button :
 		{
 			flex               : '0 0 auto',
-			margin             : '0.3vmin',
+			margin             : '0.2vmin',
 			borderRadius       : 2,
 			backgroundColor    : 'rgba(255, 255, 255, 0.7)',
 			cursor             : 'pointer',
@@ -53,20 +50,48 @@ const styles = (theme) =>
 			transitionDuration : '0.15s',
 			width              : '5vmin',
 			height             : '5vmin',
-			opacity            : 1,
+			opacity            : 0,
 			'&.visible'        :
 			{
 				opacity : 1
 			}
 		},
-		micButton :
+		collapseButton :
 		{
-			flex         : '0 0 auto',
-			borderRadius : 2,
-			width        : '5vmin',
-			height       : '5vmin',
-			minHeight    : 'auto',
-			opacity      : 1
+			position                     : 'fixed',
+			display                      : 'flex',
+			zIndex                       : 30,
+			backgroundColor              : 'rgba(0,0,0,.1)',
+			color                        : 'white',
+			transitionProperty           : 'left, bottom',
+			transitionDuration           : '0.6s',
+			[theme.breakpoints.up('md')] :
+			{
+				top            : '50%',
+				flexDirection  : 'column',
+				justifyContent : 'center',
+				alignItems     : 'center',
+				transform      : 'translate(0%, -50%)',
+				left           : theme.spacing(1)
+			},
+			[theme.breakpoints.down('sm')] :
+			{
+				flexDirection : 'row',
+				bottom        : theme.spacing(1),
+				left          : '50%',
+				transform     : 'translate(-50%, 0%)'
+			}
+		},
+		expandOpen :
+		{
+			[theme.breakpoints.up('md')] :
+			{
+				left : theme.spacing(10)
+			},
+			[theme.breakpoints.down('sm')] :
+			{
+				bottom : theme.spacing(10)
+			}
 		},
 		icon :
 		{
@@ -99,22 +124,23 @@ const styles = (theme) =>
 const FullScreenView = (props) =>
 {
 	const {
-		roomClient,
 		advancedMode,
 		consumer,
 		toggleConsumerFullscreen,
 		toolbarsVisible,
 		permanentTopBar,
 		classes,
-		settings,
-		me,
-		micProducer,
-		hasAudioPermission,
-		smallContainer,
-		noiseVolume
+		theme
 	} = props;
 
-	const intl = useIntl();
+	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+	const [ expanded, setExpanded ] = React.useState(false);
+
+	const handleExpandClick = () =>
+	{
+		setExpanded(!expanded);
+	};
 
 	if (!consumer)
 		return null;
@@ -125,132 +151,9 @@ const FullScreenView = (props) =>
 		!consumer.remotelyPaused
 	);
 
-	let micState;
-
-	let micTip;
-
-	if (!me.canSendMic || !hasAudioPermission)
-	{
-		micState = 'unsupported';
-		micTip = intl.formatMessage({
-			id             : 'device.audioUnsupported',
-			defaultMessage : 'Audio unsupported'
-		});
-	}
-	else if (!micProducer)
-	{
-		micState = 'off';
-		micTip = intl.formatMessage({
-			id             : 'device.activateAudio',
-			defaultMessage : 'Activate audio'
-		});
-	}
-	else if (!micProducer.locallyPaused &&
-		!micProducer.remotelyPaused &&
-		!settings.audioMuted)
-	{
-		micState = 'on';
-		micTip = intl.formatMessage({
-			id             : 'device.muteAudio',
-			defaultMessage : 'Mute audio'
-		});
-	}
-	else
-	{
-		micState = 'muted';
-		micTip = intl.formatMessage({
-			id             : 'device.unMuteAudio',
-			defaultMessage : 'Unmute audio'
-		});
-	}
-
-	console.log('stefka');
-
 	return (
 		<div className={classes.root}>
 			<div className={classes.controls}>
-				<div className={classes.button} >
-					<React.Fragment>
-						<Tooltip title={micTip} placement='bottom' arrow>
-							{ smallContainer ?
-								<div>
-									<IconButton
-										aria-label={intl.formatMessage({
-											id             : 'device.muteAudio',
-											defaultMessage : 'Mute audio'
-										})}
-										className={classnames(classes.smallContainer, classes.micButton)}
-										disabled={
-											!me.canSendMic ||
-											!hasAudioPermission ||
-											me.audioInProgress
-										}
-										color={micState === 'on' ?
-											settings.voiceActivatedUnmute ?
-												me.isAutoMuted ? 'secondary'
-													: 'primary'
-												: 'default'
-											: 'secondary'
-										}
-										size='small'
-										onClick={() =>
-										{
-											if (micState === 'off')
-												roomClient.updateMic({ start: true });
-											else if (micState === 'on')
-												roomClient.muteMic();
-											else
-												roomClient.unmuteMic();
-										}}
-									>
-										{ (settings.voiceActivatedUnmute && micState === 'on') ?
-											<MicIcon />
-											:
-											<MicOffIcon />
-										}
-									</IconButton>
-								</div>
-								:
-								<div>
-									<Fab
-										aria-label={intl.formatMessage({
-											id             : 'device.muteAudio',
-											defaultMessage : 'Mute audio'
-										})}
-										className={classnames(classes.fab, classes.micButton)}
-										disabled={
-											!me.canSendMic ||
-											!hasAudioPermission ||
-											me.audioInProgress
-										}
-										color={micState === 'on' ?
-											settings.voiceActivatedUnmute ?
-												me.isAutoMuted ? 'secondary' : 'primary'
-												: 'primary'
-											: 'secondary'
-										}
-										size='large'
-										onClick={() =>
-										{
-											if (micState === 'off')
-												roomClient.updateMic({ start: true });
-											else if (micState === 'on')
-												roomClient.muteMic();
-											else
-												roomClient.unmuteMic();
-										}}
-									>
-										{ (settings.voiceActivatedUnmute && micState === 'on') ?
-											<MicIcon />
-											:
-											<MicOffIcon />
-										}
-									</Fab>
-								</div>
-							}
-						</Tooltip>
-					</React.Fragment>
-				</div>
 				<div
 					className={classnames(classes.button, {
 						visible : toolbarsVisible || permanentTopBar
@@ -264,6 +167,29 @@ const FullScreenView = (props) =>
 					<FullScreenExitIcon className={classes.icon} />
 				</div>
 			</div>
+
+			<IconButton
+				className={classnames(classes.collapseButton, {
+					[classes.expandOpen] : expanded
+				})}
+				onClick={handleExpandClick}
+			>
+				{smallScreen?
+					expanded ?
+						<KeyboardArrowDownIcon />
+						:
+						<KeyboardArrowUpIcon />
+					:
+					expanded ?
+						<KeyboardArrowLeftIcon />
+						:
+						<KeyboardArrowRightIcon />
+				}
+			</IconButton>
+
+			<Collapse in={expanded} timeout='auto' unmountOnExit className={classes.buttonControlBar}>
+				<ButtonControlBar />
+			</Collapse>
 
 			<VideoView
 				advancedMode={advancedMode}
@@ -294,49 +220,21 @@ const FullScreenView = (props) =>
 
 FullScreenView.propTypes =
 {
-	roomClient               : PropTypes.any.isRequired,
 	advancedMode             : PropTypes.bool,
 	consumer                 : appPropTypes.Consumer,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toolbarsVisible          : PropTypes.bool,
 	permanentTopBar          : PropTypes.bool,
-	classes                  : PropTypes.object.isRequired.button,
-	settings                 : PropTypes.object,
-	me                       : appPropTypes.Me.isRequired,
-	micProducer              : appPropTypes.Producer,
-	hasAudioPermission       : PropTypes.bool.isRequired,
-	smallContainer           : PropTypes.bool,
-	noiseVolume              : PropTypes.number
+	classes                  : PropTypes.object.isRequired,
+	theme                    : PropTypes.object.isRequired
 };
-
-const canShareAudio = makePermissionSelector(permissions.SHARE_AUDIO);
 
 const mapStateToProps = (state) =>
-{
-	let noise;
-
-	// noise = volume under threshold
-	if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold)
-	{
-		// noise mapped to range 0 ... 10 
-		noise = Math.round((100 + state.peerVolumes[state.me.id]) /
-			(100 + state.settings.noiseThreshold)*10);
-	}
-	// noiseVolume over threshold: no noise but voice
-	else { noise = 10; }
-
-	return {
-		consumer           : state.consumers[state.room.fullScreenConsumer],
-		toolbarsVisible    : state.room.toolbarsVisible,
-		permanentTopBar    : state.settings.permanentTopBar,
-		me                 : state.me,
-		...meProducersSelector(state),
-		settings           : state.settings,
-		noiseVolume        : noise,
-		roomClient         : global.CLIENT,
-		hasAudioPermission : canShareAudio(state)
-	};
-};
+	({
+		consumer        : state.consumers[state.room.fullScreenConsumer],
+		toolbarsVisible : state.room.toolbarsVisible,
+		permanentTopBar : state.settings.permanentTopBar
+	});
 
 const mapDispatchToProps = (dispatch) =>
 	({
@@ -358,9 +256,8 @@ export default connect(
 				prev.consumers[prev.room.fullScreenConsumer] ===
 					next.consumers[next.room.fullScreenConsumer] &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
-				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
-				prev.settings.audioMuted === next.settings.audioMuted
+				prev.settings.permanentTopBar === next.settings.permanentTopBar
 			);
 		}
 	}
-)(withStyles(styles)(FullScreenView));
+)(withStyles(styles, { withTheme: true })(FullScreenView));
