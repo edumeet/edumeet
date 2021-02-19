@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makePeerConsumerSelector } from '../Selectors';
 import PropTypes from 'prop-types';
@@ -155,8 +155,12 @@ const Peer = (props) =>
 		style,
 		smallContainer,
 		windowConsumer,
+		fullScreenConsumer,
 		classes,
-		theme
+		theme,
+		enableLayersSwitch,
+		width,
+		height
 	} = props;
 
 	const micEnabled = (
@@ -190,6 +194,34 @@ const Peer = (props) =>
 		rootStyle.backgroundImage = `url(${peer.picture})`;
 		rootStyle.backgroundSize = 'auto 100%';
 	}
+
+	useEffect(() =>
+	{
+		const handler = setTimeout(() =>
+		{
+			if (!webcamConsumer)
+				return;
+
+			if (windowConsumer === webcamConsumer.id)
+			{
+				// if playing in external window, set the maximum quality levels
+				roomClient.setConsumerPreferredLayersMax(webcamConsumer);
+			}
+			else if (enableLayersSwitch && webcamConsumer?.type !== 'simple'
+				&& fullScreenConsumer !== webcamConsumer.id)
+			{
+				roomClient.adaptConsumerPreferredLayers(webcamConsumer, width, height);
+			}
+		}, 1000);
+
+		return () => { clearTimeout(handler); };
+	}, [
+		enableLayersSwitch,
+		webcamConsumer,
+		windowConsumer,
+		fullScreenConsumer,
+		roomClient, width, height
+	]);
 
 	return (
 		<React.Fragment>
@@ -441,6 +473,8 @@ const Peer = (props) =>
 						videoCodec={webcamConsumer && webcamConsumer.codec}
 						audioScore={micConsumer ? micConsumer.score : null}
 						videoScore={webcamConsumer ? webcamConsumer.score : null}
+						width={width}
+						height={height}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -634,6 +668,8 @@ const Peer = (props) =>
 								videoVisible={videoVisible}
 								videoCodec={consumer && consumer.codec}
 								videoScore={consumer ? consumer.score : null}
+								width={width}
+								height={height}
 							/>
 						</div>
 					</div>
@@ -778,6 +814,8 @@ const Peer = (props) =>
 							videoVisible={screenVisible}
 							videoCodec={screenConsumer && screenConsumer.codec}
 							videoScore={screenConsumer ? screenConsumer.score : null}
+							width={width}
+							height={height}
 						/>
 					</div>
 				</div>
@@ -796,6 +834,7 @@ Peer.propTypes =
 	screenConsumer           : appPropTypes.Consumer,
 	extraVideoConsumers      : PropTypes.arrayOf(appPropTypes.Consumer),
 	windowConsumer           : PropTypes.string,
+	fullScreenConsumer       : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
 	browser                  : PropTypes.object.isRequired,
 	spacing                  : PropTypes.number,
@@ -804,7 +843,10 @@ Peer.propTypes =
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
 	classes                  : PropTypes.object.isRequired,
-	theme                    : PropTypes.object.isRequired
+	theme                    : PropTypes.object.isRequired,
+	enableLayersSwitch       : PropTypes.bool,
+	width                    : PropTypes.number,
+	height                   : PropTypes.number
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -814,11 +856,12 @@ const makeMapStateToProps = (initialState, { id }) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer           : state.peers[id],
+			peer               : state.peers[id],
 			...getPeerConsumers(state, id),
-			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : id === state.room.activeSpeakerId,
-			browser        : state.me.browser
+			windowConsumer     : state.room.windowConsumer,
+			fullScreenConsumer : state.room.fullScreenConsumer,
+			activeSpeaker      : id === state.room.activeSpeakerId,
+			browser            : state.me.browser
 		};
 	};
 
@@ -853,7 +896,11 @@ export default withRoomContext(connect(
 				prev.consumers === next.consumers &&
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.windowConsumer === next.room.windowConsumer &&
-				prev.me.browser === next.me.browser
+				prev.room.fullScreenConsumer === next.room.fullScreenConsumer &&
+				prev.me.browser === next.me.browser &&
+				prev.enableLayersSwitch === next.enableLayersSwitch &&
+				prev.width === next.width &&
+				prev.height === next.height
 			);
 		}
 	}
