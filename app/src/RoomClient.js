@@ -20,6 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
+import { parseScalabilityMode } from 'mediasoup-client';
 
 let createTorrent;
 
@@ -101,6 +102,67 @@ const VIDEO_SVC_ENCODINGS =
 [
 	{ scalabilityMode: 'S3T3', dtx: true }
 ];
+
+/**
+ * Validates the simulcast `encodings` array extracting the resolution scalings
+ * array.
+ * ref. https://www.w3.org/TR/webrtc/#rtp-media-api
+ * 
+ * @param {*} encodings
+ * @returns the resolution scalings array
+ */
+function getResolutionScalings(encodings)
+{
+	const resolutionScalings = [];
+
+	// SVC encodings
+	if (encodings.length === 1)
+	{
+		const { spatialLayers, temporalLayers } =
+			mediasoupClient.parseScalabilityMode(encodings[0].scalabilityMode);
+
+		for (let i=0; i < spatialLayers; i++)
+		{
+			resolutionScalings.push(2 ** (spatialLayers - i - 1));
+		}
+
+		return resolutionScalings;
+	}
+
+	// Simulcast encodings
+	let scaleResolutionDownByDefined = false;
+
+	encodings.forEach((encoding) =>
+	{
+		if (encoding.scaleResolutionDownBy !== undefined)
+		{
+			// at least one scaleResolutionDownBy is defined
+			scaleResolutionDownByDefined = true;
+			// scaleResolutionDownBy must be >= 1.0
+			resolutionScalings.push(Math.max(1.0, encoding.scaleResolutionDownBy));
+		}
+		else
+		{
+			// If encodings contains any encoding whose scaleResolutionDownBy
+			// attribute is defined, set any undefined scaleResolutionDownBy
+			// of the other encodings to 1.0.
+			resolutionScalings.push(1.0);
+		}
+	});
+
+	// If the scaleResolutionDownBy attribues of sendEncodings are
+	// still undefined, initialize each encoding's scaleResolutionDownBy
+	// to 2^(length of sendEncodings - encoding index - 1).
+	if (!scaleResolutionDownByDefined)
+	{
+		encodings.forEach((encoding, index) =>
+		{
+			resolutionScalings[index] = 2 ** (encodings.length - index - 1);
+		});
+	}
+
+	return resolutionScalings;
+}
 
 let store;
 
@@ -1518,6 +1580,8 @@ export default class RoomClient
 					else
 						encodings = VIDEO_SIMULCAST_ENCODINGS;
 
+					const resolutionScalings = getResolutionScalings(encodings);
+
 					this._webcamProducer = await this._sendTransport.produce(
 						{
 							track,
@@ -1530,7 +1594,8 @@ export default class RoomClient
 							{
 								source : 'webcam',
 								width,
-								height
+								height,
+								resolutionScalings
 							}
 						});
 				}
@@ -2168,23 +2233,30 @@ export default class RoomClient
 			return;
 		}
 
-		const { id, preferredSpatialLayer, preferredTemporalLayer, width, height } = consumer;
+		const {
+			id,
+			preferredSpatialLayer,
+			preferredTemporalLayer,
+			width,
+			height,
+			resolutionScalings
+		} = consumer;
 		const availableArea = Math.round(viewportWidth * viewportHeight);
 
 		logger.debug(
-			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" viewportWidth:"%d", viewportHeight:"%d"]',
-			consumer.id, width, height, viewportWidth, viewportHeight);
+			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" resolutionScalings:[%s] viewportWidth:"%d", viewportHeight:"%d"]',
+			consumer.id, width, height, resolutionScalings.join(', '),
+			viewportWidth, viewportHeight);
 
-		let spatialLayer = 0;
+		let newPreferredSpatialLayer = 0;
 
-		for (let i = 0; i < window.config.simulcastEncodings.length; i++)
+		for (let i = 0; i < resolutionScalings.length; i++)
 		{
-			const levelArea = width * height /
-				(window.config.simulcastEncodings[i].scaleResolutionDownBy ** 2);
+			const levelArea = width * height / (resolutionScalings[i] ** 2);
 
 			if (availableArea >= levelArea)
 			{
-				spatialLayer = i;
+				newPreferredSpatialLayer = i;
 			}
 			else
 			{
@@ -2192,27 +2264,27 @@ export default class RoomClient
 			}
 		}
 
-		let temporalLayer = consumer.temporalLayers - 1;
+		let newPreferredTemporalLayer = consumer.temporalLayers - 1;
 
-		if (spatialLayer === 0)
+		if (newPreferredSpatialLayer === 0)
 		{
-			const lowestLevelArea = width * height /
-				(window.config.simulcastEncodings[0].scaleResolutionDownBy ** 2);
+			const lowestLevelArea = width * height / (resolutionScalings[0] ** 2);
 
-			if (availableArea < lowestLevelArea * 0.5)
+			if (availableArea < lowestLevelArea * 0.5 && newPreferredTemporalLayer > 0)
 			{
-				temporalLayer = 1;
+				newPreferredTemporalLayer -= 1;
 			}
-			if (availableArea < lowestLevelArea * 0.25)
+			if (availableArea < lowestLevelArea * 0.25 && newPreferredTemporalLayer > 0)
 			{
-				temporalLayer = 0;
+				newPreferredTemporalLayer -= 1;
 			}
 		}
 
-		if (preferredSpatialLayer !== spatialLayer ||
-			preferredTemporalLayer !== temporalLayer)
+		if (preferredSpatialLayer !== newPreferredSpatialLayer ||
+			preferredTemporalLayer !== newPreferredTemporalLayer)
 		{
-			return this.setConsumerPreferredLayers(id, spatialLayer, temporalLayer);
+			return this.setConsumerPreferredLayers(id,
+				newPreferredSpatialLayer, newPreferredTemporalLayer);
 		}
 
 	}
@@ -2479,6 +2551,7 @@ export default class RoomClient
 							source                 : consumer.appData.source,
 							width                  : consumer.appData.width,
 							height                 : consumer.appData.height,
+							resolutionScalings     : consumer.appData.resolutionScalings,
 							spatialLayers          : spatialLayers,
 							temporalLayers         : temporalLayers,
 							preferredSpatialLayer  : spatialLayers - 1,
