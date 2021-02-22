@@ -267,7 +267,7 @@ module.exports = async function(rooms, peers, config)
 
 			await collect(registry);
 			res.set('Content-Type', registry.contentType);
-			const data = registry.metrics();
+			const data = await registry.metrics();
 
 			res.end(data);
 		});
