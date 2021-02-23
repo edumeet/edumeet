@@ -777,6 +777,7 @@ export default class RoomClient
 				chatActions.addUserMessage(chatMessage.text));
 
 			await this.sendRequest('chatMessage', { chatMessage });
+
 		}
 		catch (error)
 		{
@@ -856,6 +857,13 @@ export default class RoomClient
 		const blob = new Blob([ html.innerHTML ], { type: 'text/html;charset=utf-8' });
 
 		saveAs(blob, fileName);
+	}
+
+	sortChat(order)
+	{
+		store.dispatch(
+			chatActions.sortChat(order)
+		);
 	}
 
 	handleDownload(magnetUri)

@@ -20,3 +20,9 @@ export const clearChat = () =>
 	({
 		type : 'CLEAR_CHAT'
 	});
+
+export const sortChat = (order) =>
+	({
+		type    : 'SORT_CHAT',
+		payload : { order }
+	});

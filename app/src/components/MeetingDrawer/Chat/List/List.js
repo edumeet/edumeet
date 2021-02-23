@@ -29,31 +29,10 @@ class MessageList extends React.Component
 		this.node.scrollTop = this.node.scrollHeight;
 	}
 
-	getSnapshotBeforeUpdate()
+	componentDidUpdate()
 	{
-		return this.node.scrollTop
-			+ this.node.offsetHeight === this.node.scrollHeight;
-	}
-
-	shouldComponentUpdate(nextProps)
-	{
-		if (
-			nextProps.chat.length !== this.props.chat.length ||
-			nextProps.files !== this.props.files
-		)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	componentDidUpdate(prevProps, prevState, shouldScroll)
-	{
-		if (shouldScroll)
-		{
-			this.node.scrollTop = this.node.scrollHeight;
-		}
+		this.node.scrollTop = (this.props.chat.order === 'asc') ?
+			this.node.scrollHeight : 0;
 	}
 
 	getTimeString(time)
@@ -73,9 +52,26 @@ class MessageList extends React.Component
 			intl
 		} = this.props;
 
-		const items = [ ...chat, ...files ];
+		const items = [ ...chat.messages, ...files ];
 
 		items.sort((a, b) => (a.time < b.time ? -1: 1));
+
+		if (items.length > 0)
+		{
+			switch (chat.order)
+			{
+				case 'asc':
+					items.sort();
+					break;
+
+				case 'desc':
+					items.reverse();
+					break;
+
+				default:
+					break;
+			}
+		}
 
 		return (
 			<React.Fragment>
@@ -162,7 +158,7 @@ class MessageList extends React.Component
 
 MessageList.propTypes =
 {
-	chat      : PropTypes.array,
+	chat      : PropTypes.object,
 	myPicture : PropTypes.string,
 	classes   : PropTypes.object.isRequired,
 

@@ -22,6 +22,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
 import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined';
+import SortIcon from '@material-ui/icons/Sort';
 
 const styles = (theme) =>
 	({
@@ -254,6 +255,31 @@ const ChatInput = (props) =>
 						{/* /Format buttons */}
 					</Grid>
 					<Grid item>
+						{/* Button sort chat */}
+						<React.Fragment>
+							{chat.order === 'asc' ?
+								<IconButton
+									className={classes.IconButton}
+									// aria-label='Share gallery file'
+									component='span'
+									// disabled={chat.messages.length < 1}
+									onClick={() => roomClient.sortChat('desc')}
+								>
+									<SortIcon style={{ transform: 'rotateX(180deg) rotateY(180deg)' }} />
+								</IconButton>
+								:
+								<IconButton
+									className={classes.IconButton}
+									// aria-label='Share gallery file'
+									component='span'
+									disabled={chat.messages.length < 1}
+									onClick={() => roomClient.sortChat('asc')}
+								>
+									<SortIcon style={{ transform: 'rotateY(180deg)' }} />
+								</IconButton>
+							}
+						</React.Fragment>
+						{/* /Button sort chat */}
 
 						{/* Button save chat */}
 						<React.Fragment>

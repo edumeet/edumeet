@@ -3,7 +3,13 @@ import
 	createNewMessage
 } from './helper';
 
-const chat = (state = [], action) =>
+const initialState =
+{
+	messages : [],
+	order    : 'asc'
+};
+
+const chat = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
@@ -13,26 +19,33 @@ const chat = (state = [], action) =>
 
 			const message = createNewMessage(text, 'client', 'Me', undefined);
 
-			return [ ...state, message ];
+			return { ...state, messages: [ ...state.messages, message ] };
 		}
 
 		case 'ADD_NEW_RESPONSE_MESSAGE':
 		{
 			const { message } = action.payload;
 
-			return [ ...state, message ];
+			return { ...state, messages: [ ...state.messages, message ] };
 		}
 
 		case 'ADD_CHAT_HISTORY':
 		{
 			const { chatHistory } = action.payload;
 
-			return [ ...state, ...chatHistory ];
+			return { ...state, messages: chatHistory };
 		}
 
 		case 'CLEAR_CHAT':
 		{
-			return [];
+			return { ...state, messages: [] };
+		}
+
+		case 'SORT_CHAT':
+		{
+			const { order } = action.payload;
+
+			return { ...state, order: order };
 		}
 
 		default:
