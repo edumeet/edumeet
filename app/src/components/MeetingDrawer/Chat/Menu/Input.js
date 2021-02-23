@@ -170,6 +170,7 @@ const ChatInput = (props) =>
 							blockRenderMap={singleLinePlugin.blockRenderMap}
 						/>
 					</div>
+					{/* /Input field */}
 					{/* Button send message */}
 					<IconButton
 						size='small'
@@ -188,9 +189,9 @@ const ChatInput = (props) =>
 					<Divider orientation='horizontal'/>
 				</Grid>
 
-				{/* Format buttons */}
 				<Grid item container justify='space-between' alignItems='center'>
 					<Grid item>
+						{/* Format buttons */}
 						<IconButton
 							size='small'
 							classes={{ sizeSmall: classes.icon }}
@@ -265,6 +266,7 @@ const ChatInput = (props) =>
 
 							</IconButton>
 						</React.Fragment>
+						{/* /Button save chat */}
 
 						{/* Button for file sharing */}
 						<React.Fragment>
