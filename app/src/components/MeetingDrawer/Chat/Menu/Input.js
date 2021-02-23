@@ -8,7 +8,9 @@ import { permissions } from '../../../../permissions';
 import { makePermissionSelector } from '../../../Selectors';
 import Paper from '@material-ui/core/Paper';
 import { Grid } from '@material-ui/core';
-import { Editor, EditorState, RichUtils, ContentState } from 'draft-js';
+import { EditorState, RichUtils, ContentState } from 'draft-js';
+import Editor from 'draft-js-plugins-editor';
+import createSingleLinePlugin from 'draft-js-single-line-plugin';
 import { stateToHTML } from 'draft-js-export-html';
 import 'draft-js/dist/Draft.css';
 import InputBase from '@material-ui/core/InputBase';
@@ -53,6 +55,11 @@ const styles = (theme) =>
 
 const ChatInput = (props) =>
 {
+
+	const singleLinePlugin = createSingleLinePlugin();
+
+	const plugins = [ singleLinePlugin ];
+
 	const intl = useIntl();
 
 	const [ message, setMessage ] = useState('');
@@ -100,7 +107,13 @@ const ChatInput = (props) =>
 		setEditorState(RichUtils.toggleInlineStyle(editorState, 'ITALIC'));
 
 	const handleClearInput = () =>
-		setEditorState(EditorState.push(editorState, ContentState.createFromText('')));
+	{
+		setEditorState(EditorState.push(
+			editorState,
+			ContentState.createFromText(''),
+			'remove-range')
+		);
+	};
 
 	const {
 		roomClient,
@@ -117,19 +130,26 @@ const ChatInput = (props) =>
 
 	} = props;
 
+	const handleIsMessageEmpty = () =>
+		((message === '<br>') ? true : false);
+
 	const handleSendMessage = () =>
 	{
-		if (message && message !== '')
+		if (!handleIsMessageEmpty())
 		{
 			const sendMessage = createNewMessage(message, 'response', displayName, picture);
 
 			roomClient.sendChatMessage(sendMessage);
 
-			setMessage('');
-
 			handleClearInput();
+
+			// eslint-disable-next-line
+			console.log('setMessage', message)
 		}
 	};
+
+	const handleReturn = (e) =>
+		handleSendMessage();
 
 	useEffect(() =>
 	{
@@ -196,7 +216,12 @@ const ChatInput = (props) =>
 							// eslint-disable-next-line
 							handleKeyCommand={handleKeyCommand}
 							onChange={setEditorState}
+							// eslint-disable-next-line
+							handleReturn={handleReturn}
 							// autoFocus
+							plugins={plugins}
+							blockRenderMap={singleLinePlugin.blockRenderMap}
+
 						/>
 					</div>
 
@@ -206,7 +231,7 @@ const ChatInput = (props) =>
 						classes={{ sizeSmall: classes.icon }}
 						color='primary'
 						aria-label='Send'
-						// disabled={!canChat || !message}
+						disabled={!canChat || handleIsMessageEmpty()}
 						onClick={handleSendMessage}
 					>
 						<SendIcon />
@@ -225,7 +250,7 @@ const ChatInput = (props) =>
 						<IconButton
 							size='small'
 							classes={{ sizeSmall: classes.icon }}
-							// disabled={disabled}
+							disabled={!canChat}
 							// aria-label='Share gallery file'
 							component='span'
 							onClick={handleBoldClick}
@@ -235,7 +260,7 @@ const ChatInput = (props) =>
 						<IconButton
 							size='small'
 							classes={{ sizeSmall: classes.icon }}
-							// disabled={disabled}
+							disabled={!canChat}
 							// aria-label='Share gallery file'
 							component='span'
 							onClick={handleItalicClick}
@@ -245,7 +270,7 @@ const ChatInput = (props) =>
 						<IconButton
 							size='small'
 							classes={{ sizeSmall: classes.icon }}
-							// disabled={disabled}
+							disabled={!canChat}
 							// aria-label='Share gallery file'
 							component='span'
 							onClick={handleUnderlineClick}
@@ -262,7 +287,7 @@ const ChatInput = (props) =>
 									className={classes.IconButton}
 									// aria-label='Share gallery file'
 									component='span'
-									// disabled={chat.messages.length < 1}
+									disabled={chat.messages.length < 1}
 									onClick={() => roomClient.sortChat('desc')}
 								>
 									<SortIcon style={{ transform: 'rotateX(180deg) rotateY(180deg)' }} />
