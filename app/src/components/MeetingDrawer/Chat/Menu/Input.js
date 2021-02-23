@@ -176,7 +176,10 @@ const ChatInput = (props) =>
 						size='small'
 						classes={{ sizeSmall: classes.icon }}
 						color='primary'
-						aria-label='Send'
+						aria-label={intl.formatMessage({
+							id             : 'label.send',
+							defaultMessage : 'Send'
+						})}
 						disabled={!canChat || handleIsMessageEmpty()}
 						onClick={handleSendMessage}
 					>
@@ -196,7 +199,10 @@ const ChatInput = (props) =>
 							size='small'
 							classes={{ sizeSmall: classes.icon }}
 							disabled={!canChat}
-							// aria-label='Share gallery file'
+							aria-label={intl.formatMessage({
+								id             : 'label.bold',
+								defaultMessage : 'Bold'
+							})}
 							component='span'
 							onClick={handleBoldClick}
 						>
@@ -206,7 +212,11 @@ const ChatInput = (props) =>
 							size='small'
 							classes={{ sizeSmall: classes.icon }}
 							disabled={!canChat}
-							// aria-label='Share gallery file'
+							aria-label={intl.formatMessage({
+								id             : 'label.italic',
+								defaultMessage : 'Italic'
+							})}
+
 							component='span'
 							onClick={handleItalicClick}
 						>
@@ -216,7 +226,11 @@ const ChatInput = (props) =>
 							size='small'
 							classes={{ sizeSmall: classes.icon }}
 							disabled={!canChat}
-							// aria-label='Share gallery file'
+							aria-label={intl.formatMessage({
+								id             : 'label.underline',
+								defaultMessage : 'Underline'
+							})}
+
 							component='span'
 							onClick={handleUnderlineClick}
 						>
@@ -230,7 +244,11 @@ const ChatInput = (props) =>
 							{chat.order === 'asc' ?
 								<IconButton
 									className={classes.IconButton}
-									// aria-label='Share gallery file'
+									aria-label={intl.formatMessage({
+										id             : 'label.sortAscending',
+										defaultMessage : 'Sort ascending'
+									})}
+
 									component='span'
 									disabled={chat.messages.length < 1}
 									onClick={() => roomClient.sortChat('desc')}
@@ -240,7 +258,10 @@ const ChatInput = (props) =>
 								:
 								<IconButton
 									className={classes.IconButton}
-									// aria-label='Share gallery file'
+									aria-label={intl.formatMessage({
+										id             : 'label.sortDescending',
+										defaultMessage : 'Sort descending'
+									})}
 									component='span'
 									disabled={chat.messages.length < 1}
 									onClick={() => roomClient.sortChat('asc')}
@@ -257,7 +278,11 @@ const ChatInput = (props) =>
 								size='small'
 								classes={{ sizeSmall: classes.icon }}
 								disabled={!canShareFiles || !canShare || chatItemsLength === 0}
-								aria-label='Share gallery file'
+								aria-label={intl.formatMessage({
+									id             : 'label.saveChat',
+									defaultMessage : 'Save chat'
+								})}
+
 								component='span'
 								onClick={() => roomClient.saveChat()
 								}
@@ -283,7 +308,10 @@ const ChatInput = (props) =>
 									size='small'
 									classes={{ sizeSmall: classes.icon }}
 									color='primary'
-									aria-label='Share file'
+									aria-label={intl.formatMessage({
+										id             : 'label.shareFile',
+										defaultMessage : 'Share file'
+									})}
 									disabled={!canShareFiles || !canShare}
 									component='span'
 								// onClick={(e) => (e.target.value = null)}
@@ -314,7 +342,10 @@ const ChatInput = (props) =>
 									size='small'
 									classes={{ sizeSmall: classes.icon }}
 									disabled={!canShareFiles || !canShare}
-									aria-label='Share gallery file'
+									aria-label={intl.formatMessage({
+										id             : 'label.shareGalleryFile',
+										defaultMessage : 'Share gallery file'
+									})}
 									component='span'
 								>
 									<PhotoCamera />
