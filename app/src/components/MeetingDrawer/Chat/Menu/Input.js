@@ -13,7 +13,6 @@ import Editor from 'draft-js-plugins-editor';
 import createSingleLinePlugin from 'draft-js-single-line-plugin';
 import { stateToHTML } from 'draft-js-export-html';
 import 'draft-js/dist/Draft.css';
-import InputBase from '@material-ui/core/InputBase';
 import Divider from '@material-ui/core/Divider';
 
 import IconButton from '@material-ui/core/IconButton';
@@ -30,14 +29,13 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			padding      : theme.spacing(1),
+			padding      : theme.spacing(0),
 			display      : 'flex',
 			alignItems   : 'center',
 			borderRadius : 0
 		},
 		input :
 		{
-			// marginLeft     : 8,
 			flex           : 1,
 			'&[type=file]' : {
 				display : 'none'
@@ -55,18 +53,19 @@ const styles = (theme) =>
 
 const ChatInput = (props) =>
 {
-
-	const singleLinePlugin = createSingleLinePlugin();
-
-	const plugins = [ singleLinePlugin ];
-
 	const intl = useIntl();
-
-	const [ message, setMessage ] = useState('');
 
 	const [ editorState, setEditorState ] = React.useState(
 		() => EditorState.createEmpty()
 	);
+
+	const [ message, setMessage ] = useState('');
+
+	useEffect(() =>
+	{
+		setMessage(stateToHTML(editorState.getCurrentContent(), { defaultBlockTag: null }));
+
+	}, [ editorState ]);
 
 	const createNewMessage = (text, sender, name, picture) =>
 		({
@@ -78,10 +77,19 @@ const ChatInput = (props) =>
 			picture
 		});
 
-	/* 
-	const handleMessage = (e) =>
-		setMessage(e);
-	 */
+	const {
+		roomClient,
+		displayName,
+		picture,
+		canChat,
+		canShare,
+		classes,
+		browser,
+		canShareFiles,
+		chat,
+		files
+
+	} = props;
 
 	const handleKeyCommand = (command) =>
 	{
@@ -115,21 +123,6 @@ const ChatInput = (props) =>
 		);
 	};
 
-	const {
-		roomClient,
-		displayName,
-		picture,
-		canChat,
-		canShare,
-		classes,
-		browser,
-		canShareFiles,
-		list,
-		chat,
-		files
-
-	} = props;
-
 	const handleIsMessageEmpty = () =>
 		((message === '<br>') ? true : false);
 
@@ -142,24 +135,11 @@ const ChatInput = (props) =>
 			roomClient.sendChatMessage(sendMessage);
 
 			handleClearInput();
-
-			// eslint-disable-next-line
-			console.log('setMessage', message)
 		}
 	};
 
-	const handleReturn = (e) =>
+	const handleReturn = () =>
 		handleSendMessage();
-
-	useEffect(() =>
-	{
-		const res = stateToHTML(editorState.getCurrentContent(), {
-			defaultBlockTag : null
-		});
-
-		setMessage(res);
-
-	}, [ editorState ]);
 
 	const handleFile = async (event) =>
 	{
@@ -169,41 +149,11 @@ const ChatInput = (props) =>
 
 	const chatItemsLength = files.length + chat.length;
 
+	const singleLinePlugin = createSingleLinePlugin();
+
 	return (
 		<Paper className={classes.root}>
-			{/* Input message field */}
-			{/*
-			<InputBase
-				className={classes.input}
-				placeholder={intl.formatMessage({
-					id             : 'label.chatInput',
-					defaultMessage : 'Enter chat message...'
-				})}
-				value={message || ''}
-				disabled={!canChat}
-				onChange={handleMessage}
-				onKeyPress={(ev) =>
-				{
-					if (ev.key === 'Enter')
-					{
-						ev.preventDefault();
-
-						if (message && message !== '')
-						{
-							const sendMessage = createNewMessage(message, 'response', displayName, picture);
-
-							roomClient.sendChatMessage(sendMessage);
-
-							setMessage('');
-						}
-					}
-				}}
-				autoFocus
-			/>
-			*/}
-
 			<Grid container direction='column'>
-
 				<Grid item container direction='row' alignItems='center'>
 					{/* Input field */}
 					<div className={classes.input}>
@@ -213,18 +163,13 @@ const ChatInput = (props) =>
 								defaultMessage : 'Enter chat message...'
 							})}
 							editorState={editorState}
-							// eslint-disable-next-line
-							handleKeyCommand={handleKeyCommand}
 							onChange={setEditorState}
-							// eslint-disable-next-line
+							handleKeyCommand={handleKeyCommand}
 							handleReturn={handleReturn}
-							// autoFocus
-							plugins={plugins}
+							plugins={[ singleLinePlugin ]}
 							blockRenderMap={singleLinePlugin.blockRenderMap}
-
 						/>
 					</div>
-
 					{/* Button send message */}
 					<IconButton
 						size='small'
@@ -237,7 +182,6 @@ const ChatInput = (props) =>
 						<SendIcon />
 					</IconButton>
 					{/* /Button send message */}
-
 				</Grid>
 
 				<Grid item>
@@ -245,7 +189,7 @@ const ChatInput = (props) =>
 				</Grid>
 
 				{/* Format buttons */}
-				<Grid item container justify='space-between'>
+				<Grid item container justify='space-between' alignItems='center'>
 					<Grid item>
 						<IconButton
 							size='small'
@@ -348,6 +292,7 @@ const ChatInput = (props) =>
 								</IconButton>
 							</label>
 						</React.Fragment>
+						{/* /Button for file sharing */}
 
 						{/* Button for gallery file sharing (mobile) */}
 						{(browser.platform === 'mobile') && canShareFiles && canShare &&
@@ -374,14 +319,11 @@ const ChatInput = (props) =>
 								</IconButton>
 							</label>
 						</React.Fragment>
-
 						}
+						{/* Button for gallery file sharing (mobile) */}
 					</Grid>
-
 				</Grid>
-
 			</Grid>
-
 		</Paper>
 	);
 };
@@ -396,7 +338,6 @@ ChatInput.propTypes =
 	classes       : PropTypes.object.isRequired,
 	browser       : PropTypes.object.isRequired,
 	canShareFiles : PropTypes.bool.isRequired,
-	list          : PropTypes.isRequired,
 	chat          : PropTypes.isRequired,
 	files         : PropTypes.isRequired
 };
