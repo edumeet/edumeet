@@ -25,27 +25,29 @@ import FormatItalicIcon from '@material-ui/icons/FormatItalic';
 import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined';
 import SortIcon from '@material-ui/icons/Sort';
 
+import Tooltip from '@material-ui/core/Tooltip';
+
 const styles = (theme) =>
 	({
 		root :
-		{
-			padding      : theme.spacing(0),
-			display      : 'flex',
-			alignItems   : 'center',
-			borderRadius : 0
-		},
+	{
+		padding      : theme.spacing(0),
+		display      : 'flex',
+		alignItems   : 'center',
+		borderRadius : 0
+	},
 		input :
-		{
-			flex           : 1,
-			'&[type=file]' : {
-				display : 'none'
-			},
-			padding         : '8px 4px',
-			'line-height'   : '20px',
-			'font-size'     : '16px',
-			'width'         : '50px',
-			'overflow-wrap' : 'break-word'
+	{
+		flex           : 1,
+		'&[type=file]' : {
+			display : 'none'
 		},
+		padding         : '8px 4px',
+		'line-height'   : '20px',
+		'font-size'     : '16px',
+		'width'         : '50px',
+		'overflow-wrap' : 'break-word'
+	},
 		icon : {
 			padding : theme.spacing(1)
 		}
@@ -172,19 +174,29 @@ const ChatInput = (props) =>
 					</div>
 					{/* /Input field */}
 					{/* Button send message */}
-					<IconButton
-						size='small'
-						classes={{ sizeSmall: classes.icon }}
-						color='primary'
-						aria-label={intl.formatMessage({
+					<Tooltip
+						title={intl.formatMessage({
 							id             : 'label.send',
 							defaultMessage : 'Send'
 						})}
-						disabled={!canChat || handleIsMessageEmpty()}
-						onClick={handleSendMessage}
+						placement='top'
+						enterDelay='700'
+						enterNextDelay='700'
 					>
-						<SendIcon />
-					</IconButton>
+						<IconButton
+							size='small'
+							classes={{ sizeSmall: classes.icon }}
+							color='primary'
+							aria-label={intl.formatMessage({
+								id             : 'label.send',
+								defaultMessage : 'Send'
+							})}
+							disabled={!canChat || handleIsMessageEmpty()}
+							onClick={handleSendMessage}
+						>
+							<SendIcon />
+						</IconButton>
+					</Tooltip>
 					{/* /Button send message */}
 				</Grid>
 
@@ -193,103 +205,171 @@ const ChatInput = (props) =>
 				</Grid>
 
 				<Grid item container justify='space-between' alignItems='center'>
+					{/* Format buttons */}
 					<Grid item>
-						{/* Format buttons */}
-						<IconButton
-							size='small'
-							classes={{ sizeSmall: classes.icon }}
-							disabled={!canChat}
-							aria-label={intl.formatMessage({
+						<Tooltip
+							title={intl.formatMessage({
 								id             : 'label.bold',
 								defaultMessage : 'Bold'
 							})}
-							component='span'
-							onClick={handleBoldClick}
+							placement='top'
+							enterDelay='700'
+							enterNextDelay='700'
 						>
-							<FormatBoldIcon />
-						</IconButton>
-						<IconButton
-							size='small'
-							classes={{ sizeSmall: classes.icon }}
-							disabled={!canChat}
-							aria-label={intl.formatMessage({
+							<IconButton
+								size='small'
+								classes={{ sizeSmall: classes.icon }}
+								disabled={!canChat}
+								aria-label={intl.formatMessage({
+									id             : 'label.bold',
+									defaultMessage : 'Bold'
+								})}
+								component='span'
+								onClick={handleBoldClick}
+							>
+								<FormatBoldIcon />
+							</IconButton>
+
+						</Tooltip>
+
+						<Tooltip
+							title={intl.formatMessage({
 								id             : 'label.italic',
 								defaultMessage : 'Italic'
 							})}
-
-							component='span'
-							onClick={handleItalicClick}
+							placement='top'
+							enterDelay='700'
+							enterNextDelay='700'
 						>
-							<FormatItalicIcon />
-						</IconButton>
-						<IconButton
-							size='small'
-							classes={{ sizeSmall: classes.icon }}
-							disabled={!canChat}
-							aria-label={intl.formatMessage({
+							<IconButton
+								size='small'
+								classes={{ sizeSmall: classes.icon }}
+								disabled={!canChat}
+								aria-label={intl.formatMessage({
+									id             : 'label.italic',
+									defaultMessage : 'Italic'
+								})}
+
+								component='span'
+								onClick={handleItalicClick}
+							>
+								<FormatItalicIcon />
+							</IconButton>
+						</Tooltip>
+
+						<Tooltip
+							title={intl.formatMessage({
 								id             : 'label.underline',
 								defaultMessage : 'Underline'
 							})}
-
-							component='span'
-							onClick={handleUnderlineClick}
+							placement='top'
+							enterDelay='700'
+							enterNextDelay='700'
 						>
-							<FormatUnderlinedIcon />
-						</IconButton>
-						{/* /Format buttons */}
+							<IconButton
+								size='small'
+								classes={{ sizeSmall: classes.icon }}
+								disabled={!canChat}
+								aria-label={intl.formatMessage({
+									id             : 'label.underline',
+									defaultMessage : 'Underline'
+								})}
+
+								component='span'
+								onClick={handleUnderlineClick}
+							>
+								<FormatUnderlinedIcon />
+							</IconButton>
+
+						</Tooltip>
 					</Grid>
+					{/* /Format buttons */}
+
+					{/* Actions buttons */}
 					<Grid item>
 						{/* Button sort chat */}
 						<React.Fragment>
 							{chat.order === 'asc' ?
-								<IconButton
-									className={classes.IconButton}
-									aria-label={intl.formatMessage({
+
+								<Tooltip
+									title={intl.formatMessage({
 										id             : 'label.sortAscending',
 										defaultMessage : 'Sort ascending'
 									})}
-
-									component='span'
-									disabled={chat.messages.length < 1}
-									onClick={() => roomClient.sortChat('desc')}
+									placement='top'
+									enterDelay='700'
+									enterNextDelay='700'
 								>
-									<SortIcon style={{ transform: 'rotateX(180deg) rotateY(180deg)' }} />
-								</IconButton>
+									<IconButton
+										className={classes.IconButton}
+										aria-label={intl.formatMessage({
+											id             : 'label.sortAscending',
+											defaultMessage : 'Sort ascending'
+										})}
+
+										component='span'
+										disabled={chat.messages.length < 1}
+										onClick={() => roomClient.sortChat('desc')}
+									>
+										<SortIcon style={{ transform: 'rotateX(180deg) rotateY(180deg)' }} />
+									</IconButton>
+								</Tooltip>
 								:
-								<IconButton
-									className={classes.IconButton}
-									aria-label={intl.formatMessage({
+
+								<Tooltip
+									title={intl.formatMessage({
 										id             : 'label.sortDescending',
 										defaultMessage : 'Sort descending'
 									})}
-									component='span'
-									disabled={chat.messages.length < 1}
-									onClick={() => roomClient.sortChat('asc')}
+									placement='top'
+									enterDelay='700'
+									enterNextDelay='700'
 								>
-									<SortIcon style={{ transform: 'rotateY(180deg)' }} />
-								</IconButton>
+									<IconButton
+										className={classes.IconButton}
+										aria-label={intl.formatMessage({
+											id             : 'label.sortDescending',
+											defaultMessage : 'Sort descending'
+										})}
+										component='span'
+										disabled={chat.messages.length < 1}
+										onClick={() => roomClient.sortChat('asc')}
+									>
+										<SortIcon style={{ transform: 'rotateY(180deg)' }} />
+									</IconButton>
+								</Tooltip>
 							}
 						</React.Fragment>
 						{/* /Button sort chat */}
 
 						{/* Button save chat */}
 						<React.Fragment>
-							<IconButton
-								size='small'
-								classes={{ sizeSmall: classes.icon }}
-								disabled={!canShareFiles || !canShare || chatItemsLength === 0}
-								aria-label={intl.formatMessage({
+
+							<Tooltip
+								title={intl.formatMessage({
 									id             : 'label.saveChat',
-									defaultMessage : 'Save chat'
+									defaultMessage : 'Save Chat'
 								})}
-
-								component='span'
-								onClick={() => roomClient.saveChat()
-								}
+								placement='top'
+								enterDelay='700'
+								enterNextDelay='700'
 							>
-								<SaveIcon />
+								<IconButton
+									size='small'
+									classes={{ sizeSmall: classes.icon }}
+									disabled={!canShareFiles || !canShare || chatItemsLength === 0}
+									aria-label={intl.formatMessage({
+										id             : 'label.saveChat',
+										defaultMessage : 'Save chat'
+									})}
 
-							</IconButton>
+									component='span'
+									onClick={() => roomClient.saveChat()
+									}
+								>
+									<SaveIcon />
+								</IconButton>
+							</Tooltip>
 						</React.Fragment>
 						{/* /Button save chat */}
 
@@ -304,22 +384,33 @@ const ChatInput = (props) =>
 								onChange={handleFile}
 							/>
 							<label htmlFor='contained-button-file'>
-								<IconButton
-									size='small'
-									classes={{ sizeSmall: classes.icon }}
-									color='primary'
-									aria-label={intl.formatMessage({
+								<Tooltip
+									title={intl.formatMessage({
 										id             : 'label.shareFile',
 										defaultMessage : 'Share file'
 									})}
-									disabled={!canShareFiles || !canShare}
-									component='span'
-								// onClick={(e) => (e.target.value = null)}
+									placement='top'
+									enterDelay='700'
+									enterNextDelay='700'
 								>
-									<AttachFileIcon
+
+									<IconButton
 										size='small'
-									/>
-								</IconButton>
+										classes={{ sizeSmall: classes.icon }}
+										color='primary'
+										aria-label={intl.formatMessage({
+											id             : 'label.shareFile',
+											defaultMessage : 'Share file'
+										})}
+										disabled={!canShareFiles || !canShare}
+										component='span'
+										// onClick={(e) => (e.target.value = null)}
+									>
+										<AttachFileIcon
+											size='small'
+										/>
+									</IconButton>
+								</Tooltip>
 							</label>
 						</React.Fragment>
 						{/* /Button for file sharing */}
@@ -338,23 +429,35 @@ const ChatInput = (props) =>
 
 							<label htmlFor='share-files-gallery-button'>
 
-								<IconButton
-									size='small'
-									classes={{ sizeSmall: classes.icon }}
-									disabled={!canShareFiles || !canShare}
-									aria-label={intl.formatMessage({
+								<Tooltip
+									title={intl.formatMessage({
 										id             : 'label.shareGalleryFile',
 										defaultMessage : 'Share gallery file'
 									})}
-									component='span'
+
+									placement='top'
+									enterDelay='700'
+									enterNextDelay='700'
 								>
-									<PhotoCamera />
-								</IconButton>
+									<IconButton
+										size='small'
+										classes={{ sizeSmall: classes.icon }}
+										disabled={!canShareFiles || !canShare}
+										aria-label={intl.formatMessage({
+											id             : 'label.shareGalleryFile',
+											defaultMessage : 'Share gallery file'
+										})}
+										component='span'
+									>
+										<PhotoCamera />
+									</IconButton>
+								</Tooltip>
 							</label>
 						</React.Fragment>
 						}
-						{/* Button for gallery file sharing (mobile) */}
+						{/* /Button for gallery file sharing (mobile) */}
 					</Grid>
+					{/* /Actions buttons */}
 				</Grid>
 			</Grid>
 		</Paper>
