@@ -299,4 +299,4 @@ export default withRoomContext(connect(
 			);
 		}
 	}
-)(withStyles(styles, { withTheme: true })(FullScreenView));
+)(withStyles(styles, { withTheme: true })(FullScreenView)));
