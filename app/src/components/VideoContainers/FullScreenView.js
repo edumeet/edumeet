@@ -137,9 +137,19 @@ const FullScreenView = (props) =>
 
 	const [ expanded, setExpanded ] = React.useState(false);
 
+	let timer = null;
+
 	const handleExpandClick = () =>
 	{
 		setExpanded(!expanded);
+	};
+
+	const handleAutoHide = (logical) =>
+	{
+		logical ?
+			timer = setTimeout(() => setExpanded(false), 10000)
+			:
+			clearTimeout(timer);
 	};
 
 	if (!consumer)
@@ -167,29 +177,33 @@ const FullScreenView = (props) =>
 					<FullScreenExitIcon className={classes.icon} />
 				</div>
 			</div>
-
-			<IconButton
-				className={classnames(classes.collapseButton, {
-					[classes.expandOpen] : expanded
-				})}
-				onClick={handleExpandClick}
+			<div
+				onMouseEnter={() => handleAutoHide(false)}
+				onMouseLeave={() => handleAutoHide(true)}
 			>
-				{smallScreen?
-					expanded ?
-						<KeyboardArrowDownIcon />
+				<IconButton
+					className={classnames(classes.collapseButton, {
+						[classes.expandOpen] : expanded
+					})}
+					onClick={handleExpandClick}
+				>
+					{smallScreen?
+						expanded ?
+							<KeyboardArrowDownIcon />
+							:
+							<KeyboardArrowUpIcon />
 						:
-						<KeyboardArrowUpIcon />
-					:
-					expanded ?
-						<KeyboardArrowLeftIcon />
-						:
-						<KeyboardArrowRightIcon />
-				}
-			</IconButton>
+						expanded ?
+							<KeyboardArrowLeftIcon />
+							:
+							<KeyboardArrowRightIcon />
+					}
+				</IconButton>
 
-			<Collapse in={expanded} timeout='auto' unmountOnExit className={classes.buttonControlBar}>
-				<ButtonControlBar />
-			</Collapse>
+				<Collapse in={expanded} timeout='auto' unmountOnExit className={classes.buttonControlBar}>
+					<ButtonControlBar />
+				</Collapse>
+			</div>
 
 			<VideoView
 				advancedMode={advancedMode}
