@@ -1480,6 +1480,8 @@ class Room extends EventEmitter
 
 				this._chatHistory = [];
 
+				this._fileHistory = [];
+
 				// Spread to others
 				this._notification(peer.socket, 'moderator:clearChat', null, true);
 
@@ -1613,6 +1615,7 @@ class Room extends EventEmitter
 				break;
 			}
 
+			/*
 			case 'moderator:clearFileSharing':
 			{
 				if (!this._hasPermission(peer, MODERATE_FILES))
@@ -1628,6 +1631,7 @@ class Room extends EventEmitter
 
 				break;
 			}
+			*/
 
 			case 'raisedHand':
 			{

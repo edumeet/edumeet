@@ -1749,6 +1749,7 @@ export default class RoomClient
 			roomActions.setClearChatInProgress(false));
 	}
 
+	/*
 	async clearFileSharing()
 	{
 		logger.debug('clearFileSharing()');
@@ -1770,6 +1771,7 @@ export default class RoomClient
 		store.dispatch(
 			roomActions.setClearFileSharingInProgress(false));
 	}
+	*/
 
 	async givePeerRole(peerId, roleId)
 	{
@@ -2889,6 +2891,7 @@ export default class RoomClient
 						break;
 					}
 
+					/*
 					case 'moderator:clearFileSharing':
 					{
 						store.dispatch(fileActions.clearFiles());
@@ -2903,6 +2906,7 @@ export default class RoomClient
 
 						break;
 					}
+					*/
 
 					case 'producerScore':
 					{

@@ -49,7 +49,7 @@ const ChatModerator = (props) =>
 	const handleClearChat = () =>
 	{
 		roomClient.clearChat();
-		roomClient.clearFileSharing();
+		// roomClient.clearFileSharing();
 	};
 
 	return (
