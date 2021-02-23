@@ -147,7 +147,7 @@ const ChatInput = (props) =>
 			await props.roomClient.shareFiles(event.target.files);
 	};
 
-	const chatItemsLength = files.length + chat.length;
+	const chatItemsLength = files.length + chat.messages.length;
 
 	const singleLinePlugin = createSingleLinePlugin();
 
