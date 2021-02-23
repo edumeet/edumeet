@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
+import { useWindowSize } from '@react-hook/window-size';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import * as appPropTypes from '../appPropTypes';
 import * as roomActions from '../../actions/roomActions';
+import { withRoomContext } from '../../RoomContext';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import VideoView from './VideoView';
 import ButtonControlBar from '../Controls/ButtonControlBar';
@@ -124,8 +126,10 @@ const styles = (theme) =>
 const FullScreenView = (props) =>
 {
 	const {
+		roomClient,
 		advancedMode,
 		consumer,
+		fullScreenConsumer,
 		toggleConsumerFullscreen,
 		toolbarsVisible,
 		permanentTopBar,
@@ -152,6 +156,22 @@ const FullScreenView = (props) =>
 			clearTimeout(timer);
 	};
 
+	const elementRef = useRef(null);
+	const size = useWindowSize({
+		wait : 400
+	});
+
+	useEffect(() =>
+	{
+		if (!elementRef.current)
+			return;
+
+		if (consumer && consumer.type !== 'simple')
+		{
+			roomClient.adaptConsumerPreferredLayers(consumer, size[0], size[1]);
+		}
+	}, [ size, fullScreenConsumer ]);
+
 	if (!consumer)
 		return null;
 
@@ -162,7 +182,7 @@ const FullScreenView = (props) =>
 	);
 
 	return (
-		<div className={classes.root}>
+		<div className={classes.root} ref={elementRef}>
 			<div className={classes.controls}>
 				<div
 					className={classnames(classes.button, {
@@ -227,6 +247,8 @@ const FullScreenView = (props) =>
 				videoVisible={consumerVisible}
 				videoCodec={consumer && consumer.codec}
 				videoScore={consumer ? consumer.score : null}
+				width={size[0]}
+				height={size[1]}
 			/>
 		</div>
 	);
@@ -234,8 +256,10 @@ const FullScreenView = (props) =>
 
 FullScreenView.propTypes =
 {
+	roomClient               : PropTypes.any.isRequired,
 	advancedMode             : PropTypes.bool,
 	consumer                 : appPropTypes.Consumer,
+	fullScreenConsumer       : PropTypes.string,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toolbarsVisible          : PropTypes.bool,
 	permanentTopBar          : PropTypes.bool,
@@ -245,9 +269,10 @@ FullScreenView.propTypes =
 
 const mapStateToProps = (state) =>
 	({
-		consumer        : state.consumers[state.room.fullScreenConsumer],
-		toolbarsVisible : state.room.toolbarsVisible,
-		permanentTopBar : state.settings.permanentTopBar
+		consumer           : state.consumers[state.room.fullScreenConsumer],
+		toolbarsVisible    : state.room.toolbarsVisible,
+		permanentTopBar    : state.settings.permanentTopBar,
+		fullScreenConsumer : state.room.fullScreenConsumer
 	});
 
 const mapDispatchToProps = (dispatch) =>
@@ -259,7 +284,7 @@ const mapDispatchToProps = (dispatch) =>
 		}
 	});
 
-export default connect(
+export default withRoomContext(connect(
 	mapStateToProps,
 	mapDispatchToProps,
 	null,

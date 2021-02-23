@@ -26,6 +26,7 @@ const initialState =
 	drawerOverlayed         : window.config.drawerOverlayed || true,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
 	mediaPerms              : { audio: true, video: true },
+	localPicture            : null,
 	...window.config.defaultAudio
 };
 
@@ -242,6 +243,13 @@ const settings = (state = initialState, action) =>
 			const { videoMuted } = action.payload;
 
 			return { ...state, videoMuted };
+		}
+
+		case 'SET_LOCAL_PICTURE':
+		{
+			const { localPicture } = action.payload;
+
+			return { ...state, localPicture };
 		}
 
 		default:

@@ -35,7 +35,7 @@
 		"helmet": "^3.21.2",
 		"ims-lti": "^3.0.2",
 		"jsonwebtoken": "^8.5.1",
-		"mediasoup": "^3.5.14",
+		"mediasoup": "^3.6.27",
 		"openid-client": "^3.7.3",
 		"passport": "^0.4.0",
 		"passport-local": "^1.0.0",

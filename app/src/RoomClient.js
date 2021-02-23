@@ -20,6 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
+import { parseScalabilityMode } from 'mediasoup-client';
 
 let createTorrent;
 
@@ -101,6 +102,67 @@ const VIDEO_SVC_ENCODINGS =
 [
 	{ scalabilityMode: 'S3T3', dtx: true }
 ];
+
+/**
+ * Validates the simulcast `encodings` array extracting the resolution scalings
+ * array.
+ * ref. https://www.w3.org/TR/webrtc/#rtp-media-api
+ * 
+ * @param {*} encodings
+ * @returns the resolution scalings array
+ */
+function getResolutionScalings(encodings)
+{
+	const resolutionScalings = [];
+
+	// SVC encodings
+	if (encodings.length === 1)
+	{
+		const { spatialLayers, temporalLayers } =
+			mediasoupClient.parseScalabilityMode(encodings[0].scalabilityMode);
+
+		for (let i=0; i < spatialLayers; i++)
+		{
+			resolutionScalings.push(2 ** (spatialLayers - i - 1));
+		}
+
+		return resolutionScalings;
+	}
+
+	// Simulcast encodings
+	let scaleResolutionDownByDefined = false;
+
+	encodings.forEach((encoding) =>
+	{
+		if (encoding.scaleResolutionDownBy !== undefined)
+		{
+			// at least one scaleResolutionDownBy is defined
+			scaleResolutionDownByDefined = true;
+			// scaleResolutionDownBy must be >= 1.0
+			resolutionScalings.push(Math.max(1.0, encoding.scaleResolutionDownBy));
+		}
+		else
+		{
+			// If encodings contains any encoding whose scaleResolutionDownBy
+			// attribute is defined, set any undefined scaleResolutionDownBy
+			// of the other encodings to 1.0.
+			resolutionScalings.push(1.0);
+		}
+	});
+
+	// If the scaleResolutionDownBy attribues of sendEncodings are
+	// still undefined, initialize each encoding's scaleResolutionDownBy
+	// to 2^(length of sendEncodings - encoding index - 1).
+	if (!scaleResolutionDownByDefined)
+	{
+		encodings.forEach((encoding, index) =>
+		{
+			resolutionScalings[index] = 2 ** (encodings.length - index - 1);
+		});
+	}
+
+	return resolutionScalings;
+}
 
 let store;
 
@@ -259,6 +321,10 @@ export default class RoomClient
 
 		this.setLocale(store.getState().intl.locale);
 
+		if (store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(store.getState().settings.localPicture));
+		}
 	}
 
 	close()
@@ -542,6 +608,13 @@ export default class RoomClient
 
 	}
 
+	setPicture(picture)
+	{
+		store.dispatch(settingsActions.setLocalPicture(picture));
+		store.dispatch(meActions.setPicture(picture));
+		this.changePicture(picture);
+	}
+
 	receiveLoginChildWindow(data)
 	{
 		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);
@@ -549,7 +622,11 @@ export default class RoomClient
 		const { displayName, picture } = data;
 
 		store.dispatch(settingsActions.setDisplayName(displayName));
-		store.dispatch(meActions.setPicture(picture));
+
+		if (!store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(picture));
+		}
 
 		store.dispatch(meActions.loggedIn(true));
 
@@ -566,7 +643,10 @@ export default class RoomClient
 	{
 		logger.debug('receiveLogoutChildWindow()');
 
-		store.dispatch(meActions.setPicture(null));
+		if (!store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(null));
+		}
 
 		store.dispatch(meActions.loggedIn(false));
 
@@ -1479,7 +1559,7 @@ export default class RoomClient
 
 				([ track ] = stream.getVideoTracks());
 
-				const { deviceId: trackDeviceId } = track.getSettings();
+				const { deviceId: trackDeviceId, width, height } = track.getSettings();
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
@@ -1500,6 +1580,8 @@ export default class RoomClient
 					else
 						encodings = VIDEO_SIMULCAST_ENCODINGS;
 
+					const resolutionScalings = getResolutionScalings(encodings);
+
 					this._webcamProducer = await this._sendTransport.produce(
 						{
 							track,
@@ -1510,7 +1592,10 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'webcam'
+								source : 'webcam',
+								width,
+								height,
+								resolutionScalings
 							}
 						});
 				}
@@ -1520,7 +1605,9 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'webcam'
+							source : 'webcam',
+							width,
+							height
 						}
 					});
 				}
@@ -2084,6 +2171,124 @@ export default class RoomClient
 		}
 	}
 
+	async restartIce()
+	{
+		logger.debug('restartIce()');
+
+		try
+		{
+			if (this._sendTransport)
+			{
+				const iceParameters = await this.sendRequest(
+					'restartIce',
+					{ transportId: this._sendTransport.id });
+
+				await this._sendTransport.restartIce({ iceParameters });
+			}
+
+			if (this._recvTransport)
+			{
+				const iceParameters = await this.sendRequest(
+					'restartIce',
+					{ transportId: this._recvTransport.id });
+
+				await this._recvTransport.restartIce({ iceParameters });
+			}
+
+			logger.debug('ICE restarted');
+		}
+		catch (error)
+		{
+			logger.error('restartIce() | failed:%o', error);
+		}
+	}
+
+	setConsumerPreferredLayersMax(consumer)
+	{
+		if (consumer.type === 'simple')
+		{
+			return;
+		}
+
+		logger.debug(
+			'setConsumerPreferredLayersMax() [consumerId:"%s"]', consumer.id);
+
+		if (consumer.preferredSpatialLayer !== consumer.spatialLayers -1 ||
+			consumer.preferredTemporalLayer !== consumer.temporalLayers -1)
+		{
+			return this.setConsumerPreferredLayers(consumer.id,
+				consumer.spatialLayers - 1, consumer.temporalLayers - 1);
+		}
+	}
+
+	adaptConsumerPreferredLayers(consumer, viewportWidth, viewportHeight)
+	{
+		if (consumer.type === 'simple')
+		{
+			return;
+		}
+
+		if (!viewportWidth || !viewportHeight)
+		{
+			return;
+		}
+
+		const {
+			id,
+			preferredSpatialLayer,
+			preferredTemporalLayer,
+			width,
+			height,
+			resolutionScalings
+		} = consumer;
+		const availableArea = Math.round(viewportWidth * viewportHeight);
+
+		logger.debug(
+			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" resolutionScalings:[%s] viewportWidth:"%d", viewportHeight:"%d"]',
+			consumer.id, width, height, resolutionScalings.join(', '),
+			viewportWidth, viewportHeight);
+
+		let newPreferredSpatialLayer = 0;
+
+		for (let i = 0; i < resolutionScalings.length; i++)
+		{
+			const levelArea = width * height / (resolutionScalings[i] ** 2);
+
+			if (availableArea >= levelArea)
+			{
+				newPreferredSpatialLayer = i;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		let newPreferredTemporalLayer = consumer.temporalLayers - 1;
+
+		if (newPreferredSpatialLayer === 0)
+		{
+			const lowestLevelArea = width * height / (resolutionScalings[0] ** 2);
+
+			if (availableArea < lowestLevelArea * 0.5 && newPreferredTemporalLayer > 0)
+			{
+				newPreferredTemporalLayer -= 1;
+			}
+			if (availableArea < lowestLevelArea * 0.25 && newPreferredTemporalLayer > 0)
+			{
+				newPreferredTemporalLayer -= 1;
+			}
+		}
+
+		if (preferredSpatialLayer !== newPreferredSpatialLayer ||
+			preferredTemporalLayer !== newPreferredTemporalLayer)
+		{
+			return this.setConsumerPreferredLayers(id,
+				newPreferredSpatialLayer, newPreferredTemporalLayer);
+		}
+
+	}
+
 	async setConsumerPriority(consumerId, priority)
 	{
 		logger.debug(
@@ -2344,6 +2549,9 @@ export default class RoomClient
 							remotelyPaused         : producerPaused,
 							rtpParameters          : consumer.rtpParameters,
 							source                 : consumer.appData.source,
+							width                  : consumer.appData.width,
+							height                 : consumer.appData.height,
+							resolutionScalings     : consumer.appData.resolutionScalings,
 							spatialLayers          : spatialLayers,
 							temporalLayers         : temporalLayers,
 							preferredSpatialLayer  : spatialLayers - 1,
@@ -3187,6 +3395,21 @@ export default class RoomClient
 					});
 
 				this._sendTransport.on(
+					'connectionstatechange', (connectState) =>
+					{
+						switch (connectState)
+						{
+							case 'disconnected':
+							case 'failed':
+								this.restartIce();
+								break;
+
+							default:
+								break;
+						}
+					});
+
+				this._sendTransport.on(
 					'produce', async ({ kind, rtpParameters, appData }, callback, errback) =>
 					{
 						try
@@ -3247,6 +3470,21 @@ export default class RoomClient
 						})
 						.then(callback)
 						.catch(errback);
+				});
+
+			this._recvTransport.on(
+				'connectionstatechange', (connectState) =>
+				{
+					switch (connectState)
+					{
+						case 'disconnected':
+						case 'failed':
+							this.restartIce();
+							break;
+
+						default:
+							break;
+					}
 				});
 
 			// Set our media capabilities.

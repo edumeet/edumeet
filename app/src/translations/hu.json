@@ -171,6 +171,10 @@
 	"settings.noiseThreshold": "Zajszint",
 	"settings.mirrorOwnVideo": "Saját videókép tükrözése",
 	"settings.language": "Nyelv",
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "A file-t nem sikerült elmenteni",
 	"filesharing.startingFileShare": "Fájl megosztása",
