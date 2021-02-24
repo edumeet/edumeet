@@ -19,7 +19,24 @@ const styles = (theme) =>
 			alignItems    : 'center',
 			overflowY     : 'auto',
 			padding       : theme.spacing(1)
+		},
+		'@global' : {
+			'*' : {
+				'scrollbar-width' : 'thin'
+			},
+			'*::-webkit-scrollbar' : {
+				width : '5px'
+			},
+			'*::-webkit-scrollbar-track' : {
+				background : 'white'
+
+			},
+			'*::-webkit-scrollbar-thumb' : {
+				backgroundColor : '#999999'
+			}
+
 		}
+
 	});
 
 class MessageList extends React.Component
