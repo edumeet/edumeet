@@ -2242,6 +2242,8 @@ export default class RoomClient
 			resolutionScalings
 		} = consumer;
 		const availableArea = Math.round(viewportWidth * viewportHeight);
+		const adaptiveScalingFactor = Math.min(Math.max(
+			window.config.adaptiveScalingFactor || 0.75, 0.5), 1.0);
 
 		logger.debug(
 			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" resolutionScalings:[%s] viewportWidth:"%d", viewportHeight:"%d"]',
@@ -2254,7 +2256,7 @@ export default class RoomClient
 		{
 			const levelArea = width * height / (resolutionScalings[i] ** 2);
 
-			if (availableArea >= levelArea)
+			if (availableArea >= levelArea * adaptiveScalingFactor * adaptiveScalingFactor)
 			{
 				newPreferredSpatialLayer = i;
 			}

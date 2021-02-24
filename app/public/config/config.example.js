@@ -77,6 +77,11 @@ var config =
 		{ scaleResolutionDownBy: 2 },
 		{ scaleResolutionDownBy: 1 }
 	],
+	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
+	// example: 
+	// with level width=640px, the minimum width required to trigger the
+	// level change will be: 640 * 0.75 = 480px
+	adaptiveScalingFactor: 0.75,
 
 	/**
 	 * Alternative simulcast setting:
