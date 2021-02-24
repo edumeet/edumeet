@@ -107,6 +107,9 @@ const ChatInput = (props) =>
 		return 'not-handled';
 	};
 
+	const handleInlineStyled = (style) =>
+		editorState.getCurrentInlineStyle().has(style);
+
 	const handleUnderlineClick = () =>
 		setEditorState(RichUtils.toggleInlineStyle(editorState, 'UNDERLINE'));
 
@@ -224,8 +227,11 @@ const ChatInput = (props) =>
 									id             : 'label.bold',
 									defaultMessage : 'Bold'
 								})}
+								color={handleInlineStyled('BOLD') ? 'primary': ''}
+
 								component='span'
 								onClick={handleBoldClick}
+
 							>
 								<FormatBoldIcon />
 							</IconButton>
@@ -249,6 +255,7 @@ const ChatInput = (props) =>
 									id             : 'label.italic',
 									defaultMessage : 'Italic'
 								})}
+								color={handleInlineStyled('ITALIC') ? 'primary': ''}
 
 								component='span'
 								onClick={handleItalicClick}
@@ -274,6 +281,7 @@ const ChatInput = (props) =>
 									id             : 'label.underline',
 									defaultMessage : 'Underline'
 								})}
+								color={handleInlineStyled('UNDERLINE') ? 'primary': ''}
 
 								component='span'
 								onClick={handleUnderlineClick}
