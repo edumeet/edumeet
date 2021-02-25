@@ -31,11 +31,22 @@ services:
     image: redis
     container_name: edumeet_redis
     restart: unless-stopped
-    expose:
-    - 6379
     networks:
       edumeet:
         ipv4_address: 172.22.0.2
+
+  nginx:
+    image: nginx
+    container_name: edumeet_nginx
+    restart: unless-stopped
+    ports:
+    - 8443:443
+    volumes:
+    - ${PWD}/../server/certs/mediasoup-demo.localhost.cert.pem:/etc/nginx/cert.pem:ro
+    - ${PWD}/../server/certs/mediasoup-demo.localhost.key.pem:/etc/nginx/key.pem:ro
+    - ${PWD}/config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    extra_hosts:
+      edumeet: 172.22.0.1
 
   prometheus:
     image: prom/prometheus:latest
@@ -48,8 +59,6 @@ services:
     command:
     - '--config.file=/etc/prometheus/prometheus.yml'
     - '--storage.tsdb.path=/prometheus'
-    expose:
-    - 9090
     ports:
     - 9090:9090
     links:
@@ -63,8 +72,6 @@ services:
     image: prom/node-exporter:latest
     container_name: edumeet_node_exporter
     restart: unless-stopped
-    expose:
-    - 9100
 
   #cadvisor:
   #  image: google/cadvisor:latest
@@ -85,8 +92,6 @@ services:
     restart: unless-stopped
     links:
     - prometheus:prometheus
-    expose:
-    - 9091
     ports:
     - 9091:3000
     volumes:

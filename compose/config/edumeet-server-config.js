@@ -171,11 +171,11 @@ module.exports =
 	listeningPort         : 3443,
 	// Any http request is redirected to https.
 	// Listening port for http server.
-	listeningRedirectPort : 8080,
+	//listeningRedirectPort : 8080,
 	// Listens only on http, only on listeningPort
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
-	httpOnly              : false,
+	httpOnly              : true,
 	// WebServer/Express trust proxy config for httpOnly mode
 	// You can find more info:
 	//  - https://expressjs.com/en/guide/behind-proxies.html

@@ -16,6 +16,6 @@ docker-compose logs -f edumeet
 
 Accessing endpoints:
 
-- Edumeet: https://127.0.0.1:4443/
+- Edumeet: https://127.0.0.1:8443/
 - Prometheus: http://127.0.0.1:9090/
 - Grafana: http://127.0.0.1:9091/

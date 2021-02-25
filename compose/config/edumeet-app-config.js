@@ -2,7 +2,7 @@
 var config =
 {
 	loginEnabled    : false,
-	developmentPort : 3443,
+	developmentPort : 8443,
 	productionPort  : 3443,
 
 	/**
