@@ -260,7 +260,7 @@ module.exports = async function(rooms, peers, config)
 
 		const app = express();
 
-		app.get('/', async (req, res) =>
+		app.get('/metrics', async (req, res) =>
 		{
 			logger.debug(`GET ${req.originalUrl}`);
 			const registry = new prom.Registry();
