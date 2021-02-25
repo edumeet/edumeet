@@ -2241,7 +2241,8 @@ export default class RoomClient
 			height,
 			resolutionScalings
 		} = consumer;
-		const availableArea = Math.round(viewportWidth * viewportHeight);
+		const adaptiveScalingFactor = Math.min(Math.max(
+			window.config.adaptiveScalingFactor || 0.75, 0.5), 1.0);
 
 		logger.debug(
 			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" resolutionScalings:[%s] viewportWidth:"%d", viewportHeight:"%d"]',
@@ -2252,9 +2253,10 @@ export default class RoomClient
 
 		for (let i = 0; i < resolutionScalings.length; i++)
 		{
-			const levelArea = width * height / (resolutionScalings[i] ** 2);
+			const levelWidth = adaptiveScalingFactor * width / resolutionScalings[i];
+			const levelHeight = adaptiveScalingFactor * height / resolutionScalings[i];
 
-			if (availableArea >= levelArea)
+			if (viewportWidth >= levelWidth || viewportHeight >= levelHeight)
 			{
 				newPreferredSpatialLayer = i;
 			}
@@ -2266,15 +2268,19 @@ export default class RoomClient
 
 		let newPreferredTemporalLayer = consumer.temporalLayers - 1;
 
-		if (newPreferredSpatialLayer === 0)
+		if (newPreferredSpatialLayer === 0 && newPreferredTemporalLayer > 0)
 		{
-			const lowestLevelArea = width * height / (resolutionScalings[0] ** 2);
+			const lowestLevelWidth = width / resolutionScalings[0];
+			const lowestLevelHeight = height / resolutionScalings[0];
 
-			if (availableArea < lowestLevelArea * 0.5 && newPreferredTemporalLayer > 0)
+			if (viewportWidth < lowestLevelWidth * 0.5
+				&& viewportHeight < lowestLevelHeight * 0.5)
 			{
 				newPreferredTemporalLayer -= 1;
 			}
-			if (availableArea < lowestLevelArea * 0.25 && newPreferredTemporalLayer > 0)
+			if (newPreferredTemporalLayer > 0
+				&& viewportWidth < lowestLevelWidth * 0.25
+				&& viewportHeight < lowestLevelHeight * 0.25)
 			{
 				newPreferredTemporalLayer -= 1;
 			}
