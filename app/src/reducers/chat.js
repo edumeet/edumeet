@@ -1,8 +1,3 @@
-import
-{
-	createNewMessage
-} from './helper';
-
 const initialState =
 {
 	order          : 'asc',
@@ -15,16 +10,7 @@ const chat = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
-		case 'ADD_NEW_USER_MESSAGE':
-		{
-			const { text } = action.payload;
-
-			const message = createNewMessage(text, 'client', 'Me', undefined);
-
-			return { ...state, messages: [ ...state.messages, message ] };
-		}
-
-		case 'ADD_NEW_RESPONSE_MESSAGE':
+		case 'ADD_MESSAGE':
 		{
 			const { message } = action.payload;
 

@@ -774,7 +774,15 @@ export default class RoomClient
 		try
 		{
 			store.dispatch(
-				chatActions.addUserMessage(chatMessage.text));
+				chatActions.addMessage(
+					{
+						...chatMessage,
+						name    : 'Me',
+						sender  : 'client',
+						picture : undefined
+					}
+				)
+			);
 
 			store.dispatch(
 				chatActions.setIsScrollEnd(true));
@@ -2837,7 +2845,7 @@ export default class RoomClient
 						const { peerId, chatMessage } = notification.data;
 
 						store.dispatch(
-							chatActions.addResponseMessage({ ...chatMessage, peerId, isRead: false }));
+							chatActions.addMessage({ ...chatMessage, peerId, isRead: false }));
 
 						if (
 							!store.getState().toolarea.toolAreaOpen ||

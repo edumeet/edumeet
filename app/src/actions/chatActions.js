@@ -1,12 +1,6 @@
-export const addUserMessage = (text) =>
+export const addMessage = (message) =>
 	({
-		type    : 'ADD_NEW_USER_MESSAGE',
-		payload : { text }
-	});
-
-export const addResponseMessage = (message) =>
-	({
-		type    : 'ADD_NEW_RESPONSE_MESSAGE',
+		type    : 'ADD_MESSAGE',
 		payload : { message }
 	});
 

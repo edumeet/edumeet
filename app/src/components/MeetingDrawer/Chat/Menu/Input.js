@@ -125,11 +125,11 @@ const ChatInput = (props) =>
 		{
 			const sendMessage = {
 				type    : 'message',
-				text    : message,
-				time    : Date.now(),
-				name    : displayName,
 				sender  : 'response',
-				picture : picture
+				name    : displayName,
+				picture : picture,
+				text    : message,
+				time    : Date.now()
 			};
 
 			roomClient.sendChatMessage(sendMessage);
