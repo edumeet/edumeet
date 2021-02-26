@@ -259,7 +259,10 @@ const MediaSettings = ({
 						onChange={(event) =>
 						{
 							if (event.target.value)
-								roomClient.updateWebcam({ newResolution: event.target.value });
+								roomClient.updateWebcam({
+									restart       : true,
+									newResolution : event.target.value
+								});
 						}}
 						name='Video resolution'
 						autoWidth

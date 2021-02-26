@@ -80,6 +80,14 @@ const VIDEO_CONSTRAINS =
 	}
 };
 
+function getVideoConstrains(resolution, aspectRatio)
+{
+	return {
+		width : VIDEO_CONSTRAINS[resolution].width,
+		aspectRatio
+	};
+}
+
 const PC_PROPRIETARY_CONSTRAINTS =
 {
 	optional : [ { googDscp: true } ]
@@ -1536,6 +1544,7 @@ export default class RoomClient
 
 			const {
 				resolution,
+				aspectRatio,
 				frameRate
 			} = store.getState().settings;
 
@@ -1552,7 +1561,7 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { ideal: deviceId },
-							...VIDEO_CONSTRAINS[resolution],
+							...getVideoConstrains(resolution, aspectRatio),
 							frameRate
 						}
 					});
@@ -1560,6 +1569,8 @@ export default class RoomClient
 				([ track ] = stream.getVideoTracks());
 
 				const { deviceId: trackDeviceId, width, height } = track.getSettings();
+
+				logger.debug('getUserMedia track settings:', track.getSettings());
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
@@ -1649,7 +1660,7 @@ export default class RoomClient
 
 				await track.applyConstraints(
 					{
-						...VIDEO_CONSTRAINS[resolution],
+						...getVideoConstrains(resolution, aspectRatio),
 						frameRate
 					}
 				);
@@ -1661,7 +1672,7 @@ export default class RoomClient
 
 					await track.applyConstraints(
 						{
-							...VIDEO_CONSTRAINS[resolution],
+							...getVideoConstrains(resolution, aspectRatio),
 							frameRate
 						}
 					);
@@ -3829,7 +3840,7 @@ export default class RoomClient
 		try
 		{
 			const device = this._webcams[videoDeviceId];
-			const resolution = store.getState().settings.resolution;
+			const { resolution, aspectRatio } = store.getState().settings;
 
 			if (!device)
 				throw new Error('no webcam devices');
@@ -3839,7 +3850,7 @@ export default class RoomClient
 					video :
 					{
 						deviceId : { ideal: videoDeviceId },
-						...VIDEO_CONSTRAINS[resolution]
+						...getVideoConstrains(resolution, aspectRatio)
 					}
 				});
 
@@ -4037,13 +4048,14 @@ export default class RoomClient
 
 			const {
 				screenSharingResolution,
+				aspectRatio,
 				screenSharingFrameRate
 			} = store.getState().settings;
 
 			if (start)
 			{
 				const stream = await this._screenSharing.start({
-					...VIDEO_CONSTRAINS[screenSharingResolution],
+					...getVideoConstrains(screenSharingResolution, aspectRatio),
 					frameRate : screenSharingFrameRate
 				});
 
@@ -4135,7 +4147,7 @@ export default class RoomClient
 
 				await track.applyConstraints(
 					{
-						...VIDEO_CONSTRAINS[screenSharingResolution],
+						...getVideoConstrains(screenSharingResolution, aspectRatio),
 						frameRate : screenSharingFrameRate
 					}
 				);
