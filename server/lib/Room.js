@@ -1478,6 +1478,9 @@ class Room extends EventEmitter
 				if (!this._hasPermission(peer, MODERATE_CHAT))
 					throw new Error('peer not authorized');
 
+				if (!this._hasPermission(peer, MODERATE_FILES))
+					throw new Error('peer not authorized');
+
 				this._chatHistory = [];
 
 				this._fileHistory = [];

@@ -1739,6 +1739,8 @@ export default class RoomClient
 			await this.sendRequest('moderator:clearChat');
 
 			store.dispatch(chatActions.clearChat());
+
+			store.dispatch(fileActions.clearFiles());
 		}
 		catch (error)
 		{
@@ -2851,6 +2853,8 @@ export default class RoomClient
 					case 'moderator:clearChat':
 					{
 						store.dispatch(chatActions.clearChat());
+
+						store.dispatch(fileActions.clearFiles());
 
 						store.dispatch(requestActions.notify(
 							{
