@@ -69,17 +69,6 @@ const ChatInput = (props) =>
 
 	}, [ editorState ]);
 
-	const createNewMessage = (text, sender, name, picture) =>
-		({
-			type   : 'message',
-			text,
-			time   : Date.now(),
-			name,
-			sender,
-			picture,
-			isSeen : false
-		});
-
 	const {
 		roomClient,
 		displayName,
@@ -134,7 +123,14 @@ const ChatInput = (props) =>
 	{
 		if (!handleIsMessageEmpty())
 		{
-			const sendMessage = createNewMessage(message, 'response', displayName, picture);
+			const sendMessage = {
+				type    : 'message',
+				text    : message,
+				time    : Date.now(),
+				name    : displayName,
+				sender  : 'response',
+				picture : picture
+			};
 
 			roomClient.sendChatMessage(sendMessage);
 
