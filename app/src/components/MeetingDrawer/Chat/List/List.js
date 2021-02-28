@@ -41,15 +41,35 @@ const styles = (theme) =>
 
 class MessageList extends React.Component
 {
-	componentDidMount()
+	getSnapshotBeforeUpdate()
 	{
-		this.node.scrollTop = this.node.scrollHeight;
+		const scrollTop = Math.floor(this.node.scrollTop);
+
+		const offsetHeight = this.node.offsetHeight;
+
+		const scrollHeight = this.node.scrollHeight;
+
+		return (Math.abs((scrollTop + offsetHeight) - scrollHeight) < 2);
 	}
 
-	componentDidUpdate()
+	componentDidUpdate(prevProps, prevState, shouldScroll)
 	{
-		this.node.scrollTop = (this.props.chat.order === 'asc') ?
-			this.node.scrollHeight : 0;
+		if (shouldScroll)
+		{
+			this.node.scrollTop = Math.floor(this.node.scrollHeight);
+		}
+
+		else if (prevProps.chat.order !== this.props.chat.order)
+		{
+			if (this.props.chat.order === 'asc')
+			{
+				this.node.scrollTop = this.node.scrollHeight;
+			}
+			else if (this.props.chat.order === 'desc')
+			{
+				this.node.scrollTop = 0;
+			}
+		}
 	}
 
 	getTimeString(time)
