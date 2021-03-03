@@ -797,7 +797,7 @@ async function runMediasoupWorkers()
 	const { logLevel, logTags, rtcMinPort, rtcMaxPort } = config.mediasoup.worker;
     const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
 
-	for (let i = 0; i < numWorkers; ++i)
+	for (let i = 0; i < numWorkers; i++)
 	{
 		const worker = await mediasoup.createWorker(
 			{
