@@ -614,6 +614,13 @@ class Room extends EventEmitter
 					this._roomId);
 				this.close();
 			}
+			else if(this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked()){
+				logger.info(
+					'Room deserted for some time, closing the room [roomId:"%s"] and kick peers from the lobby',
+					this._roomId);
+				
+				this.close();
+			}
 			else
 				logger.debug('selfDestructCountdown() aborted; room is not empty!');
 		}, 10000);
@@ -847,6 +854,12 @@ class Room extends EventEmitter
 		// lobby is empty, close the room after a while.
 		if (this.checkEmpty() && this._lobby.checkEmpty())
 			this.selfDestructCountdown();
+		// If this is the last Peer in the room,
+		// lobby is not empty and room is locked, 
+		// close the room after a while.
+		else if(this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked()){
+			this.selfDestructCountdown();
+		}
 	}
 
 	async _handleSocketRequest(peer, request, cb)
@@ -1372,7 +1385,7 @@ class Room extends EventEmitter
 				break;
 			}
 
-			/* case 'changePicture':
+			case 'changePicture':
 			{
 				// Ensure the Peer is joined.
 				if (!peer.joined)
@@ -1392,7 +1405,7 @@ class Room extends EventEmitter
 				cb();
 
 				break;
-			} */
+			}
 
 			case 'chatMessage':
 			{
@@ -1884,6 +1897,8 @@ class Room extends EventEmitter
 		{
 			// Remove from its map.
 			consumerPeer.removeConsumer(consumer.id);
+
+			this._notification(consumerPeer.socket, 'consumerClosed', { consumerId: consumer.id });
 		});
 
 		consumer.on('producerclose', () =>

@@ -11,7 +11,6 @@ import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
@@ -169,7 +168,6 @@ const JoinDialog = ({
 	displayName,
 	displayNameInProgress,
 	loggedIn,
-	myPicture,
 	changeDisplayName,
 	setMediaPerms,
 	classes,
@@ -413,21 +411,14 @@ const JoinDialog = ({
 														() => roomClient.login(roomId)
 												}
 											>
-												{ myPicture ?
-													<Avatar
-														src={myPicture}
-														className={classes.accountButtonAvatar}
-													/>
-													:
-													<AccountCircle
-														className={
-															classnames(
-																classes.accountButtonAvatar,
-																loggedIn ? classes.green : null
-															)
-														}
-													/>
-												}
+												<AccountCircle
+													className={
+														classnames(
+															classes.accountButtonAvatar,
+															loggedIn ? classes.green : null
+														)
+													}
+												/>
 											</IconButton>
 										</Grid>
 										<Grid item>
@@ -782,7 +773,6 @@ JoinDialog.propTypes =
 	displayNameInProgress : PropTypes.bool.isRequired,
 	loginEnabled          : PropTypes.bool.isRequired,
 	loggedIn              : PropTypes.bool.isRequired,
-	myPicture             : PropTypes.string,
 	changeDisplayName     : PropTypes.func.isRequired,
 	setMediaPerms  	      : PropTypes.func.isRequired,
 	classes               : PropTypes.object.isRequired,
@@ -803,7 +793,6 @@ const mapStateToProps = (state) =>
 		displayNameInProgress : state.me.displayNameInProgress,
 		loginEnabled          : state.me.loginEnabled,
 		loggedIn              : state.me.loggedIn,
-		myPicture             : state.me.picture,
 		locale                : state.intl.locale,
 		localesList           : state.intl.list
 

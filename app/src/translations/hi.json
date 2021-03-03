@@ -171,6 +171,10 @@
 	"settings.noiseThreshold": "शोर सीमा",
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "फ़ाइल सहेजने में असमर्थ",
 	"filesharing.startingFileShare": "फ़ाइल के आदान-प्रदान का प्रयास है",

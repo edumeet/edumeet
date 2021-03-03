@@ -3,7 +3,7 @@ node_modules/
 /app/build/
 /app/public/config/config.js
 /app/public/images/logo.*
-!/app/public/images/logo.example.png
+!/app/public/images/logo.edumeet.svg
 /server/config/
 !/server/config/config.example.js
 /server/public/
@@ -11,3 +11,4 @@ node_modules/
 !/server/certs/mediasoup-demo.localhost.*
 .vscode
 /app/public/config/*.pem
+yarn.lock

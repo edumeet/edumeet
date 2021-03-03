@@ -4,6 +4,9 @@ var config =
 	loginEnabled    : false,
 	developmentPort : 3443,
 	productionPort  : 443,
+	// If the server component runs on a different host than the app
+	// you can uncomment the following line and specify the host name.
+	//serverHostname  : 'external-server.com',
 
 	/**
 	 * Supported browsers version 
@@ -74,6 +77,11 @@ var config =
 		{ scaleResolutionDownBy: 2 },
 		{ scaleResolutionDownBy: 1 }
 	],
+	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
+	// example: 
+	// with level width=640px, the minimum width required to trigger the
+	// level change will be: 640 * 0.75 = 480px
+	adaptiveScalingFactor: 0.75,
 
 	/**
 	 * Alternative simulcast setting:
@@ -163,7 +171,7 @@ var config =
 	lockLastN            : false,
 	// Show logo if "logo" is not null, else show title
 	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-	logo                 : 'images/logo.example.png',
+	logo                 : 'images/logo.edumeet.svg',
 	title                : 'edumeet',
 	// Service & Support URL
 	// if not set then not displayed on the about modals

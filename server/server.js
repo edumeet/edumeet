@@ -620,20 +620,7 @@ async function runHttpsServer()
 				res.redirect(ltiURL);
 			}
 			else
-			{
-				const specialChars = "<>@!^*()[]{}:;|'\"\\,~`";
-
-				for (let i = 0; i < specialChars.length; i++)
-				{
-					if (req.url.substring(1).indexOf(specialChars[i]) > -1)
-					{
-						req.url = `/${encodeURIComponent(encodeURI(req.url.substring(1)))}`;
-						res.redirect(`${req.url}`);
-					}
-				}
-
 				return next();
-			}
 		}
 		else
 			res.redirect(`https://${req.hostname}${req.url}`);
@@ -807,14 +794,18 @@ async function runMediasoupWorkers()
 
 	logger.info('running %d mediasoup Workers...', numWorkers);
 
-	for (let i = 0; i < numWorkers; ++i)
+	const { logLevel, logTags, rtcMinPort, rtcMaxPort } = config.mediasoup.worker;
+    const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
+
+	for (let i = 0; i < numWorkers; i++)
 	{
 		const worker = await mediasoup.createWorker(
 			{
-				logLevel   : config.mediasoup.worker.logLevel,
-				logTags    : config.mediasoup.worker.logTags,
-				rtcMinPort : config.mediasoup.worker.rtcMinPort,
-				rtcMaxPort : config.mediasoup.worker.rtcMaxPort
+				logLevel,
+				logTags,
+				rtcMinPort : rtcMinPort + i * portInterval,
+				rtcMaxPort : i === numWorkers - 1 ? rtcMaxPort
+					: rtcMinPort + (i + 1) * portInterval - 1
 			});
 
 		worker.on('died', () =>

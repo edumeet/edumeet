@@ -171,6 +171,10 @@
 	"settings.noiseThreshold": "Noise threshold",
 	"settings.mirrorOwnVideo": "Mirror view of own video",
 	"settings.language": "Select language",
+	"settings.myPhotoButton": "Set my photo",
+	"settings.myPhotoLabel": "Max. file size: 5MB, accepted: jpg, jpeg, png",
+	"settings.myPhotoSizeError": " file is too large",
+	"settings.myPhotoTypeError": " is not a supported file extension",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",

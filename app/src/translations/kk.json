@@ -169,6 +169,10 @@
 	"settings.noiseThreshold": "Шу деңгейі",
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Файлды сақтау мүмкін емес",
 	"filesharing.startingFileShare": "Файлды бөлісу әрекеті",
