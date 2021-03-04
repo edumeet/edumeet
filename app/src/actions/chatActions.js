@@ -21,8 +21,20 @@ export const clearChat = () =>
 		type : 'CLEAR_CHAT'
 	});
 
+export const goToNewestMessages = (flag) =>
+	({
+		type    : 'GO_TO_NEWEST_MESSAGES',
+		payload : { flag }
+	});
+
 export const sortChat = (order) =>
 	({
 		type    : 'SORT_CHAT',
 		payload : { order }
+	});
+
+export const setAreNewMessages = (flag) =>
+	({
+		type    : 'SET_ARE_NEW_MESSAGES',
+		payload : { flag }
 	});

@@ -5,8 +5,10 @@ import
 
 const initialState =
 {
-	messages : [],
-	order    : 'asc'
+	order          : 'asc',
+	isScrollEnd    : true,
+	messages       : [],
+	areNewMessages : false
 };
 
 const chat = (state = initialState, action) =>
@@ -46,6 +48,20 @@ const chat = (state = initialState, action) =>
 			const { order } = action.payload;
 
 			return { ...state, order: order };
+		}
+
+		case 'GO_TO_NEWEST_MESSAGES':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, isScrollEnd: flag };
+		}
+
+		case 'SET_ARE_NEW_MESSAGES':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, areNewMessages: flag };
 		}
 
 		default:

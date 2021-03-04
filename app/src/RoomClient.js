@@ -776,6 +776,9 @@ export default class RoomClient
 			store.dispatch(
 				chatActions.addUserMessage(chatMessage.text));
 
+			store.dispatch(
+				chatActions.goToNewestMessages(true));
+
 			await this.sendRequest('chatMessage', { chatMessage });
 
 		}

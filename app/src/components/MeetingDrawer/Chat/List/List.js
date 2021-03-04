@@ -4,10 +4,13 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { FormattedTime, injectIntl } from 'react-intl';
 import * as appPropTypes from '../../../appPropTypes';
-
+import * as chatActions from '../../../../actions/chatActions';
+import classnames from 'classnames';
 import Message from './Item/Message';
 import File from './Item/File';
 import EmptyAvatar from '../../../../images/avatar-empty.jpeg';
+import Button from '@material-ui/core/Button';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
 const styles = (theme) =>
 	({
@@ -35,41 +38,95 @@ const styles = (theme) =>
 				backgroundColor : '#999999'
 			}
 
+		},
+		'buttonGoToNewest' :
+		{
+			position     : 'fixed',
+			borderRadius : '50px'
+		},
+		'asc' : {
+			bottom : '100px'
+		},
+		'desc' :
+		{
+			top : '130px'
 		}
 
 	});
 
 class MessageList extends React.Component
 {
-	getSnapshotBeforeUpdate()
+	constructor(props)
 	{
-		const scrollTop = Math.floor(this.node.scrollTop);
+		super(props);
 
-		const offsetHeight = this.node.offsetHeight;
-
-		const scrollHeight = this.node.scrollHeight;
-
-		return (Math.abs((scrollTop + offsetHeight) - scrollHeight) < 2);
+		this.ref = React.createRef();
 	}
 
-	componentDidUpdate(prevProps, prevState, shouldScroll)
+	componentDidMount()
 	{
-		if (shouldScroll)
+		this.ref.current.addEventListener('scroll', () => this.handleSetIsScrollEnd());
+	}
+
+	componentDidUpdate(prevProps)
+	{
+		if (this.props.chat.isScrollEnd)
+			this.handleGoToNewest();
+
+		if (prevProps.chat.order !== this.props.chat.order)
 		{
-			this.node.scrollTop = Math.floor(this.node.scrollHeight);
+			this.handleSetIsScrollEnd();
+			this.handleGoToNewest();
 		}
 
-		else if (prevProps.chat.order !== this.props.chat.order)
-		{
-			if (this.props.chat.order === 'asc')
-			{
-				this.node.scrollTop = this.node.scrollHeight;
-			}
-			else if (this.props.chat.order === 'desc')
-			{
-				this.node.scrollTop = 0;
-			}
-		}
+		this.handleSetAreNewMessages(prevProps);
+	}
+
+	handleSetAreNewMessages(prevProps)
+	{
+		if (
+			this.props.chat.messages.length + this.props.files.length > 0 &&
+			this.props.chat.isScrollEnd === false &&
+			(
+				this.props.chat.messages.length !== prevProps.chat.messages.length ||
+				this.props.files.length !== prevProps.files.length
+			)
+		)
+			this.props.setAreNewMessages(true);
+
+	}
+
+	handleSetIsScrollEnd()
+	{
+		let isScrollEnd = undefined;
+
+		if (this.props.chat.order === 'asc')
+			isScrollEnd = (
+				Math.abs(
+					Math.floor(this.ref.current.scrollTop) +
+					this.ref.current.offsetHeight -
+					this.ref.current.scrollHeight
+
+				) < 2
+			);
+		else
+		if (this.props.chat.order === 'desc')
+			isScrollEnd = (this.ref.current.scrollTop === 0 ? true : false);
+
+		this.props.goToNewestMessages(isScrollEnd);
+
+		if (this.props.chat.isScrollEnd)
+			this.props.setAreNewMessages(false);
+
+	}
+
+	handleGoToNewest()
+	{
+		if (this.props.chat.order === 'asc')
+			this.ref.current.scrollTop = this.ref.current.scrollHeight;
+		else
+		if (this.props.chat.order === 'desc')
+			this.ref.current.scrollTop = 0;
 	}
 
 	getTimeString(time)
@@ -95,24 +152,50 @@ class MessageList extends React.Component
 
 		if (items.length > 0)
 		{
-			switch (chat.order)
-			{
-				case 'asc':
-					items.sort();
-					break;
-
-				case 'desc':
-					items.reverse();
-					break;
-
-				default:
-					break;
-			}
+			if (chat.order === 'asc')
+				items.sort();
+			else
+			if (chat.order === 'desc')
+				items.reverse();
 		}
 
 		return (
 			<React.Fragment>
-				<div id='chatList' className={classes.root} ref={(node) => { this.node = node; }}>
+				<div id='chatList' className={classes.root} ref={this.ref}>
+					{this.props.chat.areNewMessages ?
+						<Button
+							variant='contained'
+							color='primary'
+							size='small'
+							onClick={() => this.handleGoToNewest()}
+							className={
+								classnames(
+									classes.buttonGoToNewest,
+									(chat.order === 'asc' ? classes.asc : classes.desc)
+								)
+							}
+							endIcon={
+								(chat.order === 'asc' ?
+									<ChevronLeftIcon
+										style={{
+											color     : 'white',
+											transform : 'rotate(270deg)'
+										}}
+									/> :
+									<ChevronLeftIcon
+										style={{
+											color     : 'white',
+											transform : 'rotate(90deg)'
+										}}
+									/>
+								)
+							}
+						>
+							New Messages
+						</Button>
+						: null
+					}
+
 					{items.length === 0
 						? (<div>
 							{intl.formatMessage({
@@ -200,10 +283,12 @@ MessageList.propTypes =
 	myPicture : PropTypes.string,
 	classes   : PropTypes.object.isRequired,
 
-	files : PropTypes.object.isRequired,
-	me    : appPropTypes.Me.isRequired,
-	peers : PropTypes.object.isRequired,
-	intl  : PropTypes.object.isRequired
+	files              : PropTypes.object.isRequired,
+	me                 : appPropTypes.Me.isRequired,
+	peers              : PropTypes.object.isRequired,
+	intl               : PropTypes.object.isRequired,
+	goToNewestMessages : PropTypes.func.isRequired,
+	setAreNewMessages  : PropTypes.func.isRequired
 
 };
 
@@ -217,9 +302,21 @@ const mapStateToProps = (state) =>
 
 	});
 
+const mapDispatchToProps = (dispatch) =>
+	({
+		goToNewestMessages : (flag) =>
+		{
+			dispatch(chatActions.goToNewestMessages(flag));
+		},
+		setAreNewMessages : (flag) =>
+		{
+			dispatch(chatActions.setAreNewMessages(flag));
+		}
+	});
+
 export default connect(
 	mapStateToProps,
-	null,
+	mapDispatchToProps,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
@@ -233,5 +330,4 @@ export default connect(
 			);
 		}
 	}
-// )(withStyles(styles)(MessageList));
 )(withStyles(styles)(injectIntl(MessageList)));
