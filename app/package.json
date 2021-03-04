@@ -53,7 +53,7 @@
 		"redux-thunk": "^2.3.0",
 		"reselect": "^4.0.0",
 		"riek": "^1.1.0",
-		"socket.io-client": "^2.3.0",
+		"socket.io-client": "^2.4.0",
 		"source-map-explorer": "^2.1.0",
 		"webtorrent": "^0.108.1"
 	},
@@ -74,7 +74,7 @@
 		"not op_mini all"
 	],
 	"devDependencies": {
-		"electron": "^7.1.1",
+		"electron": "^12.0.0",
 		"eslint-plugin-react": "^7.19.0",
 		"foreman": "^3.0.1",
 		"redux-mock-store": "^1.5.3"
