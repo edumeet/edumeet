@@ -2066,19 +2066,17 @@ export default class RoomClient
 		}
 	}
 
-	async _resumeConsumer(consumer)
+	async _resumeConsumer(consumer, { initial = false } = {})
 	{
 		logger.debug('_resumeConsumer() [consumer:"%o"]', consumer);
 
-		if (!consumer.paused || consumer.closed)
+		if ((!initial && !consumer.paused) || consumer.closed)
 			return;
 
 		try
 		{
-			await this.sendRequest('resumeConsumer', { consumerId: consumer.id });
-
 			consumer.resume();
-
+			await this.sendRequest('resumeConsumer', { consumerId: consumer.id });
 			store.dispatch(
 				consumerActions.setConsumerResumed(consumer.id, 'local'));
 		}
@@ -2086,6 +2084,11 @@ export default class RoomClient
 		{
 			logger.error('_resumeConsumer() [error:"%o"]', error);
 		}
+	}
+
+	async _startConsumer(consumer)
+	{
+		return this._resumeConsumer(consumer, { initial: true });
 	}
 
 	async lowerPeerHand(peerId)
@@ -2511,95 +2514,6 @@ export default class RoomClient
 
 			switch (request.method)
 			{
-				case 'newConsumer':
-				{
-					const {
-						peerId,
-						producerId,
-						id,
-						kind,
-						rtpParameters,
-						type,
-						appData,
-						producerPaused
-					} = request.data;
-
-					const consumer = await this._recvTransport.consume(
-						{
-							id,
-							producerId,
-							kind,
-							rtpParameters,
-							appData : { ...appData, peerId } // Trick.
-						});
-
-					// Store in the map.
-					this._consumers.set(consumer.id, consumer);
-
-					consumer.on('transportclose', () =>
-					{
-						this._consumers.delete(consumer.id);
-					});
-
-					const { spatialLayers, temporalLayers } =
-						mediasoupClient.parseScalabilityMode(
-							consumer.rtpParameters.encodings[0].scalabilityMode);
-
-					store.dispatch(consumerActions.addConsumer(
-						{
-							id                     : consumer.id,
-							peerId                 : peerId,
-							kind                   : kind,
-							type                   : type,
-							locallyPaused          : false,
-							remotelyPaused         : producerPaused,
-							rtpParameters          : consumer.rtpParameters,
-							source                 : consumer.appData.source,
-							width                  : consumer.appData.width,
-							height                 : consumer.appData.height,
-							resolutionScalings     : consumer.appData.resolutionScalings,
-							spatialLayers          : spatialLayers,
-							temporalLayers         : temporalLayers,
-							preferredSpatialLayer  : spatialLayers - 1,
-							preferredTemporalLayer : temporalLayers - 1,
-							priority               : 1,
-							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
-							track                  : consumer.track
-						},
-						peerId));
-
-					// We are ready. Answer the request so the server will
-					// resume this Consumer (which was paused for now).
-					cb(null);
-
-					if (kind === 'audio')
-					{
-						consumer.volume = 0;
-
-						const stream = new MediaStream();
-
-						stream.addTrack(consumer.track);
-
-						if (!stream.getAudioTracks()[0])
-							throw new Error('request.newConsumer | given stream has no audio track');
-
-						consumer.hark = hark(stream, { play: false });
-
-						consumer.hark.on('volume_change', (volume) =>
-						{
-							volume = Math.round(volume);
-
-							if (consumer && volume !== consumer.volume)
-							{
-								consumer.volume = volume;
-
-								store.dispatch(peerVolumeActions.setPeerVolume(peerId, volume));
-							}
-						});
-					}
-
-					break;
-				}
 
 				default:
 				{
@@ -3097,6 +3011,94 @@ export default class RoomClient
 
 						store.dispatch(
 							peerActions.removePeer(peerId));
+
+						break;
+					}
+
+					case 'newConsumer':
+					{
+						const {
+							peerId,
+							producerId,
+							id,
+							kind,
+							rtpParameters,
+							type,
+							appData,
+							producerPaused
+						} = notification.data;
+
+						const consumer = await this._recvTransport.consume(
+							{
+								id,
+								producerId,
+								kind,
+								rtpParameters,
+								appData : { ...appData, peerId } // Trick.
+							});
+
+						// Store in the map.
+						this._consumers.set(consumer.id, consumer);
+
+						consumer.on('transportclose', () =>
+						{
+							this._consumers.delete(consumer.id);
+						});
+
+						const { spatialLayers, temporalLayers } =
+							mediasoupClient.parseScalabilityMode(
+								consumer.rtpParameters.encodings[0].scalabilityMode);
+
+						store.dispatch(consumerActions.addConsumer(
+							{
+								id                     : consumer.id,
+								peerId                 : peerId,
+								kind                   : kind,
+								type                   : type,
+								locallyPaused          : false,
+								remotelyPaused         : producerPaused,
+								rtpParameters          : consumer.rtpParameters,
+								source                 : consumer.appData.source,
+								width                  : consumer.appData.width,
+								height                 : consumer.appData.height,
+								resolutionScalings     : consumer.appData.resolutionScalings,
+								spatialLayers          : spatialLayers,
+								temporalLayers         : temporalLayers,
+								preferredSpatialLayer  : spatialLayers - 1,
+								preferredTemporalLayer : temporalLayers - 1,
+								priority               : 1,
+								codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
+								track                  : consumer.track
+							},
+							peerId));
+
+						await this._startConsumer(consumer);
+
+						if (kind === 'audio')
+						{
+							consumer.volume = 0;
+
+							const stream = new MediaStream();
+
+							stream.addTrack(consumer.track);
+
+							if (!stream.getAudioTracks()[0])
+								throw new Error('request.newConsumer | given stream has no audio track');
+
+							consumer.hark = hark(stream, { play: false });
+
+							consumer.hark.on('volume_change', (volume) =>
+							{
+								volume = Math.round(volume);
+
+								if (consumer && volume !== consumer.volume)
+								{
+									consumer.volume = volume;
+
+									store.dispatch(peerVolumeActions.setPeerVolume(peerId, volume));
+								}
+							});
+						}
 
 						break;
 					}

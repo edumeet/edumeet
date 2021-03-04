@@ -1940,7 +1940,7 @@ class Room extends EventEmitter
 		// Send a request to the remote Peer with Consumer parameters.
 		try
 		{
-			await this._request(
+			this._notification(
 				consumerPeer.socket,
 				'newConsumer',
 				{
@@ -1954,10 +1954,6 @@ class Room extends EventEmitter
 					producerPaused : consumer.producerPaused
 				}
 			);
-
-			// Now that we got the positive response from the remote Peer and, if
-			// video, resume the Consumer to ask for an efficient key frame.
-			await consumer.resume();
 
 			this._notification(
 				consumerPeer.socket,
