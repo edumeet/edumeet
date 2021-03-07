@@ -50,7 +50,7 @@ const chat = (state = initialState, action) =>
 			return { ...state, order: order };
 		}
 
-		case 'GO_TO_NEWEST_MESSAGES':
+		case 'SET_IS_SCROLL_END':
 		{
 			const { flag } = action.payload;
 

@@ -114,7 +114,7 @@ class MessageList extends React.Component
 		if (this.props.chat.order === 'desc')
 			isScrollEnd = (this.ref.current.scrollTop === 0 ? true : false);
 
-		this.props.goToNewestMessages(isScrollEnd);
+		this.props.setIsScrollEnd(isScrollEnd);
 
 		if (this.props.chat.isScrollEnd)
 			this.props.setAreNewMessages(false);
@@ -284,12 +284,12 @@ MessageList.propTypes =
 	myPicture : PropTypes.string,
 	classes   : PropTypes.object.isRequired,
 
-	files              : PropTypes.object.isRequired,
-	me                 : appPropTypes.Me.isRequired,
-	peers              : PropTypes.object.isRequired,
-	intl               : PropTypes.object.isRequired,
-	goToNewestMessages : PropTypes.func.isRequired,
-	setAreNewMessages  : PropTypes.func.isRequired
+	files             : PropTypes.object.isRequired,
+	me                : appPropTypes.Me.isRequired,
+	peers             : PropTypes.object.isRequired,
+	intl              : PropTypes.object.isRequired,
+	setIsScrollEnd    : PropTypes.func.isRequired,
+	setAreNewMessages : PropTypes.func.isRequired
 
 };
 
@@ -305,9 +305,9 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = (dispatch) =>
 	({
-		goToNewestMessages : (flag) =>
+		setIsScrollEnd : (flag) =>
 		{
-			dispatch(chatActions.goToNewestMessages(flag));
+			dispatch(chatActions.setIsScrollEnd(flag));
 		},
 		setAreNewMessages : (flag) =>
 		{

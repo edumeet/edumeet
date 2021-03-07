@@ -777,7 +777,7 @@ export default class RoomClient
 				chatActions.addUserMessage(chatMessage.text));
 
 			store.dispatch(
-				chatActions.goToNewestMessages(true));
+				chatActions.setIsScrollEnd(true));
 
 			await this.sendRequest('chatMessage', { chatMessage });
 
