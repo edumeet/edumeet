@@ -336,6 +336,12 @@ export default class RoomClient
 		{
 			store.dispatch(meActions.setPicture(store.getState().settings.localPicture));
 		}
+
+		// Receive transport restart ICE object
+		this._recvRestartIce = { timer: null, restarting: false };
+
+		// Send transport restart ICE object
+		this._sendRestartIce = { timer: null, restarting: false };
 	}
 
 	close()
@@ -554,7 +560,6 @@ export default class RoomClient
 			}
 			event.preventDefault();
 		}, true);
-
 	}
 
 	_startDevicesListener()
@@ -2196,36 +2201,54 @@ export default class RoomClient
 		}
 	}
 
-	async restartIce()
+	async restartIce(transport, ice, delay)
 	{
-		logger.debug('restartIce()');
+		logger.debug('restartIce() [transport:%o ice:%o delay:%d]', transport, ice, delay);
 
-		try
+		if (!transport)
 		{
-			if (this._sendTransport)
+			logger.error('restartIce(): missing valid transport object');
+
+			return;
+		}
+
+		if (!ice)
+		{
+			logger.error('restartIce(): missing valid ice object');
+
+			return;
+		}
+
+		clearTimeout(ice.timer);
+		ice.timer = setTimeout(async () =>
+		{
+			try
 			{
+				if (ice.restarting)
+				{
+					return;
+				}
+				ice.restarting = true;
+
 				const iceParameters = await this.sendRequest(
 					'restartIce',
-					{ transportId: this._sendTransport.id });
+					{ transportId: transport.id });
 
-				await this._sendTransport.restartIce({ iceParameters });
+				await transport.restartIce({ iceParameters });
+				ice.restarting = false;
+				logger.debug('ICE restarted');
 			}
-
-			if (this._recvTransport)
+			catch (error)
 			{
-				const iceParameters = await this.sendRequest(
-					'restartIce',
-					{ transportId: this._recvTransport.id });
+				logger.error('restartIce() [failed:%o]', error);
 
-				await this._recvTransport.restartIce({ iceParameters });
+				ice.restarting = false;
+				ice.timer = setTimeout(() =>
+				{
+					this.restartIce(transport, ice, delay * 2);
+				}, delay);
 			}
-
-			logger.debug('ICE restarted');
-		}
-		catch (error)
-		{
-			logger.error('restartIce() | failed:%o', error);
-		}
+		}, delay);
 	}
 
 	setConsumerPreferredLayersMax(consumer)
@@ -3431,10 +3454,11 @@ export default class RoomClient
 						{
 							case 'disconnected':
 							case 'failed':
-								this.restartIce();
+								this.restartIce(this._sendTransport, this._sendRestartIce, 2000);
 								break;
 
 							default:
+								clearTimeout(this._sendRestartIce.timer);
 								break;
 						}
 					});
@@ -3509,10 +3533,11 @@ export default class RoomClient
 					{
 						case 'disconnected':
 						case 'failed':
-							this.restartIce();
+							this.restartIce(this._recvTransport, this._recvRestartIce, 2000);
 							break;
 
 						default:
+							clearTimeout(this._recvRestartIce.timer);
 							break;
 					}
 				});
