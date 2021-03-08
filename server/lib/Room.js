@@ -3,7 +3,7 @@ const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
-const { SocketTimeoutError } = require('./errors');
+const { SocketTimeoutError, NotFoundInMediasoupError } = require('./errors');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
@@ -803,7 +803,14 @@ class Room extends EventEmitter
 				{
 					logger.error('"request" failed [error:"%o"]', error);
 
-					cb(error);
+					if (error instanceof NotFoundInMediasoupError)
+					{
+						cb({ notFoundInMediasoupError : true });
+					}
+					else
+					{
+						cb(error);
+					}
 				});
 		});
 
@@ -1237,7 +1244,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.pause();
 
@@ -1256,7 +1263,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.resume();
 
@@ -1275,7 +1282,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.setPreferredLayers({ spatialLayer, temporalLayer });
 
@@ -1294,7 +1301,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.setPriority(priority);
 
@@ -1313,7 +1320,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.requestKeyFrame();
 
@@ -1358,7 +1365,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				const stats = await consumer.getStats();
 

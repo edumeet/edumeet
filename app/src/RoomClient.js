@@ -2100,7 +2100,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_pauseConsumer() [error:"%o"]', error);
+			logger.error('_pauseConsumer() [consumerId: %s; error:"%o"]', consumer.id, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumer.id);
+			}
 		}
 	}
 
@@ -2120,7 +2124,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_resumeConsumer() [error:"%o"]', error);
+			logger.error('_resumeConsumer() [consumerId: %s; error:"%o"]', consumer.id, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumer.id);
+			}
 		}
 	}
 
@@ -2208,7 +2216,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPreferredLayers() [error:"%o"]', error);
+			logger.error('setConsumerPreferredLayers() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
 	}
 
@@ -2368,7 +2380,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPriority() [error:"%o"]', error);
+			logger.error('setConsumerPriority() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
 	}
 
@@ -2382,7 +2398,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('requestConsumerKeyFrame() [error:"%o"]', error);
+			logger.error('requestConsumerKeyFrame() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
 	}
 
@@ -3063,6 +3083,14 @@ export default class RoomClient
 					{
 						const { peerId } = notification.data;
 
+						for (const consumer of this._consumers.values())
+						{
+							if (peerId === consumer.appData.peerId)
+							{
+								this._closeConsumer(consumer.id);
+							}
+						}
+
 						this._spotlights.closePeer(peerId);
 
 						store.dispatch(
@@ -3162,22 +3190,8 @@ export default class RoomClient
 					case 'consumerClosed':
 					{
 						const { consumerId } = notification.data;
-						const consumer = this._consumers.get(consumerId);
 
-						if (!consumer)
-							break;
-
-						consumer.close();
-
-						if (consumer.hark != null)
-							consumer.hark.stop();
-
-						this._consumers.delete(consumerId);
-
-						const { peerId } = consumer.appData;
-
-						store.dispatch(
-							consumerActions.removeConsumer(consumerId, peerId));
+						this._closeConsumer(consumerId);
 
 						break;
 					}
@@ -4507,5 +4521,27 @@ export default class RoomClient
 			return true;
 
 		return false;
+	}
+
+	_closeConsumer(consumerId)
+	{
+		const consumer = this._consumers.get(consumerId);
+
+		if (!consumer)
+			return;
+
+		consumer.close();
+
+		if (consumer.hark != null)
+			consumer.hark.stop();
+
+		this._consumers.delete(consumerId);
+
+		const { peerId } = consumer.appData;
+
+		store.dispatch(
+			consumerActions.removeConsumer(consumerId, peerId));
+
+		this.handleConsumerPreferredLayers();
 	}
 }
