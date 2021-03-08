@@ -4541,7 +4541,5 @@ export default class RoomClient
 
 		store.dispatch(
 			consumerActions.removeConsumer(consumerId, peerId));
-
-		this.handleConsumerPreferredLayers();
 	}
 }
