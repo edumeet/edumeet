@@ -247,8 +247,19 @@ export default class RoomClient
 		// Access code
 		this._accessCode = accessCode;
 
-		// Alert sound
-		this._soundAlert = new Audio('/sounds/notify.mp3');
+		// Alert sounds
+		this._soundAlerts = { 'default': { audio: new Audio('/sounds/notify.mp3') } };
+		if ('notificationSounds' in window.config)
+		{
+			for (const [ k, v ] of Object.entries(window.config.notificationSounds))
+			{
+				if (v != null && v.play !== undefined)
+					this._soundAlerts[k] = {
+						audio : new Audio(v.play),
+						delay : v.delay ? v.delay: 0
+					};
+			}
+		}
 
 		// Socket.io peer connection
 		this._signalingSocket = null;
@@ -659,13 +670,24 @@ export default class RoomClient
 			}));
 	}
 
-	_soundNotification()
+	_soundNotification(type = 'default')
 	{
 		const { notificationSounds } = store.getState().settings;
 
 		if (notificationSounds)
 		{
-			const alertPromise = this._soundAlert.play();
+			const soundAlert = this._soundAlerts[type] === undefined
+				? this._soundAlerts['default'] : this._soundAlerts[type];
+
+			const now = Date.now();
+
+			if (soundAlert.last !== undefined && (now - soundAlert.last) < soundAlert.delay)
+			{
+				return;
+			}
+			soundAlert.last = now;
+
+			const alertPromise = soundAlert.audio.play();
 
 			if (alertPromise !== undefined)
 			{
@@ -2624,7 +2646,7 @@ export default class RoomClient
 						store.dispatch(
 							roomActions.setToolbarsVisible(true));
 
-						this._soundNotification();
+						this._soundNotification(notification.method);
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2666,7 +2688,7 @@ export default class RoomClient
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
 
-							this._soundNotification();
+							this._soundNotification(notification.method);
 
 							store.dispatch(requestActions.notify(
 								{
@@ -2885,7 +2907,7 @@ export default class RoomClient
 								}));
 						}
 
-						this._soundNotification();
+						this._soundNotification(notification.method);
 
 						break;
 					}
@@ -2905,7 +2927,7 @@ export default class RoomClient
 						{
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
-							this._soundNotification();
+							this._soundNotification(notification.method);
 						}
 
 						break;
@@ -2948,7 +2970,7 @@ export default class RoomClient
 						{
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
-							this._soundNotification();
+							this._soundNotification(notification.method);
 						}
 
 						break;
@@ -2988,7 +3010,7 @@ export default class RoomClient
 
 						this._spotlights.newPeer(id);
 
-						this._soundNotification();
+						this._soundNotification(notification.method);
 
 						store.dispatch(requestActions.notify(
 							{
