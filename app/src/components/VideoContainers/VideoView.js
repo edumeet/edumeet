@@ -31,7 +31,7 @@ const styles = (theme) =>
 			flex               : '100 100 auto',
 			height             : '100%',
 			width              : '100%',
-			objectFit          : 'cover',
+			objectFit          : 'contain',
 			userSelect         : 'none',
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
