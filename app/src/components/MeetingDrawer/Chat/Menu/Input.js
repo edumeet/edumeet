@@ -122,11 +122,9 @@ const ChatInput = (props) =>
 
 	const handleClearInput = () =>
 	{
-		setEditorState(EditorState.push(
-			editorState,
-			ContentState.createFromText(''),
-			'remove-range')
-		);
+		setEditorState(EditorState.moveFocusToEnd(
+			EditorState.push(editorState, ContentState.createFromText(''), 'remove-range')
+		));
 	};
 
 	const handleIsMessageEmpty = () =>
