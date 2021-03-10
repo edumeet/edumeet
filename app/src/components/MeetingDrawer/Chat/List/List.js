@@ -52,7 +52,6 @@ const styles = (theme) =>
 		{
 			top : '130px'
 		}
-
 	});
 
 class MessageList extends React.Component
@@ -61,12 +60,16 @@ class MessageList extends React.Component
 	{
 		super(props);
 
-		this.ref = React.createRef();
+		this.refList = React.createRef();
+
+		this.handleIsMessageSeen= this.handleIsMessageSeen.bind(this);
 	}
 
 	componentDidMount()
 	{
-		this.ref.current.addEventListener('scroll', () => this.handleSetIsScrollEnd());
+		this.refList.current.addEventListener('scroll', () => this.handleSetIsScrollEnd());
+
+		this.refList.current.addEventListener('scroll', (event) => this.handleIsMessageSeen(event));
 	}
 
 	componentDidUpdate(prevProps)
@@ -104,15 +107,15 @@ class MessageList extends React.Component
 		if (this.props.chat.order === 'asc')
 			isScrollEnd = (
 				Math.abs(
-					Math.floor(this.ref.current.scrollTop) +
-					this.ref.current.offsetHeight -
-					this.ref.current.scrollHeight
+					Math.floor(this.refList.current.scrollTop) +
+					this.refList.current.offsetHeight -
+					this.refList.current.scrollHeight
 
 				) < 2
 			);
 		else
 		if (this.props.chat.order === 'desc')
-			isScrollEnd = (this.ref.current.scrollTop === 0 ? true : false);
+			isScrollEnd = (this.refList.current.scrollTop === 0 ? true : false);
 
 		this.props.setIsScrollEnd(isScrollEnd);
 
@@ -121,13 +124,34 @@ class MessageList extends React.Component
 
 	}
 
+	handleIsMessageSeen(event)
+	{
+		const list = event.target;
+
+		const listRect = list.getBoundingClientRect();
+
+		const items = [ ...list.childNodes ];
+
+		items.forEach((item) =>
+		{
+			const itemRect = item.getBoundingClientRect();
+
+			const isSeen = itemRect.top <= listRect.bottom;
+
+			if (isSeen && item.dataset.isseen === 'false')
+			{
+				this.props.setIsMessageRead(item.dataset.time, true);
+			}
+		});
+	}
+
 	handleGoToNewest()
 	{
 		if (this.props.chat.order === 'asc')
-			this.ref.current.scrollTop = this.ref.current.scrollHeight;
+			this.refList.current.scrollTop = this.refList.current.scrollHeight;
 		else
 		if (this.props.chat.order === 'desc')
-			this.ref.current.scrollTop = 0;
+			this.refList.current.scrollTop = 0;
 	}
 
 	getTimeString(time)
@@ -162,8 +186,8 @@ class MessageList extends React.Component
 
 		return (
 			<React.Fragment>
-				<div id='chatList' className={classes.root} ref={this.ref}>
-					{this.props.chat.areNewMessages ?
+				<div id='chatList' className={classes.root} ref={this.refList}>
+					{chat.areNewMessages ?
 						<Button
 							variant='contained'
 							color='primary'
@@ -205,10 +229,8 @@ class MessageList extends React.Component
 							})}
 
 						</div>)
-						: ''
-					}
-					{
 
+						:
 						items.map((item) =>
 						{
 							if (item.type === 'message')
@@ -218,14 +240,17 @@ class MessageList extends React.Component
 
 								return (
 									<Message
+										isseen={item.isRead}
+										sender={item.sender}
 										key={item.time}
 										self={item.sender === 'client'}
 										picture={picture}
 										text={item.text}
 										time={this.getTimeString(item.time)}
+										time2={item.time}
 										name={item.name}
-									/>
-								);
+										isScrollEnd={this.isScrollEnd}
+									/>);
 							}
 
 							else if (item.type === 'file')
@@ -289,7 +314,8 @@ MessageList.propTypes =
 	peers             : PropTypes.object.isRequired,
 	intl              : PropTypes.object.isRequired,
 	setIsScrollEnd    : PropTypes.func.isRequired,
-	setAreNewMessages : PropTypes.func.isRequired
+	setAreNewMessages : PropTypes.func.isRequired,
+	setIsMessageRead  : PropTypes.func.isRequired
 
 };
 
@@ -312,6 +338,10 @@ const mapDispatchToProps = (dispatch) =>
 		setAreNewMessages : (flag) =>
 		{
 			dispatch(chatActions.setAreNewMessages(flag));
+		},
+		setIsMessageRead : (id, isRead) =>
+		{
+			dispatch(chatActions.setIsMessageRead(id, isRead));
 		}
 	});
 

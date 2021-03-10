@@ -71,12 +71,13 @@ const ChatInput = (props) =>
 
 	const createNewMessage = (text, sender, name, picture) =>
 		({
-			type : 'message',
+			type   : 'message',
 			text,
-			time : Date.now(),
+			time   : Date.now(),
 			name,
 			sender,
-			picture
+			picture,
+			isSeen : false
 		});
 
 	const {

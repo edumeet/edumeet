@@ -2837,7 +2837,7 @@ export default class RoomClient
 						const { peerId, chatMessage } = notification.data;
 
 						store.dispatch(
-							chatActions.addResponseMessage({ ...chatMessage, peerId }));
+							chatActions.addResponseMessage({ ...chatMessage, peerId, isRead: false }));
 
 						if (
 							!store.getState().toolarea.toolAreaOpen ||

@@ -38,3 +38,11 @@ export const setIsScrollEnd = (flag) =>
 		type    : 'SET_IS_SCROLL_END',
 		payload : { flag }
 	});
+
+export const setIsMessageRead = (id, isRead) =>
+{
+	return ({
+		type    : 'SET_IS_MESSAGE_READ',
+		payload : { id, isRead }
+	});
+};

@@ -51,7 +51,22 @@ const styles = (theme) =>
 			borderRadius : '50%',
 			height       : '2rem',
 			alignSelf    : 'center'
+		},
+		'@keyframes fadeIn' : {
+			'0%' : {
+				backgroundColor : 'yellow'
+			},
+			'100%' : {
+				backgroundColor : 'none'
+			}
+		},
+		'isseen' : {
+			animation : '$fadeIn 3s ease-in-out'
+		},
+		'isunseen' : {
+			backgroundColor : 'yellow'
 		}
+
 	});
 
 const Message = (props) =>
@@ -64,18 +79,24 @@ const Message = (props) =>
 		text,
 		time,
 		name,
-		classes
+		classes,
+		time2,
+		isseen,
+		sender
 	} = props;
 
 	return (
 		<Paper
 			className={classnames(
 				classes.root,
-				self ? classes.selfMessage : classes.remoteMessage
+				self ? classes.selfMessage : classes.remoteMessage,
+				isseen && sender === 'response' ? classes.isseen : null
 			)}
+			data-isseen={isseen}
+			data-time={time2}
 		>
 			<img alt='Avatar' className={classes.avatar} src={picture} />
-			<div className={classes.content}>
+			<div className={classnames(classes.content)}>
 				<Typography
 					className={classes.text}
 					variant='subtitle1'
@@ -116,8 +137,12 @@ Message.propTypes =
 	picture : PropTypes.string,
 	text    : PropTypes.string,
 	time    : PropTypes.object,
+	time2   : PropTypes.string,
 	name    : PropTypes.string,
-	classes : PropTypes.object.isRequired
+	classes : PropTypes.object.isRequired,
+	isseen  : PropTypes.bool.isRequired,
+	sender  : PropTypes.string.isRequired
+
 };
 
 export default withStyles(styles)(Message);

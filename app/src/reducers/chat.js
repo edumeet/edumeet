@@ -64,6 +64,21 @@ const chat = (state = initialState, action) =>
 			return { ...state, areNewMessages: flag };
 		}
 
+		case 'SET_IS_MESSAGE_READ':
+		{
+			const { id, isRead } = action.payload;
+
+			state.messages.forEach((key, index) =>
+			{
+				if (state.messages[index].time === Number(id))
+				{
+					state.messages[index].isRead = isRead;
+				}
+			});
+
+			return { ...state };
+		}
+
 		default:
 			return state;
 	}
