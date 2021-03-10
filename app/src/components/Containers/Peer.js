@@ -40,6 +40,7 @@ const styles = (theme) =>
 			{
 				// transition  : 'filter .2s',
 				// filter      : 'grayscale(0)',
+				boxShadow   : 'var(--active-speaker-shadow)',
 				borderColor : 'var(--active-speaker-border-color)'
 			},
 			'&:not(.active-speaker):not(.screen)' :
