@@ -154,11 +154,6 @@ class MessageList extends React.Component
 			this.refList.current.scrollTop = 0;
 	}
 
-	getTimeString(time)
-	{
-		return (<FormattedTime value={new Date(time)} />);
-	}
-
 	render()
 	{
 		const {
@@ -246,8 +241,7 @@ class MessageList extends React.Component
 										self={item.sender === 'client'}
 										picture={picture}
 										text={item.text}
-										time={this.getTimeString(item.time)}
-										time2={item.time}
+										time={item.time}
 										name={item.name}
 										isScrollEnd={this.isScrollEnd}
 									/>);
