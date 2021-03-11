@@ -154,9 +154,6 @@ class MessageList extends React.Component
 			{
 				if (isSeen && item.dataset.isseen === 'false')
 				{
-					// eslint-disable-next-line
-					console.log(isSeen, 'tagname:', item.tagName)
-
 					this.props.setIsMessageRead(item.dataset.time, true);
 				}
 			}
