@@ -53,14 +53,13 @@ const styles = (theme) =>
 			{
 				transition : 'opacity 0.5s',
 				opacity    : '0'
+			},
+			'&.asc' : {
+				bottom : '100px'
+			},
+			'&.desc' : {
+				top : '130px'
 			}
-		},
-		'asc' : {
-			bottom : '100px'
-		},
-		'desc' :
-		{
-			top : '130px'
 		}
 	});
 
@@ -201,7 +200,7 @@ class MessageList extends React.Component
 							classnames(
 								classes.buttonGoToNewest,
 								chat.areNewMessages ? 'show': 'hide',
-								chat.order === 'asc' ? classes.asc : classes.desc
+								chat.order === 'asc' ? 'asc' : 'desc'
 							)
 						}
 						endIcon={
