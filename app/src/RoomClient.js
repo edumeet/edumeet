@@ -3921,7 +3921,7 @@ export default class RoomClient
 
 			const { width, height } = track.getSettings();
 
-			logger.debug('getUserMedia track settings:', track.getSettings());
+			logger.debug('extra video track settings:', track.getSettings());
 
 			let exists = false;
 
@@ -3980,7 +3980,9 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'extravideo'
+							source : 'extravideo',
+							width,
+							height
 						}
 					});
 				}
@@ -4133,6 +4135,10 @@ export default class RoomClient
 
 				([ track ] = stream.getVideoTracks());
 
+				const { width, height } = track.getSettings();
+
+				logger.debug('screenSharing track settings:', track.getSettings());
+
 				if (this._useSharingSimulcast)
 				{
 					// If VP9 is the only available video codec then use SVC.
@@ -4158,6 +4164,8 @@ export default class RoomClient
 							.map((encoding) => ({ ...encoding, dtx: true }));
 					}
 
+					const resolutionScalings = getResolutionScalings(encodings);
+
 					this._screenSharingProducer = await this._sendTransport.produce(
 						{
 							track,
@@ -4168,7 +4176,10 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'screen'
+								source : 'screen',
+								width,
+								height,
+								resolutionScalings
 							}
 						});
 				}
@@ -4178,7 +4189,9 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'screen'
+							source : 'screen',
+							width,
+							height
 						}
 					});
 				}
