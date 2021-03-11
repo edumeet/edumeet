@@ -106,24 +106,27 @@ const SpeakerPeer = (props) =>
 	{
 		const handler = setTimeout(() =>
 		{
-			if (!webcamConsumer)
+			const consumer = webcamConsumer || screenConsumer;
+
+			if (!consumer)
 				return;
 
-			if (windowConsumer === webcamConsumer.id)
+			if (windowConsumer === consumer.id)
 			{
 				// if playing in external window, set the maximum quality levels
-				roomClient.setConsumerPreferredLayersMax(webcamConsumer);
+				roomClient.setConsumerPreferredLayersMax(consumer);
 			}
 			else if (webcamConsumer?.type !== 'simple'
-				&& fullScreenConsumer !== webcamConsumer.id)
+				&& fullScreenConsumer !== consumer.id)
 			{
-				roomClient.adaptConsumerPreferredLayers(webcamConsumer, width, height);
+				roomClient.adaptConsumerPreferredLayers(consumer, width, height);
 			}
 		}, 1000);
 
 		return () => { clearTimeout(handler); };
 	}, [
 		webcamConsumer,
+		screenConsumer,
 		windowConsumer,
 		fullScreenConsumer,
 		roomClient, width, height

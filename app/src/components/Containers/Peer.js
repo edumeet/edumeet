@@ -200,18 +200,20 @@ const Peer = (props) =>
 	{
 		const handler = setTimeout(() =>
 		{
-			if (!webcamConsumer)
+			const consumer = webcamConsumer || screenConsumer;
+
+			if (!consumer)
 				return;
 
-			if (windowConsumer === webcamConsumer.id)
+			if (windowConsumer === consumer.id)
 			{
 				// if playing in external window, set the maximum quality levels
-				roomClient.setConsumerPreferredLayersMax(webcamConsumer);
+				roomClient.setConsumerPreferredLayersMax(consumer);
 			}
-			else if (enableLayersSwitch && webcamConsumer?.type !== 'simple'
-				&& fullScreenConsumer !== webcamConsumer.id)
+			else if (enableLayersSwitch && consumer?.type !== 'simple'
+				&& fullScreenConsumer !== consumer.id)
 			{
-				roomClient.adaptConsumerPreferredLayers(webcamConsumer, width, height);
+				roomClient.adaptConsumerPreferredLayers(consumer, width, height);
 			}
 		}, 1000);
 
@@ -219,6 +221,7 @@ const Peer = (props) =>
 	}, [
 		enableLayersSwitch,
 		webcamConsumer,
+		screenConsumer,
 		windowConsumer,
 		fullScreenConsumer,
 		roomClient, width, height
