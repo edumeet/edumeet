@@ -226,7 +226,7 @@ class MessageList extends React.Component
 							)
 						}
 					>
-						New Messages
+						( {chat.countUnread} ) New Messages
 					</Button>
 
 					{items.length === 0
