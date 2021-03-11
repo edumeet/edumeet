@@ -3919,6 +3919,10 @@ export default class RoomClient
 
 			([ track ] = stream.getVideoTracks());
 
+			const { width, height } = track.getSettings();
+
+			logger.debug('getUserMedia track settings:', track.getSettings());
+
 			let exists = false;
 
 			this._extraVideoProducers.forEach(function(value)
@@ -3951,6 +3955,8 @@ export default class RoomClient
 					else
 						encodings = VIDEO_SIMULCAST_ENCODINGS;
 
+					const resolutionScalings = getResolutionScalings(encodings);
+
 					producer = await this._sendTransport.produce(
 						{
 							track,
@@ -3961,7 +3967,10 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'extravideo'
+								source : 'extravideo',
+								width,
+								height,
+								resolutionScalings
 							}
 						});
 				}
