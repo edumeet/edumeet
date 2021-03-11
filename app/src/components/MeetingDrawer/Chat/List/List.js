@@ -251,7 +251,6 @@ class MessageList extends React.Component
 										text={item.text}
 										time={item.time}
 										name={item.name}
-										isScrollEnd={this.isScrollEnd}
 									/>);
 							}
 
