@@ -33,7 +33,11 @@ const chat = (state = initialState, action) =>
 				(item, index) => { chatHistory[index].isRead = true; }
 			);
 
-			return { ...state, messages: chatHistory };
+			return {
+				...state,
+				messages : chatHistory,
+				count    : chatHistory.length
+			};
 		}
 
 		case 'CLEAR_CHAT':
