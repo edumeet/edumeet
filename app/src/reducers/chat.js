@@ -4,7 +4,8 @@ const initialState =
 	isScrollEnd    : true,
 	messages       : [],
 	areNewMessages : false,
-	count          : 0
+	count          : 0,
+	countUnread    : 0
 };
 
 const chat = (state = initialState, action) =>
@@ -17,9 +18,11 @@ const chat = (state = initialState, action) =>
 
 			return {
 				...state,
-				messages : [ ...state.messages, message ],
-				count    : state.count + 1
+				messages    : [ ...state.messages, message ],
+				count       : state.count + 1,
+				countUnread : message.sender === 'response' ? ++state.countUnread : state.countUnread
 			};
+
 		}
 
 		case 'ADD_CHAT_HISTORY':
@@ -37,8 +40,9 @@ const chat = (state = initialState, action) =>
 		{
 			return {
 				...state,
-				messages : [],
-				count    : 0
+				messages    : [],
+				count       : 0,
+				countUnread : 0
 			};
 		}
 
@@ -72,6 +76,8 @@ const chat = (state = initialState, action) =>
 				if (state.messages[index].time === Number(id))
 				{
 					state.messages[index].isRead = isRead;
+
+					state.countUnread--;
 				}
 			});
 
