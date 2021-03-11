@@ -54,7 +54,7 @@ const styles = (theme) =>
 		},
 		'@keyframes fadeIn' : {
 			'0%' : {
-				backgroundColor : 'yellow'
+				backgroundColor : '#5f9b2d5c'
 			},
 			'100%' : {
 				backgroundColor : 'none'
@@ -64,7 +64,7 @@ const styles = (theme) =>
 			animation : '$fadeIn 3s ease-in-out'
 		},
 		'isunseen' : {
-			backgroundColor : 'yellow'
+			backgroundColor : '#5f9b2d5c'
 		}
 
 	});
