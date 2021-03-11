@@ -3,7 +3,8 @@ const initialState =
 	order          : 'asc',
 	isScrollEnd    : true,
 	messages       : [],
-	areNewMessages : false
+	areNewMessages : false,
+	count          : 0
 };
 
 const chat = (state = initialState, action) =>
@@ -14,7 +15,11 @@ const chat = (state = initialState, action) =>
 		{
 			const { message } = action.payload;
 
-			return { ...state, messages: [ ...state.messages, message ] };
+			return {
+				...state,
+				messages : [ ...state.messages, message ],
+				count    : state.count + 1
+			};
 		}
 
 		case 'ADD_CHAT_HISTORY':
@@ -26,7 +31,11 @@ const chat = (state = initialState, action) =>
 
 		case 'CLEAR_CHAT':
 		{
-			return { ...state, messages: [] };
+			return {
+				...state,
+				messages : [],
+				count    : 0
+			};
 		}
 
 		case 'SORT_CHAT':
