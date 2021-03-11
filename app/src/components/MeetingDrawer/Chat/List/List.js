@@ -38,12 +38,22 @@ const styles = (theme) =>
 			'*::-webkit-scrollbar-thumb' : {
 				backgroundColor : '#999999'
 			}
-
 		},
-		'buttonGoToNewest' :
+
+		buttonGoToNewest :
 		{
 			position     : 'fixed',
-			borderRadius : '50px'
+			borderRadius : '50px',
+			'&.show'     :
+			{
+				transition : 'opacity 0.5s',
+				opacity    : '1'
+			},
+			'&.hide' :
+			{
+				transition : 'opacity 0.5s',
+				opacity    : '0'
+			}
 		},
 		'asc' : {
 			bottom : '100px'
@@ -182,39 +192,37 @@ class MessageList extends React.Component
 		return (
 			<React.Fragment>
 				<div id='chatList' className={classes.root} ref={this.refList}>
-					{chat.areNewMessages ?
-						<Button
-							variant='contained'
-							color='primary'
-							size='small'
-							onClick={() => this.handleGoToNewest()}
-							className={
-								classnames(
-									classes.buttonGoToNewest,
-									(chat.order === 'asc' ? classes.asc : classes.desc)
-								)
-							}
-							endIcon={
-								(chat.order === 'asc' ?
-									<ChevronLeftIcon
-										style={{
-											color     : 'white',
-											transform : 'rotate(270deg)'
-										}}
-									/> :
-									<ChevronLeftIcon
-										style={{
-											color     : 'white',
-											transform : 'rotate(90deg)'
-										}}
-									/>
-								)
-							}
-						>
-							New Messages
-						</Button>
-						: null
-					}
+					<Button
+						variant='contained'
+						color='primary'
+						size='small'
+						onClick={() => this.handleGoToNewest()}
+						className={
+							classnames(
+								classes.buttonGoToNewest,
+								chat.areNewMessages ? 'show': 'hide',
+								chat.order === 'asc' ? classes.asc : classes.desc
+							)
+						}
+						endIcon={
+							(chat.order === 'asc' ?
+								<ChevronLeftIcon
+									style={{
+										color     : 'white',
+										transform : 'rotate(270deg)'
+									}}
+								/> :
+								<ChevronLeftIcon
+									style={{
+										color     : 'white',
+										transform : 'rotate(90deg)'
+									}}
+								/>
+							)
+						}
+					>
+						New Messages
+					</Button>
 
 					{items.length === 0
 						? (<div>
