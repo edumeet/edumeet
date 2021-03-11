@@ -83,6 +83,9 @@ class MessageList extends React.Component
 
 	componentDidUpdate(prevProps)
 	{
+		if (prevProps.chat.count !== this.props.chat.count)
+			this.handleIsMessageSeen();
+
 		if (this.props.chat.isScrollEnd)
 			this.handleGoToNewest();
 
@@ -133,9 +136,9 @@ class MessageList extends React.Component
 
 	}
 
-	handleIsMessageSeen(event)
+	handleIsMessageSeen()
 	{
-		const list = event.target;
+		const list = this.refList.current;
 
 		const listRect = list.getBoundingClientRect();
 
@@ -147,9 +150,15 @@ class MessageList extends React.Component
 
 			const isSeen = itemRect.top <= listRect.bottom;
 
-			if (isSeen && item.dataset.isseen === 'false')
+			if (item.tagName === 'DIV')
 			{
-				this.props.setIsMessageRead(item.dataset.time, true);
+				if (isSeen && item.dataset.isseen === 'false')
+				{
+					// eslint-disable-next-line
+					console.log(isSeen, 'tagname:', item.tagName)
+
+					this.props.setIsMessageRead(item.dataset.time, true);
+				}
 			}
 		});
 	}

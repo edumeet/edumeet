@@ -26,6 +26,10 @@ const chat = (state = initialState, action) =>
 		{
 			const { chatHistory } = action.payload;
 
+			chatHistory.forEach(
+				(item, index) => { chatHistory[index].isRead = true; }
+			);
+
 			return { ...state, messages: chatHistory };
 		}
 

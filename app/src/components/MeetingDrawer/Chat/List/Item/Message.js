@@ -53,18 +53,16 @@ const styles = (theme) =>
 			alignSelf    : 'center'
 		},
 		'@keyframes fadeIn' : {
-			'0%' : {
+			'from' : {
 				backgroundColor : '#5f9b2d5c'
 			},
-			'100%' : {
-				backgroundColor : 'none'
+			'to' : {
+				backgroundColor : 'white'
 			}
 		},
-		'isseen' : {
-			animation : '$fadeIn 3s ease-in-out'
-		},
-		'isunseen' : {
-			backgroundColor : '#5f9b2d5c'
+		isseen : {
+			animation         : '$fadeIn 2s linear',
+			animationFillMode : 'forwards'
 		}
 
 	});

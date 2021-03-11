@@ -129,7 +129,8 @@ const ChatInput = (props) =>
 				name    : displayName,
 				picture : picture,
 				text    : message,
-				time    : Date.now()
+				time    : Date.now(),
+				isRead  : null
 			};
 
 			roomClient.sendChatMessage(sendMessage);

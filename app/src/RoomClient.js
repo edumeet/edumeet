@@ -779,7 +779,8 @@ export default class RoomClient
 						...chatMessage,
 						name    : 'Me',
 						sender  : 'client',
-						picture : undefined
+						picture : undefined,
+						isRead  : true
 					}
 				)
 			);
