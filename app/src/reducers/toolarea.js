@@ -44,7 +44,7 @@ const toolarea = (state = initialState, action) =>
 			return { ...state, currentToolTab: toolTab, unreadMessages, unreadFiles };
 		}
 
-		case 'ADD_NEW_RESPONSE_MESSAGE':
+		case 'ADD_MESSAGE':
 		{
 			if (state.toolAreaOpen && state.currentToolTab === 'chat')
 			{
