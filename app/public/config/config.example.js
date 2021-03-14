@@ -74,14 +74,14 @@ var config =
 	{
 		3840 :
 		[
-			{ scaleResolutionDownBy: 6, maxBitRate: 750000 },
-			{ scaleResolutionDownBy: 3, maxBitRate: 1500000 },
+			{ scaleResolutionDownBy: 4, maxBitRate: 1500000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 4000000 },
 			{ scaleResolutionDownBy: 1, maxBitRate: 10000000 }
 		],
 		1920 :
 		[
-			{ scaleResolutionDownBy: 6, maxBitRate: 250000 },
-			{ scaleResolutionDownBy: 3, maxBitRate: 900000 },
+			{ scaleResolutionDownBy: 4, maxBitRate: 750000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 1500000 },
 			{ scaleResolutionDownBy: 1, maxBitRate: 4000000 }
 		],
 		1280 :
@@ -100,6 +100,7 @@ var config =
 			{ scaleResolutionDownBy: 1, maxBitRate: 250000 }
 		]
 	},
+
 
 	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
 	// example: 
