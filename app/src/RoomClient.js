@@ -93,11 +93,36 @@ const PC_PROPRIETARY_CONSTRAINTS =
 	optional : [ { googDscp: true } ]
 };
 
-const VIDEO_SIMULCAST_ENCODINGS =
-[
-	{ scaleResolutionDownBy: 4, maxBitRate: 100000 },
-	{ scaleResolutionDownBy: 1, maxBitRate: 1200000 }
-];
+const VIDEO_SIMULCAST_PROFILES =
+{
+	3840 :
+	[
+		{ scaleResolutionDownBy: 6, maxBitRate: 750000 },
+		{ scaleResolutionDownBy: 3, maxBitRate: 1500000 },
+		{ scaleResolutionDownBy: 1, maxBitRate: 10000000 }
+	],
+	1920 :
+	[
+		{ scaleResolutionDownBy: 6, maxBitRate: 250000 },
+		{ scaleResolutionDownBy: 3, maxBitRate: 900000 },
+		{ scaleResolutionDownBy: 1, maxBitRate: 4000000 }
+	],
+	1280 :
+	[
+		{ scaleResolutionDownBy: 4, maxBitRate: 250000 },
+		{ scaleResolutionDownBy: 2, maxBitRate: 900000 },
+		{ scaleResolutionDownBy: 1, maxBitRate: 3000000 }
+	],
+	640 :
+	[
+		{ scaleResolutionDownBy: 2, maxBitRate: 250000 },
+		{ scaleResolutionDownBy: 1, maxBitRate: 900000 }
+	],
+	320 :
+	[
+		{ scaleResolutionDownBy: 1, maxBitRate: 250000 }
+	]
+};
 
 // Used for VP9 webcam video.
 const VIDEO_KSVC_ENCODINGS =
@@ -1603,21 +1628,7 @@ export default class RoomClient
 
 				if (this._useSimulcast)
 				{
-					// If VP9 is the only available video codec then use SVC.
-					const firstVideoCodec = this._mediasoupDevice
-						.rtpCapabilities
-						.codecs
-						.find((c) => c.kind === 'video');
-
-					let encodings;
-
-					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-						encodings = VIDEO_KSVC_ENCODINGS;
-					else if ('simulcastEncodings' in window.config)
-						encodings = window.config.simulcastEncodings;
-					else
-						encodings = VIDEO_SIMULCAST_ENCODINGS;
-
+					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
 
 					this._webcamProducer = await this._sendTransport.produce(
@@ -3940,21 +3951,7 @@ export default class RoomClient
 
 				if (this._useSimulcast)
 				{
-					// If VP9 is the only available video codec then use SVC.
-					const firstVideoCodec = this._mediasoupDevice
-						.rtpCapabilities
-						.codecs
-						.find((c) => c.kind === 'video');
-
-					let encodings;
-
-					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-						encodings = VIDEO_KSVC_ENCODINGS;
-					else if ('simulcastEncodings' in window.config)
-						encodings = window.config.simulcastEncodings;
-					else
-						encodings = VIDEO_SIMULCAST_ENCODINGS;
-
+					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
 
 					producer = await this._sendTransport.produce(
@@ -4141,26 +4138,17 @@ export default class RoomClient
 
 				if (this._useSharingSimulcast)
 				{
+					let encodings = this._getEncodings(width, height);
+
 					// If VP9 is the only available video codec then use SVC.
 					const firstVideoCodec = this._mediasoupDevice
 						.rtpCapabilities
 						.codecs
 						.find((c) => c.kind === 'video');
 
-					let encodings;
-
-					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+					if (firstVideoCodec.mimeType.toLowerCase() !== 'video/vp9')
 					{
-						encodings = VIDEO_SVC_ENCODINGS;
-					}
-					else if ('simulcastEncodings' in window.config)
-					{
-						encodings = window.config.simulcastEncodings
-							.map((encoding) => ({ ...encoding, dtx: true }));
-					}
-					else
-					{
-						encodings = VIDEO_SIMULCAST_ENCODINGS
+						encodings = encodings
 							.map((encoding) => ({ ...encoding, dtx: true }));
 					}
 
@@ -4563,5 +4551,54 @@ export default class RoomClient
 
 		store.dispatch(
 			consumerActions.removeConsumer(consumerId, peerId));
+	}
+
+	_chooseEncodings(simulcastProfiles, size)
+	{
+		let encodings;
+
+		const sortedMap = new Map([ ...Object.entries(simulcastProfiles) ]
+			.sort((a, b) => parseInt(b[0]) - parseInt(a[0])));
+
+		for (const [ key, value ] of sortedMap)
+		{
+			if (key < size)
+			{
+				if (encodings === null)
+				{
+					encodings = value;
+				}
+
+				break;
+			}
+
+			encodings = value;
+		}
+
+		return encodings;
+	}
+
+	_getEncodings(width, height)
+	{
+		// If VP9 is the only available video codec then use SVC.
+		const firstVideoCodec = this._mediasoupDevice
+			.rtpCapabilities
+			.codecs
+			.find((c) => c.kind === 'video');
+
+		let encodings;
+
+		const size = (width > height ? width : height);
+
+		if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+			encodings = VIDEO_KSVC_ENCODINGS;
+		else if ('simulcastProfiles' in window.config)
+			encodings = this._chooseEncodings(window.config.simulcastProfiles, size);
+		else if ('simulcastEncodings' in window.config)
+			encodings = window.config.simulcastEncodings;
+		else
+			encodings = this._chooseEncodings(VIDEO_SIMULCAST_PROFILES, size);
+
+		return encodings;
 	}
 }
