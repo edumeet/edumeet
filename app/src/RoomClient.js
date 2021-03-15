@@ -80,6 +80,14 @@ const VIDEO_CONSTRAINS =
 	}
 };
 
+function getVideoConstrains(resolution, aspectRatio)
+{
+	return {
+		width : VIDEO_CONSTRAINS[resolution].width,
+		aspectRatio
+	};
+}
+
 const PC_PROPRIETARY_CONSTRAINTS =
 {
 	optional : [ { googDscp: true } ]
@@ -247,8 +255,19 @@ export default class RoomClient
 		// Access code
 		this._accessCode = accessCode;
 
-		// Alert sound
-		this._soundAlert = new Audio('/sounds/notify.mp3');
+		// Alert sounds
+		this._soundAlerts = { 'default': { audio: new Audio('/sounds/notify.mp3') } };
+		if ('notificationSounds' in window.config)
+		{
+			for (const [ k, v ] of Object.entries(window.config.notificationSounds))
+			{
+				if (v != null && v.play !== undefined)
+					this._soundAlerts[k] = {
+						audio : new Audio(v.play),
+						delay : v.delay ? v.delay: 0
+					};
+			}
+		}
 
 		// Socket.io peer connection
 		this._signalingSocket = null;
@@ -325,6 +344,12 @@ export default class RoomClient
 		{
 			store.dispatch(meActions.setPicture(store.getState().settings.localPicture));
 		}
+
+		// Receive transport restart ICE object
+		this._recvRestartIce = { timer: null, restarting: false };
+
+		// Send transport restart ICE object
+		this._sendRestartIce = { timer: null, restarting: false };
 	}
 
 	close()
@@ -543,7 +568,6 @@ export default class RoomClient
 			}
 			event.preventDefault();
 		}, true);
-
 	}
 
 	_startDevicesListener()
@@ -659,13 +683,24 @@ export default class RoomClient
 			}));
 	}
 
-	_soundNotification()
+	_soundNotification(type = 'default')
 	{
 		const { notificationSounds } = store.getState().settings;
 
 		if (notificationSounds)
 		{
-			const alertPromise = this._soundAlert.play();
+			const soundAlert = this._soundAlerts[type] === undefined
+				? this._soundAlerts['default'] : this._soundAlerts[type];
+
+			const now = Date.now();
+
+			if (soundAlert.last !== undefined && (now - soundAlert.last) < soundAlert.delay)
+			{
+				return;
+			}
+			soundAlert.last = now;
+
+			const alertPromise = soundAlert.audio.play();
 
 			if (alertPromise !== undefined)
 			{
@@ -1536,6 +1571,7 @@ export default class RoomClient
 
 			const {
 				resolution,
+				aspectRatio,
 				frameRate
 			} = store.getState().settings;
 
@@ -1552,7 +1588,7 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { ideal: deviceId },
-							...VIDEO_CONSTRAINS[resolution],
+							...getVideoConstrains(resolution, aspectRatio),
 							frameRate
 						}
 					});
@@ -1560,6 +1596,8 @@ export default class RoomClient
 				([ track ] = stream.getVideoTracks());
 
 				const { deviceId: trackDeviceId, width, height } = track.getSettings();
+
+				logger.debug('getUserMedia track settings:', track.getSettings());
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
@@ -1649,7 +1687,7 @@ export default class RoomClient
 
 				await track.applyConstraints(
 					{
-						...VIDEO_CONSTRAINS[resolution],
+						...getVideoConstrains(resolution, aspectRatio),
 						frameRate
 					}
 				);
@@ -1661,7 +1699,7 @@ export default class RoomClient
 
 					await track.applyConstraints(
 						{
-							...VIDEO_CONSTRAINS[resolution],
+							...getVideoConstrains(resolution, aspectRatio),
 							frameRate
 						}
 					);
@@ -2062,30 +2100,41 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_pauseConsumer() [error:"%o"]', error);
+			logger.error('_pauseConsumer() [consumerId: %s; error:"%o"]', consumer.id, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumer.id);
+			}
 		}
 	}
 
-	async _resumeConsumer(consumer)
+	async _resumeConsumer(consumer, { initial = false } = {})
 	{
 		logger.debug('_resumeConsumer() [consumer:"%o"]', consumer);
 
-		if (!consumer.paused || consumer.closed)
+		if ((!initial && !consumer.paused) || consumer.closed)
 			return;
 
 		try
 		{
-			await this.sendRequest('resumeConsumer', { consumerId: consumer.id });
-
 			consumer.resume();
-
+			await this.sendRequest('resumeConsumer', { consumerId: consumer.id });
 			store.dispatch(
 				consumerActions.setConsumerResumed(consumer.id, 'local'));
 		}
 		catch (error)
 		{
-			logger.error('_resumeConsumer() [error:"%o"]', error);
+			logger.error('_resumeConsumer() [consumerId: %s; error:"%o"]', consumer.id, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumer.id);
+			}
 		}
+	}
+
+	async _startConsumer(consumer)
+	{
+		return this._resumeConsumer(consumer, { initial: true });
 	}
 
 	async lowerPeerHand(peerId)
@@ -2167,40 +2216,62 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPreferredLayers() [error:"%o"]', error);
+			logger.error('setConsumerPreferredLayers() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
 	}
 
-	async restartIce()
+	async restartIce(transport, ice, delay)
 	{
-		logger.debug('restartIce()');
+		logger.debug('restartIce() [transport:%o ice:%o delay:%d]', transport, ice, delay);
 
-		try
+		if (!transport)
 		{
-			if (this._sendTransport)
+			logger.error('restartIce(): missing valid transport object');
+
+			return;
+		}
+
+		if (!ice)
+		{
+			logger.error('restartIce(): missing valid ice object');
+
+			return;
+		}
+
+		clearTimeout(ice.timer);
+		ice.timer = setTimeout(async () =>
+		{
+			try
 			{
+				if (ice.restarting)
+				{
+					return;
+				}
+				ice.restarting = true;
+
 				const iceParameters = await this.sendRequest(
 					'restartIce',
-					{ transportId: this._sendTransport.id });
+					{ transportId: transport.id });
 
-				await this._sendTransport.restartIce({ iceParameters });
+				await transport.restartIce({ iceParameters });
+				ice.restarting = false;
+				logger.debug('ICE restarted');
 			}
-
-			if (this._recvTransport)
+			catch (error)
 			{
-				const iceParameters = await this.sendRequest(
-					'restartIce',
-					{ transportId: this._recvTransport.id });
+				logger.error('restartIce() [failed:%o]', error);
 
-				await this._recvTransport.restartIce({ iceParameters });
+				ice.restarting = false;
+				ice.timer = setTimeout(() =>
+				{
+					this.restartIce(transport, ice, delay * 2);
+				}, delay);
 			}
-
-			logger.debug('ICE restarted');
-		}
-		catch (error)
-		{
-			logger.error('restartIce() | failed:%o', error);
-		}
+		}, delay);
 	}
 
 	setConsumerPreferredLayersMax(consumer)
@@ -2241,7 +2312,8 @@ export default class RoomClient
 			height,
 			resolutionScalings
 		} = consumer;
-		const availableArea = Math.round(viewportWidth * viewportHeight);
+		const adaptiveScalingFactor = Math.min(Math.max(
+			window.config.adaptiveScalingFactor || 0.75, 0.5), 1.0);
 
 		logger.debug(
 			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" resolutionScalings:[%s] viewportWidth:"%d", viewportHeight:"%d"]',
@@ -2252,9 +2324,10 @@ export default class RoomClient
 
 		for (let i = 0; i < resolutionScalings.length; i++)
 		{
-			const levelArea = width * height / (resolutionScalings[i] ** 2);
+			const levelWidth = adaptiveScalingFactor * width / resolutionScalings[i];
+			const levelHeight = adaptiveScalingFactor * height / resolutionScalings[i];
 
-			if (availableArea >= levelArea)
+			if (viewportWidth >= levelWidth || viewportHeight >= levelHeight)
 			{
 				newPreferredSpatialLayer = i;
 			}
@@ -2266,15 +2339,19 @@ export default class RoomClient
 
 		let newPreferredTemporalLayer = consumer.temporalLayers - 1;
 
-		if (newPreferredSpatialLayer === 0)
+		if (newPreferredSpatialLayer === 0 && newPreferredTemporalLayer > 0)
 		{
-			const lowestLevelArea = width * height / (resolutionScalings[0] ** 2);
+			const lowestLevelWidth = width / resolutionScalings[0];
+			const lowestLevelHeight = height / resolutionScalings[0];
 
-			if (availableArea < lowestLevelArea * 0.5 && newPreferredTemporalLayer > 0)
+			if (viewportWidth < lowestLevelWidth * 0.5
+				&& viewportHeight < lowestLevelHeight * 0.5)
 			{
 				newPreferredTemporalLayer -= 1;
 			}
-			if (availableArea < lowestLevelArea * 0.25 && newPreferredTemporalLayer > 0)
+			if (newPreferredTemporalLayer > 0
+				&& viewportWidth < lowestLevelWidth * 0.25
+				&& viewportHeight < lowestLevelHeight * 0.25)
 			{
 				newPreferredTemporalLayer -= 1;
 			}
@@ -2303,7 +2380,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPriority() [error:"%o"]', error);
+			logger.error('setConsumerPriority() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
 	}
 
@@ -2317,7 +2398,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('requestConsumerKeyFrame() [error:"%o"]', error);
+			logger.error('requestConsumerKeyFrame() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
 	}
 
@@ -2505,95 +2590,6 @@ export default class RoomClient
 
 			switch (request.method)
 			{
-				case 'newConsumer':
-				{
-					const {
-						peerId,
-						producerId,
-						id,
-						kind,
-						rtpParameters,
-						type,
-						appData,
-						producerPaused
-					} = request.data;
-
-					const consumer = await this._recvTransport.consume(
-						{
-							id,
-							producerId,
-							kind,
-							rtpParameters,
-							appData : { ...appData, peerId } // Trick.
-						});
-
-					// Store in the map.
-					this._consumers.set(consumer.id, consumer);
-
-					consumer.on('transportclose', () =>
-					{
-						this._consumers.delete(consumer.id);
-					});
-
-					const { spatialLayers, temporalLayers } =
-						mediasoupClient.parseScalabilityMode(
-							consumer.rtpParameters.encodings[0].scalabilityMode);
-
-					store.dispatch(consumerActions.addConsumer(
-						{
-							id                     : consumer.id,
-							peerId                 : peerId,
-							kind                   : kind,
-							type                   : type,
-							locallyPaused          : false,
-							remotelyPaused         : producerPaused,
-							rtpParameters          : consumer.rtpParameters,
-							source                 : consumer.appData.source,
-							width                  : consumer.appData.width,
-							height                 : consumer.appData.height,
-							resolutionScalings     : consumer.appData.resolutionScalings,
-							spatialLayers          : spatialLayers,
-							temporalLayers         : temporalLayers,
-							preferredSpatialLayer  : spatialLayers - 1,
-							preferredTemporalLayer : temporalLayers - 1,
-							priority               : 1,
-							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
-							track                  : consumer.track
-						},
-						peerId));
-
-					// We are ready. Answer the request so the server will
-					// resume this Consumer (which was paused for now).
-					cb(null);
-
-					if (kind === 'audio')
-					{
-						consumer.volume = 0;
-
-						const stream = new MediaStream();
-
-						stream.addTrack(consumer.track);
-
-						if (!stream.getAudioTracks()[0])
-							throw new Error('request.newConsumer | given stream has no audio track');
-
-						consumer.hark = hark(stream, { play: false });
-
-						consumer.hark.on('volume_change', (volume) =>
-						{
-							volume = Math.round(volume);
-
-							if (consumer && volume !== consumer.volume)
-							{
-								consumer.volume = volume;
-
-								store.dispatch(peerVolumeActions.setPeerVolume(peerId, volume));
-							}
-						});
-					}
-
-					break;
-				}
 
 				default:
 				{
@@ -2704,7 +2700,7 @@ export default class RoomClient
 						store.dispatch(
 							roomActions.setToolbarsVisible(true));
 
-						this._soundNotification();
+						this._soundNotification(notification.method);
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2746,7 +2742,7 @@ export default class RoomClient
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
 
-							this._soundNotification();
+							this._soundNotification(notification.method);
 
 							store.dispatch(requestActions.notify(
 								{
@@ -2965,7 +2961,7 @@ export default class RoomClient
 								}));
 						}
 
-						this._soundNotification();
+						this._soundNotification(notification.method);
 
 						break;
 					}
@@ -2985,7 +2981,7 @@ export default class RoomClient
 						{
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
-							this._soundNotification();
+							this._soundNotification(notification.method);
 						}
 
 						break;
@@ -3028,7 +3024,7 @@ export default class RoomClient
 						{
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
-							this._soundNotification();
+							this._soundNotification(notification.method);
 						}
 
 						break;
@@ -3068,7 +3064,7 @@ export default class RoomClient
 
 						this._spotlights.newPeer(id);
 
-						this._soundNotification();
+						this._soundNotification(notification.method);
 
 						store.dispatch(requestActions.notify(
 							{
@@ -3087,6 +3083,14 @@ export default class RoomClient
 					{
 						const { peerId } = notification.data;
 
+						for (const consumer of this._consumers.values())
+						{
+							if (peerId === consumer.appData.peerId)
+							{
+								this._closeConsumer(consumer.id);
+							}
+						}
+
 						this._spotlights.closePeer(peerId);
 
 						store.dispatch(
@@ -3095,25 +3099,99 @@ export default class RoomClient
 						break;
 					}
 
+					case 'newConsumer':
+					{
+						const {
+							peerId,
+							producerId,
+							id,
+							kind,
+							rtpParameters,
+							type,
+							appData,
+							producerPaused
+						} = notification.data;
+
+						const consumer = await this._recvTransport.consume(
+							{
+								id,
+								producerId,
+								kind,
+								rtpParameters,
+								appData : { ...appData, peerId } // Trick.
+							});
+
+						// Store in the map.
+						this._consumers.set(consumer.id, consumer);
+
+						consumer.on('transportclose', () =>
+						{
+							this._consumers.delete(consumer.id);
+						});
+
+						const { spatialLayers, temporalLayers } =
+							mediasoupClient.parseScalabilityMode(
+								consumer.rtpParameters.encodings[0].scalabilityMode);
+
+						store.dispatch(consumerActions.addConsumer(
+							{
+								id                     : consumer.id,
+								peerId                 : peerId,
+								kind                   : kind,
+								type                   : type,
+								locallyPaused          : false,
+								remotelyPaused         : producerPaused,
+								rtpParameters          : consumer.rtpParameters,
+								source                 : consumer.appData.source,
+								width                  : consumer.appData.width,
+								height                 : consumer.appData.height,
+								resolutionScalings     : consumer.appData.resolutionScalings,
+								spatialLayers          : spatialLayers,
+								temporalLayers         : temporalLayers,
+								preferredSpatialLayer  : spatialLayers - 1,
+								preferredTemporalLayer : temporalLayers - 1,
+								priority               : 1,
+								codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
+								track                  : consumer.track
+							},
+							peerId));
+
+						await this._startConsumer(consumer);
+
+						if (kind === 'audio')
+						{
+							consumer.volume = 0;
+
+							const stream = new MediaStream();
+
+							stream.addTrack(consumer.track);
+
+							if (!stream.getAudioTracks()[0])
+								throw new Error('request.newConsumer | given stream has no audio track');
+
+							consumer.hark = hark(stream, { play: false });
+
+							consumer.hark.on('volume_change', (volume) =>
+							{
+								volume = Math.round(volume);
+
+								if (consumer && volume !== consumer.volume)
+								{
+									consumer.volume = volume;
+
+									store.dispatch(peerVolumeActions.setPeerVolume(peerId, volume));
+								}
+							});
+						}
+
+						break;
+					}
+
 					case 'consumerClosed':
 					{
 						const { consumerId } = notification.data;
-						const consumer = this._consumers.get(consumerId);
 
-						if (!consumer)
-							break;
-
-						consumer.close();
-
-						if (consumer.hark != null)
-							consumer.hark.stop();
-
-						this._consumers.delete(consumerId);
-
-						const { peerId } = consumer.appData;
-
-						store.dispatch(
-							consumerActions.removeConsumer(consumerId, peerId));
+						this._closeConsumer(consumerId);
 
 						break;
 					}
@@ -3401,10 +3479,11 @@ export default class RoomClient
 						{
 							case 'disconnected':
 							case 'failed':
-								this.restartIce();
+								this.restartIce(this._sendTransport, this._sendRestartIce, 2000);
 								break;
 
 							default:
+								clearTimeout(this._sendRestartIce.timer);
 								break;
 						}
 					});
@@ -3479,10 +3558,11 @@ export default class RoomClient
 					{
 						case 'disconnected':
 						case 'failed':
-							this.restartIce();
+							this.restartIce(this._recvTransport, this._recvRestartIce, 2000);
 							break;
 
 						default:
+							clearTimeout(this._recvRestartIce.timer);
 							break;
 					}
 				});
@@ -3823,7 +3903,7 @@ export default class RoomClient
 		try
 		{
 			const device = this._webcams[videoDeviceId];
-			const resolution = store.getState().settings.resolution;
+			const { resolution, aspectRatio } = store.getState().settings;
 
 			if (!device)
 				throw new Error('no webcam devices');
@@ -3833,11 +3913,15 @@ export default class RoomClient
 					video :
 					{
 						deviceId : { ideal: videoDeviceId },
-						...VIDEO_CONSTRAINS[resolution]
+						...getVideoConstrains(resolution, aspectRatio)
 					}
 				});
 
 			([ track ] = stream.getVideoTracks());
+
+			const { width, height } = track.getSettings();
+
+			logger.debug('extra video track settings:', track.getSettings());
 
 			let exists = false;
 
@@ -3871,6 +3955,8 @@ export default class RoomClient
 					else
 						encodings = VIDEO_SIMULCAST_ENCODINGS;
 
+					const resolutionScalings = getResolutionScalings(encodings);
+
 					producer = await this._sendTransport.produce(
 						{
 							track,
@@ -3881,7 +3967,10 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'extravideo'
+								source : 'extravideo',
+								width,
+								height,
+								resolutionScalings
 							}
 						});
 				}
@@ -3891,7 +3980,9 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'extravideo'
+							source : 'extravideo',
+							width,
+							height
 						}
 					});
 				}
@@ -4031,17 +4122,22 @@ export default class RoomClient
 
 			const {
 				screenSharingResolution,
+				aspectRatio,
 				screenSharingFrameRate
 			} = store.getState().settings;
 
 			if (start)
 			{
 				const stream = await this._screenSharing.start({
-					...VIDEO_CONSTRAINS[screenSharingResolution],
+					...getVideoConstrains(screenSharingResolution, aspectRatio),
 					frameRate : screenSharingFrameRate
 				});
 
 				([ track ] = stream.getVideoTracks());
+
+				const { width, height } = track.getSettings();
+
+				logger.debug('screenSharing track settings:', track.getSettings());
 
 				if (this._useSharingSimulcast)
 				{
@@ -4068,6 +4164,8 @@ export default class RoomClient
 							.map((encoding) => ({ ...encoding, dtx: true }));
 					}
 
+					const resolutionScalings = getResolutionScalings(encodings);
+
 					this._screenSharingProducer = await this._sendTransport.produce(
 						{
 							track,
@@ -4078,7 +4176,10 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'screen'
+								source : 'screen',
+								width,
+								height,
+								resolutionScalings
 							}
 						});
 				}
@@ -4088,7 +4189,9 @@ export default class RoomClient
 						track,
 						appData :
 						{
-							source : 'screen'
+							source : 'screen',
+							width,
+							height
 						}
 					});
 				}
@@ -4129,7 +4232,7 @@ export default class RoomClient
 
 				await track.applyConstraints(
 					{
-						...VIDEO_CONSTRAINS[screenSharingResolution],
+						...getVideoConstrains(screenSharingResolution, aspectRatio),
 						frameRate : screenSharingFrameRate
 					}
 				);
@@ -4440,5 +4543,25 @@ export default class RoomClient
 			return true;
 
 		return false;
+	}
+
+	_closeConsumer(consumerId)
+	{
+		const consumer = this._consumers.get(consumerId);
+
+		if (!consumer)
+			return;
+
+		consumer.close();
+
+		if (consumer.hark != null)
+			consumer.hark.stop();
+
+		this._consumers.delete(consumerId);
+
+		const { peerId } = consumer.appData;
+
+		store.dispatch(
+			consumerActions.removeConsumer(consumerId, peerId));
 	}
 }

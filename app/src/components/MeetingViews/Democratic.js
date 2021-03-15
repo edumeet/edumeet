@@ -116,8 +116,8 @@ class Democratic extends React.PureComponent
 		)
 		{
 			this.setState({
-				peerWidth  : FILL_RATE * x,
-				peerHeight : FILL_RATE * y
+				peerWidth  : Math.ceil(FILL_RATE * x),
+				peerHeight : Math.ceil(FILL_RATE * y)
 			});
 		}
 	};

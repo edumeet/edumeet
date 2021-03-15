@@ -77,6 +77,11 @@ var config =
 		{ scaleResolutionDownBy: 2 },
 		{ scaleResolutionDownBy: 1 }
 	],
+	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
+	// example: 
+	// with level width=640px, the minimum width required to trigger the
+	// level change will be: 640 * 0.75 = 480px
+	adaptiveScalingFactor: 0.75,
 
 	/**
 	 * Alternative simulcast setting:
@@ -153,6 +158,26 @@ var config =
 	drawerOverlayed      : true,
 	// Position of notifications
 	notificationPosition : 'right',
+	/**
+	 * Set the notificationSounds.  Valid keys are:
+	 * 'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage',
+	 * 'sendFile', 'newPeer' and 'default'.
+	 *
+	 * Not defining a key is equivalent to using the default notification sound.
+	 * Setting 'play' to null disables the sound notification.
+	 */
+	notificationSounds   : {
+		chatMessage : {
+			play  : '/sounds/notify-chat.mp3',
+		},
+		raisedHand  : {
+			play  : '/sounds/notify-hand.mp3',
+		},
+		default     : {
+			delay : 5000, // minimum delay between alert sounds [ms]
+			play  : '/sounds/notify.mp3',
+		},
+	},
 	// Timeout for autohiding topbar and button control bar
 	hideTimeout          : 3000,
 	// max number of participant that will be visible in 

@@ -65,7 +65,7 @@ Currently edumeet will run on nodejs v14.x
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
-$ sudo apt install git npm build-essential redis
+$ sudo apt install git npm build-essential redis libssl-dev openssl pkg-config
 ```
 
 * Clone the project:
