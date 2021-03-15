@@ -38,7 +38,7 @@ module.exports = async function(rooms, peers, config)
 			logger.debug(`GET ${req.originalUrl}`);
 			const registry = new promClient.Registry();
 
-			await collectDefaultMetrics(workers, registry);
+			await collectDefaultMetrics(workers, registry, config);
 			res.set('Content-Type', registry.contentType);
 			const data = await registry.metrics();
 

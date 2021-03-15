@@ -16,7 +16,7 @@ const metadata = {
 	'score'     : { metricType: prom.Gauge }
 };
 
-module.exports = async function(workers, registry)
+module.exports = async function(workers, registry, config)
 {
     const newMetrics = function(subsystem)
     {
