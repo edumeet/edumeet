@@ -501,7 +501,7 @@ module.exports =
 		port       : 8889, // allocated port
 		quiet      : false, // include fewer labels
 		// aggregated metrics options
-		period     : 5 // update period (seconds)
+		period     : 15 // update period (seconds)
 	}
 	
 };
