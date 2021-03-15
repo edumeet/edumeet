@@ -14,13 +14,11 @@ services:
     build: ./edumeet
     container_name: edumeet
     restart: unless-stopped
-    user: "${UID}:${GID}"
+    user: "${CURRENT_USER}"
     volumes:
     - ${PWD}/..:/edumeet
     - ${PWD}/config/edumeet-server-config.js:/edumeet/server/config/config.js:ro
     - ${PWD}/config/edumeet-app-config.js:/edumeet/app/public/config/config.js:ro
-    environment:
-    - DEBUG="edumeet*,mediasoup*"
     network_mode: "host"
     extra_hosts:
       redis: 172.22.0.2
@@ -47,6 +45,8 @@ services:
     - ${PWD}/config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     extra_hosts:
       edumeet: 172.22.0.1
+    depends_on:
+    - edumeet
 
   prometheus:
     image: prom/prometheus:latest
@@ -96,6 +96,8 @@ services:
     - 9091:3000
     volumes:
     - ./config/grafana-prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus.yml
+    - ./config/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/all.yml
+    - ./config/grafana-dashboards:/var/lib/grafana/dashboards
     - ./data/grafana:/var/lib/grafana
     environment:
     - GF_SECURITY_ADMIN_USER=admin

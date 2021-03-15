@@ -9,7 +9,7 @@ chmod +x /usr/local/bin/docker-compose
 Starting:
 
 ```sh
-docker-compose up --build -d
+CURRENT_USER=$UID:$GID docker-compose up --build -d
 
 docker-compose logs -f edumeet
 ```

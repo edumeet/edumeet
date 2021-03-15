@@ -399,7 +399,7 @@ module.exports =
 	// Mediasoup settings
 	mediasoup            :
 	{
-		numWorkers : Object.keys(os.cpus()).length,
+		numWorkers : 2, //Object.keys(os.cpus()).length,
 		// mediasoup Worker settings.
 		worker     :
 		{
@@ -499,7 +499,9 @@ module.exports =
 		// listen     : 'localhost', // exporter listens on this address
 		numeric    : false, // show numeric IP addresses
 		port       : 8889, // allocated port
-		quiet      : false // include fewer labels
+		quiet      : false, // include fewer labels
+		// aggregated metrics options
+		period     : 5 // update period (seconds)
 	}
 	
 };
