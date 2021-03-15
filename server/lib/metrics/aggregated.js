@@ -244,4 +244,4 @@ module.exports = function(workers, config)
     });
 
     return register;
-}
+};
