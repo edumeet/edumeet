@@ -11,11 +11,11 @@ Starting:
 ```sh
 CURRENT_USER=$UID:$GID docker-compose up --build -d
 
-docker-compose logs -f edumeet
+docker-compose logs -f --tail=50 edumeet
 ```
 
 Accessing endpoints:
 
 - Edumeet: https://127.0.0.1:8443/
 - Prometheus: http://127.0.0.1:9090/
-- Grafana: http://127.0.0.1:9091/
+- Grafana: http://127.0.0.1:9091/ (user:pass `admin`:`admin`)
