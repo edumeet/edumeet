@@ -37,13 +37,13 @@ const migrations =
 		state.me = undefined;
 
 		return { ...state };
-	}
+	},
 	2 : (state) =>
 	{
 		state.settings.autoGainControl = true;
-	
+
 		return { ...state };
-	}	
+	}
 	// Next version
 	//	3 : (state) =>
 	//	{
