@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
   "links": [],
   "panels": [
     {
@@ -47,7 +46,7 @@
         "current": true,
         "max": false,
         "min": false,
-        "show": false,
+        "show": true,
         "total": false,
         "values": true
       },
@@ -64,7 +63,11 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "alias": "Memory",
+          "$$hashKey": "object:254",
+          "alias": "Workers",
+          "fill": 0,
+          "hideTooltip": true,
+          "lines": false,
           "yaxis": 2
         }
       ],
@@ -73,10 +76,18 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(max by(url) (mediasoup_workers_cpu))",
+          "expr": "mediasoup_workers_cpu",
           "interval": "",
           "legendFormat": "CPU",
           "refId": "A"
+        },
+        {
+          "expr": "mediasoup_workers_count",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Workers",
+          "refId": "B"
         }
       ],
       "thresholds": [],
@@ -99,6 +110,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:210",
           "format": "none",
           "label": null,
           "logBase": 1,
@@ -107,8 +119,9 @@
           "show": true
         },
         {
+          "$$hashKey": "object:211",
           "decimals": 0,
-          "format": "decmbytes",
+          "format": "none",
           "label": "",
           "logBase": 1,
           "max": null,
@@ -167,6 +180,7 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
+          "$$hashKey": "object:367",
           "alias": "Memory",
           "yaxis": 2
         }
@@ -176,7 +190,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(max by(url) (mediasoup_workers_memory)) / 1e6",
+          "expr": "mediasoup_workers_memory / 1e6",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -202,6 +216,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:374",
           "format": "decmbytes",
           "label": null,
           "logBase": 1,
@@ -210,6 +225,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:375",
           "decimals": 0,
           "format": "decmbytes",
           "label": "",
@@ -599,7 +615,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Service CPU",
+      "title": "Edumeet server CPU",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -615,6 +631,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:94",
           "format": "none",
           "label": null,
           "logBase": 1,
@@ -623,6 +640,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:95",
           "decimals": 0,
           "format": "decmbytes",
           "label": "",
@@ -683,6 +701,7 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
+          "$$hashKey": "object:145",
           "alias": "Memory",
           "yaxis": 2
         }
@@ -702,7 +721,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Service Memory",
+      "title": "Edumeet server Memory",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -718,6 +737,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:152",
           "format": "decmbytes",
           "label": null,
           "logBase": 1,
@@ -726,6 +746,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:153",
           "decimals": 0,
           "format": "decmbytes",
           "label": "",
@@ -1436,5 +1457,5 @@
   "timezone": "",
   "title": "MediaSoup",
   "uid": "mediasoup",
-  "version": 9
+  "version": 1
 }
