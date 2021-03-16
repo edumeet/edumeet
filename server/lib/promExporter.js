@@ -38,7 +38,7 @@ module.exports = async function(rooms, peers, config)
 			logger.debug(`GET ${req.originalUrl}`);
 			const registry = new promClient.Registry();
 
-			await collectDefaultMetrics(workers, registry, config);
+			await collectDefaultMetrics(workers, rooms, peers, registry, config);
 			res.set('Content-Type', registry.contentType);
 			const data = await registry.metrics();
 
@@ -46,7 +46,7 @@ module.exports = async function(rooms, peers, config)
 		});
 
 		// aggregated register
-		const registerAggregated = RegisterAggregated(workers, config);
+		const registerAggregated = RegisterAggregated(workers, rooms, peers, config);
 
 		app.get('/metrics', async (req, res) =>
 		{

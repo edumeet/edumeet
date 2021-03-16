@@ -7,7 +7,7 @@ const Logger = require('../Logger');
 const logger = new Logger('metrics:aggregated');
 
 //
-module.exports = function(workers, config)
+module.exports = function(workers, rooms, peers, config)
 {
     const register = new promClient.Registry();
     promClient.collectDefaultMetrics({ prefix: 'mediasoup_', register });
