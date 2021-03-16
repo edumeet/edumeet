@@ -15,6 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -35,7 +36,7 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 4,
+        "w": 6,
         "x": 0,
         "y": 0
       },
@@ -63,7 +64,6 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "$$hashKey": "object:254",
           "alias": "Workers",
           "fill": 0,
           "hideTooltip": true,
@@ -110,7 +110,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:210",
           "format": "none",
           "label": null,
           "logBase": 1,
@@ -119,7 +118,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:211",
           "decimals": 0,
           "format": "none",
           "label": "",
@@ -152,8 +150,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 4,
-        "x": 4,
+        "w": 6,
+        "x": 6,
         "y": 0
       },
       "hiddenSeries": false,
@@ -178,13 +176,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "$$hashKey": "object:367",
-          "alias": "Memory",
-          "yaxis": 2
-        }
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -216,16 +208,215 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:374",
           "format": "decmbytes",
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
-          "$$hashKey": "object:375",
+          "decimals": 0,
+          "format": "decmbytes",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 45,
+      "legend": {
+        "avg": false,
+        "current": true,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.4.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "rate(mediasoup_process_cpu_seconds_total[30s])",
+          "interval": "",
+          "legendFormat": "CPU",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Edumeet server CPU",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "decimals": 0,
+          "format": "decmbytes",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 77,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.4.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "Memory",
+          "yaxis": 2
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "mediasoup_process_resident_memory_bytes / 1e6",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Edumeet server Memory",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "decmbytes",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
           "decimals": 0,
           "format": "decmbytes",
           "label": "",
@@ -258,8 +449,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 8,
-        "y": 0
+        "x": 0,
+        "y": 7
       },
       "hiddenSeries": false,
       "id": 34,
@@ -289,13 +480,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(mediasoup_audio_in_count)",
+          "expr": "mediasoup_audio_in_count",
           "interval": "",
           "legendFormat": "Audio",
           "refId": "A"
         },
         {
-          "expr": "sum(mediasoup_video_in_count)",
+          "expr": "mediasoup_video_in_count",
           "hide": false,
           "interval": "",
           "legendFormat": "Video",
@@ -362,8 +553,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 13,
-        "y": 0
+        "x": 5,
+        "y": 7
       },
       "hiddenSeries": false,
       "id": 42,
@@ -471,8 +662,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 18,
-        "y": 0
+        "x": 10,
+        "y": 7
       },
       "hiddenSeries": false,
       "id": 38,
@@ -561,7 +752,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -569,122 +759,22 @@
         },
         "overrides": []
       },
-      "fill": 1,
+      "fill": 0,
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 4,
-        "x": 0,
+        "x": 15,
         "y": 7
       },
       "hiddenSeries": false,
-      "id": 45,
-      "legend": {
-        "avg": false,
-        "current": true,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "7.4.3",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "rate(mediasoup_process_cpu_seconds_total[30s])",
-          "interval": "",
-          "legendFormat": "CPU",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Edumeet server CPU",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:94",
-          "format": "none",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "$$hashKey": "object:95",
-          "decimals": 0,
-          "format": "decmbytes",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {},
-          "links": []
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 7,
-        "w": 4,
-        "x": 4,
-        "y": 7
-      },
-      "hiddenSeries": false,
-      "id": 77,
+      "id": 78,
       "legend": {
         "avg": false,
         "current": false,
         "max": false,
         "min": false,
-        "show": false,
+        "show": true,
         "total": false,
         "values": false
       },
@@ -701,9 +791,12 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "$$hashKey": "object:145",
-          "alias": "Memory",
-          "yaxis": 2
+          "alias": "Lost",
+          "color": "#F2495C"
+        },
+        {
+          "alias": "Retransmitted",
+          "color": "#FF9830"
         }
       ],
       "spaceLength": 10,
@@ -711,17 +804,25 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "mediasoup_process_resident_memory_bytes / 1e6",
+          "expr": "100 * mediasoup_packets_losts_in_sum / mediasoup_packets_counts_in_sum",
+          "format": "time_series",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "Lost",
           "refId": "A"
+        },
+        {
+          "expr": "100 * mediasoup_packets_retransmitted_in_sum / mediasoup_packets_counts_in_sum",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Retransmitted",
+          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Edumeet server Memory",
+      "title": "Input packets",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -737,8 +838,8 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:152",
-          "format": "decmbytes",
+          "decimals": null,
+          "format": "percent",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -746,10 +847,8 @@
           "show": true
         },
         {
-          "$$hashKey": "object:153",
-          "decimals": 0,
-          "format": "decmbytes",
-          "label": "",
+          "format": "short",
+          "label": null,
           "logBase": 1,
           "max": null,
           "min": null,
@@ -760,6 +859,117 @@
         "align": false,
         "alignLevel": null
       }
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "links": [],
+          "mappings": [],
+          "max": 10,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 5
+              },
+              {
+                "color": "green",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 19,
+        "y": 7
+      },
+      "id": 79,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.4.3",
+      "targets": [
+        {
+          "expr": "mediasoup_audio_scores_in_mean",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "Audio (average)",
+          "refId": "A"
+        },
+        {
+          "expr": "mediasoup_audio_scores_in_min",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Audio (min)",
+          "refId": "B"
+        },
+        {
+          "expr": "mediasoup_audio_scores_in_max",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Audio (max)",
+          "refId": "C"
+        },
+        {
+          "expr": "mediasoup_video_scores_in_mean",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Video (average)",
+          "refId": "D"
+        },
+        {
+          "expr": "mediasoup_video_scores_in_min",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Video (min)",
+          "refId": "E"
+        },
+        {
+          "expr": "mediasoup_video_scores_in_max",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Video (max)",
+          "refId": "F"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Scores",
+      "type": "stat"
     },
     {
       "aliasColors": {},
@@ -779,8 +989,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 8,
-        "y": 7
+        "x": 0,
+        "y": 14
       },
       "hiddenSeries": false,
       "id": 36,
@@ -882,8 +1092,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 13,
-        "y": 7
+        "x": 5,
+        "y": 14
       },
       "hiddenSeries": false,
       "id": 43,
@@ -997,8 +1207,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 18,
-        "y": 7
+        "x": 10,
+        "y": 14
       },
       "hiddenSeries": false,
       "id": 41,
@@ -1100,8 +1310,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 8,
-        "y": 14
+        "x": 0,
+        "y": 21
       },
       "hiddenSeries": false,
       "id": 40,
@@ -1216,8 +1426,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 13,
-        "y": 14
+        "x": 5,
+        "y": 21
       },
       "hiddenSeries": false,
       "id": 48,
@@ -1332,8 +1542,8 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 18,
-        "y": 14
+        "x": 10,
+        "y": 21
       },
       "hiddenSeries": false,
       "id": 44,
@@ -1455,7 +1665,7 @@
     ]
   },
   "timezone": "",
-  "title": "MediaSoup",
-  "uid": "mediasoup",
-  "version": 1
+  "title": "MediaSoup (default)",
+  "uid": "mediasoup-default",
+  "version": 9
 }

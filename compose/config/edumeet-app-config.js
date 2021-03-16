@@ -68,15 +68,15 @@ var config =
 	// Enable or disable simulcast for screen sharing video
 	simulcastSharing              : false,
 	// Simulcast encoding layers and levels
-	simulcastEncodings            :
+	/* simulcastEncodings            :
 	[
 		{ scaleResolutionDownBy: 4 },
 		{ scaleResolutionDownBy: 2 },
 		{ scaleResolutionDownBy: 1 }
-		/* { maxBitRate: 50000 }, 
-		{ maxBitRate: 1000000 },
-		{ maxBitRate: 4800000 } */
-	],
+		// { maxBitRate: 50000 }, 
+		// { maxBitRate: 1000000 },
+		// { maxBitRate: 4800000 }
+	], */
 	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
 	// example: 
 	// with level width=640px, the minimum width required to trigger the
