@@ -38,8 +38,14 @@ const migrations =
 
 		return { ...state };
 	}
+	2 : (state) =>
+	{
+		state.settings.autoGainControl = true;
+	
+		return { ...state };
+	}	
 	// Next version
-	//	2 : (state) =>
+	//	3 : (state) =>
 	//	{
 	//		return { ...state };
 	//	}
@@ -51,7 +57,7 @@ const persistConfig =
 	storage         : storage,
 	// migrate will iterate state over all version-functions
 	// from migrations until version is reached
-	version         : 1,
+	version         : 2,
 	migrate         : createMigrate(migrations, { debug: false }),
 	stateReconciler : autoMergeLevel2,
 	whitelist       : [ 'settings', 'intl' ]
