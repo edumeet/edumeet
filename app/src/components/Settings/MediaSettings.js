@@ -270,7 +270,7 @@ const MediaSettings = ({
 								{
 									if (event.target.value)
 										roomClient.updateWebcam({
-											restart     : true,
+											restart       : true,
 											newResolution : event.target.value
 										});
 								}}
@@ -302,7 +302,7 @@ const MediaSettings = ({
 									{
 										if (event.target.value)
 											roomClient.updateWebcam({
-												restart     : true,
+												restart      : true,
 												newFrameRate : event.target.value
 											});
 									}}
