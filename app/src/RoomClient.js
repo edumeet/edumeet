@@ -1626,9 +1626,10 @@ export default class RoomClient
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
-				if (this._useSimulcast)
+				const encodings = this._getEncodings(width, height);
+
+				if (this._useSimulcast && encodings.length > 1)
 				{
-					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
 
 					this._webcamProducer = await this._sendTransport.produce(
@@ -3948,10 +3949,10 @@ export default class RoomClient
 			{
 
 				let producer;
+				const encodings = this._getEncodings(width, height);
 
-				if (this._useSimulcast)
+				if (this._useSimulcast && encodings.length > 1)
 				{
-					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
 
 					producer = await this._sendTransport.produce(
@@ -4136,10 +4137,10 @@ export default class RoomClient
 
 				logger.debug('screenSharing track settings:', track.getSettings());
 
-				if (this._useSharingSimulcast)
-				{
-					let encodings = this._getEncodings(width, height);
+				let encodings = this._getEncodings(width, height);
 
+				if (this._useSharingSimulcast && encodings.length > 1)
+				{
 					// If VP9 is the only available video codec then use SVC.
 					const firstVideoCodec = this._mediasoupDevice
 						.rtpCapabilities
