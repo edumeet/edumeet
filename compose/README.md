@@ -18,4 +18,4 @@ Accessing endpoints:
 
 - Edumeet: https://127.0.0.1:8443/
 - Prometheus: http://127.0.0.1:9090/
-- Grafana: http://127.0.0.1:9091/ (user:pass `admin`:`admin`)
+- Grafana: http://127.0.0.1:9091/d/mediasoup/mediasoup (user:pass `admin`:`admin`)
