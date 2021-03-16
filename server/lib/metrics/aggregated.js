@@ -7,7 +7,7 @@ const Logger = require('../Logger');
 const logger = new Logger('metrics:aggregated');
 
 //
-module.exports = function(workers, rooms, peers, config)
+module.exports = function(workers, rooms_, peers_, config)
 {
     const register = new promClient.Registry();
     promClient.collectDefaultMetrics({ prefix: 'mediasoup_', register });
@@ -33,6 +33,12 @@ module.exports = function(workers, rooms, peers, config)
 
         let workers_cpu = new Stats();
         let workers_memory = new Stats();
+
+        let rooms = new Stats();
+        rooms.push(rooms_.size);
+
+        let peers = new Stats();
+        peers.push(peers_.size);
 
         // in
         let video_bitrates_in = new Stats();
@@ -166,6 +172,8 @@ module.exports = function(workers, rooms, peers, config)
             Object.assign(mediasoupStats, {
                 workers_cpu:                formatStats(workers_cpu),
                 workers_memory:             formatStats(workers_memory),
+                rooms:                      formatStats(rooms),
+                peers:                      formatStats(peers),
                 // in
                 video_bitrates_in:          formatStats(video_bitrates_in),
                 video_scores_in:            formatStats(video_scores_in),
@@ -197,9 +205,12 @@ module.exports = function(workers, rooms, peers, config)
 
     // mediasoup metrics
     [
-        { name: 'workers_count',                  statName: 'workers_cpu',             statValue: 'length' },
-        { name: 'workers_cpu',                    statName: 'workers_cpu',             statValue: 'sum' },
-        { name: 'workers_memory',                 statName: 'workers_memory',          statValue: 'sum' },
+        { name: 'workers_count',                  statName: 'workers_cpu',              statValue: 'length' },
+        { name: 'workers_cpu',                    statName: 'workers_cpu',              statValue: 'sum' },
+        { name: 'workers_memory',                 statName: 'workers_memory',           statValue: 'sum' },
+        //
+        { name: 'rooms',                          statName: 'rooms',                    statValue: 'sum' },
+        { name: 'peers',                          statName: 'peers',                    statValue: 'sum' },
         // audio in
         { name: 'audio_in_count',                 statName: 'audio_bitrates_in',        statValue: 'length' },
         // audio in bitrates

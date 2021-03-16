@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
   "links": [],
   "panels": [
     {
@@ -862,6 +861,72 @@
     },
     {
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 3,
+        "x": 16,
+        "y": 7
+      },
+      "id": 81,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.4.3",
+      "targets": [
+        {
+          "expr": "mediasoup_rooms",
+          "interval": "",
+          "legendFormat": "Rooms",
+          "refId": "A"
+        },
+        {
+          "expr": "mediasoup_peers",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Peers",
+          "refId": "B"
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -901,7 +966,7 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 16,
+        "x": 19,
         "y": 7
       },
       "id": 79,
@@ -1667,5 +1732,5 @@
   "timezone": "",
   "title": "MediaSoup (default)",
   "uid": "mediasoup-default",
-  "version": 9
+  "version": 13
 }
