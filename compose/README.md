@@ -20,3 +20,9 @@ Accessing endpoints:
 - Edumeet (app build): https://127.0.0.1:3443/
 - Prometheus: http://127.0.0.1:9090/
 - Grafana: http://127.0.0.1:9091/ (user:pass `admin`:`admin`)
+
+Rebuild app:
+
+```sh
+docker-compose exec edumeet sh -c "cd app && yarn && yarn build"
+```
