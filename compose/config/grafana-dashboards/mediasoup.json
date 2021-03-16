@@ -448,7 +448,7 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
+        "w": 4,
         "x": 0,
         "y": 7
       },
@@ -552,8 +552,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
-        "x": 5,
+        "w": 4,
+        "x": 4,
         "y": 7
       },
       "hiddenSeries": false,
@@ -661,20 +661,20 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
-        "x": 10,
+        "w": 4,
+        "x": 8,
         "y": 7
       },
       "hiddenSeries": false,
       "id": 38,
       "legend": {
         "avg": false,
-        "current": true,
+        "current": false,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": true
+        "values": false
       },
       "lines": true,
       "linewidth": 1,
@@ -764,7 +764,7 @@
       "gridPos": {
         "h": 7,
         "w": 4,
-        "x": 15,
+        "x": 12,
         "y": 7
       },
       "hiddenSeries": false,
@@ -901,7 +901,7 @@
       "gridPos": {
         "h": 7,
         "w": 5,
-        "x": 19,
+        "x": 16,
         "y": 7
       },
       "id": 79,
@@ -988,7 +988,7 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
+        "w": 4,
         "x": 0,
         "y": 14
       },
@@ -1091,8 +1091,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
-        "x": 5,
+        "w": 4,
+        "x": 4,
         "y": 14
       },
       "hiddenSeries": false,
@@ -1206,20 +1206,20 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
-        "x": 10,
+        "w": 4,
+        "x": 8,
         "y": 14
       },
       "hiddenSeries": false,
       "id": 41,
       "legend": {
         "avg": false,
-        "current": true,
+        "current": false,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": true
+        "values": false
       },
       "lines": true,
       "linewidth": 1,
@@ -1309,9 +1309,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
-        "x": 0,
-        "y": 21
+        "w": 4,
+        "x": 12,
+        "y": 14
       },
       "hiddenSeries": false,
       "id": 40,
@@ -1425,9 +1425,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
-        "x": 5,
-        "y": 21
+        "w": 4,
+        "x": 16,
+        "y": 14
       },
       "hiddenSeries": false,
       "id": 48,
@@ -1541,9 +1541,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 5,
-        "x": 10,
-        "y": 21
+        "w": 4,
+        "x": 20,
+        "y": 14
       },
       "hiddenSeries": false,
       "id": 44,
