@@ -270,8 +270,8 @@ const MediaSettings = ({
 								{
 									if (event.target.value)
 										roomClient.updateWebcam({
-											restart     : true,
-											newDeviceId : event.target.value
+											restart       : true,
+											newResolution : event.target.value
 										});
 								}}
 								name='Video resolution'
@@ -302,8 +302,8 @@ const MediaSettings = ({
 									{
 										if (event.target.value)
 											roomClient.updateWebcam({
-												restart     : true,
-												newDeviceId : event.target.value
+												restart      : true,
+												newFrameRate : event.target.value
 											});
 									}}
 									name='Frame rate'
