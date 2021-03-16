@@ -1628,7 +1628,7 @@ export default class RoomClient
 
 				const encodings = this._getEncodings(width, height);
 
-				if (this._useSimulcast && encodings.length > 1)
+				if (this._useSimulcast && encodings && encodings.length > 1)
 				{
 					const resolutionScalings = getResolutionScalings(encodings);
 
@@ -3951,7 +3951,7 @@ export default class RoomClient
 				let producer;
 				const encodings = this._getEncodings(width, height);
 
-				if (this._useSimulcast && encodings.length > 1)
+				if (this._useSimulcast && encodings && encodings.length > 1)
 				{
 					const resolutionScalings = getResolutionScalings(encodings);
 
@@ -4139,7 +4139,7 @@ export default class RoomClient
 
 				let encodings = this._getEncodings(width, height);
 
-				if (this._useSharingSimulcast && encodings.length > 1)
+				if (this._useSharingSimulcast && encodings && encodings.length > 1)
 				{
 					// If VP9 is the only available video codec then use SVC.
 					const firstVideoCodec = this._mediasoupDevice
