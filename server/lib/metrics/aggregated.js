@@ -42,6 +42,7 @@ module.exports = function(workers, config)
 
         let packets_counts_in = new Stats();
         let packets_losts_in = new Stats();
+        let packets_retransmitted_in = new Stats();
 
         let round_trip_times_out = new Stats();
         let packets_counts_out = new Stats();
@@ -101,6 +102,7 @@ module.exports = function(workers, config)
                                 {
                                     continue;
                                 }
+                                console.log(s);
                                 if (s.kind === 'video')
                                 {
                                     video_bitrates_in.push(s.bitrate);
@@ -111,6 +113,7 @@ module.exports = function(workers, config)
                                 }
                                 packets_counts_in.push(s.packetCount || 0);
                                 packets_losts_in.push(s.packetsLost || 0);
+                                packets_retransmitted_in.push(s.packetsRetransmitted || 0);
                             }
                         }
 
@@ -156,19 +159,22 @@ module.exports = function(workers, config)
             }
 
             Object.assign(mediasoupStats, {
-                workers_cpu:            formatStats(workers_cpu),
-                workers_memory:         formatStats(workers_memory),
-                video_bitrates_in:      formatStats(video_bitrates_in),
-                video_bitrates_out:     formatStats(video_bitrates_out),
-                audio_bitrates_in:      formatStats(audio_bitrates_in),
-                audio_bitrates_out:     formatStats(audio_bitrates_out),
-                round_trip_times_out:   formatStats(round_trip_times_out),
-                packets_counts_in:      formatStats(packets_counts_in),
-                packets_losts_in:       formatStats(packets_losts_in),
-                packets_counts_out:     formatStats(packets_counts_out),
-                packets_losts_out:      formatStats(packets_losts_out),
-                spatial_layers_out:     formatStats(spatial_layers_out),
-                temporal_layers_out:    formatStats(temporal_layers_out),
+                workers_cpu:                formatStats(workers_cpu),
+                workers_memory:             formatStats(workers_memory),
+                // in
+                video_bitrates_in:          formatStats(video_bitrates_in),
+                audio_bitrates_in:          formatStats(audio_bitrates_in),
+                packets_counts_in:          formatStats(packets_counts_in),
+                packets_losts_in:           formatStats(packets_losts_in),
+                packets_retransmitted_in:   formatStats(packets_retransmitted_in),
+                // out
+                video_bitrates_out:         formatStats(video_bitrates_out),
+                audio_bitrates_out:         formatStats(audio_bitrates_out),
+                round_trip_times_out:       formatStats(round_trip_times_out),
+                packets_counts_out:         formatStats(packets_counts_out),
+                packets_losts_out:          formatStats(packets_losts_out),
+                spatial_layers_out:         formatStats(spatial_layers_out),
+                temporal_layers_out:        formatStats(temporal_layers_out),
             });
 
         }
@@ -189,6 +195,7 @@ module.exports = function(workers, config)
         
         { name: 'workers_memory',             statName: 'workers_memory',       statValue: 'sum' },
 
+        // in
         { name: 'audio_in_count',             statName: 'audio_bitrates_in',    statValue: 'length' },
         { name: 'audio_bitrates_in_sum',      statName: 'audio_bitrates_in',    statValue: 'sum' },
         { name: 'audio_bitrates_in_mean',     statName: 'audio_bitrates_in',    statValue: 'mean' },
@@ -203,6 +210,22 @@ module.exports = function(workers, config)
         { name: 'video_bitrates_in_max',      statName: 'video_bitrates_in',    statValue: 'max' },
         { name: 'video_bitrates_in_p25',      statName: 'video_bitrates_in',    statValue: 'p25' },
         
+        { name: 'packets_counts_in_mean',  statName: 'packets_counts_in',       statValue: 'mean' },
+        { name: 'packets_counts_in_min',   statName: 'packets_counts_in',       statValue: 'min' },
+        { name: 'packets_counts_in_max',   statName: 'packets_counts_in',       statValue: 'max' },
+        { name: 'packets_counts_in_p25',   statName: 'packets_counts_in',       statValue: 'p25' },
+
+        { name: 'packets_losts_in_mean',  statName: 'packets_losts_in',         statValue: 'mean' },
+        { name: 'packets_losts_in_min',   statName: 'packets_losts_in',         statValue: 'min' },
+        { name: 'packets_losts_in_max',   statName: 'packets_losts_in',         statValue: 'max' },
+        { name: 'packets_losts_in_p25',   statName: 'packets_losts_in',         statValue: 'p25' },
+
+        { name: 'packets_retransmitted_in_mean',  statName: 'packets_retransmitted_in', statValue: 'mean' },
+        { name: 'packets_retransmitted_in_min',   statName: 'packets_retransmitted_in', statValue: 'min' },
+        { name: 'packets_retransmitted_in_max',   statName: 'packets_retransmitted_in', statValue: 'max' },
+        { name: 'packets_retransmitted_in_p25',   statName: 'packets_retransmitted_in', statValue: 'p25' },
+
+        // out
         { name: 'audio_out_count',            statName: 'audio_bitrates_out',   statValue: 'length' },
         { name: 'audio_bitrates_out_sum',     statName: 'audio_bitrates_out',   statValue: 'sum' },
         { name: 'audio_bitrates_out_mean',    statName: 'audio_bitrates_out',   statValue: 'mean' },

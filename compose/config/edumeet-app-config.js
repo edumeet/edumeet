@@ -70,12 +70,12 @@ var config =
 	// Simulcast encoding layers and levels
 	simulcastEncodings            :
 	[
-		/* { scaleResolutionDownBy: 4 },
+		{ scaleResolutionDownBy: 4 },
 		{ scaleResolutionDownBy: 2 },
-		{ scaleResolutionDownBy: 1 } */
-		{ maxBitRate: 50000 }, 
+		{ scaleResolutionDownBy: 1 }
+		/* { maxBitRate: 50000 }, 
 		{ maxBitRate: 1000000 },
-		{ maxBitRate: 4800000 }
+		{ maxBitRate: 4800000 } */
 	],
 	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
 	// example: 
