@@ -3121,7 +3121,8 @@ export default class RoomClient
 							rtpParameters,
 							type,
 							appData,
-							producerPaused
+							producerPaused,
+							score
 						} = notification.data;
 
 						const consumer = await this._recvTransport.consume(
@@ -3164,7 +3165,8 @@ export default class RoomClient
 								preferredTemporalLayer : temporalLayers - 1,
 								priority               : 1,
 								codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
-								track                  : consumer.track
+								track                  : consumer.track,
+								score                  : score
 							},
 							peerId));
 
