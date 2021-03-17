@@ -128,7 +128,7 @@ var config =
 	// defaults for audio setting on new clients / can be customized and overruled from client side
 	defaultAudio :
 	{
-		autoGainControl      : false, // default : false
+		autoGainControl      : true, // default : true
 		echoCancellation     : true, // default : true 
 		noiseSuppression     : true, // default : true 
 		// Automatically unmute speaking above noisThereshold
