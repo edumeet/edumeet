@@ -93,21 +93,6 @@ app.use(sharedCookieParser);
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
-if (config.getRequestsCachePeriod > 0)
-{
-	app.use((req, res, next) => {
-		if (req.method === 'GET')
-		{
-			res.set('Cache-control', `public, max-age=${config.getRequestsCachePeriod}`)
-		}
-		else
-		{
-		res.set('Cache-control', 'no-store');
-		}
-		next();
-	});
-}
-
 const session = expressSession({
 	secret            : config.cookieSecret,
 	name              : config.cookieName,
@@ -643,9 +628,13 @@ async function runHttpsServer()
 	});
 
 	// Serve all files in the public folder as static files.
-	app.use(express.static('public'));
+	app.use(express.static('public', {
+		maxAge: (config.staticFilesCachePeriod || 0) * 1000
+	}));
 
-	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
+	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`, {
+		maxAge: (config.staticFilesCachePeriod || 0) * 1000
+	}));
 
 	if (config.httpOnly === true)
 	{
