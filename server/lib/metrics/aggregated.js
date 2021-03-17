@@ -13,6 +13,7 @@ module.exports = function(workers, rooms_, peers_, config)
     promClient.collectDefaultMetrics({ prefix: 'mediasoup_', register });
     
     const mediasoupStats = {};
+    let mediasoupStatsUpdate = 0;
 
     const formatStats = (s) =>
     {
@@ -29,7 +30,14 @@ module.exports = function(workers, rooms_, peers_, config)
 
     const collectStats = async () =>
     {
-        logger.info('collectStats');
+        const now = Date.now();
+
+        if (now - mediasoupStatsUpdate < config.period * 1000)
+        {
+            return;
+        }
+        logger.info(`collectStats (elapsed: ${((now - (mediasoupStatsUpdate || now)) / 1000).toFixed(0)}s)`);
+        mediasoupStatsUpdate = now;
 
         let workers_cpu = new Stats();
         let workers_memory = new Stats();
@@ -168,7 +176,13 @@ module.exports = function(workers, rooms_, peers_, config)
                     }
                 }
             }
-
+        }
+        catch(err)
+        {
+            logger.error('collectStats error:', err.message);
+        }
+        finally
+        {
             Object.assign(mediasoupStats, {
                 workers_cpu:                formatStats(workers_cpu),
                 workers_memory:             formatStats(workers_memory),
@@ -191,17 +205,8 @@ module.exports = function(workers, rooms_, peers_, config)
                 spatial_layers_out:         formatStats(spatial_layers_out),
                 temporal_layers_out:        formatStats(temporal_layers_out),
             });
-
         }
-        catch(err)
-        {
-            logger.error('collectStats error:', err.message);
-        }
-
-        setTimeout(collectStats, (config.period || 15) * 1000);
     }
-
-    collectStats();
 
     // mediasoup metrics
     [
@@ -289,9 +294,13 @@ module.exports = function(workers, rooms_, peers_, config)
             help: `MediaSoup ${name}`,
             labelNames: [],
             registers: [ register ],
-            collect()
+            async collect()
             {
-                this.set({}, mediasoupStats[statName][statValue]);
+                await collectStats();
+                if (mediasoupStats[statName] !== undefined && mediasoupStats[statName][statValue] !== undefined)
+                {
+                    this.set({}, mediasoupStats[statName][statValue]);
+                }
             }
         });
     });
