@@ -76,23 +76,23 @@ class MessageList extends React.Component
 
 		this.refMessage = React.createRef();
 
-		this.handleIsMessageSeen= this.handleIsMessageSeen.bind(this);
+		this.isMessageSeen= this.isMessageSeen.bind(this);
 
 		this.state = { width: 0 };
 	}
 
 	componentDidMount()
 	{
-		this.refList.current.addEventListener('scroll', () => this.handleSetIsScrollEnd());
+		this.refList.current.addEventListener('scroll', this.handleSetScrollEnd);
 
-		this.refList.current.addEventListener('scroll', (event) => this.handleIsMessageSeen(event));
+		this.refList.current.addEventListener('scroll', this.handleIsMesagesSeen);
 	}
 
 	componentDidUpdate(prevProps)
 	{
 		if (prevProps.chat.count !== this.props.chat.count)
 		{
-			this.handleIsMessageSeen();
+			this.isMessageSeen();
 		}
 
 		if (this.props.chat.isScrollEnd)
@@ -102,14 +102,24 @@ class MessageList extends React.Component
 
 		if (prevProps.chat.order !== this.props.chat.order)
 		{
-			this.handleSetIsScrollEnd();
+			this.setIsScrollEnd();
 
 			this.handleGoToNewest();
 		}
 
-		this.handleSetAreNewMessages(prevProps);
+		this.setAreNewMessages(prevProps);
 
 		this.setCurrWidth();
+	}
+
+	handleSetScrollEnd = () =>
+	{
+		this.setIsScrollEnd();
+	}
+
+	handleIsMesagesSeen = (e) =>
+	{
+		this.isMessageSeen(e);
 	}
 
 	setCurrWidth()
@@ -136,7 +146,7 @@ class MessageList extends React.Component
 
 	}
 
-	handleSetAreNewMessages(prevProps)
+	setAreNewMessages(prevProps)
 	{
 		if (
 			this.props.chat.messages.length + this.props.files.length > 0 &&
@@ -150,7 +160,7 @@ class MessageList extends React.Component
 
 	}
 
-	handleSetIsScrollEnd()
+	setIsScrollEnd()
 	{
 		let isScrollEnd = undefined;
 
@@ -174,7 +184,7 @@ class MessageList extends React.Component
 
 	}
 
-	handleIsMessageSeen()
+	isMessageSeen()
 	{
 		const list = this.refList.current;
 

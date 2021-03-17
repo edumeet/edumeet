@@ -106,11 +106,6 @@ const Message = (props) =>
 		width
 	} = props;
 
-	const getTimeString = (val) =>
-	{
-		return (<FormattedTime value={new Date(val)} />);
-	};
-
 	return (
 		<Paper
 			className={classnames(
@@ -148,7 +143,7 @@ const Message = (props) =>
 							}) })`
 							:
 							<b>{name}</b>
-						} - { getTimeString(time) }
+						} - <FormattedTime value={new Date(time)} />
 					</b>
 				</Typography>
 				}
