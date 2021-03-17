@@ -93,7 +93,7 @@ app.use(sharedCookieParser);
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
-if (config.getRequestsCachePeriod)
+if (config.getRequestsCachePeriod > 0)
 {
 	app.use((req, res, next) => {
 		if (req.method === 'GET')
