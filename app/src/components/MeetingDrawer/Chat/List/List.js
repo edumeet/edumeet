@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { FormattedTime, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import * as appPropTypes from '../../../appPropTypes';
 import * as chatActions from '../../../../actions/chatActions';
 import classnames from 'classnames';
