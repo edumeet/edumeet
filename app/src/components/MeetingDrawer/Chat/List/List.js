@@ -126,7 +126,6 @@ class MessageList extends React.Component
 	{
 		let width = 0;
 
-		// if (this.refMessage.current !== null)
 		if (this.props.chat.messages.length !== 0)
 		{
 			width = this.refMessage.current.offsetWidth;
@@ -137,13 +136,6 @@ class MessageList extends React.Component
 
 		else if (this.state.width !== 0)
 			this.setState({ width: 0 });
-
-		/* eslint-disable no-console */
-		// console.log('#chat.length: ', this.props.chat.messages.length);
-		// console.log('#width: ', width);
-		// console.log('#this.state.width: ', this.state.width);
-		/* eslint-enable no-console */
-
 	}
 
 	setAreNewMessages(prevProps)
