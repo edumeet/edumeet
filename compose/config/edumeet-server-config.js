@@ -396,6 +396,9 @@ module.exports =
 	requestTimeout       : 20000,
 	// Socket retries when timeout
 	requestRetries       : 3,
+	// If > 0, sets a cache-control max-age (in seconds) to the GET response
+	// headers.
+	getRequestsCachePeriod : 0,
 	// Mediasoup settings
 	mediasoup            :
 	{
