@@ -63,6 +63,7 @@ const styles = (theme) =>
 		avatar :
 		{
 			borderRadius    : '50%',
+			width           : '2rem',
 			height          : '2rem',
 			alignSelf       : 'center',
 			margin          : theme.spacing(0.5),
