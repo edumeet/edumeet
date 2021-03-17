@@ -120,10 +120,6 @@ const VIDEO_SIMULCAST_PROFILES =
 	],
 	320 :
 	[
-		// This is a hack  - we need to have at least 2 entries
-		// with same scale, to force simulcast usage
-		// and have control over bandwith limit.
-		{ scaleResolutionDownBy: 1, maxBitRate: 100000 },
 		{ scaleResolutionDownBy: 1, maxBitRate: 250000 }
 	]
 };
@@ -1630,10 +1626,9 @@ export default class RoomClient
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
-				const encodings = this._getEncodings(width, height);
-
-				if (this._useSimulcast && encodings && encodings.length > 1)
+				if (this._useSimulcast)
 				{
+					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
 
 					this._webcamProducer = await this._sendTransport.produce(
@@ -3955,10 +3950,10 @@ export default class RoomClient
 			{
 
 				let producer;
-				const encodings = this._getEncodings(width, height);
 
-				if (this._useSimulcast && encodings && encodings.length > 1)
+				if (this._useSimulcast)
 				{
+					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
 
 					producer = await this._sendTransport.produce(
@@ -4143,10 +4138,10 @@ export default class RoomClient
 
 				logger.debug('screenSharing track settings:', track.getSettings());
 
-				let encodings = this._getEncodings(width, height);
-
-				if (this._useSharingSimulcast && encodings && encodings.length > 1)
+				if (this._useSharingSimulcast)
 				{
+					let encodings = this._getEncodings(width, height);
+
 					// If VP9 is the only available video codec then use SVC.
 					const firstVideoCodec = this._mediasoupDevice
 						.rtpCapabilities
@@ -4580,6 +4575,12 @@ export default class RoomClient
 			}
 
 			encodings = value;
+		}
+
+		// hack as there is a bug in mediasoup
+		if (encodings.length === 1)
+		{
+			encodings.push(encodings[0]);
 		}
 
 		return encodings;
