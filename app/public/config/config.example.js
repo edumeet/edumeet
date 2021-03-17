@@ -70,6 +70,7 @@ var config =
 	simulcast                     : true,
 	// Enable or disable simulcast for screen sharing video
 	simulcastSharing              : false,
+	// Define different encodings for various resolutions of the video
 	simulcastProfiles :
 	{
 		3840 :
@@ -97,6 +98,10 @@ var config =
 		],
 		320 :
 		[
+			// This is a hack  - we need to have at least 2 entries
+			// with same scale, to force simulcast usage
+			// and have control over bandwith limit.
+			{ scaleResolutionDownBy: 1, maxBitRate: 100000 },
 			{ scaleResolutionDownBy: 1, maxBitRate: 250000 }
 		]
 	},

@@ -120,6 +120,10 @@ const VIDEO_SIMULCAST_PROFILES =
 	],
 	320 :
 	[
+		// This is a hack  - we need to have at least 2 entries
+		// with same scale, to force simulcast usage
+		// and have control over bandwith limit.
+		{ scaleResolutionDownBy: 1, maxBitRate: 100000 },
 		{ scaleResolutionDownBy: 1, maxBitRate: 250000 }
 	]
 };
