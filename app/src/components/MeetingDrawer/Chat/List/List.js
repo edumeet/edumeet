@@ -122,7 +122,7 @@ class MessageList extends React.Component
 		this.isMessageSeen(e);
 	}
 
-	setCurrWidth()
+	setCurrWidth = () =>
 	{
 		let width = 0;
 
@@ -138,7 +138,7 @@ class MessageList extends React.Component
 			this.setState({ width: 0 });
 	}
 
-	setAreNewMessages(prevProps)
+	setAreNewMessages = (prevProps) =>
 	{
 		if (
 			this.props.chat.messages.length + this.props.files.length > 0 &&
@@ -152,7 +152,7 @@ class MessageList extends React.Component
 
 	}
 
-	setIsScrollEnd()
+	setIsScrollEnd = () =>
 	{
 		let isScrollEnd = undefined;
 
@@ -176,7 +176,7 @@ class MessageList extends React.Component
 
 	}
 
-	isMessageSeen()
+	isMessageSeen = () =>
 	{
 		const list = this.refList.current;
 
@@ -200,7 +200,7 @@ class MessageList extends React.Component
 		});
 	}
 
-	handleGoToNewest()
+	handleGoToNewest = () =>
 	{
 		if (this.props.chat.order === 'asc')
 			this.refList.current.scrollTop = this.refList.current.scrollHeight;
