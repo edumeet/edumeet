@@ -777,7 +777,7 @@ export default class RoomClient
 				chatActions.addMessage(
 					{
 						...chatMessage,
-						name    : 'Me',
+						// name    : 'Me',
 						sender  : 'client',
 						picture : undefined,
 						isRead  : true

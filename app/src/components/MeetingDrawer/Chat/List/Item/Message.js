@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -22,49 +22,71 @@ const styles = (theme) =>
 	({
 		root :
 		{
-			display      : 'flex',
-			marginBottom : theme.spacing(1),
-			padding      : theme.spacing(1),
-			flexShrink   : 0
+			display         : 'flex',
+			flexShrink      : 0,
+			borderRadius    : '10px',
+			backgroundColor : '#e0e0e085',
+			boxShadow       : 'none',
+			padding         : theme.spacing(0)
 		},
-		selfMessage :
+		independent :
 		{
-			marginLeft : 'auto'
+			marginTop : theme.spacing(1)
 		},
-		remoteMessage :
+		continuationStart :
 		{
-			marginRight : 'auto'
+			marginBottom : theme.spacing(0),
+			borderRadius : '0px 0px 0px 0px'
 		},
-		text :
+
+		continuationMiddle :
 		{
-			'& p' :
-			{
-				margin : 0
-			}
+			marginBottom : theme.spacing(0),
+			borderRadius : '0px 0px 0px 0px'
 		},
-		content :
+		continuationEnd :
 		{
-			marginLeft : theme.spacing(1)
+			marginBottom : theme.spacing(0),
+			borderRadius : '0px 0px 0px 0px'
+		},
+		sent :
+		{
+			alignSelf : 'flex-end'
+		},
+		received :
+		{
+			alignSelf : 'flex-start'
+		},
+		name : {
+
 		},
 		avatar :
 		{
-			borderRadius : '50%',
-			height       : '2rem',
-			alignSelf    : 'center'
+			borderRadius    : '50%',
+			height          : '2rem',
+			alignSelf       : 'center',
+			margin          : theme.spacing(0.5),
+			backgroundColor : '#e0e0e085'
+		},
+		content :
+		{
+			margin : theme.spacing(1),
+			'& p'  : {
+				margin : '0'
+			}
 		},
 		'@keyframes fadeIn' : {
 			'from' : {
 				backgroundColor : '#5f9b2d5c'
 			},
 			'to' : {
-				backgroundColor : 'white'
+				backgroundColor : '#e0e0e085'
 			}
 		},
 		isseen : {
 			animation         : '$fadeIn 2s linear',
 			animationFillMode : 'forwards'
 		}
-
 	});
 
 const Message = (props) =>
@@ -72,14 +94,16 @@ const Message = (props) =>
 	const intl = useIntl();
 
 	const {
-		self,
-		picture,
+		avatar,
 		text,
 		time,
 		name,
 		classes,
 		isseen,
-		sender
+		sender,
+		sameName,
+		refMessage,
+		width
 	} = props;
 
 	const getTimeString = (val) =>
@@ -91,21 +115,52 @@ const Message = (props) =>
 		<Paper
 			className={classnames(
 				classes.root,
-				self ? classes.selfMessage : classes.remoteMessage,
-				isseen && sender === 'response' ? classes.isseen : null
+				sender === 'client' ? classes.sent : classes.received,
+				isseen && sender === 'response' ? classes.isseen : null,
+				sameName ? classes.continuationMiddle : classes.independent
 			)}
+			style={{
+				minWidth : width
+				// width    : width
+			}}
 			data-isseen={isseen}
 			data-time={time}
+			ref={refMessage}
 		>
-			<img alt='Avatar' className={classes.avatar} src={picture} />
-			<div className={classnames(classes.content)}>
+			{/* Avatar */}
+			<img
+				className={classes.avatar}
+				// style={{ visibility: sameName && 'hidden' }}
+				src={avatar}
+				alt='Avatar'
+			/>
+			{/* /Avatar */}
+
+			<div className={classes.content}>
+				{/* Name & Time */}
+				{(!sameName) &&
+				<Typography variant='subtitle1'>
+					<b>
+						{ sender === 'client' ?
+							`${name} ${Math.floor(Math.random() * 10)} (${intl.formatMessage({
+								id             : 'room.me',
+								defaultMessage : 'Me'
+							}) })`
+							:
+							<b>{name}</b>
+						} - { getTimeString(time) }
+					</b>
+				</Typography>
+				}
+				{/* /Name & Time */}
+
+				{/* Content */}
 				<Typography
-					className={classes.text}
 					variant='subtitle1'
 					// eslint-disable-next-line react/no-danger
 					dangerouslySetInnerHTML={{ __html : DOMPurify.sanitize(
 						marked.parse(
-							text,
+							text + width,
 							{ renderer: linkRenderer }
 						),
 						{
@@ -118,16 +173,7 @@ const Message = (props) =>
 						}
 					) }}
 				/>
-				<Typography variant='caption'>
-					{ self ?
-						intl.formatMessage({
-							id             : 'room.me',
-							defaultMessage : 'Me'
-						})
-						:
-						name
-					} - { getTimeString(time) }
-				</Typography>
+				{/* /Content */}
 			</div>
 		</Paper>
 	);
@@ -135,15 +181,17 @@ const Message = (props) =>
 
 Message.propTypes =
 {
-	self    : PropTypes.bool,
-	picture : PropTypes.string,
-	text    : PropTypes.string,
-	time    : PropTypes.string,
-	name    : PropTypes.string,
-	classes : PropTypes.object.isRequired,
-	isseen  : PropTypes.bool.isRequired,
-	sender  : PropTypes.string.isRequired
-
+	avatar     : PropTypes.string,
+	text       : PropTypes.string,
+	time       : PropTypes.string,
+	name       : PropTypes.string,
+	classes    : PropTypes.object.isRequired,
+	isseen     : PropTypes.bool.isRequired,
+	sender     : PropTypes.string.isRequired,
+	sameName   : PropTypes.object.isRequired,
+	refMessage : PropTypes.object.isRequired,
+	onClick    : PropTypes.object.isRequired,
+	width      : PropTypes.number.isRequired
 };
 
 export default withStyles(styles)(Message);

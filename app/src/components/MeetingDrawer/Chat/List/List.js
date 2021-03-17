@@ -39,7 +39,10 @@ const styles = (theme) =>
 				backgroundColor : '#999999'
 			}
 		},
-
+		'MsgContainer' :
+		{
+			backgroundColor : 'red'
+		},
 		buttonGoToNewest :
 		{
 			position     : 'fixed',
@@ -71,7 +74,11 @@ class MessageList extends React.Component
 
 		this.refList = React.createRef();
 
+		this.refMessage = React.createRef();
+
 		this.handleIsMessageSeen= this.handleIsMessageSeen.bind(this);
+
+		this.state = { width: 0 };
 	}
 
 	componentDidMount()
@@ -84,18 +91,49 @@ class MessageList extends React.Component
 	componentDidUpdate(prevProps)
 	{
 		if (prevProps.chat.count !== this.props.chat.count)
+		{
 			this.handleIsMessageSeen();
+		}
 
 		if (this.props.chat.isScrollEnd)
+		{
 			this.handleGoToNewest();
+		}
 
 		if (prevProps.chat.order !== this.props.chat.order)
 		{
 			this.handleSetIsScrollEnd();
+
 			this.handleGoToNewest();
 		}
 
 		this.handleSetAreNewMessages(prevProps);
+
+		this.setCurrWidth();
+	}
+
+	setCurrWidth()
+	{
+		let width = 0;
+
+		// if (this.refMessage.current !== null)
+		if (this.props.chat.messages.length !== 0)
+		{
+			width = this.refMessage.current.offsetWidth;
+
+			if (width > this.state.width)
+				this.setState({ width: width });
+		}
+
+		else if (this.state.width !== 0)
+			this.setState({ width: 0 });
+
+		/* eslint-disable no-console */
+		// console.log('#chat.length: ', this.props.chat.messages.length);
+		// console.log('#width: ', width);
+		// console.log('#this.state.width: ', this.state.width);
+		/* eslint-enable no-console */
+
 	}
 
 	handleSetAreNewMessages(prevProps)
@@ -178,7 +216,8 @@ class MessageList extends React.Component
 			files,
 			me,
 			peers,
-			intl
+			intl,
+			settings
 		} = this.props;
 
 		const items = [ ...chat.messages, ...files ];
@@ -193,6 +232,8 @@ class MessageList extends React.Component
 			if (chat.order === 'desc')
 				items.reverse();
 		}
+
+		let prevName = null;
 
 		return (
 			<React.Fragment>
@@ -237,7 +278,6 @@ class MessageList extends React.Component
 							})}
 
 						</div>)
-
 						:
 						items.map((item) =>
 						{
@@ -246,17 +286,26 @@ class MessageList extends React.Component
 								const picture = (item.sender === 'response' ?
 									item.picture : myPicture) || EmptyAvatar;
 
-								return (
+								const message = (
 									<Message
-										isseen={item.isRead}
-										sender={item.sender}
+										refMessage={this.refMessage}
 										key={item.time}
 										self={item.sender === 'client'}
-										picture={picture}
+										avatar={picture}
 										text={item.text}
 										time={item.time}
 										name={item.name}
+										isseen={item.isRead}
+										sender={settings.displayName === item.name ?
+											'client' : item.sender
+										}
+										sameName={prevName === item.name ? true : false}
+										width={this.state.width}
 									/>);
+
+								prevName = item.name;
+
+								return message;
 							}
 
 							else if (item.type === 'file')
@@ -316,6 +365,7 @@ MessageList.propTypes =
 	classes   : PropTypes.object.isRequired,
 
 	files             : PropTypes.object.isRequired,
+	settings          : PropTypes.object.isRequired,
 	me                : appPropTypes.Me.isRequired,
 	peers             : PropTypes.object.isRequired,
 	intl              : PropTypes.object.isRequired,
@@ -331,7 +381,8 @@ const mapStateToProps = (state) =>
 		myPicture : state.me.picture,
 		me        : state.me,
 		peers     : state.peers,
-		files     : state.files
+		files     : state.files,
+		settings  : state.settings
 
 	});
 
@@ -363,7 +414,8 @@ export default connect(
 				prev.files === next.files &&
 				prev.me.picture === next.me.picture &&
 				prev.me === next.me &&
-				prev.peers === next.peers
+				prev.peers === next.peers &&
+				prev.settings === next.settings
 			);
 		}
 	}
