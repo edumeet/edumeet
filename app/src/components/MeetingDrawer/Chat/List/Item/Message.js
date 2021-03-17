@@ -160,7 +160,7 @@ const Message = (props) =>
 					// eslint-disable-next-line react/no-danger
 					dangerouslySetInnerHTML={{ __html : DOMPurify.sanitize(
 						marked.parse(
-							text + width,
+							text,
 							{ renderer: linkRenderer }
 						),
 						{
