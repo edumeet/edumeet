@@ -130,7 +130,7 @@ const Message = (props) =>
 			{/* Avatar */}
 			<img
 				className={classes.avatar}
-				// style={{ visibility: sameName && 'hidden' }}
+				style={{ visibility: sameName && 'hidden' }}
 				src={avatar}
 				alt='Avatar'
 			/>
