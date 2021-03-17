@@ -142,7 +142,7 @@ const Message = (props) =>
 				<Typography variant='subtitle1'>
 					<b>
 						{ sender === 'client' ?
-							`${name} ${Math.floor(Math.random() * 10)} (${intl.formatMessage({
+							`${name} (${intl.formatMessage({
 								id             : 'room.me',
 								defaultMessage : 'Me'
 							}) })`
