@@ -1958,16 +1958,8 @@ class Room extends EventEmitter
 					rtpParameters  : consumer.rtpParameters,
 					type           : consumer.type,
 					appData        : producer.appData,
-					producerPaused : consumer.producerPaused
-				}
-			);
-
-			this._notification(
-				consumerPeer.socket,
-				'consumerScore',
-				{
-					consumerId : consumer.id,
-					score      : consumer.score
+					producerPaused : consumer.producerPaused,
+					score          : consumer.score
 				}
 			);
 		}
