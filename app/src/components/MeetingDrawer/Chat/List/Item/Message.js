@@ -141,6 +141,7 @@ const Message = (props) =>
 			/>
 			{/* /Avatar */}
 
+			{/* Content */}
 			<div className={classes.content}>
 				{/* Name & Time */}
 				{(!sameName) &&
@@ -159,7 +160,7 @@ const Message = (props) =>
 				}
 				{/* /Name & Time */}
 
-				{/* Content */}
+				{/* Text */}
 				<Typography
 					variant='subtitle1'
 					// eslint-disable-next-line react/no-danger
@@ -168,8 +169,9 @@ const Message = (props) =>
 						allowedHTMLNodes
 					) }}
 				/>
-				{/* /Content */}
+				{/* /Text */}
 			</div>
+			{/* Content */}
 		</Paper>
 	);
 };
