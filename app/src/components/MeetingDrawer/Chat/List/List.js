@@ -289,18 +289,18 @@ class MessageList extends React.Component
 									<Message
 										refMessage={this.refMessage}
 										key={item.time}
-										self={item.sender === 'client'}
+										time={item.time}
 										avatar={(item.sender === 'response' ?
 											item.picture : myPicture) || EmptyAvatar
 										}
-										text={item.text}
-										time={item.time}
 										name={item.name}
+										text={item.text}
 										isseen={item.isRead}
 										sender={settings.displayName === item.name ?
 											'client' : item.sender
 										}
 										sameName={prevName === item.name ? true : false}
+										self={item.sender === 'client'}
 										width={this.state.width}
 									/>);
 
