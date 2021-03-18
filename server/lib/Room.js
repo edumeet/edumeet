@@ -1618,24 +1618,6 @@ class Room extends EventEmitter
 				break;
 			}
 
-			/*
-			case 'moderator:clearFileSharing':
-			{
-				if (!this._hasPermission(peer, MODERATE_FILES))
-					throw new Error('peer not authorized');
-
-				this._fileHistory = [];
-
-				// Spread to others
-				this._notification(peer.socket, 'moderator:clearFileSharing', null, true);
-
-				// Return no error
-				cb();
-
-				break;
-			}
-			*/
-
 			case 'raisedHand':
 			{
 				const { raisedHand } = request.data;

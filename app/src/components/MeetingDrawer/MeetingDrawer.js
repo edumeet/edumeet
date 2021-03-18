@@ -11,15 +11,12 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Badge from '@material-ui/core/Badge';
 import Chat from './Chat/Chat';
-// import FileSharing from './FileSharing/FileSharing';
 import ParticipantList from './ParticipantList/ParticipantList';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import IconButton from '@material-ui/core/IconButton';
 import ChatIcon from '@material-ui/icons/Chat';
 import GroupIcon from '@material-ui/icons/Group';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
-import LockIcon from '@material-ui/icons/Lock';
 
 import { ReactComponent as PinIcon } from '../../images/pin-icon-baseline.svg';
 import { ReactComponent as UnpinIcon } from '../../images/pin-icon-outline.svg';
@@ -28,7 +25,6 @@ const tabs =
 [
 	'users',
 	'chat'
-	// 'files',
 ];
 
 const styles = (theme) =>
@@ -111,18 +107,6 @@ const MeetingDrawer = (props) =>
 							</Badge>
 						}
 					/>
-					{/*
-					<Tab
-						label={
-							<Badge color='secondary' badgeContent={unreadFiles}>
-								{intl.formatMessage({
-									id             : 'label.filesharing',
-									defaultMessage : 'File sharing'
-								})}
-							</Badge>
-						}
-					/>
-					*/}
 				</Tabs>
 				<IconButton onClick={toggleDrawerOverlayed}>
 					{ drawerOverlayed ? <UnpinIcon /> : <PinIcon /> }
@@ -132,7 +116,6 @@ const MeetingDrawer = (props) =>
 				</IconButton>
 			</AppBar>
 			{currentToolTab === 'chat' && <Chat />}
-			{/* currentToolTab === 'files' && <FileSharing /> */}
 			{currentToolTab === 'users' && <ParticipantList />}
 		</div>
 	);
