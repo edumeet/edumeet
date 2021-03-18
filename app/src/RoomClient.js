@@ -1428,8 +1428,13 @@ export default class RoomClient
 			{
 				this.disconnectLocalHark();
 
+				let muted = false;
+
 				if (this._micProducer)
+				{
+					muted = this._micProducer.paused;
 					await this.disableMic();
+				}
 
 				const stream = await navigator.mediaDevices.getUserMedia(
 					{
@@ -1496,9 +1501,9 @@ export default class RoomClient
 					this.disableMic();
 				});
 
-				this._micProducer.volume = 0;
-
 				this.connectLocalHark(track);
+				if (muted) this.muteMic();
+				else this.unmuteMic();
 			}
 			else if (this._micProducer)
 			{
