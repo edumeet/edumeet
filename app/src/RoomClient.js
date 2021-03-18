@@ -194,6 +194,7 @@ export default class RoomClient
 			accessCode,
 			device,
 			produce,
+			headless,
 			forceTcp,
 			displayName,
 			muted,
@@ -350,6 +351,19 @@ export default class RoomClient
 
 		// Send transport restart ICE object
 		this._sendRestartIce = { timer: null, restarting: false };
+
+		if (headless)
+		{
+			const encodedRoomId =
+				encodeURIComponent(decodeURIComponent(window.location.pathname.slice(1)));
+
+			this.join({
+				roomId    : encodedRoomId,
+				joinVideo : false,
+				joinAudio : false
+			});
+		}
+
 	}
 
 	close()
