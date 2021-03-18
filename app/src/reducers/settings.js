@@ -4,7 +4,7 @@ const initialState =
 	selectedWebcam          : null,
 	selectedAudioDevice     : null,
 	advancedMode            : false,
-	autoGainControl         : false,
+	autoGainControl         : true,
 	echoCancellation        : true,
 	noiseSuppression        : true,
 	voiceActivatedUnmute    : false,

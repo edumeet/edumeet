@@ -70,27 +70,44 @@ var config =
 	simulcast                     : true,
 	// Enable or disable simulcast for screen sharing video
 	simulcastSharing              : false,
-	// Simulcast encoding layers and levels
-	simulcastEncodings            :
-	[
-		{ scaleResolutionDownBy: 4 },
-		{ scaleResolutionDownBy: 2 },
-		{ scaleResolutionDownBy: 1 }
-	],
+	// Define different encodings for various resolutions of the video
+	simulcastProfiles :
+	{
+		3840 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 1500000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 4000000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 10000000 }
+		],
+		1920 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 750000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 1500000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 4000000 }
+		],
+		1280 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 250000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 900000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 3000000 }
+		],
+		640 :
+		[
+			{ scaleResolutionDownBy: 2, maxBitRate: 250000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 900000 }
+		],
+		320 :
+		[
+			{ scaleResolutionDownBy: 1, maxBitRate: 250000 }
+		]
+	},
+
+
 	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
 	// example: 
 	// with level width=640px, the minimum width required to trigger the
 	// level change will be: 640 * 0.75 = 480px
 	adaptiveScalingFactor: 0.75,
-
-	/**
-	 * Alternative simulcast setting:
-	 * [
-	 *   { maxBitRate: 50000 }, 
-	 *	 { maxBitRate: 1000000 },
-	 *	 { maxBitRate: 4800000 }
-	 *],
-	 **/
 
 	/**
 	 * White listing browsers that support audio output device selection.
@@ -112,7 +129,7 @@ var config =
 	// defaults for audio setting on new clients / can be customized and overruled from client side
 	defaultAudio :
 	{
-		autoGainControl      : false, // default : false
+		autoGainControl      : true, // default : true
 		echoCancellation     : true, // default : true 
 		noiseSuppression     : true, // default : true 
 		// Automatically unmute speaking above noisThereshold

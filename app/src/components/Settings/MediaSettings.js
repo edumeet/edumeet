@@ -253,37 +253,6 @@ const MediaSettings = ({
 						}
 					</FormHelperText>
 				</FormControl>
-				<FormControl className={classes.formControl}>
-					<Select
-						value={settings.resolution || ''}
-						onChange={(event) =>
-						{
-							if (event.target.value)
-								roomClient.updateWebcam({
-									restart       : true,
-									newResolution : event.target.value
-								});
-						}}
-						name='Video resolution'
-						autoWidth
-						className={classes.selectEmpty}
-					>
-						{resolutions.map((resolution, index) =>
-						{
-							return (
-								<MenuItem key={index} value={resolution.value}>
-									{resolution.label}
-								</MenuItem>
-							);
-						})}
-					</Select>
-					<FormHelperText>
-						<FormattedMessage
-							id='settings.resolution'
-							defaultMessage='Select your video resolution'
-						/>
-					</FormHelperText>
-				</FormControl>
 				<List className={classes.root} component='nav'>
 					<ListItem button onClick={() => setVideoSettingsOpen(!videoSettingsOpen)}>
 						<ListItemText primary={intl.formatMessage({
@@ -300,7 +269,10 @@ const MediaSettings = ({
 								onChange={(event) =>
 								{
 									if (event.target.value)
-										roomClient.updateWebcam({ newResolution: event.target.value });
+										roomClient.updateWebcam({
+											restart       : true,
+											newResolution : event.target.value
+										});
 								}}
 								name='Video resolution'
 								autoWidth
@@ -329,7 +301,10 @@ const MediaSettings = ({
 									onChange={(event) =>
 									{
 										if (event.target.value)
-											roomClient.updateWebcam({ newFrameRate: event.target.value });
+											roomClient.updateWebcam({
+												restart      : true,
+												newFrameRate : event.target.value
+											});
 									}}
 									name='Frame rate'
 									autoWidth
