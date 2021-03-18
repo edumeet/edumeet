@@ -20,7 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-import { parseScalabilityMode } from 'mediasoup-client';
+// import { parseScalabilityMode } from 'mediasoup-client';
 
 let createTorrent;
 
