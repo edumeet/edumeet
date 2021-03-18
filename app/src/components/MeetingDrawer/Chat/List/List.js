@@ -285,15 +285,14 @@ class MessageList extends React.Component
 						{
 							if (item.type === 'message')
 							{
-								const picture = (item.sender === 'response' ?
-									item.picture : myPicture) || EmptyAvatar;
-
 								const message = (
 									<Message
 										refMessage={this.refMessage}
 										key={item.time}
 										self={item.sender === 'client'}
-										avatar={picture}
+										avatar={(item.sender === 'response' ?
+											item.picture : myPicture) || EmptyAvatar
+										}
 										text={item.text}
 										time={item.time}
 										name={item.name}
