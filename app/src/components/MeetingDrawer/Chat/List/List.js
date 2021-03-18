@@ -85,7 +85,7 @@ class MessageList extends React.Component
 	{
 		this.refList.current.addEventListener('scroll', this.handleSetScrollEnd);
 
-		this.refList.current.addEventListener('scroll', this.handleIsMesagesSeen);
+		this.refList.current.addEventListener('scroll', this.handleIsMessageSeen);
 	}
 
 	componentDidUpdate(prevProps)
@@ -117,7 +117,7 @@ class MessageList extends React.Component
 		this.setIsScrollEnd();
 	}
 
-	handleIsMesagesSeen = (e) =>
+	handleIsMessageSeen = (e) =>
 	{
 		this.isMessageSeen(e);
 	}
