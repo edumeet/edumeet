@@ -90,6 +90,11 @@ class MessageList extends React.Component
 
 	componentDidUpdate(prevProps)
 	{
+		if (this.props.chat.count === 0)
+		{
+			this.setMessageWidth(0);
+		}
+
 		if (prevProps.chat.count !== this.props.chat.count)
 		{
 			this.isMessageSeen();
@@ -109,7 +114,6 @@ class MessageList extends React.Component
 
 		this.setAreNewMessages(prevProps);
 
-		this.setCurrWidth();
 	}
 
 	handleSetScrollEnd = () =>
@@ -122,20 +126,17 @@ class MessageList extends React.Component
 		this.isMessageSeen(e);
 	}
 
-	setCurrWidth = () =>
+	setMessageWidth = (width) =>
 	{
-		let width = 0;
-
-		if (this.props.chat.messages.length !== 0)
+		if (width === 0 && this.state.width !== 0)
 		{
-			width = this.refMessage.current.offsetWidth;
-
-			if (width > this.state.width)
-				this.setState({ width: width });
+			this.setState({ width: 0 });
 		}
 
-		else if (this.state.width !== 0)
-			this.setState({ width: 0 });
+		if (width > this.state.width)
+		{
+			this.setState({ width: width });
+		}
 	}
 
 	setAreNewMessages = (prevProps) =>
@@ -287,7 +288,7 @@ class MessageList extends React.Component
 							{
 								const message = (
 									<Message
-										refMessage={this.refMessage}
+										refMessage={(el) => el && this.setMessageWidth(el.offsetWidth)}
 										key={item.time}
 										time={item.time}
 										avatar={(item.sender === 'response' ?
