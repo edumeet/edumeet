@@ -629,11 +629,11 @@ async function runHttpsServer()
 
 	// Serve all files in the public folder as static files.
 	app.use(express.static('public', {
-		maxAge: (config.staticFilesCachePeriod || 0) * 1000
+		maxAge : (config.staticFilesCachePeriod || 0) * 1000
 	}));
 
 	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`, {
-		maxAge: (config.staticFilesCachePeriod || 0) * 1000
+		maxAge : (config.staticFilesCachePeriod || 0) * 1000
 	}));
 
 	if (config.httpOnly === true)
@@ -799,7 +799,7 @@ async function runMediasoupWorkers()
 	logger.info('running %d mediasoup Workers...', numWorkers);
 
 	const { logLevel, logTags, rtcMinPort, rtcMaxPort } = config.mediasoup.worker;
-    const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
+	const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
 
 	for (let i = 0; i < numWorkers; i++)
 	{
@@ -807,9 +807,9 @@ async function runMediasoupWorkers()
 			{
 				logLevel,
 				logTags,
-				rtcMinPort : rtcMinPort + i * portInterval,
+				rtcMinPort : rtcMinPort + (i * portInterval),
 				rtcMaxPort : i === numWorkers - 1 ? rtcMaxPort
-					: rtcMinPort + (i + 1) * portInterval - 1
+					: rtcMinPort + ((i + 1) * portInterval) - 1
 			});
 
 		worker.on('died', () =>
