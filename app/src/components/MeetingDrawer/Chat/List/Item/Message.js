@@ -8,16 +8,6 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { useIntl, FormattedTime } from 'react-intl';
 
-const linkRenderer = new marked.Renderer();
-
-linkRenderer.link = (href, title, text) =>
-{
-	title = title ? title : href;
-	text = text ? text : href;
-
-	return `<a target='_blank' href='${ href }' title='${ title }'>${ text }</a>`;
-};
-
 const styles = (theme) =>
 	({
 		root :
@@ -94,6 +84,25 @@ const Message = (props) =>
 {
 	const intl = useIntl();
 
+	const linkRenderer = new marked.Renderer();
+
+	linkRenderer.link = (href, title, text) =>
+	{
+		title = title ? title : href;
+		text = text ? text : href;
+
+		return `<a target='_blank' href='${ href }' title='${ title }'>${ text }</a>`;
+	};
+
+	const allowedHTMLNodes = {
+		ALLOWED_TAGS : [
+			'a', 'b', 'strong', 'i',
+			'em', 'u', 'strike', 'p',
+			'br'
+		],
+		ALLOWED_ATTR : [ 'href', 'target', 'title' ]
+	};
+
 	const {
 		avatar,
 		text,
@@ -155,18 +164,8 @@ const Message = (props) =>
 					variant='subtitle1'
 					// eslint-disable-next-line react/no-danger
 					dangerouslySetInnerHTML={{ __html : DOMPurify.sanitize(
-						marked.parse(
-							text,
-							{ renderer: linkRenderer }
-						),
-						{
-							ALLOWED_TAGS : [
-								'a', 'b', 'strong', 'i',
-								'em', 'u', 'strike', 'p',
-								'br'
-							],
-							ALLOWED_ATTR : [ 'href', 'target', 'title' ]
-						}
+						marked.parse(text, { renderer: linkRenderer }),
+						allowedHTMLNodes
 					) }}
 				/>
 				{/* /Content */}
