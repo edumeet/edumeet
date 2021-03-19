@@ -20,7 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-import { parseScalabilityMode } from 'mediasoup-client';
+// import { parseScalabilityMode } from 'mediasoup-client';
 
 let createTorrent;
 
@@ -219,6 +219,7 @@ export default class RoomClient
 			accessCode,
 			device,
 			produce,
+			headless,
 			forceTcp,
 			displayName,
 			muted,
@@ -375,6 +376,19 @@ export default class RoomClient
 
 		// Send transport restart ICE object
 		this._sendRestartIce = { timer: null, restarting: false };
+
+		if (headless)
+		{
+			const encodedRoomId =
+				encodeURIComponent(decodeURIComponent(window.location.pathname.slice(1)));
+
+			this.join({
+				roomId    : encodedRoomId,
+				joinVideo : false,
+				joinAudio : false
+			});
+		}
+
 	}
 
 	close()
@@ -1414,8 +1428,13 @@ export default class RoomClient
 			{
 				this.disconnectLocalHark();
 
+				let muted = false;
+
 				if (this._micProducer)
+				{
+					muted = this._micProducer.paused;
 					await this.disableMic();
+				}
 
 				const stream = await navigator.mediaDevices.getUserMedia(
 					{
@@ -1482,9 +1501,9 @@ export default class RoomClient
 					this.disableMic();
 				});
 
-				this._micProducer.volume = 0;
-
 				this.connectLocalHark(track);
+				if (muted) this.muteMic();
+				else this.unmuteMic();
 			}
 			else if (this._micProducer)
 			{
@@ -3120,7 +3139,8 @@ export default class RoomClient
 							rtpParameters,
 							type,
 							appData,
-							producerPaused
+							producerPaused,
+							score
 						} = notification.data;
 
 						const consumer = await this._recvTransport.consume(
@@ -3163,7 +3183,8 @@ export default class RoomClient
 								preferredTemporalLayer : temporalLayers - 1,
 								priority               : 1,
 								codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
-								track                  : consumer.track
+								track                  : consumer.track,
+								score                  : score
 							},
 							peerId));
 
@@ -4573,6 +4594,12 @@ export default class RoomClient
 			}
 
 			encodings = value;
+		}
+
+		// hack as there is a bug in mediasoup
+		if (encodings.length === 1)
+		{
+			encodings.push(encodings[0]);
 		}
 
 		return encodings;

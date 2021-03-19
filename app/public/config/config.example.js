@@ -70,6 +70,7 @@ var config =
 	simulcast                     : true,
 	// Enable or disable simulcast for screen sharing video
 	simulcastSharing              : false,
+	// Define different encodings for various resolutions of the video
 	simulcastProfiles :
 	{
 		3840 :
