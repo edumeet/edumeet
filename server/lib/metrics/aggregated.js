@@ -36,8 +36,9 @@ module.exports = function(workers, rooms_, peers_, config)
         {
             return;
         }
-        logger.info(`collectStats (elapsed: ${((now - (mediasoupStatsUpdate || now)) / 1000).toFixed(0)}s)`);
         mediasoupStatsUpdate = now;
+
+        const start = process.hrtime();
 
         let workers_cpu = new Stats();
         let workers_memory = new Stats();
@@ -206,6 +207,9 @@ module.exports = function(workers, rooms_, peers_, config)
                 temporal_layers_out:        formatStats(temporal_layers_out),
             });
         }
+
+        const end = process.hrtime(start);
+        logger.info(`collectStats (elapsed: ${end[0] * 1e3 + end[1] * 1e-6} ms)`);
     }
 
     // mediasoup metrics
