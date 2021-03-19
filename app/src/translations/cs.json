@@ -109,7 +109,7 @@
 	"label.leave": "Opustit",
 	"label.chatInput": "Napište zprávu chatu",
 	"label.chat": "Chat",
-	"label.chatNoMessages": null,
+	"label.chatNoMessages": "Žádné zprávy",
 	"label.filesharing": "Sdílení souborů",
 	"label.participants": "Účastníci",
 	"label.shareFile": "Sdílet soubor",
