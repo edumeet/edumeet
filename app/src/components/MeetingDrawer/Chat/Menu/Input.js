@@ -228,6 +228,7 @@ const ChatInput = (props) =>
 
 								component='span'
 								onClick={handleBoldClick}
+								onMouseDown={(e) => e.preventDefault()}
 
 							>
 								<FormatBoldIcon />
@@ -258,6 +259,7 @@ const ChatInput = (props) =>
 
 								component='span'
 								onClick={handleItalicClick}
+								onMouseDown={(e) => e.preventDefault()}
 							>
 								<FormatItalicIcon />
 							</IconButton>
@@ -286,6 +288,7 @@ const ChatInput = (props) =>
 
 								component='span'
 								onClick={handleUnderlineClick}
+								onMouseDown={(e) => e.preventDefault()}
 							>
 								<FormatUnderlinedIcon />
 							</IconButton>
@@ -320,6 +323,7 @@ const ChatInput = (props) =>
 										component='span'
 										disabled={chat.messages.length < 1}
 										onClick={() => roomClient.sortChat('desc')}
+										onMouseDown={(e) => e.preventDefault()}
 									>
 										<SortIcon style={{ transform: 'rotateX(180deg) rotateY(180deg)' }} />
 									</IconButton>
@@ -374,8 +378,8 @@ const ChatInput = (props) =>
 									})}
 
 									component='span'
-									onClick={() => roomClient.saveChat()
-									}
+									onClick={() => roomClient.saveChat()}
+									onMouseDown={(e) => e.preventDefault()}
 								>
 									<SaveIcon />
 								</IconButton>
@@ -415,6 +419,7 @@ const ChatInput = (props) =>
 										disabled={!canShareFiles || !canShare}
 										component='span'
 										// onClick={(e) => (e.target.value = null)}
+										onMouseDown={(e) => e.preventDefault()}
 									>
 										<AttachFileIcon
 											size='small'
@@ -458,6 +463,7 @@ const ChatInput = (props) =>
 											defaultMessage : 'Share gallery file'
 										})}
 										component='span'
+										onMouseDown={(e) => e.preventDefault()}
 									>
 										<PhotoCamera />
 									</IconButton>
