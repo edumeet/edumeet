@@ -131,8 +131,7 @@ const styles = (theme) =>
 			},
 			'&.hidden' :
 			{
-				opacity            : 0,
-				transitionDuration : '0s'
+				display : 'none'
 			}
 		},
 		peer :
