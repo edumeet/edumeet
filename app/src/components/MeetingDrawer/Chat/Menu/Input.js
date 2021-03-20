@@ -204,8 +204,9 @@ const ChatInput = (props) =>
 				</Grid>
 
 				<Grid item container justify='space-between' alignItems='center'>
-					{/* Format buttons */}
+					{/* Buttons of format */}
 					<Grid item>
+						{/* Button bold */}
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.bold',
@@ -233,7 +234,9 @@ const ChatInput = (props) =>
 							</IconButton>
 
 						</Tooltip>
+						{/* /Button bold */}
 
+						{/* Button italic */}
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.italic',
@@ -259,7 +262,9 @@ const ChatInput = (props) =>
 								<FormatItalicIcon />
 							</IconButton>
 						</Tooltip>
+						{/* /Button italic */}
 
+						{/* Button underline */}
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.underline',
@@ -286,6 +291,7 @@ const ChatInput = (props) =>
 							</IconButton>
 
 						</Tooltip>
+						{/* /Button underline */}
 					</Grid>
 					{/* /Format buttons */}
 
@@ -377,7 +383,7 @@ const ChatInput = (props) =>
 						</React.Fragment>
 						{/* /Button save chat */}
 
-						{/* Button for file sharing */}
+						{/* Button share file */}
 						<React.Fragment>
 							<input
 								id='contained-button-file'
@@ -417,9 +423,9 @@ const ChatInput = (props) =>
 								</Tooltip>
 							</label>
 						</React.Fragment>
-						{/* /Button for file sharing */}
+						{/* /Button share file */}
 
-						{/* Button for gallery file sharing (mobile) */}
+						{/* Button share gallery file (mobile) */}
 						{(browser.platform === 'mobile') && canShareFiles && canShare &&
 						<React.Fragment>
 							<input
@@ -459,7 +465,7 @@ const ChatInput = (props) =>
 							</label>
 						</React.Fragment>
 						}
-						{/* /Button for gallery file sharing (mobile) */}
+						{/* /Button share gallery file (mobile) */}
 					</Grid>
 					{/* /Actions buttons */}
 				</Grid>
