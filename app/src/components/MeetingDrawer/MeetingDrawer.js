@@ -108,12 +108,16 @@ const MeetingDrawer = (props) =>
 						}
 					/>
 				</Tabs>
-				<IconButton onClick={toggleDrawerOverlayed}>
-					{ drawerOverlayed ? <UnpinIcon /> : <PinIcon /> }
-				</IconButton>
-				<IconButton onClick={closeDrawer}>
-					{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-				</IconButton>
+				{browser.platform !== 'mobile' && (
+					<React.Fragment>
+						<IconButton onClick={toggleDrawerOverlayed}>
+							{ drawerOverlayed ? <UnpinIcon /> : <PinIcon /> }
+						</IconButton>
+						<IconButton onClick={closeDrawer}>
+							{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+						</IconButton>
+					</React.Fragment>
+				)}
 			</AppBar>
 			{currentToolTab === 'chat' && <Chat />}
 			{currentToolTab === 'users' && <ParticipantList />}
