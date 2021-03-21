@@ -20,28 +20,28 @@ const styles = (theme) =>
 			wordWrap        : 'break-word',
 			wordBreak       : 'break-all'
 		},
-		independent :
+		single :
 		{
 			marginTop    : theme.spacing(1),
 			borderRadius : '10px 10px 10px 10px'
 		},
-		continuationStart :
+		combinedBegin :
 		{
 			marginTop    : theme.spacing(1),
 			borderRadius : '10px 10px 0px 0px'
 		},
 
-		continuationMiddle :
+		combinedMiddle :
 		{
 			marginBottom : theme.spacing(0),
 			borderRadius : '0px 0px 0px 0px'
 		},
-		continuationEnd :
+		combinedEnd :
 		{
 			marginBottom : theme.spacing(0),
 			borderRadius : '0px 0px 10px 10px'
 		},
-		continuationTime :
+		combinedTime :
 		{
 			alignSelf   : 'center',
 			fontSize    : '13px',
@@ -142,14 +142,14 @@ const Message = (props) =>
 			ref={refMessage}
 		>
 			{/* Avatar */}
-			{(format === 'independent' || format ==='continuationStart') && 'hidden' ?
+			{(format === 'single' || format ==='combinedBegin') && 'hidden' ?
 				<img
 					className={classes.avatar}
 					src={avatar}
 					alt='Avatar'
 				/>
 				:
-				<div className={classes.continuationTime}>
+				<div className={classes.combinedTime}>
 					<FormattedTime value={new Date(time)} />
 				</div>
 			}
@@ -158,7 +158,7 @@ const Message = (props) =>
 			{/* Content */}
 			<div className={classes.content}>
 				{/* Name & Time */}
-				{(format === 'independent' || format ==='continuationStart') &&
+				{(format === 'single' || format ==='combinedBegin') &&
 				<Typography variant='subtitle1'>
 					<b>
 						{ sender === 'client' ?

@@ -291,13 +291,13 @@ class MessageList extends React.Component
 							let format = null;
 
 							if (curr !== prev && curr !== next)
-								format = 'independent';
+								format = 'single';
 							else if (curr !== prev && curr === next)
-								format = 'continuationStart';
+								format = 'combinedBegin';
 							else if (curr === prev && curr === next)
-								format = 'continuationMiddle';
+								format = 'combinedMiddle';
 							else if (curr === prev && curr !== next)
-								format = 'continuationEnd';
+								format = 'combinedEnd';
 
 							if (item.type === 'message')
 							{
