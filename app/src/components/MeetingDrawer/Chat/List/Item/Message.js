@@ -41,6 +41,13 @@ const styles = (theme) =>
 			marginBottom : theme.spacing(0),
 			borderRadius : '0px 0px 0px 0px'
 		},
+		continuationTime :
+		{
+			alignSelf   : 'center',
+			fontSize    : '13px',
+			paddingLeft : '11px',
+			color       : '#999999'
+		},
 		sent :
 		{
 			alignSelf : 'flex-end'
@@ -135,12 +142,17 @@ const Message = (props) =>
 			ref={refMessage}
 		>
 			{/* Avatar */}
-			<img
-				className={classes.avatar}
-				style={{ visibility: sameName && 'hidden' }}
-				src={avatar}
-				alt='Avatar'
-			/>
+			{!sameName && 'hidden' ?
+				<img
+					className={classes.avatar}
+					src={avatar}
+					alt='Avatar'
+				/>
+				:
+				<div className={classes.continuationTime}>
+					<FormattedTime value={new Date(time)} />
+				</div>
+			}
 			{/* /Avatar */}
 
 			{/* Content */}
