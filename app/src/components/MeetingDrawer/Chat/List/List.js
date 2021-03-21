@@ -236,8 +236,6 @@ class MessageList extends React.Component
 				items.reverse();
 		}
 
-		let prevName = null;
-
 		return (
 			<React.Fragment>
 				<div id='chatList' className={classes.root} ref={this.refList}>
@@ -282,8 +280,25 @@ class MessageList extends React.Component
 
 						</div>)
 						:
-						items.map((item) =>
+						items.map((item, index) =>
 						{
+							const prev = (index > 0) ? items[index-1].name : null;
+
+							const curr = item.name;
+
+							const next = (index < items.length - 1) ? items[index+1].name : null;
+
+							let format = null;
+
+							if (curr !== prev && curr !== next)
+								format = 'independent';
+							else if (curr !== prev && curr === next)
+								format = 'continuationStart';
+							else if (curr === prev && curr === next)
+								format = 'continuationMiddle';
+							else if (curr === prev && curr !== next)
+								format = 'continuationEnd';
+
 							if (item.type === 'message')
 							{
 								const message = (
@@ -300,12 +315,10 @@ class MessageList extends React.Component
 										sender={settings.displayName === item.name ?
 											'client' : item.sender
 										}
-										sameName={prevName === item.name ? true : false}
 										self={item.sender === 'client'}
 										width={this.state.width}
+										format={format}
 									/>);
-
-								prevName = item.name;
 
 								return message;
 							}

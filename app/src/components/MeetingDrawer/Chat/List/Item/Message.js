@@ -14,7 +14,6 @@ const styles = (theme) =>
 		{
 			display         : 'flex',
 			flexShrink      : 0,
-			borderRadius    : '10px',
 			backgroundColor : '#e0e0e085',
 			boxShadow       : 'none',
 			padding         : theme.spacing(0),
@@ -23,12 +22,13 @@ const styles = (theme) =>
 		},
 		independent :
 		{
-			marginTop : theme.spacing(1)
+			marginTop    : theme.spacing(1),
+			borderRadius : '10px 10px 10px 10px'
 		},
 		continuationStart :
 		{
-			marginBottom : theme.spacing(0),
-			borderRadius : '0px 0px 0px 0px'
+			marginTop    : theme.spacing(1),
+			borderRadius : '10px 10px 0px 0px'
 		},
 
 		continuationMiddle :
@@ -39,7 +39,7 @@ const styles = (theme) =>
 		continuationEnd :
 		{
 			marginBottom : theme.spacing(0),
-			borderRadius : '0px 0px 0px 0px'
+			borderRadius : '0px 0px 10px 10px'
 		},
 		continuationTime :
 		{
@@ -120,9 +120,9 @@ const Message = (props) =>
 		classes,
 		isseen,
 		sender,
-		sameName,
 		refMessage,
-		width
+		width,
+		format
 	} = props;
 
 	return (
@@ -131,7 +131,7 @@ const Message = (props) =>
 				classes.root,
 				sender === 'client' ? classes.sent : classes.received,
 				isseen && sender === 'response' ? classes.isseen : null,
-				sameName ? classes.continuationMiddle : classes.independent
+				classes[format]
 			)}
 			style={{
 				minWidth : width
@@ -142,7 +142,7 @@ const Message = (props) =>
 			ref={refMessage}
 		>
 			{/* Avatar */}
-			{!sameName && 'hidden' ?
+			{(format === 'independent' || format ==='continuationStart') && 'hidden' ?
 				<img
 					className={classes.avatar}
 					src={avatar}
@@ -158,7 +158,7 @@ const Message = (props) =>
 			{/* Content */}
 			<div className={classes.content}>
 				{/* Name & Time */}
-				{(!sameName) &&
+				{(format === 'independent' || format ==='continuationStart') &&
 				<Typography variant='subtitle1'>
 					<b>
 						{ sender === 'client' ?
@@ -199,10 +199,10 @@ Message.propTypes =
 	classes    : PropTypes.object.isRequired,
 	isseen     : PropTypes.bool.isRequired,
 	sender     : PropTypes.string.isRequired,
-	sameName   : PropTypes.object.isRequired,
 	refMessage : PropTypes.object.isRequired,
 	onClick    : PropTypes.object.isRequired,
-	width      : PropTypes.number.isRequired
+	width      : PropTypes.number.isRequired,
+	format     : PropTypes.string.isRequired
 };
 
 export default withStyles(styles)(Message);
