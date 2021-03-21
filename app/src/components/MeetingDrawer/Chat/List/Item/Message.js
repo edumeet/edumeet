@@ -200,7 +200,6 @@ Message.propTypes =
 	isseen     : PropTypes.bool.isRequired,
 	sender     : PropTypes.string.isRequired,
 	refMessage : PropTypes.object.isRequired,
-	onClick    : PropTypes.object.isRequired,
 	width      : PropTypes.number.isRequired,
 	format     : PropTypes.string.isRequired
 };
