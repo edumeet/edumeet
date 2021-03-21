@@ -17,7 +17,9 @@ const styles = (theme) =>
 			borderRadius    : '10px',
 			backgroundColor : '#e0e0e085',
 			boxShadow       : 'none',
-			padding         : theme.spacing(0)
+			padding         : theme.spacing(0),
+			wordWrap        : 'break-word',
+			wordBreak       : 'break-all'
 		},
 		independent :
 		{
