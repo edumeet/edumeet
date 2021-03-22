@@ -3,118 +3,217 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import { FormattedMessage } from 'react-intl';
+import { useIntl, FormattedTime, FormattedMessage } from 'react-intl';
 import magnet from 'magnet-uri';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import DescriptionIcon from '@material-ui/icons/Description';
 import Paper from '@material-ui/core/Paper';
+import classnames from 'classnames';
+import SaveIcon from '@material-ui/icons/Save';
+import GetAppIcon from '@material-ui/icons/GetApp';
 
 const styles = (theme) =>
 	({
 		root :
 		{
-			display              : 'flex',
-			alignItems           : 'center',
-			justifyContent       : 'space-between',
-			width                : '100%',
-			padding              : theme.spacing(1),
-			boxShadow            : '0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12)',
-			'&:not(:last-child)' :
-			{
-				marginBottom : theme.spacing(1)
-			}
+
+			display         : 'flex',
+			flexShrink      : 0,
+			backgroundColor : '#e0e0e085',
+			boxShadow       : 'none',
+			padding         : theme.spacing(0),
+			wordWrap        : 'break-word',
+			wordBreak       : 'break-all'
+
+			// alignItems     : 'center',
+			// justifyContent : 'space-between'
 		},
-		participant :
+		single :
 		{
-			display    : 'flex',
-			alignItems : 'center'
+			marginTop    : theme.spacing(1),
+			borderRadius : '10px 10px 10px 10px'
+		},
+		combinedBegin :
+		{
+			marginTop    : theme.spacing(1),
+			borderRadius : '10px 10px 0px 0px'
 		},
 
+		combinedMiddle :
+		{
+			marginBottom : theme.spacing(0),
+			borderRadius : '0px 0px 0px 0px'
+		},
+		combinedEnd :
+		{
+			marginBottom : theme.spacing(0),
+			borderRadius : '0px 0px 10px 10px'
+		},
+		combinedTime :
+		{
+			alignSelf : 'center',
+			fontSize  : '13px',
+			color     : '#999999',
+			margin    : theme.spacing(0.5)
+		},
+		sent :
+		{
+			alignSelf : 'flex-end'
+		},
+		received :
+		{
+			alignSelf : 'flex-start'
+		},
+		name : {
+
+		},
 		avatar :
 		{
-			borderRadius : '50%',
-			height       : '2rem'
+			borderRadius    : '50%',
+			width           : '2rem',
+			height          : '2rem',
+			alignSelf       : 'center',
+			margin          : theme.spacing(0.5),
+			backgroundColor : '#e0e0e085'
 		},
+		content :
+		{
+			margin : theme.spacing(1),
+			'& p'  : {
+				margin : '0'
+			}
+		},
+		'@keyframes fadeIn' : {
+			'from' : {
+				backgroundColor : '#5f9b2d5c'
+			},
+			'to' : {
+				backgroundColor : '#e0e0e085'
+			}
+		},
+		isseen : {
+			animation         : '$fadeIn 2s linear',
+			animationFillMode : 'forwards'
+		},
+
 		text :
 		{
 			margin  : 0,
 			padding : theme.spacing(1)
-		},
-		fileContent :
-		{
-			display    : 'flex',
-			alignItems : 'center'
-
 		},
 		fileInfo :
 		{
 			display    : 'flex',
 			alignItems : 'center',
 			padding    : theme.spacing(1)
-		},
-		button :
-		{
-			marginRight : 'auto'
 		}
 	});
 
 const File = (props) =>
 {
+
+	const intl = useIntl();
+
 	const {
 		roomClient,
-		displayName,
-		picture,
+		name,
 		canShareFiles,
 		magnetUri,
 		time,
 		file,
-		classes
+		classes,
+		sender,
+		isseen,
+		format,
+		width,
+		refMessage,
+		avatar
+
 	} = props;
 
 	return (
 		<Paper
-			className={classes.root}
+			className={classnames(
+				classes.root,
+				sender === 'client' ? classes.sent : classes.received,
+				isseen && sender === 'response' ? classes.isseen : null,
+				classes[format]
+			)}
+			style={{ minWidth: width }}
+			data-isseen={isseen}
+			data-time={time}
+			ref={refMessage}
 		>
 			{/* Avatar */}
-			<div className={classes.participant}>
-				<img alt='Avatar' className={classes.avatar} src={picture} />
-				<span>&nbsp;{displayName}</span>
-			</div>
+			{(format === 'single' || format ==='combinedBegin') && 'hidden' ?
+				<img
+					className={classes.avatar}
+					src={avatar}
+					alt='Avatar'
+				/>
+				:
+				<div className={classes.combinedTime}>
+					<FormattedTime value={new Date(time)} />
+				</div>
+			}
 			{/* /Avatar */}
 
 			{/* Content */}
-			<div className={classes.fileContent}>
+			<div className={classes.content}>
+
+				{/* Name & Time */}
+				{(format === 'single' || format ==='combinedBegin') &&
+				<Typography variant='subtitle1'>
+					<b>
+						{ sender === 'client' ?
+							`${name} (${intl.formatMessage({
+								id             : 'room.me',
+								defaultMessage : 'Me'
+							}) })`
+							:
+							<b>{name}</b>
+						} - <FormattedTime value={new Date(time)} />
+					</b>
+				</Typography>
+				}
+				{/* /Name & Time */}
 				{ file.files &&
 				<Fragment>
 					{/*
-							<Typography className={classes.text}>
-								<FormattedMessage
-									id='filesharing.finished'
-									defaultMessage='File finished downloading'
-								/>
-							</Typography>
-							*/}
+					<Typography className={classes.text}>
+						<FormattedMessage
+							id='filesharing.finished'
+							defaultMessage='File finished downloading'
+						/>
+					</Typography>
+					*/}
 					{ file.files.map((sharedFile, i) => (
-						<div className={classes.fileInfo} key={i}>
+						<div
+							className={classes.fileInfo} key={i}
+							onClick={() =>
+							{
+								roomClient.saveFile(sharedFile);
+							}}
+						>
 							<DescriptionIcon />
 							<Typography className={classes.text}>
 								{sharedFile.name}
 							</Typography>
-							<Button
+							<IconButton
 								variant='contained'
 								component='span'
 								className={classes.button}
-								onClick={() =>
-								{
-									roomClient.saveFile(sharedFile);
-								}}
 							>
+								{/*
 								<FormattedMessage
 									id='filesharing.save'
 									defaultMessage='Save'
 								/>
-							</Button>
+								*/}
+								<SaveIcon/>
+							</IconButton>
 						</div>
 					))}
 				</Fragment>
@@ -125,35 +224,40 @@ const File = (props) =>
 					{/*
 						<FormattedMessage
 							id='filesharing.sharedFile'
-							defaultMessage='{displayName} shared a file'
+							defaultMessage='{name} shared a file'
 							values={{
-								displayName
+								name
 							}}
 						/>
 						*/}
 				</Typography>
 
 				{ (!file.active && !file.files) &&
-				<div className={classes.fileInfo}>
+				<div
+					className={classes.fileInfo}
+					onClick={() =>
+					{
+						roomClient.handleDownload(magnetUri);
+					}}
+				>
 					<DescriptionIcon />
 					<Typography className={classes.text}>
 						{ magnet.decode(magnetUri).dn }
 					</Typography>
 					{ canShareFiles ?
-						<Button
+						<IconButton
 							variant='contained'
 							component='span'
 							className={classes.button}
-							onClick={() =>
-							{
-								roomClient.handleDownload(magnetUri);
-							}}
 						>
+							{/*
 							<FormattedMessage
 								id='filesharing.download'
 								defaultMessage='Download'
 							/>
-						</Button>
+							*/}
+							<GetAppIcon/>
+						</IconButton>
 						:
 						<Typography className={classes.text}>
 							<FormattedMessage
@@ -192,11 +296,18 @@ File.propTypes = {
 	roomClient    : PropTypes.object.isRequired,
 	magnetUri     : PropTypes.string.isRequired,
 	time          : PropTypes.string.isRequired,
-	displayName   : PropTypes.string.isRequired,
+	name          : PropTypes.string.isRequired,
 	picture       : PropTypes.string,
 	canShareFiles : PropTypes.bool.isRequired,
 	file          : PropTypes.object.isRequired,
-	classes       : PropTypes.object.isRequired
+	classes       : PropTypes.object.isRequired,
+	isseen        : PropTypes.bool.isRequired,
+	sender        : PropTypes.string.isRequired,
+	refMessage    : PropTypes.object.isRequired,
+	width         : PropTypes.number.isRequired,
+	format        : PropTypes.string.isRequired,
+	avatar        : PropTypes.string
+
 };
 
 const mapStateToProps = (state, { time, magnetUri }) =>

@@ -351,11 +351,20 @@ class MessageList extends React.Component
 
 								return (
 									<File
+										// refMessage={(el) => el && this.setMessageWidth(el.offsetWidth)}
 										key={item.time}
 										time={item.time}
 										magnetUri={item.magnetUri}
-										displayName={displayName}
-										picture={filePicture || EmptyAvatar}
+										name={displayName}
+										avatar={filePicture || EmptyAvatar}
+										isseen={item.isRead}
+										sender={settings.displayName === item.name ?
+											'client' : item.sender
+										}
+										self={item.sender === 'client'}
+										width={this.state.width}
+										format={format}
+
 									/>
 								);
 
