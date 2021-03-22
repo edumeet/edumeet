@@ -8,6 +8,7 @@ import magnet from 'magnet-uri';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import DescriptionIcon from '@material-ui/icons/Description';
+import Paper from '@material-ui/core/Paper';
 
 const styles = (theme) =>
 	({
@@ -72,7 +73,9 @@ const File = (props) =>
 	} = props;
 
 	return (
-		<div className={classes.root}>
+		<Paper
+			className={classes.root}
+		>
 			{/* Avatar */}
 			<div className={classes.participant}>
 				<img alt='Avatar' className={classes.avatar} src={picture} />
@@ -181,7 +184,7 @@ const File = (props) =>
 				}
 			</div>
 			{/* /Content */}
-		</div>
+		</Paper>
 	);
 };
 
