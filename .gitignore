@@ -12,3 +12,4 @@ node_modules/
 .vscode
 /app/public/config/*.pem
 yarn.lock
+yarn-error.log
