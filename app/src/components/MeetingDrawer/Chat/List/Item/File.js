@@ -58,31 +58,29 @@ const styles = (theme) =>
 		}
 	});
 
-class File extends React.PureComponent
+const File = (props) =>
 {
-	render()
-	{
-		const {
-			roomClient,
-			displayName,
-			picture,
-			canShareFiles,
-			magnetUri,
-			time,
-			file,
-			classes
-		} = this.props;
+	const {
+		roomClient,
+		displayName,
+		picture,
+		canShareFiles,
+		magnetUri,
+		time,
+		file,
+		classes
+	} = props;
 
-		return (
-			<div className={classes.root}>
-				<div className={classes.participant}>
-					<img alt='Avatar' className={classes.avatar} src={picture} />
-					<span>&nbsp;{displayName}</span>
-				</div>
-				<div className={classes.fileContent}>
-					{ file.files &&
-						<Fragment>
-							{/*
+	return (
+		<div className={classes.root}>
+			<div className={classes.participant}>
+				<img alt='Avatar' className={classes.avatar} src={picture} />
+				<span>&nbsp;{displayName}</span>
+			</div>
+			<div className={classes.fileContent}>
+				{ file.files &&
+				<Fragment>
+					{/*
 							<Typography className={classes.text}>
 								<FormattedMessage
 									id='filesharing.finished'
@@ -90,32 +88,32 @@ class File extends React.PureComponent
 								/>
 							</Typography>
 							*/}
-							{ file.files.map((sharedFile, i) => (
-								<div className={classes.fileInfo} key={i}>
-									<DescriptionIcon />
-									<Typography className={classes.text}>
-										{sharedFile.name}
-									</Typography>
-									<Button
-										variant='contained'
-										component='span'
-										className={classes.button}
-										onClick={() =>
-										{
-											roomClient.saveFile(sharedFile);
-										}}
-									>
-										<FormattedMessage
-											id='filesharing.save'
-											defaultMessage='Save'
-										/>
-									</Button>
-								</div>
-							))}
-						</Fragment>
-					}
-					<Typography className={classes.text}>
-						{/*
+					{ file.files.map((sharedFile, i) => (
+						<div className={classes.fileInfo} key={i}>
+							<DescriptionIcon />
+							<Typography className={classes.text}>
+								{sharedFile.name}
+							</Typography>
+							<Button
+								variant='contained'
+								component='span'
+								className={classes.button}
+								onClick={() =>
+								{
+									roomClient.saveFile(sharedFile);
+								}}
+							>
+								<FormattedMessage
+									id='filesharing.save'
+									defaultMessage='Save'
+								/>
+							</Button>
+						</div>
+					))}
+				</Fragment>
+				}
+				<Typography className={classes.text}>
+					{/*
 						<FormattedMessage
 							id='filesharing.sharedFile'
 							defaultMessage='{displayName} shared a file'
@@ -124,61 +122,60 @@ class File extends React.PureComponent
 							}}
 						/>
 						*/}
+				</Typography>
+
+				{ (!file.active && !file.files) &&
+				<div className={classes.fileInfo}>
+					<DescriptionIcon />
+					<Typography className={classes.text}>
+						{ magnet.decode(magnetUri).dn }
 					</Typography>
-
-					{ (!file.active && !file.files) &&
-						<div className={classes.fileInfo}>
-							<DescriptionIcon />
-							<Typography className={classes.text}>
-								{ magnet.decode(magnetUri).dn }
-							</Typography>
-							{ canShareFiles ?
-								<Button
-									variant='contained'
-									component='span'
-									className={classes.button}
-									onClick={() =>
-									{
-										roomClient.handleDownload(magnetUri);
-									}}
-								>
-									<FormattedMessage
-										id='filesharing.download'
-										defaultMessage='Download'
-									/>
-								</Button>
-								:
-								<Typography className={classes.text}>
-									<FormattedMessage
-										id='label.fileSharingUnsupported'
-										defaultMessage='File sharing not supported'
-									/>
-								</Typography>
-							}
-						</div>
-					}
-
-					{ file.timeout &&
+					{ canShareFiles ?
+						<Button
+							variant='contained'
+							component='span'
+							className={classes.button}
+							onClick={() =>
+							{
+								roomClient.handleDownload(magnetUri);
+							}}
+						>
+							<FormattedMessage
+								id='filesharing.download'
+								defaultMessage='Download'
+							/>
+						</Button>
+						:
 						<Typography className={classes.text}>
 							<FormattedMessage
-								id='filesharing.missingSeeds'
-								defaultMessage={
-									`If this process takes a long time, there might not 
-									be anyone seeding this torrent. Try asking someone to 
-									reupload the file that you want.`
-								}
+								id='label.fileSharingUnsupported'
+								defaultMessage='File sharing not supported'
 							/>
 						</Typography>
 					}
-
-					{ file.active &&
-						<progress value={file.progress} />
-					}
 				</div>
+				}
+
+				{ file.timeout &&
+				<Typography className={classes.text}>
+					<FormattedMessage
+						id='filesharing.missingSeeds'
+						defaultMessage={
+							`If this process takes a long time, there might not 
+									be anyone seeding this torrent. Try asking someone to 
+									reupload the file that you want.`
+						}
+					/>
+				</Typography>
+				}
+
+				{ file.active &&
+				<progress value={file.progress} />
+				}
 			</div>
-		);
-	}
-}
+		</div>
+	);
+};
 
 File.propTypes = {
 	roomClient    : PropTypes.object.isRequired,
