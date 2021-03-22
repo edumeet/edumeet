@@ -73,10 +73,14 @@ const File = (props) =>
 
 	return (
 		<div className={classes.root}>
+			{/* Avatar */}
 			<div className={classes.participant}>
 				<img alt='Avatar' className={classes.avatar} src={picture} />
 				<span>&nbsp;{displayName}</span>
 			</div>
+			{/* /Avatar */}
+
+			{/* Content */}
 			<div className={classes.fileContent}>
 				{ file.files &&
 				<Fragment>
@@ -112,6 +116,8 @@ const File = (props) =>
 					))}
 				</Fragment>
 				}
+
+				{/* Text */}
 				<Typography className={classes.text}>
 					{/*
 						<FormattedMessage
@@ -155,6 +161,7 @@ const File = (props) =>
 					}
 				</div>
 				}
+				{/* /Text */}
 
 				{ file.timeout &&
 				<Typography className={classes.text}>
@@ -173,6 +180,7 @@ const File = (props) =>
 				<progress value={file.progress} />
 				}
 			</div>
+			{/* /Content */}
 		</div>
 	);
 };
