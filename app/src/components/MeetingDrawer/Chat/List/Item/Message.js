@@ -43,10 +43,10 @@ const styles = (theme) =>
 		},
 		combinedTime :
 		{
-			alignSelf   : 'center',
-			fontSize    : '13px',
-			paddingLeft : '11px',
-			color       : '#999999'
+			alignSelf : 'center',
+			fontSize  : '13px',
+			color     : '#999999',
+			margin    : theme.spacing(0.5)
 		},
 		sent :
 		{
