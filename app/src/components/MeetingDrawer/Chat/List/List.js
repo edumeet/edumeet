@@ -76,8 +76,6 @@ class MessageList extends React.Component
 
 		this.refMessage = React.createRef();
 
-		this.isMessageSeen= this.isMessageSeen.bind(this);
-
 		this.state = { width: 0 };
 	}
 
