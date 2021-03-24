@@ -109,6 +109,7 @@
 	"label.chatInput": "Rakstiet tērziņa ziņu...",
 	"label.chat": "Tērzētava",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Failu koplietošana",
 	"label.participants": "Dalībnieki",
 	"label.shareFile": "Koplietot failu",

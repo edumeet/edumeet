@@ -110,6 +110,7 @@
 	"label.chatInput": "Indique mensagem...",
 	"label.chat": "Chat",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Partilha de ficheiro",
 	"label.participants": "Participantes",
 	"label.shareFile": "Partilhar ficheiro",

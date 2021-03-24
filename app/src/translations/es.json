@@ -115,6 +115,7 @@
 	"label.chatInput": "Escriba su mensaje...",
 	"label.chat": "Chat",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Compartir ficheros",
 	"label.participants": "Participantes",
 	"label.shareFile": "Compartir fichero",

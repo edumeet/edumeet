@@ -110,6 +110,7 @@
 	"label.chatInput": "输入聊天消息",
 	"label.chat": "聊天",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "文件共享",
 	"label.participants": "参与者",
 	"label.shareFile": "共享文件",

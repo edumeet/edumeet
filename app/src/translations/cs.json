@@ -110,6 +110,7 @@
 	"label.chatInput": "Napište zprávu chatu",
 	"label.chat": "Chat",
 	"label.chatNoMessages": "Žádné zprávy",
+	"label.chatNewMessages": null,
 	"label.filesharing": "Sdílení souborů",
 	"label.participants": "Účastníci",
 	"label.shareFile": "Sdílet soubor",

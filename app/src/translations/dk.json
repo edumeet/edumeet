@@ -110,6 +110,7 @@
 	"label.chatInput": "Indtast chatbesked ...",
 	"label.chat": "Chat",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Fildeling",
 	"label.participants": "Deltagere",
 	"label.shareFile": "Del fil",

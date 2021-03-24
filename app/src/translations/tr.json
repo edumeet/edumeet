@@ -110,6 +110,7 @@
 	"label.chatInput": "Sohbet mesajı gir...",
 	"label.chat": "Sohbet",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Dosya paylaşım",
 	"label.participants": "Katılımcılar",
 	"label.shareFile": "Dosya paylaş",

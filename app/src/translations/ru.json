@@ -108,6 +108,7 @@
 	"label.chatInput": "Введите сообщение чата...",
 	"label.chat": "Чат",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Обмен файлами",
 	"label.participants": "Участники",
 	"label.shareFile": "Поделиться файлом",

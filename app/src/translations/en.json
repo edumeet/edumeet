@@ -110,6 +110,7 @@
 	"label.chatInput": "Enter chat message...",
 	"label.chat": "Chat",
 	"label.chatNoMessages": "No messages",
+	"label.chatNewMessages": "New messages",
 	"label.filesharing": "File sharing",
 	"label.participants": "Participants",
 	"label.shareFile": "Share file",

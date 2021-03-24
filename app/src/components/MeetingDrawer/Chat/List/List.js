@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { injectIntl } from 'react-intl';
+import { injectIntl, FormattedMessage } from 'react-intl';
 import * as appPropTypes from '../../../appPropTypes';
 import * as chatActions from '../../../../actions/chatActions';
 import classnames from 'classnames';
@@ -266,7 +266,11 @@ class MessageList extends React.Component
 							)
 						}
 					>
-						( {chat.countUnread} ) New Messages
+						( {chat.countUnread} )&nbsp;
+						<FormattedMessage
+							id='label.chatNewMessages'
+							defaultMessage='New messages'
+						/>
 					</Button>
 
 					{items.length === 0

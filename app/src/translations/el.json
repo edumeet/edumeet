@@ -110,6 +110,7 @@
 	"label.chatInput": "Γράψτε το μήνυμά σας...",
 	"label.chat": "Συνομολία",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Διαμοιρασμοός αρχείου",
 	"label.participants": "Συμμετέχοντες",
 	"label.shareFile": "Διαμοιραστείτε ένα αρχείο",

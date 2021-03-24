@@ -110,6 +110,7 @@
 	"label.chatInput": "Skriv melding...",
 	"label.chat": "Chat",
 	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Fildeling",
 	"label.participants": "Deltakere",
 	"label.shareFile": "Del fil",
