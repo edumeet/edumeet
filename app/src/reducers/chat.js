@@ -1,10 +1,10 @@
 const initialState =
 {
-	order          : 'asc',
-	isScrollEnd    : true,
-	messages       : [],
-	count          : 0,
-	countUnread    : 0
+	order       : 'asc',
+	isScrollEnd : true,
+	messages    : [],
+	count       : 0,
+	countUnread : 0
 };
 
 const chat = (state = initialState, action) =>
