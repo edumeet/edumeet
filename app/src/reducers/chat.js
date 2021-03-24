@@ -3,7 +3,6 @@ const initialState =
 	order          : 'asc',
 	isScrollEnd    : true,
 	messages       : [],
-	areNewMessages : false,
 	count          : 0,
 	countUnread    : 0
 };
@@ -62,13 +61,6 @@ const chat = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, isScrollEnd: flag };
-		}
-
-		case 'SET_ARE_NEW_MESSAGES':
-		{
-			const { flag } = action.payload;
-
-			return { ...state, areNewMessages: flag };
 		}
 
 		case 'SET_IS_MESSAGE_READ':

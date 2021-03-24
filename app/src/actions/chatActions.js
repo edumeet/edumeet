@@ -21,12 +21,6 @@ export const sortChat = (order) =>
 		payload : { order }
 	});
 
-export const setAreNewMessages = (flag) =>
-	({
-		type    : 'SET_ARE_NEW_MESSAGES',
-		payload : { flag }
-	});
-
 export const setIsScrollEnd = (flag) =>
 	({
 		type    : 'SET_IS_SCROLL_END',

@@ -109,9 +109,6 @@ class MessageList extends React.Component
 
 			this.handleGoToNewest();
 		}
-
-		this.setAreNewMessages(prevProps);
-
 	}
 
 	handleSetScrollEnd = () =>
@@ -137,20 +134,6 @@ class MessageList extends React.Component
 		}
 	}
 
-	setAreNewMessages = (prevProps) =>
-	{
-		if (
-			this.props.chat.messages.length + this.props.files.length > 0 &&
-			this.props.chat.isScrollEnd === false &&
-			(
-				this.props.chat.messages.length !== prevProps.chat.messages.length ||
-				this.props.files.length !== prevProps.files.length
-			)
-		)
-			this.props.setAreNewMessages(true);
-
-	}
-
 	setIsScrollEnd = () =>
 	{
 		let isScrollEnd = undefined;
@@ -169,9 +152,6 @@ class MessageList extends React.Component
 			isScrollEnd = (this.refList.current.scrollTop === 0 ? true : false);
 
 		this.props.setIsScrollEnd(isScrollEnd);
-
-		if (this.props.chat.isScrollEnd)
-			this.props.setAreNewMessages(false);
 
 	}
 
@@ -245,7 +225,7 @@ class MessageList extends React.Component
 						className={
 							classnames(
 								classes.buttonGoToNewest,
-								chat.areNewMessages ? 'show': 'hide',
+								chat.countUnread > 0 ? 'show': 'hide',
 								chat.order === 'asc' ? 'asc' : 'desc'
 							)
 						}
@@ -390,14 +370,13 @@ MessageList.propTypes =
 	myPicture : PropTypes.string,
 	classes   : PropTypes.object.isRequired,
 
-	files             : PropTypes.object.isRequired,
-	settings          : PropTypes.object.isRequired,
-	me                : appPropTypes.Me.isRequired,
-	peers             : PropTypes.object.isRequired,
-	intl              : PropTypes.object.isRequired,
-	setIsScrollEnd    : PropTypes.func.isRequired,
-	setAreNewMessages : PropTypes.func.isRequired,
-	setIsMessageRead  : PropTypes.func.isRequired
+	files            : PropTypes.object.isRequired,
+	settings         : PropTypes.object.isRequired,
+	me               : appPropTypes.Me.isRequired,
+	peers            : PropTypes.object.isRequired,
+	intl             : PropTypes.object.isRequired,
+	setIsScrollEnd   : PropTypes.func.isRequired,
+	setIsMessageRead : PropTypes.func.isRequired
 
 };
 
@@ -417,10 +396,6 @@ const mapDispatchToProps = (dispatch) =>
 		setIsScrollEnd : (flag) =>
 		{
 			dispatch(chatActions.setIsScrollEnd(flag));
-		},
-		setAreNewMessages : (flag) =>
-		{
-			dispatch(chatActions.setAreNewMessages(flag));
 		},
 		setIsMessageRead : (id, isRead) =>
 		{
