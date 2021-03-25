@@ -76,6 +76,7 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 

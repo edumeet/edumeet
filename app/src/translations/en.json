@@ -76,6 +76,7 @@
 	"room.localRecordingResumed": "{displayName} resumed local recording",
 	"room.localRecordingStopped": "{displayName} stopped local recording",
 	"room.recordingConsent": "When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming.",
+	"room.localRecordingSecurityError": "Recording the specified source is not allowed due to security restrictions. Check you client settings!",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 

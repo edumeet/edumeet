@@ -19,7 +19,8 @@ const initialState =
 	raisedHandInProgress  : false,
 	loggedIn              : false,
 	isSpeaking            : false,
-	isAutoMuted           : true
+	isAutoMuted           : true,
+	localRecordingState   : null
 };
 
 const me = (state = initialState, action) =>
@@ -165,6 +166,13 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, isAutoMuted: flag };
+		}
+
+		case 'SET_LOCAL_RECORDING_STATE':
+		{
+			const { localRecordingState } = action.payload;
+
+			return { ...state, localRecordingState };
 		}
 
 		default:

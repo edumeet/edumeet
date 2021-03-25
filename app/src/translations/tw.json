@@ -75,6 +75,7 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 
 	"me.mutedPTT": "您已靜音，請按下 空白鍵 來說話",
 

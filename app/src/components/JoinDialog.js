@@ -205,6 +205,7 @@ const JoinDialog = ({
 		(location.pathname === '/') && history.push(encodeURIComponent(roomId));
 	});
 
+	/* TODO: unused! Should we remove it?
 	const _askForPerms = () =>
 	{
 		if (mediaPerms.video || mediaPerms.audio)
@@ -212,6 +213,7 @@ const JoinDialog = ({
 			navigator.mediaDevices.getUserMedia(mediaPerms);
 		}
 	};
+	*/
 
 	const handleSetMediaPerms = (event, newMediaPerms) =>
 	{

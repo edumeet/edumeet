@@ -75,6 +75,7 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 
 	"me.mutedPTT": null,
 

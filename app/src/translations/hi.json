@@ -76,6 +76,7 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 
 	"me.mutedPTT": "आप शांत हैं, बात करने के लिए स्पेस-बार दबाईए",
 

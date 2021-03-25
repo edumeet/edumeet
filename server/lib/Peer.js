@@ -4,6 +4,14 @@ const Logger = require('./Logger');
 
 const logger = new Logger('Peer');
 
+// Recoding STATE
+const RECORDING_STOP='stop';
+const RECORDING_START='start';
+const RECORDING_PAUSE='pause';
+const RECORDING_RESUME='resume';
+
+const RECORDING_TYPE_LOCAL='local';
+
 class Peer extends EventEmitter
 {
 	constructor({ id, roomId, socket })
@@ -49,7 +57,7 @@ class Peer extends EventEmitter
 
 		this._localRecordingState = null;
 
-		this._localRecordingStateHistory = [];
+		this._recordingStateHistory = [];
 
 		this._transports = new Map();
 
@@ -303,19 +311,24 @@ class Peer extends EventEmitter
 		return this._localRecordingState;
 	}
 
-	get localRecordingStateHistory()
+	get recordingStateHistory()
 	{
-		return this._localRecordingStateHistory;
+		return this._recordingStateHistory;
 	}
 
-	set localRecordingState(localRecordingState)
+	set localRecordingState(recordingState)
 	{
-		this.localRecordingStateHistory.push({
-			timestamp : Date.now(),
-			localRecordingState
-		});
+		this._localRecordingState=recordingState;
+		this.addRecordingStateHistory(recordingState, RECORDING_TYPE_LOCAL);
+	}
 
-		this._localRecordingState=localRecordingState;
+	addRecordingStateHistory(recordingState, recordingType)
+	{
+		this.recordingStateHistory.push({
+			timestamp : Date.now(),
+			recordingState,
+			recordingType
+		});
 	}
 
 	addRole(newRole)
@@ -408,14 +421,14 @@ class Peer extends EventEmitter
 	{
 		const peerInfo =
 		{
-			id                         : this.id,
-			displayName                : this.displayName,
-			picture                    : this.picture,
-			roles                      : this.roles.map((role) => role.id),
-			raisedHand                 : this.raisedHand,
-			raisedHandTimestamp        : this.raisedHandTimestamp,
-			localRecordingState        : this.localRecordingState,
-			localRecordingStateHistory : this.localRecordingStateHistory
+			id                    : this.id,
+			displayName           : this.displayName,
+			picture               : this.picture,
+			roles                 : this.roles.map((role) => role.id),
+			raisedHand            : this.raisedHand,
+			raisedHandTimestamp   : this.raisedHandTimestamp,
+			localRecordingState   : this.localRecordingState,
+			recordingStateHistory : this.localRecordingStateHistory
 		};
 
 		return peerInfo;

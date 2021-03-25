@@ -29,7 +29,16 @@ class Notifications extends Component
 			if (notExists) continue;
 
 			notExists = notExists ||
-				!currentNotifications.filter(({ id }) => newNotifications[i].id === id).length;
+				!currentNotifications.filter(
+					({ id }) => newNotifications[i].id === id).length ||
+				currentNotifications.filter(
+					({ id }) =>
+						(
+							newNotifications[i].id === id &&
+							newNotifications[i].toBeClosed === true
+						)
+				).length;
+
 		}
 
 		return notExists;

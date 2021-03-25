@@ -76,11 +76,10 @@ if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production'
 		{
 			// filter VOLUME level actions from log
 			predicate : (getState, action) => !(
-				action.type === 'SET_PEER_VOLUME'/* ||
+				action.type === 'SET_PEER_VOLUME' ||
 				action.type === 'SET_ROOM_ACTIVE_SPEAKER'||
 				action.type === 'SET_IS_SPEAKING' ||
 				action.type === 'SET_AUTO_MUTED'
-*/
 			),
 			duration  : true,
 			timestamp : false,

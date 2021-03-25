@@ -18,24 +18,6 @@ export const setRoomActiveSpeaker = (peerId) =>
 		payload : { peerId }
 	});
 
-export const setRecordingInProgress = (recordingInProgress) =>
-	({
-		type    : 'SET_RECORDING_IN_PROGRESS',
-		payload : { recordingInProgress }
-	});
-
-export const setLocalRecordingInProgress = (localRecordingInProgress) =>
-	({
-		type    : 'SET_LOCAL_RECORDING_IN_PROGRESS',
-		payload : { localRecordingInProgress }
-	});
-
-export const setLocalRecordingPaused = (localRecordingPaused) =>
-	({
-		type    : 'SET_LOCAL_RECORDING_PAUSED',
-		payload : { localRecordingPaused }
-	});
-
 export const setRoomLocked = () =>
 	({
 		type : 'SET_ROOM_LOCKED'

@@ -76,6 +76,7 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 
 	"me.mutedPTT": "Jste ztišen, chcete-li mluvit, podržte mezerník",
 

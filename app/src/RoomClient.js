@@ -21,6 +21,7 @@ import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
 import { openDB, deleteDB } from 'idb';
+import { RECORDING_START, RECORDING_STOP, RECORDING_PAUSE, RECORDING_RESUME } from './recordingStates';
 
 let createTorrent;
 
@@ -138,12 +139,6 @@ const VIDEO_SVC_ENCODINGS =
 [
 	{ scalabilityMode: 'S3T3', dtx: true }
 ];
-
-// Recoding STATE
-const RECORDING_STOP='stop';
-const RECORDING_START='start';
-const RECORDING_PAUSE='pause';
-const RECORDING_RESUME='resume';
 
 let store;
 
@@ -3706,12 +3701,12 @@ export default class RoomClient
 		{
 			const ctx = new AudioContext();
 			const dest = ctx.createMediaStreamDestination();
-			const micms = new MediaStream();
+			const micMS = new MediaStream();
 
-			micms.addTrack(stream1);
+			micMS.addTrack(stream1);
 
-			if (micms.getAudioTracks().length > 0)
-				ctx.createMediaStreamSource(micms).connect(dest);
+			if (micMS.getAudioTracks().length > 0)
+				ctx.createMediaStreamSource(micMS).connect(dest);
 
 			if (stream2.getAudioTracks().length > 0)
 				ctx.createMediaStreamSource(stream2).connect(dest);
@@ -3729,6 +3724,14 @@ export default class RoomClient
 			gumStream = this._micProducer.track;
 
 			gdmStream = await navigator.mediaDevices.getDisplayMedia(RECORDING_CONSTRAINTS);
+			gdmStream.getVideoTracks().forEach((track) =>
+			{
+				track.addEventListener('ended', (e) =>
+				{
+					logger.debug(`gdmStream ${track.kind} track ended event: ${JSON.stringify(e)}`);
+					this.stopLocalRecording();
+				});
+			});
 			recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
 			recorder = new MediaRecorder(recorderStream, { mimeType: recordingMimeType });
 
@@ -3739,7 +3742,7 @@ export default class RoomClient
 			}
 			else
 			{
-				idbName=Date.now();
+				idbName = Date.now();
 				idbDB = await openDB(idbName, 1,
 					{
 						upgrade(db)
@@ -3784,11 +3787,25 @@ export default class RoomClient
 					}
 				};
 
-				recorder.onerror = (e) =>
+				recorder.onerror = (error) =>
 				{
-					logger.err(e);
-					recorder.stop();
-					store.dispatch(roomActions.setLocalRecordingInProgress(false));
+					logger.err(`Recorder onerror: ${error}`);
+					switch (error.name)
+					{
+						case 'SecurityError':
+							store.dispatch(requestActions.notify(
+								{
+									type : 'error',
+									text : intl.formatMessage({
+										id             : 'room.localRecordingSecurityError',
+										defaultMessage : 'Recording the specified source is not allowed due to security restrictions. Check you client settings!'
+									})
+								}));
+							break;
+						case 'InvalidStateError':
+						default:
+							throw new Error(error);
+					}
 				};
 
 				recorder.onstop = (e) =>
@@ -3835,6 +3852,16 @@ export default class RoomClient
 					})
 				}));
 			logger.error('startLocalRecording() [error:"%o"]', error);
+			if (recorder) recorder.stop();
+			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
+			if (typeof gdmStream !== 'undefined' && gdmStream && typeof gdmStream.getTracks === 'function')
+			{
+				gdmStream.getTracks().forEach((track) => track.stop());
+			}
+
+			gdmStream=null;
+			recorderStream = null;
+			recorder = null;
 
 			return -1;
 		}
@@ -3843,8 +3870,7 @@ export default class RoomClient
 		{
 			await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
 
-			store.dispatch(roomActions.setLocalRecordingInProgress(true));
-			store.dispatch(roomActions.setRecordingInProgress(true));
+			store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3864,7 +3890,7 @@ export default class RoomClient
 						defaultMessage : 'Unexpected error ocurred during local recording'
 					})
 				}));
-			logger.error('startLocalRecord() [error:"%o"]', error);
+			logger.error('startLocalRecording() [error:"%o"]', error);
 		}
 	}
 	async stopLocalRecording()
@@ -3872,7 +3898,7 @@ export default class RoomClient
 		logger.debug('stopLocalRecording()');
 		try
 		{
-			await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
+			recorder.stop();
 
 			store.dispatch(requestActions.notify(
 				{
@@ -3882,8 +3908,9 @@ export default class RoomClient
 					})
 				}));
 
-			recorder.stop();
-			store.dispatch(roomActions.setLocalRecordingInProgress(false));
+			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
+
+			await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
 
 		}
 		catch (error)
@@ -3905,14 +3932,14 @@ export default class RoomClient
 	async pauseLocalRecording()
 	{
 		recorder.pause();
-		store.dispatch(roomActions.setLocalRecordingPaused(true));
+		store.dispatch(meActions.setLocalRecordingState(RECORDING_PAUSE));
 		await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_PAUSE });
 	}
 
 	async resumeLocalRecording()
 	{
 		recorder.resume();
-		store.dispatch(roomActions.setLocalRecordingPaused(false));
+		store.dispatch(meActions.setLocalRecordingState(RECORDING_RESUME));
 		await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_RESUME });
 	}
 

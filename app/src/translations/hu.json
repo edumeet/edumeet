@@ -39,7 +39,7 @@
 	"room.audioOnly": "csak Hang",
 	"room.audioVideo": "Hang és Videó",
 	"room.youAreReady": "Ok, kész vagy",
-	"room.emptyRequireLogin": "A konferencia üres! Be kell lépned a konferencia elkezdéséhez, vagy várnod kell amíg a házigazda becsatlakozik.",
+	"room.emptyRequireLogin": "Be kell jelentkezned a konferencia elkezdéséhez, vagy várnod kell amíg a házigazda megnyitja a szobát.",
 	"room.locketWait": "Az automatikus belépés tiltva van - Várj amíg valaki beenged ...",
 	"room.lobbyAdministration": "Előszoba adminisztráció",
 	"room.peersInLobby": "Résztvevők az előszobában",
@@ -76,6 +76,7 @@
 	"room.localRecordingResumed": "{displayName} visszaindította a helyi rögzítést",
 	"room.localRecordingStopped": "{displayName} leállította a helyi rögzítést",
 	"room.recordingConsent": "A konferencián való részvételeddel beleegyezésed adod hogy a konferenciáról hang és videó felvétel, és/vagy élő közvetítés készüljön!",
+	"room.localRecordingSecurityError": null,
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 

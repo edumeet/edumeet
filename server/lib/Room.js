@@ -838,6 +838,8 @@ class Room extends EventEmitter
 			roomPermissions[PROMOTE_PEER].some((roomRole) => role.id === roomRole.id)
 		);
 
+		delete this._peers[peer.id];
+
 		// No peers left with PROMOTE_PEER, might need to give
 		// lobbyPeers to peers that are left.
 		if (

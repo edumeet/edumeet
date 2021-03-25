@@ -4,9 +4,6 @@ const initialState =
 	// new/connecting/connected/disconnected/closed,
 	state                         : 'new',
 	locked                        : false,
-	recordingInProgress           : false,
-	localRecordingInProgress      : false,
-	localRecordingPaused          : false,
 	inLobby                       : false,
 	signInRequired                : false,
 	overRoomLimit                 : false,
@@ -63,27 +60,6 @@ const room = (state = initialState, action) =>
 				return { ...state, state: roomState };
 			else
 				return { ...state, state: roomState, activeSpeakerId: null };
-		}
-
-		case 'SET_RECORDING_IN_PROGRESS':
-		{
-			const { recordingInProgress } = action.payload;
-
-			return { ...state, recordingInProgress };
-		}
-
-		case 'SET_LOCAL_RECORDING_IN_PROGRESS':
-		{
-			const { localRecordingInProgress } = action.payload;
-
-			return { ...state, localRecordingInProgress };
-		}
-
-		case 'SET_LOCAL_RECORDING_PAUSED':
-		{
-			const { localRecordingPaused } = action.payload;
-
-			return { ...state, localRecordingPaused };
 		}
 
 		case 'SET_ROOM_LOCKED':

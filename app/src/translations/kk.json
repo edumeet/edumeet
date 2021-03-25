@@ -74,6 +74,7 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 
 	"me.mutedPTT": "Сіз дыбыссызсыз, сөйлесу үшін БОС ОРЫН пернесін ұстап тұрыңыз",
 

@@ -76,6 +76,7 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 
 	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj SPACJĘ, aby mówić.",
 
