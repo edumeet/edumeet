@@ -163,11 +163,16 @@ class MessageList extends React.Component
 
 		const items = [ ...list.childNodes ];
 
+		let isSeen = null;
+
 		items.forEach((item) =>
 		{
 			const itemRect = item.getBoundingClientRect();
 
-			const isSeen = itemRect.top <= listRect.bottom;
+			if (this.props.chat.order === 'asc')
+				isSeen = itemRect.top <= listRect.bottom;
+			else
+				isSeen = itemRect.top >= listRect.top;
 
 			if (item.tagName === 'DIV')
 			{
