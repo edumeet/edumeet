@@ -14,7 +14,7 @@ const styles = (theme) =>
 		{
 			display         : 'flex',
 			flexShrink      : 0,
-			backgroundColor : '#e0e0e085',
+			backgroundColor : '#5f9b2d5c',
 			boxShadow       : 'none',
 			padding         : theme.spacing(0),
 			wordWrap        : 'break-word',
@@ -75,17 +75,9 @@ const styles = (theme) =>
 				margin : '0'
 			}
 		},
-		'@keyframes fadeIn' : {
-			'from' : {
-				backgroundColor : '#5f9b2d5c'
-			},
-			'to' : {
-				backgroundColor : '#e0e0e085'
-			}
-		},
-		isseen : {
-			animation         : '$fadeIn 2s linear',
-			animationFillMode : 'forwards'
+		isSeen : {
+			backgroundColor : '#e0e0e085',
+			transition      : 'background-color 1s'
 		}
 	});
 
@@ -130,7 +122,7 @@ const Message = (props) =>
 			className={classnames(
 				classes.root,
 				sender === 'client' ? classes.sent : classes.received,
-				isseen && sender === 'response' ? classes.isseen : null,
+				isseen ? classes.isSeen : null,
 				classes[format]
 			)}
 			style={{
