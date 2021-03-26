@@ -313,7 +313,7 @@ File.propTypes = {
 const mapStateToProps = (state, { time, magnetUri }) =>
 {
 	return {
-		file          : state.files.filter((item) => item.time === time)[0],
+		file          : state.files.files.filter((item) => item.time === time)[0],
 		canShareFiles : state.me.canShareFiles
 	};
 };

@@ -206,7 +206,7 @@ class MessageList extends React.Component
 			settings
 		} = this.props;
 
-		const items = [ ...chat.messages, ...files ];
+		const items = [ ...chat.messages, ...files.files ];
 
 		items.sort((a, b) => (a.time < b.time ? -1: 1));
 

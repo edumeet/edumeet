@@ -1,4 +1,11 @@
-const files = (state = [], action) =>
+const initialState =
+{
+	files       : [],
+	count       : 0,
+	countUnread : 0
+};
+
+const files = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
@@ -6,7 +13,7 @@ const files = (state = [], action) =>
 		{
 			const { peerId, magnetUri, time } = action.payload;
 
-			const newFile = {
+			const file = {
 				type      : 'file',
 				time      : time ? time : Date.now(),
 				active    : false,
@@ -16,7 +23,13 @@ const files = (state = [], action) =>
 				magnetUri : magnetUri
 			};
 
-			return [ ...state, newFile ];
+			return {
+				...state,
+				files       : [ ...state.files, file ],
+				count       : state.count + 1,
+				countUnread : file.sender === 'response' ? ++state.countUnread : state.countUnread
+
+			};
 		}
 
 		case 'ADD_FILE_HISTORY':
@@ -27,76 +40,76 @@ const files = (state = [], action) =>
 
 			fileHistory.forEach((file) =>
 			{
-				const newFile =
-				{
-					active   : false,
+				newFileHistory.push({
 					type     : 'file',
+					active   : false,
 					progress : 0,
 					files    : null,
 					...file
-				};
-
-				newFileHistory.push(newFile);
+				});
 			});
 
-			return [ ...state, ...newFileHistory ];
+			return {
+				...state,
+				files : newFileHistory,
+				count : newFileHistory.length
+			};
 		}
 
 		case 'SET_FILE_ACTIVE':
 		{
 			const { magnetUri } = action.payload;
 
-			state.forEach((item, index) =>
+			state.files.forEach((item, index) =>
 			{
 				if (item.magnetUri === magnetUri)
 				{
-					state[index] = { ...item, active: true };
-
+					state.files[index].active = true;
 				}
 			});
 
-			return [ ...state ];
+			return { ...state };
 		}
 
 		case 'SET_FILE_INACTIVE':
 		{
 			const { magnetUri } = action.payload;
 
-			state.forEach((item, index) =>
+			state.files.forEach((item, index) =>
 			{
 				if (item.magnetUri === magnetUri)
 				{
-					state[index] = { ...item, active: false };
+					state.files[index].active = false;
 				}
 			});
 
-			return [ ...state ];
+			return { ...state };
 		}
 
 		case 'SET_FILE_PROGRESS':
 		{
 			const { magnetUri, progress } = action.payload;
 
-			state.forEach((item, index) =>
+			state.files.forEach((item, index) =>
 			{
 				if (item.magnetUri === magnetUri)
 				{
-					state[index] = { ...item, progress: progress };
+					state.files[index].progress = progress;
 				}
 			});
 
-			return [ ...state ];
+			return { ...state };
 		}
 
 		case 'SET_FILE_DONE':
 		{
 			const { magnetUri, sharedFiles } = action.payload;
 
-			state.forEach((item, index) =>
+			state.files.forEach((item, index) =>
 			{
 				if (item.magnetUri === magnetUri)
 				{
-					state[index] = {
+					state.files[index] = {
 						...item,
 						files    : sharedFiles,
 						progress : 1,
@@ -108,12 +121,20 @@ const files = (state = [], action) =>
 				}
 			});
 
-			return [ ...state ];
+			return { ...state };
 		}
 
 		case 'CLEAR_FILES':
-			return [];
+		{
+			// return [];
+			return {
+				...state,
+				files       : [],
+				count       : 0,
+				countUnread : 0
+			};
 
+		}
 		default:
 			return state;
 	}
