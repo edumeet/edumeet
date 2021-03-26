@@ -14,6 +14,7 @@ import createSingleLinePlugin from 'draft-js-single-line-plugin';
 import { stateToHTML } from 'draft-js-export-html';
 import 'draft-js/dist/Draft.css';
 import Divider from '@material-ui/core/Divider';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
@@ -25,18 +26,15 @@ import FormatItalicIcon from '@material-ui/icons/FormatItalic';
 import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined';
 import SortIcon from '@material-ui/icons/Sort';
 
-import Tooltip from '@material-ui/core/Tooltip';
-
-const styles = (theme) =>
-	({
-		root :
+const styles = (theme) => ({
+	root :
 	{
 		padding      : theme.spacing(0),
 		display      : 'flex',
 		alignItems   : 'center',
 		borderRadius : 0
 	},
-		input :
+	input :
 	{
 		flex           : 1,
 		'&[type=file]' : {
@@ -48,10 +46,10 @@ const styles = (theme) =>
 		'width'         : '50px',
 		'overflow-wrap' : 'break-word'
 	},
-		icon : {
-			padding : theme.spacing(1)
-		}
-	});
+	icon : {
+		padding : theme.spacing(1)
+	}
+});
 
 const ChatInput = (props) =>
 {
@@ -80,8 +78,48 @@ const ChatInput = (props) =>
 		canShareFiles,
 		chat,
 		files
-
 	} = props;
+
+	const chatItemsLength = files.length + chat.messages.length;
+
+	const singleLinePlugin = createSingleLinePlugin();
+
+	const clearInput = () =>
+	{
+		setEditorState(EditorState.moveFocusToEnd(
+			EditorState.push(editorState, ContentState.createFromText(''), 'remove-range')
+		));
+	};
+
+	const isMessageEmpty = () => ((message === '<br>') ? true : false);
+
+	const sendMessage = () =>
+	{
+		if (!isMessageEmpty())
+		{
+			roomClient.sendChatMessage({
+				type    : 'message',
+				time    : Date.now(),
+				sender  : 'response',
+				isRead  : null,
+				name    : displayName,
+				picture : picture,
+				text    : message
+			});
+
+			clearInput();
+		}
+	};
+
+	const attachFile = async (e) =>
+	{
+		if (e.target.files.length > 0)
+		{
+			await props.roomClient.shareFiles(
+				e.target.files
+			);
+		}
+	};
 
 	const handleKeyCommand = (command) =>
 	{
@@ -109,53 +147,23 @@ const ChatInput = (props) =>
 	const handleItalicClick = () =>
 		setEditorState(RichUtils.toggleInlineStyle(editorState, 'ITALIC'));
 
-	const handleClearInput = () =>
-	{
-		setEditorState(EditorState.moveFocusToEnd(
-			EditorState.push(editorState, ContentState.createFromText(''), 'remove-range')
-		));
-	};
+	const handleAttachFile = (e) =>
+		attachFile(e);
 
 	const handleIsMessageEmpty = () =>
-		((message === '<br>') ? true : false);
+		isMessageEmpty();
 
 	const handleSendMessage = () =>
-	{
-		if (!handleIsMessageEmpty())
-		{
-			const sendMessage = {
-				type    : 'message',
-				sender  : 'response',
-				name    : displayName,
-				picture : picture,
-				text    : message,
-				time    : Date.now(),
-				isRead  : null
-			};
-
-			roomClient.sendChatMessage(sendMessage);
-
-			handleClearInput();
-		}
-	};
+		sendMessage();
 
 	const handleReturn = () =>
-		handleSendMessage();
-
-	const handleFile = async (event) =>
-	{
-		if (event.target.files.length > 0)
-			await props.roomClient.shareFiles(event.target.files);
-	};
-
-	const chatItemsLength = files.length + chat.messages.length;
-
-	const singleLinePlugin = createSingleLinePlugin();
+		sendMessage();
 
 	return (
 		<Paper className={classes.root}>
 			<Grid container direction='column'>
 				<Grid item container direction='row' alignItems='center'>
+
 					{/* Input field */}
 					<div className={classes.input}>
 						<Editor
@@ -172,6 +180,7 @@ const ChatInput = (props) =>
 						/>
 					</div>
 					{/* /Input field */}
+
 					{/* Button send message */}
 					<Tooltip
 						title={intl.formatMessage({
@@ -197,6 +206,7 @@ const ChatInput = (props) =>
 						</IconButton>
 					</Tooltip>
 					{/* /Button send message */}
+
 				</Grid>
 
 				<Grid item>
@@ -204,8 +214,10 @@ const ChatInput = (props) =>
 				</Grid>
 
 				<Grid item container justify='space-between' alignItems='center'>
+
 					{/* Buttons of format */}
 					<Grid item>
+
 						{/* Button bold */}
 						<Tooltip
 							title={intl.formatMessage({
@@ -295,11 +307,13 @@ const ChatInput = (props) =>
 
 						</Tooltip>
 						{/* /Button underline */}
-					</Grid>
-					{/* /Format buttons */}
 
-					{/* Actions buttons */}
+					</Grid>
+					{/* /Buttons of format */}
+
+					{/* Buttons of actions */}
 					<Grid item>
+
 						{/* Button sort chat */}
 						<React.Fragment>
 							{chat.order === 'asc' ?
@@ -395,7 +409,7 @@ const ChatInput = (props) =>
 								disabled={!canShare}
 								type='file'
 								multiple
-								onChange={handleFile}
+								onChange={handleAttachFile}
 							/>
 							<label htmlFor='contained-button-file'>
 								<Tooltip
@@ -428,7 +442,7 @@ const ChatInput = (props) =>
 								</Tooltip>
 							</label>
 						</React.Fragment>
-						{/* /Button share file */}
+						{/* /Button of share file */}
 
 						{/* Button share gallery file (mobile) */}
 						{(browser.platform === 'mobile') && canShareFiles && canShare &&
@@ -437,7 +451,7 @@ const ChatInput = (props) =>
 								className={classes.input}
 								type='file'
 								disabled={!canShare}
-								onChange={handleFile}
+								onChange={handleAttachFile}
 								accept='image/*'
 								id='share-files-gallery-button'
 							/>
@@ -472,8 +486,10 @@ const ChatInput = (props) =>
 						</React.Fragment>
 						}
 						{/* /Button share gallery file (mobile) */}
+
 					</Grid>
-					{/* /Actions buttons */}
+					{/* /Buttons of actions */}
+
 				</Grid>
 			</Grid>
 		</Paper>
