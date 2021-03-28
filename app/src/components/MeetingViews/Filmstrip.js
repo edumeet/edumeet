@@ -78,6 +78,13 @@ class Filmstrip extends React.PureComponent
 		this.activePeerContainer = React.createRef();
 
 		this.filmStripContainer = React.createRef();
+
+		const selectedPeerId = this.getSelectedPeerId();
+
+		if (selectedPeerId)
+		{
+			props.roomClient.setSelectedPeer(selectedPeerId);
+		}
 	}
 
 	state = {
@@ -255,7 +262,7 @@ class Filmstrip extends React.PureComponent
 	render()
 	{
 		const {
-			// roomClient,
+			roomClient,
 			peers,
 			myId,
 			advancedMode,
@@ -327,7 +334,6 @@ class Filmstrip extends React.PureComponent
 									<Grid key={peerId} item>
 										<div
 											key={peerId}
-											// onClick={() => roomClient.setSelectedPeer(peerId)}
 											className={classnames(classes.filmItem, {
 												selected : this.getSelectedPeerId() === peerId,
 												active   : peerId === activePeerId
@@ -359,7 +365,7 @@ class Filmstrip extends React.PureComponent
 }
 
 Filmstrip.propTypes = {
-	// roomClient      : PropTypes.any.isRequired,
+	roomClient      : PropTypes.any.isRequired,
 	activeSpeakerId : PropTypes.string,
 	advancedMode    : PropTypes.bool,
 	peers           : PropTypes.object.isRequired,

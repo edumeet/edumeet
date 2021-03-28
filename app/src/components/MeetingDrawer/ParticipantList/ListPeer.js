@@ -109,6 +109,7 @@ const ListPeer = (props) =>
 		isModerator,
 		spotlight,
 		peer,
+		mode,
 		openRolesManager,
 		micConsumer,
 		webcamConsumer,
@@ -326,7 +327,9 @@ const ListPeer = (props) =>
 
 								isSelected ?
 									roomClient.removeSelectedPeer(peer.id) :
-									roomClient.addSelectedPeer(peer.id);
+									mode === 'filmstrip' ?
+										roomClient.setSelectedPeer(peer.id) :
+										roomClient.addSelectedPeer(peer.id);
 							}}
 						>
 							{ !isSelected ?
@@ -473,6 +476,7 @@ ListPeer.propTypes =
 	isModerator      : PropTypes.bool,
 	spotlight        : PropTypes.bool,
 	peer             : appPropTypes.Peer.isRequired,
+	mode             : PropTypes.string.isRequired,
 	openRolesManager : PropTypes.func.isRequired,
 	micConsumer      : appPropTypes.Consumer,
 	webcamConsumer   : appPropTypes.Consumer,
@@ -490,6 +494,7 @@ const makeMapStateToProps = (initialState, { id }) =>
 	{
 		return {
 			peer : state.peers[id],
+			mode : state.room.mode,
 			...getPeerConsumers(state, id)
 		};
 	};
@@ -517,6 +522,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.peers === next.peers &&
+				prev.room.mode === next.room.mode &&
 				prev.consumers === next.consumers
 			);
 		}
