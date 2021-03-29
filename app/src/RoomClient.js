@@ -2167,6 +2167,38 @@ export default class RoomClient
 				peerActions.setPeerScreenInProgress(peerId, false));
 	}
 
+	async setAudioGain(micConsumer, peerId, audioGain)
+	{
+		logger.debug(
+			'setAudioGain() [micConsumer:"%o", peerId:"%s", type:"%s"]',
+			micConsumer,
+			peerId,
+			audioGain
+		);
+
+		if (!micConsumer)
+		{
+			return;
+		}
+
+		micConsumer.audioGain = audioGain;
+
+		try
+		{
+			for (const consumer of this._consumers.values())
+			{
+				if (consumer.appData.peerId === peerId)
+				{
+					store.dispatch(consumerActions.setConsumerAudioGain(consumer.id, audioGain));
+				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('setAudioGain() [error:"%o"]', error);
+		}
+	}
+
 	async _pauseConsumer(consumer)
 	{
 		logger.debug('_pauseConsumer() [consumer:"%o"]', consumer);
@@ -3237,7 +3269,8 @@ export default class RoomClient
 							priority               : 1,
 							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
 							track                  : consumer.track,
-							score                  : score
+							score                  : score,
+							audioGain              : undefined
 						};
 
 						this._spotlights.addVideoConsumer(consumerStoreObject);

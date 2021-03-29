@@ -97,6 +97,15 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
+		case 'SET_CONSUMER_AUDIO_GAIN':
+		{
+			const { consumerId, audioGain } = action.payload;
+			const consumer = state[consumerId];
+			const newConsumer = { ...consumer, audioGain };
+
+			return { ...state, [consumerId]: newConsumer };
+		}
+
 		case 'SET_CONSUMER_SCORE':
 		{
 			const { consumerId, score } = action.payload;
