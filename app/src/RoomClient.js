@@ -55,36 +55,31 @@ const VIDEO_CONSTRAINS =
 {
 	'low' :
 	{
-		width       : { ideal: 320 },
-		aspectRatio : videoAspectRatio
+		width : 320
 	},
 	'medium' :
 	{
-		width       : { ideal: 640 },
-		aspectRatio : videoAspectRatio
+		width : 640
 	},
 	'high' :
 	{
-		width       : { ideal: 1280 },
-		aspectRatio : videoAspectRatio
+		width : 1280
 	},
 	'veryhigh' :
 	{
-		width       : { ideal: 1920 },
-		aspectRatio : videoAspectRatio
+		width : 1920
 	},
 	'ultra' :
 	{
-		width       : { ideal: 3840 },
-		aspectRatio : videoAspectRatio
+		width : 3840
 	}
 };
 
 function getVideoConstrains(resolution, aspectRatio)
 {
 	return {
-		width : VIDEO_CONSTRAINS[resolution].width,
-		aspectRatio
+		width  : { ideal: VIDEO_CONSTRAINS[resolution].width },
+		height : { ideal: VIDEO_CONSTRAINS[resolution].width / aspectRatio }
 	};
 }
 
