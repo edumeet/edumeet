@@ -26,6 +26,31 @@ const {
 // const AwaitQueue = require('awaitqueue');
 // const axios = require('axios');
 
+// To gather ip address only on interface like eth0, ens0p3
+const ifaceWhiteListRegex = /^(eth.*)|(ens.*)|(tun.*)/
+
+function getListenIps() {
+	let listenIP = [];
+	const ifaces = os.networkInterfaces();
+	Object.keys(ifaces).forEach(function (ifname) {
+		if (ifname.match(ifaceWhiteListRegex)) {
+			ifaces[ifname].forEach(function (iface) {
+				if (
+					(iface.family !== "IPv4" &&
+						(iface.family !== "IPv6" || iface.scopeid !== 0)) ||
+					iface.internal !== false
+				) {
+					// skip over internal (i.e. 127.0.0.1) and non-ipv4 or ipv6 non global addresses
+					return;
+				}
+				listenIP.push({ ip: iface.address, announcedIp: iface.address });
+			});
+		}
+	});
+	console.log('Using listenips:', listenIP);
+	return listenIP;
+}
+
 module.exports =
 {
 
@@ -89,45 +114,46 @@ module.exports =
 					username     : 'alice',
 					passwordHash : '$2b$10$PAXXw.6cL3zJLd7ZX.AnL.sFg2nxjQPDmMmGSOQYIJSa0TrZ9azG6',
 					displayName  : 'Alice',
-					emails       : [ { value: 'alice@atlanta.com' } ],
-					meet_roles   : [ ]
+					emails       : [ { value: 'alice@atlanta.com' } ]
 				},
 				{
 					id           : 2,
 					username     : 'bob',
 					passwordHash : '$2b$10$BzAkXcZ54JxhHTqCQcFn8.H6klY/G48t4jDBeTE2d2lZJk/.tvv0G',
 					displayName  : 'Bob',
-					emails       : [ { value: 'bob@biloxi.com' } ],
-					meet_roles   : [ ]
+					emails       : [ { value: 'bob@biloxi.com' } ]
 				}
 			]
 		}
 	},
 	*/
 	// URI and key for requesting geoip-based TURN server closest to the client
-	turnAPIKey    : 'examplekey',
-	turnAPIURI    : 'https://example.com/api/turn',
-	turnAPIparams : {
-		'uri_schema' 	: 'turn',
-		'transport' 		: 'tcp',
-		'ip_ver'    		: 'ipv4',
-		'servercount'	: '2'
-	},
-	turnAPITimeout    : 2 * 1000,
+	//turnAPIKey    : 'examplekey',
+	//turnAPIURI    : 'https://example.com/api/turn',
+	//turnAPIparams : {
+	//	'uri_schema' 	: 'turn',
+	//	'transport' 		: 'tcp',
+	//	'ip_ver'    		: 'ipv4',
+	//	'servercount'	: '2'
+	//},
+	//turnAPITimeout    : 2 * 1000,
 	// Backup turnservers if REST fails or is not configured
-	backupTurnServers : [
-		{
-			urls : [
-				'turn:turn.example.com:443?transport=tcp'
-			],
-			username   : 'example',
-			credential : 'example'
-		}
-	],
+	//backupTurnServers : [
+	//	{
+	//		urls : [
+	//			'turn:turn.example.com:443?transport=tcp'
+	//		],
+	//		username   : 'example',
+	//		credential : 'example'
+	//	}
+	//],
 	// bittorrent tracker
 	fileTracker  : 'wss://tracker.lab.vvc.niif.hu:443',
 	// redis server options
-	redisOptions : {},
+	redisOptions : {
+		host: 'redis',
+		port: 6379
+	},
 	// session cookie secret
 	cookieSecret : 'T0P-S3cR3t_cook!e',
 	cookieName   : 'edumeet.sid',
@@ -142,10 +168,10 @@ module.exports =
 	// If omitted listens on every IP. ("0.0.0.0" and "::")
 	// listeningHost: 'localhost',
 	// Listening port for https server.
-	listeningPort         : 443,
+	listeningPort         : 3443,
 	// Any http request is redirected to https.
 	// Listening port for http server.
-	listeningRedirectPort : 80,
+	listeningRedirectPort : 8080,
 	// Listens only on http, only on listeningPort
 	// listeningRedirectPort disabled
 	// use case: loadbalancer backend
@@ -194,13 +220,13 @@ module.exports =
 	// See examples below.
 	// Examples:
 	/*
-	// All authenticated users will be MODERATOR and AUTHENTICATED
+	// All authenicated users will be MODERATOR and AUTHENTICATED
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		peer.addRole(userRoles.MODERATOR);
 		peer.addRole(userRoles.AUTHENTICATED);
 	},
-	// All authenticated users will be AUTHENTICATED,
+	// All authenicated users will be AUTHENTICATED,
 	// and those with the moderator role set in the userinfo
 	// will also be MODERATOR
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
@@ -240,7 +266,19 @@ module.exports =
 			}
 		}
 	},
-	// All authenticated users will be AUTHENTICATED,
+	// All authenicated users will be AUTHENTICATED,
+	// and those with email ending with @example.com
+	// will also be MODERATOR
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
+	{
+		if (userinfo.email && userinfo.email.endsWith('@example.com'))
+		{
+			peer.addRole(userRoles.MODERATOR);
+		}
+
+		peer.addRole(userRoles.AUTHENTICATED);
+	},
+	// All authenicated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
@@ -346,21 +384,15 @@ module.exports =
 	// action as soon as a peer with the permission joins. In this example
 	// everyone will be able to lock/unlock room until a MODERATOR joins.
 	allowWhenRoleMissing : [ CHANGE_ROOM_LOCK ],
-	// When true, the room will be open to all users as long as there
+	// When truthy, the room will be open to all users when as long as there
 	// are allready users in the room
 	activateOnHostJoin   : true,
-	// roomsUnlocked is an array of rooms users can enter without waiting
-	// in the lobby.  If the array is undefined or null, users can enter
-	// any room without waiting in the lobby.  This is the default.  The
-	// aim of roomsUnlocked is to enforce moderated access to all rooms
-	// with the exception of the rooms defined in the array.
-	// roomsUnlocked        : [ 'unlocked1', 'unlocked2', 'unlocked3' ],
 	// When set, maxUsersPerRoom defines how many users can join
 	// a single room. If not set, there is no limit.
 	// maxUsersPerRoom    : 20,
 	// Room size before spreading to new router
 	routerScaleSize      : 40,
-	// Socket timeout value
+	// Socket timout value
 	requestTimeout       : 20000,
 	// Socket retries when timeout
 	requestRetries       : 3,
@@ -369,7 +401,7 @@ module.exports =
 	// Mediasoup settings
 	mediasoup            :
 	{
-		numWorkers : Object.keys(os.cpus()).length,
+		numWorkers : 2, //Object.keys(os.cpus()).length,
 		// mediasoup Worker settings.
 		worker     :
 		{
@@ -446,15 +478,14 @@ module.exports =
 		// mediasoup WebRtcTransport settings.
 		webRtcTransport :
 		{
-			listenIps :
-			[
+			listenIps : getListenIps(),
+			/*[
 				// change 192.0.2.1 IPv4 to your server's IPv4 address!!
-				{ ip: '192.0.2.1', announcedIp: null }
-
+				//{ ip: '192.0.2.1', announcedIp: null }
 				// Can have multiple listening interfaces
 				// change 2001:DB8::1 IPv6 to your server's IPv6 address!!
 				// { ip: '2001:DB8::1', announcedIp: null }
-			],
+			],*/
 			initialAvailableOutgoingBitrate : 1000000,
 			minimumAvailableOutgoingBitrate : 600000,
 			// Additional options that are not part of WebRtcTransportOptions.
@@ -462,7 +493,7 @@ module.exports =
 		}
 	}
 
-	/*
+	
 	,
 	// Prometheus exporter
 	prometheus : {
@@ -470,9 +501,9 @@ module.exports =
 		// listen     : 'localhost', // exporter listens on this address
 		numeric    : true, // show numeric IP addresses
 		port       : 8889, // allocated port
-		quiet      : false // include fewer labels
+		quiet      : false, // include fewer labels
 		// aggregated metrics options
 		period     : 15 // update period (seconds)
 	}
-	*/
+	
 };

@@ -36,16 +36,16 @@ let ScreenShare;
 
 let requestTimeout,
 	lastN,
-	mobileLastN,
-	videoAspectRatio;
+	mobileLastN;
+	// videoAspectRatio;
 
 if (process.env.NODE_ENV !== 'test')
 {
 	({
 		requestTimeout = 20000,
 		lastN = 4,
-		mobileLastN = 1,
-		videoAspectRatio = 1.777 // 16 : 9
+		mobileLastN = 1
+		// videoAspectRatio = 1.777 // 16 : 9
 	} = window.config);
 }
 
@@ -55,36 +55,31 @@ const VIDEO_CONSTRAINS =
 {
 	'low' :
 	{
-		width       : { ideal: 320 },
-		aspectRatio : videoAspectRatio
+		width : 320
 	},
 	'medium' :
 	{
-		width       : { ideal: 640 },
-		aspectRatio : videoAspectRatio
+		width : 640
 	},
 	'high' :
 	{
-		width       : { ideal: 1280 },
-		aspectRatio : videoAspectRatio
+		width : 1280
 	},
 	'veryhigh' :
 	{
-		width       : { ideal: 1920 },
-		aspectRatio : videoAspectRatio
+		width : 1920
 	},
 	'ultra' :
 	{
-		width       : { ideal: 3840 },
-		aspectRatio : videoAspectRatio
+		width : 3840
 	}
 };
 
 function getVideoConstrains(resolution, aspectRatio)
 {
 	return {
-		width : VIDEO_CONSTRAINS[resolution].width,
-		aspectRatio
+		width  : { ideal: VIDEO_CONSTRAINS[resolution].width },
+		height : { ideal: VIDEO_CONSTRAINS[resolution].width / aspectRatio }
 	};
 }
 
@@ -151,7 +146,7 @@ function getResolutionScalings(encodings)
 	// SVC encodings
 	if (encodings.length === 1)
 	{
-		const { spatialLayers, temporalLayers } =
+		const { spatialLayers } =
 			mediasoupClient.parseScalabilityMode(encodings[0].scalabilityMode);
 
 		for (let i=0; i < spatialLayers; i++)
@@ -4177,7 +4172,7 @@ export default class RoomClient
 
 				if (this._useSharingSimulcast)
 				{
-					let encodings = this._getEncodings(width, height);
+					let encodings = this._getEncodings(width, height, true);
 
 					// If VP9 is the only available video codec then use SVC.
 					const firstVideoCodec = this._mediasoupDevice
@@ -4623,7 +4618,7 @@ export default class RoomClient
 		return encodings;
 	}
 
-	_getEncodings(width, height)
+	_getEncodings(width, height, screenSharing = false)
 	{
 		// If VP9 is the only available video codec then use SVC.
 		const firstVideoCodec = this._mediasoupDevice
@@ -4636,7 +4631,7 @@ export default class RoomClient
 		const size = (width > height ? width : height);
 
 		if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-			encodings = VIDEO_KSVC_ENCODINGS;
+			encodings = screenSharing ? VIDEO_SVC_ENCODINGS : VIDEO_KSVC_ENCODINGS;
 		else if ('simulcastProfiles' in window.config)
 			encodings = this._chooseEncodings(window.config.simulcastProfiles, size);
 		else if ('simulcastEncodings' in window.config)

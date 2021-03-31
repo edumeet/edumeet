@@ -88,9 +88,9 @@ trustProxy           : ['192.0.2.5'],
         balance url_param roomId
         hash-type consistent
 
-        server mm1 192.0.2.1:80 check maxconn 20 verify none
-        server mm2 192.0.2.2:80 check maxconn 20 verify none
-        server mm3 192.0.2.3:80 check maxconn 20 verify none
+        server mm1 192.0.2.1:80 check maxconn 2000 verify none
+        server mm2 192.0.2.2:80 check maxconn 2000 verify none
+        server mm3 192.0.2.3:80 check maxconn 2000 verify none
 
     frontend meet.example.com
         bind 192.0.2.5:80
