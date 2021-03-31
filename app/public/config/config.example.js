@@ -33,6 +33,20 @@ var config =
 	},
 
 	/**
+	 * Network priorities 
+	 * DSCP bits set by browser according this priority values. 
+	 * ("high" means actually: EF for audio, and AF41 for Video in chrome)
+	 * https://en.wikipedia.org/wiki/Differentiated_services
+	 */
+	networkPriorities :
+	{
+		'audio'            : 'high',
+		'mainVideo'        : 'high',
+		'additionalVideos' : 'medium',
+		'screenShare'      : 'medium'
+	},
+
+	/**
 	 * Resolutions:
 	 * 
 	 * low ~ 320x240

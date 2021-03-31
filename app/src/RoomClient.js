@@ -75,6 +75,14 @@ const VIDEO_CONSTRAINS =
 	}
 };
 
+const DEFAULT_NETWORK_PRIORITIES =
+{
+	audio            : 'high',
+	mainVideo        : 'high',
+	additionalVideos : 'medium',
+	screenShare      : 'medium'
+};
+
 function getVideoConstrains(resolution, aspectRatio)
 {
 	return {
@@ -1452,9 +1460,20 @@ export default class RoomClient
 
 				store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
 
+				const networkPriority =
+					window.config.networkPriorities.audio ?
+						window.config.networkPriorities.audio :
+						DEFAULT_NETWORK_PRIORITIES.audio;
+
 				this._micProducer = await this._sendTransport.produce(
 					{
 						track,
+						encodings :
+						[
+							{
+								networkPriority
+							}
+						],
 						codecOptions :
 						{
 							opusStereo,
@@ -1640,10 +1659,27 @@ export default class RoomClient
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
+				const networkPriority =
+					window.config.networkPriorities.mainVideo ?
+						window.config.networkPriorities.mainVideo :
+						DEFAULT_NETWORK_PRIORITIES.mainVideo;
+
 				if (this._useSimulcast)
 				{
 					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
+
+					/** 
+					 * TODO: 
+					 * I receive DOMException: 
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+					 * Attempted to set an unimplemented parameter of RtpParameters.
+					encodings.forEach((encoding) =>
+					{
+						encoding.networkPriority=networkPriority;
+					});
+					*/
+					encodings[0].networkPriority=networkPriority;
 
 					this._webcamProducer = await this._sendTransport.produce(
 						{
@@ -1666,7 +1702,8 @@ export default class RoomClient
 				{
 					this._webcamProducer = await this._sendTransport.produce({
 						track,
-						appData :
+						encodings : [ { networkPriority } ],
+						appData   :
 						{
 							source : 'webcam',
 							width,
@@ -3965,10 +4002,20 @@ export default class RoomClient
 
 				let producer;
 
+				const networkPriority =
+					window.config.networkPriorities.extraVideo ?
+						window.config.networkPriorities.extraVideo :
+						DEFAULT_NETWORK_PRIORITIES.extraVideo;
+
 				if (this._useSimulcast)
 				{
 					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
+
+					encodings.forEach((encoding) =>
+					{
+						encoding.networkPriority=networkPriority;
+					});
 
 					producer = await this._sendTransport.produce(
 						{
@@ -3991,7 +4038,8 @@ export default class RoomClient
 				{
 					producer = await this._sendTransport.produce({
 						track,
-						appData :
+						encodings : [ { networkPriority } ],
+						appData   :
 						{
 							source : 'extravideo',
 							width,
@@ -4152,6 +4200,11 @@ export default class RoomClient
 
 				logger.debug('screenSharing track settings:', track.getSettings());
 
+				const networkPriority =
+					window.config.networkPriorities.screenShare ?
+						window.config.networkPriorities.screenShare :
+						DEFAULT_NETWORK_PRIORITIES.screenShare;
+
 				if (this._useSharingSimulcast)
 				{
 					let encodings = this._getEncodings(width, height);
@@ -4169,6 +4222,18 @@ export default class RoomClient
 					}
 
 					const resolutionScalings = getResolutionScalings(encodings);
+
+					/** 
+					 * TODO: 
+					 * I receive DOMException: 
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+					 * Attempted to set an unimplemented parameter of RtpParameters.
+					encodings.forEach((encoding) =>
+					{
+						encoding.networkPriority=networkPriority;
+					});
+					*/
+					encodings[0].networkPriority=networkPriority;
 
 					this._screenSharingProducer = await this._sendTransport.produce(
 						{
@@ -4191,7 +4256,8 @@ export default class RoomClient
 				{
 					this._screenSharingProducer = await this._sendTransport.produce({
 						track,
-						appData :
+						encodings : [ { networkPriority } ],
+						appData   :
 						{
 							source : 'screen',
 							width,
