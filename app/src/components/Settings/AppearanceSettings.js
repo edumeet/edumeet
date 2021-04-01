@@ -195,7 +195,15 @@ const AppearanceSettings = (props) =>
 			<FormControlLabel
 				className={classnames(classes.setting, classes.switchLabel)}
 				control={
-					<Switch checked={settings.hideNoVideoParticipants} onChange={onToggleHideNoVideoParticipants} value='hideNoVideoParticipants' />}
+					<Switch
+						checked={settings.hideNoVideoParticipants}
+						onChange={() =>
+						{
+							roomClient.setHideNoVideoParticipants(!settings.hideNoVideoParticipants);
+							onToggleHideNoVideoParticipants();
+						}}
+						value='hideNoVideoParticipants'
+					/>}
 				labelPlacement='start'
 				label={intl.formatMessage({
 					id             : 'settings.hideNoVideoParticipants',

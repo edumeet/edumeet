@@ -316,7 +316,9 @@ export default class RoomClient
 			settingsActions.setLastN(this._maxSpotlights));
 
 		// Manager of spotlight
-		this._spotlights = new Spotlights(this._maxSpotlights, this);
+		this._spotlights = new Spotlights(this._maxSpotlights,
+			store.getState().settings.hideNoVideoParticipants, this);
+		// ASTAGOR END
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -3179,29 +3181,31 @@ export default class RoomClient
 							mediasoupClient.parseScalabilityMode(
 								consumer.rtpParameters.encodings[0].scalabilityMode);
 
-						store.dispatch(consumerActions.addConsumer(
-							{
-								id                     : consumer.id,
-								peerId                 : peerId,
-								kind                   : kind,
-								type                   : type,
-								locallyPaused          : false,
-								remotelyPaused         : producerPaused,
-								rtpParameters          : consumer.rtpParameters,
-								source                 : consumer.appData.source,
-								width                  : consumer.appData.width,
-								height                 : consumer.appData.height,
-								resolutionScalings     : consumer.appData.resolutionScalings,
-								spatialLayers          : spatialLayers,
-								temporalLayers         : temporalLayers,
-								preferredSpatialLayer  : spatialLayers - 1,
-								preferredTemporalLayer : temporalLayers - 1,
-								priority               : 1,
-								codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
-								track                  : consumer.track,
-								score                  : score
-							},
-							peerId));
+						const consumerStoreObject = {
+							id                     : consumer.id,
+							peerId                 : peerId,
+							kind                   : kind,
+							type                   : type,
+							locallyPaused          : false,
+							remotelyPaused         : producerPaused,
+							rtpParameters          : consumer.rtpParameters,
+							source                 : consumer.appData.source,
+							width                  : consumer.appData.width,
+							height                 : consumer.appData.height,
+							resolutionScalings     : consumer.appData.resolutionScalings,
+							spatialLayers          : spatialLayers,
+							temporalLayers         : temporalLayers,
+							preferredSpatialLayer  : 0,
+							preferredTemporalLayer : 0,
+							priority               : 1,
+							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
+							track                  : consumer.track,
+							score                  : score
+						};
+
+						this._spotlights.addVideoConsumer(consumerStoreObject);
+
+						store.dispatch(consumerActions.addConsumer(consumerStoreObject, peerId));
 
 						await this._startConsumer(consumer);
 
@@ -3254,6 +3258,8 @@ export default class RoomClient
 						store.dispatch(
 							consumerActions.setConsumerPaused(consumerId, 'remote'));
 
+						this._spotlights.pauseVideoConsumer(consumerId);
+
 						break;
 					}
 
@@ -3267,6 +3273,8 @@ export default class RoomClient
 
 						store.dispatch(
 							consumerActions.setConsumerResumed(consumerId, 'remote'));
+
+						this._spotlights.resumeVideoConsumer(consumerId);
 
 						break;
 					}
@@ -4573,6 +4581,8 @@ export default class RoomClient
 	{
 		const consumer = this._consumers.get(consumerId);
 
+		this._spotlights.removeVideoConsumer(consumerId);
+
 		if (!consumer)
 			return;
 
@@ -4642,5 +4652,10 @@ export default class RoomClient
 			encodings = this._chooseEncodings(VIDEO_SIMULCAST_PROFILES, size);
 
 		return encodings;
+	}
+
+	setHideNoVideoParticipants(hideNoVideoParticipants)
+	{
+		this._spotlights.hideNoVideoParticipants = hideNoVideoParticipants;
 	}
 }

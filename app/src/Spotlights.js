@@ -1,19 +1,18 @@
 import Logger from './Logger';
-import { makePeerConsumerSelector } from './components/Selectors';
 
 const logger = new Logger('Spotlight');
 
 export default class Spotlights
 {
-	constructor(maxSpotlights, roomClient)
+	constructor(maxSpotlights, hideNoVideoParticipants, roomClient)
 	{
 		this._maxSpotlights = maxSpotlights;
 		this._peerList = [];
+		this._activeVideoConsumers = [];
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
 		this._roomClient = roomClient;
-		this._consumersStoreUnsubscriber = null;
-		this._hideNoVideoParticipantsStoreUnsubscriber = null;
+		this._hideNoVideoParticipants = hideNoVideoParticipants;
 	}
 
 	addPeers(peers)
@@ -65,6 +64,7 @@ export default class Spotlights
 	clearSpotlights()
 	{
 		this._peerList = [];
+		this._activeVideoConsumers = [];
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
 	}
@@ -90,6 +90,8 @@ export default class Spotlights
 			'room "peerClosed" event [peerId:%o]', id);
 
 		this._peerList = this._peerList.filter((peer) => peer !== id);
+		this._activeVideoConsumers = this._activeVideoConsumers.filter((consumer) =>
+			consumer.peerId !== id);
 		this._selectedSpotlights = this._selectedSpotlights.filter((peer) => peer !== id);
 		this._spotlightsUpdated();
 	}
@@ -115,48 +117,76 @@ export default class Spotlights
 		}
 	}
 
-	_hasVideoContent(state, getPeerConsumers)
+	addVideoConsumer(newConsumer)
 	{
-		return function(peerId, index, array)
+		if (newConsumer.kind === 'video' && (newConsumer.source === 'webcam' ||
+			newConsumer.source === 'extravideo' || newConsumer.source === 'screen') &&
+			this._activeVideoConsumers.findIndex((consumer) =>
+				consumer.consumerId === newConsumer.id) === -1)
 		{
-			const peer = state.peers[peerId];
+			this._activeVideoConsumers.push({
+				consumerId     : newConsumer.id,
+				peerId         : newConsumer.peerId,
+				remotelyPaused : newConsumer.remotelyPaused });
 
-			if (peer)
-			{
-				const consumers = { ...getPeerConsumers(state, peerId) };
+			this._spotlightsUpdated();
+		}
+	}
 
-				const videoVisible = (
-					Boolean(consumers.webcamConsumer) &&
-					!consumers.webcamConsumer.remotelyPaused
-				);
+	removeVideoConsumer(consumerId)
+	{
+		const oldLength = this._activeVideoConsumers.length;
 
-				const screenVisible = (
-					Boolean(consumers.screenConsumer) &&
-					!consumers.screenConsumer.remotelyPaused
-				);
+		this._activeVideoConsumers = this._activeVideoConsumers.filter((consumer) =>
+			consumer.consumerId !== consumerId);
 
-				if (videoVisible || screenVisible)
-				{
-					return true;
-				}
-			}
+		if (oldLength !== this._activeVideoConsumers.length)
+			this._spotlightsUpdated();
+	}
 
-			return false;
-		};
+	resumeVideoConsumer(consumerId)
+	{
+		const videoConsumer = this._activeVideoConsumers.find((consumer) =>
+			consumer.consumerId === consumerId);
+
+		if (videoConsumer)
+		{
+			videoConsumer.remotelyPaused = false;
+			this._spotlightsUpdated();
+		}
+	}
+
+	pauseVideoConsumer(consumerId)
+	{
+		const videoConsumer = this._activeVideoConsumers.find((consumer) =>
+			consumer.consumerId === consumerId);
+
+		if (videoConsumer)
+		{
+			videoConsumer.remotelyPaused = true;
+			this._spotlightsUpdated();
+		}
+	}
+
+	_hasActiveVideo(peerId)
+	{
+		if (this._activeVideoConsumers.findIndex((consumer) =>
+			consumer.peerId === peerId && !consumer.remotelyPaused) !== -1)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	_spotlightsUpdated()
 	{
-		const getPeerConsumers = makePeerConsumerSelector();
-
-		const state = this._roomClient.getState();
-
 		let spotlights;
 
-		if (state.settings.hideNoVideoParticipants)
+		if (this._hideNoVideoParticipants)
 		{
-			spotlights = this._peerList.filter(
-				this._hasVideoContent(state, getPeerConsumers));
+			spotlights = this._peerList.filter((peerId) =>
+				this._hasActiveVideo(peerId));
 		}
 		else
 		{
@@ -185,6 +215,7 @@ export default class Spotlights
 		{
 			logger.debug('_spotlightsUpdated() | spotlights not updated');
 		}
+
 	}
 
 	_arraysEqual(arr1, arr2)
@@ -201,6 +232,21 @@ export default class Spotlights
 		return true;
 	}
 
+	get hideNoVideoParticipants()
+	{
+		return this._hideNoVideoParticipants;
+	}
+
+	set hideNoVideoParticipants(hideNoVideoParticipants)
+	{
+		const oldHideNoVideoParticipants = this._hideNoVideoParticipants;
+
+		this._hideNoVideoParticipants = hideNoVideoParticipants;
+
+		if (oldHideNoVideoParticipants !== this._hideNoVideoParticipants)
+			this._spotlightsUpdated();
+	}
+
 	get maxSpotlights()
 	{
 		return this._maxSpotlights;
@@ -215,40 +261,4 @@ export default class Spotlights
 		if (oldMaxSpotlights !== this._maxSpotlights)
 			this._spotlightsUpdated();
 	}
-
-	onStoreChanged(that, newVal, oldVal, objectPath)
-	{
-		switch (objectPath)
-		{
-			case 'consumers':
-			case 'settings.hideNoVideoParticipants':
-			{
-				that._spotlightsUpdated();
-				break;
-			}
-		}
-	}
-
-	createStoreSubscribers()
-	{
-		this.removeStoreSubscribers();
-		this._consumersStoreUnsubscriber = this._roomClient.subscribeStoreWatch(
-			'consumers', this);
-		this._hideNoVideoParticipantsStoreUnsubscriber = this._roomClient.subscribeStoreWatch(
-			'settings.hideNoVideoParticipants', this);
-	}
-
-	removeStoreSubscribers()
-	{
-		if (this._consumersStoreUnsubscriber)
-		{
-			this._consumersStoreUnsubscriber();
-		}
-
-		if (this._hideNoVideoParticipantsStoreUnsubscriber)
-		{
-			this._hideNoVideoParticipantsStoreUnsubscriber();
-		}
-	}
-
 }
