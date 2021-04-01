@@ -88,6 +88,7 @@ function run()
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
+	const headless = parameters.get('headless');
 
 	const { pathname } = window.location;
 
@@ -167,6 +168,7 @@ function run()
 			accessCode,
 			device,
 			produce,
+			headless,
 			forceTcp,
 			displayName,
 			muted,

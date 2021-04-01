@@ -364,6 +364,8 @@ module.exports =
 	requestTimeout       : 20000,
 	// Socket retries when timeout
 	requestRetries       : 3,
+	// If > 0, sets a cache-control max-age (in seconds) to static files responses.
+	staticFilesCachePeriod : 0,
 	// Mediasoup settings
 	mediasoup            :
 	{
@@ -466,9 +468,11 @@ module.exports =
 	prometheus : {
 		deidentify : false, // deidentify IP addresses
 		// listen     : 'localhost', // exporter listens on this address
-		numeric    : false, // show numeric IP addresses
+		numeric    : true, // show numeric IP addresses
 		port       : 8889, // allocated port
 		quiet      : false // include fewer labels
+		// aggregated metrics options
+		period     : 15 // update period (seconds)
 	}
 	*/
 };

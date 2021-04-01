@@ -172,6 +172,10 @@
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
 	"settings.hideNoVideoParticipants": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Kan ikke gemme fil",
 	"filesharing.startingFileShare": "Forsøger at dele filen",

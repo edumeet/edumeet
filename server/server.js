@@ -87,7 +87,7 @@ const tls =
 const app = express();
 
 app.use(helmet.hsts());
-const sharedCookieParser=cookieParser();
+const sharedCookieParser = cookieParser();
 
 app.use(sharedCookieParser);
 app.use(bodyParser.json({ limit: '5mb' }));
@@ -628,9 +628,13 @@ async function runHttpsServer()
 	});
 
 	// Serve all files in the public folder as static files.
-	app.use(express.static('public'));
+	app.use(express.static('public', {
+		maxAge : (config.staticFilesCachePeriod || 0) * 1000
+	}));
 
-	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
+	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`, {
+		maxAge : (config.staticFilesCachePeriod || 0) * 1000
+	}));
 
 	if (config.httpOnly === true)
 	{
@@ -794,14 +798,18 @@ async function runMediasoupWorkers()
 
 	logger.info('running %d mediasoup Workers...', numWorkers);
 
-	for (let i = 0; i < numWorkers; ++i)
+	const { logLevel, logTags, rtcMinPort, rtcMaxPort } = config.mediasoup.worker;
+	const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
+
+	for (let i = 0; i < numWorkers; i++)
 	{
 		const worker = await mediasoup.createWorker(
 			{
-				logLevel   : config.mediasoup.worker.logLevel,
-				logTags    : config.mediasoup.worker.logTags,
-				rtcMinPort : config.mediasoup.worker.rtcMinPort,
-				rtcMaxPort : config.mediasoup.worker.rtcMaxPort
+				logLevel,
+				logTags,
+				rtcMinPort : rtcMinPort + (i * portInterval),
+				rtcMaxPort : i === numWorkers - 1 ? rtcMaxPort
+					: rtcMinPort + ((i + 1) * portInterval) - 1
 			});
 
 		worker.on('died', () =>

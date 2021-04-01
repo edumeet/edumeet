@@ -154,7 +154,10 @@ const AppearanceSettings = (props) =>
 					onChange={(event) =>
 					{
 						if (event.target.value)
+						{
 							handleChangeAspectRatio(event.target.value);
+							roomClient.updateWebcam({ restart: true });
+						}
 					}}
 					name={intl.formatMessage({
 						id             : 'settings.aspectRatio',

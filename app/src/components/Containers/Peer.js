@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makePeerConsumerSelector } from '../Selectors';
 import PropTypes from 'prop-types';
@@ -40,6 +40,7 @@ const styles = (theme) =>
 			{
 				// transition  : 'filter .2s',
 				// filter      : 'grayscale(0)',
+				boxShadow   : 'var(--active-speaker-shadow)',
 				borderColor : 'var(--active-speaker-border-color)'
 			},
 			'&:not(.active-speaker):not(.screen)' :
@@ -110,7 +111,16 @@ const styles = (theme) =>
 			alignItems      : 'center',
 			padding         : theme.spacing(1),
 			zIndex          : 20,
-			'& p'           :
+			'&.hide'        :
+			{
+				transition : 'opacity 0.1s ease-in-out',
+				opacity    : 0
+			},
+			'&.hover' :
+			{
+				opacity : 1
+			},
+			'& p' :
 			{
 				padding       : '6px 12px',
 				borderRadius  : 6,
@@ -146,8 +156,12 @@ const Peer = (props) =>
 		style,
 		smallContainer,
 		windowConsumer,
+		fullScreenConsumer,
 		classes,
-		theme
+		theme,
+		enableLayersSwitch,
+		width,
+		height
 	} = props;
 
 	const micEnabled = (
@@ -175,6 +189,43 @@ const Peer = (props) =>
 		'margin' : spacing,
 		...style
 	};
+
+	if (peer.picture)
+	{
+		rootStyle.backgroundImage = `url(${peer.picture})`;
+		rootStyle.backgroundSize = 'auto 100%';
+	}
+
+	useEffect(() =>
+	{
+		const handler = setTimeout(() =>
+		{
+			const consumer = webcamConsumer || screenConsumer;
+
+			if (!consumer)
+				return;
+
+			if (windowConsumer === consumer.id)
+			{
+				// if playing in external window, set the maximum quality levels
+				roomClient.setConsumerPreferredLayersMax(consumer);
+			}
+			else if (enableLayersSwitch && consumer?.type !== 'simple'
+				&& fullScreenConsumer !== consumer.id)
+			{
+				roomClient.adaptConsumerPreferredLayers(consumer, width, height);
+			}
+		}, 1000);
+
+		return () => { clearTimeout(handler); };
+	}, [
+		enableLayersSwitch,
+		webcamConsumer,
+		screenConsumer,
+		windowConsumer,
+		fullScreenConsumer,
+		roomClient, width, height
+	]);
 
 	return (
 		<React.Fragment>
@@ -210,7 +261,12 @@ const Peer = (props) =>
 			>
 				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible &&
-						<div className={classes.videoInfo}>
+						<div className={classnames(
+							classes.videoInfo,
+							'hide',
+							hover ? 'hover' : null
+						)}
+						>
 							<p>
 								<FormattedMessage
 									id='room.videoPaused'
@@ -421,6 +477,8 @@ const Peer = (props) =>
 						videoCodec={webcamConsumer && webcamConsumer.codec}
 						audioScore={micConsumer ? micConsumer.score : null}
 						videoScore={webcamConsumer ? webcamConsumer.score : null}
+						width={width}
+						height={height}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -614,6 +672,8 @@ const Peer = (props) =>
 								videoVisible={videoVisible}
 								videoCodec={consumer && consumer.codec}
 								videoScore={consumer ? consumer.score : null}
+								width={width}
+								height={height}
 							/>
 						</div>
 					</div>
@@ -758,6 +818,8 @@ const Peer = (props) =>
 							videoVisible={screenVisible}
 							videoCodec={screenConsumer && screenConsumer.codec}
 							videoScore={screenConsumer ? screenConsumer.score : null}
+							width={width}
+							height={height}
 						/>
 					</div>
 				</div>
@@ -776,6 +838,7 @@ Peer.propTypes =
 	screenConsumer           : appPropTypes.Consumer,
 	extraVideoConsumers      : PropTypes.arrayOf(appPropTypes.Consumer),
 	windowConsumer           : PropTypes.string,
+	fullScreenConsumer       : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
 	browser                  : PropTypes.object.isRequired,
 	spacing                  : PropTypes.number,
@@ -784,7 +847,10 @@ Peer.propTypes =
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
 	classes                  : PropTypes.object.isRequired,
-	theme                    : PropTypes.object.isRequired
+	theme                    : PropTypes.object.isRequired,
+	enableLayersSwitch       : PropTypes.bool,
+	width                    : PropTypes.number,
+	height                   : PropTypes.number
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -794,11 +860,12 @@ const makeMapStateToProps = (initialState, { id }) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer           : state.peers[id],
+			peer               : state.peers[id],
 			...getPeerConsumers(state, id),
-			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : id === state.room.activeSpeakerId,
-			browser        : state.me.browser
+			windowConsumer     : state.room.windowConsumer,
+			fullScreenConsumer : state.room.fullScreenConsumer,
+			activeSpeaker      : id === state.room.activeSpeakerId,
+			browser            : state.me.browser
 		};
 	};
 
@@ -833,7 +900,11 @@ export default withRoomContext(connect(
 				prev.consumers === next.consumers &&
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.windowConsumer === next.room.windowConsumer &&
-				prev.me.browser === next.me.browser
+				prev.room.fullScreenConsumer === next.room.fullScreenConsumer &&
+				prev.me.browser === next.me.browser &&
+				prev.enableLayersSwitch === next.enableLayersSwitch &&
+				prev.width === next.width &&
+				prev.height === next.height
 			);
 		}
 	}

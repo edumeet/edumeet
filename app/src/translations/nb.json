@@ -172,6 +172,10 @@
 	"settings.mirrorOwnVideo": "Vis eget bilde speilet for deg",
 	"settings.language": null,
 	"settings.hideNoVideoParticipants": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",

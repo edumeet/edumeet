@@ -31,7 +31,7 @@ const styles = (theme) =>
 			flex               : '100 100 auto',
 			height             : '100%',
 			width              : '100%',
-			objectFit          : 'cover',
+			objectFit          : 'contain',
 			userSelect         : 'none',
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
@@ -92,6 +92,7 @@ const styles = (theme) =>
 				"AcodL		Acod	Acod	Acod	Acod" \
 					"VcodL		Vcod	Vcod	Vcod	Vcod" \
 					"ResL		Res		Res		Res		Res" \
+					"VPortL		VPort VPort VPort VPort" \
 					"RecvL		RecvBps RecvBps RecvSum RecvSum" \
 					"SendL		SendBps SendBps SendSum SendSum" \
 					"IPlocL		IPloc	IPloc	IPloc	IPloc" \
@@ -105,6 +106,8 @@ const styles = (theme) =>
 					'& .Vcod'     : { gridArea: 'Vcod' },
 					'& .ResL'     : { gridArea: 'ResL' },
 					'& .Res'      : { gridArea: 'Res' },
+					'& .VPortL'   : { gridArea: 'VPortL' },
+					'& .VPort'    : { gridArea: 'VPort' },
 					'& .RecvL'    : { gridArea: 'RecvL' },
 					'& .RecvBps'  : { gridArea: 'RecvBps', justifySelf: 'flex-end' },
 					'& .RecvSum'  : { gridArea: 'RecvSum', justifySelf: 'flex-end' },
@@ -128,8 +131,7 @@ const styles = (theme) =>
 			},
 			'&.hidden' :
 			{
-				opacity            : 0,
-				transitionDuration : '0s'
+				display : 'none'
 			}
 		},
 		peer :
@@ -143,16 +145,19 @@ const styles = (theme) =>
 			color           : 'rgba(255, 255, 255, 0.85)',
 			border          : 'none',
 			borderBottom    : '1px solid #aeff00',
-			backgroundColor : 'transparent'
+			backgroundColor : 'rgba(0, 0, 0, 0.25)',
+			padding         : theme.spacing(0.6)
 		},
 		displayNameStatic :
 		{
-			userSelect : 'none',
-			cursor     : 'text',
-			fontSize   : 14,
-			fontWeight : 400,
-			color      : 'rgba(255, 255, 255, 0.85)',
-			'&:hover'  :
+			userSelect      : 'none',
+			cursor          : 'text',
+			fontSize        : 14,
+			fontWeight      : 400,
+			color           : 'rgba(255, 255, 255, 0.85)',
+			backgroundColor : 'rgba(0, 0, 0, 0.25)',
+			padding         : theme.spacing(0.6),
+			'&:hover'       :
 			{
 				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
@@ -204,7 +209,9 @@ class VideoView extends React.PureComponent
 			onChangeDisplayName,
 			children,
 			classes,
-			netInfo
+			netInfo,
+			width,
+			height
 		} = this.props;
 
 		const {
@@ -301,6 +308,15 @@ class VideoView extends React.PureComponent
 									<span className={'ResL'}>Res: </span>
 									<span className={'Res'}>
 										{videoWidth}x{videoHeight}
+									</span>
+								</React.Fragment>
+							}
+
+							{ (videoVisible && width && height) &&
+								<React.Fragment>
+									<span className={'VPortL'}>VPort: </span>
+									<span className={'VPort'}>
+										{Math.round(width)}x{Math.round(height)}
 									</span>
 								</React.Fragment>
 							}
@@ -525,7 +541,9 @@ VideoView.propTypes =
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
 	classes                        : PropTypes.object.isRequired,
-	netInfo                        : PropTypes.object
+	netInfo                        : PropTypes.object,
+	width                          : PropTypes.number,
+	height                         : PropTypes.number
 };
 
 export default withStyles(styles)(VideoView);

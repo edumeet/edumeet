@@ -172,6 +172,10 @@
 	"settings.mirrorOwnVideo": "Ansicht des eigenen Videos spiegeln",
 	"settings.language": "Sprache auswählen",
 	"settings.hideNoVideoParticipants": "Teilnehmer ohne Video ausblenden",
+	"settings.myPhotoButton": "Mein Foto festlegen",
+	"settings.myPhotoLabel": "Maximale Dateigröße: 5MB, akzeptiert: jpg, jpeg, png",
+	"settings.myPhotoSizeError": " Datei ist zu groß",
+	"settings.myPhotoTypeError": " ist keine unterstützte Dateierweiterung",
 
 	"filesharing.saveFileError": "Fehler beim Speichern der Datei",
 	"filesharing.startingFileShare": "Starte Teilen der Datei",

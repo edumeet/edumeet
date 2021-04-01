@@ -684,6 +684,11 @@ module.exports = async function(rooms, peers)
 			const interactive = new Interactive(socket);
 
 			interactive.openCommandConsole();
+			
+			socket.on('error', (error) =>
+			{
+				console.error(`interactiveServer socket error:`, error.message);
+			});
 		});
 
 		await new Promise((resolve) =>

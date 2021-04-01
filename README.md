@@ -29,7 +29,7 @@ If you want the ansible approach, you can find ansible role [here](https://githu
 If you want to install it on the Debian & Ubuntu based operating systems.
 
 * Prerequisites:
-edumeet will run on nodejs v10.x and later versions. (v12.x has a know issue for now, please until it will be fixed use the 10.x version)
+edumeet will run on nodejs v14.x (tested with v14.15.4 version).
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 * Download .deb package from [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
@@ -61,11 +61,11 @@ $ sudo systemctl start edumeet
 ## Manual installation
 
 * Prerequisites:
-Currently edumeet will only run on nodejs v13.x
+Currently edumeet will run on nodejs v14.x
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
-$ sudo apt install git npm build-essential redis
+$ sudo apt install git npm build-essential redis libssl-dev openssl pkg-config
 ```
 
 * Clone the project:

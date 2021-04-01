@@ -3,7 +3,7 @@ const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
 const Logger = require('./Logger');
 const Lobby = require('./Lobby');
-const { SocketTimeoutError } = require('./errors');
+const { SocketTimeoutError, NotFoundInMediasoupError } = require('./errors');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
@@ -214,13 +214,14 @@ class Room extends EventEmitter
 			mediasoupRouters.set(router.id, router);
 
 			const audioLevelObserver = await router.createAudioLevelObserver(
-			{
-				maxEntries : 1,
-				threshold  : -80,
-				interval   : 800
-			});
+				{
+					maxEntries : 1,
+					threshold  : -80,
+					interval   : 800
+				});
 
-			audioLevelObservers.set(router.id, { audioLevelObserver : audioLevelObserver, peerId : null, volume : -1000 });
+			audioLevelObservers.set(router.id,
+				{ audioLevelObserver: audioLevelObserver, peerId: null, volume: -1000 });
 		}
 
 		return new Room({
@@ -261,7 +262,8 @@ class Room extends EventEmitter
 		this._queue = new AwaitQueue();
 
 		// Locked flag.
-		this._locked = config.roomsUnlocked && Array.isArray(config.roomsUnlocked) && !config.roomsUnlocked.includes(roomId)
+		this._locked = config.roomsUnlocked && Array.isArray(config.roomsUnlocked)
+			&& !config.roomsUnlocked.includes(roomId);
 
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;
@@ -513,22 +515,23 @@ class Room extends EventEmitter
 
 		let maxVolume = -1000;
 
-		let debugRouterId = null;
+		// let debugRouterId = null;
 
-		this._audioLevelObservers.forEach((audioLevelObject, routerId) => {
+		this._audioLevelObservers.forEach((audioLevelObject, routerId) =>
+		{
 			const tmpPeerId = audioLevelObject.peerId;
 
 			if (tmpPeerId && audioLevelObject.volume > maxVolume)
 			{
 				maxVolume = audioLevelObject.volume;
 				peerId = tmpPeerId;
-				debugRouterId = routerId;
+				// debugRouterId = routerId;
 			}
 		});
 
 		if (!peerId || Date.now() > (this._lastActiveSpeakerUpdateTimestamp + 1000))
 		{
-			if(peerId)
+			if (peerId)
 			{
 				this._lastActiveSpeakerUpdateTimestamp = Date.now();
 			}
@@ -540,8 +543,8 @@ class Room extends EventEmitter
 					peer.socket,
 					'activeSpeaker',
 					{
-					peerId : peerId,
-					volume : maxVolume
+						peerId : peerId,
+						volume : maxVolume
 					});
 			}
 		}
@@ -549,22 +552,23 @@ class Room extends EventEmitter
 
 	_handleAudioLevelObservers()
 	{
-		this._audioLevelObservers.forEach((audioLevelObject, routerId) => {
+		this._audioLevelObservers.forEach((audioLevelObject, routerId) =>
+		{
 			// Set audioLevelObserver events.
 			audioLevelObject.audioLevelObserver.on('volumes', (volumes) =>
 			{
 				const { producer, volume } = volumes[0];
 
-				const audioLevelObject = this._audioLevelObservers.get(routerId)
+				const audioLevelObject = this._audioLevelObservers.get(routerId);
 
 				audioLevelObject.peerId = producer.appData.peerId;
 				audioLevelObject.volume = volume;
 				this._sendActiveSpeakerInfo();
-		});
+			});
 
 			audioLevelObject.audioLevelObserver.on('silence', () =>
-		{
-				const audioLevelObject = this._audioLevelObservers.get(routerId)
+			{
+				const audioLevelObject = this._audioLevelObservers.get(routerId);
 
 				audioLevelObject.peerId = null;
 				audioLevelObject.volume = -1000;
@@ -611,6 +615,13 @@ class Room extends EventEmitter
 			{
 				logger.info(
 					'Room deserted for some time, closing the room [roomId:"%s"]',
+					this._roomId);
+				this.close();
+			}
+			else if (this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked())
+			{
+				logger.info(
+					'Room deserted for some time, closing the room [roomId:"%s"] and kick peers from the lobby',
 					this._roomId);
 				this.close();
 			}
@@ -796,7 +807,14 @@ class Room extends EventEmitter
 				{
 					logger.error('"request" failed [error:"%o"]', error);
 
-					cb(error);
+					if (error instanceof NotFoundInMediasoupError)
+					{
+						cb({ notFoundInMediasoupError: true });
+					}
+					else
+					{
+						cb(error);
+					}
 				});
 		});
 
@@ -847,6 +865,13 @@ class Room extends EventEmitter
 		// lobby is empty, close the room after a while.
 		if (this.checkEmpty() && this._lobby.checkEmpty())
 			this.selfDestructCountdown();
+		// If this is the last Peer in the room,
+		// lobby is not empty and room is locked, 
+		// close the room after a while.
+		else if (this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked())
+		{
+			this.selfDestructCountdown();
+		}
 	}
 
 	async _handleSocketRequest(peer, request, cb)
@@ -995,7 +1020,7 @@ class Room extends EventEmitter
 				if (maxIncomingBitrate)
 				{
 					try { await transport.setMaxIncomingBitrate(maxIncomingBitrate); }
-					catch(error)
+					catch (error)
 					{
 						logger.error('CreateWebRtcTransport transport.setMaxIncomingBitrate ERROR [roomId:"%s", maxIncomingBitrate:"%s", transportId:"%s", error:"%o"]', this._roomId, maxIncomingBitrate, transport.id, error);
 					}
@@ -1084,6 +1109,7 @@ class Room extends EventEmitter
 				appData = { ...appData, peerId: peer.id };
 
 				let producer = null;
+
 				try
 				{
 					producer =
@@ -1140,10 +1166,11 @@ class Room extends EventEmitter
 				// Add into the audioLevelObserver.
 				if (kind === 'audio')
 				{
-					this._audioLevelObservers.get(peer.routerId).audioLevelObserver.addProducer({ producerId: producer.id })
-						.catch((error) => {
-							logger.error('audioLevelObserver addProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
-							});
+					this._audioLevelObservers.get(peer.routerId).audioLevelObserver.addProducer(
+						{ producerId: producer.id }).catch((error) =>
+					{
+						logger.error('audioLevelObserver addProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
+					});
 				}
 
 				break;
@@ -1161,10 +1188,11 @@ class Room extends EventEmitter
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
 
-				this._audioLevelObservers.get(peer.routerId).audioLevelObserver.removeProducer({ producerId: producer.id })
-					.catch((error) => {
-						logger.error('audioLevelObserver removeProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
-						});
+				this._audioLevelObservers.get(peer.routerId).audioLevelObserver.removeProducer(
+					{ producerId: producer.id }).catch((error) =>
+				{
+					logger.error('audioLevelObserver removeProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
+				});
 
 				producer.close();
 
@@ -1224,7 +1252,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.pause();
 
@@ -1243,7 +1271,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.resume();
 
@@ -1262,7 +1290,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.setPreferredLayers({ spatialLayer, temporalLayer });
 
@@ -1281,7 +1309,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.setPriority(priority);
 
@@ -1300,7 +1328,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.requestKeyFrame();
 
@@ -1345,7 +1373,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				const stats = await consumer.getStats();
 
@@ -1372,7 +1400,7 @@ class Room extends EventEmitter
 				break;
 			}
 
-			/* case 'changePicture':
+			case 'changePicture':
 			{
 				// Ensure the Peer is joined.
 				if (!peer.joined)
@@ -1392,7 +1420,7 @@ class Room extends EventEmitter
 				cb();
 
 				break;
-			} */
+			}
 
 			case 'chatMessage':
 			{
@@ -1884,6 +1912,8 @@ class Room extends EventEmitter
 		{
 			// Remove from its map.
 			consumerPeer.removeConsumer(consumer.id);
+
+			this._notification(consumerPeer.socket, 'consumerClosed', { consumerId: consumer.id });
 		});
 
 		consumer.on('producerclose', () =>
@@ -1925,7 +1955,7 @@ class Room extends EventEmitter
 		// Send a request to the remote Peer with Consumer parameters.
 		try
 		{
-			await this._request(
+			this._notification(
 				consumerPeer.socket,
 				'newConsumer',
 				{
@@ -1936,20 +1966,8 @@ class Room extends EventEmitter
 					rtpParameters  : consumer.rtpParameters,
 					type           : consumer.type,
 					appData        : producer.appData,
-					producerPaused : consumer.producerPaused
-				}
-			);
-
-			// Now that we got the positive response from the remote Peer and, if
-			// video, resume the Consumer to ask for an efficient key frame.
-			await consumer.resume();
-
-			this._notification(
-				consumerPeer.socket,
-				'consumerScore',
-				{
-					consumerId : consumer.id,
-					score      : consumer.score
+					producerPaused : consumer.producerPaused,
+					score          : consumer.score
 				}
 			);
 		}

@@ -155,3 +155,8 @@ export const setVideoMuted = (videoMuted) =>
 		type    : 'SET_VIDEO_MUTED',
 		payload : { videoMuted }
 	});
+export const setLocalPicture = (localPicture) =>
+	({
+		type    : 'SET_LOCAL_PICTURE',
+		payload : { localPicture }
+	});

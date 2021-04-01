@@ -4,6 +4,9 @@ var config =
 	loginEnabled    : false,
 	developmentPort : 3443,
 	productionPort  : 443,
+	// If the server component runs on a different host than the app
+	// you can uncomment the following line and specify the host name.
+	//serverHostname  : 'external-server.com',
 
 	/**
 	 * Supported browsers version 
@@ -67,22 +70,44 @@ var config =
 	simulcast                     : true,
 	// Enable or disable simulcast for screen sharing video
 	simulcastSharing              : false,
-	// Simulcast encoding layers and levels
-	simulcastEncodings            :
-	[
-		{ scaleResolutionDownBy: 4 },
-		{ scaleResolutionDownBy: 2 },
-		{ scaleResolutionDownBy: 1 }
-	],
+	// Define different encodings for various resolutions of the video
+	simulcastProfiles :
+	{
+		3840 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 1500000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 4000000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 10000000 }
+		],
+		1920 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 750000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 1500000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 4000000 }
+		],
+		1280 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 250000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 900000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 3000000 }
+		],
+		640 :
+		[
+			{ scaleResolutionDownBy: 2, maxBitRate: 250000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 900000 }
+		],
+		320 :
+		[
+			{ scaleResolutionDownBy: 1, maxBitRate: 250000 }
+		]
+	},
 
-	/**
-	 * Alternative simulcast setting:
-	 * [
-	 *   { maxBitRate: 50000 }, 
-	 *	 { maxBitRate: 1000000 },
-	 *	 { maxBitRate: 4800000 }
-	 *],
-	 **/
+
+	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
+	// example: 
+	// with level width=640px, the minimum width required to trigger the
+	// level change will be: 640 * 0.75 = 480px
+	adaptiveScalingFactor: 0.75,
 
 	/**
 	 * White listing browsers that support audio output device selection.
@@ -104,7 +129,7 @@ var config =
 	// defaults for audio setting on new clients / can be customized and overruled from client side
 	defaultAudio :
 	{
-		autoGainControl      : false, // default : false
+		autoGainControl      : true, // default : true
 		echoCancellation     : true, // default : true 
 		noiseSuppression     : true, // default : true 
 		// Automatically unmute speaking above noisThereshold
@@ -150,6 +175,26 @@ var config =
 	drawerOverlayed      : true,
 	// Position of notifications
 	notificationPosition : 'right',
+	/**
+	 * Set the notificationSounds.  Valid keys are:
+	 * 'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage',
+	 * 'sendFile', 'newPeer' and 'default'.
+	 *
+	 * Not defining a key is equivalent to using the default notification sound.
+	 * Setting 'play' to null disables the sound notification.
+	 */
+	notificationSounds   : {
+		chatMessage : {
+			play  : '/sounds/notify-chat.mp3',
+		},
+		raisedHand  : {
+			play  : '/sounds/notify-hand.mp3',
+		},
+		default     : {
+			delay : 5000, // minimum delay between alert sounds [ms]
+			play  : '/sounds/notify.mp3',
+		},
+	},
 	// Timeout for autohiding topbar and button control bar
 	hideTimeout          : 3000,
 	// max number of participant that will be visible in 
@@ -163,7 +208,7 @@ var config =
 	lockLastN            : false,
 	// Show logo if "logo" is not null, else show title
 	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-	logo                 : 'images/logo.example.png',
+	logo                 : 'images/logo.edumeet.svg',
 	title                : 'edumeet',
 	// Service & Support URL
 	// if not set then not displayed on the about modals

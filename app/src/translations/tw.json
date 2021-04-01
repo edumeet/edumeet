@@ -171,6 +171,10 @@
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
 	"settings.hideNoVideoParticipants": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "無法保存文件",
 	"filesharing.startingFileShare": "開始分享文件",
