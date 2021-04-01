@@ -318,7 +318,6 @@ export default class RoomClient
 		// Manager of spotlight
 		this._spotlights = new Spotlights(this._maxSpotlights,
 			store.getState().settings.hideNoVideoParticipants, this);
-		// ASTAGOR END
 
 		// Transport for sending.
 		this._sendTransport = null;
