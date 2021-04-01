@@ -22,6 +22,8 @@ import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
 import { openDB, deleteDB } from 'idb';
 import { RECORDING_START, RECORDING_STOP, RECORDING_PAUSE, RECORDING_RESUME } from './recordingStates';
+import streamSaver from 'streamsaver';
+import { WritableStream } from 'web-streams-polyfill/ponyfill';
 
 let createTorrent;
 
@@ -3721,7 +3723,16 @@ export default class RoomClient
 
 		try
 		{
-			gumStream = this._micProducer.track;
+			if (this._micProducer == null)
+			{
+				// If my micProducer is not initialized yet we start with an empty track
+				// TODO replace if inicialised
+				gumStream = new MediaStream().track;
+			}
+			else
+			{
+				gumStream = this._micProducer.track;
+			}
 
 			gdmStream = await navigator.mediaDevices.getDisplayMedia(RECORDING_CONSTRAINTS);
 			gdmStream.getVideoTracks().forEach((track) =>
@@ -3816,12 +3827,38 @@ export default class RoomClient
 					{
 						try
 						{
-							idbDB.getAll(idbStoreName).then((blobs) =>
+							const useFallback = false;
+
+							if (useFallback)
 							{
+								idbDB.getAll(idbStoreName).then((blobs) =>
+								{
 
-								this.saveRecordingAndCleanup(blobs, idbDB, idbName);
+									this.saveRecordingAndCleanup(blobs, idbDB, idbName);
 
-							});
+								});
+							}
+							else
+							{
+								// stream saver
+								// On firefox WritableStream isn't implemented yet web-streams-polyfill/ponyfill will fix it
+								if (!window.WritableStream)
+								{
+									streamSaver.WritableStream = WritableStream;
+								}
+								const fileStream = streamSaver.createWriteStream(`${idbName}.webm`, {
+									// size : blob.size // Makes the procentage visiable in the download
+								});
+
+								const writer = fileStream.getWriter();
+
+								idbDB.getAllKeys(idbStoreName).then((keys) =>
+								{
+									// recursive function to save the data from the indexed db
+									this.saveRecordingWithStreamSaver(keys, writer, true, idbDB, idbName);
+								});
+
+							}
 
 						}
 						catch (error)
@@ -3985,6 +4022,67 @@ export default class RoomClient
 		// save as
 		this.invokeSaveAsDialog(blob, `${dbName}.webm`);
 
+		// destroy
+		this.saveRecordingCleanup(db, dbName);
+	}
+
+	// save recording with Stream saver and destroy
+	saveRecordingWithStreamSaver(keys, writer, stop = false, db, dbName)
+	{
+		let readableStream = null;
+
+		let reader = null;
+
+		let pump = null;
+
+		const key = keys[0];
+
+		// on the first call we stop the streams (tab/screen sharing) 
+		if (stop)
+		{
+			// Stop all used video/audio tracks
+			if (recorderStream && recorderStream.getTracks().length > 0)
+				recorderStream.getTracks().forEach((track) => track.stop());
+
+			if (gdmStream && gdmStream.getTracks().length > 0)
+				gdmStream.getTracks().forEach((track) => track.stop());
+		}
+		// we remove the key that we are removing
+		keys.shift();
+		db.get(idbStoreName, key).then((blob) =>
+		{
+			if (keys.length===0)
+			{
+				// if this is the last key we close the writable stream and cleanup the indexedDB
+				readableStream = blob.stream();
+				reader = readableStream.getReader();
+				pump = () => reader.read()
+					.then((res) => (res.done
+						? this.saveRecordingCleanup(db, dbName, writer)
+						: writer.write(res.value).then(pump)));
+				pump();
+			}
+			else
+			{
+				// push data to the writable stream
+				readableStream = blob.stream();
+				reader = readableStream.getReader();
+				pump = () => reader.read()
+					.then((res) => (res.done
+						? this.saveRecordingWithStreamSaver(keys, writer, false, db, dbName)
+						: writer.write(res.value).then(pump)));
+				pump();
+			}
+		});
+
+	}
+
+	saveRecordingCleanup(db, dbName, writer=null)
+	{
+		if (writer!=null)
+		{
+			writer.close();
+		}
 		// destroy
 		db.close();
 		deleteDB(dbName);
