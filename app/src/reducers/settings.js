@@ -23,7 +23,7 @@ const initialState =
 	notificationSounds      : true,
 	mirrorOwnVideo          : true,
 	buttonControlBar        : window.config.buttonControlBar || false,
-	drawerOverlayed         : window.config.drawerOverlayed || true,
+	drawerOverlayed         : (typeof window.config.drawerOverlayed === 'undefined') ? true : window.config.drawerOverlayed,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
 	mediaPerms              : { audio: true, video: true },
 	localPicture            : null,
