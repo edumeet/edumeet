@@ -1760,20 +1760,38 @@ export default class RoomClient
 	{
 		logger.debug('addSelectedPeer() [peerId:"%s"]', peerId);
 
-		this._spotlights.addPeerToSpotlight(peerId);
+		this._spotlights.addPeerToSelectedSpotlights(peerId);
 
 		store.dispatch(
 			roomActions.addSelectedPeer(peerId));
+	}
+
+	setSelectedPeer(peerId)
+	{
+		logger.debug('setSelectedPeer() [peerId:"%s"]', peerId);
+
+		this.clearSelectedPeers();
+		this.addSelectedPeer(peerId);
 	}
 
 	removeSelectedPeer(peerId)
 	{
 		logger.debug('removeSelectedPeer() [peerId:"%s"]', peerId);
 
-		this._spotlights.removePeerSpotlight(peerId);
+		this._spotlights.removePeerFromSelectedSpotlights(peerId);
 
 		store.dispatch(
 			roomActions.removeSelectedPeer(peerId));
+	}
+
+	clearSelectedPeers()
+	{
+		logger.debug('clearSelectedPeers()');
+
+		this._spotlights.clearPeersFromSelectedSpotlights();
+
+		store.dispatch(
+			roomActions.clearSelectedPeers());
 	}
 
 	async promoteAllLobbyPeers()
