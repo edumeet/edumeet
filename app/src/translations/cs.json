@@ -171,7 +171,7 @@
 	"settings.noiseThreshold": "Mezní hodnota hluku",
 	"settings.mirrorOwnVideo": "Zrcadlové zobrazení vlastního videa",
 	"settings.language": "Vyberte jazyk",
-	"settings.hideNoVideoParticipants": null,
+	"settings.hideNoVideoParticipants": "Zobrazovat jen účastníky s obrazem",
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
