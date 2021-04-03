@@ -19,6 +19,9 @@
 		"@material-ui/icons": "^4.5.1",
 		"@material-ui/lab": "^4.0.0-alpha.56",
 		"@react-hook/window-size": "^3.0.7",
+		"@types/node": "^14.14.37",
+		"@types/react": "^17.0.3",
+		"@types/react-dom": "^17.0.3",
 		"bowser": "^2.7.0",
 		"classnames": "^2.2.6",
 		"create-torrent": "^4.4.1",
@@ -55,6 +58,7 @@
 		"riek": "^1.1.0",
 		"socket.io-client": "^2.4.0",
 		"source-map-explorer": "^2.1.0",
+		"typescript": "^4.2.3",
 		"webtorrent": "^0.108.1"
 	},
 	"scripts": {
