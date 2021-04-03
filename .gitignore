@@ -11,5 +11,5 @@ node_modules/
 !/server/certs/mediasoup-demo.localhost.*
 .vscode
 /app/public/config/*.pem
-yarn.lock
+/server/yarn.lock
 yarn-error.log
