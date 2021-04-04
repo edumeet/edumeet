@@ -1,2 +1,2 @@
-*.ts
-*.tsx
+.eslintrc.js
+src/react-app-env.d.ts
