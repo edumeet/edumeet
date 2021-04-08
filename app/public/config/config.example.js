@@ -4,9 +4,12 @@ var config =
 	loginEnabled    : false,
 	developmentPort : 3443,
 	productionPort  : 443,
+
+	/*
 	// If the server component runs on a different host than the app
 	// you can uncomment the following line and specify the host name.
-	//serverHostname  : 'external-server.com',
+	serverHostname  : 'external-server.com',
+    */
 
 	/**
 	 * Supported browsers version 
@@ -27,6 +30,20 @@ var config =
 		'chromium'                     : '>=74',
 		'opera'                        : '>=62',
 		'samsung internet for android' : '>=11.1.1.52'
+	},
+
+	/**
+	 * Network priorities 
+	 * DSCP bits set by browser according this priority values. 
+	 * ("high" means actually: EF for audio, and AF41 for Video in chrome)
+	 * https://en.wikipedia.org/wiki/Differentiated_services
+	 */
+	networkPriorities :
+	{
+		'audio'            : 'high',
+		'mainVideo'        : 'high',
+		'additionalVideos' : 'medium',
+		'screenShare'      : 'medium'
 	},
 
 	/**
@@ -71,7 +88,7 @@ var config =
 	// Enable or disable simulcast for screen sharing video
 	simulcastSharing              : false,
 	// Define different encodings for various resolutions of the video
-	simulcastProfiles :
+	simulcastProfiles             :
 	{
 		3840 :
 		[
@@ -102,12 +119,11 @@ var config =
 		]
 	},
 
-
 	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
 	// example: 
 	// with level width=640px, the minimum width required to trigger the
 	// level change will be: 640 * 0.75 = 480px
-	adaptiveScalingFactor: 0.75,
+	adaptiveScalingFactor : 0.75,
 
 	/**
 	 * White listing browsers that support audio output device selection.
@@ -175,6 +191,7 @@ var config =
 	drawerOverlayed      : true,
 	// Position of notifications
 	notificationPosition : 'right',
+
 	/**
 	 * Set the notificationSounds.  Valid keys are:
 	 * 'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage',
@@ -183,43 +200,43 @@ var config =
 	 * Not defining a key is equivalent to using the default notification sound.
 	 * Setting 'play' to null disables the sound notification.
 	 */
-	notificationSounds   : {
+	notificationSounds : {
 		chatMessage : {
-			play  : '/sounds/notify-chat.mp3',
+			play : '/sounds/notify-chat.mp3'
 		},
-		raisedHand  : {
-			play  : '/sounds/notify-hand.mp3',
+		raisedHand : {
+			play : '/sounds/notify-hand.mp3'
 		},
-		default     : {
+		default : {
 			delay : 5000, // minimum delay between alert sounds [ms]
-			play  : '/sounds/notify.mp3',
-		},
+			play  : '/sounds/notify.mp3'
+		}
 	},
 	// Timeout for autohiding topbar and button control bar
-	hideTimeout          : 3000,
+	hideTimeout : 3000,
 	// max number of participant that will be visible in 
 	// as speaker
-	lastN                : 4,
-	mobileLastN          : 1,
+	lastN       : 4,
+	mobileLastN : 1,
 	// Highest number of lastN the user can select manually in 
 	// userinteface
-	maxLastN             : 5,
+	maxLastN    : 5,
 	// If truthy, users can NOT change number of speakers visible
-	lockLastN            : false,
+	lockLastN   : false,
 	// Show logo if "logo" is not null, else show title
 	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-	logo                 : 'images/logo.edumeet.svg',
-	title                : 'edumeet',
+	logo        : 'images/logo.edumeet.svg',
+	title       : 'edumeet',
 	// Service & Support URL
 	// if not set then not displayed on the about modals
-	supportUrl           : 'https://support.example.com',
+	supportUrl  : 'https://support.example.com',
 	// Privacy and dataprotection URL or path
 	// by default privacy/privacy.html
 	// that is a placeholder for your policies
 	//
 	// but an external url could be also used here	 
-	privacyUrl           : 'privacy/privacy.html',
-	theme                :
+	privacyUrl  : 'privacy/privacy.html',
+	theme       :
 	{
 		palette :
 		{
