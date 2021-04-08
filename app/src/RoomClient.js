@@ -4012,10 +4012,17 @@ export default class RoomClient
 					const encodings = this._getEncodings(width, height);
 					const resolutionScalings = getResolutionScalings(encodings);
 
+					/** 
+					 * TODO: 
+					 * I receive DOMException: 
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+					 * Attempted to set an unimplemented parameter of RtpParameters.
 					encodings.forEach((encoding) =>
 					{
 						encoding.networkPriority=networkPriority;
 					});
+					*/
+					encodings[0].networkPriority=networkPriority;
 
 					producer = await this._sendTransport.produce(
 						{
