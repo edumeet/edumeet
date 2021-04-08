@@ -1461,8 +1461,8 @@ export default class RoomClient
 				store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
 
 				const networkPriority =
-					window.config.networkPriorities.audio ?
-						window.config.networkPriorities.audio :
+					window.config.networkPriorities?.audio ?
+						window.config.networkPriorities?.audio :
 						DEFAULT_NETWORK_PRIORITIES.audio;
 
 				this._micProducer = await this._sendTransport.produce(
@@ -1660,8 +1660,8 @@ export default class RoomClient
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
 				const networkPriority =
-					window.config.networkPriorities.mainVideo ?
-						window.config.networkPriorities.mainVideo :
+					window.config.networkPriorities?.mainVideo ?
+						window.config.networkPriorities?.mainVideo :
 						DEFAULT_NETWORK_PRIORITIES.mainVideo;
 
 				if (this._useSimulcast)
@@ -4003,8 +4003,8 @@ export default class RoomClient
 				let producer;
 
 				const networkPriority =
-					window.config.networkPriorities.extraVideo ?
-						window.config.networkPriorities.extraVideo :
+					window.config.networkPriorities?.extraVideo ?
+						window.config.networkPriorities?.extraVideo :
 						DEFAULT_NETWORK_PRIORITIES.extraVideo;
 
 				if (this._useSimulcast)
@@ -4208,8 +4208,8 @@ export default class RoomClient
 				logger.debug('screenSharing track settings:', track.getSettings());
 
 				const networkPriority =
-					window.config.networkPriorities.screenShare ?
-						window.config.networkPriorities.screenShare :
+					window.config.networkPriorities?.screenShare ?
+						window.config.networkPriorities?.screenShare :
 						DEFAULT_NETWORK_PRIORITIES.screenShare;
 
 				if (this._useSharingSimulcast)
