@@ -4829,7 +4829,7 @@ export default class RoomClient
 		// hack as there is a bug in mediasoup
 		if (encodings.length === 1)
 		{
-			encodings.push(encodings[0]);
+			encodings.push({ ...encodings[0] });
 		}
 
 		return encodings;
