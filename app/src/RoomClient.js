@@ -363,6 +363,8 @@ export default class RoomClient
 
 		this._screenSharingProducer = null;
 
+		this._screenSharingAudioProducer = null;
+
 		this._startKeyListener();
 
 		this._startDevicesListener();
@@ -1476,11 +1478,11 @@ export default class RoomClient
 						],
 						codecOptions :
 						{
-							opusStereo,
-							opusDtx,
-							opusFec,
-							opusPtime,
-							opusMaxPlaybackRate
+							opusStereo          : opusStereo,
+							opusFec             : opusFec,
+							opusDtx             : opusDtx,
+							opusMaxPlaybackRate : opusMaxPlaybackRate,
+							opusPtime           : opusPtime
 						},
 						appData :
 						{ source: 'mic' }
@@ -2670,7 +2672,6 @@ export default class RoomClient
 
 			switch (request.method)
 			{
-
 				default:
 				{
 					logger.error('unknown request.method "%s"', request.method);
@@ -4192,6 +4193,8 @@ export default class RoomClient
 		{
 			const available = this._screenSharing.isScreenShareAvailable();
 
+			const isAudioEnabled = this._screenSharing.isAudioEnabled();
+
 			if (!available)
 				throw new Error('screen sharing not available');
 
@@ -4208,16 +4211,59 @@ export default class RoomClient
 
 			const {
 				screenSharingResolution,
+				autoGainControl,
+				echoCancellation,
+				noiseSuppression,
 				aspectRatio,
 				screenSharingFrameRate
 			} = store.getState().settings;
 
+			if (!window.config.centralAudioOptions)
+			{
+				throw new Error(
+					'Missing centralAudioOptions from app config! (See it in example config.)'
+				);
+			}
+
+			const {
+				sampleRate = 48000,
+				channelCount = 1,
+				volume = 1.0,
+				sampleSize = 16,
+				opusStereo = false,
+				opusDtx = true,
+				opusFec = true,
+				opusPtime = 20,
+				opusMaxPlaybackRate = 48000
+			} = window.config.centralAudioOptions;
+
 			if (start)
 			{
-				const stream = await this._screenSharing.start({
-					...getVideoConstrains(screenSharingResolution, aspectRatio),
-					frameRate : screenSharingFrameRate
-				});
+				let stream;
+
+				if (isAudioEnabled)
+				{
+					stream = await this._screenSharing.start({
+						...getVideoConstrains(screenSharingResolution, aspectRatio),
+						frameRate        : screenSharingFrameRate,
+						sampleRate       : sampleRate,
+						channelCount     : channelCount,
+						volume           : volume,
+						autoGainControl  : autoGainControl,
+						echoCancellation : echoCancellation,
+						noiseSuppression : noiseSuppression,
+						sampleSize       : sampleSize
+					});
+
+				}
+				else
+				{
+					stream = await this._screenSharing.start({
+						...getVideoConstrains(screenSharingResolution, aspectRatio),
+						frameRate : screenSharingFrameRate
+					});
+
+				}
 
 				([ track ] = stream.getVideoTracks());
 
@@ -4320,17 +4366,89 @@ export default class RoomClient
 
 					this.disableScreenSharing();
 				});
-			}
-			else if (this._screenSharingProducer)
-			{
-				({ track } = this._screenSharingProducer);
 
-				await track.applyConstraints(
+				([ track ] = stream.getAudioTracks());
+
+				if (isAudioEnabled && track)
+				{
+
+					this._screenSharingAudioProducer = await this._sendTransport.produce(
+						{
+							track,
+							codecOptions :
+							{
+								opusStereo          : opusStereo,
+								opusFec             : opusFec,
+								opusDtx             : opusDtx,
+								opusMaxPlaybackRate : opusMaxPlaybackRate,
+								opusPtime           : opusPtime
+							},
+							appData :
+							{ source: 'mic' }
+						});
+
+					store.dispatch(producerActions.addProducer(
+						{
+							id            : this._screenSharingAudioProducer.id,
+							source        : 'mic',
+							paused        : this._screenSharingAudioProducer.paused,
+							track         : this._screenSharingAudioProducer.track,
+							rtpParameters : this._screenSharingAudioProducer.rtpParameters,
+							codec         : this._screenSharingAudioProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
+						}));
+
+					this._screenSharingAudioProducer.on('transportclose', () =>
 					{
-						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate : screenSharingFrameRate
-					}
-				);
+						this._screenSharingAudioProducer = null;
+					});
+
+					this._screenSharingAudioProducer.on('trackended', () =>
+					{
+						store.dispatch(requestActions.notify(
+							{
+								type : 'error',
+								text : intl.formatMessage({
+									id             : 'devices.screenSharingDisconnected',
+									defaultMessage : 'Screen sharing disconnected'
+								})
+							}));
+
+						// this.disableScreenSharing();
+					});
+
+					this._screenSharingAudioProducer.volume = 0;
+				}
+
+			}
+			else
+			{
+				if (this._screenSharingProducer)
+				{
+					({ track } = this._screenSharingProducer);
+
+					await track.applyConstraints(
+						{
+							...getVideoConstrains(screenSharingResolution, aspectRatio),
+							frameRate : screenSharingFrameRate
+						}
+					);
+				}
+				if (this._screenSharingAudioProducer)
+				{
+					({ track } = this._screenSharingAudioProducer);
+
+					await track.applyConstraints(
+						{
+							sampleRate       : sampleRate,
+							channelCount     : channelCount,
+							volume           : volume,
+							autoGainControl  : autoGainControl,
+							echoCancellation : echoCancellation,
+							noiseSuppression : noiseSuppression,
+							sampleSize       : sampleSize
+						}
+					);
+				}
 			}
 		}
 		catch (error)
@@ -4364,6 +4482,14 @@ export default class RoomClient
 
 		this._screenSharingProducer.close();
 
+		if (this._screenSharingAudioProducer)
+		{
+			this._screenSharingAudioProducer.close();
+
+			store.dispatch(
+				producerActions.removeProducer(this._screenSharingAudioProducer.id));
+		}
+
 		store.dispatch(
 			producerActions.removeProducer(this._screenSharingProducer.id));
 
@@ -4371,6 +4497,12 @@ export default class RoomClient
 		{
 			await this.sendRequest(
 				'closeProducer', { producerId: this._screenSharingProducer.id });
+
+			if (this._screenSharingAudioProducer)
+			{
+				await this.sendRequest(
+					'closeProducer', { producerId: this._screenSharingAudioProducer.id });
+			}
 		}
 		catch (error)
 		{
@@ -4378,6 +4510,7 @@ export default class RoomClient
 		}
 
 		this._screenSharingProducer = null;
+		this._screenSharingAudioProducer = null;
 
 		this._screenSharing.stop();
 
