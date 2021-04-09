@@ -49,7 +49,7 @@ services:
     - edumeet
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.26.0
     user: root
     container_name: edumeet_prometheus
     restart: unless-stopped
@@ -69,7 +69,7 @@ services:
       edumeet: 172.22.0.1
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:v1.1.2
     container_name: edumeet_node_exporter
     restart: unless-stopped
 
@@ -86,7 +86,7 @@ services:
   #  - 8080
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:7.5.3
     user: root
     container_name: edumeet_grafana
     restart: unless-stopped
