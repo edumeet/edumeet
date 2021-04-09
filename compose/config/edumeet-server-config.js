@@ -503,7 +503,8 @@ module.exports =
 		port       : 8889, // allocated port
 		quiet      : false, // include fewer labels
 		// aggregated metrics options
-		period     : 15 // update period (seconds)
+		period     : 15, // update period (seconds)
+		secret     : null // if set, checks the authorization header: `Bearer <secret>`
 	}
 	
 };

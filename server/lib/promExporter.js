@@ -51,6 +51,12 @@ module.exports = async function(rooms, peers, config)
 		app.get('/metrics', async (req, res) =>
 		{
 			logger.debug(`GET ${req.originalUrl}`);
+
+			if (config.secret && req.headers.authorization !== 'Bearer ' + config.secret)
+			{
+				logger.error(`Invalid authorization header`);
+				return res.status(401).end();
+			}
 		
 			res.set('Content-Type', registerAggregated.contentType);
 			const data = await registerAggregated.metrics();
