@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": "Zajszint",
 	"settings.mirrorOwnVideo": "Saját videókép tükrözése",
 	"settings.language": "Nyelv",
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

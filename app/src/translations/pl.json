@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": "Próg szumu",
 	"settings.mirrorOwnVideo": "Lustrzany widok własnego wideo",
 	"settings.language": "Wybór języka",
+	"settings.hideNoVideoParticipants": "Ukrywanie uczestników bez wideo",
 	"settings.myPhotoButton": "Ustaw moje zdjęcie",
 	"settings.myPhotoLabel": "Maksymalny rozmiar pliku: 5MB, dozwolone: jpg, jpeg, png",
 	"settings.myPhotoSizeError": " plik jest zbyt duży",

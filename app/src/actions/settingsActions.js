@@ -133,6 +133,11 @@ export const toggleMirrorOwnVideo = () =>
 		type : 'TOGGLE_MIRROR_OWN_VIDEO'
 	});
 
+export const toggleHideNoVideoParticipants = () =>
+	({
+		type : 'TOGGLE_HIDE_NO_VIDEO_PARTICIPANTS'
+	});
+
 export const setMediaPerms = (mediaPerms) =>
 	({
 		type    : 'SET_MEDIA_PERMS',

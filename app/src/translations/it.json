@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": "Soglia di rumore",
 	"settings.mirrorOwnVideo": "Specchiare il proprio video",
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

@@ -171,6 +171,7 @@
 	"settings.noiseThreshold": "Noise threshold",
 	"settings.mirrorOwnVideo": "Mirror view of own video",
 	"settings.language": "Select language",
+	"settings.hideNoVideoParticipants": "Hide participants with no video",
 	"settings.myPhotoButton": "Set my photo",
 	"settings.myPhotoLabel": "Max. file size: 5MB, accepted: jpg, jpeg, png",
 	"settings.myPhotoSizeError": " file is too large",

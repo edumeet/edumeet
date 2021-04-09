@@ -169,6 +169,7 @@
 	"settings.noiseThreshold": "Шу деңгейі",
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
