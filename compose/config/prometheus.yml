@@ -26,5 +26,7 @@ scrape_configs:
   # authorization:
   #   type: Bearer
   #   credentials: "prometheus-secret"
+  # tls_config:
+  #   insecure_skip_verify: true
   static_configs:
   - targets: ['edumeet:8889']
