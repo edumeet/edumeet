@@ -21,7 +21,11 @@ Accessing endpoints:
 - Prometheus: http://127.0.0.1:9090/
 - Grafana: http://127.0.0.1:9091/ (user:pass `admin`:`admin`)
 
-Rebuild app:
+Note: to use the https://127.0.0.1:3443/ endpoint, visit first
+https://127.0.0.1:8443/ accepting the self-signed certificate exception valid 
+also for the websocket connection.
+
+Rebuild the web application bundle:
 
 ```sh
 docker-compose exec edumeet sh -c "cd app && yarn && yarn build"
