@@ -30,7 +30,7 @@
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
 		"material-ui-popup-state": "^1.7.0",
-		"mediasoup-client": "^3.6.21",
+		"mediasoup-client": "^3.6.29",
 		"notistack": "^0.9.5",
 		"prop-types": "^15.7.2",
 		"random-string": "^0.2.0",
