@@ -1,8 +1,9 @@
+import Logger from './Logger';
+
 const express = require('express');
 const mediasoup = require('mediasoup');
 const promClient = require('prom-client');
 
-const Logger = require('./Logger');
 const collectDefaultMetrics = require('./metrics/default');
 const RegisterAggregated = require('./metrics/aggregated');
 

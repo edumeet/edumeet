@@ -1,6 +1,7 @@
+import Logger from '../Logger';
+
 const { Resolver } = require('dns').promises;
 const prom = require('prom-client');
-const Logger = require('../Logger');
 
 const logger = new Logger('metrics:default');
 

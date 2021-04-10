@@ -1,17 +1,18 @@
+import Logger from './Logger';
+
 const EventEmitter = require('events').EventEmitter;
 const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
-const Logger = require('./Logger');
 const Lobby = require('./Lobby');
 const { SocketTimeoutError, NotFoundInMediasoupError } = require('./errors');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const userRoles = require('../userRoles');
 
-const {
+import {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
-} = require('../access');
+} from '../access';
 
 const permissions = require('../permissions'), {
 	CHANGE_ROOM_LOCK,

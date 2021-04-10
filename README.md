@@ -104,7 +104,7 @@ This will build the client application and copy everythink to `server/public` fr
 ```bash
 $ cd ..
 $ cd server
-$ npm install
+$ yarn
 ```
 
 ## Run it locally
@@ -113,7 +113,7 @@ $ npm install
 
 ```bash
 $ cd server
-$ npm start
+$ yarn start
 ```
 
 * Note: Do not run the server as root. If you need to use port 80/443 make a iptables-mapping for that or use systemd configuration for that (see further down this doc).
