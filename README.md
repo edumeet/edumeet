@@ -65,7 +65,7 @@ Currently edumeet will run on nodejs v14.x
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 ```bash
-$ sudo apt install git npm build-essential redis libssl-dev openssl pkg-config
+$ sudo apt install git npm yarnpkg build-essential redis libssl-dev openssl pkg-config
 ```
 
 * Clone the project:
@@ -93,8 +93,8 @@ $ cp app/public/config/config.example.js app/public/config/config.js
 
 ```bash
 $ cd app
-$ npm install
-$ npm run build
+$ yarn
+$ yarn build
 ```
 
 This will build the client application and copy everythink to `server/public` from where the server can host client code to browser requests.
@@ -104,7 +104,7 @@ This will build the client application and copy everythink to `server/public` fr
 ```bash
 $ cd ..
 $ cd server
-$ npm install
+$ yarn
 ```
 
 ## Run it locally
@@ -113,7 +113,7 @@ $ npm install
 
 ```bash
 $ cd server
-$ npm start
+$ yarn start
 ```
 
 * Note: Do not run the server as root. If you need to use port 80/443 make a iptables-mapping for that or use systemd configuration for that (see further down this doc).

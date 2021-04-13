@@ -1,8 +1,8 @@
+import Logger from '../Logger';
+
 const promClient = require('prom-client');
 const pidusage = require('pidusage');
 const Stats = require('fast-stats').Stats;
-
-const Logger = require('../Logger');
 
 const logger = new Logger('metrics:aggregated');
 

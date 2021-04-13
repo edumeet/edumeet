@@ -2,6 +2,8 @@
 
 process.title = 'edumeet-server';
 
+import Logger from './lib/Logger';
+
 const bcrypt = require('bcrypt');
 const config = require('./config/config');
 const fs = require('fs');
@@ -13,7 +15,6 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
-const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
 const base64 = require('base-64');

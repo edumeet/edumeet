@@ -4,6 +4,89 @@
 		"es6": true,
 		"node": true
 	},
+	"overrides": [
+		{
+			"files":["**/*.ts"],
+			"plugins": ["prettier", "@typescript-eslint"],
+			"extends": ["airbnb-typescript/base", "prettier"],
+			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"project": "./tsconfig.json"
+			},
+			// "settings": {
+			// 	"import/resolver": {
+			// 		"typescript": {
+			// 			"alwaysTryTypes": true
+			// 		}
+			// 	}
+			// },
+			"rules": {
+				"no-underscore-dangle":"off",
+				"object-curly-spacing": [
+					"warn",
+					"always"
+				],
+				"no-unused-vars": [
+					"warn",
+					{
+						"vars": "all",
+						"args": "none"
+					}
+				],
+				"@typescript-eslint/semi": [
+					"off"
+				],
+				"@typescript-eslint/no-unused-vars": [
+					"warn",
+					{
+						"vars": "all",
+						"args": "none"
+					}
+				],
+				"max-len": [
+					"warn",
+					{
+						"code": 100,
+						"ignoreStrings": true,
+						"ignoreTemplateLiterals": true,
+						"ignoreComments": true
+					}
+				],
+				"prefer-destructuring": [
+					"error",
+					{
+						"VariableDeclarator": {
+							"array": false,
+							"object": true
+						},
+						"AssignmentExpression": {
+							"array": false,
+							"object": false
+						}
+					},
+					{
+						"enforceForRenamedProperties": false
+					}
+				],
+				"no-plusplus": [
+					"error",
+					{
+						"allowForLoopAfterthoughts": true
+					}
+				],
+				"import/no-extraneous-dependencies": [
+					"error",
+					{
+						"devDependencies": [
+							"**/*.test.js",
+							"**/*.test.ts",
+							"src/tests/**/*"
+						]
+					}
+				]
+			}
+		}
+	],
 	"extends":
 	[
 		"eslint:recommended"

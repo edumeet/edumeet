@@ -3,10 +3,10 @@ const os = require('os');
 
 const userRoles = require('../userRoles');
 
-const {
+import {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
-} = require('../access');
+} from '../access';
 
 const {
 	CHANGE_ROOM_LOCK,
