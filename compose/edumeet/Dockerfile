@@ -7,4 +7,4 @@ ENV DEBUG=edumeet*,mediasoup*
 RUN npm install -g nodemon && \
     npm install -g concurrently
 CMD cd app && yarn && yarn build
-CMD concurrently --names "server,app" "cd server && yarn && nodemon server.js" "cd app && yarn && yarn start"
+CMD concurrently --names "server,app" "cd server && yarn && yarn dev" "cd app && yarn && yarn start"

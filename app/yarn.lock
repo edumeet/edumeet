@@ -8602,7 +8602,7 @@ media-typer@0.3.0:
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
 
-mediasoup-client@^3.6.21:
+mediasoup-client@^3.6.29:
   version "3.6.29"
   resolved "https://registry.yarnpkg.com/mediasoup-client/-/mediasoup-client-3.6.29.tgz#27fdb3547144a83a1907026ae6aeb033bcd7bd0d"
   integrity sha512-Q2c1uR6B8UUyqEckot3q0xegwENykP7hRHNVDKw7kCC2XH09/tKKM+5RcqKgB4fHUKlHIwtcWCgN54uSUN7OfA==
