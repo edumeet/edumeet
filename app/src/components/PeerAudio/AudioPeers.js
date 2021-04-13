@@ -21,6 +21,7 @@ const AudioPeers = (props) =>
 							key={micConsumer.id}
 							audioTrack={micConsumer.track}
 							audioOutputDevice={audioOutputDevice}
+							audioGain={micConsumer.audioGain}
 						/>
 					);
 				})

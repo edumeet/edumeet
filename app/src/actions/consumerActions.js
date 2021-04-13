@@ -56,3 +56,9 @@ export const setConsumerScore = (consumerId, score) =>
 		type    : 'SET_CONSUMER_SCORE',
 		payload : { consumerId, score }
 	});
+
+export const setConsumerAudioGain = (consumerId, audioGain) =>
+	({
+		type    : 'SET_CONSUMER_AUDIO_GAIN',
+		payload : { consumerId, audioGain }
+	});
