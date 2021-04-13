@@ -14,7 +14,7 @@
 	"license": "MIT",
 	"main": "lib/index.js",
 	"scripts": {
-		"start": "yarn build && ts-node dist/server.js",
+		"start": "yarn build && node dist/server.js",
 		"build": "rm -rf dist && tsc && ln -s ../certs dist/certs",
 		"dev": "nodemon --exec ts-node --ignore dist/ -e js,ts server.js",
 		"connect": "ts-node connect.js",
