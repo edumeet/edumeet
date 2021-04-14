@@ -1420,7 +1420,6 @@ export default class RoomClient
 			const {
 				sampleRate = 48000,
 				channelCount = 1,
-				volume = 1.0,
 				sampleSize = 16,
 				opusStereo = false,
 				opusDtx = true,
@@ -1450,7 +1449,6 @@ export default class RoomClient
 							deviceId : { ideal: deviceId },
 							sampleRate,
 							channelCount,
-							volume,
 							autoGainControl,
 							echoCancellation,
 							noiseSuppression,
@@ -1532,7 +1530,6 @@ export default class RoomClient
 					{
 						sampleRate,
 						channelCount,
-						volume,
 						autoGainControl,
 						echoCancellation,
 						noiseSuppression,
@@ -1548,7 +1545,6 @@ export default class RoomClient
 						{
 							sampleRate,
 							channelCount,
-							volume,
 							autoGainControl,
 							echoCancellation,
 							noiseSuppression,
@@ -4270,7 +4266,6 @@ export default class RoomClient
 			const {
 				sampleRate = 48000,
 				channelCount = 1,
-				volume = 1.0,
 				sampleSize = 16,
 				opusStereo = false,
 				opusDtx = true,
@@ -4290,7 +4285,6 @@ export default class RoomClient
 						frameRate        : screenSharingFrameRate,
 						sampleRate       : sampleRate,
 						channelCount     : channelCount,
-						volume           : volume,
 						autoGainControl  : autoGainControl,
 						echoCancellation : echoCancellation,
 						noiseSuppression : noiseSuppression,

@@ -160,7 +160,6 @@ var config =
 		sampleRate          : 48000, // default : 48000 and don't go higher
 		// usually mics are mono so this saves bandwidth
 		channelCount        : 1, // default : 1
-		volume              : 1.0, // default : 1.0
 		sampleSize          : 16, // default : 16
 		// usually mics are mono so this saves bandwidth
 		opusStereo          : false, // default : false
