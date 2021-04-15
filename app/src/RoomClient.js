@@ -767,9 +767,6 @@ export default class RoomClient
 		}
 	}
 
-	/* Chat ------------------------------------------------------------- */
-
-	// Text Messaging
 	async sendChatMessage(chatMessage)
 	{
 		logger.debug('sendChatMessage() [chatMessage:"%s"]', chatMessage);
@@ -809,7 +806,137 @@ export default class RoomClient
 		}
 	}
 
-	// Files Sharing
+	saveFile(file)
+	{
+		file.getBlob((err, blob) =>
+		{
+			if (err)
+			{
+				store.dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : intl.formatMessage({
+							id             : 'filesharing.saveFileError',
+							defaultMessage : 'Unable to save file'
+						})
+					}));
+
+				return;
+			}
+
+			saveAs(blob, file.name);
+		});
+	}
+
+	async saveChat()
+	{
+		const html = window.document.getElementsByTagName('html')[0].cloneNode(true);
+
+		const chatEl = html.querySelector('#chatList');
+
+		html.querySelector('body').replaceChildren(chatEl);
+
+		const fileName= 'chat.html';
+
+		// remove unused tags
+		[ 'script', 'link' ].forEach((element) =>
+		{
+			const el = html.getElementsByTagName(element);
+
+			let i = el.length;
+
+			while (i--) el[i].parentNode.removeChild(el[i]);
+		});
+
+		// embed images
+		for await (const img of html.querySelectorAll('img'))
+		{
+			img.src = `${img.src}`;
+
+			await fetch(img.src)
+
+				.then((response) => response.blob())
+				.then((data) =>
+				{
+					const reader = new FileReader();
+
+					reader.readAsDataURL(data);
+
+					reader.onloadend = () => { img.src = reader.result; };
+				});
+		}
+
+		const blob = new Blob([ html.innerHTML ], { type: 'text/html;charset=utf-8' });
+
+		saveAs(blob, fileName);
+	}
+
+	sortChat(order)
+	{
+		store.dispatch(
+			chatActions.sortChat(order)
+		);
+	}
+
+	handleDownload(magnetUri)
+	{
+		store.dispatch(
+			fileActions.setFileActive(magnetUri));
+
+		const existingTorrent = this._webTorrent.get(magnetUri);
+
+		if (existingTorrent)
+		{
+			// Never add duplicate torrents, use the existing one instead.
+			this._handleTorrent(existingTorrent);
+
+			return;
+		}
+
+		this._webTorrent.add(magnetUri, this._handleTorrent);
+	}
+
+	_handleTorrent(torrent)
+	{
+		// Torrent already done, this can happen if the
+		// same file was sent multiple times.
+		if (torrent.progress === 1)
+		{
+			store.dispatch(
+				fileActions.setFileDone(
+					torrent.magnetURI,
+					torrent.files
+				));
+
+			return;
+		}
+
+		let lastMove = 0;
+
+		torrent.on('download', () =>
+		{
+			if (Date.now() - lastMove > 1000)
+			{
+				store.dispatch(
+					fileActions.setFileProgress(
+						torrent.magnetURI,
+						torrent.progress
+					));
+
+				lastMove = Date.now();
+			}
+		});
+
+		torrent.on('done', () =>
+		{
+			store.dispatch(
+				fileActions.setFileDone(
+					torrent.magnetURI,
+					torrent.files
+				));
+		});
+	}
+
 	async shareFiles(files)
 	{
 		store.dispatch(requestActions.notify(
@@ -887,6 +1014,7 @@ export default class RoomClient
 		});
 	}
 
+	// { file, name, picture }
 	async _sendFile(time, magnetUri)
 	{
 		logger.debug('sendFile() [magnetUri:"%o"]', magnetUri);
@@ -915,141 +1043,6 @@ export default class RoomClient
 				}));
 		}
 	}
-
-	downloadFile(magnetUri)
-	{
-		store.dispatch(
-			fileActions.setFileActive(magnetUri));
-
-		const existingTorrent = this._webTorrent.get(magnetUri);
-
-		if (existingTorrent)
-		{
-			// Never add duplicate torrents, use the existing one instead.
-			this._handleTorrent(existingTorrent);
-
-			return;
-		}
-
-		this._webTorrent.add(magnetUri, this._handleTorrent);
-	}
-
-	_handleTorrent(torrent)
-	{
-		// Torrent already done, this can happen if the
-		// same file was sent multiple times.
-		if (torrent.progress === 1)
-		{
-			store.dispatch(
-				fileActions.setFileDone(
-					torrent.magnetURI,
-					torrent.files
-				));
-
-			return;
-		}
-
-		let lastMove = 0;
-
-		torrent.on('download', () =>
-		{
-			if (Date.now() - lastMove > 1000)
-			{
-				store.dispatch(
-					fileActions.setFileProgress(
-						torrent.magnetURI,
-						torrent.progress
-					));
-
-				lastMove = Date.now();
-			}
-		});
-
-		torrent.on('done', () =>
-		{
-			store.dispatch(
-				fileActions.setFileDone(
-					torrent.magnetURI,
-					torrent.files
-				));
-		});
-	}
-
-	saveFile(file)
-	{
-		file.getBlob((err, blob) =>
-		{
-			if (err)
-			{
-				store.dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : intl.formatMessage({
-							id             : 'filesharing.saveFileError',
-							defaultMessage : 'Unable to save file'
-						})
-					}));
-
-				return;
-			}
-
-			saveAs(blob, file.name);
-		});
-	}
-
-	// Messages Sorting
-	sortChat(order)
-	{
-		store.dispatch(
-			chatActions.sortChat(order)
-		);
-	}
-
-	// Chat Saving
-	async saveChat()
-	{
-		const html = window.document.getElementsByTagName('html')[0].cloneNode(true);
-
-		const chatEl = html.querySelector('#chatList');
-
-		html.querySelector('body').replaceChildren(chatEl);
-
-		const fileName= 'chat.html';
-
-		// remove unused tags
-		[ 'script', 'link' ].forEach((element) =>
-		{
-			const el = html.getElementsByTagName(element);
-
-			let i = el.length;
-
-			while (i--) el[i].parentNode.removeChild(el[i]);
-		});
-
-		// embed images
-		for await (const img of html.querySelectorAll('img'))
-		{
-			img.src = `${img.src}`;
-
-			await fetch(img.src)
-
-				.then((response) => response.blob())
-				.then((data) =>
-				{
-					const reader = new FileReader();
-
-					reader.readAsDataURL(data);
-
-					reader.onloadend = () => { img.src = reader.result; };
-				});
-		}
-
-		const blob = new Blob([ html.innerHTML ], { type: 'text/html;charset=utf-8' });
-
-		saveAs(blob, fileName);
-	}
-
-	/* /Chat ------------------------------------------------------------- */
 
 	async muteMic()
 	{

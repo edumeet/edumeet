@@ -237,7 +237,7 @@ const File = (props) =>
 					className={classes.fileInfo}
 					onClick={() =>
 					{
-						roomClient.downloadFile(magnetUri);
+						roomClient.handleDownload(magnetUri);
 					}}
 				>
 					<DescriptionIcon />
