@@ -30,10 +30,6 @@ const migrations =
 	},
 	1 : (state) =>
 	{
-		state.settings.sampleRate = undefined;
-		state.settings.channelCount = undefined;
-		state.settings.volume = undefined;
-		state.settings.sampleSize = undefined;
 		state.me = undefined;
 
 		return { ...state };
@@ -45,11 +41,29 @@ const migrations =
 		return { ...state };
 	}
 	// Next version
-	//	3 : (state) =>
+	//	4 : (state) =>
 	//	{
 	//		return { ...state };
 	//	}
 };
+
+/*
+ * It migrates the status to the config version number.
+ */
+if (window.config.version)
+{
+	migrations[window.config.version] = (state) =>
+	{
+		if (window.config.audioPresets
+			&& window.config.audioPresets[window.config.audioPreset])
+		{
+			Object.assign(state.settings,
+				window.config.audioPresets[window.config.audioPreset]);
+		}
+
+		return { ...state };
+	};
+}
 
 const persistConfig =
 {
@@ -57,8 +71,8 @@ const persistConfig =
 	storage         : storage,
 	// migrate will iterate state over all version-functions
 	// from migrations until version is reached
-	version         : 2,
-	migrate         : createMigrate(migrations, { debug: false }),
+	version         : window.config.version || 2,
+	migrate         : createMigrate(migrations, { debug: true }),
 	stateReconciler : autoMergeLevel2,
 	whitelist       : [ 'settings', 'intl' ]
 };
@@ -75,11 +89,16 @@ const reduxMiddlewares =
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
+	const LOG_IGNORE = [
+		'SET_PEER_VOLUME',
+		'SET_ROOM_ACTIVE_SPEAKER'
+	];
+
 	const reduxLogger = createLogger(
 		{
-			// filter VOLUME level actions from log
-			predicate : (getState, action) => !(action.type === 'SET_PEER_VOLUME'),
+			predicate : (getState, action) => LOG_IGNORE.indexOf(action.type) === -1,
 			duration  : true,
+			collapsed : true,
 			timestamp : false,
 			level     : 'log',
 			logErrors : true
