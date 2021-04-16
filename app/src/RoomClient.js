@@ -3760,7 +3760,7 @@ export default class RoomClient
 			const gainNode = ctx.createGain();
 
 			gainNode.connect(dest);
-			recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
+			recorderStream = mixer(gumStream, gdmStream);
 
 			recorder = new MediaRecorder(recorderStream, { mimeType: recordingMimeType });
 
