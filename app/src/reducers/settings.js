@@ -27,9 +27,13 @@ const initialState =
 	drawerOverlayed         : (typeof window.config.drawerOverlayed === 'undefined') ? true : window.config.drawerOverlayed,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
 	mediaPerms              : { audio: true, video: true },
-	localPicture            : null,
-	...window.config.defaultAudio
+	localPicture            : null
 };
+
+if (window.config.audioPresets && window.config.audioPresets[window.config.audioPreset])
+{
+	Object.assign(initialState,	window.config.audioPresets[window.config.audioPreset]);
+}
 
 const settings = (state = initialState, action) =>
 {
@@ -68,14 +72,14 @@ const settings = (state = initialState, action) =>
 		{
 			const { sampleRate } = action.payload;
 
-			return { ...state, sampleRate };
+			return { ...state, sampleRate, opusMaxPlaybackRate: sampleRate };
 		}
 
 		case 'SET_CHANNEL_COUNT':
 		{
 			const { channelCount } = action.payload;
 
-			return { ...state, channelCount };
+			return { ...state, channelCount, opusStereo: channelCount > 1 };
 		}
 
 		case 'SET_VOLUME':
@@ -90,6 +94,13 @@ const settings = (state = initialState, action) =>
 			const { autoGainControl } = action.payload;
 
 			return { ...state, autoGainControl };
+		}
+
+		case 'SET_AUDIO_PRESET':
+		{
+			const { audioPreset } = action.payload;
+
+			return { ...state, audioPreset };
 		}
 
 		case 'SET_ECHO_CANCELLATION':
@@ -118,6 +129,41 @@ const settings = (state = initialState, action) =>
 			const { noiseThreshold } = action.payload;
 
 			return { ...state, noiseThreshold };
+		}
+
+		case 'SET_OPUS_STEREO':
+		{
+			const { opusStereo } = action.payload;
+
+			return { ...state, opusStereo };
+		}
+
+		case 'SET_OPUS_DTX':
+		{
+			const { opusDtx } = action.payload;
+
+			return { ...state, opusDtx };
+		}
+
+		case 'SET_OPUS_FEC':
+		{
+			const { opusFec } = action.payload;
+
+			return { ...state, opusFec };
+		}
+
+		case 'SET_OPUS_PTIME':
+		{
+			const { opusPtime } = action.payload;
+
+			return { ...state, opusPtime };
+		}
+
+		case 'SET_OPUS_MAX_PLAYBACK_RATE':
+		{
+			const { opusMaxPlaybackRate } = action.payload;
+
+			return { ...state, opusMaxPlaybackRate };
 		}
 
 		case 'SET_DEFAULT_AUDIO':
