@@ -1275,7 +1275,7 @@ export default class RoomClient
 		this._hark = hark(this._harkStream,
 			{
 				play      : false,
-				interval  : 10,
+				interval  : 100,
 				threshold : store.getState().settings.noiseThreshold,
 				history   : 100
 			});
@@ -1284,6 +1284,8 @@ export default class RoomClient
 
 		this._hark.on('volume_change', (volume) =>
 		{
+			volume = Math.round(volume);
+
 			// Update only if there is a bigger diff 
 			if (this._micProducer && Math.abs(volume - this._hark.lastVolume) > 0.5)
 			{
@@ -1293,13 +1295,13 @@ export default class RoomClient
 				// at low levels
 				if (volume < this._hark.lastVolume)
 				{
-					volume =
+					volume = Math.round(
 						this._hark.lastVolume -
 						Math.pow(
 							(volume - this._hark.lastVolume) /
 							(100 + this._hark.lastVolume)
 							, 2
-						) * 10;
+						) * 10);
 				}
 
 				this._hark.lastVolume = volume;
@@ -1407,26 +1409,16 @@ export default class RoomClient
 			const {
 				autoGainControl,
 				echoCancellation,
-				noiseSuppression
+				noiseSuppression,
+				sampleRate,
+				channelCount,
+				sampleSize,
+				opusStereo,
+				opusDtx,
+				opusFec,
+				opusPtime,
+				opusMaxPlaybackRate
 			} = store.getState().settings;
-
-			if (!window.config.centralAudioOptions)
-			{
-				throw new Error(
-					'Missing centralAudioOptions from app config! (See it in example config.)'
-				);
-			}
-
-			const {
-				sampleRate = 48000,
-				channelCount = 1,
-				sampleSize = 16,
-				opusStereo = false,
-				opusDtx = true,
-				opusFec = true,
-				opusPtime = 20,
-				opusMaxPlaybackRate = 48000
-			} = window.config.centralAudioOptions;
 
 			if (
 				(restart && this._micProducer) ||
@@ -3286,7 +3278,7 @@ export default class RoomClient
 							if (!stream.getAudioTracks()[0])
 								throw new Error('request.newConsumer | given stream has no audio track');
 
-							consumer.hark = hark(stream, { play: false });
+							consumer.hark = hark(stream, { play: false, interval: 100 });
 
 							consumer.hark.on('volume_change', (volume) =>
 							{
@@ -4253,26 +4245,16 @@ export default class RoomClient
 				echoCancellation,
 				noiseSuppression,
 				aspectRatio,
-				screenSharingFrameRate
+				screenSharingFrameRate,
+				sampleRate,
+				channelCount,
+				sampleSize,
+				opusStereo,
+				opusDtx,
+				opusFec,
+				opusPtime,
+				opusMaxPlaybackRate
 			} = store.getState().settings;
-
-			if (!window.config.centralAudioOptions)
-			{
-				throw new Error(
-					'Missing centralAudioOptions from app config! (See it in example config.)'
-				);
-			}
-
-			const {
-				sampleRate = 48000,
-				channelCount = 1,
-				sampleSize = 16,
-				opusStereo = false,
-				opusDtx = true,
-				opusFec = true,
-				opusPtime = 20,
-				opusMaxPlaybackRate = 48000
-			} = window.config.centralAudioOptions;
 
 			if (start)
 			{
@@ -4282,13 +4264,13 @@ export default class RoomClient
 				{
 					stream = await this._screenSharing.start({
 						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate        : screenSharingFrameRate,
-						sampleRate       : sampleRate,
-						channelCount     : channelCount,
-						autoGainControl  : autoGainControl,
-						echoCancellation : echoCancellation,
-						noiseSuppression : noiseSuppression,
-						sampleSize       : sampleSize
+						frameRate : screenSharingFrameRate,
+						sampleRate,
+						channelCount,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
 					});
 
 				}
@@ -4475,13 +4457,12 @@ export default class RoomClient
 
 					await track.applyConstraints(
 						{
-							sampleRate       : sampleRate,
-							channelCount     : channelCount,
-							volume           : volume,
-							autoGainControl  : autoGainControl,
-							echoCancellation : echoCancellation,
-							noiseSuppression : noiseSuppression,
-							sampleSize       : sampleSize
+							sampleRate,
+							channelCount,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
 						}
 					);
 				}
