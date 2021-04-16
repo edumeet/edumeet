@@ -502,7 +502,7 @@ const Me = (props) =>
 																color={'default'}
 															/>
 															<SettingsVoiceIcon
-																clip-path='url(#cut-off-indicator)'
+																clipPath='url(#cut-off-indicator)'
 																style={
 																	(
 																		{ 'position': 'absolute' },
@@ -565,7 +565,7 @@ const Me = (props) =>
 																color={'default'}
 															/>
 															<SettingsVoiceIcon
-																clip-path='url(#cut-off-indicator)'
+																clipPath='url(#cut-off-indicator)'
 																style={
 																	(
 																		{ 'position': 'absolute' },
