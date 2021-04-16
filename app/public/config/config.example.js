@@ -1,6 +1,11 @@
 // eslint-disable-next-line
 var config =
 {
+	// The config revision number. 
+	// Increase this value to overwrite the clients settings stored in the 
+	// localStorage state.
+	version: 3,
+
 	loginEnabled    : false,
 	developmentPort : 3443,
 	productionPort  : 443,
@@ -142,31 +147,52 @@ var config =
 	{
 		tcp : true
 	},
-	// defaults for audio setting on new clients / can be customized and overruled from client side
-	defaultAudio :
+	// Presets configuration.
+	audioPreset : 'conference',
+	audioPresets :
 	{
-		autoGainControl      : true, // default : true
-		echoCancellation     : true, // default : true 
-		noiseSuppression     : true, // default : true 
-		// Automatically unmute speaking above noisThereshold
-		voiceActivatedUnmute : false, // default : false 
-		// This is only for voiceActivatedUnmute and audio-indicator
-		noiseThreshold       : -60 // default -60
-	},
-	// Audio options for now only centrally from config file: 
-	centralAudioOptions :
-	{
-		// will not eat that much bandwith thanks to opus
-		sampleRate          : 48000, // default : 48000 and don't go higher
-		// usually mics are mono so this saves bandwidth
-		channelCount        : 1, // default : 1
-		sampleSize          : 16, // default : 16
-		// usually mics are mono so this saves bandwidth
-		opusStereo          : false, // default : false
-		opusDtx             : true, // default : true / will save bandwidth 
-		opusFec             : true, // default : true / forward error correction
-		opusPtime           : '20', // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
-		opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
+		conference :
+		{
+			autoGainControl      : true, // default : true
+			echoCancellation     : true, // default : true 
+			noiseSuppression     : true, // default : true 
+			// Automatically unmute speaking above noisThereshold
+			voiceActivatedUnmute : false, // default : false 
+			// This is only for voiceActivatedUnmute and audio-indicator
+			noiseThreshold       : -60, // default -60
+			// will not eat that much bandwith thanks to opus
+			sampleRate          : 48000, // default : 48000 and don't go higher
+			// usually mics are mono so this saves bandwidth
+			channelCount        : 1, // default : 1
+			sampleSize          : 16, // default : 16
+			// usually mics are mono so this saves bandwidth
+			opusStereo          : false, // default : false
+			opusDtx             : true, // default : true / will save bandwidth 
+			opusFec             : true, // default : true / forward error correction
+			opusPtime           : 20, // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
+			opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
+		},
+		hifi :
+		{
+			autoGainControl      : false, // default : true
+			echoCancellation     : false, // default : true 
+			noiseSuppression     : false, // default : true 
+			// Automatically unmute speaking above noisThereshold
+			voiceActivatedUnmute : false, // default : false 
+			// This is only for voiceActivatedUnmute and audio-indicator
+			noiseThreshold       : -60, // default -60
+			// will not eat that much bandwith thanks to opus
+			sampleRate          : 48000, // default : 48000 and don't go higher
+			// usually mics are mono so this saves bandwidth
+			channelCount        : 2, // default : 1
+			sampleSize          : 16, // default : 16
+			// usually mics are mono so this saves bandwidth
+			opusStereo          : true, // default : false
+			opusDtx             : false, // default : true / will save bandwidth 
+			opusFec             : true, // default : true / forward error correction
+			opusPtime           : 20, // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
+			opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
+		}
 	},
 
 	/**
