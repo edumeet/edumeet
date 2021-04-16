@@ -246,6 +246,7 @@ const TopBar = (props) =>
 		permanentTopBar,
 		drawerOverlayed,
 		toolAreaOpen,
+		isSafari,
 		isMobile,
 		loggedIn,
 		loginEnabled,
@@ -656,13 +657,13 @@ const TopBar = (props) =>
 				onExited={handleExited}
 				getContentAnchorEl={null}
 			>
-				{ currentMenu === 'moreActions' &&
+				{ currentMenu === 'moreActions' && !isSafari &&
 					<Paper>
 						{
 							(
-								localRecordingState === RECORDING_START ||
+								(localRecordingState === RECORDING_START ||
 								localRecordingState === RECORDING_RESUME ||
-								localRecordingState === RECORDING_PAUSE
+								localRecordingState === RECORDING_PAUSE)&& !isSafari
 							)
 							&&
 							<MenuItem
@@ -713,9 +714,9 @@ const TopBar = (props) =>
 							onClick={() =>
 							{
 								handleMenuClose();
-								if (localRecordingState === RECORDING_START ||
+								if ((localRecordingState === RECORDING_START ||
 									localRecordingState === RECORDING_PAUSE ||
-									localRecordingState === RECORDING_RESUME)
+									localRecordingState === RECORDING_RESUME)&& !isSafari)
 								{
 									roomClient.stopLocalRecording();
 								}
@@ -730,9 +731,9 @@ const TopBar = (props) =>
 								color='primary'
 							>
 								{
-									(localRecordingState === RECORDING_START ||
+									((localRecordingState === RECORDING_START ||
 									localRecordingState === RECORDING_PAUSE ||
-									localRecordingState === RECORDING_RESUME) ?
+									localRecordingState === RECORDING_RESUME))&& !isSafari ?
 										<StopIcon />
 										:
 										<FiberManualRecordIcon />
@@ -740,9 +741,9 @@ const TopBar = (props) =>
 							</Badge>
 
 							{
-								(localRecordingState === RECORDING_START ||
+								((localRecordingState === RECORDING_START ||
 								localRecordingState === RECORDING_PAUSE ||
-								localRecordingState === RECORDING_RESUME) ?
+								localRecordingState === RECORDING_RESUME))&& !isSafari ?
 									<p className={classes.moreAction}>
 										<FormattedMessage
 											id='tooltip.stopLocalRecording'
@@ -917,9 +918,9 @@ const TopBar = (props) =>
 				}
 				{
 					(
-						localRecordingState === RECORDING_PAUSE ||
+						(localRecordingState === RECORDING_PAUSE ||
 						localRecordingState === RECORDING_RESUME ||
-						localRecordingState === RECORDING_START
+						localRecordingState === RECORDING_START)&& !isSafari
 					)
 					&&
 					<MenuItem
@@ -972,9 +973,9 @@ const TopBar = (props) =>
 					onClick={() =>
 					{
 						handleMenuClose();
-						if (localRecordingState === RECORDING_START ||
+						if ((localRecordingState === RECORDING_START ||
 							localRecordingState === RECORDING_PAUSE ||
-							localRecordingState === RECORDING_RESUME)
+							localRecordingState === RECORDING_RESUME)&& !isSafari)
 						{
 							roomClient.stopLocalRecording();
 						}
@@ -989,18 +990,18 @@ const TopBar = (props) =>
 						color='primary'
 					>
 						{
-							(localRecordingState === RECORDING_START ||
+							((localRecordingState === RECORDING_START ||
 							localRecordingState === RECORDING_PAUSE ||
-							localRecordingState === RECORDING_RESUME) ?
+							localRecordingState === RECORDING_RESUME)) && !isSafari ?
 								<StopIcon />
 								:
 								<FiberManualRecordIcon />
 						}
 					</Badge>
 					{
-						(localRecordingState === RECORDING_START ||
+						((localRecordingState === RECORDING_START ||
 						localRecordingState === RECORDING_PAUSE ||
-						localRecordingState === RECORDING_RESUME) ?
+						localRecordingState === RECORDING_RESUME)&& !isSafari) ?
 							<p className={classes.moreAction}>
 								<FormattedMessage
 									id='tooltip.stopLocalRecording'
@@ -1230,6 +1231,7 @@ TopBar.propTypes =
 {
 	roomClient           : PropTypes.object.isRequired,
 	room                 : appPropTypes.Room.isRequired,
+	isSafari         			 : PropTypes.string,
 	isMobile             : PropTypes.bool.isRequired,
 	peersLength          : PropTypes.number,
 	lobbyPeers           : PropTypes.array,
@@ -1279,6 +1281,7 @@ const makeMapStateToProps = () =>
 	const mapStateToProps = (state) =>
 		({
 			room                : state.room,
+			isSafari            : state.me.browser.name === 'safari',
 			isMobile            : state.me.browser.platform === 'mobile',
 			peersLength         : peersLengthSelector(state),
 			lobbyPeers          : lobbyPeersKeySelector(state),
