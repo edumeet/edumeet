@@ -3765,7 +3765,7 @@ export default class RoomClient
 					this.stopLocalRecording();
 				});
 			});
-			
+
 			recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
 
 			recorder = new MediaRecorder(recorderStream, { mimeType: recordingMimeType });
