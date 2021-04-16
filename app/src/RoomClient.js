@@ -41,6 +41,12 @@ let recorder;
 
 let recordingMimeType;
 
+let ctx;
+
+let dest;
+
+let micMS;
+
 // by default save temp data to Indexed DB
 let logToIDB = true;
 
@@ -1440,6 +1446,21 @@ export default class RoomClient
 						}
 					);
 				}
+			}
+
+			console.log('ctx.');
+
+			if (recorder != null)
+			{
+				console.log('ctx.createMediaStreamSource(this._micProducer.track).connect(dest)');
+				console.log(this._micProducer);
+				if (micMS.getAudioTracks().length > 0)
+				{
+					console.log('ctx...this._micProducer)');
+					micMS.addTrack(this._micProducer.track);
+					console.log(micMS);
+				}
+				ctx.createMediaStreamSource(micMS).connect(dest);
 			}
 
 			await this._updateAudioDevices();
@@ -3699,23 +3720,24 @@ export default class RoomClient
 			throw new Error('Unsupported media recording format %O', recordingMimeType);
 		}
 
-		function mixer(stream1, stream2)
+		function mixer(astream, vstream)
 		{
-			const ctx = new AudioContext();
-			const dest = ctx.createMediaStreamDestination();
-			const micMS = new MediaStream();
+			console.log('ctx..');
+			ctx = new AudioContext();
+			dest = ctx.createMediaStreamDestination();
+			micMS = new MediaStream();
 
-			micMS.addTrack(stream1);
+			micMS.addTrack(astream);
 
 			if (micMS.getAudioTracks().length > 0)
 				ctx.createMediaStreamSource(micMS).connect(dest);
 
-			if (stream2.getAudioTracks().length > 0)
-				ctx.createMediaStreamSource(stream2).connect(dest);
+			if (vstream.getAudioTracks().length > 0)
+				ctx.createMediaStreamSource(vstream).connect(dest);
 
 			let tracks = dest.stream.getTracks();
 
-			tracks = tracks.concat(stream2.getVideoTracks());
+			tracks = tracks.concat(vstream.getVideoTracks());
 
 			return new MediaStream(tracks);
 
@@ -3743,8 +3765,16 @@ export default class RoomClient
 					this.stopLocalRecording();
 				});
 			});
+			
 			recorderStream = gumStream ? mixer(gumStream, gdmStream): gdmStream;
+
 			recorder = new MediaRecorder(recorderStream, { mimeType: recordingMimeType });
+
+			/* 
+			console.log('recorder');
+			console.log(recorder);
+			recorderStream = new MediaStream(gumStream);
+			console.log(recorder); */
 
 			if (typeof indexedDB === 'undefined' || typeof indexedDB.open === 'undefined')
 			{
