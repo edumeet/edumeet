@@ -4104,6 +4104,13 @@ export default class RoomClient
 		// destroy
 		db.close();
 		deleteDB(dbName);
+		// delete all previouse recordings that might be left in indexedDB
+		// https://bugzilla.mozilla.org/show_bug.cgi?id=934640
+		if (indexedDB.databases instanceof Function)
+		{
+			indexedDB.databases().then((r) => r.forEach((dbdata) => deleteDB(dbdata.name)));
+		}
+
 		recordingMimeType=null;
 		recordingData=[];
 		recorder = null;
