@@ -33,7 +33,7 @@ const styles = (theme) =>
 		{
 			position       : 'absolute',
 			zIndex         : 1520,
-			right          : 0,
+			left           : 0,
 			top            : 0,
 			display        : 'flex',
 			flexDirection  : 'row',
