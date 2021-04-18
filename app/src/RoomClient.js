@@ -198,8 +198,12 @@ export default class RoomClient
 		this._basePath = basePath;
 
 		// Use displayName
+		this._displayName=null;
 		if (displayName)
+		{
 			store.dispatch(settingsActions.setDisplayName(displayName));
+			this._displayName=displayName;
+		}
 
 		this._tracker = 'wss://tracker.lab.vvc.niif.hu:443';
 
@@ -609,6 +613,8 @@ export default class RoomClient
 
 		store.dispatch(settingsActions.setDisplayName(displayName));
 
+		this._displayName=displayName;
+
 		if (!store.getState().settings.localPicture)
 		{
 			store.dispatch(meActions.setPicture(picture));
@@ -800,6 +806,9 @@ export default class RoomClient
 						displayName
 					})
 				}));
+
+			this._displayName=displayName;
+
 		}
 		catch (error)
 		{
@@ -2702,6 +2711,9 @@ export default class RoomClient
 								})
 							}));
 
+						if (peerId === this._peerId)
+							this._displayName=displayName;
+
 						break;
 					}
 
@@ -2802,6 +2814,9 @@ export default class RoomClient
 									displayName
 								})
 							}));
+
+						if (peerId === this._peerId)
+							this._displayName=displayName;
 
 						break;
 					}
@@ -3285,6 +3300,9 @@ export default class RoomClient
 		logger.debug('_joinRoom()');
 
 		const { displayName } = store.getState().settings;
+
+		this._displayName=displayName;
+
 		const { picture } = store.getState().me;
 
 		try
