@@ -1458,8 +1458,9 @@ export default class RoomClient
 			if (recorder != null)
 			{
 				// gainNode.disconnect(); if i want to delete previos streams
-				ctx.createMediaStreamSource(new MediaStream([ this._micProducer.track ])).connect(dest);
-
+				ctx.createMediaStreamSource(
+					new MediaStream([ this._micProducer.track ])
+				).connect(dest);
 			}
 
 			await this._updateAudioDevices();
