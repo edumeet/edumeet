@@ -82,9 +82,6 @@ const LeaveDialog = ({
 				/>
 			</DialogContent>
 			<DialogActions>
-				{ window.config.logo &&
-					<img alt='Logo' className={classes.logo} src={window.config.logo} />
-				}
 				<Button onClick={handleStay} color='primary'>
 					<FormattedMessage
 						id='label.no'
