@@ -10,9 +10,12 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
+// import DialogContentText from '@material-ui/core/DialogContentText';
 import Button from '@material-ui/core/Button';
 // import Divider from '@material-ui/core/Divider';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
+import CancelIcon from '@material-ui/icons/Cancel';
 
 const styles = (theme) =>
 	({
@@ -82,13 +85,21 @@ const LeaveDialog = ({
 				/>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={handleStay} color='primary'>
+				<Button
+					onClick={handleStay}
+					color='primary'
+					startIcon={<CancelIcon />}
+				>
 					<FormattedMessage
 						id='label.no'
 						defaultMessage='No'
 					/>
 				</Button>
-				<Button onClick={handleLeave} color='primary'>
+				<Button
+					onClick={handleLeave}
+					color='primary'
+					startIcon={<MeetingRoomIcon />}
+				>
 					<FormattedMessage
 						id='label.yes'
 						defaultMessage='Yes'
