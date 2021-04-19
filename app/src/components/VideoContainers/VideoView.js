@@ -10,6 +10,7 @@ import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';
 import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
+import AudioMotionAnalyzer from 'audiomotion-analyzer';
 
 const logger = new Logger('VideoView');
 
@@ -161,6 +162,10 @@ const styles = (theme) =>
 			{
 				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
+		},
+		audioAnalyzer :
+		{
+			width : '30%'
 		}
 	});
 
@@ -180,8 +185,15 @@ class VideoView extends React.PureComponent
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
 
+		// Latest received audio track.
+		// @type {MediaStreamTrack}
+		this._audioTrack = null;
+
 		// Periodic timer for showing video resolution.
 		this._videoResolutionTimer = null;
+
+		// Audio Analyzer
+		this.audioAnalyzerContainer = React.createRef();
 	}
 
 	render()
@@ -192,6 +204,7 @@ class VideoView extends React.PureComponent
 			isScreen,
 			isExtraVideo,
 			showQuality,
+			showAudioAnalyzer,
 			displayName,
 			showPeerInfo,
 			videoContain,
@@ -370,6 +383,13 @@ class VideoView extends React.PureComponent
 								}
 							</div>
 						}
+
+						{ showAudioAnalyzer &&
+							<div className={classnames(classes.audioAnalyzer)}>
+								<div ref={this.audioAnalyzerContainer} />
+							</div>
+						}
+
 					</div>
 
 					{ showPeerInfo &&
@@ -424,9 +444,20 @@ class VideoView extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { videoTrack } = this.props;
+		const { videoTrack, audioTrack, showAudioAnalyzer } = this.props;
 
 		this._setTracks(videoTrack);
+
+		// Audio analyzer
+		if (showAudioAnalyzer)
+		{
+			this._setAudioMonitorTrack(audioTrack);
+		}
+		else
+		{
+			this.audioMotion = null;
+		}
+
 	}
 
 	componentWillUnmount()
@@ -447,9 +478,18 @@ class VideoView extends React.PureComponent
 	{
 		if (prevProps !== this.props)
 		{
-			const { videoTrack } = this.props;
+			const { videoTrack, audioTrack, showAudioAnalyzer } = this.props;
 
 			this._setTracks(videoTrack);
+
+			if (showAudioAnalyzer)
+			{
+				this._setAudioMonitorTrack(audioTrack);
+			}
+			else
+			{
+				this.audioMotion = null;
+			}
 		}
 	}
 
@@ -486,6 +526,38 @@ class VideoView extends React.PureComponent
 		}
 	}
 
+	_setAudioMonitorTrack(track)
+	{
+		if (!this.audioMotion)
+		{
+			logger.debug('_setAudioMonitorTrack creating audioMotion with dom:', this.audioAnalyzerContainer.current);
+
+			this.audioMotion = new AudioMotionAnalyzer(this.audioAnalyzerContainer.current,
+				{
+					width           : 640,
+					height          : 360,
+					connectSpeakers : false,
+					mode            : 1 // https://audiomotion.dev/#/?id=mode-number
+				});
+		}
+
+		if (track)
+		{
+			logger.debug('_setAudioMonitorTrack connecting track to audioMotion', track);
+
+			const mediaStream = new MediaStream([ track ]);
+			const sourceNode = new MediaStreamAudioSourceNode(this.audioMotion.audioCtx, {
+				mediaStream
+			});
+
+			this.audioMotion.connectInput(sourceNode);
+		}
+		else
+		{
+			this.audioMotion.disconnectInput();
+		}
+	}
+
 	_showVideoResolution()
 	{
 		this._videoResolutionTimer = setInterval(() =>
@@ -512,6 +584,20 @@ class VideoView extends React.PureComponent
 	{
 		this.setState({ videoWidth: null, videoHeight: null });
 	}
+
+	handleMenuClick(event)
+	{
+		logger.debug('handleMenuClick', event.currentTarget);
+
+		this.menuAnchorElement = event.currentTarget;
+	}
+
+	handleMenuClose(event)
+	{
+		logger.debug('handleMenuClose', event.currentTarget);
+
+		this.menuAnchorElement = null;
+	}
 }
 
 VideoView.propTypes =
@@ -521,12 +607,14 @@ VideoView.propTypes =
 	isScreen                       : PropTypes.bool,
 	isExtraVideo   	               : PropTypes.bool,
 	showQuality                    : PropTypes.bool,
+	showAudioAnalyzer              : PropTypes.bool,
 	displayName                    : PropTypes.string,
 	showPeerInfo                   : PropTypes.bool,
 	videoContain                   : PropTypes.bool,
 	advancedMode                   : PropTypes.bool,
 	videoTrack                     : PropTypes.any,
 	videoVisible                   : PropTypes.bool.isRequired,
+	audioTrack                     : PropTypes.any,
 	consumerSpatialLayers          : PropTypes.number,
 	consumerTemporalLayers         : PropTypes.number,
 	consumerCurrentSpatialLayer    : PropTypes.number,

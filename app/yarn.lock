@@ -2797,6 +2797,11 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
+audiomotion-analyzer@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/audiomotion-analyzer/-/audiomotion-analyzer-3.2.1.tgz#49993153278c0e0859a833fef58dbc6e41e3bf55"
+  integrity sha512-ZvNcrG/bIcybLoCMpyHsxGJ7jBKSMkUykiDZSEzuWiKfaMV7xm3bqfndorFqFkOmpUXhFOC2/gqZj3alV/xZYg==
+
 autoprefixer@^9.6.1:
   version "9.8.6"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.8.6.tgz#3b73594ca1bf9266320c5acf1588d74dea74210f"
