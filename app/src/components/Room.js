@@ -30,6 +30,7 @@ import ButtonControlBar from './Controls/ButtonControlBar';
 import Help from './Controls/Help';
 import About from './Controls/About';
 import RolesManager from './Controls/RolesManager';
+import LeaveDialog from './LeaveDialog';
 
 const TIMEOUT = window.config.hideTimeout || 5000;
 
@@ -290,6 +291,10 @@ class Room extends React.PureComponent
 				{ room.rolesManagerOpen &&
 					<RolesManager />
 				}
+				{ room.leaveOpen &&
+					<LeaveDialog/>
+				}
+
 			</div>
 		);
 	}

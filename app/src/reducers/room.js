@@ -27,6 +27,7 @@ const initialState =
 	rolesManagerOpen              : false,
 	helpOpen                      : false,
 	aboutOpen                     : false,
+	leaveOpen                     : false,
 	currentSettingsTab            : 'media', // media, appearance, advanced
 	lockDialogOpen                : false,
 	joined                        : false,
@@ -152,6 +153,13 @@ const room = (state = initialState, action) =>
 			const { aboutOpen } = action.payload;
 
 			return { ...state, aboutOpen };
+		}
+
+		case 'SET_LEAVE_OPEN':
+		{
+			const { leaveOpen } = action.payload;
+
+			return { ...state, leaveOpen };
 		}
 
 		case 'SET_SETTINGS_TAB':

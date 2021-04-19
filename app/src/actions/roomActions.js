@@ -94,6 +94,12 @@ export const setAboutOpen = (aboutOpen) =>
 		payload : { aboutOpen }
 	});
 
+export const setLeaveOpen = (leaveOpen) =>
+	({
+		type    : 'SET_LEAVE_OPEN',
+		payload : { leaveOpen }
+	});
+
 export const setSettingsTab = (tab) =>
 	({
 		type    : 'SET_SETTINGS_TAB',
