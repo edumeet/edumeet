@@ -457,7 +457,6 @@ class VideoView extends React.PureComponent
 		{
 			this.audioMotion = null;
 		}
-
 	}
 
 	componentWillUnmount()
@@ -554,6 +553,7 @@ class VideoView extends React.PureComponent
 		}
 		else
 		{
+			// disconnects all the tracks
 			this.audioMotion.disconnectInput();
 		}
 	}
