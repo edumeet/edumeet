@@ -4,7 +4,7 @@ var config =
 	// The config revision number. 
 	// Increase this value to overwrite the clients settings stored in the 
 	// localStorage state.
-	version: 3,
+	version: 4,
 
 	loginEnabled    : false,
 	developmentPort : 3443,
@@ -169,7 +169,7 @@ var config =
 			opusStereo          : false, // default : false
 			opusDtx             : true, // default : true / will save bandwidth 
 			opusFec             : true, // default : true / forward error correction
-			opusPtime           : 20, // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
+			opusPtime           : 20, // default : 20 / minimum packet time (10, 20, 40, 60, 120)
 			opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
 		},
 		hifi :
@@ -190,7 +190,7 @@ var config =
 			opusStereo          : true, // default : false
 			opusDtx             : false, // default : true / will save bandwidth 
 			opusFec             : true, // default : true / forward error correction
-			opusPtime           : 20, // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
+			opusPtime           : 40, // default : 20 / minimum packet time (10, 20, 40, 60, 120)
 			opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
 		}
 	},

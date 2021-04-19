@@ -112,6 +112,7 @@ const MediaSettings = ({
 	setSampleSize,
 	setOpusDtx,
 	setOpusFec,
+	setOpusPtime,
 	roomClient,
 	me,
 	volume,
@@ -504,7 +505,7 @@ const MediaSettings = ({
 									settingsActions.setSampleSize(sampleSize);
 									setOpusDtx(opusDtx);
 									setOpusFec(opusFec);
-									settingsActions.setOpusPtime(opusPtime);
+									setOpusPtime(opusPtime);
 									settingsActions.setOpusMaxPlaybackRate(opusMaxPlaybackRate);
 								}
 
@@ -645,7 +646,9 @@ const MediaSettings = ({
 									marks={[ { value: volume, label: `${volume.toFixed(0)} dB` } ]}
 								/>
 							</ListItem>
+
 							{/* advanced options */}
+
 							<ListItem className={classes.nested}>
 								<FormControl className={classes.formControl}>
 									<Select
@@ -679,6 +682,7 @@ const MediaSettings = ({
 									</FormHelperText>
 								</FormControl>
 							</ListItem>
+
 							<ListItem className={classes.nested}>
 								<FormControl className={classes.formControl}>
 									<Select
@@ -712,6 +716,7 @@ const MediaSettings = ({
 									</FormHelperText>
 								</FormControl>
 							</ListItem>
+
 							<ListItem className={classes.nested}>
 								<FormControl className={classes.formControl}>
 									<Select
@@ -745,6 +750,7 @@ const MediaSettings = ({
 									</FormHelperText>
 								</FormControl>
 							</ListItem>
+
 							<ListItem className={classes.nested}>
 								<FormControlLabel
 									className={classnames(classes.setting, classes.switchLabel)}
@@ -764,6 +770,7 @@ const MediaSettings = ({
 									})}
 								/>
 							</ListItem>
+
 							<ListItem className={classes.nested}>
 								<FormControlLabel
 									className={classnames(classes.setting, classes.switchLabel)}
@@ -782,6 +789,40 @@ const MediaSettings = ({
 										defaultMessage : 'Enable Opus Forward Error Correction (FEC)'
 									})}
 								/>
+							</ListItem>
+
+							<ListItem className={classes.nested}>
+								<FormControl className={classes.formControl}>
+									<Select
+										value={settings.opusPtime || ''}
+										onChange={(event) =>
+										{
+											if (event.target.value)
+											{
+												setOpusPtime(event.target.value);
+												roomClient.updateMic();
+											}
+										}}
+										name='Opus frame size'
+										autoWidth
+										className={classes.selectEmpty}
+									>
+										{ [ 10, 20, 30, 40, 50, 60 ].map((opusPtime) =>
+										{
+											return (
+												<MenuItem key={opusPtime} value={opusPtime}>
+													{opusPtime} ms
+												</MenuItem>
+											);
+										})}
+									</Select>
+									<FormHelperText>
+										<FormattedMessage
+											id='settings.opusPtime'
+											defaultMessage='Select the Opus frame size'
+										/>
+									</FormHelperText>
+								</FormControl>
 							</ListItem>
 
 						</List>
@@ -806,6 +847,7 @@ MediaSettings.propTypes =
 	setSampleSize           : PropTypes.func.isRequired,
 	setOpusDtx              : PropTypes.func.isRequired,
 	setOpusFec              : PropTypes.func.isRequired,
+	setOpusPtime            : PropTypes.func.isRequired,
 	me                      : appPropTypes.Me.isRequired,
 	volume                  : PropTypes.number,
 	settings                : PropTypes.object.isRequired,
@@ -831,7 +873,8 @@ const mapDispatchToProps = {
 	setChannelCount         : settingsActions.setChannelCount,
 	setSampleSize           : settingsActions.setSampleSize,
 	setOpusDtx              : settingsActions.setOpusDtx,
-	setOpusFec              : settingsActions.setOpusFec
+	setOpusFec              : settingsActions.setOpusFec,
+	setOpusPtime            : settingsActions.setOpusPtime
 };
 
 export default withRoomContext(connect(
