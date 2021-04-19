@@ -91,7 +91,8 @@ if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production'
 {
 	const LOG_IGNORE = [
 		'SET_PEER_VOLUME',
-		'SET_ROOM_ACTIVE_SPEAKER'
+		'SET_ROOM_ACTIVE_SPEAKER',
+		'ADD_TRANSPORT_STATS'
 	];
 
 	const reduxLogger = createLogger(
