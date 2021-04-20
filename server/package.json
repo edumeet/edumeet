@@ -15,7 +15,7 @@
 	"main": "lib/index.js",
 	"scripts": {
 		"start": "yarn build && node dist/server.js",
-		"build": "rm -rf dist && tsc && ln -s ../certs dist/certs && ln -s ../public dist/public",
+		"build": "rm -rf dist && tsc && ln -s ../certs dist/certs && ln -s ../public dist/public && chmod 755 dist/server.js",
 		"dev": "nodemon --exec ts-node --ignore dist/ -e js,ts server.js",
 		"connect": "ts-node connect.js",
 		"lint": "eslint -c .eslintrc.json --ext .js,.ts *.js *.ts lib/",
