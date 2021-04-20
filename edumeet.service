@@ -3,7 +3,7 @@ Description=edumeet is a audio / video meeting service running in the browser an
 After=network.target
 
 [Service]
-ExecStart=/usr/local/src/edumeet/server/server.js
+ExecStart=/usr/local/src/edumeet/server/dist/server.js
 Restart=always
 User=nobody
 Group=nogroup
