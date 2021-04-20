@@ -49,6 +49,8 @@ const styles = (theme) =>
 		{
 			borderRadius : '50%',
 			height       : '2rem',
+			width        : '2rem',
+			objectFit    : 'cover',
 			marginTop    : theme.spacing(0.5)
 		},
 		peerInfo :
