@@ -65,6 +65,7 @@ const styles = (theme) =>
 			width           : '2rem',
 			height          : '2rem',
 			alignSelf       : 'center',
+			objectFit       : 'cover',
 			margin          : theme.spacing(0.5),
 			backgroundColor : '#e0e0e085'
 		},
