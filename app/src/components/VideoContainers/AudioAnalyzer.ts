@@ -62,18 +62,22 @@ export class AudioAnalyzer
             .domain([0, 64, 128, 192, 255])
             .out('hex');
 
+        // capture resize events and force rendering
 		this.resizeObserver = new ResizeObserver((entries) =>
 		{
-            if (this.canvas)
+            const { clientWidth, clientHeight } = this.container;
+
+            if (this.canvas && (
+                this.canvas.width !== clientWidth || this.canvas.height !== clientHeight))
             {
-                this.canvas.width = this.container.clientWidth;
-                this.canvas.height = this.container.clientHeight;
+                this.canvas.width = clientWidth;
+                this.canvas.height = clientHeight;
                 this.canvasColumn = 0;
                 requestAnimationFrame(this.render.bind(this));
             }
 		});
 
-		this.resizeObserver.observe(container);
+		this.resizeObserver.observe(this.container);
 
 		// audio context
 		this.context = new AudioContext({
@@ -141,7 +145,7 @@ export class AudioAnalyzer
     {
         const { canvas, canvasContext } = this;
 
-        if (!canvasContext || !canvas)
+        if (!canvasContext || !canvas || !canvas.height)
             return;
 
         this.analyser.getByteFrequencyData(this.frequencyArray);
@@ -178,11 +182,14 @@ export class AudioAnalyzer
         }
 
         this.canvasColumn += 1;
-        if (this.canvasColumn > canvas.width)
+        if (this.canvasColumn >= canvas.width)
         {
-            this.canvasColumn = this.labelsWidth;
-            canvasContext.clearRect(this.labelsWidth, 0,
+            this.canvasColumn = canvas.width - 1;
+            const imageData = canvasContext.getImageData(
+                this.labelsWidth + 1, 0,
                 canvas.width - this.labelsWidth, canvas.height);
+            canvasContext.putImageData(imageData, this.labelsWidth, 0);
+            canvasContext.clearRect(canvas.width - 1, 0, 1, canvas.height);
         }
     }
 
