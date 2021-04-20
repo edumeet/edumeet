@@ -116,8 +116,8 @@ class Democratic extends React.PureComponent
 		)
 		{
 			this.setState({
-				peerWidth  : FILL_RATE * x,
-				peerHeight : FILL_RATE * y
+				peerWidth  : Math.ceil(FILL_RATE * x),
+				peerHeight : Math.ceil(FILL_RATE * y)
 			});
 		}
 	};
@@ -156,6 +156,7 @@ class Democratic extends React.PureComponent
 			toolbarsVisible,
 			permanentTopBar,
 			buttonControlBar,
+			hideSelfView,
 			classes
 		} = this.props;
 
@@ -175,11 +176,13 @@ class Democratic extends React.PureComponent
 				)}
 				ref={this.peersRef}
 			>
+				{ !hideSelfView &&
 				<Me
 					advancedMode={advancedMode}
 					spacing={6}
 					style={style}
 				/>
+				}
 				{ spotlightsPeers.map((peer) =>
 				{
 					return (
@@ -189,6 +192,9 @@ class Democratic extends React.PureComponent
 							id={peer}
 							spacing={6}
 							style={style}
+							enableLayersSwitch
+							width={this.state.peerWidth}
+							height={this.state.peerHeight}
 						/>
 					);
 				})}
@@ -203,6 +209,7 @@ Democratic.propTypes =
 	boxes            : PropTypes.number,
 	spotlightsPeers  : PropTypes.array.isRequired,
 	toolbarsVisible  : PropTypes.bool.isRequired,
+	hideSelfView     : PropTypes.bool.isRequired,
 	permanentTopBar  : PropTypes.bool.isRequired,
 	buttonControlBar : PropTypes.bool.isRequired,
 	toolAreaOpen     : PropTypes.bool.isRequired,
@@ -216,6 +223,7 @@ const mapStateToProps = (state) =>
 		boxes            : videoBoxesSelector(state),
 		spotlightsPeers  : spotlightPeersSelector(state),
 		toolbarsVisible  : state.room.toolbarsVisible,
+		hideSelfView     : state.room.hideSelfView,
 		permanentTopBar  : state.settings.permanentTopBar,
 		buttonControlBar : state.settings.buttonControlBar,
 		toolAreaOpen     : state.toolarea.toolAreaOpen,
@@ -236,6 +244,7 @@ export default connect(
 				prev.consumers === next.consumers &&
 				prev.room.spotlights === next.room.spotlights &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
+				prev.room.hideSelfView === next.room.hideSelfView &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
 				prev.settings.buttonControlBar === next.settings.buttonControlBar &&
 				prev.settings.aspectRatio === next.settings.aspectRatio &&

@@ -11,6 +11,7 @@ const peersSelector = (state) => state.peers;
 const lobbyPeersSelector = (state) => state.lobbyPeers;
 const getPeerConsumers = (state, id) =>
 	(state.peers[id] ? state.peers[id].consumers : null);
+const isHiddenSelect = (state) => state.room.hideSelfView;
 const getAllConsumers = (state) => state.consumers;
 const peersKeySelector = createSelector(
 	peersSelector,
@@ -182,21 +183,25 @@ export const raisedHandsSelector = createSelector(
 );
 
 export const videoBoxesSelector = createSelector(
+	isHiddenSelect,
 	spotlightsLengthSelector,
 	screenProducersSelector,
 	spotlightScreenConsumerSelector,
 	extraVideoProducersSelector,
 	spotlightExtraVideoConsumerSelector,
 	(
+		isHidden,
 		spotlightsLength,
 		screenProducers,
 		screenConsumers,
 		extraVideoProducers,
 		extraVideoConsumers
 	) =>
-		spotlightsLength + 1 + screenProducers.length +
-		screenConsumers.length + extraVideoProducers.length +
-		extraVideoConsumers.length
+	{
+		return spotlightsLength + (isHidden ? 0 : 1) +
+			(isHidden ? 0 : screenProducers.length) + screenConsumers.length +
+			(isHidden ? 0 : extraVideoProducers.length) + extraVideoConsumers.length;
+	}
 );
 
 export const meProducersSelector = createSelector(

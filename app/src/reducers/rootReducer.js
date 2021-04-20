@@ -12,6 +12,8 @@ import toolarea from './toolarea';
 import files from './files';
 import settings from './settings';
 import transports from './transports';
+import intl from './intl';
+// import { intlReducer } from 'react-intl-redux';
 
 export default combineReducers({
 	room,
@@ -26,5 +28,7 @@ export default combineReducers({
 	chat,
 	toolarea,
 	files,
-	settings
+	settings,
+	// intl : intlReducer
+	intl
 });

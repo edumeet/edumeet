@@ -2,6 +2,9 @@
 
 process.title = 'edumeet-server';
 
+import Logger from './lib/Logger';
+
+const bcrypt = require('bcrypt');
 const config = require('./config/config');
 const fs = require('fs');
 const http = require('http');
@@ -12,12 +15,10 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
-const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
-
 const userRoles = require('./userRoles');
 const {
 	loginHelper,
@@ -27,6 +28,8 @@ const {
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
 const imsLti = require('ims-lti');
+const SAMLStrategy = require('passport-saml').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
 const redis = require('redis');
 const redisClient = redis.createClient(config.redisOptions);
 const { Issuer, Strategy } = require('openid-client');
@@ -69,26 +72,27 @@ const tls =
 	key           : fs.readFileSync(config.tls.key),
 	secureOptions : 'tlsv12',
 	ciphers       :
-	[
-		'ECDHE-ECDSA-AES128-GCM-SHA256',
-		'ECDHE-RSA-AES128-GCM-SHA256',
-		'ECDHE-ECDSA-AES256-GCM-SHA384',
-		'ECDHE-RSA-AES256-GCM-SHA384',
-		'ECDHE-ECDSA-CHACHA20-POLY1305',
-		'ECDHE-RSA-CHACHA20-POLY1305',
-		'DHE-RSA-AES128-GCM-SHA256',
-		'DHE-RSA-AES256-GCM-SHA384'
-	].join(':'),
+		[
+			'ECDHE-ECDSA-AES128-GCM-SHA256',
+			'ECDHE-RSA-AES128-GCM-SHA256',
+			'ECDHE-ECDSA-AES256-GCM-SHA384',
+			'ECDHE-RSA-AES256-GCM-SHA384',
+			'ECDHE-ECDSA-CHACHA20-POLY1305',
+			'ECDHE-RSA-CHACHA20-POLY1305',
+			'DHE-RSA-AES128-GCM-SHA256',
+			'DHE-RSA-AES256-GCM-SHA384'
+		].join(':'),
 	honorCipherOrder : true
 };
 
 const app = express();
 
 app.use(helmet.hsts());
+const sharedCookieParser = cookieParser();
 
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(sharedCookieParser);
+app.use(bodyParser.json({ limit: '5mb' }));
+app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
 const session = expressSession({
 	secret            : config.cookieSecret,
@@ -124,6 +128,8 @@ let mainListener;
 let io;
 let oidcClient;
 let oidcStrategy;
+let samlStrategy;
+let localStrategy;
 
 async function run()
 {
@@ -138,7 +144,7 @@ async function run()
 			await promExporter(rooms, peers, config.prometheus);
 		}
 
-		if (typeof(config.auth) === 'undefined')
+		if (typeof (config.auth) === 'undefined')
 		{
 			logger.warn('Auth is not configured properly!');
 		}
@@ -156,6 +162,7 @@ async function run()
 		// Run WebSocketServer.
 		await runWebSocketServer();
 
+		// eslint-disable-next-line no-unused-vars
 		const errorHandler = (err, req, res, next) =>
 		{
 			const trackingId = uuidv4();
@@ -197,7 +204,7 @@ function setupLTI(ltiConfig)
 
 	// Add redis nonce store
 	ltiConfig.nonceStore = new imsLti.Stores.RedisStore(ltiConfig.consumerKey, redisClient);
-	ltiConfig.passReqToCallback= true;
+	ltiConfig.passReqToCallback = true;
 
 	const ltiStrategy = new LTIStrategy(
 		ltiConfig,
@@ -240,6 +247,51 @@ function setupLTI(ltiConfig)
 	);
 
 	passport.use('lti', ltiStrategy);
+}
+
+function setupSAML()
+{
+	samlStrategy = new SAMLStrategy(
+		config.auth.saml,
+		function(profile, done)
+		{
+			return done(null,
+				{
+					id        : profile.uid,
+					_userinfo : profile
+				});
+		}
+	);
+
+	passport.use('saml', samlStrategy);
+}
+
+function setupLocal()
+{
+	localStrategy = new LocalStrategy(
+		function(username, plaintextPassword, done)
+		{
+			const found = config.auth.local.users.find((element) =>
+			{
+				// TODO use encrypted password
+				return element.username === username &&
+					bcrypt.compareSync(plaintextPassword, element.passwordHash);
+			});
+
+			if (found === undefined)
+				return done(null, null);
+			else
+			{
+				const userinfo = { ...found };
+
+				delete userinfo.password;
+
+				return done(null, { id: found.id, _userinfo: userinfo });
+			}
+		}
+	);
+
+	passport.use('local', localStrategy);
 }
 
 function setupOIDC(oidcIssuer)
@@ -302,16 +354,25 @@ async function setupAuth()
 {
 	// LTI
 	if (
-		typeof(config.auth.lti) !== 'undefined' &&
-		typeof(config.auth.lti.consumerKey) !== 'undefined' &&
-		typeof(config.auth.lti.consumerSecret) !== 'undefined'
-	) 	setupLTI(config.auth.lti);
+		typeof (config.auth.lti) !== 'undefined' &&
+		typeof (config.auth.lti.consumerKey) !== 'undefined' &&
+		typeof (config.auth.lti.consumerSecret) !== 'undefined'
+	) setupLTI(config.auth.lti);
 
 	// OIDC
 	if (
-		typeof(config.auth.oidc) !== 'undefined' &&
-		typeof(config.auth.oidc.issuerURL) !== 'undefined' &&
-		typeof(config.auth.oidc.clientOptions) !== 'undefined'
+		typeof (config.auth) !== 'undefined' &&
+		(
+			(
+				typeof (config.auth.strategy) !== 'undefined' &&
+				config.auth.strategy === 'oidc'
+			)
+			// it is default strategy
+			|| typeof (config.auth.strategy) === 'undefined'
+		) &&
+		typeof (config.auth.oidc) !== 'undefined' &&
+		typeof (config.auth.oidc.issuerURL) !== 'undefined' &&
+		typeof (config.auth.oidc.clientOptions) !== 'undefined'
 	)
 	{
 		const oidcIssuer = await Issuer.discover(config.auth.oidc.issuerURL);
@@ -321,18 +382,69 @@ async function setupAuth()
 
 	}
 
+	// SAML
+	if (
+		typeof (config.auth) !== 'undefined' &&
+		typeof (config.auth.strategy) !== 'undefined' &&
+		config.auth.strategy === 'saml' &&
+		typeof (config.auth.saml) !== 'undefined' &&
+		typeof (config.auth.saml.entryPoint) !== 'undefined' &&
+		typeof (config.auth.saml.issuer) !== 'undefined' &&
+		typeof (config.auth.saml.cert) !== 'undefined'
+	)
+	{
+		setupSAML();
+	}
+
+	// Local
+	if (
+		typeof (config.auth) !== 'undefined' &&
+		typeof (config.auth.strategy) !== 'undefined' &&
+		config.auth.strategy === 'local' &&
+		typeof (config.auth.local) !== 'undefined' &&
+		typeof (config.auth.local.users) !== 'undefined'
+	)
+	{
+		setupLocal();
+	}
+
 	app.use(passport.initialize());
 	app.use(passport.session());
+
+	// Auth strategy (by default oidc)
+	const authStrategy = (config.auth && config.auth.strategy) ? config.auth.strategy : 'oidc';
 
 	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
-		passport.authenticate('oidc', {
-			state : base64.encode(JSON.stringify({
+		logger.debug('/auth/login');
+
+		let state;
+
+		if (req.query.peerId && req.query.roomId)
+		{
+			state = {
 				peerId : req.query.peerId,
 				roomId : req.query.roomId
-			}))
-		})(req, res, next);
+			};
+
+			if (authStrategy== 'saml' || authStrategy=='local')
+			{
+				req.session.authState=state;
+			}
+		}
+
+		if (authStrategy === 'local' && !(req.user && req.password))
+		{
+			res.redirect('/login_dialog');
+		}
+		else
+		{
+			passport.authenticate(authStrategy, {
+				state : base64.encode(JSON.stringify(state))
+			}
+			)(req, res, next);
+		}
 	});
 
 	// lti launch
@@ -340,13 +452,28 @@ async function setupAuth()
 		passport.authenticate('lti', { failureRedirect: '/' }),
 		(req, res) =>
 		{
+			logger.debug('/auth/lti');
 			res.redirect(`/${req.user.room}`);
 		}
 	);
 
+	app.get('/auth/check_login_status', (req, res) =>
+	{
+		let loggedIn = false;
+
+		if (Boolean(req.session.passport) &&
+			Boolean(req.session.passport.user))
+		{
+			loggedIn = true;
+		}
+
+		res.send({ loggedIn: loggedIn });
+	});
+
 	// logout
 	app.get('/auth/logout', (req, res) =>
 	{
+		logger.debug('/auth/logout');
 		const { peerId } = req.session;
 
 		const peer = peers.get(peerId);
@@ -361,18 +488,64 @@ async function setupAuth()
 		}
 
 		req.logout();
+		req.session.passport = undefined;
+		req.session.touch();
+		req.session.save();
 		req.session.destroy(() => res.send(logoutHelper()));
+	});
+	// SAML metadata
+	app.get('/auth/metadata', (req, res) =>
+	{
+		logger.debug('/auth/metadata');
+		if (config.auth && config.auth.saml &&
+			config.auth.saml.decryptionCert &&
+			config.auth.saml.signingCert)
+		{
+			const metadata = samlStrategy.generateServiceProviderMetadata(
+				config.auth.saml.decryptionCert,
+				config.auth.saml.signingCert
+			);
+
+			if (metadata)
+			{
+				res.set('Content-Type', 'text/xml');
+				res.send(metadata);
+			}
+			else
+			{
+				res.status('Error generating SAML metadata', 500);
+			}
+		}
+		else
+			res.status('Missing SAML decryptionCert or signingKey from config', 500);
 	});
 
 	// callback
-	app.get(
+	app.all(
 		'/auth/callback',
-		passport.authenticate('oidc', { failureRedirect: '/auth/login' }),
+		passport.authenticate(authStrategy, { failureRedirect: '/auth/login' }),
 		async (req, res, next) =>
 		{
+			logger.debug('/auth/callback');
 			try
 			{
-				const state = JSON.parse(base64.decode(req.query.state));
+				let state;
+
+				if (authStrategy == 'saml' || authStrategy == 'local')
+					state=req.session.authState;
+				else
+				{
+					if (req.method === 'GET')
+						state = JSON.parse(base64.decode(req.query.state));
+					if (req.method === 'POST')
+						state = JSON.parse(base64.decode(req.body.state));
+				}
+
+				if (!state || !state.peerId || !state.roomId)
+				{
+					res.redirect('/auth/login');
+					logger.debug('Empty state or state.peerId or state.roomId in auth/callback');
+				}
 
 				const { peerId, roomId } = state;
 
@@ -427,7 +600,7 @@ async function runHttpsServer()
 
 			try
 			{
-				ltiURL = new URL(`${req.protocol }://${ req.get('host') }${req.originalUrl}`);
+				ltiURL = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
 			}
 			catch (error)
 			{
@@ -456,9 +629,13 @@ async function runHttpsServer()
 	});
 
 	// Serve all files in the public folder as static files.
-	app.use(express.static('public'));
+	app.use(express.static('public', {
+		maxAge : (config.staticFilesCachePeriod || 0) * 1000
+	}));
 
-	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
+	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`, {
+		maxAge : (config.staticFilesCachePeriod || 0) * 1000
+	}));
 
 	if (config.httpOnly === true)
 	{
@@ -486,21 +663,21 @@ async function runHttpsServer()
 		mainListener.listen(config.listeningPort);
 }
 
-function isPathAlreadyTaken(url)
+function isPathAlreadyTaken(actualUrl)
 {
 	const alreadyTakenPath =
-	[
-		'/config/',
-		'/static/',
-		'/images/',
-		'/sounds/',
-		'/favicon.',
-		'/auth/'
-	];
+		[
+			'/config/',
+			'/static/',
+			'/images/',
+			'/sounds/',
+			'/favicon.',
+			'/auth/'
+		];
 
 	alreadyTakenPath.forEach((path) =>
 	{
-		if (url.toString().startsWith(path))
+		if (actualUrl.toString().startsWith(path))
 			return true;
 	});
 
@@ -512,12 +689,10 @@ function isPathAlreadyTaken(url)
  */
 async function runWebSocketServer()
 {
-	io = require('socket.io')(mainListener);
+	io = require('socket.io')(mainListener, { cookie: false });
 
 	io.use(
-		sharedSession(session, {
-			autoSave : true
-		})
+		sharedSession(session, sharedCookieParser, {})
 	);
 
 	// Handle connections from clients.
@@ -598,6 +773,9 @@ async function runWebSocketServer()
 
 			room.handlePeer({ peer, returning });
 
+			socket.handshake.session.touch();
+			socket.handshake.session.save();
+
 			statusLog();
 		})
 			.catch((error) =>
@@ -621,14 +799,18 @@ async function runMediasoupWorkers()
 
 	logger.info('running %d mediasoup Workers...', numWorkers);
 
-	for (let i = 0; i < numWorkers; ++i)
+	const { logLevel, logTags, rtcMinPort, rtcMaxPort } = config.mediasoup.worker;
+	const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
+
+	for (let i = 0; i < numWorkers; i++)
 	{
 		const worker = await mediasoup.createWorker(
 			{
-				logLevel   : config.mediasoup.worker.logLevel,
-				logTags    : config.mediasoup.worker.logTags,
-				rtcMinPort : config.mediasoup.worker.rtcMinPort,
-				rtcMaxPort : config.mediasoup.worker.rtcMaxPort
+				logLevel,
+				logTags,
+				rtcMinPort : rtcMinPort + (i * portInterval),
+				rtcMaxPort : i === numWorkers - 1 ? rtcMaxPort
+					: rtcMinPort + ((i + 1) * portInterval) - 1
 			});
 
 		worker.on('died', () =>
@@ -657,7 +839,7 @@ async function getOrCreateRoom({ roomId })
 
 		// const mediasoupWorker = getMediasoupWorker();
 
-		room = await Room.create({ mediasoupWorkers, roomId });
+		room = await Room.create({ mediasoupWorkers, roomId, peers });
 
 		rooms.set(roomId, room);
 

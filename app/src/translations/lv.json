@@ -59,11 +59,14 @@
 	"room.raisedHand": "{displayName} pacēla roku",
 	"room.loweredHand": "{displayName} nolaida roku",
 	"room.extraVideo": "Papildus video",
+	"room.extraVideoDuplication": null,
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
 
@@ -124,6 +127,11 @@
 	"label.addVideo": "Pievienot video",
 	"label.moreActions": null,
 	"label.version": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",
@@ -155,6 +163,13 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Nav iespējams saglabāt failu",
 	"filesharing.startingFileShare": "Tiek mēģināts kopīgot failu",
@@ -169,11 +184,13 @@
 
 	"devices.devicesChanged": "Jūsu ierīces pamainījās. Iestatījumu izvēlnē (dialogā) iestatiet jaunās ierīces.",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Skaņa (audio) netiek atbalstīta",
 	"device.activateAudio": "Iespējot/aktivēt mikrofonu (izejošo skaņu)",
 	"device.muteAudio": "Atslēgt/noklusināt mikrofonu (izejošo skaņu) ",
 	"device.unMuteAudio": "Ieslēgt mikrofonu (izejošo skaņu)",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Kamera (izejošais video) netiek atbalstīta",
 	"device.startVideo": "Ieslēgt kameru (izejošo video)",
 	"device.stopVideo": "Izslēgt kameru (izejošo video)",
@@ -190,11 +207,15 @@
 	"devices.microphoneMuteError": "Nav iespējams izslēgt Jūsu mikrofonu",
 	"devices.microphoneUnMuteError": "Nav iespējams ieslēgt Jūsu mikrofonu",
 
-	"devices.screenSharingDisconnected" : "Ekrāna kopīgošana nenotiek (atvienota)",
+	"devices.screenSharingDisconnected": "Ekrāna kopīgošana nenotiek (atvienota)",
 	"devices.screenSharingError": "Atgadījās kļūme, piekļūstot Jūsu ekrānam",
 
 	"devices.cameraDisconnected": "Kamera atvienota",
 	"devices.cameraError": "Atgadījās kļūme, piekļūstot Jūsu kamerai",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": "Moderators nodzēsa tērziņus",
 	"moderator.clearFiles": "Moderators notīrīja failus",

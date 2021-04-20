@@ -7,7 +7,7 @@ import { useIntl, FormattedMessage } from 'react-intl';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import MediaSettings from './MediaSettings';
-import AppearenceSettings from './AppearenceSettings';
+import AppearanceSettings from './AppearanceSettings';
 import AdvancedSettings from './AdvancedSettings';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -17,7 +17,7 @@ import Button from '@material-ui/core/Button';
 const tabs =
 [
 	'media',
-	'appearence',
+	'appearance',
 	'advanced'
 ];
 
@@ -96,7 +96,7 @@ const Settings = ({
 				<Tab
 					label={intl.formatMessage({
 						id             : 'label.appearance',
-						defaultMessage : 'Appearence'
+						defaultMessage : 'Appearance'
 					})}
 				/>
 				<Tab
@@ -107,7 +107,7 @@ const Settings = ({
 				/>
 			</Tabs>
 			{currentSettingsTab === 'media' && <MediaSettings />}
-			{currentSettingsTab === 'appearence' && <AppearenceSettings />}
+			{currentSettingsTab === 'appearance' && <AppearanceSettings />}
 			{currentSettingsTab === 'advanced' && <AdvancedSettings />}
 			<DialogActions>
 				<Button onClick={() => handleCloseSettings(false)} color='primary'>

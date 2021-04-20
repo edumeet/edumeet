@@ -59,12 +59,15 @@
 	"room.raisedHand": null,
 	"room.loweredHand": null,
 	"room.extraVideo": null,
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": null,
 	"room.help": null,
 	"room.about": null,
 	"room.shortcutKeys": null,
 	"room.browsePeersSpotlight": null,
 	"room.stopAllScreenSharing": null,
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
 
 	"me.mutedPTT": null,
 
@@ -96,6 +99,11 @@
 	"tooltip.muteParticipantAudioModerator": null,
 	"tooltip.muteParticipantVideoModerator": null,
 	"tooltip.muteScreenSharingModerator": null,
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"label.roomName": "Nombre de la sala",
 	"label.chooseRoomButton": "Continuar",
@@ -161,6 +169,13 @@
 	"settings.drawerOverlayed": null,
 	"settings.voiceActivatedUnmute": null,
 	"settings.noiseThreshold": null,
+	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "No ha sido posible guardar el fichero",
 	"filesharing.startingFileShare": "Intentando compartir el fichero",
@@ -175,11 +190,13 @@
 
 	"devices.devicesChanged": "Sus dispositivos han cambiado, vuelva a configurarlos en la ventana de ajustes",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Sonido no disponible",
 	"device.activateAudio": "Activar sonido",
 	"device.muteAudio": "Silenciar sonido",
 	"device.unMuteAudio": "Reactivar sonido",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Vídeo no disponible",
 	"device.startVideo": "Iniciar vídeo",
 	"device.stopVideo": "Detener vídeo",
@@ -201,6 +218,10 @@
 
 	"devices.cameraDisconnected": "Cámara desconectada",
 	"devices.cameraError": "Hubo un error al acceder a su cámara",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": null,
 	"moderator.clearFiles": null,

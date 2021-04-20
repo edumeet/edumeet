@@ -16,7 +16,18 @@ class SocketTimeoutError extends Error
 	}
 }
 
+class NotFoundInMediasoupError extends Error
+{
+	constructor(message)
+	{
+		super(message);
+
+		this.name = 'NotFoundInMediasoupError';
+	}
+}
+
 module.exports =
 {
-	SocketTimeoutError
+	SocketTimeoutError,
+	NotFoundInMediasoupError
 };

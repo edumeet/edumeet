@@ -128,3 +128,35 @@ export const setLastN = (lastN) =>
 		type    : 'SET_LAST_N',
 		payload : { lastN }
 	});
+export const toggleMirrorOwnVideo = () =>
+	({
+		type : 'TOGGLE_MIRROR_OWN_VIDEO'
+	});
+
+export const toggleHideNoVideoParticipants = () =>
+	({
+		type : 'TOGGLE_HIDE_NO_VIDEO_PARTICIPANTS'
+	});
+
+export const setMediaPerms = (mediaPerms) =>
+	({
+		type    : 'SET_MEDIA_PERMS',
+		payload : { mediaPerms }
+	});
+
+export const setAudioMuted = (audioMuted) =>
+	({
+		type    : 'SET_AUDIO_MUTED',
+		payload : { audioMuted }
+	});
+
+export const setVideoMuted = (videoMuted) =>
+	({
+		type    : 'SET_VIDEO_MUTED',
+		payload : { videoMuted }
+	});
+export const setLocalPicture = (localPicture) =>
+	({
+		type    : 'SET_LOCAL_PICTURE',
+		payload : { localPicture }
+	});

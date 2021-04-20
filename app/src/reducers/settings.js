@@ -1,18 +1,16 @@
 const initialState =
 {
-	displayName             : 'Guest',
+	displayName             : '',
 	selectedWebcam          : null,
 	selectedAudioDevice     : null,
 	advancedMode            : false,
-	sampleRate              : 48000,
-	channelCount            : 1,
-	volume                  : 1.0,
-	autoGainControl         : false,
+	autoGainControl         : true,
 	echoCancellation        : true,
 	noiseSuppression        : true,
 	voiceActivatedUnmute    : false,
 	noiseThreshold          : -50,
-	sampleSize              : 16,
+	audioMuted              : false,
+	videoMuted              : false,
 	// low, medium, high, veryhigh, ultra
 	resolution              : window.config.defaultResolution || 'medium',
 	frameRate               : window.config.defaultFrameRate || 15,
@@ -23,9 +21,13 @@ const initialState =
 	hiddenControls          : false,
 	showNotifications       : true,
 	notificationSounds      : true,
+	mirrorOwnVideo          : true,
+	hideNoVideoParticipants : false,
 	buttonControlBar        : window.config.buttonControlBar || false,
-	drawerOverlayed         : window.config.drawerOverlayed || true,
+	drawerOverlayed         : (typeof window.config.drawerOverlayed === 'undefined') ? true : window.config.drawerOverlayed,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
+	mediaPerms              : { audio: true, video: true },
+	localPicture            : null,
 	...window.config.defaultAudio
 };
 
@@ -214,6 +216,48 @@ const settings = (state = initialState, action) =>
 			const { screenSharingFrameRate } = action.payload;
 
 			return { ...state, screenSharingFrameRate };
+		}
+
+		case 'TOGGLE_MIRROR_OWN_VIDEO':
+		{
+			const mirrorOwnVideo = !state.mirrorOwnVideo;
+
+			return { ...state, mirrorOwnVideo };
+		}
+
+		case 'TOGGLE_HIDE_NO_VIDEO_PARTICIPANTS':
+		{
+			const hideNoVideoParticipants = !state.hideNoVideoParticipants;
+
+			return { ...state, hideNoVideoParticipants };
+		}
+
+		case 'SET_MEDIA_PERMS':
+		{
+			const { mediaPerms } = action.payload;
+
+			return { ...state, mediaPerms };
+		}
+
+		case 'SET_AUDIO_MUTED':
+		{
+			const { audioMuted } = action.payload;
+
+			return { ...state, audioMuted };
+		}
+
+		case 'SET_VIDEO_MUTED':
+		{
+			const { videoMuted } = action.payload;
+
+			return { ...state, videoMuted };
+		}
+
+		case 'SET_LOCAL_PICTURE':
+		{
+			const { localPicture } = action.payload;
+
+			return { ...state, localPicture };
 		}
 
 		default:

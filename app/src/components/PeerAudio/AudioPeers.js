@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { passiveMicConsumerSelector } from '../Selectors';
+import { micConsumerSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import PeerAudio from './PeerAudio';
 
@@ -21,6 +21,7 @@ const AudioPeers = (props) =>
 							key={micConsumer.id}
 							audioTrack={micConsumer.track}
 							audioOutputDevice={audioOutputDevice}
+							audioGain={micConsumer.audioGain}
 						/>
 					);
 				})
@@ -37,7 +38,7 @@ AudioPeers.propTypes =
 
 const mapStateToProps = (state) =>
 	({
-		micConsumers      : passiveMicConsumerSelector(state),
+		micConsumers      : micConsumerSelector(state),
 		audioOutputDevice : state.settings.selectedAudioOutputDevice
 	});
 

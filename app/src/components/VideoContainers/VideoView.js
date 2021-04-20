@@ -31,12 +31,12 @@ const styles = (theme) =>
 			flex               : '100 100 auto',
 			height             : '100%',
 			width              : '100%',
-			objectFit          : 'cover',
+			objectFit          : 'contain',
 			userSelect         : 'none',
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
 			backgroundColor    : 'var(--peer-video-bg-color)',
-			'&.isMe'           :
+			'&.isMirrored'     :
 			{
 				transform : 'scaleX(-1)'
 			},
@@ -92,6 +92,7 @@ const styles = (theme) =>
 				"AcodL		Acod	Acod	Acod	Acod" \
 					"VcodL		Vcod	Vcod	Vcod	Vcod" \
 					"ResL		Res		Res		Res		Res" \
+					"VPortL		VPort VPort VPort VPort" \
 					"RecvL		RecvBps RecvBps RecvSum RecvSum" \
 					"SendL		SendBps SendBps SendSum SendSum" \
 					"IPlocL		IPloc	IPloc	IPloc	IPloc" \
@@ -105,6 +106,8 @@ const styles = (theme) =>
 					'& .Vcod'     : { gridArea: 'Vcod' },
 					'& .ResL'     : { gridArea: 'ResL' },
 					'& .Res'      : { gridArea: 'Res' },
+					'& .VPortL'   : { gridArea: 'VPortL' },
+					'& .VPort'    : { gridArea: 'VPort' },
 					'& .RecvL'    : { gridArea: 'RecvL' },
 					'& .RecvBps'  : { gridArea: 'RecvBps', justifySelf: 'flex-end' },
 					'& .RecvSum'  : { gridArea: 'RecvSum', justifySelf: 'flex-end' },
@@ -128,8 +131,7 @@ const styles = (theme) =>
 			},
 			'&.hidden' :
 			{
-				opacity            : 0,
-				transitionDuration : '0s'
+				display : 'none'
 			}
 		},
 		peer :
@@ -143,16 +145,19 @@ const styles = (theme) =>
 			color           : 'rgba(255, 255, 255, 0.85)',
 			border          : 'none',
 			borderBottom    : '1px solid #aeff00',
-			backgroundColor : 'transparent'
+			backgroundColor : 'rgba(0, 0, 0, 0.25)',
+			padding         : theme.spacing(0.6)
 		},
 		displayNameStatic :
 		{
-			userSelect : 'none',
-			cursor     : 'text',
-			fontSize   : 14,
-			fontWeight : 400,
-			color      : 'rgba(255, 255, 255, 0.85)',
-			'&:hover'  :
+			userSelect      : 'none',
+			cursor          : 'text',
+			fontSize        : 14,
+			fontWeight      : 400,
+			color           : 'rgba(255, 255, 255, 0.85)',
+			backgroundColor : 'rgba(0, 0, 0, 0.25)',
+			padding         : theme.spacing(0.6),
+			'&:hover'       :
 			{
 				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
@@ -171,10 +176,6 @@ class VideoView extends React.PureComponent
 			videoHeight : null
 		};
 
-		// Latest received audio track
-		// @type {MediaStreamTrack}
-		this._audioTrack = null;
-
 		// Latest received video track.
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
@@ -187,6 +188,7 @@ class VideoView extends React.PureComponent
 	{
 		const {
 			isMe,
+			isMirrored,
 			isScreen,
 			isExtraVideo,
 			showQuality,
@@ -207,7 +209,9 @@ class VideoView extends React.PureComponent
 			onChangeDisplayName,
 			children,
 			classes,
-			netInfo
+			netInfo,
+			width,
+			height
 		} = this.props;
 
 		const {
@@ -308,6 +312,15 @@ class VideoView extends React.PureComponent
 								</React.Fragment>
 							}
 
+							{ (videoVisible && width && height) &&
+								<React.Fragment>
+									<span className={'VPortL'}>VPort: </span>
+									<span className={'VPort'}>
+										{Math.round(width)}x{Math.round(height)}
+									</span>
+								</React.Fragment>
+							}
+
 							{ isMe && !isScreen && !isExtraVideo &&
 									(netInfo.recv && netInfo.send && netInfo.send.iceSelectedTuple) &&
 									<React.Fragment>
@@ -394,21 +407,13 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden  : !videoVisible,
-						'isMe'  : isMe && !isScreen,
-						contain : videoContain
+						hidden       : !videoVisible,
+						'isMirrored' : isMirrored,
+						contain      : videoContain
 					})}
 					autoPlay
 					playsInline
 					muted
-					controls={false}
-				/>
-
-				<audio
-					ref='audioElement'
-					autoPlay
-					playsInline
-					muted={isMe}
 					controls={false}
 				/>
 
@@ -419,9 +424,9 @@ class VideoView extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { videoTrack, audioTrack } = this.props;
+		const { videoTrack } = this.props;
 
-		this._setTracks(videoTrack, audioTrack);
+		this._setTracks(videoTrack);
 	}
 
 	componentWillUnmount()
@@ -442,24 +447,23 @@ class VideoView extends React.PureComponent
 	{
 		if (prevProps !== this.props)
 		{
-			const { videoTrack, audioTrack } = this.props;
+			const { videoTrack } = this.props;
 
-			this._setTracks(videoTrack, audioTrack);
+			this._setTracks(videoTrack);
 		}
 	}
 
-	_setTracks(videoTrack, audioTrack)
+	_setTracks(videoTrack)
 	{
-		if (this._videoTrack === videoTrack && this._audioTrack === audioTrack)
+		if (this._videoTrack === videoTrack)
 			return;
 
 		this._videoTrack = videoTrack;
-		this._audioTrack = audioTrack;
 
 		clearInterval(this._videoResolutionTimer);
 		this._hideVideoResolution();
 
-		const { videoElement, audioElement } = this.refs;
+		const { videoElement } = this.refs;
 
 		if (videoTrack)
 		{
@@ -471,12 +475,6 @@ class VideoView extends React.PureComponent
 
 			videoElement.oncanplay = () => this.setState({ videoCanPlay: true });
 
-			videoElement.onplay = () =>
-			{
-				audioElement.play()
-					.catch((error) => logger.warn('audioElement.play() [error:"%o]', error));
-			};
-
 			videoElement.play()
 				.catch((error) => logger.warn('videoElement.play() [error:"%o]', error));
 
@@ -485,21 +483,6 @@ class VideoView extends React.PureComponent
 		else
 		{
 			videoElement.srcObject = null;
-		}
-
-		if (audioTrack)
-		{
-			const stream = new MediaStream();
-
-			stream.addTrack(audioTrack);
-			audioElement.srcObject = stream;
-
-			audioElement.play()
-				.catch((error) => logger.warn('audioElement.play() [error:"%o]', error));
-		}
-		else
-		{
-			audioElement.srcObject = null;
 		}
 	}
 
@@ -534,6 +517,7 @@ class VideoView extends React.PureComponent
 VideoView.propTypes =
 {
 	isMe                           : PropTypes.bool,
+	isMirrored                     : PropTypes.bool,
 	isScreen                       : PropTypes.bool,
 	isExtraVideo   	               : PropTypes.bool,
 	showQuality                    : PropTypes.bool,
@@ -542,7 +526,6 @@ VideoView.propTypes =
 	videoContain                   : PropTypes.bool,
 	advancedMode                   : PropTypes.bool,
 	videoTrack                     : PropTypes.any,
-	audioTrack                     : PropTypes.any,
 	videoVisible                   : PropTypes.bool.isRequired,
 	consumerSpatialLayers          : PropTypes.number,
 	consumerTemporalLayers         : PropTypes.number,
@@ -558,7 +541,9 @@ VideoView.propTypes =
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
 	classes                        : PropTypes.object.isRequired,
-	netInfo               						   : PropTypes.object
+	netInfo                        : PropTypes.object,
+	width                          : PropTypes.number,
+	height                         : PropTypes.number
 };
 
 export default withStyles(styles)(VideoView);

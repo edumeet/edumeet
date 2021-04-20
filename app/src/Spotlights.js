@@ -1,61 +1,47 @@
-import { EventEmitter } from 'events';
 import Logger from './Logger';
 
 const logger = new Logger('Spotlight');
 
-export default class Spotlights extends EventEmitter
+export default class Spotlights
 {
-	constructor(maxSpotlights, signalingSocket)
+	constructor(maxSpotlights, hideNoVideoParticipants, roomClient)
 	{
-		super();
-
-		this._signalingSocket = signalingSocket;
 		this._maxSpotlights = maxSpotlights;
 		this._peerList = [];
+		this._activeVideoConsumers = [];
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
-		this._started = false;
-	}
-
-	start()
-	{
-		this._handleSignaling();
-
-		this._started = true;
-		this._spotlightsUpdated();
+		this._roomClient = roomClient;
+		this._hideNoVideoParticipants = hideNoVideoParticipants;
 	}
 
 	addPeers(peers)
 	{
 		for (const peer of peers)
 		{
-			this._newPeer(peer.id);
+			if (this._peerList.indexOf(peer.id) === -1)
+			{
+				logger.debug('adding peer [peerId: "%s"]', peer.id);
+				this._peerList.push(peer.id);
+			}
 		}
+		this._spotlightsUpdated();
 	}
 
 	peerInSpotlights(peerId)
 	{
-		if (this._started)
-		{
-			return this._currentSpotlights.indexOf(peerId) !== -1;
-		}
-		else
-		{
-			return false;
-		}
+		return this._currentSpotlights.indexOf(peerId) !== -1;
 	}
 
-	addPeerToSpotlight(peerId)
+	addPeerToSelectedSpotlights(peerId)
 	{
 		logger.debug('addPeerToSpotlight() [peerId:"%s"]', peerId);
 
 		this._selectedSpotlights = [ ...this._selectedSpotlights, peerId ];
-
-		if (this._started)
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
-	removePeerSpotlight(peerId)
+	removePeerFromSelectedSpotlights(peerId)
 	{
 		logger.debug('removePeerSpotlight() [peerId:"%s"]', peerId);
 
@@ -63,40 +49,27 @@ export default class Spotlights extends EventEmitter
 			this._selectedSpotlights.filter((peer) =>
 				peer !== peerId);
 
-		if (this._started)
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
-	_handleSignaling()
+	clearPeersFromSelectedSpotlights()
 	{
-		this._signalingSocket.on('notification', (notification) =>
-		{
-			if (notification.method === 'newPeer')
-			{
-				const { id } = notification.data;
+		logger.debug('clearPeersFromSpotlights()');
 
-				this._newPeer(id);
-			}
+		this._selectedSpotlights = [];
 
-			if (notification.method === 'peerClosed')
-			{
-				const { peerId } = notification.data;
-
-				this._closePeer(peerId);
-			}
-		});
+		this._spotlightsUpdated();
 	}
 
 	clearSpotlights()
 	{
-		this._started = false;
-
 		this._peerList = [];
+		this._activeVideoConsumers = [];
 		this._selectedSpotlights = [];
 		this._currentSpotlights = [];
 	}
 
-	_newPeer(id)
+	newPeer(id)
 	{
 		logger.debug(
 			'room "newpeer" event [id: "%s"]', id);
@@ -107,30 +80,26 @@ export default class Spotlights extends EventEmitter
 
 			this._peerList.push(id);
 
-			if (this._started)
-				this._spotlightsUpdated();
+			this._spotlightsUpdated();
 		}
 	}
 
-	_closePeer(id)
+	closePeer(id)
 	{
 		logger.debug(
 			'room "peerClosed" event [peerId:%o]', id);
 
 		this._peerList = this._peerList.filter((peer) => peer !== id);
-
+		this._activeVideoConsumers = this._activeVideoConsumers.filter((consumer) =>
+			consumer.peerId !== id);
 		this._selectedSpotlights = this._selectedSpotlights.filter((peer) => peer !== id);
-
-		if (this._started)
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
 	addSpeakerList(speakerList)
 	{
 		this._peerList = [ ...new Set([ ...speakerList, ...this._peerList ]) ];
-
-		if (this._started)
-			this._spotlightsUpdated();
+		this._spotlightsUpdated();
 	}
 
 	handleActiveSpeaker(peerId)
@@ -148,38 +117,105 @@ export default class Spotlights extends EventEmitter
 		}
 	}
 
+	addVideoConsumer(newConsumer)
+	{
+		if (newConsumer.kind === 'video' && (newConsumer.source === 'webcam' ||
+			newConsumer.source === 'extravideo' || newConsumer.source === 'screen') &&
+			this._activeVideoConsumers.findIndex((consumer) =>
+				consumer.consumerId === newConsumer.id) === -1)
+		{
+			this._activeVideoConsumers.push({
+				consumerId     : newConsumer.id,
+				peerId         : newConsumer.peerId,
+				remotelyPaused : newConsumer.remotelyPaused });
+
+			this._spotlightsUpdated();
+		}
+	}
+
+	removeVideoConsumer(consumerId)
+	{
+		const oldLength = this._activeVideoConsumers.length;
+
+		this._activeVideoConsumers = this._activeVideoConsumers.filter((consumer) =>
+			consumer.consumerId !== consumerId);
+
+		if (oldLength !== this._activeVideoConsumers.length)
+			this._spotlightsUpdated();
+	}
+
+	resumeVideoConsumer(consumerId)
+	{
+		const videoConsumer = this._activeVideoConsumers.find((consumer) =>
+			consumer.consumerId === consumerId);
+
+		if (videoConsumer)
+		{
+			videoConsumer.remotelyPaused = false;
+			this._spotlightsUpdated();
+		}
+	}
+
+	pauseVideoConsumer(consumerId)
+	{
+		const videoConsumer = this._activeVideoConsumers.find((consumer) =>
+			consumer.consumerId === consumerId);
+
+		if (videoConsumer)
+		{
+			videoConsumer.remotelyPaused = true;
+			this._spotlightsUpdated();
+		}
+	}
+
+	_hasActiveVideo(peerId)
+	{
+		if (this._activeVideoConsumers.findIndex((consumer) =>
+			consumer.peerId === peerId && !consumer.remotelyPaused) !== -1)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	_spotlightsUpdated()
 	{
 		let spotlights;
 
-		const maxSpotlights =
-			this._selectedSpotlights.length >
-			this._maxSpotlights ?
-				this._selectedSpotlights.length :
-				this._maxSpotlights;
-
-		if (this._selectedSpotlights.length > 0)
+		if (this._hideNoVideoParticipants)
 		{
-			spotlights = [ ...new Set([ ...this._selectedSpotlights, ...this._peerList ]) ];
+			spotlights = this._peerList.filter((peerId) =>
+				this._hasActiveVideo(peerId));
 		}
 		else
 		{
 			spotlights = this._peerList;
 		}
 
-		if (
-			!this._arraysEqual(
-				this._currentSpotlights, spotlights.slice(0, maxSpotlights)
-			)
-		)
+		while (this._selectedSpotlights.length > this._maxSpotlights)
+		{
+			this._selectedSpotlights.shift();
+		}
+
+		if (this._selectedSpotlights.length > 0)
+		{
+			spotlights = [ ...new Set([ ...this._selectedSpotlights, ...spotlights ]) ];
+		}
+
+		if (!this._arraysEqual(
+			this._currentSpotlights, spotlights.slice(0, this._maxSpotlights)))
 		{
 			logger.debug('_spotlightsUpdated() | spotlights updated, emitting');
 
-			this._currentSpotlights = spotlights.slice(0, maxSpotlights);
-			this.emit('spotlights-updated', this._currentSpotlights);
+			this._currentSpotlights = spotlights.slice(0, this._maxSpotlights);
+			this._roomClient.updateSpotlights(this._currentSpotlights);
 		}
 		else
+		{
 			logger.debug('_spotlightsUpdated() | spotlights not updated');
+		}
+
 	}
 
 	_arraysEqual(arr1, arr2)
@@ -194,6 +230,21 @@ export default class Spotlights extends EventEmitter
 		}
 
 		return true;
+	}
+
+	get hideNoVideoParticipants()
+	{
+		return this._hideNoVideoParticipants;
+	}
+
+	set hideNoVideoParticipants(hideNoVideoParticipants)
+	{
+		const oldHideNoVideoParticipants = this._hideNoVideoParticipants;
+
+		this._hideNoVideoParticipants = hideNoVideoParticipants;
+
+		if (oldHideNoVideoParticipants !== this._hideNoVideoParticipants)
+			this._spotlightsUpdated();
 	}
 
 	get maxSpotlights()

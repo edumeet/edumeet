@@ -19,6 +19,7 @@ import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
+import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
 import ScreenOffIcon from '@material-ui/icons/StopScreenShare';
@@ -32,6 +33,8 @@ import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
+import ListItem from '@material-ui/core/ListItem';
+import Slider from '@material-ui/core/Slider';
 
 const styles = (theme) =>
 	({
@@ -81,6 +84,33 @@ const styles = (theme) =>
 		}
 	});
 
+const VolumeSlider = withStyles(
+	{
+		root :
+		{
+			color   : '#3880ff',
+			height  : 2,
+			padding : '15px 0'
+		},
+		track : {
+			height : 2
+		},
+		rail : {
+			height  : 2,
+			opacity : 0.2
+		},
+		mark : {
+			backgroundColor : '#bfbfbf',
+			height          : 10,
+			width           : 3,
+			marginTop       : -3
+		},
+		markActive : {
+			opacity         : 1,
+			backgroundColor : 'currentColor'
+		}
+	})(Slider);
+
 const ListPeer = (props) =>
 {
 	const intl = useIntl();
@@ -109,6 +139,7 @@ const ListPeer = (props) =>
 		isModerator,
 		spotlight,
 		peer,
+		mode,
 		openRolesManager,
 		micConsumer,
 		webcamConsumer,
@@ -251,6 +282,27 @@ const ListPeer = (props) =>
 						<Typography className={classes.moreActionsHeader}>
 							{peer.displayName}
 						</Typography>
+						<ListItem className={classes.nested}
+							disabled={!micConsumer || peer.stopPeerAudioInProgress}
+						>
+							<VolumeDownIcon />
+							<VolumeSlider className={classnames(classes.slider, classnames.setting)}
+								key={'audio-gain-slider'}
+								disabled={!micConsumer || peer.stopPeerAudioInProgress}
+								min={0}
+								max={2}
+								step={0.05}
+								value={micConsumer && micConsumer.audioGain !== undefined?
+									micConsumer.audioGain: 1}
+								valueLabelDisplay={'auto'}
+								onChange={
+									(event, value) =>
+									{
+										roomClient.setAudioGain(micConsumer, peer.id, value);
+									}}
+							/>
+							<VolumeUpIcon />
+						</ListItem>
 						<MenuItem
 							disabled={
 								peer.peerVideoInProgress ||
@@ -326,7 +378,9 @@ const ListPeer = (props) =>
 
 								isSelected ?
 									roomClient.removeSelectedPeer(peer.id) :
-									roomClient.addSelectedPeer(peer.id);
+									mode === 'filmstrip' ?
+										roomClient.setSelectedPeer(peer.id) :
+										roomClient.addSelectedPeer(peer.id);
 							}}
 						>
 							{ !isSelected ?
@@ -473,6 +527,7 @@ ListPeer.propTypes =
 	isModerator      : PropTypes.bool,
 	spotlight        : PropTypes.bool,
 	peer             : appPropTypes.Peer.isRequired,
+	mode             : PropTypes.string.isRequired,
 	openRolesManager : PropTypes.func.isRequired,
 	micConsumer      : appPropTypes.Consumer,
 	webcamConsumer   : appPropTypes.Consumer,
@@ -490,6 +545,7 @@ const makeMapStateToProps = (initialState, { id }) =>
 	{
 		return {
 			peer : state.peers[id],
+			mode : state.room.mode,
 			...getPeerConsumers(state, id)
 		};
 	};
@@ -517,6 +573,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.peers === next.peers &&
+				prev.room.mode === next.room.mode &&
 				prev.consumers === next.consumers
 			);
 		}

@@ -1,5 +1,6 @@
+import Logger from './Logger';
+
 const EventEmitter = require('events').EventEmitter;
-const Logger = require('./Logger');
 
 const logger = new Logger('Lobby');
 
@@ -61,11 +62,33 @@ class Lobby extends EventEmitter
 	{
 		logger.info('promoteAllPeers()');
 
+		const peerArray = [];
+
 		for (const peer in this._peers)
 		{
-			if (!this._peers[peer].closed)
-				this.promotePeer(peer);
+			peerArray.push(peer);
 		}
+
+		const lobby = this;
+		setTimeout(function() {
+				lobby._promoteAllPeersLoop(lobby, peerArray, 0);
+			}, 200);
+	}
+
+	_promoteAllPeersLoop(lobby, peerArray, index)
+	{
+		if (index >= peerArray.length) return;
+
+		const peer = lobby._peers[peerArray[index]];
+
+		if (peer && lobby._peers[peer.id] && !lobby._peers[peer.id].closed)
+				lobby.promotePeer(peer.id);
+
+		index++;
+
+		setTimeout(function() {
+				lobby._promoteAllPeersLoop(lobby, peerArray, index);
+			}, 200);
 	}
 
 	promotePeer(peerId)

@@ -1,4 +1,6 @@
 const os = require('os');
+// const fs = require('fs');
+
 const userRoles = require('../userRoles');
 
 const {
@@ -31,12 +33,16 @@ module.exports =
 	/*
 	auth :
 	{
+		// Always enabled if configured
 		lti :
 		{
 			consumerKey    : 'key',
 			consumerSecret : 'secret'
 		},
-		oidc:
+
+		// Auth strategy to use (default oidc)
+		strategy : 'oidc',
+		oidc :
 		{
 			// The issuer URL for OpenID Connect discovery
 			// The OpenID Provider Configuration Document
@@ -59,6 +65,42 @@ module.exports =
 				redirect_uri  : 'https://client.example.com/auth/callback'
 			}
 
+		},
+		saml :
+		{
+			// where edumeet.example.com is your edumeet server
+			callbackUrl    : 'https://edumeet.example.com/auth/callback',
+			issuer         : 'https://edumeet.example.com',
+			entryPoint     : 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
+			privateCert    : fs.readFileSync('config/saml_privkey.pem', 'utf-8'),
+			signingCert    : fs.readFileSync('config/saml_cert.pem', 'utf-8'),
+			decryptionPvk  : fs.readFileSync('config/saml_privkey.pem', 'utf-8'),
+			decryptionCert : fs.readFileSync('config/saml_cert.pem', 'utf-8'),
+			// Federation cert
+			cert           : fs.readFileSync('config/federation_cert.pem', 'utf-8')
+		},
+
+		// to create password hash use: node server/utils/password_encode.js cleartextpassword
+		local :
+		{
+			users : [
+				{
+					id           : 1,
+					username     : 'alice',
+					passwordHash : '$2b$10$PAXXw.6cL3zJLd7ZX.AnL.sFg2nxjQPDmMmGSOQYIJSa0TrZ9azG6',
+					displayName  : 'Alice',
+					emails       : [ { value: 'alice@atlanta.com' } ],
+					meet_roles   : [ ]
+				},
+				{
+					id           : 2,
+					username     : 'bob',
+					passwordHash : '$2b$10$BzAkXcZ54JxhHTqCQcFn8.H6klY/G48t4jDBeTE2d2lZJk/.tvv0G',
+					displayName  : 'Bob',
+					emails       : [ { value: 'bob@biloxi.com' } ],
+					meet_roles   : [ ]
+				}
+			]
 		}
 	},
 	*/
@@ -152,13 +194,13 @@ module.exports =
 	// See examples below.
 	// Examples:
 	/*
-	// All authenicated users will be MODERATOR and AUTHENTICATED
+	// All authenticated users will be MODERATOR and AUTHENTICATED
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		peer.addRole(userRoles.MODERATOR);
 		peer.addRole(userRoles.AUTHENTICATED);
 	},
-	// All authenicated users will be AUTHENTICATED,
+	// All authenticated users will be AUTHENTICATED,
 	// and those with the moderator role set in the userinfo
 	// will also be MODERATOR
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
@@ -198,19 +240,7 @@ module.exports =
 			}
 		}
 	},
-	// All authenicated users will be AUTHENTICATED,
-	// and those with email ending with @example.com
-	// will also be MODERATOR
-	userMapping : async ({ peer, room, roomId, userinfo }) =>
-	{
-		if (userinfo.email && userinfo.email.endsWith('@example.com'))
-		{
-			peer.addRole(userRoles.MODERATOR);
-		}
-
-		peer.addRole(userRoles.AUTHENTICATED);
-	},
-	// All authenicated users will be AUTHENTICATED,
+	// All authenticated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
@@ -237,6 +267,10 @@ module.exports =
 				peer.picture = userinfo.picture;
 			}
 		}
+		if (userinfo['urn:oid:0.9.2342.19200300.100.1.60'] != null)
+		{
+			peer.picture = `data:image/jpeg;base64, ${userinfo['urn:oid:0.9.2342.19200300.100.1.60']}`;
+		}
 
 		if (userinfo.nickname != null)
 		{
@@ -246,6 +280,16 @@ module.exports =
 		if (userinfo.name != null)
 		{
 			peer.displayName = userinfo.name;
+		}
+
+		if (userinfo.displayName != null)
+		{
+			peer.displayName = userinfo.displayName;
+		}
+
+		if (userinfo['urn:oid:2.16.840.1.113730.3.1.241'] != null)
+		{
+			peer.displayName = userinfo['urn:oid:2.16.840.1.113730.3.1.241'];
 		}
 
 		if (userinfo.email != null)
@@ -302,18 +346,26 @@ module.exports =
 	// action as soon as a peer with the permission joins. In this example
 	// everyone will be able to lock/unlock room until a MODERATOR joins.
 	allowWhenRoleMissing : [ CHANGE_ROOM_LOCK ],
-	// When truthy, the room will be open to all users when as long as there
+	// When true, the room will be open to all users as long as there
 	// are allready users in the room
 	activateOnHostJoin   : true,
+	// roomsUnlocked is an array of rooms users can enter without waiting
+	// in the lobby.  If the array is undefined or null, users can enter
+	// any room without waiting in the lobby.  This is the default.  The
+	// aim of roomsUnlocked is to enforce moderated access to all rooms
+	// with the exception of the rooms defined in the array.
+	// roomsUnlocked        : [ 'unlocked1', 'unlocked2', 'unlocked3' ],
 	// When set, maxUsersPerRoom defines how many users can join
 	// a single room. If not set, there is no limit.
 	// maxUsersPerRoom    : 20,
 	// Room size before spreading to new router
 	routerScaleSize      : 40,
-	// Socket timout value
+	// Socket timeout value
 	requestTimeout       : 20000,
 	// Socket retries when timeout
 	requestRetries       : 3,
+	// If > 0, sets a cache-control max-age (in seconds) to static files responses.
+	staticFilesCachePeriod : 0,
 	// Mediasoup settings
 	mediasoup            :
 	{
@@ -409,14 +461,19 @@ module.exports =
 			maxIncomingBitrate              : 1500000
 		}
 	}
-	// Prometheus exporter
+
 	/*
-	prometheus: {
-		deidentify: false, // deidentify IP addresses
-		// listen: 'localhost', // exporter listens on this address
-		numeric: false, // show numeric IP addresses
-		port: 8889, // allocated port
-		quiet: false // include fewer labels
+	,
+	// Prometheus exporter
+	prometheus : {
+		deidentify : false, // deidentify IP addresses
+		// listen     : 'localhost', // exporter listens on this address
+		numeric    : true, // show numeric IP addresses
+		port       : 8889, // allocated port
+		quiet      : false // include fewer labels
+		// aggregated metrics options
+		period     : 15 // update period (seconds)
+		secret     : null // if set, checks the authorization header: `Bearer <secret>`
 	}
 	*/
 };

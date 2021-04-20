@@ -59,16 +59,19 @@
 	"room.raisedHand": " {displayName} підняв руку",
 	"room.loweredHand": " {displayName} опустив руку",
 	"room.extraVideo": "Додаткове відео",
+	"room.extraVideoDuplication": null,
 	"room.overRoomLimit": "Кімната переповнена, спробуйте знову через деякий час",	
 	"room.help": "Допомога",
 	"room.about": "Про нас",
 	"room.shortcutKeys": "Гарячі клавіші",
 	"room.browsePeersSpotlight": "Переглянути учасників у центрі уваги",
 	"room.stopAllScreenSharing": "Зупинити спільне використання екрану",
-	"me.mutedPTT":" У вас вимкнено звук, утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
+	"room.hideSelfView": null,
+	"room.showSelfView": null,
+
+	"me.mutedPTT": " У вас вимкнено звук, утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
 	"roles.gotRole": "Ви отримали роль {role}",
 	"roles.lostRole": "Ви втратили роль {role}",
-
 
 	"tooltip.login": "Увійти",
 	"tooltip.logout": "Вихід",
@@ -126,6 +129,11 @@
 	"label.promoteAllPeers": "Сприяти всім",
 	"label.moreActions": "Більше дій",
 	"label.version": "Версія",
+	"label.username": null,
+	"label.password": null,
+	"label.login": null,
+	"label.logout": null,
+	"label.join": null,
 
 	"settings.settings": "Налаштування",
 	"settings.camera": "Камера",
@@ -136,7 +144,7 @@
 	"settings.cantSelectAudio": "Неможливо вибрати аудіопристрій",
 	"settings.audioOutput": "Пристрій аудіовиходу",
 	"settings.selectAudioOutput": "Виберіть пристрій аудіовиходу",
-	"settings.cantSelectAudioOutput": "Неможливо вибрати аудіо вихідний пристрій",	
+	"settings.cantSelectAudioOutput": "Неможливо вибрати аудіо вихідний пристрій",
 	"settings.resolution": "Виберіть роздільну здатність відео",
 	"settings.frameRate": "Виберіть частоту кадрів відео",
 	"settings.screenSharingResolution": "Оберіть роздільну здатність екрану",
@@ -150,7 +158,7 @@
 	"settings.lastn": "Кількість видимих відео",
 	"settings.hiddenControls": "Приховані засоби медіа",
 	"settings.notificationSounds": "Звуки сповіщення",
-	"settings.showNotifications": "Показати сповіщення", 
+	"settings.showNotifications": "Показати сповіщення",
 	"settings.buttonControlBar": "Окремий контроль медіа",
 	"settings.showAdvancedVideo": "Розширені налаштування відео",
 	"settings.showAdvancedAudio": "Розширені налаштування звуку",
@@ -160,6 +168,13 @@
 	"settings.drawerOverlayed": "Боковий ящик над вмістом",
 	"settings.voiceActivatedUnmute": "Активований голос вмикається",
 	"settings.noiseThreshold": "Поріг шуму",
+	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Неможливо зберегти файл",
 	"filesharing.startingFileShare": "Спроба поділитися файлом",
@@ -174,11 +189,13 @@
 
 	"devices.devicesChanged": "Ваші пристрої змінилися, налаштуйте ваші пристрої в діалоговому вікні налаштувань",
 
+	"devices.enableOnlyMicrophone": null,
 	"device.audioUnsupported": "Аудіо не підтримується",
 	"device.activateAudio": "Активувати звук",
 	"device.muteAudio": "Вимкнути звук",
 	"device.unMuteAudio": "Увімкнути звук",
 
+	"devices.enableOnlyCamera": null,
 	"device.videoUnsupported": "Відео не підтримується",
 	"device.startVideo": "Запустити відео",
 	"device.stopVideo": "Зупинити відео",
@@ -200,6 +217,10 @@
 
 	"devices.cameraDisconnected": "Камера відключена",
 	"devices.cameraError": "Під час доступу до камери сталася помилка",
+
+	"devices.enableBothMicrophoneAndCamera": null,
+	"devices.disableBothMicrophoneAndCamera": null,
+	"devices.chooseMedia": null,
 
 	"moderator.clearChat": "Модератор очистив чат",
 	"moderator.clearFiles": "Модератор очистив файли",
