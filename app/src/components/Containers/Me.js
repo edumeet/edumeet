@@ -22,6 +22,9 @@ import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
 import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = (theme) =>
 	({
@@ -357,6 +360,20 @@ const Me = (props) =>
 
 		return () => clearInterval(poll);
 	}, [ roomClient, advancedMode ]);
+
+	// menu
+	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
+	const [ showAudioAnalyzer, setShowAudioAnalyzer ] = React.useState(null);
+
+	const handleMenuOpen = (event) =>
+	{
+		setMenuAnchorElement(event.currentTarget);
+	};
+
+	const handleMenuClose = (event) =>
+	{
+		setMenuAnchorElement(null);
+	};
 
 	return (
 		<React.Fragment>
@@ -708,6 +725,57 @@ const Me = (props) =>
 										}
 									</Tooltip>
 								}
+
+								<Tooltip
+									title={intl.formatMessage({
+										id             : 'device.options',
+										defaultMessage : 'Options'
+									})}
+									placement={smallContainer ? 'top' : 'left'}
+								>
+									{ smallContainer ?
+										<IconButton
+											aria-label={intl.formatMessage({
+												id             : 'device.options',
+												defaultMessage : 'Options'
+											})}
+											className={classes.smallContainer}
+											size='small'
+											onClick={handleMenuOpen}
+										>
+											<MoreHorizIcon />
+										</IconButton>
+										:
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.options',
+												defaultMessage : 'Options'
+											})}
+											className={classes.fab}
+											size='large'
+											onClick={handleMenuOpen}
+										>
+											<MoreHorizIcon />
+										</Fab>
+									}
+								</Tooltip>
+								<Menu
+									anchorEl={menuAnchorElement}
+									keepMounted
+									open={Boolean(menuAnchorElement)}
+									onClose={handleMenuClose}
+								>
+									<MenuItem
+										onClick={() =>
+										{
+											setShowAudioAnalyzer(!showAudioAnalyzer);
+											handleMenuClose();
+										}}
+									>
+										{ showAudioAnalyzer ? 'Disable' : 'Enable' } audio analyzer
+									</MenuItem>
+								</Menu>
+
 							</React.Fragment>
 						</div>
 					}
@@ -722,6 +790,7 @@ const Me = (props) =>
 						showPeerInfo
 						videoTrack={webcamProducer && webcamProducer.track}
 						videoVisible={videoVisible}
+						audioTrack={micProducer && micProducer.track}
 						audioCodec={micProducer && micProducer.codec}
 						videoCodec={webcamProducer && webcamProducer.codec}
 						netInfo={transports && transports}
@@ -732,6 +801,7 @@ const Me = (props) =>
 						{
 							roomClient.changeDisplayName(displayName);
 						}}
+						showAudioAnalyzer={showAudioAnalyzer}
 					>
 						{ micState === 'muted' ? null : <Volume id={me.id} /> }
 					</VideoView>
