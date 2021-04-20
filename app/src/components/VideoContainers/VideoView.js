@@ -456,8 +456,9 @@ class VideoView extends React.PureComponent
 		{
 			this._setAudioMonitorTrack(audioTrack);
 		}
-		else
+		else if (this.audioAnalyzer)
 		{
+			this.audioAnalyzer.delete();
 			this.audioAnalyzer = null;
 		}
 	}
@@ -490,7 +491,7 @@ class VideoView extends React.PureComponent
 			}
 			else if (this.audioAnalyzer)
 			{
-				this.audioAnalyzer.removeTracks();
+				this.audioAnalyzer.delete();
 				this.audioAnalyzer = null;
 			}
 		}

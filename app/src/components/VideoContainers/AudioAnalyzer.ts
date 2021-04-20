@@ -13,9 +13,9 @@ export class AudioAnalyzer
 
     tracks         : Map<MediaStreamTrack, MediaStreamAudioSourceNode>;
 
-    canvas         : HTMLCanvasElement;
+    canvas         : HTMLCanvasElement | null;
 
-    canvasContext  : CanvasRenderingContext2D;
+    canvasContext  : CanvasRenderingContext2D | null;
 
     canvasColumn   : number;
 
@@ -30,6 +30,8 @@ export class AudioAnalyzer
     private labelsWidth = 20;
 
     private labelsSize = 10;
+
+    private resizeObserver : ResizeObserver;
 
 	constructor(container: HTMLElement)
 	{
@@ -60,15 +62,18 @@ export class AudioAnalyzer
             .domain([0, 64, 128, 192, 255])
             .out('hex');
 
-		const resizeObserver = new ResizeObserver((entries) =>
+		this.resizeObserver = new ResizeObserver((entries) =>
 		{
-			this.canvas.width = this.container.clientWidth;
-			this.canvas.height = this.container.clientHeight;
-            this.canvasColumn = 0;
-            requestAnimationFrame(this.render.bind(this));
+            if (this.canvas)
+            {
+                this.canvas.width = this.container.clientWidth;
+                this.canvas.height = this.container.clientHeight;
+                this.canvasColumn = 0;
+                requestAnimationFrame(this.render.bind(this));
+            }
 		});
 
-		resizeObserver.observe(container);
+		this.resizeObserver.observe(container);
 
 		// audio context
 		this.context = new AudioContext({
@@ -116,8 +121,29 @@ export class AudioAnalyzer
 		this.tracks.clear();
 	}
 
+    delete()
+    {
+        logger.debug('delete');
+
+        if (this.canvas)
+        {
+            this.canvasContext = null;
+            this.container.removeChild(this.canvas);
+            this.canvas = null;
+        }
+
+        this.removeTracks();
+        this.resizeObserver.disconnect();
+        this.context.close();
+    }
+
     render()
     {
+        const { canvas, canvasContext } = this;
+
+        if (!canvasContext || !canvas)
+            return;
+
         this.analyser.getByteFrequencyData(this.frequencyArray);
 
         if (this.canvasColumn < this.labelsWidth)
@@ -132,10 +158,10 @@ export class AudioAnalyzer
                     freqString = `${Math.round(freq / 1000)}k`;
                 }
 
-                this.canvasContext.font = `${this.labelsSize}px Sans`;
-                this.canvasContext.fillStyle = 'white';
-                this.canvasContext.fillText(freqString, 0,
-                    this.canvas.height * (1 - y) + this.labelsSize);
+                canvasContext.font = `${this.labelsSize}px Sans`;
+                canvasContext.fillStyle = 'white';
+                canvasContext.fillText(freqString, 0,
+                    canvas.height * (1 - y) + this.labelsSize);
             });
 
             this.canvasColumn = this.labelsWidth;
@@ -146,17 +172,17 @@ export class AudioAnalyzer
             const color = this.colorScale(this.frequencyArray[i]);
             const y = Math.log(i) / Math.log(this.frequencyArray.length);
 
-            this.canvasContext.fillStyle = color;
-            this.canvasContext.fillRect(
-                this.canvasColumn, this.canvas.height * (1 - y), 1, 1);
+            canvasContext.fillStyle = color;
+            canvasContext.fillRect(
+                this.canvasColumn, canvas.height * (1 - y), 1, 1);
         }
 
         this.canvasColumn += 1;
-        if (this.canvasColumn > this.canvas.width)
+        if (this.canvasColumn > canvas.width)
         {
             this.canvasColumn = this.labelsWidth;
-            this.canvasContext.clearRect(this.labelsWidth, 0,
-                this.canvas.width - this.labelsWidth, this.canvas.height);
+            canvasContext.clearRect(this.labelsWidth, 0,
+                canvas.width - this.labelsWidth, canvas.height);
         }
     }
 
