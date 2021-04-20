@@ -46,7 +46,7 @@ export class AudioAnalyzer
 			left: 0;
 			width: 100%;
 			height: 100%;
-			background-color: black;
+			background-color: rgba(0, 0, 0, 0.9);
 		`;
 
 		this.canvas.width = this.container.clientWidth;
@@ -135,7 +135,7 @@ export class AudioAnalyzer
                 this.canvasContext.font = `${this.labelsSize}px Sans`;
                 this.canvasContext.fillStyle = 'white';
                 this.canvasContext.fillText(freqString, 0,
-                    this.canvas.height * (1 - y) + this.labelsSize / 2);
+                    this.canvas.height * (1 - y) + this.labelsSize);
             });
 
             this.canvasColumn = this.labelsWidth;

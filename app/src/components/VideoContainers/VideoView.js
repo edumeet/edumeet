@@ -165,9 +165,10 @@ const styles = (theme) =>
 		},
 		audioAnalyzer :
 		{
-			width     : '30%',
-			height    : '30%',
-			minHeight : '120px'
+			width           : '30%',
+			height          : '30%',
+			minHeight       : '120px',
+			backgroundColor : 'transparent'
 		}
 	});
 
