@@ -10,7 +10,7 @@ import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';
 import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
-import AudioMotionAnalyzer from 'audiomotion-analyzer';
+import { AudioAnalyzer } from './AudioAnalyzer';
 
 const logger = new Logger('VideoView');
 
@@ -165,7 +165,9 @@ const styles = (theme) =>
 		},
 		audioAnalyzer :
 		{
-			width : '30%'
+			width     : '30%',
+			height    : '30%',
+			minHeight : '120px'
 		}
 	});
 
@@ -385,9 +387,9 @@ class VideoView extends React.PureComponent
 						}
 
 						{ showAudioAnalyzer &&
-							<div className={classnames(classes.audioAnalyzer)}>
-								<div ref={this.audioAnalyzerContainer} />
-							</div>
+							<div className={classnames(classes.audioAnalyzer)}
+								ref={this.audioAnalyzerContainer}
+							/>
 						}
 
 					</div>
@@ -455,7 +457,7 @@ class VideoView extends React.PureComponent
 		}
 		else
 		{
-			this.audioMotion = null;
+			this.audioAnalyzer = null;
 		}
 	}
 
@@ -485,9 +487,10 @@ class VideoView extends React.PureComponent
 			{
 				this._setAudioMonitorTrack(audioTrack);
 			}
-			else
+			else if (this.audioAnalyzer)
 			{
-				this.audioMotion = null;
+				this.audioAnalyzer.removeTracks();
+				this.audioAnalyzer = null;
 			}
 		}
 	}
@@ -527,34 +530,20 @@ class VideoView extends React.PureComponent
 
 	_setAudioMonitorTrack(track)
 	{
-		if (!this.audioMotion)
+		if (!this.audioAnalyzer)
 		{
-			logger.debug('_setAudioMonitorTrack creating audioMotion with dom:', this.audioAnalyzerContainer.current);
-
-			this.audioMotion = new AudioMotionAnalyzer(this.audioAnalyzerContainer.current,
-				{
-					width           : 640,
-					height          : 360,
-					connectSpeakers : false,
-					mode            : 1 // https://audiomotion.dev/#/?id=mode-number
-				});
+			logger.debug('_setAudioMonitorTrack creating audioAnalyzer with dom:', this.audioAnalyzerContainer.current);
+			this.audioAnalyzer = new AudioAnalyzer(this.audioAnalyzerContainer.current);
 		}
 
 		if (track)
 		{
-			logger.debug('_setAudioMonitorTrack connecting track to audioMotion', track);
-
-			const mediaStream = new MediaStream([ track ]);
-			const sourceNode = new MediaStreamAudioSourceNode(this.audioMotion.audioCtx, {
-				mediaStream
-			});
-
-			this.audioMotion.connectInput(sourceNode);
+			this.audioAnalyzer.addTrack(track);
 		}
 		else
 		{
 			// disconnects all the tracks
-			this.audioMotion.disconnectInput();
+			this.audioAnalyzer.removeTracks();
 		}
 	}
 
