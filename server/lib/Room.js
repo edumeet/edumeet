@@ -560,6 +560,7 @@ class Room extends EventEmitter
 			{
 				const { producer, volume } = volumes[0];
 
+				// eslint-disable-next-line no-shadow
 				const audioLevelObject = this._audioLevelObservers.get(routerId);
 
 				audioLevelObject.peerId = producer.appData.peerId;
@@ -569,6 +570,7 @@ class Room extends EventEmitter
 
 			audioLevelObject.audioLevelObserver.on('silence', () =>
 			{
+				// eslint-disable-next-line no-shadow
 				const audioLevelObject = this._audioLevelObservers.get(routerId);
 
 				audioLevelObject.peerId = null;
