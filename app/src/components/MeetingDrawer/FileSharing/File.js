@@ -25,7 +25,9 @@ const styles = (theme) =>
 		avatar :
 		{
 			borderRadius : '50%',
-			height       : '2rem'
+			height       : '2rem',
+			width        : '2rem',
+			objectFit    : 'cover'
 		},
 		text :
 		{
