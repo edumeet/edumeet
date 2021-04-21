@@ -350,6 +350,37 @@ const MediaSettings = ({
 						</FormControl>
 						<FormControl className={classes.formControl}>
 							<Select
+								value={settings.frameRate || window.config.defaultFrameRate}
+								onChange={(event) =>
+								{
+									if (event.target.value)
+										roomClient.updateWebcam({
+											restart      : true,
+											newFrameRate : event.target.value
+										});
+								}}
+								name='Frame rate'
+								autoWidth
+								className={classes.selectEmpty}
+							>
+								{ [ 1, 5, 10, 15, 20, 25, 30, 60 ].map((frameRate) =>
+								{
+									return (
+										<MenuItem key={frameRate} value={frameRate}>
+											{frameRate}
+										</MenuItem>
+									);
+								})}
+							</Select>
+							<FormHelperText>
+								<FormattedMessage
+									id='settings.webcamFrameRate'
+									defaultMessage='Select your webcam frame rate'
+								/>
+							</FormHelperText>
+						</FormControl>
+						<FormControl className={classes.formControl}>
+							<Select
 								value={settings.screenSharingFrameRate || ''}
 								onChange={(event) =>
 								{
