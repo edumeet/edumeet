@@ -171,6 +171,15 @@ export class AudioAnalyzer
             this.canvasColumn = this.labelsWidth;
         }
 
+        if (this.canvasColumn >= canvas.width)
+        {
+            this.canvasColumn = canvas.width - 1;
+            const imageData = canvasContext.getImageData(
+                this.labelsWidth + 1, 0,
+                canvas.width - this.labelsWidth, canvas.height);
+            canvasContext.putImageData(imageData, this.labelsWidth, 0);
+        }
+
         for (let i = 0; i < this.frequencyArray.length; i++)
         {
             const color = this.colorScale(this.frequencyArray[i]);
@@ -182,15 +191,6 @@ export class AudioAnalyzer
         }
 
         this.canvasColumn += 1;
-        if (this.canvasColumn >= canvas.width)
-        {
-            this.canvasColumn = canvas.width - 1;
-            const imageData = canvasContext.getImageData(
-                this.labelsWidth + 1, 0,
-                canvas.width - this.labelsWidth, canvas.height);
-            canvasContext.putImageData(imageData, this.labelsWidth, 0);
-            canvasContext.clearRect(canvas.width - 1, 0, 1, canvas.height);
-        }
     }
 
 	renderLoop()
