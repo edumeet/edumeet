@@ -49,7 +49,6 @@ const ChatModerator = (props) =>
 	const handleClearChat = () =>
 	{
 		roomClient.clearChat();
-		// roomClient.clearFileSharing();
 	};
 
 	return (
@@ -76,25 +75,6 @@ const ChatModerator = (props) =>
 					defaultMessage='Clear chat'
 				/>
 			</Button>
-			{/*
-			<Button
-				aria-label={intl.formatMessage({
-					id             : 'room.clearFileSharing',
-					defaultMessage : 'Clear files'
-				})}
-				className={classes.actionButton}
-				variant='contained'
-				color='secondary'
-				disabled={room.clearFileSharingInProgress}
-				onClick={() => roomClient.clearFileSharing()}
-			>
-				<FormattedMessage
-					id='room.clearFileSharing'
-					defaultMessage='Clear files'
-				/>
-			</Button>
-			*/}
-
 		</ul>
 	);
 };
