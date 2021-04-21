@@ -167,6 +167,7 @@ const styles = (theme) =>
 		{
 			width           : '30%',
 			height          : '30%',
+			minWidth        : '180px',
 			minHeight       : '120px',
 			backgroundColor : 'transparent'
 		}

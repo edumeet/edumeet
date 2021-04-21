@@ -33,6 +33,8 @@ export class AudioAnalyzer
 
     private resizeObserver : ResizeObserver;
 
+    private resizeCanvasTimeout : any;
+
 	constructor(container: HTMLElement)
 	{
 		logger.debug('constructor', { container });
@@ -45,9 +47,11 @@ export class AudioAnalyzer
 		this.canvas.style.cssText = `
 			position: relative;
 			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
 			background-color: rgba(0, 0, 0, 0.9);
 		`;
 
@@ -56,7 +60,8 @@ export class AudioAnalyzer
 		this.canvasContext = this.canvas.getContext('2d') as CanvasRenderingContext2D;
 		this.container.append(this.canvas);
 
-        this.canvasColumn = 0;
+        this.canvasColumn = this.labelsWidth;
+        this.renderScale();
 
         this.colorScale = chroma.scale([ 'black', 'blue', 'yellow', 'red' ])
             .domain([0, 64, 128, 192, 255])
@@ -65,16 +70,8 @@ export class AudioAnalyzer
         // capture resize events and force rendering
 		this.resizeObserver = new ResizeObserver((entries) =>
 		{
-            const { clientWidth, clientHeight } = this.container;
-
-            if (this.canvas && (
-                this.canvas.width !== clientWidth || this.canvas.height !== clientHeight))
-            {
-                this.canvas.width = clientWidth;
-                this.canvas.height = clientHeight;
-                this.canvasColumn = 0;
-                requestAnimationFrame(this.render.bind(this));
-            }
+            clearTimeout(this.resizeCanvasTimeout);
+            this.resizeCanvasTimeout = setTimeout(() => this.resizeCanvas(), 200);
 		});
 
 		this.resizeObserver.observe(this.container);
@@ -141,6 +138,56 @@ export class AudioAnalyzer
         this.context.close();
     }
 
+    resizeCanvas()
+    {
+        const { clientWidth, clientHeight } = this.container;
+
+        if (this.canvas && this.canvasContext && (
+            this.canvas.width !== clientWidth || this.canvas.height !== clientHeight))
+        {
+            const scaleX = clientWidth / this.canvas.width;
+            this.canvasColumn = Math.floor(this.canvasColumn * scaleX);
+
+            const img = new Image();
+            img.onload = () => {
+                if (this.canvas && this.canvasContext)
+                {
+                    this.canvas.width = clientWidth;
+                    this.canvas.height = clientHeight;
+                    this.canvasContext.drawImage(img, 0, 0, clientWidth, clientHeight);
+                    this.renderScale();
+                }
+            };
+            img.src = this.canvas.toDataURL();
+        }
+    }
+
+    renderScale()
+    {
+        const { canvas, canvasContext } = this;
+
+        if (!canvasContext || !canvas || !canvas.height)
+            return;
+
+        canvasContext.clearRect(0, 0, this.labelsWidth, canvas.height);
+
+        [5, 20, 100, 500, 2000, 6000, 20000].forEach((freq) =>
+        {
+            const y = Math.log(freq) / Math.log(24000);
+
+            let freqString = `${freq}`;
+            if (freq > 1000)
+            {
+                freqString = `${Math.round(freq / 1000)}k`;
+            }
+
+            canvasContext.font = `${this.labelsSize}px Sans`;
+            canvasContext.fillStyle = 'white';
+            canvasContext.fillText(freqString, 0,
+                canvas.height * (1 - y) + this.labelsSize);
+        });
+    }
+
     render()
     {
         const { canvas, canvasContext } = this;
@@ -149,27 +196,6 @@ export class AudioAnalyzer
             return;
 
         this.analyser.getByteFrequencyData(this.frequencyArray);
-
-        if (this.canvasColumn < this.labelsWidth)
-        {
-            [5, 20, 100, 500, 2000, 6000, 20000].forEach((freq) =>
-            {
-                const y = Math.log(freq) / Math.log(24000);
-
-                let freqString = `${freq}`;
-                if (freq > 1000)
-                {
-                    freqString = `${Math.round(freq / 1000)}k`;
-                }
-
-                canvasContext.font = `${this.labelsSize}px Sans`;
-                canvasContext.fillStyle = 'white';
-                canvasContext.fillText(freqString, 0,
-                    canvas.height * (1 - y) + this.labelsSize);
-            });
-
-            this.canvasColumn = this.labelsWidth;
-        }
 
         if (this.canvasColumn >= canvas.width)
         {
