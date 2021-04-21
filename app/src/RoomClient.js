@@ -4598,7 +4598,7 @@ export default class RoomClient
 	{
 		logger.debug('_setNoiseThreshold() [threshold:"%s"]', threshold);
 
-		this._hark.setThreshold(threshold);
+		this._hark?.setThreshold(threshold);
 
 		store.dispatch(
 			settingsActions.setNoiseThreshold(threshold));
