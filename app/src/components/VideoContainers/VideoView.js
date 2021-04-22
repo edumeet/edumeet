@@ -91,7 +91,6 @@ const styles = (theme) =>
 					// eslint-disable-next-line
 					gridTemplateAreas : '\
 					"AcodL		Acod	Acod	Acod	Acod" \
-					"OconfL		Oconf	Oconf	Oconf	Oconf" \
 					"VcodL		Vcod	Vcod	Vcod	Vcod" \
 					"ResL		Res		Res		Res		Res" \
 					"VPortL		VPort VPort VPort VPort" \
@@ -104,8 +103,6 @@ const styles = (theme) =>
 
 					'& .AcodL'    : { gridArea: 'AcodL' },
 					'& .Acod'     : { gridArea: 'Acod' },
-					'& .OconfL'   : { gridArea: 'OconfL' },
-					'& .Oconf'    : { gridArea: 'Oconf' },
 					'& .VcodL'    : { gridArea: 'VcodL' },
 					'& .Vcod'     : { gridArea: 'Vcod' },
 					'& .ResL'     : { gridArea: 'ResL' },
@@ -310,17 +307,9 @@ class VideoView extends React.PureComponent
 								<React.Fragment>
 									<span className={'AcodL'}>Acod: </span>
 									<span className={'Acod'}>
-										{audioCodec}
+										{audioCodec} {opusConfig}
 									</span>
 								</React.Fragment>
-							}
-							{ opusConfig ?
-								<React.Fragment>
-									<span className={'OconfL'}>Opus: </span>
-									<span className={'Oconf'}>
-										{opusConfig}
-									</span>
-								</React.Fragment> : ''
 							}
 
 							{ videoCodec &&
