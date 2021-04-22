@@ -204,7 +204,7 @@ let store;
 
 let intl;
 
-const e2eSupported = Boolean(RTCRtpSender.prototype.createEncodedStreams);
+const insertableStreamsSupported = Boolean(RTCRtpSender.prototype.createEncodedStreams);
 
 // Opus config parser
 // Ref. https://tools.ietf.org/html/rfc6716#section-3.1
@@ -3322,7 +3322,7 @@ export default class RoomClient
 								appData : { ...appData, peerId } // Trick.
 							});
 
-						if (e2eSupported)
+						if (insertableStreamsSupported)
 							setupReceiverTransform(consumer.id, consumer.rtpReceiver);
 
 						// Store in the map.
@@ -3749,7 +3749,7 @@ export default class RoomClient
 					iceServers         : this._turnServers,
 					// TODO: Fix for issue #72
 					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined,
-					additionalSettings : { encodedInsertableStreams: e2eSupported }
+					additionalSettings : { encodedInsertableStreams: insertableStreamsSupported }
 				});
 
 			this._recvTransport.on(
