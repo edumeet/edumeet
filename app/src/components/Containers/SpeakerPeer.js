@@ -183,6 +183,7 @@ const SpeakerPeer = (props) =>
 						videoScore={webcamConsumer ? webcamConsumer.score : null}
 						width={width}
 						height={height}
+						opusConfig={micConsumer && micConsumer.opusConfig}
 					>
 						<Volume id={peer.id} />
 					</VideoView>

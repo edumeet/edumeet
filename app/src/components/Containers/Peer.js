@@ -631,6 +631,7 @@ const Peer = (props) =>
 						videoScore={webcamConsumer ? webcamConsumer.score : null}
 						width={width}
 						height={height}
+						opusConfig={micConsumer && micConsumer.opusConfig}
 						showAudioAnalyzer={showAudioAnalyzer}
 					>
 						<Volume id={peer.id} />

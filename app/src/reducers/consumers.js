@@ -124,6 +124,19 @@ const consumers = (state = initialState, action) =>
 			return initialState;
 		}
 
+		case 'SET_CONSUMER_OPUS_CONFIG':
+		{
+			const { consumerId, opusConfig } = action.payload;
+			const consumer = state[consumerId];
+			const newConsumer =
+			{
+				...consumer,
+				opusConfig
+			};
+
+			return { ...state, [consumerId]: newConsumer };
+		}
+
 		default:
 			return state;
 	}

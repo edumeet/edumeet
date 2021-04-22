@@ -90,7 +90,8 @@ const styles = (theme) =>
 
 					// eslint-disable-next-line
 					gridTemplateAreas : '\
-				"AcodL		Acod	Acod	Acod	Acod" \
+					"AcodL		Acod	Acod	Acod	Acod" \
+					"OconfL		Oconf	Oconf	Oconf	Oconf" \
 					"VcodL		Vcod	Vcod	Vcod	Vcod" \
 					"ResL		Res		Res		Res		Res" \
 					"VPortL		VPort VPort VPort VPort" \
@@ -103,6 +104,8 @@ const styles = (theme) =>
 
 					'& .AcodL'    : { gridArea: 'AcodL' },
 					'& .Acod'     : { gridArea: 'Acod' },
+					'& .OconfL'   : { gridArea: 'OconfL' },
+					'& .Oconf'    : { gridArea: 'Oconf' },
 					'& .VcodL'    : { gridArea: 'VcodL' },
 					'& .Vcod'     : { gridArea: 'Vcod' },
 					'& .ResL'     : { gridArea: 'ResL' },
@@ -228,7 +231,8 @@ class VideoView extends React.PureComponent
 			classes,
 			netInfo,
 			width,
-			height
+			height,
+			opusConfig
 		} = this.props;
 
 		const {
@@ -309,6 +313,14 @@ class VideoView extends React.PureComponent
 										{audioCodec}
 									</span>
 								</React.Fragment>
+							}
+							{ opusConfig ?
+								<React.Fragment>
+									<span className={'OconfL'}>Opus: </span>
+									<span className={'Oconf'}>
+										{opusConfig}
+									</span>
+								</React.Fragment> : ''
 							}
 
 							{ videoCodec &&
@@ -623,7 +635,8 @@ VideoView.propTypes =
 	classes                        : PropTypes.object.isRequired,
 	netInfo                        : PropTypes.object,
 	width                          : PropTypes.number,
-	height                         : PropTypes.number
+	height                         : PropTypes.number,
+	opusConfig                     : PropTypes.string
 };
 
 export default withStyles(styles)(VideoView);
