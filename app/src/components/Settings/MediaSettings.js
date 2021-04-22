@@ -696,7 +696,7 @@ const MediaSettings = ({
 										autoWidth
 										className={classes.selectEmpty}
 									>
-										{ [ 8000, 16000, 32000, 44100, 48000 ].map((sampleRate) =>
+										{ [ 8000, 16000, 24000, 44100, 48000 ].map((sampleRate) =>
 										{
 											return (
 												<MenuItem key={sampleRate} value={sampleRate}>
@@ -764,7 +764,7 @@ const MediaSettings = ({
 										autoWidth
 										className={classes.selectEmpty}
 									>
-										{ [ 8, 16, 32 ].map((sampleSize) =>
+										{ [ 8, 16, 24, 32 ].map((sampleSize) =>
 										{
 											return (
 												<MenuItem key={sampleSize} value={sampleSize}>
@@ -838,7 +838,7 @@ const MediaSettings = ({
 										autoWidth
 										className={classes.selectEmpty}
 									>
-										{ [ 10, 20, 30, 40, 50, 60 ].map((opusPtime) =>
+										{ [ 2.5, 5, 10, 20, 30, 40, 50, 60 ].map((opusPtime) =>
 										{
 											return (
 												<MenuItem key={opusPtime} value={opusPtime}>
