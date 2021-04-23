@@ -6,7 +6,5 @@ WORKDIR /edumeet
 ENV DEBUG=edumeet*,mediasoup*
 RUN npm install -g nodemon && \
     npm install -g concurrently
-CMD touch /.yarnrc && mkdir /.yarn && chown 775 /.yarn /.yarnrc
-CMD cd app && yarn && yarn build
-CMD cd server && yarn
-CMD concurrently --names "server,app" "cd server && yarn dev" "cd app && yarn start"
+RUN touch /.yarnrc && mkdir /.yarn && chmod 775 /.yarn /.yarnrc
+CMD concurrently --names "server,app" "cd server && yarn && yarn dev" "cd app && yarn && yarn build && yarn start"
