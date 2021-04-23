@@ -153,6 +153,7 @@ var config =
 	{
 		conference :
 		{
+			name                 : 'Conference audio',
 			autoGainControl      : true, // default : true
 			echoCancellation     : true, // default : true 
 			noiseSuppression     : true, // default : true 
@@ -174,6 +175,7 @@ var config =
 		},
 		hifi :
 		{
+			name                 : 'HiFi streaming',
 			autoGainControl      : false, // default : true
 			echoCancellation     : false, // default : true 
 			noiseSuppression     : false, // default : true 

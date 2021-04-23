@@ -1376,7 +1376,7 @@ export default class RoomClient
 	// https://bugs.chromium.org/p/chromium/issues/detail?id=796964
 	async updateMic({
 		start = false,
-		restart = false || this._device.flag !== 'firefox',
+		restart = true,
 		newDeviceId = null
 	} = {})
 	{
