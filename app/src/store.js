@@ -47,31 +47,13 @@ const migrations =
 	//	}
 };
 
-/*
- * It migrates the status to the config version number.
- */
-if (window.config.version)
-{
-	migrations[window.config.version] = (state) =>
-	{
-		if (window.config.audioPresets
-			&& window.config.audioPresets[window.config.audioPreset])
-		{
-			Object.assign(state.settings,
-				window.config.audioPresets[window.config.audioPreset]);
-		}
-
-		return { ...state };
-	};
-}
-
 const persistConfig =
 {
 	key             : 'root',
 	storage         : storage,
 	// migrate will iterate state over all version-functions
 	// from migrations until version is reached
-	version         : window.config.version || 2,
+	version         : 2,
 	migrate         : createMigrate(migrations, { debug: true }),
 	stateReconciler : autoMergeLevel2,
 	whitelist       : [ 'settings', 'intl' ]

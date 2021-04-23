@@ -1,11 +1,6 @@
 // eslint-disable-next-line
 var config =
 {
-	// The config revision number. 
-	// Increase this value to overwrite the clients settings stored in the 
-	// localStorage state.
-	version: 4,
-
 	loginEnabled    : false,
 	developmentPort : 8443,
 	productionPort  : 3443,
