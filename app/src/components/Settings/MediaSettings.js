@@ -497,9 +497,9 @@ const MediaSettings = ({
 					</FormControl>
 				}
 
-				{window.config.audioPresets && <FormControl className={classes.formControl}>
+				{settings.audioPresets && <FormControl className={classes.formControl}>
 					<Select
-						value={settings.audioPreset || window.config.audioPreset}
+						value={settings.audioPreset}
 						onChange={(event) =>
 						{
 							const audioPreset = event.target.value;
@@ -508,8 +508,8 @@ const MediaSettings = ({
 							{
 								setAudioPreset(audioPreset);
 
-								if (window.config.audioPresets
-									&& window.config.audioPresets[audioPreset])
+								if (settings.audioPresets
+									&& settings.audioPresets[audioPreset])
 								{
 									const {
 										autoGainControl,
@@ -524,7 +524,7 @@ const MediaSettings = ({
 										opusFec,
 										opusPtime,
 										opusMaxPlaybackRate
-									} = window.config.audioPresets[audioPreset];
+									} = settings.audioPresets[audioPreset];
 
 									setAutoGainControl(autoGainControl);
 									setEchoCancellation(echoCancellation);
@@ -548,11 +548,11 @@ const MediaSettings = ({
 						className={classes.selectEmpty}
 					>
 						{
-							Object.keys(window.config.audioPresets).map((value) =>
+							Object.keys(settings.audioPresets).map((value) =>
 							{
 								return (
 									<MenuItem key={value} value={value}>
-										{window.config.audioPresets[value].name}
+										{settings.audioPresets[value].name}
 									</MenuItem>
 								);
 							})
