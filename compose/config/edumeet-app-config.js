@@ -192,7 +192,7 @@ var config =
 			opusStereo          : true, // default : false
 			opusDtx             : false, // default : true / will save bandwidth 
 			opusFec             : true, // default : true / forward error correction
-			opusPtime           : 40, // default : 20 / minimum packet time (2.5, 5, 10, 20, 40, 60)
+			opusPtime           : 60, // default : 20 / minimum packet time (2.5, 5, 10, 20, 40, 60)
 			opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
 		}
 	},

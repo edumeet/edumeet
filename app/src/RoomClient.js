@@ -20,7 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-// import { parseScalabilityMode } from 'mediasoup-client';
+import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
 
 let createTorrent;
 
@@ -206,100 +206,6 @@ let intl;
 
 const insertableStreamsSupported = Boolean(RTCRtpSender.prototype.createEncodedStreams);
 
-// Opus config parser
-// Ref. https://tools.ietf.org/html/rfc6716#section-3.1
-const OPUS_CONFIGS = [
-	'Silk NB 10ms',
-	'Silk NB 20ms',
-	'Silk NB 40ms',
-	'Silk NB 60ms',
-	//
-	'Silk MB 10ms',
-	'Silk MB 20ms',
-	'Silk MB 40ms',
-	'Silk MB 60ms',
-	//
-	'Silk WB 10ms',
-	'Silk WB 20ms',
-	'Silk WB 40ms',
-	'Silk WB 60ms',
-	//
-	'Hybrid SWB 10ms',
-	'Hybrid SWB 20ms',
-	//
-	'Hybrid FB 10ms',
-	'Hybrid FB 20ms',
-	//
-	'Celt NB 2.5ms',
-	'Celt NB 5ms',
-	'Celt NB 10ms',
-	'Celt NB 20ms',
-	//
-	'Celt WB 2.5ms',
-	'Celt WB 5ms',
-	'Celt WB 10ms',
-	'Celt WB 20ms',
-	//
-	'Celt SWB 2.5ms',
-	'Celt SWB 5ms',
-	'Celt SWB 10ms',
-	'Celt SWB 20ms',
-	//
-	'Celt FB 2.5ms',
-	'Celt FB 5ms',
-	'Celt FB 10ms',
-	'Celt FB 20ms'
-];
-
-function setupReceiverTransform(consumerId, receiver)
-{
-	logger.debug('e2e setupReceiverTransform', { consumerId, receiver });
-
-	const receiverStreams = receiver.createEncodedStreams();
-	const readableStream = receiverStreams.readable || receiverStreams.readableStream;
-	const writableStream = receiverStreams.writable || receiverStreams.writableStream;
-
-	let receivedFrames = 0;
-
-	const transformStream = new window.TransformStream({
-		transform : (encodedFrame, controller) =>
-		{
-			if ((receivedFrames % 100) === 0)
-			{
-				const data = new Uint8Array(encodedFrame.data);
-
-				if (data)
-				{
-					const config = data[0] >> 3;
-					const stereo = (data[0] >> 1) & 0x01;
-					const frames = data[0] & 0x03;
-
-					const textConfig = OPUS_CONFIGS[config]
-						+ (stereo ? ' (stereo)' : '');
-
-					logger.debug('e2e transformStream',
-						{ config, stereo, frames }, textConfig);
-					store.dispatch(consumerActions.setConsumerOpusConfig(
-						consumerId, textConfig));
-				}
-			}
-
-			receivedFrames += 1;
-			controller.enqueue(encodedFrame);
-		}
-	});
-
-	if (receiver.track.kind === 'audio')
-	{
-		readableStream
-			.pipeThrough(transformStream)
-			.pipeTo(writableStream);
-	}
-	else
-	{
-		readableStream.pipeTo(writableStream);
-	}
-}
 export default class RoomClient
 {
 	/**
@@ -3323,7 +3229,12 @@ export default class RoomClient
 							});
 
 						if (insertableStreamsSupported)
-							setupReceiverTransform(consumer.id, consumer.rtpReceiver);
+						{
+							if (kind === 'audio')
+								opusReceiverTransform(consumer.rtpReceiver, consumer.id);
+							else
+								directReceiverTransform(consumer.rtpReceiver);
+						}
 
 						// Store in the map.
 						this._consumers.set(consumer.id, consumer);
