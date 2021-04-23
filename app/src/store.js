@@ -10,6 +10,7 @@ import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import rootReducer from './reducers/rootReducer';
 import { createFilter } from 'redux-persist-transform-filter';
+import { defaultSettings } from './reducers/settings';
 
 const migrations =
 {
@@ -39,6 +40,14 @@ const migrations =
 		state.settings.autoGainControl = true;
 
 		return { ...state };
+	},
+	3 : (state) =>
+	{
+		return {
+			...state,
+			...defaultSettings,
+			...defaultSettings.audioPresets[defaultSettings.audioPreset]
+		};
 	}
 	// Next version
 	//	4 : (state) =>
@@ -53,7 +62,7 @@ const persistConfig =
 	storage         : storage,
 	// migrate will iterate state over all version-functions
 	// from migrations until version is reached
-	version         : 2,
+	version         : 3,
 	migrate         : createMigrate(migrations, { debug: true }),
 	stateReconciler : autoMergeLevel2,
 	whitelist       : [ 'settings', 'intl' ]

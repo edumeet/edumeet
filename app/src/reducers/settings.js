@@ -1,4 +1,4 @@
-const defaultSettings = {
+export const defaultSettings = {
 	audioPreset  : 'conference',
 	audioPresets :
 	{
