@@ -4,25 +4,37 @@ import Logger from './Logger';
 
 const logger = new Logger('config');
 
-convict.addFormat(convictFormatWithValidator.ipaddress);
+convict.addFormats(convictFormatWithValidator);
+
+function assert(assertion: Boolean, msg: string)
+{
+	if (!assertion)
+		throw new Error(msg);
+}
+
+convict.addFormat({
+	name     : 'float',
+	coerce   : (v: string) => parseFloat(v),
+	validate : (v: number) => assert(Number.isFinite(v), 'must be a number')
+});
 
 const config = convict({
 	loginEnabled :
 	{
-		doc   	 : 'The login is enabled.',
-		format  : Boolean,
+		doc   	 : 'If the login is enabled.',
+		format  : 'Boolean',
 		default : false
 	},
 	developmentPort :
 	{
 		doc   	 : 'The development server listening port.',
-		format  : Number,
+		format  : 'port',
 		default : 3443
 	},
 	productionPort :
 	{
 		doc   	 : 'The production server listening port.',
-		format  : Number,
+		format  : 'port',
 		default : 443
 	},
 	serverHostname :
@@ -69,10 +81,10 @@ const config = convict({
 		format  : Object,
 		default :
 		{
-			audio         			: 'high',
-			mainVideo      		: 'high',
+			audio            : 'high',
+			mainVideo        : 'high',
 			additionalVideos : 'medium',
-			screenShare   	  : 'medium'
+			screenShare      : 'medium'
 		}
 	},
 	// The aspect ratio of the videos as shown on the screen. 
@@ -82,7 +94,7 @@ const config = convict({
 	viewAspectRatio :
 	{
 		doc   	 : 'The aspect ratio of the videos as shown on the screen.',
-		format  : Number,
+		format  : 'float',
 		default : 1.777
 	},
 	viewAspectRatios :
@@ -106,43 +118,43 @@ const config = convict({
 	videoAspectRatio :
 	{
 		doc   	 : 'The aspect ratio of the video from the camera.',
-		format  : Number,
+		format  : 'float',
 		default : 1.777
 	},
 	defaultResolution :
 	{
 		doc   	 : 'The default video camera capture resolution.',
-		format  : String,
+		format  : [ 'low', 'medium', 'high', 'veryhigh', 'ultra' ],
 		default : 'medium'
 	},
 	defaultFrameRate :
 	{
 		doc   	 : 'The default video camera capture framerate.',
-		format  : Number,
+		format  : 'nat',
 		default : 15
 	},
 	defaultScreenResolution :
 	{
 		doc   	 : 'The default screen sharing resolution.',
-		format  : String,
+		format  : [ 'low', 'medium', 'high', 'veryhigh', 'ultra' ],
 		default : 'veryhigh'
 	},
 	defaultScreenSharingFrameRate :
 	{
 		doc   	 : 'The default screen sharing framerate.',
-		format  : Number,
+		format  : 'nat',
 		default : 5
 	},
 	simulcast :
 	{
 		doc   	 : 'Enable or disable simulcast for webcam video.',
-		format  : Boolean,
+		format  : 'Boolean',
 		default : true
 	},
 	simulcastSharing :
 	{
 		doc   	 : 'Enable or disable simulcast for screen sharing video.',
-		format  : Boolean,
+		format  : 'Boolean',
 		default : false
 	},
 	simulcastProfiles :
@@ -208,13 +220,13 @@ const config = convict({
 	requestTimeout :
 	{
 		doc   	 : 'The Socket.io request timeout.',
-		format  : Number,
+		format  : 'nat',
 		default : 20000
 	},
 	requestRetries :
 	{
 		doc   	 : 'The Socket.io request maximum retries.',
-		format  : Number,
+		format  : 'nat',
 		default : 3
 	},
 	transportOptions :
@@ -264,7 +276,7 @@ const config = convict({
 	},
 
 	/**
-	 * Set max number participants in one room that join 
+	 * Set max 'int' participants in one room that join 
 	 * unmuted. Next participant will join automatically muted
 	 * Default value is 4
 	 * 
@@ -275,8 +287,8 @@ const config = convict({
 	 */
 	autoMuteThreshold :
 	{
-		doc   	 : 'Set max number participants in one room that join unmuted.',
-		format  : Number,
+		doc   	 : 'Set the max number of participants in one room that join unmuted.',
+		format  : 'nat',
 		default : 4
 	},
 	background :
@@ -294,13 +306,13 @@ const config = convict({
 	buttonControlBar :
 	{
 		doc   	 : 'If true, will show media control buttons in separate control bar, not in the ME container.',
-		format  : Boolean,
+		format  : 'Boolean',
 		default : false
 	},
 	drawerOverlayed :
 	{
 		doc   	 : 'If false, will push videos away to make room for side drawer. If true, will overlay side drawer over videos.',
-		format  : Boolean,
+		format  : 'Boolean',
 		default : true
 	},
 	notificationPosition :
@@ -339,31 +351,31 @@ const config = convict({
 	hideTimeout :
 	{
 		doc   	 : 'Timeout for autohiding topbar and button control bar.',
-		format  : Number,
+		format  : 'int',
 		default : 3000
 	},
 	lastN :
 	{
 		doc   	 : 'The max number of participant that will be visible in as speaker.',
-		format  : Number,
+		format  : 'nat',
 		default : 4
 	},
 	mobileLastN :
 	{
 		doc   	 : 'The max number of participant that will be visible in as speaker for mobile users.',
-		format  : Number,
+		format  : 'nat',
 		default : 1
 	},
 	maxLastN :
 	{
 		doc   	 : 'The highest number of lastN the user can select manually in the user interface.',
-		format  : Number,
+		format  : 'nat',
 		default : 5
 	},
 	lockLastN :
 	{
 		doc   	 : 'If truthy, users can NOT change number of speakers visible.',
-		format  : Boolean,
+		format  : 'Boolean',
 		default : false
 	},
 	// Show logo if "logo" is not null, else show title
@@ -371,7 +383,7 @@ const config = convict({
 	logo :
 	{
 		doc   	 : 'If not null, it shows the logo loaded from URL, else it shows the title.',
-		format  : String,
+		format  : 'url',
 		default : 'images/logo.edumeet.svg'
 	},
 	title :
@@ -383,7 +395,7 @@ const config = convict({
 	supportUrl :
 	{
 		doc   	 : 'Service & Support URL if not set then not displayed on the about modals.',
-		format  : String,
+		format  : 'url',
 		default : 'https://support.example.com'
 	},
 	// Privacy and data protection URL or path by default privacy/privacy.html
@@ -493,10 +505,12 @@ const config = convict({
 		},
 		typography :
 		{
-			useNextVariants : { format: Boolean, default: true }
+			useNextVariants : { format: 'Boolean', default: true }
 		}
 	}
 });
+
+logger.debug('schema:', config.getSchemaString());
 
 // Load config from window object
 config.load((window as any).config);
