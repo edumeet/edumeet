@@ -1843,6 +1843,20 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/convict-format-with-validator@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@types/convict-format-with-validator/-/convict-format-with-validator-6.0.2.tgz#5275be2815a955f1891e0065c6c2be85c79f9a56"
+  integrity sha512-H8AfvvijYaFRE5sLje5ugldjGcwOqzre/TzrrWfrMHtVUhoN5eaUf6BqkFB9QJ24iUUoCDCceej2KTmbS/GaTg==
+  dependencies:
+    "@types/convict" "*"
+
+"@types/convict@*", "@types/convict@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@types/convict/-/convict-6.0.1.tgz#224832262e1e3b5a7cca5bcc88e550ca70b6b230"
+  integrity sha512-5094Bw9nSvkUNV7qqUvzDt6lgWZpKbpR/AJu8lmtojKa12nxtHHGrPFwK3YP4YZA1rCc2tbpI5TUEBU35eqVxg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/debug@^4.1.5":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
@@ -4093,6 +4107,21 @@ convert-source-map@^0.3.3:
   version "0.3.5"
   resolved "https://registry.yarnpkg.com/convert-source-map/-/convert-source-map-0.3.5.tgz#f1d802950af7dd2631a1febe0596550c86ab3190"
   integrity sha1-8dgClQr33SYxof6+BZZVDIarMZA=
+
+convict-format-with-validator@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/convict-format-with-validator/-/convict-format-with-validator-6.0.1.tgz#a0ff08b663c40beac480d1a0d39b40382b9e39a3"
+  integrity sha512-6/O0W9/0MESdL+0fY7glQlWHs+wnP9xXlB1tjY/Wb9ujCCEBqMP8VCjtLvRlBdfwgONrpb+DTPSHQRhUO5aTlQ==
+  dependencies:
+    validator "^11.1.0"
+
+convict@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/convict/-/convict-6.0.1.tgz#d909a844d8a1187d1366d47d9bc21ec052e8bf0d"
+  integrity sha512-M4YNNq5NV4/VS8JhvBSHAokwvQRL4evEuU0VFe1GNPiqnj9TAkLXpf39ImCCVZlsp3CFp04bc/kRSWPGsJGJWg==
+  dependencies:
+    lodash.clonedeep "^4.5.0"
+    yargs-parser "^18.1.3"
 
 cookie-signature@1.0.6:
   version "1.0.6"
@@ -13442,6 +13471,11 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
+validator@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-11.1.0.tgz#ac18cac42e0aa5902b603d7a5d9b7827e2346ac4"
+  integrity sha512-qiQ5ktdO7CD6C/5/mYV4jku/7qnqzjrxb3C/Q5wR3vGGinHTgJZN/TdFT3ZX4vXhX2R1PXx42fB1cn5W+uJ4lg==
+
 value-equal@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/value-equal/-/value-equal-1.0.1.tgz#1e0b794c734c5c0cade179c437d356d931a34d6c"
@@ -14076,7 +14110,7 @@ yargs-parser@^13.1.2:
     camelcase "^5.0.0"
     decamelize "^1.2.0"
 
-yargs-parser@^18.1.2:
+yargs-parser@^18.1.2, yargs-parser@^18.1.3:
   version "18.1.3"
   resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-18.1.3.tgz#be68c4975c6b2abf469236b0c870362fab09a7b0"
   integrity sha512-o50j0JeToy/4K6OZcaQmW6lyXXKhq7csREXcDwk2omFPJEwUNOVtJKvmDr9EI1fAJZUyZcRF7kxGBWmRXudrCQ==

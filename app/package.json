@@ -24,6 +24,8 @@
 		"@types/react-dom": "^17.0.3",
 		"bowser": "^2.7.0",
 		"classnames": "^2.2.6",
+		"convict": "^6.0.1",
+		"convict-format-with-validator": "^6.0.1",
 		"create-torrent": "^4.4.1",
 		"dompurify": "^2.0.7",
 		"domready": "^1.0.8",
@@ -79,6 +81,8 @@
 		"not op_mini all"
 	],
 	"devDependencies": {
+		"@types/convict": "^6.0.1",
+		"@types/convict-format-with-validator": "^6.0.2",
 		"@typescript-eslint/eslint-plugin": "^4.20.0",
 		"@typescript-eslint/parser": "^4.20.0",
 		"babel-eslint": "^10.1.0",
