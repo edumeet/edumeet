@@ -1,8 +1,5 @@
 import convict from 'convict';
 import * as convictFormatWithValidator from 'convict-format-with-validator';
-import Logger from './Logger';
-
-const logger = new Logger('config');
 
 convict.addFormats(convictFormatWithValidator);
 
@@ -18,7 +15,7 @@ convict.addFormat({
 	validate : (v: number) => assert(Number.isFinite(v), 'must be a number')
 });
 
-const config = convict({
+const configSchema = convict({
 	loginEnabled :
 	{
 		doc   	 : 'If the login is enabled.',
@@ -510,19 +507,44 @@ const config = convict({
 	}
 });
 
-logger.debug('schema:', config.getSchemaString());
-
 // Load config from window object
-config.load((window as any).config);
+configSchema.load((window as any).config);
+
+function formatDocs(docs: any, property: string | null, schema: any)
+{
+	if (schema._cvtProperties)
+	{
+		Object.entries(schema._cvtProperties).forEach(([ name, value ]) =>
+		{
+			formatDocs(docs, `${property ? `${property}.` : ''}${name}`, value);
+		});
+
+		return;
+	}
+	else if (property)
+	{
+		docs[property] =
+		{
+			doc     : schema.doc,
+			format  : schema.format,
+			default : schema.default
+		};
+	}
+}
 
 // Perform validation
-config.validate({ allowed: 'strict' });
+configSchema.validate({ allowed: 'strict' });
 
-const properties = config.getProperties();
+const config = configSchema.getProperties();
 
-logger.debug('properties:', properties);
+// eslint-disable-next-line
+console.log('Using config:', config);
 
 // Override the window config with the validated properties.
-(window as any)['config'] = properties;
+(window as any)['config'] = config;
 
-export default properties;
+export {
+	configSchema,
+	config,
+	formatDocs
+};

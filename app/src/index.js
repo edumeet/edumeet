@@ -29,7 +29,7 @@ import { detectDevice } from 'mediasoup-client';
 
 import './index.css';
 
-import config from './config';
+import { config } from './config';
 
 const App = LazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
 
