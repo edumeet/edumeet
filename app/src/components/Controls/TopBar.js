@@ -514,7 +514,7 @@ const TopBar = (props) =>
 						aria-label={locale.split(/[-_]/)[0]}
 						className={classes.actionButton}
 						color='secondary'
-						disableRipple='true'
+						disableRipple
 						onClick={(event) => handleMenuOpen(event, 'localeMenu')}
 					>
 						{locale.split(/[-_]/)[0]}
