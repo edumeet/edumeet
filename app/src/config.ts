@@ -118,25 +118,25 @@ const configSchema = convict({
 		format  : 'float',
 		default : 1.777
 	},
-	defaultResolution :
+	resolution :
 	{
 		doc   	 : 'The default video camera capture resolution.',
 		format  : [ 'low', 'medium', 'high', 'veryhigh', 'ultra' ],
 		default : 'medium'
 	},
-	defaultFrameRate :
+	frameRate :
 	{
 		doc   	 : 'The default video camera capture framerate.',
 		format  : 'nat',
 		default : 15
 	},
-	defaultScreenResolution :
+	screenResolution :
 	{
 		doc   	 : 'The default screen sharing resolution.',
 		format  : [ 'low', 'medium', 'high', 'veryhigh', 'ultra' ],
 		default : 'veryhigh'
 	},
-	defaultScreenSharingFrameRate :
+	screenSharingFrameRate :
 	{
 		doc   	 : 'The default screen sharing framerate.',
 		format  : 'nat',
@@ -234,21 +234,35 @@ const configSchema = convict({
 			tcp : true
 		}
 	},
-	// defaults for audio setting on new clients / can be customized and overruled from client side
-	defaultAudio :
+	autoGainControl :
 	{
-		doc   	 : 'Defaults audio settings.',
-		format  : Object,
-		default :
-		{
-			autoGainControl   	  : true, // default : true
-			echoCancellation   	 : true, // default : true 
-			noiseSuppression   	 : true, // default : true 
-			// Automatically unmute speaking above noisThereshold
-			voiceActivatedUnmute : false, // default : false 
-			// This is only for voiceActivatedUnmute and audio-indicator
-			noiseThreshold   	   : -60 // default -60
-		}
+		doc     : 'Auto gain control enabled.',
+		format  : 'Boolean',
+		default : true
+	},
+	echoCancellation :
+	{
+		doc     : 'Echo cancellation enabled.',
+		format  : 'Boolean',
+		default : true
+	},
+	noiseSuppression :
+	{
+		doc     : 'Noise suppression enabled.',
+		format  : 'Boolean',
+		default : true
+	},
+	voiceActivatedUnmute :
+	{
+		doc     : 'Automatically unmute speaking above noiseThreshold.',
+		format  : 'Boolean',
+		default : false
+	},
+	noiseThreshold :
+	{
+		doc     : 'This is only for voiceActivatedUnmute and audio-indicator.',
+		format  : 'int',
+		default : -60
 	},
 	// Audio options for now only centrally from config file: 
 	centralAudioOptions :
