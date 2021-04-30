@@ -548,12 +548,22 @@ function formatDocs(docs: any, property: string | null, schema: any)
 	return docs;
 }
 
-const configDocs = formatDocs({}, null, configSchema.getSchema());
+let config: any = {};
+let configError = '';
 
 // Perform validation
-configSchema.validate({ allowed: 'strict' });
+try
+{
+	configSchema.validate({ allowed: 'strict' });
+	config = configSchema.getProperties();
+}
+catch (error: any)
+{
+	configError = error.message;
+}
 
-const config = configSchema.getProperties();
+// format docs
+const configDocs = formatDocs({}, null, configSchema.getSchema());
 
 // eslint-disable-next-line
 console.log('Using config:', config, configDocs);
@@ -564,5 +574,6 @@ console.log('Using config:', config, configDocs);
 export {
 	configSchema,
 	config,
+	configError,
 	configDocs
 };

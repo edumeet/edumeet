@@ -18,7 +18,7 @@ import Button from '@material-ui/core/Button';
 
 import { configDocs } from '../config';
 
-const styles = (theme: any) =>
+const styles = () =>
 	({
 		table : {
 			minWidth : 700
@@ -29,9 +29,6 @@ const styles = (theme: any) =>
 		cell : {
 			maxWidth : '25vw',
 			overflow : 'auto'
-		},
-		list : {
-			backgroundColor : theme.palette.background.paper
 		}
 	});
 
