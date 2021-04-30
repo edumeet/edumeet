@@ -533,18 +533,22 @@ function formatDocs(docs: any, property: string | null, schema: any)
 			formatDocs(docs, `${property ? `${property}.` : ''}${name}`, value);
 		});
 
-		return;
+		return docs;
 	}
 	else if (property)
 	{
 		docs[property] =
 		{
 			doc     : schema.doc,
-			format  : schema.format,
-			default : schema.default
+			format  : JSON.stringify(schema.format, null, 2),
+			default : JSON.stringify(schema.default, null, 2)
 		};
 	}
+
+	return docs;
 }
+
+const configDocs = formatDocs({}, null, configSchema.getSchema());
 
 // Perform validation
 configSchema.validate({ allowed: 'strict' });
@@ -552,7 +556,7 @@ configSchema.validate({ allowed: 'strict' });
 const config = configSchema.getProperties();
 
 // eslint-disable-next-line
-console.log('Using config:', config);
+console.log('Using config:', config, configDocs);
 
 // Override the window config with the validated properties.
 (window as any)['config'] = config;
@@ -560,5 +564,5 @@ console.log('Using config:', config);
 export {
 	configSchema,
 	config,
-	formatDocs
+	configDocs
 };

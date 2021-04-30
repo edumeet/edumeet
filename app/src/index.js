@@ -16,6 +16,7 @@ import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
+import ConfigDocumentation from './components/ConfigDocumentation';
 import JoinDialog from './components/JoinDialog';
 import LoginDialog from './components/AccessControl/LoginDialog';
 import LoadingView from './components/Loader/LoadingView';
@@ -192,6 +193,13 @@ function run()
 											<Switch>
 												<Route exact path='/' component={JoinDialog} />
 												<Route exact path='/login_dialog' component={LoginDialog} />
+												<Route exact path='/config-doc'
+													render={(props) => (
+														<ConfigDocumentation
+															platform={device.platform} {...props}
+														/>
+													)}
+												/>
 												<Route path='/:id' component={App} />
 											</Switch>
 										</React.Fragment>
