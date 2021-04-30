@@ -30,3 +30,13 @@ Rebuild the web application bundle:
 ```sh
 docker-compose exec -u $UID edumeet sh -c "cd app && yarn && yarn build"
 ```
+
+## Known issues
+
+The docker virtual network used by this compose configuration (`172.22.0.0/24`)
+should be reacheble from all the started services. If iptables is filtering the 
+INPUT chain, this rule is required to make the services communicating with each other:
+
+```
+iptables -A INPUT --src 172.22.0.0/16 -j ACCEPT
+```
