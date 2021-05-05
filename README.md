@@ -120,10 +120,10 @@ This will build the client application and copy everything to `server/public` fr
 cd ../server
 
 # using Yarn (recommended)
-yarn
+yarn && yarn build
 
 # using NPM
-npm i
+npm i && npm run build
 ```
 
 ## Run it locally
