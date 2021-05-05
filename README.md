@@ -60,31 +60,42 @@ $ sudo systemctl start edumeet
 
 ## Manual installation
 
-* Prerequisites:
-Currently edumeet will run on nodejs v14.x
-To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
+* Install all the required dependencies and NodeJS v14 (Debian/Ubuntu):
 
 ```bash
-$ sudo apt install git npm yarnpkg build-essential redis libssl-dev openssl pkg-config
+sudo apt install -y curl git python build-essential redis openssl libssl-dev pkg-config
+curl -fsSL https://deb.nodesource.com/setup_14.x | sudo bash -
+sudo apt update && sudo apt install -y nodejs
+```
+
+* Install the Yarn package manager (recommended):
+
+```bash
+curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update && sudo apt install -y yarn
 ```
 
 * Clone the project:
 
 ```bash
-$ git clone https://github.com/edumeet/edumeet.git
-$ cd edumeet
+git clone https://github.com/edumeet/edumeet.git
+cd edumeet
+
+# switch to the "develop" branch to get the latest version for developing
+git checkout develop
 ```
 
 * Copy `server/config/config.example.js` to `server/config/config.js` :
 
 ```bash
-$ cp server/config/config.example.js server/config/config.js
+cp server/config/config.example.js server/config/config.js
 ```
 
 * Copy `app/public/config/config.example.js` to `app/public/config/config.js` :
 
 ```bash
-$ cp app/public/config/config.example.js app/public/config/config.js
+cp app/public/config/config.example.js app/public/config/config.js
 ```
 
 * Edit your two `config.js` with appropriate settings (listening IP/port, logging options, **valid** TLS certificate, don't forget ip setting in last section in server config: (webRtcTransport), etc).
@@ -92,19 +103,27 @@ $ cp app/public/config/config.example.js app/public/config/config.js
 * Set up the browser app:
 
 ```bash
-$ cd app
-$ yarn
-$ yarn build
+cd app
+
+# using Yarn (recommended)
+yarn && yarn build
+
+# using NPM
+npm i && npm run build
 ```
 
-This will build the client application and copy everythink to `server/public` from where the server can host client code to browser requests.
+This will build the client application and copy everything to `server/public` from where the server can host client code to browser requests.
 
 * Set up the server:
 
 ```bash
-$ cd ..
-$ cd server
-$ yarn
+cd ../server
+
+# using Yarn (recommended)
+yarn && yarn build
+
+# using NPM
+npm i && npm run build
 ```
 
 ## Run it locally
@@ -112,8 +131,13 @@ $ yarn
 * Run the Node.js server application in a terminal:
 
 ```bash
-$ cd server
-$ yarn start
+cd server
+
+# using Yarn (recommended)
+yarn start
+
+# using NPM
+npm run start
 ```
 
 * Note: Do not run the server as root. If you need to use port 80/443 make a iptables-mapping for that or use systemd configuration for that (see further down this doc).
@@ -124,21 +148,23 @@ $ yarn start
 * Stop your locally running server. Copy systemd-service file `edumeet.service` to `/etc/systemd/system/` and check location path settings:
 
 ```bash
-$ cp edumeet.service /etc/systemd/system/
-$ edit /etc/systemd/system/edumeet.service
+cp edumeet.service /etc/systemd/system/
+
+# modify the install paths, if required
+sudo edit /etc/systemd/system/edumeet.service
 ```
 
 * Reload systemd configuration and start service:
 
 ```bash
-$ systemctl daemon-reload
-$ systemctl start edumeet
+sudo systemctl daemon-reload
+sudo systemctl start edumeet
 ```
 
 * If you want to start edumeet at boot time:
 
 ```bash
-$ systemctl enable edumeet
+sudo systemctl enable edumeet
 ```
 
 ## Ports and firewall
