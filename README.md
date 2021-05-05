@@ -112,7 +112,7 @@ yarn && yarn build
 npm i && npm run build
 ```
 
-This will build the client application and copy everythink to `server/public` from where the server can host client code to browser requests.
+This will build the client application and copy everything to `server/public` from where the server can host client code to browser requests.
 
 * Set up the server:
 
