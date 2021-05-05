@@ -81,6 +81,9 @@ sudo apt update && sudo apt install -y yarn
 ```bash
 git clone https://github.com/edumeet/edumeet.git
 cd edumeet
+
+# switch to the "develop" branch to get the latest version for developing
+git checkout develop
 ```
 
 * Copy `server/config/config.example.js` to `server/config/config.js` :
