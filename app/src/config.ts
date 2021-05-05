@@ -18,25 +18,25 @@ convict.addFormat({
 const configSchema = convict({
 	loginEnabled :
 	{
-		doc   	 : 'If the login is enabled.',
+		doc     : 'If the login is enabled.',
 		format  : 'Boolean',
 		default : false
 	},
 	developmentPort :
 	{
-		doc   	 : 'The development server listening port.',
+		doc     : 'The development server listening port.',
 		format  : 'port',
 		default : 3443
 	},
 	productionPort :
 	{
-		doc   	 : 'The production server listening port.',
+		doc     : 'The production server listening port.',
 		format  : 'port',
 		default : 443
 	},
 	serverHostname :
 	{
-		doc   	 : 'If the server component runs on a different host than the app you can specify the host name.',
+		doc     : 'If the server component runs on a different host than the app you can specify the host name.',
 		format  : '*',
 		default : null
 	},
@@ -74,7 +74,7 @@ const configSchema = convict({
 	 */
 	networkPriorities :
 	{
-		doc   	 : 'Network priorities.',
+		doc     : 'Network priorities.',
 		format  : Object,
 		default :
 		{
@@ -90,13 +90,13 @@ const configSchema = convict({
 	// viewAspectRatios EXACTLY (e.g. 1.333)
 	viewAspectRatio :
 	{
-		doc   	 : 'The aspect ratio of the videos as shown on the screen.',
+		doc     : 'The aspect ratio of the videos as shown on the screen.',
 		format  : 'float',
 		default : 1.777
 	},
 	viewAspectRatios :
 	{
-		doc   	 : 'The selectable aspect ratios in the settings.',
+		doc     : 'The selectable aspect ratios in the settings.',
 		format  : Array,
 		default :
 		[
@@ -114,49 +114,49 @@ const configSchema = convict({
 	// this is not changeable in settings, only config
 	videoAspectRatio :
 	{
-		doc   	 : 'The aspect ratio of the video from the camera.',
+		doc     : 'The aspect ratio of the video from the camera.',
 		format  : 'float',
 		default : 1.777
 	},
 	resolution :
 	{
-		doc   	 : 'The default video camera capture resolution.',
+		doc     : 'The default video camera capture resolution.',
 		format  : [ 'low', 'medium', 'high', 'veryhigh', 'ultra' ],
 		default : 'medium'
 	},
 	frameRate :
 	{
-		doc   	 : 'The default video camera capture framerate.',
+		doc     : 'The default video camera capture framerate.',
 		format  : 'nat',
 		default : 15
 	},
 	screenResolution :
 	{
-		doc   	 : 'The default screen sharing resolution.',
+		doc     : 'The default screen sharing resolution.',
 		format  : [ 'low', 'medium', 'high', 'veryhigh', 'ultra' ],
 		default : 'veryhigh'
 	},
 	screenSharingFrameRate :
 	{
-		doc   	 : 'The default screen sharing framerate.',
+		doc     : 'The default screen sharing framerate.',
 		format  : 'nat',
 		default : 5
 	},
 	simulcast :
 	{
-		doc   	 : 'Enable or disable simulcast for webcam video.',
+		doc     : 'Enable or disable simulcast for webcam video.',
 		format  : 'Boolean',
 		default : true
 	},
 	simulcastSharing :
 	{
-		doc   	 : 'Enable or disable simulcast for screen sharing video.',
+		doc     : 'Enable or disable simulcast for screen sharing video.',
 		format  : 'Boolean',
 		default : false
 	},
 	simulcastProfiles :
 	{
-		doc   	 : 'Define different encodings for various resolutions of the video.',
+		doc     : 'Define different encodings for various resolutions of the video.',
 		format  : Object,
 		default :
 		{
@@ -195,7 +195,7 @@ const configSchema = convict({
 	// level change will be: 640 * 0.75 = 480px
 	adaptiveScalingFactor :
 	{
-		doc   	 : 'The adaptive spatial layer selection scaling factor.',
+		doc     : 'The adaptive spatial layer selection scaling factor.',
 		format  : (value: number) => value >= 0.5 && value <= 1.0,
 		default : 0.75
 	},
@@ -207,7 +207,7 @@ const configSchema = convict({
 	 */
 	audioOutputSupportedBrowsers :
 	{
-		doc   	 : 'White listing browsers that support audio output device selection.',
+		doc     : 'White listing browsers that support audio output device selection.',
 		format  : Array,
 		default : [
 			'chrome',
@@ -216,19 +216,19 @@ const configSchema = convict({
 	},
 	requestTimeout :
 	{
-		doc   	 : 'The Socket.io request timeout.',
+		doc     : 'The Socket.io request timeout.',
 		format  : 'nat',
 		default : 20000
 	},
 	requestRetries :
 	{
-		doc   	 : 'The Socket.io request maximum retries.',
+		doc     : 'The Socket.io request maximum retries.',
 		format  : 'nat',
 		default : 3
 	},
 	transportOptions :
 	{
-		doc   	 : '',
+		doc     : '',
 		format  : Object,
 		default : {
 			tcp : true
@@ -267,7 +267,7 @@ const configSchema = convict({
 	// Audio options for now only centrally from config file: 
 	centralAudioOptions :
 	{
-		doc   	 : 'Defaults audio settings.',
+		doc     : 'Defaults audio settings.',
 		format  : Object,
 		default :
 		{
@@ -298,37 +298,37 @@ const configSchema = convict({
 	 */
 	autoMuteThreshold :
 	{
-		doc   	 : 'Set the max number of participants in one room that join unmuted.',
+		doc     : 'Set the max number of participants in one room that join unmuted.',
 		format  : 'nat',
 		default : 4
 	},
 	background :
 	{
-		doc   	 : 'The page background image URL',
+		doc     : 'The page background image URL',
 		format  : String,
 		default : 'images/background.jpg'
 	},
 	defaultLayout :
 	{
-		doc   	 : 'The default layout',
+		doc     : 'The default layout',
 		format  : [ 'democratic', 'filmstrip' ],
 		default : 'democratic'
 	},
 	buttonControlBar :
 	{
-		doc   	 : 'If true, will show media control buttons in separate control bar, not in the ME container.',
+		doc     : 'If true, will show media control buttons in separate control bar, not in the ME container.',
 		format  : 'Boolean',
 		default : false
 	},
 	drawerOverlayed :
 	{
-		doc   	 : 'If false, will push videos away to make room for side drawer. If true, will overlay side drawer over videos.',
+		doc     : 'If false, will push videos away to make room for side drawer. If true, will overlay side drawer over videos.',
 		format  : 'Boolean',
 		default : true
 	},
 	notificationPosition :
 	{
-		doc   	 : 'The position of notifications.',
+		doc     : 'The position of notifications.',
 		format  : [ 'left', 'right' ],
 		default : 'right'
 	},
@@ -343,7 +343,7 @@ const configSchema = convict({
 	 */
 	notificationSounds :
 	{
-		doc   	 : 'Set the notifications sounds.',
+		doc     : 'Set the notifications sounds.',
 		format  : Object,
 		default :
 		{
@@ -361,31 +361,31 @@ const configSchema = convict({
 	},
 	hideTimeout :
 	{
-		doc   	 : 'Timeout for autohiding topbar and button control bar.',
+		doc     : 'Timeout for autohiding topbar and button control bar.',
 		format  : 'int',
 		default : 3000
 	},
 	lastN :
 	{
-		doc   	 : 'The max number of participant that will be visible in as speaker.',
+		doc     : 'The max number of participant that will be visible in as speaker.',
 		format  : 'nat',
 		default : 4
 	},
 	mobileLastN :
 	{
-		doc   	 : 'The max number of participant that will be visible in as speaker for mobile users.',
+		doc     : 'The max number of participant that will be visible in as speaker for mobile users.',
 		format  : 'nat',
 		default : 1
 	},
 	maxLastN :
 	{
-		doc   	 : 'The highest number of lastN the user can select manually in the user interface.',
+		doc     : 'The highest number of lastN the user can select manually in the user interface.',
 		format  : 'nat',
 		default : 5
 	},
 	lockLastN :
 	{
-		doc   	 : 'If truthy, users can NOT change number of speakers visible.',
+		doc     : 'If truthy, users can NOT change number of speakers visible.',
 		format  : 'Boolean',
 		default : false
 	},
@@ -393,19 +393,19 @@ const configSchema = convict({
 	// Set logo file name using logo.* pattern like "logo.png" to not track it by git
 	logo :
 	{
-		doc   	 : 'If not null, it shows the logo loaded from URL, else it shows the title.',
+		doc     : 'If not null, it shows the logo loaded from URL, else it shows the title.',
 		format  : 'url',
 		default : 'images/logo.edumeet.svg'
 	},
 	title :
 	{
-		doc   	 : 'The title to show if the logo is not specified.',
+		doc     : 'The title to show if the logo is not specified.',
 		format  : String,
 		default : 'edumeet'
 	},
 	supportUrl :
 	{
-		doc   	 : 'Service & Support URL if not set then not displayed on the about modals.',
+		doc     : 'Service & Support URL if not set then not displayed on the about modals.',
 		format  : 'url',
 		default : 'https://support.example.com'
 	},
@@ -415,7 +415,7 @@ const configSchema = convict({
 	// but an external url could be also used here	 
 	privacyUrl :
 	{
-		doc   	 : 'Privacy and data protection URL or path by default privacy/privacy.html.',
+		doc     : 'Privacy and data protection URL or path by default privacy/privacy.html.',
 		format  : String,
 		default : 'privacy/privacy.html'
 	},
