@@ -522,9 +522,6 @@ const configSchema = convict({
 	}
 });
 
-// Load config from window object
-configSchema.load((window as any).config);
-
 function formatDocs(docs: any, property: string | null, schema: any)
 {
 	if (schema._cvtProperties)
@@ -551,6 +548,9 @@ function formatDocs(docs: any, property: string | null, schema: any)
 
 let config: any = {};
 let configError = '';
+
+// Load config from window object
+configSchema.load((window as any).config);
 
 // Perform validation
 try

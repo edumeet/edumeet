@@ -3,9 +3,18 @@
 process.title = 'edumeet-server';
 
 import Logger from './lib/Logger';
+const Room = require('./lib/Room');
+const Peer = require('./lib/Peer');
+const userRoles = require('./userRoles');
+const {
+	loginHelper,
+	logoutHelper
+} = require('./httpHelper');
+const { config } = require('./lib/config');
+const interactiveServer = require('./lib/interactiveServer');
+const promExporter = require('./lib/promExporter');
 
 const bcrypt = require('bcrypt');
-const config = require('./config/config');
 const fs = require('fs');
 const http = require('http');
 const spdy = require('spdy');
@@ -15,15 +24,8 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
-const Room = require('./lib/Room');
-const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
-const userRoles = require('./userRoles');
-const {
-	loginHelper,
-	logoutHelper
-} = require('./httpHelper');
 // auth
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
@@ -36,8 +38,6 @@ const { Issuer, Strategy } = require('openid-client');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
-const interactiveServer = require('./lib/interactiveServer');
-const promExporter = require('./lib/promExporter');
 const { v4: uuidv4 } = require('uuid');
 
 /* eslint-disable no-console */

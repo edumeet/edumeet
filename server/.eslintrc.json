@@ -7,8 +7,12 @@
 	"overrides": [
 		{
 			"files":["**/*.ts"],
-			"plugins": ["prettier", "@typescript-eslint"],
-			"extends": ["airbnb-typescript/base", "prettier"],
+			"plugins": ["@typescript-eslint"],
+			"extends":[
+				"eslint:recommended",
+				"plugin:@typescript-eslint/eslint-recommended",
+				"plugin:@typescript-eslint/recommended"
+			],
 			"parser": "@typescript-eslint/parser",
 			"parserOptions": {
 				"project": "./tsconfig.json"
@@ -21,69 +25,29 @@
 			// 	}
 			// },
 			"rules": {
-				"no-underscore-dangle":"off",
-				"object-curly-spacing": [
-					"warn",
-					"always"
-				],
-				"no-unused-vars": [
-					"warn",
+				"no-unused-vars"                                    : 0,
+				"@typescript-eslint/ban-types"                      : 0,
+				"@typescript-eslint/ban-ts-comment"                 : 0,
+				"@typescript-eslint/ban-ts-ignore"                  : 0,
+				"@typescript-eslint/explicit-module-boundary-types" : 0,
+				"@typescript-eslint/member-delimiter-style"         : [ 2,
+
 					{
-						"vars": "all",
-						"args": "none"
+						"multiline"  : { "delimiter": "semi", "requireLast": true },
+						"singleline" : { "delimiter": "semi", "requireLast": false }
 					}
 				],
-				"@typescript-eslint/semi": [
-					"off"
-				],
-				"@typescript-eslint/no-unused-vars": [
-					"warn",
+				"@typescript-eslint/no-explicit-any" : 0,
+				"@typescript-eslint/no-unused-vars"  : [ 2,
 					{
-						"vars": "all",
-						"args": "none"
+						"vars"               : "all",
+						"args"               : "after-used",
+						"ignoreRestSiblings" : false
 					}
 				],
-				"max-len": [
-					"warn",
-					{
-						"code": 100,
-						"ignoreStrings": true,
-						"ignoreTemplateLiterals": true,
-						"ignoreComments": true
-					}
-				],
-				"prefer-destructuring": [
-					"error",
-					{
-						"VariableDeclarator": {
-							"array": false,
-							"object": true
-						},
-						"AssignmentExpression": {
-							"array": false,
-							"object": false
-						}
-					},
-					{
-						"enforceForRenamedProperties": false
-					}
-				],
-				"no-plusplus": [
-					"error",
-					{
-						"allowForLoopAfterthoughts": true
-					}
-				],
-				"import/no-extraneous-dependencies": [
-					"error",
-					{
-						"devDependencies": [
-							"**/*.test.js",
-							"**/*.test.ts",
-							"src/tests/**/*"
-						]
-					}
-				]
+				"@typescript-eslint/no-use-before-define"  : [ 2, { "functions": false } ],
+				"@typescript-eslint/no-empty-function"     : 0,
+				"@typescript-eslint/no-non-null-assertion" : 0
 			}
 		}
 	],
