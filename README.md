@@ -148,21 +148,23 @@ npm run start
 * Stop your locally running server. Copy systemd-service file `edumeet.service` to `/etc/systemd/system/` and check location path settings:
 
 ```bash
-$ cp edumeet.service /etc/systemd/system/
-$ edit /etc/systemd/system/edumeet.service
+cp edumeet.service /etc/systemd/system/
+
+# modify the install paths, if required
+sudo edit /etc/systemd/system/edumeet.service
 ```
 
 * Reload systemd configuration and start service:
 
 ```bash
-$ systemctl daemon-reload
-$ systemctl start edumeet
+sudo systemctl daemon-reload
+sudo systemctl start edumeet
 ```
 
 * If you want to start edumeet at boot time:
 
 ```bash
-$ systemctl enable edumeet
+sudo systemctl enable edumeet
 ```
 
 ## Ports and firewall
