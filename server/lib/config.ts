@@ -10,6 +10,28 @@ import Logger from './Logger';
 
 const logger = new Logger('config');
 
+const userRoles = require('../userRoles');
+
+const {
+	BYPASS_ROOM_LOCK,
+	BYPASS_LOBBY
+} = require('../access');
+
+const {
+	CHANGE_ROOM_LOCK,
+	PROMOTE_PEER,
+	MODIFY_ROLE,
+	SEND_CHAT,
+	MODERATE_CHAT,
+	SHARE_AUDIO,
+	SHARE_VIDEO,
+	SHARE_SCREEN,
+	EXTRA_VIDEO,
+	SHARE_FILE,
+	MODERATE_FILES,
+	MODERATE_ROOM
+} = require('../permissions');
+
 // add parsers
 convict.addParser([
 	{ extension: 'json', parse: JSON.parse },
@@ -346,6 +368,68 @@ const configSchema = convict({
 			format  : String,
 			default : ''
 		}
+	},
+	// User roles
+	// All users have the role "NORMAL" by default. Other roles need to be
+	// added in the "userMapping" function. The following accesses and
+	// permissions are arrays of roles. Roles can be changed in userRoles.js
+	//
+	// Example:
+	// [ userRoles.MODERATOR, userRoles.AUTHENTICATED ]
+	accessFromRoles : {
+		doc     : 'User roles.',
+		format  : '*',
+		default : {
+			// The role(s) will gain access to the room
+			// even if it is locked (!)
+			[BYPASS_ROOM_LOCK] : [ userRoles.ADMIN ],
+			// The role(s) will gain access to the room without
+			// going into the lobby. If you want to restrict access to your
+			// server to only directly allow authenticated users, you could
+			// add the userRoles.AUTHENTICATED to the user in the userMapping
+			// function, and change to BYPASS_LOBBY : [ userRoles.AUTHENTICATED ]
+			[BYPASS_LOBBY]     : [ userRoles.NORMAL ]
+		}
+	},
+	permissionsFromRoles : {
+		doc     : 'User permissions from roles.',
+		format  : '*',
+		default : {
+			// The role(s) have permission to lock/unlock a room
+			[CHANGE_ROOM_LOCK] : [ userRoles.MODERATOR ],
+			// The role(s) have permission to promote a peer from the lobby
+			[PROMOTE_PEER]     : [ userRoles.NORMAL ],
+			// The role(s) have permission to give/remove other peers roles
+			[MODIFY_ROLE]      : [ userRoles.NORMAL ],
+			// The role(s) have permission to send chat messages
+			[SEND_CHAT]        : [ userRoles.NORMAL ],
+			// The role(s) have permission to moderate chat
+			[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
+			// The role(s) have permission to share audio
+			[SHARE_AUDIO]      : [ userRoles.NORMAL ],
+			// The role(s) have permission to share video
+			[SHARE_VIDEO]      : [ userRoles.NORMAL ],
+			// The role(s) have permission to share screen
+			[SHARE_SCREEN]     : [ userRoles.NORMAL ],
+			// The role(s) have permission to produce extra video
+			[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
+			// The role(s) have permission to share files
+			[SHARE_FILE]       : [ userRoles.NORMAL ],
+			// The role(s) have permission to moderate files
+			[MODERATE_FILES]   : [ userRoles.MODERATOR ],
+			// The role(s) have permission to moderate room (e.g. kick user)
+			[MODERATE_ROOM]    : [ userRoles.MODERATOR ]
+		}
+	},
+	// Array of permissions. If no peer with the permission in question
+	// is in the room, all peers are permitted to do the action. The peers
+	// that are allowed because of this rule will not be able to do this 
+	// action as soon as a peer with the permission joins. In this example
+	// everyone will be able to lock/unlock room until a MODERATOR joins.
+	allowWhenRoleMissing : {
+		doc     : 'Allow when role missing.',
+		format  : Array,
+		default : [ CHANGE_ROOM_LOCK ]
 	}
 });
 
