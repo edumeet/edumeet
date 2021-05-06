@@ -18,9 +18,9 @@ redisOptions:
 listeningPort: 3443
 ```
 
-Additionally, the `config/config.js` can be modified to overwrite specific properties
-with runtime generated values and to add configuration functions and classes.
-Look at the default `config/config.js` source file for documentation.
+Additionally, a `config/config.js` can be used to override specific properties
+with runtime generated values and to set additional configuration functions and classes.
+Look at the default `config/config.example.js` file for documentation.
 
 ## Configuration properties
 
