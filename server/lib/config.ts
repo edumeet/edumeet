@@ -230,7 +230,7 @@ const configSchema = convict({
 		{
 			// Router media codecs.
 			mediaCodecs : {
-				doc     : 'The Mediasoup codecs settings.',
+				doc     : 'The Mediasoup codecs settings. [supportedRtpCapabilities](https://github.com/versatica/mediasoup/blob/v3/src/supportedRtpCapabilities.ts)',
 				format  : '*',
 				default :
 				[
