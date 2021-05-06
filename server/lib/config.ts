@@ -44,7 +44,7 @@ const configSchema = convict({
 	turnAPIURI :
 	{
 		doc     : 'TURN server URL for requesting a geoip-based TURN server closest to the client.',
-		format  : 'url',
+		format  : String,
 		default : ''
 	},
 	turnAPIparams :
@@ -94,9 +94,21 @@ const configSchema = convict({
 		default : 'wss://tracker.lab.vvc.niif.hu:443'
 	},
 	redisOptions : {
-		doc     : 'Redis server options.',
-		format  : Object,
-		default : {}
+		host : {
+			doc     : 'Redis server host.',
+			format  : String,
+			default : 'localhost'
+		},
+		port : {
+			doc     : 'Redis server port.',
+			format  : 'port',
+			default : 6379
+		},
+		password : {
+			doc     : 'Redis server password.',
+			format  : String,
+			default : ''
+		}
 	},
 	cookieSecret : {
 		doc     : 'Session cookie secret.',
@@ -123,7 +135,7 @@ const configSchema = convict({
 	listeningHost : {
 		doc     : 'The listening Host or IP address. If omitted listens on every IP. ("0.0.0.0" and "::").',
 		format  : String,
-		default : null
+		default : ''
 	},
 	listeningPort : {
 		doc     : 'The HTTPS listening port.',
@@ -153,12 +165,12 @@ const configSchema = convict({
 	roomsUnlocked : {
 		doc     : 'An array of rooms users can enter without waiting in the lobby.',
 		format  : Array,
-		default : null
+		default : []
 	},
 	maxUsersPerRoom : {
 		doc     : 'It defines how many users can join a single room. If not set, no limit is applied.',
 		format  : 'nat',
-		default : null
+		default : 0
 	},
 	routerScaleSize : {
 		doc     : 'Room size before spreading to a new router.',
@@ -219,7 +231,7 @@ const configSchema = convict({
 			// Router media codecs.
 			mediaCodecs : {
 				doc     : 'The Mediasoup codecs settings.',
-				format  : Object,
+				format  : '*',
 				default :
 				[
 					{
@@ -332,7 +344,7 @@ const configSchema = convict({
 		secret : {
 			doc     : 'The Prometheus exporter authorization header: `Bearer <secret>` required to allow scraping.',
 			format  : String,
-			default : null
+			default : ''
 		}
 	}
 });
@@ -376,7 +388,7 @@ let config: any = {};
 let configError = '';
 let configLoaded = false;
 
-// Load config from window object
+// Load config from file
 for (const format of [ 'json', 'json5', 'yaml', 'yml', 'toml' ]) // eslint-disable-line no-restricted-syntax
 {
 	const filepath = `./config/config.${format}`;
@@ -430,7 +442,7 @@ if (fs.existsSync(`${__dirname}/../config/config.js`))
 }
 
 // eslint-disable-next-line
-logger.info('Using config:', config);
+// logger.debug('Using config:', config);
 
 //
 export {

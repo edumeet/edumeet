@@ -10,7 +10,7 @@ const {
 	loginHelper,
 	logoutHelper
 } = require('./httpHelper');
-const { config } = require('./lib/config');
+const { config, configError } = require('./lib/config');
 const interactiveServer = require('./lib/interactiveServer');
 const promExporter = require('./lib/promExporter');
 
@@ -33,12 +33,20 @@ const imsLti = require('ims-lti');
 const SAMLStrategy = require('passport-saml').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const redis = require('redis');
-const redisClient = redis.createClient(config.redisOptions);
 const { Issuer, Strategy } = require('openid-client');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
 const { v4: uuidv4 } = require('uuid');
+
+if (configError)
+{
+	/* eslint-disable no-console */
+	console.error(`Invalid config file: ${configError}`);
+	process.exit(-1);
+}
+
+const redisClient = redis.createClient(config.redisOptions);
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);

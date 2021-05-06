@@ -1,0 +1,8 @@
+redisOptions:
+  host: redis
+  port: 6379
+
+listeningPort: 3443
+listeningRedirectPort: 8080
+httpOnly: false
+trustProxy: ''

@@ -395,7 +395,7 @@ class Room extends EventEmitter
 		else if (this._hasAccess(peer, BYPASS_ROOM_LOCK))
 			this._peerJoining(peer);
 		else if (
-			'maxUsersPerRoom' in config &&
+			config.maxUsersPerRoom &&
 			(
 				Object.keys(this._peers).length +
 				this._lobby.peerList().length
