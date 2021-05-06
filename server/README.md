@@ -1,4 +1,4 @@
-# Edumeet Server Config
+# Edumeet Server Configuration
 
 | Property | Description | Format | Default value |
 | :------- | :---------- | :----- | :------------ |
@@ -20,7 +20,7 @@
 | listeningPort | The HTTPS listening port. | `"port"` | ``8443`` |
 | listeningRedirectPort | The HTTP listening port. Any HTTP request is redirected to HTTPS. | `"port"` | ``8080`` |
 | httpOnly | Listens only on HTTP on listeningPort; listeningRedirectPort disabled. Use case: load balancer backend. | `"boolean"` | ``false`` |
-| trustProxy | WebServer/Express trust proxy config for httpOnly mode. More infos: https://expressjs.com/en/guide/behind-proxies.html, https://www.npmjs.com/package/proxy-addr | `"string"` | ``""`` |
+| trustProxy | WebServer/Express trust proxy config for httpOnly mode. More infos: [expressjs](https://expressjs.com/en/guide/behind-proxies.html), [proxy-addr](https://www.npmjs.com/package/proxy-addr) | `"string"` | ``""`` |
 | activateOnHostJoin | When true, the room will be open to all users since there are users in the room. | `"boolean"` | ``true`` |
 | roomsUnlocked | An array of rooms users can enter without waiting in the lobby. | `"array"` | ``null`` |
 | maxUsersPerRoom | It defines how many users can join a single room. If not set, no limit is applied. | `"nat"` | ``null`` |
@@ -33,9 +33,9 @@
 | mediasoup.worker.rtcMinPort | The Mediasoup start listening port number. | `"port"` | ``40000`` |
 | mediasoup.worker.rtcMaxPort | The Mediasoup end listening port number. | `"port"` | ``49999`` |
 | mediasoup.router.mediaCodecs | The Mediasoup codecs settings. | `"object"` | ``[  {    "kind": "audio",    "mimeType": "audio/opus",    "clockRate": 48000,    "channels": 2  },  {    "kind": "video",    "mimeType": "video/VP8",    "clockRate": 90000,    "parameters": {      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/VP9",    "clockRate": 90000,    "parameters": {      "profile-id": 2,      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/h264",    "clockRate": 90000,    "parameters": {      "packetization-mode": 1,      "profile-level-id": "4d0032",      "level-asymmetry-allowed": 1,      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/h264",    "clockRate": 90000,    "parameters": {      "packetization-mode": 1,      "profile-level-id": "42e01f",      "level-asymmetry-allowed": 1,      "x-google-start-bitrate": 1000    }  }]`` |
-| mediasoup.webRtcTransport.listenIps | The Mediasoup listen IPs. https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp | `"array"` | ``[  {    "ip": "0.0.0.0",    "announcedIp": null  }]`` |
-| mediasoup.webRtcTransport.initialAvailableOutgoingBitrate | The Mediasoup initial available outgoing bitrate (in bps). https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions | `"nat"` | ``1000000`` |
-| mediasoup.webRtcTransport.maxIncomingBitrate | The Mediasoup maximum incoming bitrate for each transport. (in bps). https://mediasoup.org/documentation/v3/mediasoup/api/#transport-setMaxIncomingBitrate | `"nat"` | ``1500000`` |
+| mediasoup.webRtcTransport.listenIps | The Mediasoup listen IPs. [TransportListenIp](https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp) | `"array"` | ``[  {    "ip": "0.0.0.0",    "announcedIp": null  }]`` |
+| mediasoup.webRtcTransport.initialAvailableOutgoingBitrate | The Mediasoup initial available outgoing bitrate (in bps). [WebRtcTransportOptions](https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions) | `"nat"` | ``1000000`` |
+| mediasoup.webRtcTransport.maxIncomingBitrate | The Mediasoup maximum incoming bitrate for each transport. (in bps). [setMaxIncomingBitrate](https://mediasoup.org/documentation/v3/mediasoup/api/#transport-setMaxIncomingBitrate) | `"nat"` | ``1500000`` |
 | prometheus.deidentify | De-identify IP addresses in Prometheus logs. | `"boolean"` | ``false`` |
 | prometheus.listen | Prometheus exporter listening address. | `"string"` | ``"localhost"`` |
 | prometheus.numeric | Show numeric IP addresses in Prometheus logs. | `"boolean"` | ``false`` |

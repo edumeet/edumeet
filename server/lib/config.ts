@@ -141,7 +141,7 @@ const configSchema = convict({
 		default : false
 	},
 	trustProxy : {
-		doc     : 'WebServer/Express trust proxy config for httpOnly mode. More infos: https://expressjs.com/en/guide/behind-proxies.html, https://www.npmjs.com/package/proxy-addr',
+		doc     : 'WebServer/Express trust proxy config for httpOnly mode. More infos: [expressjs](https://expressjs.com/en/guide/behind-proxies.html), [proxy-addr](https://www.npmjs.com/package/proxy-addr)',
 		format  : String,
 		default : ''
 	},
@@ -278,19 +278,19 @@ const configSchema = convict({
 		webRtcTransport :
 		{
 			listenIps : {
-				doc     : 'The Mediasoup listen IPs. https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp',
+				doc     : 'The Mediasoup listen IPs. [TransportListenIp](https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp)',
 				format  : Array,
 				default : [
 					{ ip: '0.0.0.0', announcedIp: null }
 				]
 			},
 			initialAvailableOutgoingBitrate : {
-				doc     : 'The Mediasoup initial available outgoing bitrate (in bps). https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions',
+				doc     : 'The Mediasoup initial available outgoing bitrate (in bps). [WebRtcTransportOptions](https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions)',
 				format  : 'nat',
 				default : 1000000
 			},
 			maxIncomingBitrate : {
-				doc     : 'The Mediasoup maximum incoming bitrate for each transport. (in bps). https://mediasoup.org/documentation/v3/mediasoup/api/#transport-setMaxIncomingBitrate',
+				doc     : 'The Mediasoup maximum incoming bitrate for each transport. (in bps). [setMaxIncomingBitrate](https://mediasoup.org/documentation/v3/mediasoup/api/#transport-setMaxIncomingBitrate)',
 				format  : 'nat',
 				default : 1500000
 			}

@@ -26,7 +26,7 @@ data += `
 *Document generated with:* \`yarn gen-config-docs\`
 `;
 
-writeFile('config.md', data).then(() =>
+writeFile('README.md', data).then(() =>
 {
 	console.log('done'); // eslint-disable-line
 }, (err) =>
