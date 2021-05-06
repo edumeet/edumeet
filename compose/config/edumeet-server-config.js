@@ -1,33 +1,7 @@
 const os = require('os');
-// const fs = require('fs');
-
-const userRoles = require('../userRoles');
-
-import {
-	BYPASS_ROOM_LOCK,
-	BYPASS_LOBBY
-} from '../access';
-
-const {
-	CHANGE_ROOM_LOCK,
-	PROMOTE_PEER,
-	MODIFY_ROLE,
-	SEND_CHAT,
-	MODERATE_CHAT,
-	SHARE_AUDIO,
-	SHARE_VIDEO,
-	SHARE_SCREEN,
-	EXTRA_VIDEO,
-	SHARE_FILE,
-	MODERATE_FILES,
-	MODERATE_ROOM
-} = require('../permissions');
-
-// const AwaitQueue = require('awaitqueue');
-// const axios = require('axios');
 
 // To gather ip address only on interface like eth0, ens0p3
-const ifaceWhiteListRegex = /^(eth.*)|(ens.*)|(tun.*)/
+const ifaceWhiteListRegex = /^(eth.*)|(ens.*)|(tun.*)|(wlp.*)/
 
 function getListenIps() {
 	let listenIP = [];
