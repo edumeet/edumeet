@@ -112,12 +112,12 @@ const configSchema = convict({
 		cert : {
 			doc     : 'SSL certificate path.',
 			format  : String,
-			default : `${__dirname}/../certs/mediasoup-demo.localhost.cert.pem`
+			default : './certs/mediasoup-demo.localhost.cert.pem'
 		},
 		key : {
 			doc     : 'SSL key path.',
 			format  : String,
-			default : `${__dirname}/../certs/mediasoup-demo.localhost.key.pem`
+			default : './certs/mediasoup-demo.localhost.key.pem'
 		}
 	},
 	listeningHost : {
