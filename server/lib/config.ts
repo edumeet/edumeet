@@ -8,16 +8,12 @@ import { cpus } from 'os';
 
 import Logger from './Logger';
 
-const logger = new Logger('config');
-
-const userRoles = require('../userRoles');
-
-const {
+import * as userRoles from '../userRoles';
+import {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
-} = require('../access');
-
-const {
+} from '../access';
+import {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
 	MODIFY_ROLE,
@@ -30,7 +26,9 @@ const {
 	SHARE_FILE,
 	MODERATE_FILES,
 	MODERATE_ROOM
-} = require('../permissions');
+} from '../permissions';
+
+const logger = new Logger('config');
 
 // add parsers
 convict.addParser([
