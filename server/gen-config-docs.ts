@@ -1,6 +1,5 @@
 import { configDocs } from './lib/config';
 import { writeFile } from 'fs/promises';
-import config from './config/config.example';
 
 function formatJson(data)
 {
