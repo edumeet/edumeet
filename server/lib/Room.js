@@ -29,7 +29,7 @@ const permissions = require('../permissions'), {
 	MODERATE_ROOM
 } = permissions;
 
-const config = require('../config/config');
+const { config } = require('./config');
 
 const logger = new Logger('Room');
 
