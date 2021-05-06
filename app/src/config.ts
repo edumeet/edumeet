@@ -57,7 +57,7 @@ const configSchema = convict({
 				'internet explorer' : '>12',
 				'microsoft edge'   	: '>18'
 			},
-			'microsoft edge'   	           : '>=74',
+			'microsoft edge'   	           : '>18',
 			'safari'                       : '>12',
 			'firefox'                      : '>=60',
 			'chrome'                       : '>=74',
