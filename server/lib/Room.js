@@ -674,7 +674,7 @@ class Room extends EventEmitter
 
 				let turnServers;
 
-				if ('turnAPIURI' in config)
+				if (config.turnAPIURI)
 				{
 					try
 					{
@@ -697,13 +697,13 @@ class Room extends EventEmitter
 					}
 					catch (error)
 					{
-						if ('backupTurnServers' in config)
+						if (config.backupTurnServers)
 							turnServers = config.backupTurnServers;
 
 						logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
 					}
 				}
-				else if ('backupTurnServers' in config)
+				else if (config.backupTurnServers)
 				{
 					turnServers = config.backupTurnServers;
 				}
