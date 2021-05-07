@@ -1,7 +1,6 @@
 import Logger from './Logger';
 
 const express = require('express');
-const mediasoup = require('mediasoup');
 const promClient = require('prom-client');
 
 const collectDefaultMetrics = require('./metrics/default');
@@ -29,7 +28,8 @@ module.exports = async function(workers, rooms, peers)
 			logger.debug(`GET ${req.originalUrl}`);
 			const registry = new promClient.Registry();
 
-			await collectDefaultMetrics(workers, rooms, peers, registry, config.prometheus);
+			await collectDefaultMetrics(
+				workers, rooms, peers, registry, config.prometheus);
 			res.set('Content-Type', registry.contentType);
 			const data = await registry.metrics();
 
@@ -37,13 +37,15 @@ module.exports = async function(workers, rooms, peers)
 		});
 
 		// aggregated register
-		const registerAggregated = RegisterAggregated(workers, rooms, peers, config.prometheus);
+		const registerAggregated = RegisterAggregated(
+			workers, rooms, peers, config.prometheus);
 
 		app.get('/metrics', async (req, res) =>
 		{
 			logger.debug(`GET ${req.originalUrl}`);
 
-			if (config.prometheus.secret && req.headers.authorization !== `Bearer ${ config.prometheus.secret}`)
+			if (config.prometheus.secret
+				&& req.headers.authorization !== `Bearer ${ config.prometheus.secret}`)
 			{
 				logger.error('Invalid authorization header');
 
@@ -57,11 +59,11 @@ module.exports = async function(workers, rooms, peers)
 		});
 
 		const server = app.listen(config.prometheus.port, config.prometheus.listen, () =>
-			{
-				const address = server.address();
+		{
+			const address = server.address();
 
-				logger.info(`listening ${address.address}:${address.port}`);
-			});
+			logger.info(`listening ${address.address}:${address.port}`);
+		});
 	}
 	catch (err)
 	{
