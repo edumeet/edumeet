@@ -655,13 +655,16 @@ async function runHttpsServer()
 		// https
 		mainListener = spdy.createServer(tls, app);
 
-		// http
-		const redirectListener = http.createServer(app);
+		// http -> https redirect server
+		if (config.listeningRedirectPort)
+		{
+			const redirectListener = http.createServer(app);
 
-		if (config.listeningHost)
-			redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
-		else
-			redirectListener.listen(config.listeningRedirectPort);
+			if (config.listeningHost)
+				redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
+			else
+				redirectListener.listen(config.listeningRedirectPort);
+		}
 	}
 
 	// https or http

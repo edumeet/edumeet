@@ -3,6 +3,6 @@ redisOptions:
   port: 6379
 
 listeningPort: 3443
-listeningRedirectPort: 8080
+listeningRedirectPort: 0
 httpOnly: false
 trustProxy: ''
