@@ -44,9 +44,10 @@ Look at the default `config/config.example.js` file for documentation.
 | tls.key | SSL key path. | `"string"` | ``"./certs/mediasoup-demo.localhost.key.pem"`` |
 | listeningHost | The listening Host or IP address. If omitted listens on every IP. ("0.0.0.0" and "::"). | `"string"` | ``""`` |
 | listeningPort | The HTTPS listening port. | `"port"` | ``8443`` |
-| listeningRedirectPort | The HTTP listening port. Any HTTP request is redirected to HTTPS. | `"port"` | ``8080`` |
+| listeningRedirectPort | The HTTP server listening port used for redirecting any HTTP request to HTTPS. If 0, the redirect server is disabled. | `"port"` | ``8080`` |
 | httpOnly | Listens only on HTTP on listeningPort; listeningRedirectPort disabled. Use case: load balancer backend. | `"boolean"` | ``false`` |
 | trustProxy | WebServer/Express trust proxy config for httpOnly mode. More infos: [expressjs](https://expressjs.com/en/guide/behind-proxies.html), [proxy-addr](https://www.npmjs.com/package/proxy-addr) | `"string"` | ``""`` |
+| staticFilesCachePeriod | The max-age in milliseconds for HTTP caching of static resources. This can also be a string accepted by the [ms module](https://www.npmjs.com/package/ms#readme). | `"*"` | ``0`` |
 | activateOnHostJoin | When true, the room will be open to all users since there are users in the room. | `"boolean"` | ``true`` |
 | roomsUnlocked | An array of rooms users can enter without waiting in the lobby. | `"array"` | ``[]`` |
 | maxUsersPerRoom | It defines how many users can join a single room. If not set, no limit is applied. | `"nat"` | ``0`` |
