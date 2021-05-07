@@ -163,7 +163,7 @@ const configSchema = convict({
 		default : 8443
 	},
 	listeningRedirectPort : {
-		doc     : 'The HTTP listening port. Any HTTP request is redirected to HTTPS.',
+		doc     : 'The HTTP server listening port used for redirecting any HTTP request to HTTPS. If 0, the redirect server is disabled.',
 		format  : 'port',
 		default : 8080
 	},
@@ -176,6 +176,11 @@ const configSchema = convict({
 		doc     : 'WebServer/Express trust proxy config for httpOnly mode. More infos: [expressjs](https://expressjs.com/en/guide/behind-proxies.html), [proxy-addr](https://www.npmjs.com/package/proxy-addr)',
 		format  : String,
 		default : ''
+	},
+	staticFilesCachePeriod : {
+		doc     : 'The max-age in milliseconds for HTTP caching of static resources. This can also be a string accepted by the [ms module](https://www.npmjs.com/package/ms#readme).',
+		format  : '*',
+		default : 0
 	},
 	activateOnHostJoin : {
 		doc     : 'When true, the room will be open to all users since there are users in the room.',

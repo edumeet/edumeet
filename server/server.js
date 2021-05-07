@@ -638,11 +638,11 @@ async function runHttpsServer()
 
 	// Serve all files in the public folder as static files.
 	app.use(express.static('public', {
-		maxAge : (config.staticFilesCachePeriod || 0) * 1000
+		maxAge : config.staticFilesCachePeriod
 	}));
 
 	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`, {
-		maxAge : (config.staticFilesCachePeriod || 0) * 1000
+		maxAge : config.staticFilesCachePeriod
 	}));
 
 	if (config.httpOnly === true)
