@@ -146,12 +146,6 @@ async function run()
 		// Open the interactive server.
 		await interactiveServer(rooms, peers);
 
-		// start Prometheus exporter
-		if (config.prometheus)
-		{
-			await promExporter(rooms, peers, config.prometheus);
-		}
-
 		if (typeof (config.auth) === 'undefined')
 		{
 			logger.warn('Auth is not configured properly!');
@@ -166,6 +160,12 @@ async function run()
 
 		// Run HTTPS server.
 		await runHttpsServer();
+
+		// start Prometheus exporter
+		if (config.prometheus.enabled)
+		{
+			await promExporter(mediasoupWorkers, rooms, peers);
+		}
 
 		// Run WebSocketServer.
 		await runWebSocketServer();

@@ -6,3 +6,7 @@ listeningPort: 3443
 listeningRedirectPort: 0
 httpOnly: false
 trustProxy: ''
+
+prometheus:
+  enabled: true
+  listen: 0.0.0.0

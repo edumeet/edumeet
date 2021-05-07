@@ -335,39 +335,45 @@ const configSchema = convict({
 	},
 	// Prometheus exporter
 	prometheus : {
-		deidentify : {
-			doc     : 'De-identify IP addresses in Prometheus logs.',
+		enabled : {
+			doc     : 'Enables the Prometheus metrics exporter.',
 			format  : 'Boolean',
 			default : false
 		},
 		listen : {
-			doc     : 'Prometheus exporter listening address.',
+			doc     : 'Prometheus metrics exporter listening address.',
 			format  : 'String',
 			default : 'localhost'
+		},
+		port : {
+			doc     : 'The Prometheus metrics exporter listening port.',
+			format  : 'port',
+			default : 8889
+		},
+		// default metrics options
+		deidentify : {
+			doc     : 'De-identify IP addresses in Prometheus logs.',
+			format  : 'Boolean',
+			default : false
 		},
 		numeric : {
 			doc     : 'Show numeric IP addresses in Prometheus logs.',
 			format  : 'Boolean',
 			default : false
 		},
-		port : {
-			doc     : 'The Prometheus exporter listening port.',
-			format  : 'port',
-			default : 8889
-		},
 		quiet : {
-			doc     : 'Include fewer labels in Prometheus logs.',
+			doc     : 'Include fewer labels in Prometheus metrics.',
 			format  : 'Boolean',
 			default : false
 		},
 		// aggregated metrics options
 		period : {
-			doc     : 'The Prometheus exporter update period (seconds).',
+			doc     : 'The Prometheus metrics exporter update period (seconds).',
 			format  : 'nat',
 			default : 15
 		},
 		secret : {
-			doc     : 'The Prometheus exporter authorization header: `Bearer <secret>` required to allow scraping.',
+			doc     : 'The Prometheus metrics exporter authorization header: `Bearer <secret>` required to allow scraping.',
 			format  : String,
 			default : ''
 		}
