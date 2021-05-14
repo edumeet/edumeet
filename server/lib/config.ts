@@ -153,9 +153,9 @@ const configSchema = convict({
 		}
 	},
 	listeningHost : {
-		doc     : 'The listening Host or IP address. If omitted listens on every IP. ("0.0.0.0" and "::").',
+		doc     : 'The listening Host or IP address.',
 		format  : String,
-		default : ''
+		default : '0.0.0.0'
 	},
 	listeningPort : {
 		doc     : 'The HTTPS listening port.',
