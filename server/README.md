@@ -42,7 +42,7 @@ Look at the default `config/config.example.js` file for documentation.
 | cookieName | Session cookie name. | `"string"` | ``"edumeet.sid"`` |
 | tls.cert | SSL certificate path. | `"string"` | ``"./certs/mediasoup-demo.localhost.cert.pem"`` |
 | tls.key | SSL key path. | `"string"` | ``"./certs/mediasoup-demo.localhost.key.pem"`` |
-| listeningHost | The listening Host or IP address. If omitted listens on every IP. ("0.0.0.0" and "::"). | `"string"` | ``""`` |
+| listeningHost | The listening Host or IP address. | `"string"` | ``"0.0.0.0"`` |
 | listeningPort | The HTTPS listening port. | `"port"` | ``8443`` |
 | listeningRedirectPort | The HTTP server listening port used for redirecting any HTTP request to HTTPS. If 0, the redirect server is disabled. | `"port"` | ``8080`` |
 | httpOnly | Listens only on HTTP on listeningPort; listeningRedirectPort disabled. Use case: load balancer backend. | `"boolean"` | ``false`` |
