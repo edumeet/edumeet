@@ -221,8 +221,8 @@ const File = (props) =>
 				}
 
 				{/* Text */}
+				{/*
 				<Typography className={classes.text}>
-					{/*
 						<FormattedMessage
 							id='filesharing.sharedFile'
 							defaultMessage='{name} shared a file'
@@ -230,8 +230,8 @@ const File = (props) =>
 								name
 							}}
 						/>
-						*/}
 				</Typography>
+				*/}
 
 				{ (!file.active && !file.files) &&
 				<div
