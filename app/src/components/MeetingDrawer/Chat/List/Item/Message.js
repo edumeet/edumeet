@@ -46,7 +46,8 @@ const styles = (theme) =>
 			alignSelf : 'center',
 			fontSize  : '13px',
 			color     : '#999999',
-			margin    : theme.spacing(0.5)
+			margin    : theme.spacing(0.5),
+			minWidth  : '35px'
 		},
 		sent :
 		{
