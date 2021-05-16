@@ -878,65 +878,6 @@ export default class RoomClient
 		);
 	}
 
-	handleDownload(magnetUri)
-	{
-		store.dispatch(
-			fileActions.setFileActive(magnetUri));
-
-		const existingTorrent = this._webTorrent.get(magnetUri);
-
-		if (existingTorrent)
-		{
-			// Never add duplicate torrents, use the existing one instead.
-			this._handleTorrent(existingTorrent);
-
-			return;
-		}
-
-		this._webTorrent.add(magnetUri, this._handleTorrent);
-	}
-
-	_handleTorrent(torrent)
-	{
-		// Torrent already done, this can happen if the
-		// same file was sent multiple times.
-		if (torrent.progress === 1)
-		{
-			store.dispatch(
-				fileActions.setFileDone(
-					torrent.magnetURI,
-					torrent.files
-				));
-
-			return;
-		}
-
-		let lastMove = 0;
-
-		torrent.on('download', () =>
-		{
-			if (Date.now() - lastMove > 1000)
-			{
-				store.dispatch(
-					fileActions.setFileProgress(
-						torrent.magnetURI,
-						torrent.progress
-					));
-
-				lastMove = Date.now();
-			}
-		});
-
-		torrent.on('done', () =>
-		{
-			store.dispatch(
-				fileActions.setFileDone(
-					torrent.magnetURI,
-					torrent.files
-				));
-		});
-	}
-
 	async shareFiles(files)
 	{
 		store.dispatch(requestActions.notify(

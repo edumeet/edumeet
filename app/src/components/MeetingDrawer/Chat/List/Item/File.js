@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../../../RoomContext';
@@ -13,6 +13,7 @@ import Paper from '@material-ui/core/Paper';
 import classnames from 'classnames';
 import SaveIcon from '@material-ui/icons/Save';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import * as fileActions from '../../../../../actions/fileActions';
 
 const styles = (theme) =>
 	({
@@ -109,13 +110,24 @@ const styles = (theme) =>
 			display    : 'flex',
 			alignItems : 'center',
 			padding    : theme.spacing(1)
+		},
+		progressBarShow : {
+			display : 'block'
+		},
+		progressBarHide : {
+			display : 'none'
 		}
+
 	});
 
 const File = (props) =>
 {
 
 	const intl = useIntl();
+
+	const refProgress = useRef();
+
+	const [ progress, setProgress ] = useState();
 
 	const {
 		roomClient,
@@ -130,9 +142,53 @@ const File = (props) =>
 		format,
 		width,
 		refMessage,
-		avatar
+		avatar,
+		setFileProgress,
+		setFileDone,
+		setFileActive
 
 	} = props;
+
+	async function handleDownload()
+	{
+		async function handleTorrent(torrent)
+		{
+			// Torrent already done, this can happen if the
+			// same file was sent multiple times.
+			if (torrent.progress === 1)
+				setFileDone(torrent.magnetURI, torrent.files);
+			else
+			{
+				torrent.on('download', () =>
+				{
+					setFileProgress(torrent.magnetURI, torrent.progress);
+
+					refProgress.current.value = torrent.progress;
+				});
+
+				torrent.on('done', () =>
+				{
+					setFileDone(torrent.magnetURI, torrent.files);
+				});
+			}
+		}
+
+		await setFileActive(magnetUri);
+
+		setProgress(file.active);
+
+		const existingTorrent = roomClient._webTorrent.get(magnetUri);
+
+		if (existingTorrent)
+		{
+			// Never add duplicate torrents, use the existing one instead.
+			handleTorrent(existingTorrent);
+		}
+		else
+		{
+			roomClient._webTorrent.add(magnetUri, handleTorrent);
+		}
+	}
 
 	return (
 		<Paper
@@ -193,10 +249,7 @@ const File = (props) =>
 					{ file.files.map((sharedFile, i) => (
 						<div
 							className={classes.fileInfo} key={i}
-							onClick={() =>
-							{
-								roomClient.saveFile(sharedFile);
-							}}
+							onClick={() => roomClient.saveFile(sharedFile)}
 						>
 							<DescriptionIcon />
 							<Typography className={classes.text}>
@@ -233,13 +286,10 @@ const File = (props) =>
 				</Typography>
 				*/}
 
-				{ (!file.active && !file.files) &&
+				{ (!file.files) &&
 				<div
 					className={classes.fileInfo}
-					onClick={() =>
-					{
-						roomClient.handleDownload(magnetUri);
-					}}
+					onClick={() => handleDownload()}
 				>
 					<DescriptionIcon />
 					<Typography className={classes.text}>
@@ -284,9 +334,13 @@ const File = (props) =>
 				</Typography>
 				}
 
-				{ file.active &&
-				<progress value={file.progress} />
-				}
+				<progress
+					className={progress === true && file.progress < 1 ?
+						classes.progressBarShow :
+						classes.progressBarHide
+					}
+					ref={refProgress} id='test1' value={file.progress}
+				/>
 			</div>
 			{/* /Content */}
 		</Paper>
@@ -294,20 +348,23 @@ const File = (props) =>
 };
 
 File.propTypes = {
-	roomClient    : PropTypes.object.isRequired,
-	magnetUri     : PropTypes.string.isRequired,
-	time          : PropTypes.string.isRequired,
-	name          : PropTypes.string.isRequired,
-	picture       : PropTypes.string,
-	canShareFiles : PropTypes.bool.isRequired,
-	file          : PropTypes.object.isRequired,
-	classes       : PropTypes.object.isRequired,
-	isseen        : PropTypes.bool.isRequired,
-	sender        : PropTypes.string.isRequired,
-	refMessage    : PropTypes.object.isRequired,
-	width         : PropTypes.number.isRequired,
-	format        : PropTypes.string.isRequired,
-	avatar        : PropTypes.string
+	roomClient      : PropTypes.object.isRequired,
+	magnetUri       : PropTypes.string.isRequired,
+	time            : PropTypes.string.isRequired,
+	name            : PropTypes.string.isRequired,
+	picture         : PropTypes.string,
+	canShareFiles   : PropTypes.bool.isRequired,
+	file            : PropTypes.object.isRequired,
+	classes         : PropTypes.object.isRequired,
+	isseen          : PropTypes.bool.isRequired,
+	sender          : PropTypes.string.isRequired,
+	refMessage      : PropTypes.object.isRequired,
+	width           : PropTypes.number.isRequired,
+	format          : PropTypes.string.isRequired,
+	avatar          : PropTypes.string,
+	setFileDone     : PropTypes.func.isRequired,
+	setFileProgress : PropTypes.func.isRequired,
+	setFileActive   : PropTypes.func.isRequired
 
 };
 
@@ -319,14 +376,38 @@ const mapStateToProps = (state, { time, magnetUri }) =>
 	};
 };
 
+const mapDispatchToProps = (dispatch) =>
+	({
+		setFileDone : (magnetUri, files) =>
+		{
+			dispatch(
+				fileActions.setFileDone(magnetUri, files)
+			);
+		},
+		setFileProgress : (magnetURI, progress) =>
+		{
+			dispatch(
+				fileActions.setFileProgress(magnetURI, progress)
+			);
+		},
+		setFileActive : (magnetURI) =>
+		{
+			dispatch(
+				fileActions.setFileActive(magnetURI)
+			);
+		}
+
+	});
+
 export default withRoomContext(connect(
 	mapStateToProps,
-	null,
+	mapDispatchToProps,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
 		{
 			return (
+				prev.file === next.file &&
 				prev.files === next.files &&
 				prev.me.canShareFiles === next.me.canShareFiles
 			);
