@@ -104,7 +104,8 @@ const styles = (theme) =>
 		{
 			display    : 'flex',
 			alignItems : 'center',
-			padding    : theme.spacing(1)
+			padding    : theme.spacing(1),
+			cursor     : 'pointer'
 		},
 		progressBarShow : {
 			display : 'block'
