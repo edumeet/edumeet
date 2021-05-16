@@ -6,7 +6,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedTime, FormattedMessage } from 'react-intl';
 import magnet from 'magnet-uri';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import DescriptionIcon from '@material-ui/icons/Description';
 import Paper from '@material-ui/core/Paper';
@@ -19,7 +18,6 @@ const styles = (theme) =>
 	({
 		root :
 		{
-
 			display         : 'flex',
 			flexShrink      : 0,
 			backgroundColor : '#e0e0e085',
@@ -27,9 +25,6 @@ const styles = (theme) =>
 			padding         : theme.spacing(0),
 			wordWrap        : 'break-word',
 			wordBreak       : 'break-all'
-
-			// alignItems     : 'center',
-			// justifyContent : 'space-between'
 		},
 		single :
 		{
@@ -236,6 +231,8 @@ const File = (props) =>
 				</Typography>
 				}
 				{/* /Name & Time */}
+
+				{/* Save File */}
 				{ file.files &&
 				<Fragment>
 					{/*
@@ -272,6 +269,7 @@ const File = (props) =>
 					))}
 				</Fragment>
 				}
+				{/* /Save File */}
 
 				{/* Text */}
 				{/*
@@ -285,7 +283,9 @@ const File = (props) =>
 						/>
 				</Typography>
 				*/}
+				{/* /Text */}
 
+				{/* Download File */}
 				{ (!file.files) &&
 				<div
 					className={classes.fileInfo}
@@ -319,7 +319,7 @@ const File = (props) =>
 					}
 				</div>
 				}
-				{/* /Text */}
+				{/* /Download File */}
 
 				{ file.timeout &&
 				<Typography className={classes.text}>
@@ -368,7 +368,7 @@ File.propTypes = {
 
 };
 
-const mapStateToProps = (state, { time, magnetUri }) =>
+const mapStateToProps = (state, { time }) =>
 {
 	return {
 		file          : state.files.files.filter((item) => item.time === time)[0],
