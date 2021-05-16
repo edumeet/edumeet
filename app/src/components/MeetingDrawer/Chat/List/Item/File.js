@@ -145,9 +145,9 @@ const File = (props) =>
 
 	} = props;
 
-	async function handleDownload()
+	const handleDownload = () =>
 	{
-		async function handleTorrent(torrent)
+		const handleTorrent = (torrent) =>
 		{
 			// Torrent already done, this can happen if the
 			// same file was sent multiple times.
@@ -167,9 +167,9 @@ const File = (props) =>
 					setFileDone(torrent.magnetURI, torrent.files);
 				});
 			}
-		}
+		};
 
-		await setFileActive(magnetUri);
+		setFileActive(magnetUri);
 
 		setProgress(file.active);
 
@@ -184,7 +184,7 @@ const File = (props) =>
 		{
 			roomClient._webTorrent.add(magnetUri, handleTorrent);
 		}
-	}
+	};
 
 	return (
 		<Paper
@@ -340,7 +340,7 @@ const File = (props) =>
 						classes.progressBarShow :
 						classes.progressBarHide
 					}
-					ref={refProgress} id='test1' value={file.progress}
+					ref={refProgress} value={file.progress}
 				/>
 			</div>
 			{/* /Content */}
