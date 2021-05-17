@@ -11,12 +11,10 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import Paper from '@material-ui/core/Paper';
 import classnames from 'classnames';
 import SaveIcon from '@material-ui/icons/Save';
-import WarningIcon from '@material-ui/icons/Warning';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import * as fileActions from '../../../../../actions/fileActions';
 import Tooltip from '@material-ui/core/Tooltip';
 import Alert from '@material-ui/lab/Alert';
-import Grid from '@material-ui/core/Grid';
 
 const styles = (theme) =>
 	({
