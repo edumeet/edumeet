@@ -173,7 +173,9 @@ const ChatInput = (props) =>
 							})}
 							editorState={editorState}
 							onChange={setEditorState}
-							handleKeyCommand={handleKeyCommand}
+							handleKeyCommand={browser.platform !== 'mobile' ?
+								handleKeyCommand : null
+							}
 							handleReturn={handleReturn}
 							plugins={[ singleLinePlugin ]}
 							blockRenderMap={singleLinePlugin.blockRenderMap}
@@ -216,99 +218,103 @@ const ChatInput = (props) =>
 				<Grid item container justify='space-between' alignItems='center'>
 
 					{/* Buttons of format */}
-					<Grid item>
+					{(browser.platform !== 'mobile') ?
+						<Grid item>
 
-						{/* Button bold */}
-						<Tooltip
-							title={intl.formatMessage({
-								id             : 'label.bold',
-								defaultMessage : 'Bold'
-							})}
-							placement='top'
-							enterDelay='700'
-							enterNextDelay='700'
-						>
-							<IconButton
-								size='small'
-								classes={{ sizeSmall: classes.icon }}
-								disabled={!canChat}
-								aria-label={intl.formatMessage({
+							{/* Button bold */}
+							<Tooltip
+								title={intl.formatMessage({
 									id             : 'label.bold',
 									defaultMessage : 'Bold'
 								})}
-								color={handleInlineStyled('BOLD') ? 'primary': ''}
-
-								component='span'
-								onClick={handleBoldClick}
-								onMouseDown={(e) => e.preventDefault()}
-
+								placement='top'
+								enterDelay='700'
+								enterNextDelay='700'
 							>
-								<FormatBoldIcon />
-							</IconButton>
+								<IconButton
+									size='small'
+									classes={{ sizeSmall: classes.icon }}
+									disabled={!canChat}
+									aria-label={intl.formatMessage({
+										id             : 'label.bold',
+										defaultMessage : 'Bold'
+									})}
+									color={handleInlineStyled('BOLD') ? 'primary': ''}
 
-						</Tooltip>
-						{/* /Button bold */}
+									component='span'
+									onClick={handleBoldClick}
+									onMouseDown={(e) => e.preventDefault()}
 
-						{/* Button italic */}
-						<Tooltip
-							title={intl.formatMessage({
-								id             : 'label.italic',
-								defaultMessage : 'Italic'
-							})}
-							placement='top'
-							enterDelay='700'
-							enterNextDelay='700'
-						>
-							<IconButton
-								size='small'
-								classes={{ sizeSmall: classes.icon }}
-								disabled={!canChat}
-								aria-label={intl.formatMessage({
+								>
+									<FormatBoldIcon />
+								</IconButton>
+
+							</Tooltip>
+							{/* /Button bold */}
+
+							{/* Button italic */}
+							<Tooltip
+								title={intl.formatMessage({
 									id             : 'label.italic',
 									defaultMessage : 'Italic'
 								})}
-								color={handleInlineStyled('ITALIC') ? 'primary': ''}
-
-								component='span'
-								onClick={handleItalicClick}
-								onMouseDown={(e) => e.preventDefault()}
+								placement='top'
+								enterDelay='700'
+								enterNextDelay='700'
 							>
-								<FormatItalicIcon />
-							</IconButton>
-						</Tooltip>
-						{/* /Button italic */}
+								<IconButton
+									size='small'
+									classes={{ sizeSmall: classes.icon }}
+									disabled={!canChat}
+									aria-label={intl.formatMessage({
+										id             : 'label.italic',
+										defaultMessage : 'Italic'
+									})}
+									color={handleInlineStyled('ITALIC') ? 'primary': ''}
 
-						{/* Button underline */}
-						<Tooltip
-							title={intl.formatMessage({
-								id             : 'label.underline',
-								defaultMessage : 'Underline'
-							})}
-							placement='top'
-							enterDelay='700'
-							enterNextDelay='700'
-						>
-							<IconButton
-								size='small'
-								classes={{ sizeSmall: classes.icon }}
-								disabled={!canChat}
-								aria-label={intl.formatMessage({
+									component='span'
+									onClick={handleItalicClick}
+									onMouseDown={(e) => e.preventDefault()}
+								>
+									<FormatItalicIcon />
+								</IconButton>
+							</Tooltip>
+							{/* /Button italic */}
+
+							{/* Button underline */}
+							<Tooltip
+								title={intl.formatMessage({
 									id             : 'label.underline',
 									defaultMessage : 'Underline'
 								})}
-								color={handleInlineStyled('UNDERLINE') ? 'primary': ''}
-
-								component='span'
-								onClick={handleUnderlineClick}
-								onMouseDown={(e) => e.preventDefault()}
+								placement='top'
+								enterDelay='700'
+								enterNextDelay='700'
 							>
-								<FormatUnderlinedIcon />
-							</IconButton>
+								<IconButton
+									size='small'
+									classes={{ sizeSmall: classes.icon }}
+									disabled={!canChat}
+									aria-label={intl.formatMessage({
+										id             : 'label.underline',
+										defaultMessage : 'Underline'
+									})}
+									color={handleInlineStyled('UNDERLINE') ? 'primary': ''}
 
-						</Tooltip>
-						{/* /Button underline */}
+									component='span'
+									onClick={handleUnderlineClick}
+									onMouseDown={(e) => e.preventDefault()}
+								>
+									<FormatUnderlinedIcon />
+								</IconButton>
 
-					</Grid>
+							</Tooltip>
+							{/* /Button underline */}
+
+						</Grid>
+						:
+						<Grid item />
+					}
 					{/* /Buttons of format */}
 
 					{/* Buttons of actions */}
