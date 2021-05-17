@@ -377,6 +377,7 @@ const ChatInput = (props) =>
 						{/* /Button sort chat */}
 
 						{/* Button save chat */}
+						{(browser.platform !== 'mobile') &&
 						<React.Fragment>
 
 							<Tooltip
@@ -405,6 +406,7 @@ const ChatInput = (props) =>
 								</IconButton>
 							</Tooltip>
 						</React.Fragment>
+						}
 						{/* /Button save chat */}
 
 						{/* Button share file */}
