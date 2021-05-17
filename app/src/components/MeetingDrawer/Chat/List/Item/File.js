@@ -11,8 +11,12 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import Paper from '@material-ui/core/Paper';
 import classnames from 'classnames';
 import SaveIcon from '@material-ui/icons/Save';
+import WarningIcon from '@material-ui/icons/Warning';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import * as fileActions from '../../../../../actions/fileActions';
+import Tooltip from '@material-ui/core/Tooltip';
+import Alert from '@material-ui/lab/Alert';
+import Grid from '@material-ui/core/Grid';
 
 const styles = (theme) =>
 	({
@@ -238,94 +242,103 @@ const File = (props) =>
 				{/* Save File */}
 				{ file.files &&
 				<Fragment>
-					{/*
-					<Typography className={classes.text}>
-						<FormattedMessage
-							id='filesharing.finished'
-							defaultMessage='File finished downloading'
-						/>
-					</Typography>
-					*/}
 					{ file.files.map((sharedFile, i) => (
 						<div
 							className={classes.fileInfo} key={i}
 							onClick={() => roomClient.saveFile(sharedFile)}
 						>
 							<DescriptionIcon />
+
 							<Typography className={classes.text}>
 								{sharedFile.name}
 							</Typography>
-							<IconButton
-								variant='contained'
-								component='span'
-								className={classes.button}
+
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'filesharing.save',
+									defaultMessage : 'save'
+								})}
+								placement='top'
+								enterDelay='700'
+								enterNextDelay='700'
 							>
-								{/*
-								<FormattedMessage
-									id='filesharing.save'
-									defaultMessage='Save'
-								/>
-								*/}
-								<SaveIcon/>
-							</IconButton>
+								<IconButton
+									variant='contained'
+									component='span'
+									className={classes.button}
+									aria-label={intl.formatMessage({
+										id             : 'filesharing.save',
+										defaultMessage : 'Save'
+									})}
+								>
+									<SaveIcon/>
+								</IconButton>
+							</Tooltip>
 						</div>
 					))}
 				</Fragment>
 				}
 				{/* /Save File */}
 
-				{/* Text */}
-				{/*
-				<Typography className={classes.text}>
-						<FormattedMessage
-							id='filesharing.sharedFile'
-							defaultMessage='{name} shared a file'
-							values={{
-								name
-							}}
-						/>
-				</Typography>
-				*/}
-				{/* /Text */}
-
 				{/* Download File */}
 				{ (!file.files) &&
-				<div
-					className={classes.fileInfo}
-					onClick={() => handleDownload()}
-				>
-					<DescriptionIcon />
-					<Typography className={classes.text}>
-						{ magnet.decode(magnetUri).dn }
-					</Typography>
-					{ canShareFiles ?
-						<IconButton
-							variant='contained'
-							component='span'
-							className={classes.button}
-						>
-							{/*
-							<FormattedMessage
-								id='filesharing.download'
-								defaultMessage='Download'
-							/>
-							*/}
-							<GetAppIcon/>
-						</IconButton>
-						:
+				<Fragment>
+					<div
+						className={classes.fileInfo}
+						onClick={!canShareFiles ? undefined : handleDownload}
+					>
+						<DescriptionIcon />
 						<Typography className={classes.text}>
+							{ magnet.decode(magnetUri).dn }
+						</Typography>
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'filesharing.download',
+								defaultMessage : 'Download'
+							})}
+							placement='top'
+							enterDelay='700'
+							enterNextDelay='700'
+						>
+							<IconButton
+								variant='contained'
+								component='span'
+								className={classes.button}
+								disabled={!canShareFiles ? true : false}
+								aria-label={intl.formatMessage({
+									id             : 'filesharing.download',
+									defaultMessage : 'Download'
+								})}
+							>
+								<GetAppIcon/>
+							</IconButton>
+						</Tooltip>
+
+					</div>
+					<div>
+						<progress
+							className={progress === true && file.progress < 1 ?
+								classes.progressBarShow :
+								classes.progressBarHide
+							}
+							ref={refProgress} value={file.progress}
+						/>
+					</div>
+					{ !canShareFiles &&
+					<div>
+						<Alert severity='error'>
 							<FormattedMessage
 								id='label.fileSharingUnsupported'
 								defaultMessage='File sharing not supported'
 							/>
-						</Typography>
+						</Alert>
+					</div>
 					}
-				</div>
+				</Fragment>
 				}
-				{/* /Download File */}
 
 				{ file.timeout &&
-				<Typography className={classes.text}>
+				<Alert severity='warning'>
 					<FormattedMessage
 						id='filesharing.missingSeeds'
 						defaultMessage={
@@ -334,16 +347,9 @@ const File = (props) =>
 									reupload the file that you want.`
 						}
 					/>
-				</Typography>
+				</Alert>
 				}
-
-				<progress
-					className={progress === true && file.progress < 1 ?
-						classes.progressBarShow :
-						classes.progressBarHide
-					}
-					ref={refProgress} value={file.progress}
-				/>
+				{/* /Download File */}
 			</div>
 			{/* /Content */}
 		</Paper>
