@@ -140,7 +140,6 @@ const File = (props) =>
 		sender,
 		isseen,
 		format,
-		width,
 		refMessage,
 		avatar,
 		setFileProgress,
@@ -198,7 +197,6 @@ const File = (props) =>
 				isseen && sender === 'response' ? classes.isseen : null,
 				classes[format]
 			)}
-			style={{ minWidth: width }}
 			data-isseen={isseen}
 			data-time={time}
 			ref={refMessage}
