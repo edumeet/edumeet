@@ -74,11 +74,7 @@ class MessageList extends React.Component
 
 		this.refList = React.createRef();
 
-		// this.refMessage = React.createRef();
-
-		this.state = { width: 0 };
-
-		this.cacheWidth = 0;
+		this.currWidth = 0;
 	}
 
 	componentDidMount()
@@ -90,11 +86,6 @@ class MessageList extends React.Component
 
 	componentDidUpdate(prevProps)
 	{
-		if (this.props.chat.count === 0)
-		{
-			this.setMessageWidth(0);
-		}
-
 		if (prevProps.chat.count !== this.props.chat.count)
 		{
 			this.isMessageSeen();
@@ -123,96 +114,36 @@ class MessageList extends React.Component
 		this.isMessageSeen(e);
 	}
 
-	setMessageWidth = (width) =>
-	{
-		if (width === 0 && this.state.width !== 0)
-		{
-			this.setState({ width: 0 });
-		}
-
-		if (width > this.state.width)
-		{
-			this.setState({ width: width });
-		}
-	}
-
 	setTmp(el)
 	{
 		const prev = el.previousSibling;
 
 		const curr = el;
 
-		const prevFormat = prev.getAttribute('data-format');
-
-		const currFormat = curr.getAttribute('data-format');
-
 		const prevName = prev.getAttribute('data-name');
 
 		const currName = curr.getAttribute('data-name');
 
-		// eslint-disable-next-line
-		console.log('currName',currName, 'prevName',prevName)
-
-		if (
-			currName !== prevName && prevName === null
-		)
+		if (currName !== prevName)
 		{
-			this.cacheWidth = curr.offsetWidth;
+			this.currWidth = curr.offsetWidth;
 
-			// curr.style.minWidth = `${this.offsetWidth}px`;
-			curr.style.minWidth = `${this.cacheWidth}px`;
-
-			// eslint-disable-next-line
-			console.log("0")
-
-			// this.forceUpdate();
+			curr.style.minWidth = `${this.currWidth}px`;
 		}
 		else
-
-		if (
-			currName === prevName && prevName !== null &&
-			curr.offsetWidth > this.cacheWidth
-
-		)
+		if (curr.offsetWidth > this.currWidth)
 		{
-			this.cacheWidth = curr.offsetWidth;
+			this.currWidth = curr.offsetWidth;
 
-			prev.style.minWidth = `${this.cacheWidth}px`;
-			curr.style.minWidth = `${this.cacheWidth}px`;
+			prev.style.minWidth = `${curr.offsetWidth}px`;
 
-			// eslint-disable-next-line
-			console.log("1")
+			curr.style.minWidth = `${curr.offsetWidth}px`;
 
 			this.forceUpdate();
 		}
 		else
-		if (
-			currName === prevName && prevName !== null &&
-			curr.offsetWidth <= this.cacheWidth
-		)
 		{
-			prev.style.minWidth = `${this.offsetWidth}px`;
-			curr.style.minWidth = `${this.cacheWidth}px`;
-
-			// eslint-disable-next-line
-			console.log("2")
-
-			// this.forceUpdate();
-		}
-		else
-		if (
-			currName !== prevName && prevName !== null
-		)
-		{
-			this.cacheWidth = curr.offsetWidth;
-
-			prev.style.minWidth = `${this.offsetWidth}px`;
-			curr.style.minWidth = `${this.offsetWidth}px`;
-
-			// eslint-disable-next-line
-			console.log("3")
-
-			// this.forceUpdate();
+			curr.style.minWidth = `${this.currWidth}px`;
 		}
 	}
 
@@ -389,7 +320,6 @@ class MessageList extends React.Component
 											'client' : item.sender
 										}
 										self={item.sender === 'client'}
-										width={this.state.width}
 										format={format}
 									/>);
 
@@ -426,7 +356,6 @@ class MessageList extends React.Component
 
 								return (
 									<File
-										// refMessage={(el) => el && this.setMessageWidth(el.offsetWidth)}
 										key={item.time}
 										time={item.time}
 										magnetUri={item.magnetUri}
@@ -437,7 +366,6 @@ class MessageList extends React.Component
 											'client' : item.sender
 										}
 										self={item.sender === 'client'}
-										width={this.state.width}
 										format={format}
 
 									/>
