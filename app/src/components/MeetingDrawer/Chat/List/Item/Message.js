@@ -115,7 +115,6 @@ const Message = (props) =>
 		isseen,
 		sender,
 		refMessage,
-		width,
 		format
 	} = props;
 
@@ -128,10 +127,6 @@ const Message = (props) =>
 				classes[format]
 			)}
 			data-name={name}
-			style={{
-				// minWidth : width
-				// width    : width
-			}}
 			data-isseen={isseen}
 			data-time={time}
 			ref={refMessage}
