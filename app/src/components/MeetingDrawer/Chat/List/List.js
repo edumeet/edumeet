@@ -114,7 +114,7 @@ class MessageList extends React.Component
 		this.isMessageSeen(e);
 	}
 
-	setTmp(el)
+	setWidth(el)
 	{
 		const prev = el.previousSibling;
 
@@ -124,20 +124,22 @@ class MessageList extends React.Component
 
 		const currName = curr.getAttribute('data-name');
 
+		const currWidth = curr.offsetWidth;
+
 		if (currName !== prevName)
 		{
-			this.currWidth = curr.offsetWidth;
+			this.currWidth = currWidth;
 
 			curr.style.minWidth = `${this.currWidth}px`;
 		}
 		else
-		if (curr.offsetWidth > this.currWidth)
+		if (currWidth > this.currWidth)
 		{
-			this.currWidth = curr.offsetWidth;
+			this.currWidth = currWidth;
 
-			prev.style.minWidth = `${curr.offsetWidth}px`;
+			prev.style.minWidth = `${this.currWidth}px`;
 
-			curr.style.minWidth = `${curr.offsetWidth}px`;
+			curr.style.minWidth = `${this.currWidth}px`;
 
 			this.forceUpdate();
 		}
@@ -304,7 +306,7 @@ class MessageList extends React.Component
 								const message = (
 									<Message
 										refMessage={
-											(el) => el && this.setTmp(
+											(el) => el && this.setWidth(
 												el
 											)
 										}
