@@ -11,21 +11,20 @@ const files = (state = initialState, action) =>
 	{
 		case 'ADD_FILE':
 		{
-			const { peerId, magnetUri, time } = action.payload;
-
-			const file = {
-				type      : 'file',
-				time      : time ? time : Date.now(),
-				active    : false,
-				progress  : 0,
-				files     : null,
-				peerId    : peerId,
-				magnetUri : magnetUri
-			};
+			// const { peerId, magnetUri, time } = action.payload;
+			const file = action.payload;
 
 			return {
 				...state,
-				files       : [ ...state.files, file ],
+				files : [
+					...state.files,
+					{
+						...file,
+						active   : false,
+						progress : 0,
+						files    : null
+					}
+				],
 				count       : state.count + 1,
 				countUnread : file.sender === 'response' ? ++state.countUnread : state.countUnread
 
@@ -41,7 +40,6 @@ const files = (state = initialState, action) =>
 			fileHistory.forEach((file) =>
 			{
 				newFileHistory.push({
-					type     : 'file',
 					active   : false,
 					progress : 0,
 					files    : null,

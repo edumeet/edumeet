@@ -878,7 +878,7 @@ export default class RoomClient
 		);
 	}
 
-	async shareFiles(files)
+	async shareFiles(data)
 	{
 		store.dispatch(requestActions.notify(
 			{
@@ -888,7 +888,7 @@ export default class RoomClient
 				})
 			}));
 
-		createTorrent(files, (err, torrent) =>
+		createTorrent(data.attachment, (err, torrent) =>
 		{
 			if (err)
 			{
@@ -906,7 +906,33 @@ export default class RoomClient
 
 			const existingTorrent = this._webTorrent.get(torrent);
 
-			if (existingTorrent)
+			if (!existingTorrent)
+			{
+				this._webTorrent.seed(
+					data.attachment,
+					{ announceList: [ [ this._tracker ] ] },
+					(newTorrent) =>
+					{
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'filesharing.successfulFileShare',
+									defaultMessage : 'File successfully shared'
+								})
+							}));
+
+						const file = {
+							...data,
+							peerId    : this._peerId,
+							magnetUri : newTorrent.magnetURI
+						};
+
+						store.dispatch(fileActions.addFile(file));
+
+						this._sendFile(file);
+					});
+			}
+			else
 			{
 				store.dispatch(requestActions.notify(
 					{
@@ -916,59 +942,28 @@ export default class RoomClient
 						})
 					}));
 
-				const time = Date.now();
+				const file = {
+					...data,
+					peerId    : this._peerId,
+					magnetUri : existingTorrent.magnetURI
+				};
 
-				store.dispatch(fileActions.addFile(
-					this._peerId,
-					existingTorrent.magnetURI,
-					time
-				));
+				store.dispatch(fileActions.addFile(file));
 
-				this._sendFile(time, existingTorrent.magnetURI);
+				this._sendFile(file);
 
-				return;
 			}
 
-			this._webTorrent.seed(
-				files,
-				{ announceList: [ [ this._tracker ] ] },
-				(newTorrent) =>
-				{
-					store.dispatch(requestActions.notify(
-						{
-							text : intl.formatMessage({
-								id             : 'filesharing.successfulFileShare',
-								defaultMessage : 'File successfully shared'
-							})
-						}));
-
-					const time = Date.now();
-
-					store.dispatch(fileActions.addFile(
-						this._peerId,
-						newTorrent.magnetURI,
-						time
-					));
-
-					this._sendFile(time, newTorrent.magnetURI);
-				});
 		});
 	}
 
-	// { file, name, picture }
-	async _sendFile(time, magnetUri)
+	async _sendFile(file)
 	{
-		logger.debug('sendFile() [magnetUri:"%o"]', magnetUri);
+		logger.debug('sendFile() [magnetUri:"%o"]', file.magnetUri);
 
 		try
 		{
-			/*
-			const time = store.getState().files.filter(
-				(item) => item.magnetUri === magnetUri
-			)[0].time;
-			*/
-
-			await this.sendRequest('sendFile', { magnetUri, time });
+			await this.sendRequest('sendFile', file);
 		}
 		catch (error)
 		{
@@ -2822,9 +2817,9 @@ export default class RoomClient
 
 					case 'sendFile':
 					{
-						const { peerId, magnetUri, time } = notification.data;
+						const file = notification.data;
 
-						store.dispatch(fileActions.addFile(peerId, magnetUri, time));
+						store.dispatch(fileActions.addFile({ ...file }));
 
 						store.dispatch(requestActions.notify(
 							{

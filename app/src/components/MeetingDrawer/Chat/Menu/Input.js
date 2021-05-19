@@ -115,9 +115,15 @@ const ChatInput = (props) =>
 	{
 		if (e.target.files.length > 0)
 		{
-			await props.roomClient.shareFiles(
-				e.target.files
-			);
+			await props.roomClient.shareFiles({
+				type       : 'file',
+				time       : Date.now(),
+				sender     : 'response',
+				isRead     : null,
+				name       : displayName,
+				picture    : picture,
+				attachment : e.target.files
+			});
 		}
 	};
 
