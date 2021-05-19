@@ -127,8 +127,9 @@ const Message = (props) =>
 				isseen ? classes.isSeen : null,
 				classes[format]
 			)}
+			data-name={name}
 			style={{
-				minWidth : width
+				// minWidth : width
 				// width    : width
 			}}
 			data-isseen={isseen}
