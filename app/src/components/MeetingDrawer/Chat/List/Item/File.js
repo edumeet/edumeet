@@ -197,6 +197,7 @@ const File = (props) =>
 				isseen && sender === 'response' ? classes.isseen : null,
 				classes[format]
 			)}
+			data-name={name}
 			data-isseen={isseen}
 			data-time={time}
 			ref={refMessage}
