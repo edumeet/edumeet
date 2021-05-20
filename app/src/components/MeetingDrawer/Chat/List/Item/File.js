@@ -51,11 +51,13 @@ const styles = (theme) =>
 		},
 		combinedTime :
 		{
-			alignSelf : 'center',
-			fontSize  : '13px',
-			color     : '#999999',
-			margin    : theme.spacing(0.75),
-			minWidth  : '50px'
+			width          : '75px',
+			alignSelf      : 'center',
+			fontSize       : '13px',
+			color          : '#999999',
+			dispay         : 'flex',
+			display        : 'flex',
+			justifyContent : 'center'
 
 		},
 		sent :
@@ -69,15 +71,19 @@ const styles = (theme) =>
 		name : {
 
 		},
-		avatar :
-		{
-			borderRadius    : '50%',
-			width           : '2rem',
-			height          : '2rem',
-			alignSelf       : 'center',
-			objectFit       : 'cover',
-			margin          : theme.spacing(2),
-			backgroundColor : '#e0e0e085'
+		avatar : {
+			dispay         : 'flex',
+			width          : '75px',
+			display        : 'flex',
+			justifyContent : 'center',
+			'& img'        : {
+				borderRadius    : '50%',
+				width           : '2rem',
+				height          : '2rem',
+				alignSelf       : 'center',
+				objectFit       : 'cover',
+				backgroundColor : '#e0e0e085'
+			}
 		},
 		content :
 		{
@@ -203,17 +209,18 @@ const File = (props) =>
 			ref={refMessage}
 		>
 			{/* Avatar */}
-			{(format === 'single' || format ==='combinedBegin') && 'hidden' ?
-				<img
-					className={classes.avatar}
-					src={avatar}
-					alt='Avatar'
-				/>
-				:
-				<div className={classes.combinedTime}>
-					<FormattedTime value={new Date(time)} />
-				</div>
-			}
+			<div className={classes.avatar}>
+				{(format === 'single' || format ==='combinedBegin') && 'hidden' ?
+					<img
+						src={avatar}
+						alt='Avatar'
+					/>
+					:
+					<div className={classes.combinedTime}>
+						<FormattedTime value={new Date(time)} />
+					</div>
+				}
+			</div>
 			{/* /Avatar */}
 
 			{/* Content */}
