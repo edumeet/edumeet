@@ -54,8 +54,8 @@ const styles = (theme) =>
 			alignSelf : 'center',
 			fontSize  : '13px',
 			color     : '#999999',
-			margin    : theme.spacing(0.5),
-			minWidth  : '35px'
+			margin    : theme.spacing(0.75),
+			minWidth  : '50px'
 
 		},
 		sent :
@@ -76,7 +76,7 @@ const styles = (theme) =>
 			height          : '2rem',
 			alignSelf       : 'center',
 			objectFit       : 'cover',
-			margin          : theme.spacing(0.5),
+			margin          : theme.spacing(2),
 			backgroundColor : '#e0e0e085'
 		},
 		content :
