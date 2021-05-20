@@ -11,7 +11,6 @@ const files = (state = initialState, action) =>
 	{
 		case 'ADD_FILE':
 		{
-			// const { peerId, magnetUri, time } = action.payload;
 			const file = action.payload;
 
 			return {
@@ -111,8 +110,6 @@ const files = (state = initialState, action) =>
 						...item,
 						files    : sharedFiles,
 						progress : 1,
-						// type : 'file',
-						// time : Date.now(),
 						active   : false,
 						timeout  : false
 					};
@@ -124,7 +121,6 @@ const files = (state = initialState, action) =>
 
 		case 'CLEAR_FILES':
 		{
-			// return [];
 			return {
 				...state,
 				files       : [],
