@@ -152,10 +152,10 @@ const Message = (props) =>
 				<Typography variant='subtitle1'>
 					<b>
 						{ sender === 'client' ?
-							`${name} (${intl.formatMessage({
+							`${intl.formatMessage({
 								id             : 'room.me',
 								defaultMessage : 'Me'
-							}) })`
+							}) }`
 							:
 							<b>{name}</b>
 						} - <FormattedTime value={new Date(time)} />
