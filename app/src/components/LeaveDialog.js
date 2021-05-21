@@ -16,6 +16,7 @@ import Button from '@material-ui/core/Button';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import CancelIcon from '@material-ui/icons/Cancel';
+import SaveIcon from '@material-ui/icons/Save';
 
 const styles = (theme) =>
 	({
@@ -103,17 +104,19 @@ const LeaveDialog = ({
 					<FormattedMessage
 						id='label.yes'
 						defaultMessage='Yes'
-					/>
-				</Button>
 
-				{/*
-				<Button onClick={handleLeaveWithSavingChat} color='primary'>
-					<FormattedMessage
-						id='label.yesWithSavingChat'
-						defaultMessage='Yes (+ download Chat)'
 					/>
 				</Button>
-				*/}
+				<Button
+					// onClick={handleLeaveWithSavingChat}
+					color='primary'
+					startIcon={<SaveIcon />}
+				>
+					<FormattedMessage
+						id='label.leaveWithSavingChat'
+						defaultMessage='Yes (save chat)'
+					/>
+				</Button>
 			</DialogActions>
 		</Dialog>
 	);
