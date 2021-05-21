@@ -63,7 +63,11 @@ const LeaveDialog = ({
 
 	const handleLeave = () => roomClient.close();
 
-	// const handleLeaveWithSavingChat = () => roomClient.close();
+	const handleLeaveWithSavingChat = () =>
+	{
+		roomClient.saveChat();
+		// roomClient.close();
+	};
 
 	return (
 		<Dialog
@@ -108,7 +112,7 @@ const LeaveDialog = ({
 					/>
 				</Button>
 				<Button
-					// onClick={handleLeaveWithSavingChat}
+					onClick={handleLeaveWithSavingChat}
 					color='primary'
 					startIcon={<SaveIcon />}
 				>
