@@ -23,7 +23,6 @@ import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import Avatar from '@material-ui/core/Avatar';
 import Badge from '@material-ui/core/Badge';
 import Paper from '@material-ui/core/Paper';
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -217,7 +216,6 @@ const TopBar = (props) =>
 		drawerOverlayed,
 		toolAreaOpen,
 		isMobile,
-		myPicture,
 		loggedIn,
 		loginEnabled,
 		fullscreenEnabled,
@@ -468,11 +466,7 @@ const TopBar = (props) =>
 										loggedIn ? roomClient.logout() : roomClient.login();
 									}}
 								>
-									{ myPicture ?
-										<Avatar src={myPicture} />
-										:
-										<AccountCircle className={loggedIn ? classes.green : null} />
-									}
+									<AccountCircle className={loggedIn ? classes.green : null} />
 								</IconButton>
 							</Tooltip>
 						}
@@ -692,11 +686,7 @@ const TopBar = (props) =>
 							loggedIn ? roomClient.logout() : roomClient.login();
 						}}
 					>
-						{ myPicture ?
-							<Avatar src={myPicture} />
-							:
-							<AccountCircle className={loggedIn ? classes.green : null} />
-						}
+						<AccountCircle className={loggedIn ? classes.green : null} />
 						{ loggedIn ?
 							<p className={classes.moreAction}>
 								<FormattedMessage
@@ -934,7 +924,6 @@ TopBar.propTypes =
 	permanentTopBar      : PropTypes.bool.isRequired,
 	drawerOverlayed      : PropTypes.bool.isRequired,
 	toolAreaOpen         : PropTypes.bool.isRequired,
-	myPicture            : PropTypes.string,
 	loggedIn             : PropTypes.bool.isRequired,
 	loginEnabled         : PropTypes.bool.isRequired,
 	fullscreenEnabled    : PropTypes.bool,
@@ -982,7 +971,6 @@ const makeMapStateToProps = () =>
 			toolAreaOpen    : state.toolarea.toolAreaOpen,
 			loggedIn        : state.me.loggedIn,
 			loginEnabled    : state.me.loginEnabled,
-			myPicture       : state.me.picture,
 			unread          : state.toolarea.unreadMessages +
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
 			canProduceExtraVideo : hasExtraVideoPermission(state),

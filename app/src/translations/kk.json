@@ -167,6 +167,13 @@
 	"settings.drawerOverlayed": "Оңжақ панель үстінде",
 	"settings.voiceActivatedUnmute": "Дауыспен активтендіруді қосу",
 	"settings.noiseThreshold": "Шу деңгейі",
+	"settings.mirrorOwnVideo": null,
+	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
+	"settings.myPhotoButton": null,
+	"settings.myPhotoLabel": null,
+	"settings.myPhotoSizeError": null,
+	"settings.myPhotoTypeError": null,
 
 	"filesharing.saveFileError": "Файлды сақтау мүмкін емес",
 	"filesharing.startingFileShare": "Файлды бөлісу әрекеті",
@@ -221,7 +228,7 @@
 	"moderator.muteVideo": "одератор видеобейнеңізді өшірді",
 	"moderator.stopScreenSharing": "Модератор экранды бөлісуді тоқтатты",
 
-	"unsupportedBrowser.titleUsnsupportedBrowser": "Қолдау көрсетілмейтін браузер анықталды!",
+	"unsupportedBrowser.titleUnsupportedBrowser": "Қолдау көрсетілмейтін браузер анықталды!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Қажетті функционалдылық сіздің браузеріңізде қол жетімді емес!",
 	"unsupportedBrowser.bodyText": "Бұл бейнеконференция қызметі сіздің браузеріңіз қолдамайтын функцияны қажет етеді. Жаңартыңыз немесе басқа браузерге ауысыңыз немесе параметрлеріңізді тексеріңіз. Қолдау көрсетілетін браузерлер:"
 }

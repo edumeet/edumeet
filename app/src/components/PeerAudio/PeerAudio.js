@@ -11,6 +11,7 @@ export default class PeerAudio extends React.PureComponent
 		// @type {MediaStreamTrack}
 		this._audioTrack = null;
 		this._audioOutputDevice = null;
+		this._gainNode = null;
 	}
 
 	render()
@@ -25,20 +26,22 @@ export default class PeerAudio extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { audioTrack, audioOutputDevice } = this.props;
+		const { audioTrack, audioOutputDevice, audioGain } = this.props;
 
 		this._setTrack(audioTrack);
 		this._setOutputDevice(audioOutputDevice);
+		this._setAudioGain(audioGain);
 	}
 
 	componentDidUpdate(prevProps)
 	{
 		if (prevProps !== this.props)
 		{
-			const { audioTrack, audioOutputDevice } = this.props;
+			const { audioTrack, audioOutputDevice, audioGain } = this.props;
 
 			this._setTrack(audioTrack);
 			this._setOutputDevice(audioOutputDevice);
+			this._setAudioGain(audioGain);
 		}
 	}
 
@@ -55,10 +58,9 @@ export default class PeerAudio extends React.PureComponent
 		{
 			const stream = new MediaStream();
 
-			if (audioTrack)
-				stream.addTrack(audioTrack);
-
+			stream.addTrack(audioTrack);
 			audio.srcObject = stream;
+
 		}
 		else
 		{
@@ -78,10 +80,41 @@ export default class PeerAudio extends React.PureComponent
 		if (audioOutputDevice && typeof audio.setSinkId === 'function')
 			audio.setSinkId(audioOutputDevice);
 	}
+
+	_setAudioGain(audioGain)
+	{
+		if (audioGain === undefined)
+		{
+			return;
+		}
+
+		if (this._gainNode == null)
+		{
+			const	{ audio } = this.refs;
+
+			if (!audio.srcObject)
+			{
+				return;
+			}
+
+			const	AudioContext = window.AudioContext || window.webkitAudioContext,
+				audioCtx = new AudioContext(),
+				src = audioCtx.createMediaStreamSource(audio.srcObject),
+				dst = audioCtx.createMediaStreamDestination();
+
+			this._gainNode = audioCtx.createGain();
+			src.connect(this._gainNode);
+			this._gainNode.connect(audioCtx.destination);
+			audio.volume = 0;
+		}
+
+		this._gainNode.gain.value = audioGain;
+	}
 }
 
 PeerAudio.propTypes =
 {
 	audioTrack        : PropTypes.any,
-	audioOutputDevice : PropTypes.string
+	audioOutputDevice : PropTypes.string,
+	audioGain         : PropTypes.number
 };

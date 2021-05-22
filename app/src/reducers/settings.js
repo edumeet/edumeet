@@ -1,10 +1,10 @@
 const initialState =
 {
-	displayName             : `Guest ${Math.floor(Math.random() * (100000 - 10000)) + 10000}`,
+	displayName             : '',
 	selectedWebcam          : null,
 	selectedAudioDevice     : null,
 	advancedMode            : false,
-	autoGainControl         : false,
+	autoGainControl         : true,
 	echoCancellation        : true,
 	noiseSuppression        : true,
 	voiceActivatedUnmute    : false,
@@ -22,10 +22,12 @@ const initialState =
 	showNotifications       : true,
 	notificationSounds      : true,
 	mirrorOwnVideo          : true,
+	hideNoVideoParticipants : false,
 	buttonControlBar        : window.config.buttonControlBar || false,
-	drawerOverlayed         : window.config.drawerOverlayed || true,
+	drawerOverlayed         : (typeof window.config.drawerOverlayed === 'undefined') ? true : window.config.drawerOverlayed,
 	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
 	mediaPerms              : { audio: true, video: true },
+	localPicture            : null,
 	...window.config.defaultAudio
 };
 
@@ -223,6 +225,13 @@ const settings = (state = initialState, action) =>
 			return { ...state, mirrorOwnVideo };
 		}
 
+		case 'TOGGLE_HIDE_NO_VIDEO_PARTICIPANTS':
+		{
+			const hideNoVideoParticipants = !state.hideNoVideoParticipants;
+
+			return { ...state, hideNoVideoParticipants };
+		}
+
 		case 'SET_MEDIA_PERMS':
 		{
 			const { mediaPerms } = action.payload;
@@ -242,6 +251,13 @@ const settings = (state = initialState, action) =>
 			const { videoMuted } = action.payload;
 
 			return { ...state, videoMuted };
+		}
+
+		case 'SET_LOCAL_PICTURE':
+		{
+			const { localPicture } = action.payload;
+
+			return { ...state, localPicture };
 		}
 
 		default:

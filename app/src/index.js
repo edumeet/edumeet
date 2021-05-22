@@ -17,19 +17,19 @@ import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
 import JoinDialog from './components/JoinDialog';
-import LoginDialog from './components/LoginDialog';
-import LoadingView from './components/LoadingView';
+import LoginDialog from './components/AccessControl/LoginDialog';
+import LoadingView from './components/Loader/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistor, store } from './store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
-import { ReactLazyPreload } from './components/ReactLazyPreload';
+import { LazyPreload } from './components/Loader/LazyPreload';
 import { detectDevice } from 'mediasoup-client';
 
 import './index.css';
 
-const App = ReactLazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
+const App = LazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
 
 // const cache = createIntlCache();
 
@@ -88,6 +88,7 @@ function run()
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
+	const headless = parameters.get('headless');
 
 	const { pathname } = window.location;
 
@@ -167,6 +168,7 @@ function run()
 			accessCode,
 			device,
 			produce,
+			headless,
 			forceTcp,
 			displayName,
 			muted,

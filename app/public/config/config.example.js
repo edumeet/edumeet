@@ -5,6 +5,12 @@ var config =
 	developmentPort : 3443,
 	productionPort  : 443,
 
+	/*
+	// If the server component runs on a different host than the app
+	// you can uncomment the following line and specify the host name.
+	serverHostname  : 'external-server.com',
+    */
+
 	/**
 	 * Supported browsers version 
 	 * in bowser satisfy format.
@@ -24,6 +30,20 @@ var config =
 		'chromium'                     : '>=74',
 		'opera'                        : '>=62',
 		'samsung internet for android' : '>=11.1.1.52'
+	},
+
+	/**
+	 * Network priorities 
+	 * DSCP bits set by browser according this priority values. 
+	 * ("high" means actually: EF for audio, and AF41 for Video in chrome)
+	 * https://en.wikipedia.org/wiki/Differentiated_services
+	 */
+	networkPriorities :
+	{
+		'audio'            : 'high',
+		'mainVideo'        : 'high',
+		'additionalVideos' : 'medium',
+		'screenShare'      : 'medium'
 	},
 
 	/**
@@ -67,22 +87,43 @@ var config =
 	simulcast                     : true,
 	// Enable or disable simulcast for screen sharing video
 	simulcastSharing              : false,
-	// Simulcast encoding layers and levels
-	simulcastEncodings            :
-	[
-		{ scaleResolutionDownBy: 4 },
-		{ scaleResolutionDownBy: 2 },
-		{ scaleResolutionDownBy: 1 }
-	],
+	// Define different encodings for various resolutions of the video
+	simulcastProfiles             :
+	{
+		3840 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 1500000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 4000000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 10000000 }
+		],
+		1920 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 750000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 1500000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 4000000 }
+		],
+		1280 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 250000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 900000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 3000000 }
+		],
+		640 :
+		[
+			{ scaleResolutionDownBy: 2, maxBitRate: 250000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 900000 }
+		],
+		320 :
+		[
+			{ scaleResolutionDownBy: 1, maxBitRate: 250000 }
+		]
+	},
 
-	/**
-	 * Alternative simulcast setting:
-	 * [
-	 *   { maxBitRate: 50000 }, 
-	 *	 { maxBitRate: 1000000 },
-	 *	 { maxBitRate: 4800000 }
-	 *],
-	 **/
+	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
+	// example: 
+	// with level width=640px, the minimum width required to trigger the
+	// level change will be: 640 * 0.75 = 480px
+	adaptiveScalingFactor : 0.75,
 
 	/**
 	 * White listing browsers that support audio output device selection.
@@ -102,27 +143,33 @@ var config =
 		tcp : true
 	},
 	// defaults for audio setting on new clients / can be customized and overruled from client side
-	defaultAudio:
+	defaultAudio :
 	{
-		autoGainControl      : false, // default : false
+		autoGainControl      : true, // default : true
 		echoCancellation     : true, // default : true 
 		noiseSuppression     : true, // default : true 
-		voiceActivatedUnmute : false, // default : false / Automatically unmute speaking above noisThereshold
-		noiseThreshold       : -60 // default -60 / This is only for voiceActivatedUnmute and audio-indicator
+		// Automatically unmute speaking above noisThereshold
+		voiceActivatedUnmute : false, // default : false 
+		// This is only for voiceActivatedUnmute and audio-indicator
+		noiseThreshold       : -60 // default -60
 	},
 	// Audio options for now only centrally from config file: 
-	centralAudioOptions:
+	centralAudioOptions :
 	{
-		sampleRate          : 96000, // default : 96khz / will not eat that much bandwith thanks to opus
-		channelCount        : 1, // default : 1 / usually mics are mono so this saves bandwidth
-		volume              : 1.0,  // default : 1.0
-		sampleSize          : 16,  // default : 16
-		opusStereo          : false, // default : false / usually mics are mono so this saves bandwidth
-		opusDtx             : true,  // default : true / will save bandwidth 
+		// will not eat that much bandwith thanks to opus
+		sampleRate          : 48000, // default : 48000 and don't go higher
+		// usually mics are mono so this saves bandwidth
+		channelCount        : 1, // default : 1
+		volume              : 1.0, // default : 1.0
+		sampleSize          : 16, // default : 16
+		// usually mics are mono so this saves bandwidth
+		opusStereo          : false, // default : false
+		opusDtx             : true, // default : true / will save bandwidth 
 		opusFec             : true, // default : true / forward error correction
 		opusPtime           : '20', // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
-		opusMaxPlaybackRate : 96000
+		opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
 	},
+
 	/**
 	 * Set max number participants in one room that join 
 	 * unmuted. Next participant will join automatically muted
@@ -144,31 +191,52 @@ var config =
 	drawerOverlayed      : true,
 	// Position of notifications
 	notificationPosition : 'right',
+
+	/**
+	 * Set the notificationSounds.  Valid keys are:
+	 * 'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage',
+	 * 'sendFile', 'newPeer' and 'default'.
+	 *
+	 * Not defining a key is equivalent to using the default notification sound.
+	 * Setting 'play' to null disables the sound notification.
+	 */
+	notificationSounds : {
+		chatMessage : {
+			play : '/sounds/notify-chat.mp3'
+		},
+		raisedHand : {
+			play : '/sounds/notify-hand.mp3'
+		},
+		default : {
+			delay : 5000, // minimum delay between alert sounds [ms]
+			play  : '/sounds/notify.mp3'
+		}
+	},
 	// Timeout for autohiding topbar and button control bar
-	hideTimeout          : 3000,
+	hideTimeout : 3000,
 	// max number of participant that will be visible in 
 	// as speaker
-	lastN                : 4,
-	mobileLastN          : 1,
+	lastN       : 4,
+	mobileLastN : 1,
 	// Highest number of lastN the user can select manually in 
 	// userinteface
-	maxLastN             : 5,
+	maxLastN    : 5,
 	// If truthy, users can NOT change number of speakers visible
-	lockLastN            : false,
+	lockLastN   : false,
 	// Show logo if "logo" is not null, else show title
 	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-	logo                 : 'images/logo.example.png',
-	title                : 'edumeet',
+	logo        : 'images/logo.edumeet.svg',
+	title       : 'edumeet',
 	// Service & Support URL
 	// if not set then not displayed on the about modals
-	supportUrl           : 'https://support.example.com',
+	supportUrl  : 'https://support.example.com',
 	// Privacy and dataprotection URL or path
 	// by default privacy/privacy.html
 	// that is a placeholder for your policies
 	//
 	// but an external url could be also used here	 
-	privacyUrl           : 'privacy/privacy.html',
-	theme                :
+	privacyUrl  : 'privacy/privacy.html',
+	theme       :
 	{
 		palette :
 		{
@@ -206,7 +274,9 @@ var config =
 				}
 
 			},
-			MuIconButton :
+
+			/*
+			MuiIconButton :
 			{
 				colorPrimary :
 				{
@@ -226,6 +296,7 @@ var config =
 				}
 
 			},
+			*/
 
 			MuiFab :
 			{

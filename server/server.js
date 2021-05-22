@@ -2,6 +2,8 @@
 
 process.title = 'edumeet-server';
 
+import Logger from './lib/Logger';
+
 const bcrypt = require('bcrypt');
 const config = require('./config/config');
 const fs = require('fs');
@@ -13,7 +15,6 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
-const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
 const base64 = require('base-64');
@@ -87,7 +88,7 @@ const tls =
 const app = express();
 
 app.use(helmet.hsts());
-const sharedCookieParser=cookieParser();
+const sharedCookieParser = cookieParser();
 
 app.use(sharedCookieParser);
 app.use(bodyParser.json({ limit: '5mb' }));
@@ -416,14 +417,21 @@ async function setupAuth()
 	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
-		const state = {
-			peerId : req.query.peerId,
-			roomId : req.query.roomId
-		};
+		logger.debug('/auth/login');
 
-		if (authStrategy== 'saml' || authStrategy=='local')
+		let state;
+
+		if (req.query.peerId && req.query.roomId)
 		{
-			req.session.authState=state;
+			state = {
+				peerId : req.query.peerId,
+				roomId : req.query.roomId
+			};
+
+			if (authStrategy== 'saml' || authStrategy=='local')
+			{
+				req.session.authState=state;
+			}
 		}
 
 		if (authStrategy === 'local' && !(req.user && req.password))
@@ -444,13 +452,28 @@ async function setupAuth()
 		passport.authenticate('lti', { failureRedirect: '/' }),
 		(req, res) =>
 		{
+			logger.debug('/auth/lti');
 			res.redirect(`/${req.user.room}`);
 		}
 	);
 
+	app.get('/auth/check_login_status', (req, res) =>
+	{
+		let loggedIn = false;
+
+		if (Boolean(req.session.passport) &&
+			Boolean(req.session.passport.user))
+		{
+			loggedIn = true;
+		}
+
+		res.send({ loggedIn: loggedIn });
+	});
+
 	// logout
 	app.get('/auth/logout', (req, res) =>
 	{
+		logger.debug('/auth/logout');
 		const { peerId } = req.session;
 
 		const peer = peers.get(peerId);
@@ -465,11 +488,15 @@ async function setupAuth()
 		}
 
 		req.logout();
+		req.session.passport = undefined;
+		req.session.touch();
+		req.session.save();
 		req.session.destroy(() => res.send(logoutHelper()));
 	});
 	// SAML metadata
 	app.get('/auth/metadata', (req, res) =>
 	{
+		logger.debug('/auth/metadata');
 		if (config.auth && config.auth.saml &&
 			config.auth.saml.decryptionCert &&
 			config.auth.saml.signingCert)
@@ -496,9 +523,10 @@ async function setupAuth()
 	// callback
 	app.all(
 		'/auth/callback',
-		passport.authenticate(authStrategy, { failureRedirect: '/auth/login', failureFlash: true }),
+		passport.authenticate(authStrategy, { failureRedirect: '/auth/login' }),
 		async (req, res, next) =>
 		{
+			logger.debug('/auth/callback');
 			try
 			{
 				let state;
@@ -512,6 +540,13 @@ async function setupAuth()
 					if (req.method === 'POST')
 						state = JSON.parse(base64.decode(req.body.state));
 				}
+
+				if (!state || !state.peerId || !state.roomId)
+				{
+					res.redirect('/auth/login');
+					logger.debug('Empty state or state.peerId or state.roomId in auth/callback');
+				}
+
 				const { peerId, roomId } = state;
 
 				req.session.peerId = peerId;
@@ -586,20 +621,7 @@ async function runHttpsServer()
 				res.redirect(ltiURL);
 			}
 			else
-			{
-				const specialChars = "<>@!^*()[]{}:;|'\"\\,~`";
-
-				for (let i = 0; i < specialChars.length; i++)
-				{
-					if (req.url.substring(1).indexOf(specialChars[i]) > -1)
-					{
-						req.url = `/${encodeURIComponent(encodeURI(req.url.substring(1)))}`;
-						res.redirect(`${req.url}`);
-					}
-				}
-
 				return next();
-			}
 		}
 		else
 			res.redirect(`https://${req.hostname}${req.url}`);
@@ -607,9 +629,13 @@ async function runHttpsServer()
 	});
 
 	// Serve all files in the public folder as static files.
-	app.use(express.static('public'));
+	app.use(express.static('public', {
+		maxAge : (config.staticFilesCachePeriod || 0) * 1000
+	}));
 
-	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
+	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`, {
+		maxAge : (config.staticFilesCachePeriod || 0) * 1000
+	}));
 
 	if (config.httpOnly === true)
 	{
@@ -666,7 +692,7 @@ async function runWebSocketServer()
 	io = require('socket.io')(mainListener, { cookie: false });
 
 	io.use(
-		sharedSession(session, sharedCookieParser, { autoSave: true })
+		sharedSession(session, sharedCookieParser, {})
 	);
 
 	// Handle connections from clients.
@@ -747,6 +773,9 @@ async function runWebSocketServer()
 
 			room.handlePeer({ peer, returning });
 
+			socket.handshake.session.touch();
+			socket.handshake.session.save();
+
 			statusLog();
 		})
 			.catch((error) =>
@@ -770,14 +799,18 @@ async function runMediasoupWorkers()
 
 	logger.info('running %d mediasoup Workers...', numWorkers);
 
-	for (let i = 0; i < numWorkers; ++i)
+	const { logLevel, logTags, rtcMinPort, rtcMaxPort } = config.mediasoup.worker;
+	const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
+
+	for (let i = 0; i < numWorkers; i++)
 	{
 		const worker = await mediasoup.createWorker(
 			{
-				logLevel   : config.mediasoup.worker.logLevel,
-				logTags    : config.mediasoup.worker.logTags,
-				rtcMinPort : config.mediasoup.worker.rtcMinPort,
-				rtcMaxPort : config.mediasoup.worker.rtcMaxPort
+				logLevel,
+				logTags,
+				rtcMinPort : rtcMinPort + (i * portInterval),
+				rtcMaxPort : i === numWorkers - 1 ? rtcMaxPort
+					: rtcMinPort + ((i + 1) * portInterval) - 1
 			});
 
 		worker.on('died', () =>

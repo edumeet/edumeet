@@ -3,10 +3,10 @@ import { useParams } from 'react-router';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import JoinDialog from './JoinDialog';
-import LoadingView from './LoadingView';
-import { ReactLazyPreload } from './ReactLazyPreload';
+import LoadingView from './Loader/LoadingView';
+import { LazyPreload } from './Loader/LazyPreload';
 
-const Room = ReactLazyPreload(() => import(/* webpackChunkName: "room" */ './Room'));
+const Room = LazyPreload(() => import(/* webpackChunkName: "room" */ './Room'));
 
 const App = (props) =>
 {
