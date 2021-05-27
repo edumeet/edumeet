@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from 'react';
+import React, { Fragment, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../../../RoomContext';
@@ -116,24 +116,13 @@ const styles = (theme) =>
 			alignItems : 'center',
 			padding    : theme.spacing(0),
 			cursor     : 'pointer'
-		},
-		progressBarShow : {
-			display : 'block'
-		},
-		progressBarHide : {
-			display : 'none'
 		}
-
 	});
 
 const File = (props) =>
 {
 
 	const intl = useIntl();
-
-	const refProgress = useRef();
-
-	const [ progress, setProgress ] = useState();
 
 	const {
 		roomClient,
@@ -147,53 +136,8 @@ const File = (props) =>
 		isseen,
 		format,
 		refMessage,
-		avatar,
-		setFileProgress,
-		setFileDone,
-		setFileActive
-
+		avatar
 	} = props;
-
-	const handleDownload = () =>
-	{
-		const handleTorrent = (torrent) =>
-		{
-			// Torrent already done, this can happen if the
-			// same file was sent multiple times.
-			if (torrent.progress === 1)
-				setFileDone(torrent.magnetURI, torrent.files);
-			else
-			{
-				torrent.on('download', () =>
-				{
-					setFileProgress(torrent.magnetURI, torrent.progress);
-
-					refProgress.current.value = torrent.progress;
-				});
-
-				torrent.on('done', () =>
-				{
-					setFileDone(torrent.magnetURI, torrent.files);
-				});
-			}
-		};
-
-		setFileActive(magnetUri);
-
-		setProgress(file.active);
-
-		const existingTorrent = roomClient._webTorrent.get(magnetUri);
-
-		if (existingTorrent)
-		{
-			// Never add duplicate torrents, use the existing one instead.
-			handleTorrent(existingTorrent);
-		}
-		else
-		{
-			roomClient._webTorrent.add(magnetUri, handleTorrent);
-		}
-	};
 
 	return (
 		<Paper
@@ -285,11 +229,16 @@ const File = (props) =>
 				{/* /Save File */}
 
 				{/* Download File */}
+				{/* { (!file.active && !file.files) && */}
 				{ (!file.files) &&
 				<Fragment>
 					<div
 						className={classes.fileInfo}
-						onClick={!canShareFiles ? undefined : handleDownload}
+						onClick={
+							!canShareFiles ?
+								undefined :
+								() => roomClient.handleDownload(magnetUri)
+						}
 					>
 						<DescriptionIcon />
 						<Typography className={classes.text}>
@@ -320,13 +269,10 @@ const File = (props) =>
 
 					</div>
 					<div>
-						<progress
-							className={progress === true && file.progress < 1 ?
-								classes.progressBarShow :
-								classes.progressBarHide
-							}
-							ref={refProgress} value={file.progress}
-						/>
+
+						{ file.active &&
+						<progress value={file.progress} />
+						}
 					</div>
 					{ !canShareFiles &&
 					<div>
@@ -361,23 +307,20 @@ const File = (props) =>
 };
 
 File.propTypes = {
-	roomClient      : PropTypes.object.isRequired,
-	magnetUri       : PropTypes.string.isRequired,
-	time            : PropTypes.string.isRequired,
-	name            : PropTypes.string.isRequired,
-	picture         : PropTypes.string,
-	canShareFiles   : PropTypes.bool.isRequired,
-	file            : PropTypes.object.isRequired,
-	classes         : PropTypes.object.isRequired,
-	isseen          : PropTypes.bool.isRequired,
-	sender          : PropTypes.string.isRequired,
-	refMessage      : PropTypes.object.isRequired,
-	width           : PropTypes.number.isRequired,
-	format          : PropTypes.string.isRequired,
-	avatar          : PropTypes.string,
-	setFileDone     : PropTypes.func.isRequired,
-	setFileProgress : PropTypes.func.isRequired,
-	setFileActive   : PropTypes.func.isRequired
+	roomClient    : PropTypes.object.isRequired,
+	magnetUri     : PropTypes.string.isRequired,
+	time          : PropTypes.string.isRequired,
+	name          : PropTypes.string.isRequired,
+	picture       : PropTypes.string,
+	canShareFiles : PropTypes.bool.isRequired,
+	file          : PropTypes.object.isRequired,
+	classes       : PropTypes.object.isRequired,
+	isseen        : PropTypes.bool.isRequired,
+	sender        : PropTypes.string.isRequired,
+	refMessage    : PropTypes.object.isRequired,
+	width         : PropTypes.number.isRequired,
+	format        : PropTypes.string.isRequired,
+	avatar        : PropTypes.string
 
 };
 
@@ -389,38 +332,14 @@ const mapStateToProps = (state, { time }) =>
 	};
 };
 
-const mapDispatchToProps = (dispatch) =>
-	({
-		setFileDone : (magnetUri, files) =>
-		{
-			dispatch(
-				fileActions.setFileDone(magnetUri, files)
-			);
-		},
-		setFileProgress : (magnetURI, progress) =>
-		{
-			dispatch(
-				fileActions.setFileProgress(magnetURI, progress)
-			);
-		},
-		setFileActive : (magnetURI) =>
-		{
-			dispatch(
-				fileActions.setFileActive(magnetURI)
-			);
-		}
-
-	});
-
 export default withRoomContext(connect(
 	mapStateToProps,
-	mapDispatchToProps,
+	null,
 	null,
 	{
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.file === next.file &&
 				prev.files === next.files &&
 				prev.me.canShareFiles === next.me.canShareFiles
 			);
