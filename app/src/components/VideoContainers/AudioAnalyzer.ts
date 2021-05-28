@@ -1,4 +1,3 @@
-
 import chroma from 'chroma-js';
 import Logger from '../../Logger';
 
@@ -9,31 +8,31 @@ const AudioContext = window.AudioContext || window.webkitAudioContext || false;
 
 export class AudioAnalyzer
 {
-    container      : HTMLElement;
+	container : HTMLElement;
 
-    tracks         : Map<MediaStreamTrack, MediaStreamAudioSourceNode>;
+	tracks : Map<MediaStreamTrack, MediaStreamAudioSourceNode>;
 
-    canvas         : HTMLCanvasElement | null;
+	canvas : HTMLCanvasElement | null;
 
-    canvasContext  : CanvasRenderingContext2D | null;
+	canvasContext : CanvasRenderingContext2D | null;
 
-    canvasColumn   : number;
+	canvasColumn : number;
 
-    colorScale     : any;
+	colorScale : any;
 
-    context        : AudioContext;
+	context : AudioContext;
 
-    analyser       : AnalyserNode;
+	analyser : AnalyserNode;
 
-    frequencyArray : Uint8Array;
+	frequencyArray : Uint8Array;
 
-    private labelsWidth = 20;
+	private labelsWidth = 20;
 
-    private labelsSize = 10;
+	private labelsSize = 10;
 
-    private resizeObserver : ResizeObserver;
+	private resizeObserver : ResizeObserver;
 
-    private resizeCanvasTimeout : any;
+	private resizeCanvasTimeout : any;
 
 	constructor(container: HTMLElement)
 	{
@@ -47,11 +46,11 @@ export class AudioAnalyzer
 		this.canvas.style.cssText = `
 			position: relative;
 			top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
+	        left: 0;
+	        bottom: 0;
+	        right: 0;
+	        width: 100%;
+	        height: 100%;
 			background-color: rgba(0, 0, 0, 0.9);
 		`;
 
@@ -60,33 +59,33 @@ export class AudioAnalyzer
 		this.canvasContext = this.canvas.getContext('2d') as CanvasRenderingContext2D;
 		this.container.append(this.canvas);
 
-        this.canvasColumn = this.labelsWidth;
-        this.renderScale();
+		this.canvasColumn = this.labelsWidth;
+		this.renderScale();
 
-        this.colorScale = chroma.scale([ 'black', 'blue', 'yellow', 'red' ])
-            .domain([0, 64, 128, 192, 255])
-            .out('hex');
+		this.colorScale = chroma.scale([ 'black', 'blue', 'yellow', 'red' ])
+			.domain([ 0, 64, 128, 192, 255 ])
+			.out('hex');
 
-        // capture resize events and force rendering
-		this.resizeObserver = new ResizeObserver((entries) =>
+		// capture resize events and force rendering
+		this.resizeObserver = new ResizeObserver(() =>
 		{
-            clearTimeout(this.resizeCanvasTimeout);
-            this.resizeCanvasTimeout = setTimeout(() => this.resizeCanvas(), 200);
+			clearTimeout(this.resizeCanvasTimeout);
+			this.resizeCanvasTimeout = setTimeout(() => this.resizeCanvas(), 200);
 		});
 
 		this.resizeObserver.observe(this.container);
 
 		// audio context
 		this.context = new AudioContext({
-            latencyHint: 'playback',
-            sampleRate: 48000
-        });
+			latencyHint : 'playback',
+			sampleRate  : 48000
+		});
 		this.analyser = new AnalyserNode(this.context, {
-            fftSize: 2048,
-            maxDecibels: -20,
-            minDecibels: -80,
-            smoothingTimeConstant: 0.5
-        });
+			fftSize               : 2048,
+			maxDecibels           : -20,
+			minDecibels           : -80,
+			smoothingTimeConstant : 0.5
+		});
 		this.frequencyArray = new Uint8Array(this.analyser.frequencyBinCount);
 
 		requestAnimationFrame(this.renderLoop.bind(this));
@@ -122,102 +121,107 @@ export class AudioAnalyzer
 		this.tracks.clear();
 	}
 
-    delete()
-    {
-        logger.debug('delete');
+	delete()
+	{
+		logger.debug('delete');
 
-        if (this.canvas)
-        {
-            this.canvasContext = null;
-            this.container.removeChild(this.canvas);
-            this.canvas = null;
-        }
+		if (this.canvas)
+		{
+			this.canvasContext = null;
+			this.container.removeChild(this.canvas);
+			this.canvas = null;
+		}
 
-        this.removeTracks();
-        this.resizeObserver.disconnect();
-        this.context.close();
-    }
+		this.removeTracks();
+		this.resizeObserver.disconnect();
+		this.context.close();
+	}
 
-    resizeCanvas()
-    {
-        const { clientWidth, clientHeight } = this.container;
+	resizeCanvas()
+	{
+		const { clientWidth, clientHeight } = this.container;
 
-        if (this.canvas && this.canvasContext && (
-            this.canvas.width !== clientWidth || this.canvas.height !== clientHeight))
-        {
-            const scaleX = clientWidth / this.canvas.width;
-            this.canvasColumn = Math.floor(this.canvasColumn * scaleX);
+		if (this.canvas && this.canvasContext && (
+			this.canvas.width !== clientWidth || this.canvas.height !== clientHeight))
+		{
+			const scaleX = clientWidth / this.canvas.width;
 
-            const img = new Image();
-            img.onload = () => {
-                if (this.canvas && this.canvasContext)
-                {
-                    this.canvas.width = clientWidth;
-                    this.canvas.height = clientHeight;
-                    this.canvasContext.drawImage(img, 0, 0, clientWidth, clientHeight);
-                    this.renderScale();
-                }
-            };
-            img.src = this.canvas.toDataURL();
-        }
-    }
+			this.canvasColumn = Math.floor(this.canvasColumn * scaleX);
 
-    renderScale()
-    {
-        const { canvas, canvasContext } = this;
+			const img = new Image();
 
-        if (!canvasContext || !canvas || !canvas.height)
-            return;
+			img.onload = () =>
+			{
+				if (this.canvas && this.canvasContext)
+				{
+					this.canvas.width = clientWidth;
+					this.canvas.height = clientHeight;
+					this.canvasContext.drawImage(img, 0, 0, clientWidth, clientHeight);
+					this.renderScale();
+				}
+			};
+			img.src = this.canvas.toDataURL();
+		}
+	}
 
-        canvasContext.clearRect(0, 0, this.labelsWidth, canvas.height);
+	renderScale()
+	{
+		const { canvas, canvasContext } = this;
 
-        [5, 20, 100, 500, 2000, 6000, 20000].forEach((freq) =>
-        {
-            const y = Math.log(freq) / Math.log(24000);
+		if (!canvasContext || !canvas || !canvas.height)
+			return;
 
-            let freqString = `${freq}`;
-            if (freq > 1000)
-            {
-                freqString = `${Math.round(freq / 1000)}k`;
-            }
+		canvasContext.clearRect(0, 0, this.labelsWidth, canvas.height);
 
-            canvasContext.font = `${this.labelsSize}px Sans`;
-            canvasContext.fillStyle = 'white';
-            canvasContext.fillText(freqString, 0,
-                canvas.height * (1 - y) + this.labelsSize);
-        });
-    }
+		[ 5, 20, 100, 500, 2000, 6000, 20000 ].forEach((freq) =>
+		{
+			const y = Math.log(freq) / Math.log(24000);
 
-    render()
-    {
-        const { canvas, canvasContext } = this;
+			let freqString = `${freq}`;
 
-        if (!canvasContext || !canvas || !canvas.height)
-            return;
+			if (freq > 1000)
+			{
+				freqString = `${Math.round(freq / 1000)}k`;
+			}
 
-        this.analyser.getByteFrequencyData(this.frequencyArray);
+			canvasContext.font = `${this.labelsSize}px Sans`;
+			canvasContext.fillStyle = 'white';
+			canvasContext.fillText(freqString, 0,
+				canvas.height * (1 - y) + this.labelsSize);
+		});
+	}
 
-        if (this.canvasColumn >= canvas.width)
-        {
-            this.canvasColumn = canvas.width - 1;
-            const imageData = canvasContext.getImageData(
-                this.labelsWidth + 1, 0,
-                canvas.width - this.labelsWidth, canvas.height);
-            canvasContext.putImageData(imageData, this.labelsWidth, 0);
-        }
+	render()
+	{
+		const { canvas, canvasContext } = this;
 
-        for (let i = 0; i < this.frequencyArray.length; i++)
-        {
-            const color = this.colorScale(this.frequencyArray[i]);
-            const y = Math.log(i) / Math.log(this.frequencyArray.length);
+		if (!canvasContext || !canvas || !canvas.height)
+			return;
 
-            canvasContext.fillStyle = color;
-            canvasContext.fillRect(
-                this.canvasColumn, canvas.height * (1 - y), 1, 1);
-        }
+		this.analyser.getByteFrequencyData(this.frequencyArray);
 
-        this.canvasColumn += 1;
-    }
+		if (this.canvasColumn >= canvas.width)
+		{
+			this.canvasColumn = canvas.width - 1;
+			const imageData = canvasContext.getImageData(
+				this.labelsWidth + 1, 0,
+				canvas.width - this.labelsWidth, canvas.height);
+
+			canvasContext.putImageData(imageData, this.labelsWidth, 0);
+		}
+
+		for (let i = 0; i < this.frequencyArray.length; i++)
+		{
+			const color = this.colorScale(this.frequencyArray[i]);
+			const y = Math.log(i) / Math.log(this.frequencyArray.length);
+
+			canvasContext.fillStyle = color;
+			canvasContext.fillRect(
+				this.canvasColumn, canvas.height * (1 - y), 1, 1);
+		}
+
+		this.canvasColumn += 1;
+	}
 
 	renderLoop()
 	{

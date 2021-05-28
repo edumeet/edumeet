@@ -30,6 +30,8 @@ import Switch from '@material-ui/core/Switch';
 import ImageUploader from 'react-images-upload';
 import Resizer from 'react-image-file-resizer';
 
+const insertableStreamsSupported = Boolean(RTCRtpSender.prototype.createEncodedStreams);
+
 const NoiseSlider = withStyles(
 	{
 		root :
@@ -113,6 +115,7 @@ const MediaSettings = ({
 	setOpusDtx,
 	setOpusFec,
 	setOpusPtime,
+	setEnableOpusDetails,
 	roomClient,
 	me,
 	volume,
@@ -350,7 +353,7 @@ const MediaSettings = ({
 						</FormControl>
 						<FormControl className={classes.formControl}>
 							<Select
-								value={settings.frameRate || window.config.defaultFrameRate}
+								value={settings.frameRate}
 								onChange={(event) =>
 								{
 									if (event.target.value)
@@ -533,7 +536,7 @@ const MediaSettings = ({
 									roomClient._setNoiseThreshold(noiseThreshold);
 									setSampleRate(sampleRate);
 									setChannelCount(channelCount);
-									settingsActions.setSampleSize(sampleSize);
+									setSampleSize(sampleSize);
 									setOpusDtx(opusDtx);
 									setOpusFec(opusFec);
 									setOpusPtime(opusPtime);
@@ -838,7 +841,7 @@ const MediaSettings = ({
 										autoWidth
 										className={classes.selectEmpty}
 									>
-										{ [ 2.5, 5, 10, 20, 30, 40, 50, 60 ].map((opusPtime) =>
+										{ [ 3, 5, 10, 20, 30, 40, 50, 60 ].map((opusPtime) =>
 										{
 											return (
 												<MenuItem key={opusPtime} value={opusPtime}>
@@ -855,6 +858,25 @@ const MediaSettings = ({
 									</FormHelperText>
 								</FormControl>
 							</ListItem>
+
+							{insertableStreamsSupported && <ListItem className={classes.nested}>
+								<FormControlLabel
+									className={classnames(classes.setting, classes.switchLabel)}
+									control={
+										<Switch color='secondary'
+											checked={settings.enableOpusDetails} onChange={
+												(event) =>
+												{
+													setEnableOpusDetails(event.target.checked);
+												}}
+										/>}
+									labelPlacement='start'
+									label={intl.formatMessage({
+										id             : 'settings.enableOpusDetails',
+										defaultMessage : 'Enable OPUS details (page reload required)'
+									})}
+								/>
+							</ListItem>}
 
 						</List>
 					</Collapse>
@@ -879,6 +901,7 @@ MediaSettings.propTypes =
 	setOpusDtx              : PropTypes.func.isRequired,
 	setOpusFec              : PropTypes.func.isRequired,
 	setOpusPtime            : PropTypes.func.isRequired,
+	setEnableOpusDetails    : PropTypes.func.isRequired,
 	me                      : appPropTypes.Me.isRequired,
 	volume                  : PropTypes.number,
 	settings                : PropTypes.object.isRequired,
@@ -905,7 +928,8 @@ const mapDispatchToProps = {
 	setSampleSize           : settingsActions.setSampleSize,
 	setOpusDtx              : settingsActions.setOpusDtx,
 	setOpusFec              : settingsActions.setOpusFec,
-	setOpusPtime            : settingsActions.setOpusPtime
+	setOpusPtime            : settingsActions.setOpusPtime,
+	setEnableOpusDetails    : settingsActions.setEnableOpusDetails
 };
 
 export default withRoomContext(connect(

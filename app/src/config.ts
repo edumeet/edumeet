@@ -235,6 +235,7 @@ const configSchema = convict({
 			tcp : true
 		}
 	},
+	// audio options
 	autoGainControl :
 	{
 		doc     : 'Auto gain control enabled.',
@@ -265,25 +266,111 @@ const configSchema = convict({
 		format  : 'int',
 		default : -60
 	},
-	// Audio options for now only centrally from config file: 
-	centralAudioOptions :
+	sampleRate :
 	{
-		doc     : 'Defaults audio settings.',
-		format  : Object,
+		doc     : 'The audio sample rate.',
+		format  : [ 8000, 16000, 24000, 44100, 48000 ],
+		default : 48000
+	},
+	channelCount :
+	{
+		doc     : 'The audio channels count.',
+		format  : [ 1, 2 ],
+		default : 1
+	},
+	sampleSize :
+	{
+		doc     : 'The audio sample size count.',
+		format  : [ 8, 16, 24, 32 ],
+		default : 16
+	},
+	opusStereo :
+	{
+		doc     : 'If OPUS FEC stereo be enabled.',
+		format  : 'Boolean',
+		default : false
+	},
+	opusDtx :
+	{
+		doc     : 'If OPUS DTX should be enabled.',
+		format  : 'Boolean',
+		default : true
+	},
+	opusFec :
+	{
+		doc     : 'If OPUS FEC should be enabled.',
+		format  : 'Boolean',
+		default : true
+	},
+	opusPtime :
+	{
+		doc     : 'The OPUS packet time.',
+		format  : [ 3, 5, 10, 20, 30, 40, 50, 60 ],
+		default : 20
+	},
+	opusMaxPlaybackRate :
+	{
+		doc     : 'The OPUS playback rate.',
+		format  : [ 8000, 16000, 24000, 44100, 48000 ],
+		default : 48000
+	},
+	// audio presets profiles
+	audioPreset :
+	{
+		doc     : 'The audio preset',
+		format  : [ 'conference', 'hifi' ],
+		default : 'conference'
+	},
+	audioPresets :
+	{
+		doc     : 'The audio presets.',
+		format  : '*',
 		default :
 		{
-			// will not eat that much bandwith thanks to opus
-			sampleRate      		  : 48000, // default : 48000 and don't go higher
-			// usually mics are mono so this saves bandwidth
-			channelCount      		: 1, // default : 1
-			volume         			  : 1.0, // default : 1.0
-			sampleSize      		  : 16, // default : 16
-			// usually mics are mono so this saves bandwidth
-			opusStereo      		  : false, // default : false
-			opusDtx         			 : true, // default : true / will save bandwidth 
-			opusFec         			 : true, // default : true / forward error correction
-			opusPtime      		   : '20', // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
-			opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
+			conference :
+			{
+				name                 : 'Conference audio',
+				autoGainControl      : true, // default : true
+				echoCancellation     : true, // default : true 
+				noiseSuppression     : true, // default : true 
+				// Automatically unmute speaking above noiseThreshold
+				voiceActivatedUnmute : false, // default : false 
+				// This is only for voiceActivatedUnmute and audio-indicator
+				noiseThreshold       : -60, // default -60
+				// will not eat that much bandwidth thanks to opus
+				sampleRate           : 48000, // default : 48000 and don't go higher
+				// usually mics are mono so this saves bandwidth
+				channelCount         : 1, // default : 1
+				sampleSize           : 16, // default : 16
+				// usually mics are mono so this saves bandwidth
+				opusStereo           : false, // default : false
+				opusDtx              : true, // default : true / will save bandwidth 
+				opusFec              : true, // default : true / forward error correction
+				opusPtime            : 20, // minimum packet time (10, 20, 40, 60)
+				opusMaxPlaybackRate  : 48000 // default : 48000 and don't go higher
+			},
+			hifi :
+			{
+				name                 : 'HiFi streaming',
+				autoGainControl      : false, // default : true
+				echoCancellation     : false, // default : true 
+				noiseSuppression     : false, // default : true 
+				// Automatically unmute speaking above noiseThreshold
+				voiceActivatedUnmute : false, // default : false 
+				// This is only for voiceActivatedUnmute and audio-indicator
+				noiseThreshold       : -60, // default -60
+				// will not eat that much bandwidth thanks to opus
+				sampleRate           : 48000, // default : 48000 and don't go higher
+				// usually mics are mono so this saves bandwidth
+				channelCount         : 2, // default : 1
+				sampleSize           : 16, // default : 16
+				// usually mics are mono so this saves bandwidth
+				opusStereo           : true, // default : false
+				opusDtx              : false, // default : true / will save bandwidth 
+				opusFec              : true, // default : true / forward error correction
+				opusPtime            : 60, // minimum packet time (10, 20, 40, 60)
+				opusMaxPlaybackRate  : 48000 // default : 48000 and don't go higher
+			}
 		}
 	},
 

@@ -9,7 +9,6 @@ import { createMigrate, persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import { createFilter } from 'redux-persist-transform-filter';
-import { defaultSettings } from './reducers/settings';
 import { diff } from 'deep-object-diff';
 import rootReducer from './reducers/rootReducer';
 import Logger from './Logger';
@@ -45,14 +44,6 @@ const migrations =
 		state.settings.autoGainControl = true;
 
 		return { ...state };
-	},
-	3 : (state) =>
-	{
-		return {
-			...state,
-			...defaultSettings,
-			...defaultSettings.audioPresets[defaultSettings.audioPreset]
-		};
 	}
 	// Next version
 	//	4 : (state) =>
@@ -67,7 +58,7 @@ const persistConfig =
 	storage         : storage,
 	// migrate will iterate state over all version-functions
 	// from migrations until version is reached
-	version         : 3,
+	version         : 2,
 	migrate         : createMigrate(migrations, { debug: true }),
 	stateReconciler : autoMergeLevel2,
 	whitelist       : [ 'settings', 'intl', 'config' ]

@@ -162,6 +162,12 @@ export const setOpusMaxPlaybackRate = (opusMaxPlaybackRate) =>
 		payload : { opusMaxPlaybackRate }
 	});
 
+export const setEnableOpusDetails = (enableOpusDetails) =>
+	({
+		type    : 'SET_ENABLE_OPUS_DETAILS',
+		payload : { enableOpusDetails }
+	});
+
 // Default audio device
 export const setDefaultAudio = (audio) =>
 	({

@@ -3228,9 +3228,11 @@ export default class RoomClient
 								appData : { ...appData, peerId } // Trick.
 							});
 
-						if (insertableStreamsSupported)
+						if (this._recvTransport.appData.encodedInsertableStreams)
 						{
-							if (kind === 'audio')
+							const { enableOpusDetails } = store.getState().settings;
+
+							if (kind === 'audio' && enableOpusDetails)
 								opusReceiverTransform(consumer.rtpReceiver, consumer.id);
 							else
 								directReceiverTransform(consumer.rtpReceiver);
@@ -3515,7 +3517,7 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
-		const { displayName } = store.getState().settings;
+		const { displayName, enableOpusDetails } = store.getState().settings;
 		const { picture } = store.getState().me;
 
 		try
@@ -3660,7 +3662,12 @@ export default class RoomClient
 					iceServers         : this._turnServers,
 					// TODO: Fix for issue #72
 					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined,
-					additionalSettings : { encodedInsertableStreams: insertableStreamsSupported }
+					additionalSettings : {
+						encodedInsertableStreams : insertableStreamsSupported && enableOpusDetails
+					},
+					appData : {
+						encodedInsertableStreams : insertableStreamsSupported && enableOpusDetails
+					}
 				});
 
 			this._recvTransport.on(

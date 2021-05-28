@@ -12,12 +12,12 @@ export function directReceiverTransform(receiver: RTCRtpReceiver)
 {
 	logger.debug('directReceiverTransform', { receiver });
 
-    // @ts-ignore
+	// @ts-ignore
 	const receiverStreams = receiver.createEncodedStreams();
 	const readableStream = receiverStreams.readable || receiverStreams.readableStream;
 	const writableStream = receiverStreams.writable || receiverStreams.writableStream;
 
-    readableStream.pipeTo(writableStream);
+	readableStream.pipeTo(writableStream);
 }
 
 // Opus config parser
@@ -86,7 +86,7 @@ export function opusReceiverTransform(receiver: RTCRtpReceiver, consumerId: stri
 {
 	logger.debug('opusReceiverTransform', { receiver, consumerId });
 
-    // @ts-ignore
+	// @ts-ignore
 	const receiverStreams = receiver.createEncodedStreams();
 	const readableStream = receiverStreams.readable || receiverStreams.readableStream;
 	const writableStream = receiverStreams.writable || receiverStreams.writableStream;
@@ -118,7 +118,7 @@ export function opusReceiverTransform(receiver: RTCRtpReceiver, consumerId: stri
 		}
 	});
 
-    readableStream
-        .pipeThrough(transformStream)
-        .pipeTo(writableStream);
+	readableStream
+		.pipeThrough(transformStream)
+		.pipeTo(writableStream);
 }
