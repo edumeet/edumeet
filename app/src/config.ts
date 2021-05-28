@@ -1,7 +1,7 @@
 import convict from 'convict';
 import * as convictFormatWithValidator from 'convict-format-with-validator';
 
-convict.addFormats(convictFormatWithValidator);
+convict.addFormat(convictFormatWithValidator.url);
 
 function assert(assertion: Boolean, msg: string)
 {
@@ -609,35 +609,97 @@ const configSchema = convict({
 	}
 });
 
-function formatDocs(docs: any, property: string | null, schema: any)
+function formatDocs()
 {
-	if (schema._cvtProperties)
+	function _formatDocs(docs: any, property: string | null, schema: any)
 	{
-		Object.entries(schema._cvtProperties).forEach(([ name, value ]) =>
+		if (schema._cvtProperties)
 		{
-			formatDocs(docs, `${property ? `${property}.` : ''}${name}`, value);
-		});
+			Object.entries(schema._cvtProperties).forEach(([ name, value ]) =>
+			{
+				_formatDocs(docs, `${property ? `${property}.` : ''}${name}`, value);
+			});
+
+			return docs;
+		}
+		else if (property)
+		{
+			docs[property] =
+			{
+				doc     : schema.doc,
+				format  : JSON.stringify(schema.format, null, 2),
+				default : JSON.stringify(schema.default, null, 2)
+			};
+		}
 
 		return docs;
 	}
-	else if (property)
-	{
-		docs[property] =
-		{
-			doc     : schema.doc,
-			format  : JSON.stringify(schema.format, null, 2),
-			default : JSON.stringify(schema.default, null, 2)
-		};
-	}
 
-	return docs;
+	return _formatDocs({}, null, configSchema.getSchema());
 }
 
+function formatJson(data: string)
+{
+	return data ? `\`${data.replace(/\n/g, '')}\`` : '';
+}
+
+function dumpDocsMarkdown()
+{
+	let data = `# Edumeet App Configuration
+
+The app configuration file should be a valid javascript file defining a single
+\`config\` object containing the properties that you need to modify.
+
+Example \`public/config.js\`:
+\`\`\`javascript
+var config =
+{
+	developmentPort : 8443,
+	productionPort  : 3443
+};
+\`\`\`
+
+## Configuration properties
+
+| Name | Description | Format | Default value |
+| :--- | :---------- | :----- | :------------ |
+`;
+
+	Object.entries(formatDocs()).forEach((entry: [string, any]) =>
+	{
+		const [ name, value ] = entry;
+
+		data += `| ${name} | ${value.doc} | ${formatJson(value.format)} | \`${formatJson(value.default)}\` |\n`;
+	});
+
+	data += `
+
+---
+
+*Document generated with:* \`yarn gen-config-docs\`
+`;
+
+	return data;
+}
+
+// run the docs generator
+if (typeof window === 'undefined')
+{
+	import('fs').then((fs) =>
+	{
+		fs.writeFileSync('README.md', dumpDocsMarkdown());
+	});
+}
+
+//
 let config: any = {};
 let configError = '';
 
 // Load config from window object
-configSchema.load((window as any).config);
+if (typeof window !== 'undefined')
+{
+	configSchema.load((window as any).config);
+}
 
 // Perform validation
 try
@@ -650,18 +712,15 @@ catch (error: any)
 	configError = error.message;
 }
 
-// format docs
-const configDocs = formatDocs({}, null, configSchema.getSchema());
-
-// eslint-disable-next-line
-console.log('Using config:', config, configDocs);
-
 // Override the window config with the validated properties.
-(window as any)['config'] = config;
+if (typeof window !== 'undefined')
+{
+	(window as any)['config'] = config;
+}
 
 export {
 	configSchema,
 	config,
 	configError,
-	configDocs
+	formatDocs
 };
