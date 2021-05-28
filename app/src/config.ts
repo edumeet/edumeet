@@ -318,7 +318,7 @@ const configSchema = convict({
 	audioPreset :
 	{
 		doc     : 'The audio preset',
-		format  : [ 'conference', 'hifi' ],
+		format  : 'String',
 		default : 'conference'
 	},
 	audioPresets :
