@@ -19,7 +19,8 @@
 		"dev": "nodemon --exec ts-node --ignore dist/ -e js,ts server.js",
 		"connect": "ts-node connect.js",
 		"lint": "eslint -c .eslintrc.json --ext .js,.ts *.js *.ts lib/",
-		"format": "prettier --write '**/*.ts' && npm run lint --fix"
+		"format": "prettier --write '**/*.ts' && npm run lint --fix",
+		"gen-config-docs": "ts-node gen-config-docs.ts"
 	},
 	"dependencies": {
 		"awaitqueue": "^1.0.0",
@@ -30,6 +31,8 @@
 		"colors": "^1.4.0",
 		"compression": "^1.7.4",
 		"connect-redis": "^4.0.3",
+		"convict": "^6.1.0",
+		"convict-format-with-validator": "^6.0.1",
 		"cookie-parser": "^1.4.4",
 		"debug": "^4.3.1",
 		"express": "^4.17.1",
@@ -38,6 +41,7 @@
 		"fast-stats": "^0.0.6",
 		"helmet": "^3.21.2",
 		"ims-lti": "^3.0.2",
+		"json5": "^2.2.0",
 		"jsonwebtoken": "^8.5.1",
 		"mediasoup": "vpalmisano/mediasoup#3.7.1-build-with-system-openssl",
 		"openid-client": "^3.7.3",
@@ -50,7 +54,9 @@
 		"redis": "^2.8.0",
 		"socket.io": "^2.4.0",
 		"spdy": "^4.0.1",
-		"uuid": "^7.0.2"
+		"toml": "^3.0.0",
+		"uuid": "^7.0.2",
+		"yaml": "^1.10.2"
 	},
 	"devDependencies": {
 		"@types/base-64": "^0.1.3",

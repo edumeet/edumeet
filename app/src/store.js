@@ -8,8 +8,13 @@ import { createLogger } from 'redux-logger';
 import { createMigrate, persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
-import rootReducer from './reducers/rootReducer';
 import { createFilter } from 'redux-persist-transform-filter';
+import { diff } from 'deep-object-diff';
+import rootReducer from './reducers/rootReducer';
+import Logger from './Logger';
+import { config } from './config';
+
+const logger = new Logger('store');
 
 const migrations =
 {
@@ -60,7 +65,7 @@ const persistConfig =
 	version         : 2,
 	migrate         : createMigrate(migrations, { debug: false }),
 	stateReconciler : autoMergeLevel2,
-	whitelist       : [ 'settings', 'intl' ]
+	whitelist       : [ 'settings', 'intl', 'config' ]
 };
 
 const saveSubsetFilter = createFilter(
@@ -113,7 +118,27 @@ export const store = createStore(
 	enhancer
 );
 
-export const persistor = persistStore(store);
+export const persistor = persistStore(store, null, () =>
+{
+	// Check if the app config differs from the stored version.
+	const currentConfig = store.getState().config;
+	const changed = diff(currentConfig, config);
+	const changedKeys = Object.keys(changed);
+
+	if (changedKeys.length)
+	{
+		logger.debug('store config changed:', changed);
+		const changedSettings = {};
+
+		changedKeys.forEach((key) =>
+		{
+			changedSettings[key] = config[key];
+		});
+
+		store.dispatch({ type: 'SETTINGS_UPDATE', payload: changedSettings });
+		store.dispatch({ type: 'CONFIG_SET', payload: config });
+	}
+});
 
 /*
 

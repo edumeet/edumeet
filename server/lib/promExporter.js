@@ -1,35 +1,24 @@
 import Logger from './Logger';
 
 const express = require('express');
-const mediasoup = require('mediasoup');
 const promClient = require('prom-client');
 
 const collectDefaultMetrics = require('./metrics/default');
 const RegisterAggregated = require('./metrics/aggregated');
 
 const logger = new Logger('promClient');
-const workers = new Map();
 
-module.exports = async function(rooms, peers, config)
+import { config } from './config';
+
+module.exports = async function(workers, rooms, peers)
 {
 	try
 	{
-		logger.debug(`config.deidentify=${config.deidentify}`);
-		logger.debug(`config.listen=${config.listen}`);
-		logger.debug(`config.numeric=${config.numeric}`);
-		logger.debug(`config.port=${config.port}`);
-		logger.debug(`config.quiet=${config.quiet}`);
-
-		mediasoup.observer.on('newworker', (worker) =>
-		{
-			logger.debug(`observing newworker ${worker.pid} #${workers.size}`);
-			workers.set(worker.pid, worker);
-			worker.observer.on('close', () =>
-			{
-				logger.debug(`observing close worker ${worker.pid} #${workers.size - 1}`);
-				workers.delete(worker.pid);
-			});
-		});
+		logger.debug(`config.prometheus.deidentify=${config.prometheus.deidentify}`);
+		logger.debug(`config.prometheus.listen=${config.prometheus.listen}`);
+		logger.debug(`config.prometheus.numeric=${config.prometheus.numeric}`);
+		logger.debug(`config.prometheus.port=${config.prometheus.port}`);
+		logger.debug(`config.prometheus.quiet=${config.prometheus.quiet}`);
 
 		const app = express();
 
@@ -39,7 +28,8 @@ module.exports = async function(rooms, peers, config)
 			logger.debug(`GET ${req.originalUrl}`);
 			const registry = new promClient.Registry();
 
-			await collectDefaultMetrics(workers, rooms, peers, registry, config);
+			await collectDefaultMetrics(
+				workers, rooms, peers, registry, config.prometheus);
 			res.set('Content-Type', registry.contentType);
 			const data = await registry.metrics();
 
@@ -47,31 +37,33 @@ module.exports = async function(rooms, peers, config)
 		});
 
 		// aggregated register
-		const registerAggregated = RegisterAggregated(workers, rooms, peers, config);
+		const registerAggregated = RegisterAggregated(
+			workers, rooms, peers, config.prometheus);
 
 		app.get('/metrics', async (req, res) =>
 		{
 			logger.debug(`GET ${req.originalUrl}`);
 
-			if (config.secret && req.headers.authorization !== 'Bearer ' + config.secret)
+			if (config.prometheus.secret
+				&& req.headers.authorization !== `Bearer ${ config.prometheus.secret}`)
 			{
-				logger.error(`Invalid authorization header`);
+				logger.error('Invalid authorization header');
+
 				return res.status(401).end();
 			}
-		
+
 			res.set('Content-Type', registerAggregated.contentType);
 			const data = await registerAggregated.metrics();
 
 			res.end(data);
 		});
 
-		const server = app.listen(config.port || 8889,
-			config.listen || undefined, () =>
-			{
-				const address = server.address();
+		const server = app.listen(config.prometheus.port, config.prometheus.listen, () =>
+		{
+			const address = server.address();
 
-				logger.info(`listening ${address.address}:${address.port}`);
-			});
+			logger.info(`listening ${address.address}:${address.port}`);
+		});
 	}
 	catch (err)
 	{

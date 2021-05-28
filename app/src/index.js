@@ -16,6 +16,8 @@ import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
+import ConfigDocumentation from './components/ConfigDocumentation';
+import ConfigError from './components/ConfigError';
 import JoinDialog from './components/JoinDialog';
 import LoginDialog from './components/AccessControl/LoginDialog';
 import LoadingView from './components/Loader/LoadingView';
@@ -29,11 +31,14 @@ import { detectDevice } from 'mediasoup-client';
 
 import './index.css';
 
+import { config, configError } from './config';
+
 const App = LazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
 
 // const cache = createIntlCache();
 
-const supportedBrowsers={
+const supportedBrowsers =
+{
 	'windows' : {
 		'internet explorer' : '>12',
 		'microsoft edge'    : '>18'
@@ -141,14 +146,48 @@ function run()
 	if (unsupportedBrowser || webrtcUnavailable)
 	{
 		render(
-			<MuiThemeProvider theme={theme}>
-				<IntlProvider value={intl}>
-					<UnsupportedBrowser
-						webrtcUnavailable={webrtcUnavailable}
-						platform={device.platform}
-					/>
-				</IntlProvider>
-			</MuiThemeProvider>,
+			<Provider store={store}>
+				<MuiThemeProvider theme={theme}>
+					<IntlProvider value={intl}>
+						<UnsupportedBrowser
+							webrtcUnavailable={webrtcUnavailable}
+							platform={device.platform}
+						/>
+					</IntlProvider>
+				</MuiThemeProvider>
+			</Provider>,
+			document.getElementById('edumeet')
+		);
+
+		return;
+	}
+
+	if (basePath === '/config')
+	{
+		render(
+			<Provider store={store}>
+				<MuiThemeProvider theme={theme}>
+					<IntlProvider value={intl}>
+						<ConfigDocumentation />
+					</IntlProvider>
+				</MuiThemeProvider>
+			</Provider>,
+			document.getElementById('edumeet')
+		);
+
+		return;
+	}
+
+	if (configError)
+	{
+		render(
+			<Provider store={store}>
+				<MuiThemeProvider theme={theme}>
+					<IntlProvider value={intl}>
+						<ConfigError configError={configError} />
+					</IntlProvider>
+				</MuiThemeProvider>
+			</Provider>,
 			document.getElementById('edumeet')
 		);
 

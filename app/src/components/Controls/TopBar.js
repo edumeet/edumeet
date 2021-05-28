@@ -514,7 +514,7 @@ const TopBar = (props) =>
 						aria-label={locale.split(/[-_]/)[0]}
 						className={classes.actionButton}
 						color='secondary'
-						disableRipple='true'
+						disableRipple
 						onClick={(event) => handleMenuOpen(event, 'localeMenu')}
 					>
 						{locale.split(/[-_]/)[0]}
@@ -944,9 +944,9 @@ TopBar.propTypes =
 	canPromote           : PropTypes.bool.isRequired,
 	classes              : PropTypes.object.isRequired,
 	theme                : PropTypes.object.isRequired,
-	intl                 : PropTypes.object.isRequired,
-	locale               : PropTypes.object.isRequired,
-	localesList          : PropTypes.object.isRequired
+	intl                 : PropTypes.object,
+	locale               : PropTypes.string.isRequired,
+	localesList          : PropTypes.array.isRequired
 };
 
 const makeMapStateToProps = () =>

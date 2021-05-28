@@ -1,21 +1,23 @@
+import { config } from '../config';
+
 const initialState =
 {
 	displayName             : '',
 	selectedWebcam          : null,
 	selectedAudioDevice     : null,
 	advancedMode            : false,
-	autoGainControl         : true,
-	echoCancellation        : true,
-	noiseSuppression        : true,
-	voiceActivatedUnmute    : false,
-	noiseThreshold          : -50,
+	autoGainControl         : config.autoGainControl,
+	echoCancellation        : config.echoCancellation,
+	noiseSuppression        : config.noiseSuppression,
+	voiceActivatedUnmute    : config.voiceActivatedUnmute,
+	noiseThreshold          : config.noiseThreshold,
 	audioMuted              : false,
 	videoMuted              : false,
 	// low, medium, high, veryhigh, ultra
-	resolution              : window.config.defaultResolution || 'medium',
-	frameRate               : window.config.defaultFrameRate || 15,
-	screenSharingResolution : window.config.defaultScreenResolution || 'veryhigh',
-	screenSharingFrameRate  : window.config.defaultScreenSharingFrameRate || 5,
+	resolution              : config.resolution,
+	frameRate               : config.frameRate,
+	screenSharingResolution : config.screenResolution,
+	screenSharingFrameRate  : config.screenSharingFrameRate,
 	lastN                   : 4,
 	permanentTopBar         : true,
 	hiddenControls          : false,
@@ -23,12 +25,11 @@ const initialState =
 	notificationSounds      : true,
 	mirrorOwnVideo          : true,
 	hideNoVideoParticipants : false,
-	buttonControlBar        : window.config.buttonControlBar || false,
-	drawerOverlayed         : (typeof window.config.drawerOverlayed === 'undefined') ? true : window.config.drawerOverlayed,
-	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
+	buttonControlBar        : config.buttonControlBar,
+	drawerOverlayed         : config.drawerOverlayed,
+	aspectRatio             : config.viewAspectRatio,
 	mediaPerms              : { audio: true, video: true },
-	localPicture            : null,
-	...window.config.defaultAudio
+	localPicture            : null
 };
 
 const settings = (state = initialState, action) =>
@@ -258,6 +259,11 @@ const settings = (state = initialState, action) =>
 			const { localPicture } = action.payload;
 
 			return { ...state, localPicture };
+		}
+
+		case 'SETTINGS_UPDATE':
+		{
+			return { ...state, ...action.payload };
 		}
 
 		default:

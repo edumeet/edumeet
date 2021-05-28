@@ -29,7 +29,7 @@ const permissions = require('../permissions'), {
 	MODERATE_ROOM
 } = permissions;
 
-const config = require('../config/config');
+const { config } = require('./config');
 
 const logger = new Logger('Room');
 
@@ -263,7 +263,7 @@ class Room extends EventEmitter
 		this._queue = new AwaitQueue();
 
 		// Locked flag.
-		this._locked = config.roomsUnlocked && Array.isArray(config.roomsUnlocked)
+		this._locked = config.roomsUnlocked.length
 			&& !config.roomsUnlocked.includes(roomId);
 
 		// if true: accessCode is a possibility to open the room
@@ -395,7 +395,7 @@ class Room extends EventEmitter
 		else if (this._hasAccess(peer, BYPASS_ROOM_LOCK))
 			this._peerJoining(peer);
 		else if (
-			'maxUsersPerRoom' in config &&
+			config.maxUsersPerRoom &&
 			(
 				Object.keys(this._peers).length +
 				this._lobby.peerList().length
@@ -674,7 +674,7 @@ class Room extends EventEmitter
 
 				let turnServers;
 
-				if ('turnAPIURI' in config)
+				if (config.turnAPIURI)
 				{
 					try
 					{
@@ -697,13 +697,13 @@ class Room extends EventEmitter
 					}
 					catch (error)
 					{
-						if ('backupTurnServers' in config)
+						if (config.backupTurnServers)
 							turnServers = config.backupTurnServers;
 
 						logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
 					}
 				}
-				else if ('backupTurnServers' in config)
+				else if (config.backupTurnServers)
 				{
 					turnServers = config.backupTurnServers;
 				}
