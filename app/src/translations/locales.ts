@@ -139,11 +139,12 @@ export const loadOne = (locale: string): ILocale =>
 {
 	let res: any = {};
 
-  try {
-    res = list.filter(
-      // (item) => item.locale.includes(locale) || item.locale.includes(locale.split(/[-_]/)[0])
-      (item) => item.locale.includes(locale)
-    )[0]
+	try
+	{
+		res = list.filter(
+			// (item) => item.locale.includes(locale) || item.locale.includes(locale.split(/[-_]/)[0])
+			(item) => item.locale.includes(locale)
+		)[0];
 
 		res.messages = require(`./${res.file}`);
 	}
