@@ -13,6 +13,7 @@ import files from './files';
 import settings from './settings';
 import transports from './transports';
 import intl from './intl';
+import config from './config';
 // import { intlReducer } from 'react-intl-redux';
 
 export default combineReducers({
@@ -30,5 +31,6 @@ export default combineReducers({
 	files,
 	settings,
 	// intl : intlReducer
-	intl
+	intl,
+	config
 });

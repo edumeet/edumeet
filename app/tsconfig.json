@@ -21,7 +21,6 @@
     "jsx": "react-jsx",
     "downlevelIteration": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

@@ -1,6 +1,37 @@
-export const defaultSettings = {
-	audioPreset  : 'conference',
-	audioPresets :
+import { config } from '../config';
+
+const initialState =
+{
+	displayName             : '',
+	selectedWebcam          : null,
+	selectedAudioDevice     : null,
+	advancedMode            : false,
+	autoGainControl         : config.autoGainControl,
+	echoCancellation        : config.echoCancellation,
+	noiseSuppression        : config.noiseSuppression,
+	voiceActivatedUnmute    : config.voiceActivatedUnmute,
+	noiseThreshold          : config.noiseThreshold,
+	audioMuted              : false,
+	videoMuted              : false,
+	// low, medium, high, veryhigh, ultra
+	resolution              : config.resolution,
+	frameRate               : config.frameRate,
+	screenSharingResolution : config.screenResolution,
+	screenSharingFrameRate  : config.screenSharingFrameRate,
+	lastN                   : 4,
+	permanentTopBar         : true,
+	hiddenControls          : false,
+	showNotifications       : true,
+	notificationSounds      : true,
+	mirrorOwnVideo          : true,
+	hideNoVideoParticipants : false,
+	buttonControlBar        : config.buttonControlBar,
+	drawerOverlayed         : config.drawerOverlayed,
+	aspectRatio             : config.viewAspectRatio,
+	mediaPerms              : { audio: true, video: true },
+	localPicture            : null,
+	audioPreset             : 'conference',
+	audioPresets            :
 	{
 		conference :
 		{
@@ -48,41 +79,6 @@ export const defaultSettings = {
 		}
 	}
 };
-
-const initialState =
-{
-	displayName             : '',
-	selectedWebcam          : null,
-	selectedAudioDevice     : null,
-	advancedMode            : false,
-	autoGainControl         : true,
-	echoCancellation        : true,
-	noiseSuppression        : true,
-	voiceActivatedUnmute    : false,
-	noiseThreshold          : -50,
-	audioMuted              : false,
-	videoMuted              : false,
-	// low, medium, high, veryhigh, ultra
-	resolution              : window.config.defaultResolution || 'medium',
-	frameRate               : window.config.defaultFrameRate || 15,
-	screenSharingResolution : window.config.defaultScreenResolution || 'veryhigh',
-	screenSharingFrameRate  : window.config.defaultScreenSharingFrameRate || 5,
-	lastN                   : 4,
-	permanentTopBar         : true,
-	hiddenControls          : false,
-	showNotifications       : true,
-	notificationSounds      : true,
-	mirrorOwnVideo          : true,
-	hideNoVideoParticipants : false,
-	buttonControlBar        : window.config.buttonControlBar || false,
-	drawerOverlayed         : (typeof window.config.drawerOverlayed === 'undefined') ? true : window.config.drawerOverlayed,
-	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
-	mediaPerms              : { audio: true, video: true },
-	localPicture            : null
-};
-
-Object.assign(initialState,	defaultSettings);
-Object.assign(initialState,	defaultSettings.audioPresets[defaultSettings.audioPreset]);
 
 const settings = (state = initialState, action) =>
 {
@@ -353,6 +349,11 @@ const settings = (state = initialState, action) =>
 			const { localPicture } = action.payload;
 
 			return { ...state, localPicture };
+		}
+
+		case 'SETTINGS_UPDATE':
+		{
+			return { ...state, ...action.payload };
 		}
 
 		default:
