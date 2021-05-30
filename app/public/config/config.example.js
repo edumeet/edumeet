@@ -143,16 +143,13 @@ var config =
 		tcp : true
 	},
 	// defaults for audio setting on new clients / can be customized and overruled from client side
-	defaultAudio :
-	{
-		autoGainControl      : true, // default : true
-		echoCancellation     : true, // default : true 
-		noiseSuppression     : true, // default : true 
-		// Automatically unmute speaking above noisThereshold
-		voiceActivatedUnmute : false, // default : false 
-		// This is only for voiceActivatedUnmute and audio-indicator
-		noiseThreshold       : -60 // default -60
-	},
+	autoGainControl      : true, // default : true
+	echoCancellation     : true, // default : true 
+	noiseSuppression     : true, // default : true 
+	// Automatically unmute speaking above noisThereshold
+	voiceActivatedUnmute : false, // default : false 
+	// This is only for voiceActivatedUnmute and audio-indicator
+	noiseThreshold       : -60 // default -60
 	// Audio options for now only centrally from config file: 
 	centralAudioOptions :
 	{
