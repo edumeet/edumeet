@@ -965,33 +965,7 @@ export default class RoomClient
 
 			const existingTorrent = this._webTorrent.get(torrent);
 
-			if (!existingTorrent)
-			{
-				this._webTorrent.seed(
-					data.attachment,
-					{ announceList: [ [ this._tracker ] ] },
-					(newTorrent) =>
-					{
-						store.dispatch(requestActions.notify(
-							{
-								text : intl.formatMessage({
-									id             : 'filesharing.successfulFileShare',
-									defaultMessage : 'File successfully shared'
-								})
-							}));
-
-						const file = {
-							...data,
-							peerId    : this._peerId,
-							magnetUri : newTorrent.magnetURI
-						};
-
-						store.dispatch(fileActions.addFile(file));
-
-						this._sendFile(file);
-					});
-			}
-			else
+			if (existingTorrent)
 			{
 				store.dispatch(requestActions.notify(
 					{
@@ -1011,8 +985,32 @@ export default class RoomClient
 
 				this._sendFile(file);
 
+				return;
 			}
 
+			this._webTorrent.seed(
+				data.attachment,
+				{ announceList: [ [ this._tracker ] ] },
+				(newTorrent) =>
+				{
+					store.dispatch(requestActions.notify(
+						{
+							text : intl.formatMessage({
+								id             : 'filesharing.successfulFileShare',
+								defaultMessage : 'File successfully shared'
+							})
+						}));
+
+					const file = {
+						...data,
+						peerId    : this._peerId,
+						magnetUri : newTorrent.magnetURI
+					};
+
+					store.dispatch(fileActions.addFile(file));
+
+					this._sendFile(file);
+				});
 		});
 	}
 
