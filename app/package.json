@@ -14,6 +14,7 @@
 	"license": "MIT",
 	"homepage": "./",
 	"main": "src/electron-starter.js",
+	"type": "module",
 	"dependencies": {
 		"@material-ui/core": "^4.5.1",
 		"@material-ui/icons": "^4.5.1",
@@ -74,7 +75,8 @@
 		"dev": "nf start -p 3000",
 		"lint": "eslint -c .eslintrc.json --ext .js,.ts,.tsx src",
 		"lint:fix": "eslint -c .eslintrc.json --ext .js,.ts,.tsx src --fix",
-		"format": "prettier --write 'src/**/*.{ts,tsx}'"
+		"format": "prettier --write 'src/**/*.{ts,tsx}'",
+		"gen-config-docs": "node --loader ts-node/esm src/config.ts"
 	},
 	"browserslist": [
 		">0.2%",

@@ -16,7 +16,9 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 
-import { configDocs } from '../config';
+import { formatDocs } from '../config';
+
+const configDocs = formatDocs();
 
 const styles = () =>
 	({
