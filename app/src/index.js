@@ -64,7 +64,7 @@ let roomClient;
 
 RoomClient.init({ store });
 
-const theme = createMuiTheme(window.config.theme);
+const theme = createMuiTheme(config.theme);
 
 let Router;
 
@@ -127,7 +127,7 @@ function run()
 	}
 	else if (
 		!device.bowser.satisfies(
-			window.config.supportedBrowsers || supportedBrowsers
+			config.supportedBrowsers || supportedBrowsers
 		)
 	)
 	{
@@ -197,7 +197,7 @@ function run()
 	store.dispatch(
 		meActions.setMe({
 			peerId,
-			loginEnabled : window.config.loginEnabled
+			loginEnabled : config.loginEnabled
 		})
 	);
 

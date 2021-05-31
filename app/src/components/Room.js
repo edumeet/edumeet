@@ -30,8 +30,9 @@ import ButtonControlBar from './Controls/ButtonControlBar';
 import Help from './Controls/Help';
 import About from './Controls/About';
 import RolesManager from './Controls/RolesManager';
+import { config } from '../config';
 
-const TIMEOUT = window.config.hideTimeout || 5000;
+const TIMEOUT = config.hideTimeout || 5000;
 
 const styles = (theme) =>
 	({
@@ -41,7 +42,7 @@ const styles = (theme) =>
 			width                : '100%',
 			height               : '100%',
 			backgroundColor      : 'var(--background-color)',
-			backgroundImage      : `url(${window.config ? window.config.background : null})`,
+			backgroundImage      : `url(${config.background})`,
 			backgroundAttachment : 'fixed',
 			backgroundPosition   : 'center',
 			backgroundSize       : 'cover',

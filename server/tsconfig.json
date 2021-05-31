@@ -15,6 +15,7 @@
         "**/*.js"
     ],
     "exclude": [
-        "./public"
+        "./public",
+        "./dist"
     ]
 }

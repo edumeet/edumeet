@@ -20,7 +20,11 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
+<<<<<<< HEAD
 import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
+=======
+import { config } from './config';
+>>>>>>> develop
 
 let createTorrent;
 
@@ -33,21 +37,6 @@ let mediasoupClient;
 let io;
 
 let ScreenShare;
-
-let requestTimeout,
-	lastN,
-	mobileLastN;
-	// videoAspectRatio;
-
-if (process.env.NODE_ENV !== 'test')
-{
-	({
-		requestTimeout = 20000,
-		lastN = 4,
-		mobileLastN = 1
-		// videoAspectRatio = 1.777 // 16 : 9
-	} = window.config);
-}
 
 const logger = new Logger('RoomClient');
 
@@ -266,14 +255,10 @@ export default class RoomClient
 		// Whether simulcast should be used.
 		this._useSimulcast = false;
 
-		if ('simulcast' in window.config)
-			this._useSimulcast = window.config.simulcast;
+		this._useSimulcast = config.simulcast;
 
 		// Whether simulcast should be used for sharing
-		this._useSharingSimulcast = false;
-
-		if ('simulcastSharing' in window.config)
-			this._useSharingSimulcast = window.config.simulcastSharing;
+		this._useSharingSimulcast = config.simulcastSharing;
 
 		this._muted = muted;
 
@@ -288,9 +273,9 @@ export default class RoomClient
 
 		// Alert sounds
 		this._soundAlerts = { 'default': { audio: new Audio('/sounds/notify.mp3') } };
-		if ('notificationSounds' in window.config)
+		if (config.notificationSounds)
 		{
-			for (const [ k, v ] of Object.entries(window.config.notificationSounds))
+			for (const [ k, v ] of Object.entries(config.notificationSounds))
 			{
 				if (v != null && v.play !== undefined)
 					this._soundAlerts[k] = {
@@ -318,9 +303,9 @@ export default class RoomClient
 
 		// Max spotlights
 		if (device.platform === 'desktop')
-			this._maxSpotlights = lastN;
+			this._maxSpotlights = config.lastN;
 		else
-			this._maxSpotlights = mobileLastN;
+			this._maxSpotlights = config.mobileLastN;
 
 		store.dispatch(
 			settingsActions.setLastN(this._maxSpotlights));
@@ -773,7 +758,7 @@ export default class RoomClient
 				called = true;
 				callback(new SocketTimeoutError('Request timed out'));
 			},
-			requestTimeout
+			config.requestTimeout
 		);
 
 		return (...args) =>
@@ -846,11 +831,7 @@ export default class RoomClient
 	{
 		logger.debug('sendRequest() [method:"%s", data:"%o"]', method, data);
 
-		const {
-			requestRetries = 3
-		} = window.config;
-
-		for (let tries = 0; tries < requestRetries; tries++)
+		for (let tries = 0; tries < config.requestRetries; tries++)
 		{
 			try
 			{
@@ -860,7 +841,7 @@ export default class RoomClient
 			{
 				if (
 					error instanceof SocketTimeoutError &&
-					tries < requestRetries
+					tries < config.requestRetries
 				)
 					logger.warn('sendRequest() | timeout, retrying [attempt:"%s"]', tries);
 				else
@@ -1458,8 +1439,8 @@ export default class RoomClient
 				store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
 
 				const networkPriority =
-					window.config.networkPriorities?.audio ?
-						window.config.networkPriorities?.audio :
+					config.networkPriorities?.audio ?
+						config.networkPriorities?.audio :
 						DEFAULT_NETWORK_PRIORITIES.audio;
 
 				this._micProducer = await this._sendTransport.produce(
@@ -1655,8 +1636,8 @@ export default class RoomClient
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
 				const networkPriority =
-					window.config.networkPriorities?.mainVideo ?
-						window.config.networkPriorities?.mainVideo :
+					config.networkPriorities?.mainVideo ?
+						config.networkPriorities?.mainVideo :
 						DEFAULT_NETWORK_PRIORITIES.mainVideo;
 
 				if (this._useSimulcast)
@@ -2420,7 +2401,7 @@ export default class RoomClient
 			resolutionScalings
 		} = consumer;
 		const adaptiveScalingFactor = Math.min(Math.max(
-			window.config.adaptiveScalingFactor || 0.75, 0.5), 1.0);
+			config.adaptiveScalingFactor || 0.75, 0.5), 1.0);
 
 		logger.debug(
 			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" resolutionScalings:[%s] viewportWidth:"%d", viewportHeight:"%d"]',
@@ -3821,12 +3802,8 @@ export default class RoomClient
 					if (!this._muted)
 					{
 						await this.updateMic({ start: true });
-						let autoMuteThreshold = 4;
+						const autoMuteThreshold = config.autoMuteThreshold;
 
-						if ('autoMuteThreshold' in window.config)
-						{
-							autoMuteThreshold = window.config.autoMuteThreshold;
-						}
 						if (autoMuteThreshold >= 0 && peers.length >= autoMuteThreshold)
 						{
 							this.muteMic();
@@ -4071,8 +4048,8 @@ export default class RoomClient
 				let producer;
 
 				const networkPriority =
-					window.config.networkPriorities?.extraVideo ?
-						window.config.networkPriorities?.extraVideo :
+					config.networkPriorities?.extraVideo ?
+						config.networkPriorities?.extraVideo :
 						DEFAULT_NETWORK_PRIORITIES.extraVideo;
 
 				if (this._useSimulcast)
@@ -4309,8 +4286,8 @@ export default class RoomClient
 				logger.debug('screenSharing track settings:', track.getSettings());
 
 				const networkPriority =
-					window.config.networkPriorities?.screenShare ?
-						window.config.networkPriorities?.screenShare :
+					config.networkPriorities?.screenShare ?
+						config.networkPriorities?.screenShare :
 						DEFAULT_NETWORK_PRIORITIES.screenShare;
 
 				if (this._useSharingSimulcast)
@@ -4876,10 +4853,8 @@ export default class RoomClient
 
 		if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
 			encodings = screenSharing ? VIDEO_SVC_ENCODINGS : VIDEO_KSVC_ENCODINGS;
-		else if ('simulcastProfiles' in window.config)
-			encodings = this._chooseEncodings(window.config.simulcastProfiles, size);
-		else if ('simulcastEncodings' in window.config)
-			encodings = window.config.simulcastEncodings;
+		else if (config.simulcastProfiles)
+			encodings = this._chooseEncodings(config.simulcastProfiles, size);
 		else
 			encodings = this._chooseEncodings(VIDEO_SIMULCAST_PROFILES, size);
 

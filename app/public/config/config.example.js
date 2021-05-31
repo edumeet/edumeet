@@ -142,6 +142,14 @@ var config =
 	{
 		tcp : true
 	},
+	// defaults for audio setting on new clients / can be customized and overruled from client side
+	autoGainControl      : true, // default : true
+	echoCancellation     : true, // default : true 
+	noiseSuppression     : true, // default : true 
+	// Automatically unmute speaking above noiseThreshold
+	voiceActivatedUnmute : false, // default : false 
+	// This is only for voiceActivatedUnmute and audio-indicator
+	noiseThreshold       : -60, // default -60
 
 	/**
 	 * Set max number participants in one room that join 
