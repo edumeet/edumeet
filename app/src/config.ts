@@ -681,7 +681,7 @@ var config =
 
 ---
 
-*Document generated with:* \`yarn gen-config-docs\`
+*Document generated with:* \`yarn gen-config-docs\` *from:* [config.ts](src/config.ts).
 `;
 
 	return data;
