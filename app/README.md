@@ -66,8 +66,8 @@ var config =
 | lockLastN | If truthy, users can NOT change number of speakers visible. | `"boolean"` | ``false`` |
 | logo | If not null, it shows the logo loaded from URL, else it shows the title. | `"url"` | ``"images/logo.edumeet.svg"`` |
 | title | The title to show if the logo is not specified. | `"string"` | ``"edumeet"`` |
-| supportUrl | Service & Support URL if not set then not displayed on the about modals. | `"url"` | ``"https://support.example.com"`` |
-| privacyUrl | Privacy and data protection URL or path by default privacy/privacy.html. | `"string"` | ``"privacy/privacy.html"`` |
+| supportUrl | The service & Support URL; if `null`, it will be not displayed on the about dialogs. | `"url"` | ``"https://support.example.com"`` |
+| privacyUrl | The privacy and data protection URL or path. | `"string"` | ``"privacy/privacy.html"`` |
 | theme.palette.primary.main | undefined | `"string"` | ``"#313131"`` |
 | theme.overrides.MuiAppBar.colorPrimary.backgroundColor | undefined | `"string"` | ``"#313131"`` |
 | theme.overrides.MuiButton.containedPrimary.backgroundColor | undefined | `"string"` | ``"#5F9B2D"`` |
