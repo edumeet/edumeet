@@ -23,6 +23,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Switch from '@material-ui/core/Switch';
 import ImageUploader from 'react-images-upload';
 import Resizer from 'react-image-file-resizer';
+import { config } from '../../config';
 
 const NoiseSlider = withStyles(
 	{
@@ -425,8 +426,7 @@ const MediaSettings = ({
 						}
 					</FormHelperText>
 				</FormControl>
-				{ 'audioOutputSupportedBrowsers' in window.config &&
-					window.config.audioOutputSupportedBrowsers.includes(me.browser.name) &&
+				{ config.audioOutputSupportedBrowsers.includes(me.browser.name) &&
 					<FormControl className={classes.formControl}>
 						<Select
 							value={settings.selectedAudioOutputDevice || ''}

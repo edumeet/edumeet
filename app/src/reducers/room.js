@@ -1,3 +1,5 @@
+import { config } from '../config';
+
 const initialState =
 {
 	name                          : '',
@@ -17,7 +19,7 @@ const initialState =
 	fullScreenConsumer            : null, // ConsumerID
 	windowConsumer                : null, // ConsumerID
 	toolbarsVisible               : true,
-	mode                          : window.config.defaultLayout || 'democratic',
+	mode                          : config.defaultLayout,
 	selectedPeers                 : [],
 	spotlights                    : [],
 	rolesManagerPeer              : null, // peerId

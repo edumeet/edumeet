@@ -36,9 +36,10 @@ const configSchema = convict({
 	},
 	serverHostname :
 	{
-		doc     : 'If the server component runs on a different host than the app you can specify the host name.',
-		format  : '*',
-		default : null
+		doc      : 'If the server component runs on a different host than the app you can specify the host name.',
+		format   : '*',
+		default  : null,
+		nullable : true
 	},
 
 	/**
@@ -305,9 +306,10 @@ const configSchema = convict({
 	},
 	background :
 	{
-		doc     : 'The page background image URL',
-		format  : String,
-		default : 'images/background.jpg'
+		doc      : 'The page background image URL',
+		format   : String,
+		default  : 'images/background.jpg',
+		nullable : true
 	},
 	defaultLayout :
 	{
@@ -394,9 +396,10 @@ const configSchema = convict({
 	// Set logo file name using logo.* pattern like "logo.png" to not track it by git
 	logo :
 	{
-		doc     : 'If not null, it shows the logo loaded from URL, else it shows the title.',
-		format  : 'url',
-		default : 'images/logo.edumeet.svg'
+		doc      : 'If not null, it shows the logo loaded from URL, else it shows the title.',
+		format   : 'url',
+		default  : 'images/logo.edumeet.svg',
+		nullable : true
 	},
 	title :
 	{
@@ -406,9 +409,10 @@ const configSchema = convict({
 	},
 	supportUrl :
 	{
-		doc     : 'Service & Support URL if not set then not displayed on the about modals.',
-		format  : 'url',
-		default : 'https://support.example.com'
+		doc      : 'The service & Support URL; if `null`, it will be not displayed on the about dialogs.',
+		format   : 'url',
+		default  : 'https://support.example.com',
+		nullable : true
 	},
 	// Privacy and data protection URL or path by default privacy/privacy.html
 	// that is a placeholder for your policies
@@ -416,9 +420,10 @@ const configSchema = convict({
 	// but an external url could be also used here	 
 	privacyUrl :
 	{
-		doc     : 'Privacy and data protection URL or path by default privacy/privacy.html.',
-		format  : String,
-		default : 'privacy/privacy.html'
+		doc      : 'The privacy and data protection URL or path.',
+		format   : String,
+		default  : 'privacy/privacy.html',
+		nullable : true
 	},
 	// UI theme elements
 	theme :

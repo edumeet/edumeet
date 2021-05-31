@@ -41,6 +41,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -302,16 +303,16 @@ const TopBar = (props) =>
 							<MenuIcon />
 						</IconButton>
 					</PulsingBadge>
-					{ window.config.logo !=='' ?
+					{ config.logo !=='' ?
 						<img alt='Logo'
-							src={window.config.logo}
+							src={config.logo}
 							className={classes.logo}
 						/> :
 						<Typography
 							variant='h6'
 							noWrap color='inherit'
 						>
-							{window.config.title}
+							{config.title}
 						</Typography>
 					}
 					<div className={classes.grow} />

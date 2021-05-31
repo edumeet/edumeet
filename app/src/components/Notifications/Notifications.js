@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withSnackbar } from 'notistack';
 import * as notificationActions from '../../actions/notificationActions';
-
-const notificationPosition = window.config.notificationPosition || 'right';
+import { config } from '../../config';
 
 class Notifications extends Component
 {
@@ -47,7 +46,7 @@ class Notifications extends Component
 					autoHideDuration : notification.timeout,
 					anchorOrigin     : {
 						vertical   : 'bottom',
-						horizontal : notificationPosition
+						horizontal : config.notificationPosition
 					}
 				}
 			);
