@@ -20,11 +20,8 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-<<<<<<< HEAD
 import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
-=======
 import { config } from './config';
->>>>>>> develop
 
 let createTorrent;
 
