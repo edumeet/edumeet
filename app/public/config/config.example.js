@@ -149,9 +149,9 @@ var config =
 	// Automatically unmute speaking above noisThereshold
 	voiceActivatedUnmute : false, // default : false 
 	// This is only for voiceActivatedUnmute and audio-indicator
-	noiseThreshold       : -60 // default -60
+	noiseThreshold       : -60, // default -60
 	// Audio options for now only centrally from config file: 
-	centralAudioOptions :
+	centralAudioOptions  :
 	{
 		// will not eat that much bandwith thanks to opus
 		sampleRate          : 48000, // default : 48000 and don't go higher
