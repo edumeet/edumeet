@@ -99,8 +99,9 @@ export default class PeerAudio extends React.PureComponent
 
 			const	AudioContext = window.AudioContext || window.webkitAudioContext,
 				audioCtx = new AudioContext(),
-				src = audioCtx.createMediaStreamSource(audio.srcObject),
-				dst = audioCtx.createMediaStreamDestination();
+				src = audioCtx.createMediaStreamSource(audio.srcObject);
+
+			/* dst = audioCtx.createMediaStreamDestination() */
 
 			this._gainNode = audioCtx.createGain();
 			src.connect(this._gainNode);
