@@ -1,7 +1,7 @@
-export const addFile = (peerId, magnetUri) =>
+export const addFile = (file) =>
 	({
 		type    : 'ADD_FILE',
-		payload : { peerId, magnetUri }
+		payload : { ...file }
 	});
 
 export const addFileHistory = (fileHistory) =>

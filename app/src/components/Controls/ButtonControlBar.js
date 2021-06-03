@@ -64,19 +64,19 @@ const styles = (theme) =>
 			alignItems                     : 'center',
 			[theme.breakpoints.down('lg')] :
 			{
-				left : '40vw'
+				left : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				left : '50vw'
+				left : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				left : '70vw'
+				left : '60vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				left : '90vw'
+				left : '80vw'
 			}
 		}
 	});

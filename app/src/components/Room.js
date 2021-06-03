@@ -54,19 +54,19 @@ const styles = (theme) =>
 			flexShrink                     : 0,
 			[theme.breakpoints.down('lg')] :
 			{
-				width : '40vw'
+				width : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width : '50vw'
+				width : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width : '70vw'
+				width : '60vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width : '90vw'
+				width : '80vw'
 			}
 		},
 		drawerPaper :
@@ -74,19 +74,19 @@ const styles = (theme) =>
 			width                          : '30vw',
 			[theme.breakpoints.down('lg')] :
 			{
-				width : '40vw'
+				width : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width : '50vw'
+				width : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width : '70vw'
+				width : '60vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width : '90vw'
+				width : '80vw'
 			}
 		}
 	});

@@ -14,7 +14,7 @@ const toolarea = (state = initialState, action) =>
 		{
 			const toolAreaOpen = !state.toolAreaOpen;
 			const unreadMessages = toolAreaOpen && state.currentToolTab === 'chat' ? 0 : state.unreadMessages;
-			const unreadFiles = toolAreaOpen && state.currentToolTab === 'files' ? 0 : state.unreadFiles;
+			const unreadFiles = toolAreaOpen && state.currentToolTab === 'chat' ? 0 : state.unreadFiles;
 
 			return { ...state, toolAreaOpen, unreadMessages, unreadFiles };
 		}
@@ -23,7 +23,7 @@ const toolarea = (state = initialState, action) =>
 		{
 			const toolAreaOpen = true;
 			const unreadMessages = state.currentToolTab === 'chat' ? 0 : state.unreadMessages;
-			const unreadFiles = state.currentToolTab === 'files' ? 0 : state.unreadFiles;
+			const unreadFiles = state.currentToolTab === 'chat' ? 0 : state.unreadFiles;
 
 			return { ...state, toolAreaOpen, unreadMessages, unreadFiles };
 		}
@@ -39,12 +39,12 @@ const toolarea = (state = initialState, action) =>
 		{
 			const { toolTab } = action.payload;
 			const unreadMessages = toolTab === 'chat' ? 0 : state.unreadMessages;
-			const unreadFiles = toolTab === 'files' ? 0 : state.unreadFiles;
+			const unreadFiles = toolTab === 'chat' ? 0 : state.unreadFiles;
 
 			return { ...state, currentToolTab: toolTab, unreadMessages, unreadFiles };
 		}
 
-		case 'ADD_NEW_RESPONSE_MESSAGE':
+		case 'ADD_MESSAGE':
 		{
 			if (state.toolAreaOpen && state.currentToolTab === 'chat')
 			{
@@ -56,7 +56,7 @@ const toolarea = (state = initialState, action) =>
 
 		case 'ADD_FILE':
 		{
-			if (state.toolAreaOpen && state.currentToolTab === 'files')
+			if (state.toolAreaOpen && state.currentToolTab === 'chat')
 			{
 				return state;
 			}

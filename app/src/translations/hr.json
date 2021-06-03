@@ -109,6 +109,8 @@
 	"label.leave": "Napusti",
 	"label.chatInput": "Uđi u razgovor porukama",
 	"label.chat": "Razgovor",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Dijeljenje datoteka",
 	"label.participants": "Sudionici",
 	"label.shareFile": "Dijeli datoteku",
