@@ -19,7 +19,8 @@ services:
     - ${PWD}/..:/edumeet
     - ${PWD}/config/edumeet-server-config.js:/edumeet/server/config/config.js:ro
     - ${PWD}/config/edumeet-server-config.yaml:/edumeet/server/config/config.yaml:ro
-    - ${PWD}/config/edumeet-app-config.js:/edumeet/app/public/config/config.js:ro
+    #- ${PWD}/config/edumeet-app-config.js:/edumeet/app/public/config/config.js:ro
+    - ${PWD}/../app/public/config/config.example.js:/edumeet/app/public/config/config.js:ro
     network_mode: "host"
     extra_hosts:
       redis: 172.22.0.2
