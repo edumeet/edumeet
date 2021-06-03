@@ -43,11 +43,11 @@ const styles = (theme) => ({
 		'&[type=file]' : {
 			display : 'none'
 		},
-		padding         : '8px 4px',
-		'line-height'   : '20px',
-		'font-size'     : '16px',
-		'width'         : '50px',
-		'overflow-wrap' : 'break-word'
+		padding      : '8px 4px',
+		lineHeight   : '20px',
+		fontSize     : '16px',
+		width        : '50px',
+		overflowWrap : 'break-word'
 
 	},
 	icon : {
