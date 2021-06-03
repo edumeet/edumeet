@@ -15,6 +15,12 @@ convict.addFormat({
 	validate : (v: number) => assert(Number.isFinite(v), 'must be a number')
 });
 
+/**
+ * The Edumeet configuration schema.
+ *
+ * Use `yarn gen-config-docs` to re-generate the README.md and the
+ * public/config/config.example.js files.
+ */
 const configSchema = convict({
 	loginEnabled :
 	{
@@ -689,7 +695,7 @@ function dumpExampleConfigJs()
  *
  * The configuration documentation is available also:
  * - in the app/README.md file in the source tree
- * - visiting the /config page in a running instance
+ * - visiting the /?config=true page in a running instance
  */
 
 // eslint-disable-next-line
@@ -732,7 +738,7 @@ let config: any = {};
 let configError = '';
 
 // Load config from window object
-if (typeof window !== 'undefined')
+if (typeof window !== 'undefined' && (window as any).config !== undefined)
 {
 	configSchema.load((window as any).config);
 }
