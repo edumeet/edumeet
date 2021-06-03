@@ -238,24 +238,6 @@ var config = {
 		}
 	},
 
-	// The default audio preset.
-	centralAudioOptions : {
-		'autoGainControl'      : true,
-		'echoCancellation'     : true,
-		'noiseSuppression'     : true,
-		'voiceActivatedUnmute' : false,
-		'noiseThreshold'       : -60,
-		'sampleRate'           : 48000,
-		'channelCount'         : 1,
-		'sampleSize'           : 16,
-		'opusStereo'           : false,
-		'opusDtx'              : true,
-		'opusFec'              : true,
-		'opusPtime'            : 20,
-		'opusMaxPlaybackRate'  : 48000,
-		'volume'               : 1
-	},
-
 	// It sets the maximum number of participants in one room that can join unmuted.
 	// The next participant will join automatically muted.
 	// Set it to 0 to auto mute all.

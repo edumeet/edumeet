@@ -369,30 +369,6 @@ This value must match exactly one of the values defined in aspectRatios.`,
 		}
 	},
 
-	// To be removed once the advanced-audio-options PR is merged
-	centralAudioOptions :
-	{
-		doc     : 'The default audio preset.',
-		format  : Object,
-		default :
-		{
-			'autoGainControl'      : true,
-			'echoCancellation'     : true,
-			'noiseSuppression'     : true,
-			'voiceActivatedUnmute' : false,
-			'noiseThreshold'       : -60,
-			'sampleRate'           : 48000,
-			'channelCount'         : 1,
-			'sampleSize'           : 16,
-			'opusStereo'           : false,
-			'opusDtx'              : true,
-			'opusFec'              : true,
-			'opusPtime'            : 20,
-			'opusMaxPlaybackRate'  : 48000,
-			'volume'               : 1.0
-		}
-	},
-
 	autoMuteThreshold :
 	{
 		doc : `It sets the maximum number of participants in one room that can join unmuted.
