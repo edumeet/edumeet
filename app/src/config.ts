@@ -37,8 +37,8 @@ const configSchema = convict({
 	serverHostname :
 	{
 		doc      : 'If the server component runs on a different host than the app you can specify the host name.',
-		format   : '*',
-		default  : null,
+		format   : 'String',
+		default  : '',
 		nullable : true
 	},
 
@@ -89,16 +89,17 @@ const configSchema = convict({
 	// The aspect ratio of the videos as shown on the screen. 
 	// This is changeable in client settings.
 	// This value must match one of the defined values in
-	// viewAspectRatios EXACTLY (e.g. 1.333)
-	viewAspectRatio :
+	// aspectRatios EXACTLY (e.g. 1.333)
+	aspectRatio :
 	{
-		doc     : 'The aspect ratio of the videos as shown on the screen.',
+		doc : `The aspect ratio of the videos as shown on the screen.
+This value must match exactly one of the values defined in aspectRatios.`,
 		format  : 'float',
 		default : 1.777
 	},
-	viewAspectRatios :
+	aspectRatios :
 	{
-		doc     : 'The selectable aspect ratios in the settings.',
+		doc     : 'The selectable aspect ratios in the user settings.',
 		format  : Array,
 		default :
 		[
@@ -111,14 +112,6 @@ const configSchema = convict({
 				label : '16 : 9'
 			}
 		]
-	},
-	// The aspect ratio of the video from the camera
-	// this is not changeable in settings, only config
-	videoAspectRatio :
-	{
-		doc     : 'The aspect ratio of the video from the camera.',
-		format  : 'float',
-		default : 1.777
 	},
 	resolution :
 	{
@@ -191,13 +184,14 @@ const configSchema = convict({
 			]
 		}
 	},
+
 	// The adaptive spatial layer selection scaling factor (in the range [0.5, 1.0])
 	// example: 
 	// with level width=640px, the minimum width required to trigger the
 	// level change will be: 640 * 0.75 = 480px
 	adaptiveScalingFactor :
 	{
-		doc     : 'The adaptive spatial layer selection scaling factor.',
+		doc     : 'The adaptive spatial layer selection scaling factor in the range [0.5, 1.0].',
 		format  : (value: number) => value >= 0.5 && value <= 1.0,
 		default : 0.75
 	},
@@ -230,7 +224,7 @@ const configSchema = convict({
 	},
 	transportOptions :
 	{
-		doc     : '',
+		doc     : 'The Mediasoup transport options.',
 		format  : Object,
 		default : {
 			tcp : true
@@ -325,7 +319,7 @@ const configSchema = convict({
 	audioPresets :
 	{
 		doc     : 'The audio presets.',
-		format  : '*',
+		format  : Object,
 		default :
 		{
 			conference :
@@ -375,65 +369,86 @@ const configSchema = convict({
 		}
 	},
 
-	/**
-	 * Set max 'int' participants in one room that join 
-	 * unmuted. Next participant will join automatically muted
-	 * Default value is 4
-	 * 
-	 * Set it to 0 to auto mute all, 
-	 * Set it to negative (-1) to never automatically auto mute
-	 * but use it with caution
-	 * full mesh audio strongly decrease room capacity! 
-	 */
+	// To be removed once the advanced-audio-options PR is merged
+	centralAudioOptions :
+	{
+		doc     : 'The default audio preset.',
+		format  : Object,
+		default :
+		{
+			'autoGainControl'      : true,
+			'echoCancellation'     : true,
+			'noiseSuppression'     : true,
+			'voiceActivatedUnmute' : false,
+			'noiseThreshold'       : -60,
+			'sampleRate'           : 48000,
+			'channelCount'         : 1,
+			'sampleSize'           : 16,
+			'opusStereo'           : false,
+			'opusDtx'              : true,
+			'opusFec'              : true,
+			'opusPtime'            : 20,
+			'opusMaxPlaybackRate'  : 48000,
+			'volume'               : 1.0
+		}
+	},
+
 	autoMuteThreshold :
 	{
-		doc     : 'Set the max number of participants in one room that join unmuted.',
+		doc : `It sets the maximum number of participants in one room that can join unmuted.
+The next participant will join automatically muted.
+Set it to 0 to auto mute all.
+Set it to negative (-1) to never automatically auto mute but use it with caution, 
+full mesh audio strongly decrease room capacity!`,
 		format  : 'nat',
 		default : 4
 	},
+
 	background :
 	{
 		doc      : 'The page background image URL',
-		format   : String,
+		format   : 'String',
 		default  : 'images/background.jpg',
 		nullable : true
 	},
+
 	defaultLayout :
 	{
-		doc     : 'The default layout',
+		doc     : 'The default layout.',
 		format  : [ 'democratic', 'filmstrip' ],
 		default : 'democratic'
 	},
+
 	buttonControlBar :
 	{
-		doc     : 'If true, will show media control buttons in separate control bar, not in the ME container.',
+		doc     : 'If true, the media control buttons will be shown in separate control bar, not in the ME container.',
 		format  : 'Boolean',
 		default : false
 	},
+
 	drawerOverlayed :
 	{
-		doc     : 'If false, will push videos away to make room for side drawer. If true, will overlay side drawer over videos.',
+		doc : `If false, will push videos away to make room for side drawer.
+If true, will overlay side drawer over videos.`,
 		format  : 'Boolean',
 		default : true
 	},
+
 	notificationPosition :
 	{
-		doc     : 'The position of notifications.',
+		doc     : 'The position of the notifications.',
 		format  : [ 'left', 'right' ],
 		default : 'right'
 	},
 
-	/**
-	 * Set the notificationSounds. Valid keys are:
-	 * 'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage',
-	 * 'sendFile', 'newPeer' and 'default'.
-	 *
-	 * Not defining a key is equivalent to using the default notification sound.
-	 * Setting 'play' to null disables the sound notification.
-	 */
 	notificationSounds :
 	{
-		doc     : 'Set the notifications sounds.',
+		doc : `It sets the notifications sounds.
+Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 
+'chatMessage', 'sendFile', 'newPeer' and 'default'.
+Not defining a key is equivalent to using the default notification sound.
+Setting 'play' to null disables the sound notification.		
+`,
 		format  : Object,
 		default :
 		{
@@ -449,21 +464,22 @@ const configSchema = convict({
 			}
 		}
 	},
+
 	hideTimeout :
 	{
-		doc     : 'Timeout for autohiding topbar and button control bar.',
+		doc     : 'Timeout for auto hiding the topbar and the buttons control bar.',
 		format  : 'int',
 		default : 3000
 	},
 	lastN :
 	{
-		doc     : 'The max number of participant that will be visible in as speaker.',
+		doc     : 'The maximum number of participants that will be visible in as speaker.',
 		format  : 'nat',
 		default : 4
 	},
 	mobileLastN :
 	{
-		doc     : 'The max number of participant that will be visible in as speaker for mobile users.',
+		doc     : 'The maximum number of participants that will be visible in as speaker for mobile users.',
 		format  : 'nat',
 		default : 1
 	},
@@ -475,15 +491,14 @@ const configSchema = convict({
 	},
 	lockLastN :
 	{
-		doc     : 'If truthy, users can NOT change number of speakers visible.',
+		doc     : 'If true, the users can not change the number of visible speakers.',
 		format  : 'Boolean',
 		default : false
 	},
-	// Show logo if "logo" is not null, else show title
-	// Set logo file name using logo.* pattern like "logo.png" to not track it by git
+
 	logo :
 	{
-		doc      : 'If not null, it shows the logo loaded from URL, else it shows the title.',
+		doc      : 'If not null, it shows the logo loaded from the specified URL, otherwise it shows the title.',
 		format   : 'url',
 		default  : 'images/logo.edumeet.svg',
 		nullable : true
@@ -491,7 +506,7 @@ const configSchema = convict({
 	title :
 	{
 		doc     : 'The title to show if the logo is not specified.',
-		format  : String,
+		format  : 'String',
 		default : 'edumeet'
 	},
 	supportUrl :
@@ -501,115 +516,116 @@ const configSchema = convict({
 		default  : 'https://support.example.com',
 		nullable : true
 	},
-	// Privacy and data protection URL or path by default privacy/privacy.html
-	// that is a placeholder for your policies
-	//
-	// but an external url could be also used here	 
 	privacyUrl :
 	{
-		doc      : 'The privacy and data protection URL or path.',
-		format   : String,
+		doc      : 'The privacy and data protection external URL or local HTML path.',
+		format   : 'String',
 		default  : 'privacy/privacy.html',
 		nullable : true
 	},
-	// UI theme elements
+
 	theme :
 	{
-		palette :
+		doc     : 'UI theme elements colors.',
+		format  : Object,
+		default :
 		{
-			primary :
-			{
-				main : { format: String, default: '#313131' }
-			}
-		},
-		overrides :
-		{
-			MuiAppBar :
-			{
-				colorPrimary :
-				{
-					backgroundColor : { format: String, default: '#313131' }
-				}
-			},
-			MuiButton :
-			{
-				containedPrimary :
-				{
-					backgroundColor : { format: String, default: '#5F9B2D' },
-					'&:hover'   	   :
-					{
-						backgroundColor : { format: String, default: '#5F9B2D' }
-					}
-				},
-				containedSecondary :
-				{
-					backgroundColor : { format: String, default: '#f50057' },
-					'&:hover'   	   :
-					{
-						backgroundColor : { format: String, default: '#f50057' }
-					}
-				}
-
-			},
-
-			/*
-			MuiIconButton :
-			{
-				colorPrimary :
-				{
-					backgroundColor : '#5F9B2D',
-					'&:hover'	   :
-					{
-						backgroundColor : '#5F9B2D'
-					}
-				},
-				colorSecondary :
-				{
-					backgroundColor : '#f50057',
-					'&:hover'	   :
-					{
-						backgroundColor : '#f50057'
-					}
-				}
-
-			},
-			*/
-
-			MuiFab :
+			palette :
 			{
 				primary :
 				{
-					backgroundColor : { format: String, default: '#5F9B2D' },
-					'&:hover'   	   :
+					main : '#313131'
+				}
+			},
+			overrides :
+			{
+				MuiAppBar :
+				{
+					colorPrimary :
 					{
-						backgroundColor : { format: String, default: '#5F9B2D' }
+						backgroundColor : '#313131'
 					}
 				},
-				secondary :
+				MuiButton :
 				{
-					backgroundColor : { format: String, default: '#f50057' },
-					'&:hover'   	   :
+					containedPrimary :
 					{
-						backgroundColor : { format: String, default: '#f50057' }
+						backgroundColor : '#5F9B2D',
+						'&:hover'       :
+						{
+							backgroundColor : '#5F9B2D'
+						}
+					},
+					containedSecondary :
+					{
+						backgroundColor : '#f50057',
+						'&:hover'       :
+						{
+							backgroundColor : '#f50057'
+						}
 					}
-				}
 
-			},
-			MuiBadge :
-			{
-				colorPrimary :
+				},
+
+				/*
+				MuiIconButton :
 				{
-					backgroundColor : { format: String, default: '#5F9B2D' },
-					'&:hover'   	   :
+					colorPrimary :
 					{
-						backgroundColor : { format: String, default: '#518029' }
+						backgroundColor : '#5F9B2D',
+						'&:hover'	   :
+						{
+							backgroundColor : '#5F9B2D'
+						}
+					},
+					colorSecondary :
+					{
+						backgroundColor : '#f50057',
+						'&:hover'	   :
+						{
+							backgroundColor : '#f50057'
+						}
+					}
+
+				},
+				*/
+
+				MuiFab :
+				{
+					primary :
+					{
+						backgroundColor : '#5F9B2D',
+						'&:hover'       :
+						{
+							backgroundColor : '#5F9B2D'
+						}
+					},
+					secondary :
+					{
+						backgroundColor : '#f50057',
+						'&:hover'       :
+						{
+							backgroundColor : '#f50057'
+						}
+					}
+
+				},
+				MuiBadge :
+				{
+					colorPrimary :
+					{
+						backgroundColor : '#5F9B2D',
+						'&:hover'       :
+						{
+							backgroundColor : '#518029'
+						}
 					}
 				}
+			},
+			typography :
+			{
+				useNextVariants : true
 			}
-		},
-		typography :
-		{
-			useNextVariants : { format: 'Boolean', default: true }
 		}
 	}
 });
@@ -664,6 +680,9 @@ var config =
 };
 \`\`\`
 
+An example configuration file with all properties set to default values
+can be found here: [config.example.js](public/config/config.example.js).
+
 ## Configuration properties
 
 | Name | Description | Format | Default value |
@@ -674,14 +693,49 @@ var config =
 	{
 		const [ name, value ] = entry;
 
-		data += `| ${name} | ${value.doc} | ${formatJson(value.format)} | \`${formatJson(value.default)}\` |\n`;
+		data += `| ${name} | ${value.doc.replace(/\n/g, ' ')} | ${formatJson(value.format)} | \`${formatJson(value.default)}\` |\n`;
 	});
 
 	data += `
 
 ---
 
-*Document generated with:* \`yarn gen-config-docs\`
+*Document generated with:* \`yarn gen-config-docs\` *from:* [config.ts](src/config.ts).
+`;
+
+	return data;
+}
+
+function dumpExampleConfigJs()
+{
+	let data = `/**
+ * Edumeet App Configuration
+ *
+ * The configuration documentation is available also:
+ * - in the app/README.md file in the source tree
+ * - visiting the /config page in a running instance
+ */
+
+// eslint-disable-next-line
+var config = {
+`;
+
+	Object.entries(formatDocs()).forEach((entry: [string, any]) =>
+	{
+		// eslint-disable-next-line
+		let [ name, value ] = entry;
+
+		if (name.includes('.'))
+			name = `'${name}'`;
+
+		data += `\n\t// ${value.doc.replace(/\n/g, '\n\t// ')}
+\t${name} : ${value.default},
+`;
+	});
+
+	data += `};
+
+// Generated with: \`yarn gen-config-docs\` from app/src/config.ts
 `;
 
 	return data;
@@ -693,6 +747,7 @@ if (typeof window === 'undefined')
 	import('fs').then((fs) =>
 	{
 		fs.writeFileSync('README.md', dumpDocsMarkdown());
+		fs.writeFileSync('public/config/config.example.js', dumpExampleConfigJs());
 	});
 }
 

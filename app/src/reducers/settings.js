@@ -27,7 +27,7 @@ const initialState =
 	hideNoVideoParticipants : false,
 	buttonControlBar        : config.buttonControlBar,
 	drawerOverlayed         : config.drawerOverlayed,
-	aspectRatio             : config.viewAspectRatio,
+	aspectRatio             : config.aspectRatio,
 	mediaPerms              : { audio: true, video: true },
 	localPicture            : null,
 	audioPreset             : config.audioPreset,

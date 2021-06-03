@@ -77,7 +77,7 @@
 		"lint": "eslint -c .eslintrc.json --ext .js,.ts,.tsx src",
 		"lint:fix": "eslint -c .eslintrc.json --ext .js,.ts,.tsx src --fix",
 		"format": "prettier --write 'src/**/*.{ts,tsx}'",
-		"gen-config-docs": "node --loader ts-node/esm src/config.ts"
+		"gen-config-docs": "node --loader ts-node/esm src/config.ts && eslint -c .eslintrc.json public/config/config.example.js --fix"
 	},
 	"browserslist": [
 		">0.2%",
