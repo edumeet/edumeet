@@ -52,7 +52,7 @@ const ConfigError = ({
 					<Button size='small' onClick={(e) =>
 					{
 						e.preventDefault();
-						window.location.href = '/config';
+						window.location.href = '/?config=true';
 					}}
 					>
 						<FormattedMessage

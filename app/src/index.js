@@ -94,6 +94,7 @@ function run()
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
 	const headless = parameters.get('headless');
+	const showConfigDocumentationPath = parameters.get('config') === 'true';
 
 	const { pathname } = window.location;
 
@@ -162,7 +163,7 @@ function run()
 		return;
 	}
 
-	if (basePath === '/config')
+	if (showConfigDocumentationPath)
 	{
 		render(
 			<Provider store={store}>
