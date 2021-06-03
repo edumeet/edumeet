@@ -44,11 +44,12 @@ var config = {
 		'screenShare'      : 'medium'
 	},
 
-	/* The aspect ratio of the videos as shown on the screen. */
-	viewAspectRatio : 1.777,
+	/* The aspect ratio of the videos as shown on the screen.
+This value must match exactly one of the values defined in aspectRatios. */
+	aspectRatio : 1.777,
 
-	/* The selectable aspect ratios in the settings. */
-	viewAspectRatios : [
+	/* The selectable aspect ratios in the user settings. */
+	aspectRatios : [
 		{
 			'value' : 1.333,
 			'label' : '4 : 3'
@@ -58,9 +59,6 @@ var config = {
 			'label' : '16 : 9'
 		}
 	],
-
-	/* The aspect ratio of the video from the camera. */
-	videoAspectRatio : 1.777,
 
 	/* The default video camera capture resolution. */
 	resolution : 'medium',

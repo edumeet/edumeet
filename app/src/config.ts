@@ -89,16 +89,17 @@ const configSchema = convict({
 	// The aspect ratio of the videos as shown on the screen. 
 	// This is changeable in client settings.
 	// This value must match one of the defined values in
-	// viewAspectRatios EXACTLY (e.g. 1.333)
-	viewAspectRatio :
+	// aspectRatios EXACTLY (e.g. 1.333)
+	aspectRatio :
 	{
-		doc     : 'The aspect ratio of the videos as shown on the screen.',
+		doc : `The aspect ratio of the videos as shown on the screen.
+This value must match exactly one of the values defined in aspectRatios.`,
 		format  : 'float',
 		default : 1.777
 	},
-	viewAspectRatios :
+	aspectRatios :
 	{
-		doc     : 'The selectable aspect ratios in the settings.',
+		doc     : 'The selectable aspect ratios in the user settings.',
 		format  : Array,
 		default :
 		[
@@ -111,14 +112,6 @@ const configSchema = convict({
 				label : '16 : 9'
 			}
 		]
-	},
-	// The aspect ratio of the video from the camera
-	// this is not changeable in settings, only config
-	videoAspectRatio :
-	{
-		doc     : 'The aspect ratio of the video from the camera.',
-		format  : 'float',
-		default : 1.777
 	},
 	resolution :
 	{

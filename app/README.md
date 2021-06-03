@@ -25,9 +25,8 @@ can be found here: [config.example.js](public/config/config.example.js).
 | serverHostname | If the server component runs on a different host than the app you can specify the host name. | `"string"` | ``""`` |
 | supportedBrowsers | Supported browsers version in bowser satisfy format. | `"object"` | ``{  "windows": {    "internet explorer": ">12",    "microsoft edge": ">18"  },  "microsoft edge": ">18",  "safari": ">12",  "firefox": ">=60",  "chrome": ">=74",  "chromium": ">=74",  "opera": ">=62",  "samsung internet for android": ">=11.1.1.52"}`` |
 | networkPriorities | Network priorities. | `"object"` | ``{  "audio": "high",  "mainVideo": "high",  "additionalVideos": "medium",  "screenShare": "medium"}`` |
-| viewAspectRatio | The aspect ratio of the videos as shown on the screen. | `"float"` | ``1.777`` |
-| viewAspectRatios | The selectable aspect ratios in the settings. | `"array"` | ``[  {    "value": 1.333,    "label": "4 : 3"  },  {    "value": 1.777,    "label": "16 : 9"  }]`` |
-| videoAspectRatio | The aspect ratio of the video from the camera. | `"float"` | ``1.777`` |
+| aspectRatio | The aspect ratio of the videos as shown on the screen. This value must match exactly one of the values defined in aspectRatios. | `"float"` | ``1.777`` |
+| aspectRatios | The selectable aspect ratios in the user settings. | `"array"` | ``[  {    "value": 1.333,    "label": "4 : 3"  },  {    "value": 1.777,    "label": "16 : 9"  }]`` |
 | resolution | The default video camera capture resolution. | `[  "low",  "medium",  "high",  "veryhigh",  "ultra"]` | ``"medium"`` |
 | frameRate | The default video camera capture framerate. | `"nat"` | ``15`` |
 | screenResolution | The default screen sharing resolution. | `[  "low",  "medium",  "high",  "veryhigh",  "ultra"]` | ``"veryhigh"`` |
