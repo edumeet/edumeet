@@ -15,6 +15,12 @@ convict.addFormat({
 	validate : (v: number) => assert(Number.isFinite(v), 'must be a number')
 });
 
+/**
+ * The Edumeet configuration schema.
+ *
+ * Use `yarn gen-config-docs` to re-generate the README.md and the
+ * public/config/config.example.js files.
+ */
 const configSchema = convict({
 	loginEnabled :
 	{
