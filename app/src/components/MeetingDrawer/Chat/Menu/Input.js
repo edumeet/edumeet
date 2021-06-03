@@ -34,6 +34,9 @@ const styles = (theme) => ({
 		alignItems   : 'center',
 		borderRadius : 0
 	},
+	inputContainer : {
+		backgroundColor : '#F5F5F5'
+	},
 	input :
 	{
 		flex           : 1,
@@ -45,6 +48,7 @@ const styles = (theme) => ({
 		'font-size'     : '16px',
 		'width'         : '50px',
 		'overflow-wrap' : 'break-word'
+
 	},
 	icon : {
 		padding : theme.spacing(1)
@@ -168,7 +172,7 @@ const ChatInput = (props) =>
 	return (
 		<Paper className={classes.root}>
 			<Grid container direction='column'>
-				<Grid item container direction='row' alignItems='center'>
+				<Grid className={classes.inputContainer} item container direction='row' alignItems='center'>
 
 					{/* Input field */}
 					<div className={classes.input}>
