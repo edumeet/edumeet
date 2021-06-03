@@ -451,9 +451,7 @@ full mesh audio strongly decrease room capacity!`,
 	notificationSounds :
 	{
 		doc : `It sets the notifications sounds.
-Valid keys are:
-'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage', 'sendFile', 'newPeer' and 'default'.
-
+Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage', 'sendFile', 'newPeer' and 'default'.
 Not defining a key is equivalent to using the default notification sound.
 Setting 'play' to null disables the sound notification.		
 `,
@@ -688,6 +686,9 @@ var config =
 };
 \`\`\`
 
+An example configuration file with all properties set to default values
+can be found here: [config.example.js](public/config/config.example.js).
+
 ## Configuration properties
 
 | Name | Description | Format | Default value |
@@ -698,7 +699,7 @@ var config =
 	{
 		const [ name, value ] = entry;
 
-		data += `| ${name} | ${value.doc} | ${formatJson(value.format)} | \`${formatJson(value.default)}\` |\n`;
+		data += `| ${name} | ${value.doc.replace(/\n/g, ' ')} | ${formatJson(value.format)} | \`${formatJson(value.default)}\` |\n`;
 	});
 
 	data += `
