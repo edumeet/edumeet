@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState, useEffect } from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRoomContext } from '../../../../../RoomContext';
@@ -12,7 +12,6 @@ import Paper from '@material-ui/core/Paper';
 import classnames from 'classnames';
 import SaveIcon from '@material-ui/icons/Save';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import * as fileActions from '../../../../../actions/fileActions';
 import Tooltip from '@material-ui/core/Tooltip';
 import Alert from '@material-ui/lab/Alert';
 
