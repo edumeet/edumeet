@@ -331,29 +331,35 @@ class MessageList extends React.Component
 							else if (item.type === 'file')
 							{
 
-								let displayName;
+								// let displayName;
 
 								let filePicture;
 
 								if (me.id === item.peerId)
 								{
+									/*
 									displayName = intl.formatMessage({
 										id             : 'room.me',
 										defaultMessage : 'Me'
 									});
+									*/
+
 									filePicture = me.picture;
 								}
 								else if (peers[item.peerId])
 								{
-									displayName = peers[item.peerId].displayName;
+									// displayName = peers[item.peerId].displayName;
+
 									filePicture = peers[item.peerId].picture;
 								}
 								else
 								{
+									/*
 									displayName = intl.formatMessage({
 										id             : 'label.unknown',
 										defaultMessage : 'Unknown'
 									});
+									*/
 								}
 
 								return (
