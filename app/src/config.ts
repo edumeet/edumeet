@@ -736,7 +736,7 @@ var config = {
 
 	data += `};
 
-// Generated with: yarn gen-config-docs from app/src/config.ts
+// Generated with: \`yarn gen-config-docs\` from app/src/config.ts
 `;
 
 	return data;
