@@ -327,44 +327,60 @@ Setting 'play' to null disables the sound notification.
 	/* The privacy and data protection external URL or local HTML path. */
 	privacyUrl : 'privacy/privacy.html',
 
-	/* The palette main color. */
-	'theme.palette.primary.main' : '#313131',
-
-	/* The app bar background color. */
-	'theme.overrides.MuiAppBar.colorPrimary.backgroundColor' : '#313131',
-
-	/* The primary buttons background color. */
-	'theme.overrides.MuiButton.containedPrimary.backgroundColor' : '#5F9B2D',
-
-	/* The primary buttons background color when in hover state. */
-	'theme.overrides.MuiButton.containedPrimary.&:hover.backgroundColor' : '#5F9B2D',
-
-	/* The secondary buttons background color. */
-	'theme.overrides.MuiButton.containedSecondary.backgroundColor' : '#f50057',
-
-	/* The secondary buttons background color when in hover state. */
-	'theme.overrides.MuiButton.containedSecondary.&:hover.backgroundColor' : '#f50057',
-
-	/* The primary Fab buttons background color. */
-	'theme.overrides.MuiFab.primary.backgroundColor' : '#5F9B2D',
-
-	/* The primary Fab buttons background color when in hover state. */
-	'theme.overrides.MuiFab.primary.&:hover.backgroundColor' : '#5F9B2D',
-
-	/* The secondary Fab buttons background color. */
-	'theme.overrides.MuiFab.secondary.backgroundColor' : '#f50057',
-
-	/* The secondary Fab buttons background color when in hover state. */
-	'theme.overrides.MuiFab.secondary.&:hover.backgroundColor' : '#f50057',
-
-	/* The badges background color. */
-	'theme.overrides.MuiBadge.colorPrimary.backgroundColor' : '#5F9B2D',
-
-	/* The badges background color when in hover state. */
-	'theme.overrides.MuiBadge.colorPrimary.&:hover.backgroundColor' : '#518029',
-
-	/* undefined */
-	'theme.typography.useNextVariants' : true
+	/* UI theme elements colors. */
+	theme : {
+		'palette' : {
+			'primary' : {
+				'main' : '#313131'
+			}
+		},
+		'overrides' : {
+			'MuiAppBar' : {
+				'colorPrimary' : {
+					'backgroundColor' : '#313131'
+				}
+			},
+			'MuiButton' : {
+				'containedPrimary' : {
+					'backgroundColor' : '#5F9B2D',
+					'&:hover'         : {
+						'backgroundColor' : '#5F9B2D'
+					}
+				},
+				'containedSecondary' : {
+					'backgroundColor' : '#f50057',
+					'&:hover'         : {
+						'backgroundColor' : '#f50057'
+					}
+				}
+			},
+			'MuiFab' : {
+				'primary' : {
+					'backgroundColor' : '#5F9B2D',
+					'&:hover'         : {
+						'backgroundColor' : '#5F9B2D'
+					}
+				},
+				'secondary' : {
+					'backgroundColor' : '#f50057',
+					'&:hover'         : {
+						'backgroundColor' : '#f50057'
+					}
+				}
+			},
+			'MuiBadge' : {
+				'colorPrimary' : {
+					'backgroundColor' : '#5F9B2D',
+					'&:hover'         : {
+						'backgroundColor' : '#518029'
+					}
+				}
+			}
+		},
+		'typography' : {
+			'useNextVariants' : true
+		}
+	}
 };
 
 // Generated with: yarn gen-config-docs from app/src/config.ts

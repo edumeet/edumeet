@@ -79,19 +79,7 @@ Setting 'play' to null disables the sound notification.
 | title | The title to show if the logo is not specified. | `"string"` | ``"edumeet"`` |
 | supportUrl | The service & Support URL; if `null`, it will be not displayed on the about dialogs. | `"url"` | ``"https://support.example.com"`` |
 | privacyUrl | The privacy and data protection external URL or local HTML path. | `"string"` | ``"privacy/privacy.html"`` |
-| theme.palette.primary.main | The palette main color. | `"string"` | ``"#313131"`` |
-| theme.overrides.MuiAppBar.colorPrimary.backgroundColor | The app bar background color. | `"string"` | ``"#313131"`` |
-| theme.overrides.MuiButton.containedPrimary.backgroundColor | The primary buttons background color. | `"string"` | ``"#5F9B2D"`` |
-| theme.overrides.MuiButton.containedPrimary.&:hover.backgroundColor | The primary buttons background color when in hover state. | `"string"` | ``"#5F9B2D"`` |
-| theme.overrides.MuiButton.containedSecondary.backgroundColor | The secondary buttons background color. | `"string"` | ``"#f50057"`` |
-| theme.overrides.MuiButton.containedSecondary.&:hover.backgroundColor | The secondary buttons background color when in hover state. | `"string"` | ``"#f50057"`` |
-| theme.overrides.MuiFab.primary.backgroundColor | The primary Fab buttons background color. | `"string"` | ``"#5F9B2D"`` |
-| theme.overrides.MuiFab.primary.&:hover.backgroundColor | The primary Fab buttons background color when in hover state. | `"string"` | ``"#5F9B2D"`` |
-| theme.overrides.MuiFab.secondary.backgroundColor | The secondary Fab buttons background color. | `"string"` | ``"#f50057"`` |
-| theme.overrides.MuiFab.secondary.&:hover.backgroundColor | The secondary Fab buttons background color when in hover state. | `"string"` | ``"#f50057"`` |
-| theme.overrides.MuiBadge.colorPrimary.backgroundColor | The badges background color. | `"string"` | ``"#5F9B2D"`` |
-| theme.overrides.MuiBadge.colorPrimary.&:hover.backgroundColor | The badges background color when in hover state. | `"string"` | ``"#518029"`` |
-| theme.typography.useNextVariants | undefined | `"boolean"` | ``true`` |
+| theme | UI theme elements colors. | `"object"` | ``{  "palette": {    "primary": {      "main": "#313131"    }  },  "overrides": {    "MuiAppBar": {      "colorPrimary": {        "backgroundColor": "#313131"      }    },    "MuiButton": {      "containedPrimary": {        "backgroundColor": "#5F9B2D",        "&:hover": {          "backgroundColor": "#5F9B2D"        }      },      "containedSecondary": {        "backgroundColor": "#f50057",        "&:hover": {          "backgroundColor": "#f50057"        }      }    },    "MuiFab": {      "primary": {        "backgroundColor": "#5F9B2D",        "&:hover": {          "backgroundColor": "#5F9B2D"        }      },      "secondary": {        "backgroundColor": "#f50057",        "&:hover": {          "backgroundColor": "#f50057"        }      }    },    "MuiBadge": {      "colorPrimary": {        "backgroundColor": "#5F9B2D",        "&:hover": {          "backgroundColor": "#518029"        }      }    }  },  "typography": {    "useNextVariants": true  }}`` |
 
 
 ---

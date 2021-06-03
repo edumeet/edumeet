@@ -532,167 +532,107 @@ Setting 'play' to null disables the sound notification.
 		nullable : true
 	},
 
-	// UI theme elements
 	theme :
 	{
-		palette :
+		doc     : 'UI theme elements colors.',
+		format  : Object,
+		default :
 		{
-			primary :
-			{
-				main :
-				{
-					doc     : 'The palette main color.',
-					format  : 'String',
-					default : '#313131'
-				}
-			}
-		},
-		overrides :
-		{
-			MuiAppBar :
-			{
-				colorPrimary :
-				{
-					backgroundColor :
-					{
-						doc     : 'The app bar background color.',
-						format  : 'String',
-						default : '#313131'
-					}
-				}
-			},
-			MuiButton :
-			{
-				containedPrimary :
-				{
-					backgroundColor :
-					{
-						doc     : 'The primary buttons background color.',
-						format  : 'String',
-						default : '#5F9B2D'
-					},
-					'&:hover' :
-					{
-						backgroundColor :
-						{
-							doc     : 'The primary buttons background color when in hover state.',
-							format  : 'String',
-							default : '#5F9B2D'
-						}
-					}
-				},
-				containedSecondary :
-				{
-					backgroundColor :
-					{
-						doc     : 'The secondary buttons background color.',
-						format  : 'String',
-						default : '#f50057'
-					},
-					'&:hover' :
-					{
-						backgroundColor :
-						{
-							doc     : 'The secondary buttons background color when in hover state.',
-							format  : 'String',
-							default : '#f50057'
-						}
-					}
-				}
-
-			},
-
-			/*
-			MuiIconButton :
-			{
-				colorPrimary :
-				{
-					backgroundColor : '#5F9B2D',
-					'&:hover'	   :
-					{
-						backgroundColor : '#5F9B2D'
-					}
-				},
-				colorSecondary :
-				{
-					backgroundColor : '#f50057',
-					'&:hover'	   :
-					{
-						backgroundColor : '#f50057'
-					}
-				}
-
-			},
-			*/
-
-			MuiFab :
+			palette :
 			{
 				primary :
 				{
-					backgroundColor :
+					main : '#313131'
+				}
+			},
+			overrides :
+			{
+				MuiAppBar :
+				{
+					colorPrimary :
 					{
-						doc     : 'The primary Fab buttons background color.',
-						format  : 'String',
-						default : '#5F9B2D'
-					},
-					'&:hover' :
-					{
-						backgroundColor :
-						{
-							doc     : 'The primary Fab buttons background color when in hover state.',
-							format  : 'String',
-							default : '#5F9B2D'
-						}
+						backgroundColor : '#313131'
 					}
 				},
-				secondary :
+				MuiButton :
 				{
-					backgroundColor :
+					containedPrimary :
 					{
-						doc     : 'The secondary Fab buttons background color.',
-						format  : 'String',
-						default : '#f50057'
-					},
-					'&:hover' :
-					{
-						backgroundColor :
+						backgroundColor : '#5F9B2D',
+						'&:hover'       :
 						{
-							doc     : 'The secondary Fab buttons background color when in hover state.',
-							format  : 'String',
-							default : '#f50057'
+							backgroundColor : '#5F9B2D'
+						}
+					},
+					containedSecondary :
+					{
+						backgroundColor : '#f50057',
+						'&:hover'       :
+						{
+							backgroundColor : '#f50057'
 						}
 					}
-				}
 
-			},
-			MuiBadge :
-			{
-				colorPrimary :
+				},
+
+				/*
+				MuiIconButton :
 				{
-					backgroundColor :
+					colorPrimary :
 					{
-						doc     : 'The badges background color.',
-						format  : 'String',
-						default : '#5F9B2D'
-					},
-					'&:hover' :
-					{
-						backgroundColor :
+						backgroundColor : '#5F9B2D',
+						'&:hover'	   :
 						{
-							doc     : 'The badges background color when in hover state.',
-							format  : 'String',
-							default : '#518029'
+							backgroundColor : '#5F9B2D'
+						}
+					},
+					colorSecondary :
+					{
+						backgroundColor : '#f50057',
+						'&:hover'	   :
+						{
+							backgroundColor : '#f50057'
+						}
+					}
+
+				},
+				*/
+
+				MuiFab :
+				{
+					primary :
+					{
+						backgroundColor : '#5F9B2D',
+						'&:hover'       :
+						{
+							backgroundColor : '#5F9B2D'
+						}
+					},
+					secondary :
+					{
+						backgroundColor : '#f50057',
+						'&:hover'       :
+						{
+							backgroundColor : '#f50057'
+						}
+					}
+
+				},
+				MuiBadge :
+				{
+					colorPrimary :
+					{
+						backgroundColor : '#5F9B2D',
+						'&:hover'       :
+						{
+							backgroundColor : '#518029'
 						}
 					}
 				}
-			}
-		},
-		typography :
-		{
-			useNextVariants :
+			},
+			typography :
 			{
-				format  : 'Boolean',
-				default : true
+				useNextVariants : true
 			}
 		}
 	}
