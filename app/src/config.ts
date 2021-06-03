@@ -757,7 +757,7 @@ let config: any = {};
 let configError = '';
 
 // Load config from window object
-if (typeof window !== 'undefined')
+if (typeof window !== 'undefined' && (window as any).config !== undefined)
 {
 	configSchema.load((window as any).config);
 }
