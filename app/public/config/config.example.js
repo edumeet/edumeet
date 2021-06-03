@@ -9,19 +9,19 @@
 // eslint-disable-next-line
 var config = {
 
-	/* If the login is enabled. */
+	// If the login is enabled.
 	loginEnabled : false,
 
-	/* The development server listening port. */
+	// The development server listening port.
 	developmentPort : 3443,
 
-	/* The production server listening port. */
+	// The production server listening port.
 	productionPort : 443,
 
-	/* If the server component runs on a different host than the app you can specify the host name. */
+	// If the server component runs on a different host than the app you can specify the host name.
 	serverHostname : '',
 
-	/* Supported browsers version in bowser satisfy format. */
+	// Supported browsers version in bowser satisfy format.
 	supportedBrowsers : {
 		'windows' : {
 			'internet explorer' : '>12',
@@ -36,7 +36,7 @@ var config = {
 		'samsung internet for android' : '>=11.1.1.52'
 	},
 
-	/* Network priorities. */
+	// Network priorities.
 	networkPriorities : {
 		'audio'            : 'high',
 		'mainVideo'        : 'high',
@@ -44,11 +44,11 @@ var config = {
 		'screenShare'      : 'medium'
 	},
 
-	/* The aspect ratio of the videos as shown on the screen.
-This value must match exactly one of the values defined in aspectRatios. */
+	// The aspect ratio of the videos as shown on the screen.
+	// This value must match exactly one of the values defined in aspectRatios.
 	aspectRatio : 1.777,
 
-	/* The selectable aspect ratios in the user settings. */
+	// The selectable aspect ratios in the user settings.
 	aspectRatios : [
 		{
 			'value' : 1.333,
@@ -60,25 +60,25 @@ This value must match exactly one of the values defined in aspectRatios. */
 		}
 	],
 
-	/* The default video camera capture resolution. */
+	// The default video camera capture resolution.
 	resolution : 'medium',
 
-	/* The default video camera capture framerate. */
+	// The default video camera capture framerate.
 	frameRate : 15,
 
-	/* The default screen sharing resolution. */
+	// The default screen sharing resolution.
 	screenResolution : 'veryhigh',
 
-	/* The default screen sharing framerate. */
+	// The default screen sharing framerate.
 	screenSharingFrameRate : 5,
 
-	/* Enable or disable simulcast for webcam video. */
+	// Enable or disable simulcast for webcam video.
 	simulcast : true,
 
-	/* Enable or disable simulcast for screen sharing video. */
+	// Enable or disable simulcast for screen sharing video.
 	simulcastSharing : false,
 
-	/* Define different encodings for various resolutions of the video. */
+	// Define different encodings for various resolutions of the video.
 	simulcastProfiles : {
 		'320' : [
 			{
@@ -140,69 +140,69 @@ This value must match exactly one of the values defined in aspectRatios. */
 		]
 	},
 
-	/* The adaptive spatial layer selection scaling factor in the range [0.5, 1.0]. */
+	// The adaptive spatial layer selection scaling factor in the range [0.5, 1.0].
 	adaptiveScalingFactor : 0.75,
 
-	/* White listing browsers that support audio output device selection. */
+	// White listing browsers that support audio output device selection.
 	audioOutputSupportedBrowsers : [
 		'chrome',
 		'opera'
 	],
 
-	/* The Socket.io request timeout. */
+	// The Socket.io request timeout.
 	requestTimeout : 20000,
 
-	/* The Socket.io request maximum retries. */
+	// The Socket.io request maximum retries.
 	requestRetries : 3,
 
-	/* The Mediasoup transport options. */
+	// The Mediasoup transport options.
 	transportOptions : {
 		'tcp' : true
 	},
 
-	/* Auto gain control enabled. */
+	// Auto gain control enabled.
 	autoGainControl : true,
 
-	/* Echo cancellation enabled. */
+	// Echo cancellation enabled.
 	echoCancellation : true,
 
-	/* Noise suppression enabled. */
+	// Noise suppression enabled.
 	noiseSuppression : true,
 
-	/* Automatically unmute speaking above noiseThreshold. */
+	// Automatically unmute speaking above noiseThreshold.
 	voiceActivatedUnmute : false,
 
-	/* This is only for voiceActivatedUnmute and audio-indicator. */
+	// This is only for voiceActivatedUnmute and audio-indicator.
 	noiseThreshold : -60,
 
-	/* The audio sample rate. */
+	// The audio sample rate.
 	sampleRate : 48000,
 
-	/* The audio channels count. */
+	// The audio channels count.
 	channelCount : 1,
 
-	/* The audio sample size count. */
+	// The audio sample size count.
 	sampleSize : 16,
 
-	/* If OPUS FEC stereo be enabled. */
+	// If OPUS FEC stereo be enabled.
 	opusStereo : false,
 
-	/* If OPUS DTX should be enabled. */
+	// If OPUS DTX should be enabled.
 	opusDtx : true,
 
-	/* If OPUS FEC should be enabled. */
+	// If OPUS FEC should be enabled.
 	opusFec : true,
 
-	/* The OPUS packet time. */
+	// The OPUS packet time.
 	opusPtime : 20,
 
-	/* The OPUS playback rate. */
+	// The OPUS playback rate.
 	opusMaxPlaybackRate : 48000,
 
-	/* The audio preset */
+	// The audio preset
 	audioPreset : 'conference',
 
-	/* The audio presets. */
+	// The audio presets.
 	audioPresets : {
 		'conference' : {
 			'name'                 : 'Conference audio',
@@ -238,7 +238,7 @@ This value must match exactly one of the values defined in aspectRatios. */
 		}
 	},
 
-	/* The default audio preset. */
+	// The default audio preset.
 	centralAudioOptions : {
 		'autoGainControl'      : true,
 		'echoCancellation'     : true,
@@ -256,33 +256,35 @@ This value must match exactly one of the values defined in aspectRatios. */
 		'volume'               : 1
 	},
 
-	/* It sets the maximum number of participants in one room that can join unmuted.
-The next participant will join automatically muted.
-Set it to 0 to auto mute all.
-Set it to negative (-1) to never automatically auto mute but use it with caution, 
-full mesh audio strongly decrease room capacity! */
+	// It sets the maximum number of participants in one room that can join unmuted.
+	// The next participant will join automatically muted.
+	// Set it to 0 to auto mute all.
+	// Set it to negative (-1) to never automatically auto mute but use it with caution, 
+	// full mesh audio strongly decrease room capacity!
 	autoMuteThreshold : 4,
 
-	/* The page background image URL */
+	// The page background image URL
 	background : 'images/background.jpg',
 
-	/* The default layout. */
+	// The default layout.
 	defaultLayout : 'democratic',
 
-	/* If true, the media control buttons will be shown in separate control bar, not in the ME container. */
+	// If true, the media control buttons will be shown in separate control bar, not in the ME container.
 	buttonControlBar : false,
 
-	/* If false, will push videos away to make room for side drawer. If true, will overlay side drawer over videos. */
+	// If false, will push videos away to make room for side drawer.
+	// If true, will overlay side drawer over videos.
 	drawerOverlayed : true,
 
-	/* The position of the notifications. */
+	// The position of the notifications.
 	notificationPosition : 'right',
 
-	/* It sets the notifications sounds.
-Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage', 'sendFile', 'newPeer' and 'default'.
-Not defining a key is equivalent to using the default notification sound.
-Setting 'play' to null disables the sound notification.		
- */
+	// It sets the notifications sounds.
+	// Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 
+	// 'chatMessage', 'sendFile', 'newPeer' and 'default'.
+	// Not defining a key is equivalent to using the default notification sound.
+	// Setting 'play' to null disables the sound notification.		
+	// 
 	notificationSounds : {
 		'chatMessage' : {
 			'play' : '/sounds/notify-chat.mp3'
@@ -296,34 +298,34 @@ Setting 'play' to null disables the sound notification.
 		}
 	},
 
-	/* Timeout for auto hiding the topbar and the buttons control bar. */
+	// Timeout for auto hiding the topbar and the buttons control bar.
 	hideTimeout : 3000,
 
-	/* The maximum number of participants that will be visible in as speaker. */
+	// The maximum number of participants that will be visible in as speaker.
 	lastN : 4,
 
-	/* The maximum number of participants that will be visible in as speaker for mobile users. */
+	// The maximum number of participants that will be visible in as speaker for mobile users.
 	mobileLastN : 1,
 
-	/* The highest number of lastN the user can select manually in the user interface. */
+	// The highest number of lastN the user can select manually in the user interface.
 	maxLastN : 5,
 
-	/* If true, the users can not change the number of visible speakers. */
+	// If true, the users can not change the number of visible speakers.
 	lockLastN : false,
 
-	/* If not null, it shows the logo loaded from the specified URL, otherwise it shows the title. */
+	// If not null, it shows the logo loaded from the specified URL, otherwise it shows the title.
 	logo : 'images/logo.edumeet.svg',
 
-	/* The title to show if the logo is not specified. */
+	// The title to show if the logo is not specified.
 	title : 'edumeet',
 
-	/* The service & Support URL; if `null`, it will be not displayed on the about dialogs. */
+	// The service & Support URL; if `null`, it will be not displayed on the about dialogs.
 	supportUrl : 'https://support.example.com',
 
-	/* The privacy and data protection external URL or local HTML path. */
+	// The privacy and data protection external URL or local HTML path.
 	privacyUrl : 'privacy/privacy.html',
 
-	/* UI theme elements colors. */
+	// UI theme elements colors.
 	theme : {
 		'palette' : {
 			'primary' : {

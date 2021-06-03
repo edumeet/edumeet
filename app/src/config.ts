@@ -429,7 +429,8 @@ full mesh audio strongly decrease room capacity!`,
 
 	drawerOverlayed :
 	{
-		doc     : 'If false, will push videos away to make room for side drawer. If true, will overlay side drawer over videos.',
+		doc : `If false, will push videos away to make room for side drawer.
+If true, will overlay side drawer over videos.`,
 		format  : 'Boolean',
 		default : true
 	},
@@ -444,7 +445,8 @@ full mesh audio strongly decrease room capacity!`,
 	notificationSounds :
 	{
 		doc : `It sets the notifications sounds.
-Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 'chatMessage', 'sendFile', 'newPeer' and 'default'.
+Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 
+'chatMessage', 'sendFile', 'newPeer' and 'default'.
 Not defining a key is equivalent to using the default notification sound.
 Setting 'play' to null disables the sound notification.		
 `,
@@ -727,7 +729,7 @@ var config = {
 		if (name.includes('.'))
 			name = `'${name}'`;
 
-		data += `\n\t/* ${value.doc} */
+		data += `\n\t// ${value.doc.replace(/\n/g, '\n\t// ')}
 \t${name} : ${value.default},
 `;
 	});
