@@ -1507,7 +1507,12 @@ class Room extends EventEmitter
 				if (!this._hasPermission(peer, MODERATE_CHAT))
 					throw new Error('peer not authorized');
 
+				if (!this._hasPermission(peer, MODERATE_FILES))
+					throw new Error('peer not authorized');
+
 				this._chatHistory = [];
+
+				this._fileHistory = [];
 
 				// Spread to others
 				this._notification(peer.socket, 'moderator:clearChat', null, true);
@@ -1625,31 +1630,17 @@ class Room extends EventEmitter
 				if (!this._hasPermission(peer, SHARE_FILE))
 					throw new Error('peer not authorized');
 
-				const { magnetUri } = request.data;
+				// const { magnetUri, time } = request.data;
+				const file = request.data;
 
-				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
-
-				// Spread to others
-				this._notification(peer.socket, 'sendFile', {
-					peerId    : peer.id,
-					magnetUri : magnetUri
-				}, true);
-
-				// Return no error
-				cb();
-
-				break;
-			}
-
-			case 'moderator:clearFileSharing':
-			{
-				if (!this._hasPermission(peer, MODERATE_FILES))
-					throw new Error('peer not authorized');
-
-				this._fileHistory = [];
+				this._fileHistory.push({ ...file });
 
 				// Spread to others
-				this._notification(peer.socket, 'moderator:clearFileSharing', null, true);
+				this._notification(
+					peer.socket,
+					'sendFile', { ...file },
+					true
+				);
 
 				// Return no error
 				cb();

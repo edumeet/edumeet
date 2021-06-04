@@ -109,6 +109,8 @@
 	"label.leave": "Esci",
 	"label.chatInput": "Inserire messaggio...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Condivisione file",
 	"label.participants": "Partecipanti",
 	"label.shareFile": "Condividi file",

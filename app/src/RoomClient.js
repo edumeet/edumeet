@@ -414,7 +414,7 @@ export default class RoomClient
 
 			const source = event.target;
 
-			const exclude = [ 'input', 'textarea' ];
+			const exclude = [ 'input', 'textarea', 'div' ];
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
@@ -569,7 +569,7 @@ export default class RoomClient
 
 			const source = event.target;
 
-			const exclude = [ 'input', 'textarea' ];
+			const exclude = [ 'input', 'textarea', 'div' ];
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
@@ -914,9 +914,22 @@ export default class RoomClient
 		try
 		{
 			store.dispatch(
-				chatActions.addUserMessage(chatMessage.text));
+				chatActions.addMessage(
+					{
+						...chatMessage,
+						// name    : 'Me',
+						sender  : 'client',
+						picture : undefined,
+						isRead  : true
+					}
+				)
+			);
+
+			store.dispatch(
+				chatActions.setIsScrollEnd(true));
 
 			await this.sendRequest('chatMessage', { chatMessage });
+
 		}
 		catch (error)
 		{
@@ -955,6 +968,56 @@ export default class RoomClient
 		});
 	}
 
+	async saveChat()
+	{
+		const html = window.document.getElementsByTagName('html')[0].cloneNode(true);
+
+		const chatEl = html.querySelector('#chatList');
+
+		html.querySelector('body').replaceChildren(chatEl);
+
+		const fileName= 'chat.html';
+
+		// remove unused tags
+		[ 'script', 'link' ].forEach((element) =>
+		{
+			const el = html.getElementsByTagName(element);
+
+			let i = el.length;
+
+			while (i--) el[i].parentNode.removeChild(el[i]);
+		});
+
+		// embed images
+		for await (const img of html.querySelectorAll('img'))
+		{
+			img.src = `${img.src}`;
+
+			await fetch(img.src)
+
+				.then((response) => response.blob())
+				.then((data) =>
+				{
+					const reader = new FileReader();
+
+					reader.readAsDataURL(data);
+
+					reader.onloadend = () => { img.src = reader.result; };
+				});
+		}
+
+		const blob = new Blob([ html.innerHTML ], { type: 'text/html;charset=utf-8' });
+
+		saveAs(blob, fileName);
+	}
+
+	sortChat(order)
+	{
+		store.dispatch(
+			chatActions.sortChat(order)
+		);
+	}
+
 	handleDownload(magnetUri)
 	{
 		store.dispatch(
@@ -988,20 +1051,20 @@ export default class RoomClient
 			return;
 		}
 
-		let lastMove = 0;
+		// let lastMove = 0;
 
 		torrent.on('download', () =>
 		{
-			if (Date.now() - lastMove > 1000)
-			{
-				store.dispatch(
-					fileActions.setFileProgress(
-						torrent.magnetURI,
-						torrent.progress
-					));
+			// if (Date.now() - lastMove > 1000)
+			// {
+			store.dispatch(
+				fileActions.setFileProgress(
+					torrent.magnetURI,
+					torrent.progress
+				));
 
-				lastMove = Date.now();
-			}
+			// lastMove = Date.now();
+			// }
 		});
 
 		torrent.on('done', () =>
@@ -1014,7 +1077,7 @@ export default class RoomClient
 		});
 	}
 
-	async shareFiles(files)
+	async shareFiles(data)
 	{
 		store.dispatch(requestActions.notify(
 			{
@@ -1024,7 +1087,7 @@ export default class RoomClient
 				})
 			}));
 
-		createTorrent(files, (err, torrent) =>
+		createTorrent(data.attachment, (err, torrent) =>
 		{
 			if (err)
 			{
@@ -1052,18 +1115,21 @@ export default class RoomClient
 						})
 					}));
 
-				store.dispatch(fileActions.addFile(
-					this._peerId,
-					existingTorrent.magnetURI
-				));
+				const file = {
+					...data,
+					peerId    : this._peerId,
+					magnetUri : existingTorrent.magnetURI
+				};
 
-				this._sendFile(existingTorrent.magnetURI);
+				store.dispatch(fileActions.addFile(file));
+
+				this._sendFile(file);
 
 				return;
 			}
 
 			this._webTorrent.seed(
-				files,
+				data.attachment,
 				{ announceList: [ [ this._tracker ] ] },
 				(newTorrent) =>
 				{
@@ -1075,24 +1141,26 @@ export default class RoomClient
 							})
 						}));
 
-					store.dispatch(fileActions.addFile(
-						this._peerId,
-						newTorrent.magnetURI
-					));
+					const file = {
+						...data,
+						peerId    : this._peerId,
+						magnetUri : newTorrent.magnetURI
+					};
 
-					this._sendFile(newTorrent.magnetURI);
+					store.dispatch(fileActions.addFile(file));
+
+					this._sendFile(file);
 				});
 		});
 	}
 
-	// { file, name, picture }
-	async _sendFile(magnetUri)
+	async _sendFile(file)
 	{
-		logger.debug('sendFile() [magnetUri:"%o"]', magnetUri);
+		logger.debug('sendFile() [magnetUri:"%o"]', file.magnetUri);
 
 		try
 		{
-			await this.sendRequest('sendFile', { magnetUri });
+			await this.sendRequest('sendFile', file);
 		}
 		catch (error)
 		{
@@ -1854,6 +1922,8 @@ export default class RoomClient
 			await this.sendRequest('moderator:clearChat');
 
 			store.dispatch(chatActions.clearChat());
+
+			store.dispatch(fileActions.clearFiles());
 		}
 		catch (error)
 		{
@@ -1864,6 +1934,7 @@ export default class RoomClient
 			roomActions.setClearChatInProgress(false));
 	}
 
+	/*
 	async clearFileSharing()
 	{
 		logger.debug('clearFileSharing()');
@@ -1885,6 +1956,7 @@ export default class RoomClient
 		store.dispatch(
 			roomActions.setClearFileSharingInProgress(false));
 	}
+	*/
 
 	async givePeerRole(peerId, roleId)
 	{
@@ -3055,7 +3127,7 @@ export default class RoomClient
 						const { peerId, chatMessage } = notification.data;
 
 						store.dispatch(
-							chatActions.addResponseMessage({ ...chatMessage, peerId }));
+							chatActions.addMessage({ ...chatMessage, peerId, isRead: false }));
 
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
@@ -3075,6 +3147,8 @@ export default class RoomClient
 					{
 						store.dispatch(chatActions.clearChat());
 
+						store.dispatch(fileActions.clearFiles());
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -3088,9 +3162,9 @@ export default class RoomClient
 
 					case 'sendFile':
 					{
-						const { peerId, magnetUri } = notification.data;
+						const file = notification.data;
 
-						store.dispatch(fileActions.addFile(peerId, magnetUri));
+						store.dispatch(fileActions.addFile({ ...file }));
 
 						store.dispatch(requestActions.notify(
 							{
@@ -3103,7 +3177,7 @@ export default class RoomClient
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
 							(store.getState().toolarea.toolAreaOpen &&
-							store.getState().toolarea.currentToolTab !== 'files')
+							store.getState().toolarea.currentToolTab !== 'chat')
 						) // Make sound
 						{
 							store.dispatch(
@@ -3114,6 +3188,7 @@ export default class RoomClient
 						break;
 					}
 
+					/*
 					case 'moderator:clearFileSharing':
 					{
 						store.dispatch(fileActions.clearFiles());
@@ -3128,6 +3203,7 @@ export default class RoomClient
 
 						break;
 					}
+					*/
 
 					case 'producerScore':
 					{

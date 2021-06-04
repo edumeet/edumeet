@@ -51,22 +51,22 @@ const styles = (theme) =>
 			marginLeft                     : '30vw',
 			[theme.breakpoints.down('lg')] :
 			{
-				width      : 'calc(100% - 40vw)',
+				width      : 'calc(100% - 30vw)',
 				marginLeft : '40vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width      : 'calc(100% - 50vw)',
+				width      : 'calc(100% - 40vw)',
 				marginLeft : '50vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width      : 'calc(100% - 70vw)',
+				width      : 'calc(100% - 60vw)',
 				marginLeft : '70vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width      : 'calc(100% - 90vw)',
+				width      : 'calc(100% - 80vw)',
 				marginLeft : '90vw'
 			}
 		},

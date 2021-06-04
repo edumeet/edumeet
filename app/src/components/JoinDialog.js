@@ -206,13 +206,13 @@ const JoinDialog = ({
 		(location.pathname === '/') && history.push(encodeURIComponent(roomId));
 	});
 
-	const _askForPerms = () =>
+	/* const _askForPerms = () =>
 	{
 		if (mediaPerms.video || mediaPerms.audio)
 		{
 			navigator.mediaDevices.getUserMedia(mediaPerms);
 		}
-	};
+	}; */
 
 	const handleSetMediaPerms = (event, newMediaPerms) =>
 	{

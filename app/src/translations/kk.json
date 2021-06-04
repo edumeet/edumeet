@@ -107,6 +107,8 @@
 	"label.leave": "Шығу",
 	"label.chatInput": "Чат хабарламасын енгізіңіз...",
 	"label.chat": "Чат",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Файлмен бөлісу",
 	"label.participants": "Қатысушылар",
 	"label.shareFile": "Файлды бірге пайдалану",
