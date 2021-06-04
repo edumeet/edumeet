@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { RECORDING_INIT, RECORDING_START, RECORDING_STOP, RECORDING_PAUSE, RECORDING_RESUME } from '../recordingStates';
+import { RECORDING_INIT, RECORDING_START, RECORDING_STOP, RECORDING_PAUSE, RECORDING_RESUME } from '../actions/recorderActions';
 
 const meRolesSelect = (state) => state.me.roles;
 const userRolesSelect = (state) => state.room.userRoles;

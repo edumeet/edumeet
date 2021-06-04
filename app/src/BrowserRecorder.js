@@ -1,13 +1,14 @@
-import Logger from './../Logger';
+import Logger from './Logger';
 import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
-import * as meActions from './meActions';
-import * as requestActions from './requestActions';
+import * as meActions from './actions/meActions';
+import * as requestActions from './actions/requestActions';
+import { store } from './store';
 
 // Recoding STATE
 
-import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from '../recordingStates';
+import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
 
 export default class BrowserRecorder
 {
@@ -46,9 +47,9 @@ export default class BrowserRecorder
 			audio    : true,
 			advanced : [
 				{ width: 1920, height: 1080 },
-        		{ width: 1280, height: 720 }
-        	]
-        };
+				{ width: 1280, height: 720 }
+			]
+		};
 
 		// 10 sec
 		this.RECORDING_SLICE_SIZE = 10000;
@@ -183,14 +184,14 @@ export default class BrowserRecorder
 									type : 'error',
 									text : this.intl.formatMessage({
 										id             : 'room.localRecordingSecurityError',
-                                        defaultMessage : 'Recording the specified source is not allowed due to security restrictions. Check you client settings!'
+										defaultMessage : 'Recording the specified source is not allowed due to security restrictions. Check you client settings!'
 									})
 								}));
 							break;
 						case 'InvalidStateError':
 						default:
 							throw new Error(error);
-                    }
+					}
 
 				};
 
@@ -255,7 +256,7 @@ export default class BrowserRecorder
 		}
 		catch (error)
 		{
-            this.store.dispatch(requestActions.notify(
+			this.store.dispatch(requestActions.notify(
 				{
 					type : 'error',
 					text : this.intl.formatMessage({
@@ -303,7 +304,7 @@ export default class BrowserRecorder
 						defaultMessage : 'Unexpected error ocurred during local recording'
 					})
 				}));
-            this.logger.error('startLocalRecording() [error:"%o"]', error);
+			this.logger.error('startLocalRecording() [error:"%o"]', error);
 
 		}
 	}
@@ -314,7 +315,7 @@ export default class BrowserRecorder
 		{
 			this.recorder.stop();
 
-            this.store.dispatch(requestActions.notify(
+			this.store.dispatch(requestActions.notify(
 				{
 					text : this.intl.formatMessage({
 						id             : 'room.youStoppedLocalRecording',
@@ -329,7 +330,7 @@ export default class BrowserRecorder
 		catch (error)
 		{
 
-            this.store.dispatch(requestActions.notify(
+			this.store.dispatch(requestActions.notify(
 				{
 					type : 'error',
 					text : this.intl.formatMessage({
@@ -338,7 +339,7 @@ export default class BrowserRecorder
 					})
 				}));
 
-            this.logger.error('stopLocalRecording() [error:"%o"]', error);
+			this.logger.error('stopLocalRecording() [error:"%o"]', error);
 		}
 	}
 	invokeSaveAsDialog(blob)
@@ -476,5 +477,12 @@ export default class BrowserRecorder
 		{
 			this.logger.error('Error during save recovered recording error: %O', error);
 		}
+	}
+
+	checkMicProducer(producers)
+	{
+		// is it already appended to stream?
+		Object.values(producers).find((p) => p.source === 'mic');
+		// TODO 
 	}
 }
