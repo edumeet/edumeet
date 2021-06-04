@@ -112,7 +112,7 @@ const configSchema = convict({
 	fileTracker : {
 		doc     : 'Bittorrent tracker.',
 		format  : String,
-		default : 'wss://tracker.lab.vvc.niif.hu:443'
+		default : 'wss://tracker.openwebtorrent.com'
 	},
 	redisOptions : {
 		host : {

@@ -34,7 +34,7 @@ Look at the default `config/config.example.js` file for documentation.
 | turnAPIparams.servercount | TURN server count. | `"nat"` | ``2`` |
 | turnAPITimeout | TURN server API timeout (seconds). | `"nat"` | ``2000`` |
 | backupTurnServers | Backup TURN servers if REST fails or is not configured | `"*"` | ``[  {    "urls": [      "turn:turn.example.com:443?transport=tcp"    ],    "username": "example",    "credential": "example"  }]`` |
-| fileTracker | Bittorrent tracker. | `"string"` | ``"wss://tracker.lab.vvc.niif.hu:443"`` |
+| fileTracker | Bittorrent tracker. | `"string"` | ``"wss://tracker.openwebtorrent.com"`` |
 | redisOptions.host | Redis server host. | `"string"` | ``"localhost"`` |
 | redisOptions.port | Redis server port. | `"port"` | ``6379`` |
 | redisOptions.password | Redis server password. | `"string"` | ``""`` |
