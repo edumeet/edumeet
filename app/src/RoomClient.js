@@ -20,14 +20,11 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-import BrowserRecorder from './actions/BrowserRecorder';
-import startLocalRecording, { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
+import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP } from './recordingStates';
 
 let createTorrent;
 
 let WebTorrent;
-
-let recorder;
 
 let saveAs;
 
@@ -1416,11 +1413,12 @@ export default class RoomClient
 			}
 
 			// TODO update recorder inputs 
+			/* 
 			if (recorder != null)
 			{
 				recorder.addTrack(new MediaStream([ this._micProducer.track ]));
 			}
-
+			*/
 			await this._updateAudioDevices();
 		}
 		catch (error)
