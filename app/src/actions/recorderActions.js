@@ -1,14 +1,18 @@
 // Recoding STATE
-/*
+import * as meActions from './meActions';
+import BrowserRecorder from './BrowserRecorder';
+
 export const RECORDING_START = 'start';
 export const RECORDING_STOP = 'stop';
 export const RECORDING_PAUSE = 'pause';
 export const RECORDING_RESUME = 'resume';
+const recorder = new BrowserRecorder();
 
-export const startLocalRecording = (roomClient) =>
+export const startLocalRecording = (roomClient, store=null, intl=null) =>
 {
 	return async (dispatch, getState) =>
 	{
+		console.log('recorder start');
 
 		const state = getState();
 		const micProducer = Object.values(state.producers).find((p) => p.source === 'mic');
@@ -24,8 +28,9 @@ export const startLocalRecording = (roomClient) =>
 				additionalAudioTracks,
 				recordingMimeType
 			});
+
 			await roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
-			dispatch(setLocalRecordingState(RECORDING_START));
+			dispatch(meActions.setLocalRecordingState(RECORDING_START));
 		}
 		catch (err)
 		{
@@ -33,4 +38,3 @@ export const startLocalRecording = (roomClient) =>
 		}
 	};
 };
-*/

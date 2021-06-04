@@ -48,6 +48,7 @@ import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
 import randomString from 'random-string';
+import * as recordingActions from '../../actions/recorderActions';
 import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../recordingStates';
 
 const styles = (theme) =>
@@ -723,7 +724,8 @@ const TopBar = (props) =>
 								}
 								else
 								{
-									roomClient.startLocalRecording();
+									recordingActions.startLocalRecording(roomClient);
+									// roomClient.startLocalRecording();
 								}
 							}
 							}
@@ -985,7 +987,9 @@ const TopBar = (props) =>
 						}
 						else
 						{
-							roomClient.startLocalRecording();
+							// roomClient.startLocalRecording();
+							recordingActions.startLocalRecording(roomClient);
+
 						}
 					}
 					}

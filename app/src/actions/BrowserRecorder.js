@@ -1,12 +1,16 @@
-// import Logger from './../Logger';
-// this.logger = new Logger('RoomClient');
-
+import Logger from './../Logger';
 import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
+import * as meActions from './meActions';
+import * as requestActions from './requestActions';
+
+// Recoding STATE
+
+import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from '../recordingStates';
+
 export default class BrowserRecorder
 {
-
 	constructor()
 	{
 		// MediaRecorder
@@ -16,6 +20,9 @@ export default class BrowserRecorder
 		this.gdmStream = null;
 		// this.fileName = `${dbName}.webm`;
 		this.fileName = 'apple.webm';
+		this.logger = new Logger('Recorder');
+
+		// Redux TODO
 
 		// IndexedDB
 		this.idbDB = null;
@@ -79,7 +86,7 @@ export default class BrowserRecorder
 	async start({ additionalAudioTracks, recordingMimeType, constraints, micTrack = null })
 	{
 		this.recordingMimeType = recordingMimeType;
-		// logger.debug('startLocalRecording()');
+		this.logger.debug('startLocalRecording()');
 		// Check
 		if (typeof MediaRecorder === undefined)
 		{
@@ -102,7 +109,7 @@ export default class BrowserRecorder
 			{
 				track.addEventListener('ended', (e) =>
 				{
-					// logger.debug(`gdmStream ${track.kind} track ended event: ${JSON.stringify(e)}`);
+					this.logger.debug(`gdmStream ${track.kind} track ended event: ${JSON.stringify(e)}`);
 					this.stopLocalRecording();
 				});
 			});
@@ -115,7 +122,7 @@ export default class BrowserRecorder
 
 			if (typeof indexedDB === 'undefined' || typeof indexedDB.open === 'undefined')
 			{
-				// logger.warn('IndexedDB API is not available in this browser. Fallback to ');
+				this.logger.warn('IndexedDB API is not available in this browser. Fallback to ');
 				this.logToIDB = false;
 			}
 			else
@@ -146,7 +153,7 @@ export default class BrowserRecorder
 					if (e.data && e.data.size > 0)
 					{
 						chunkCounter++;
-						// logger.debug(`put chunk: ${chunkCounter}`);
+						this.logger.debug(`put chunk: ${chunkCounter}`);
 						if (this.logToIDB)
 						{
 							try
@@ -155,7 +162,7 @@ export default class BrowserRecorder
 							}
 							catch (error)
 							{
-								// logger.error('Error during saving data chunk to IndexedDB! error:%O', error);
+								this.logger.error('Error during saving data chunk to IndexedDB! error:%O', error);
 							}
 						}
 						else
@@ -167,19 +174,16 @@ export default class BrowserRecorder
 
 				this.recorder.onerror = (error) =>
 				{
-					/*
-					logger.err(`Recorder onerror: ${error}`);
+					this.logger.err(`Recorder onerror: ${error}`);
 					switch (error.name)
 					{
 						case 'SecurityError':
-							store.dispatch(requestActions.notify(
+							this.store.dispatch(requestActions.notify(
 								{
 									type : 'error',
-									text : intl.formatMessage({
+									text : this.intl.formatMessage({
 										id             : 'room.localRecordingSecurityError',
-                                        defaultMessage : 'Recording the specified source is not 
-                                        allowed due to security restrictions.
-                                         Check you client settings!'
+                                        defaultMessage : 'Recording the specified source is not allowed due to security restrictions. Check you client settings!'
 									})
 								}));
 							break;
@@ -187,12 +191,12 @@ export default class BrowserRecorder
 						default:
 							throw new Error(error);
                     }
-                     */
+
 				};
 
 				this.recorder.onstop = (e) =>
 				{
-					// logger.debug(`Logger stopped event: ${e}`);
+					this.logger.debug(`Logger stopped event: ${e}`);
 
 					if (this.logToIDB)
 					{
@@ -230,13 +234,11 @@ export default class BrowserRecorder
 										keys, writer, true, this.idbDB, this.idbName
 									);
 								});
-
 							}
-
 						}
 						catch (error)
 						{
-							// logger.error('Error during getting all data chunks from IndexedDB! error: %O', error);
+							this.logger.error('Error during getting all data chunks from IndexedDB! error: %O', error);
 						}
 
 					}
@@ -253,19 +255,18 @@ export default class BrowserRecorder
 		}
 		catch (error)
 		{
-			/*
-            store.dispatch(requestActions.notify(
+            this.store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : intl.formatMessage({
+					text : this.intl.formatMessage({
 						id             : 'room.unexpectedErrorDuringLocalRecording',
 						defaultMessage : 'Unexpected error ocurred during local recording'
 					})
 				}));
-            logger.error('startLocalRecording() [error:"%o"]', error);
-            */
+			this.logger.error('startLocalRecording() [error:"%o"]', error);
+
 			if (this.recorder) this.recorder.stop();
-			// store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
+			this.store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
 			if (typeof this.gdmStream !== 'undefined' && this.gdmStream && typeof this.gdmStream.getTracks === 'function')
 			{
 				this.gdmStream.getTracks().forEach((track) => track.stop());
@@ -280,68 +281,64 @@ export default class BrowserRecorder
 
 		try
 		{
-			// await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
+			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
 
-			// store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
+			this.store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
 
-			/* store.dispatch(requestActions.notify(
+			this.store.dispatch(requestActions.notify(
 				{
-					text : intl.formatMessage({
+					text : this.intl.formatMessage({
 						id             : 'room.youStartedLocalRecording',
 						defaultMessage : 'You started local recording'
 					})
-				})); */
+				}));
 		}
 		catch (error)
 		{
-			/*
-            store.dispatch(requestActions.notify(
+			this.store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : intl.formatMessage({
+					text : this.intl.formatMessage({
 						id             : 'room.unexpectedErrorDuringLocalRecording',
 						defaultMessage : 'Unexpected error ocurred during local recording'
 					})
 				}));
-            logger.error('startLocalRecording() [error:"%o"]', error);
-            */
+            this.logger.error('startLocalRecording() [error:"%o"]', error);
+
 		}
 	}
-	stop()
+	async stop()
 	{
-		// logger.debug('stopLocalRecording()');
+		this.logger.debug('stopLocalRecording()');
 		try
 		{
 			this.recorder.stop();
 
-			/*
-            store.dispatch(requestActions.notify(
+            this.store.dispatch(requestActions.notify(
 				{
-					text : intl.formatMessage({
+					text : this.intl.formatMessage({
 						id             : 'room.youStoppedLocalRecording',
 						defaultMessage : 'You stopped local recording'
 					})
 				}));
-            */
-			// store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
+			this.store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
 
-			// await this.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
+			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
 
 		}
 		catch (error)
 		{
-			/*
-            store.dispatch(requestActions.notify(
+
+            this.store.dispatch(requestActions.notify(
 				{
 					type : 'error',
-					text : intl.formatMessage({
+					text : this.intl.formatMessage({
 						id             : 'room.unexpectedErrorDuringLocalRecording',
 						defaultMessage : 'Unexpected error ocurred during local recording'
 					})
 				}));
 
-            logger.error('stopLocalRecording() [error:"%o"]', error);
-            */
+            this.logger.error('stopLocalRecording() [error:"%o"]', error);
 		}
 	}
 	invokeSaveAsDialog(blob)
@@ -477,7 +474,7 @@ export default class BrowserRecorder
 		}
 		catch (error)
 		{
-			// logger.error('Error during save recovered recording error: %O', error);
+			this.logger.error('Error during save recovered recording error: %O', error);
 		}
 	}
 }
