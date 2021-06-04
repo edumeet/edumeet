@@ -35,10 +35,6 @@ const migrations =
 	},
 	1 : (state) =>
 	{
-		state.settings.sampleRate = undefined;
-		state.settings.channelCount = undefined;
-		state.settings.volume = undefined;
-		state.settings.sampleSize = undefined;
 		state.me = undefined;
 
 		return { ...state };
@@ -50,7 +46,7 @@ const migrations =
 		return { ...state };
 	}
 	// Next version
-	//	3 : (state) =>
+	//	4 : (state) =>
 	//	{
 	//		return { ...state };
 	//	}
@@ -63,7 +59,7 @@ const persistConfig =
 	// migrate will iterate state over all version-functions
 	// from migrations until version is reached
 	version         : 2,
-	migrate         : createMigrate(migrations, { debug: false }),
+	migrate         : createMigrate(migrations, { debug: true }),
 	stateReconciler : autoMergeLevel2,
 	whitelist       : [ 'settings', 'intl', 'config' ]
 };
@@ -80,11 +76,17 @@ const reduxMiddlewares =
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
+	const LOG_IGNORE = [
+		'SET_PEER_VOLUME',
+		'SET_ROOM_ACTIVE_SPEAKER',
+		'ADD_TRANSPORT_STATS'
+	];
+
 	const reduxLogger = createLogger(
 		{
-			// filter VOLUME level actions from log
-			predicate : (getState, action) => !(action.type === 'SET_PEER_VOLUME'),
+			predicate : (getState, action) => LOG_IGNORE.indexOf(action.type) === -1,
 			duration  : true,
+			collapsed : true,
 			timestamp : false,
 			level     : 'log',
 			logErrors : true

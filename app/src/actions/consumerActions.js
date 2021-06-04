@@ -62,3 +62,9 @@ export const setConsumerAudioGain = (consumerId, audioGain) =>
 		type    : 'SET_CONSUMER_AUDIO_GAIN',
 		payload : { consumerId, audioGain }
 	});
+
+export const setConsumerOpusConfig = (consumerId, opusConfig) =>
+	({
+		type    : 'SET_CONSUMER_OPUS_CONFIG',
+		payload : { consumerId, opusConfig }
+	});

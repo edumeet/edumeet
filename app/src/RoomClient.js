@@ -20,6 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
+import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
 import { config } from './config';
 
 let createTorrent;
@@ -188,6 +189,8 @@ function getResolutionScalings(encodings)
 let store;
 
 let intl;
+
+const insertableStreamsSupported = Boolean(RTCRtpSender.prototype.createEncodedStreams);
 
 export default class RoomClient
 {
@@ -1320,7 +1323,7 @@ export default class RoomClient
 		this._hark = hark(this._harkStream,
 			{
 				play      : false,
-				interval  : 10,
+				interval  : 100,
 				threshold : store.getState().settings.noiseThreshold,
 				history   : 100
 			});
@@ -1329,6 +1332,8 @@ export default class RoomClient
 
 		this._hark.on('volume_change', (volume) =>
 		{
+			volume = Math.round(volume);
+
 			// Update only if there is a bigger diff 
 			if (this._micProducer && Math.abs(volume - this._hark.lastVolume) > 0.5)
 			{
@@ -1338,13 +1343,13 @@ export default class RoomClient
 				// at low levels
 				if (volume < this._hark.lastVolume)
 				{
-					volume =
+					volume = Math.round(
 						this._hark.lastVolume -
 						Math.pow(
 							(volume - this._hark.lastVolume) /
 							(100 + this._hark.lastVolume)
 							, 2
-						) * 10;
+						) * 10);
 				}
 
 				this._hark.lastVolume = volume;
@@ -1417,7 +1422,7 @@ export default class RoomClient
 	// https://bugs.chromium.org/p/chromium/issues/detail?id=796964
 	async updateMic({
 		start = false,
-		restart = false || this._device.flag !== 'firefox',
+		restart = true,
 		newDeviceId = null
 	} = {})
 	{
@@ -1452,27 +1457,16 @@ export default class RoomClient
 			const {
 				autoGainControl,
 				echoCancellation,
-				noiseSuppression
+				noiseSuppression,
+				sampleRate,
+				channelCount,
+				sampleSize,
+				opusStereo,
+				opusDtx,
+				opusFec,
+				opusPtime,
+				opusMaxPlaybackRate
 			} = store.getState().settings;
-
-			if (!config.centralAudioOptions)
-			{
-				throw new Error(
-					'Missing centralAudioOptions from app config! (See it in example config.)'
-				);
-			}
-
-			const {
-				sampleRate = 48000,
-				channelCount = 1,
-				volume = 1.0,
-				sampleSize = 16,
-				opusStereo = false,
-				opusDtx = true,
-				opusFec = true,
-				opusPtime = 20,
-				opusMaxPlaybackRate = 48000
-			} = config.centralAudioOptions;
 
 			if (
 				(restart && this._micProducer) ||
@@ -1495,7 +1489,6 @@ export default class RoomClient
 							deviceId : { ideal: deviceId },
 							sampleRate,
 							channelCount,
-							volume,
 							autoGainControl,
 							echoCancellation,
 							noiseSuppression,
@@ -1577,7 +1570,6 @@ export default class RoomClient
 					{
 						sampleRate,
 						channelCount,
-						volume,
 						autoGainControl,
 						echoCancellation,
 						noiseSuppression,
@@ -1593,7 +1585,6 @@ export default class RoomClient
 						{
 							sampleRate,
 							channelCount,
-							volume,
 							autoGainControl,
 							echoCancellation,
 							noiseSuppression,
@@ -3291,6 +3282,16 @@ export default class RoomClient
 								appData : { ...appData, peerId } // Trick.
 							});
 
+						if (this._recvTransport.appData.encodedInsertableStreams)
+						{
+							const { enableOpusDetails } = store.getState().settings;
+
+							if (kind === 'audio' && enableOpusDetails)
+								opusReceiverTransform(consumer.rtpReceiver, consumer.id);
+							else
+								directReceiverTransform(consumer.rtpReceiver);
+						}
+
 						// Store in the map.
 						this._consumers.set(consumer.id, consumer);
 
@@ -3323,7 +3324,8 @@ export default class RoomClient
 							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
 							track                  : consumer.track,
 							score                  : score,
-							audioGain              : undefined
+							audioGain              : undefined,
+							opusConfig             : null
 						};
 
 						this._spotlights.addVideoConsumer(consumerStoreObject);
@@ -3343,7 +3345,7 @@ export default class RoomClient
 							if (!stream.getAudioTracks()[0])
 								throw new Error('request.newConsumer | given stream has no audio track');
 
-							consumer.hark = hark(stream, { play: false });
+							consumer.hark = hark(stream, { play: false, interval: 100 });
 
 							consumer.hark.on('volume_change', (volume) =>
 							{
@@ -3569,7 +3571,7 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
-		const { displayName } = store.getState().settings;
+		const { displayName, enableOpusDetails } = store.getState().settings;
 		const { picture } = store.getState().me;
 
 		try
@@ -3713,7 +3715,13 @@ export default class RoomClient
 					dtlsParameters,
 					iceServers         : this._turnServers,
 					// TODO: Fix for issue #72
-					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined
+					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined,
+					additionalSettings : {
+						encodedInsertableStreams : insertableStreamsSupported && enableOpusDetails
+					},
+					appData : {
+						encodedInsertableStreams : insertableStreamsSupported && enableOpusDetails
+					}
 				});
 
 			this._recvTransport.on(
@@ -4306,27 +4314,16 @@ export default class RoomClient
 				echoCancellation,
 				noiseSuppression,
 				aspectRatio,
-				screenSharingFrameRate
+				screenSharingFrameRate,
+				sampleRate,
+				channelCount,
+				sampleSize,
+				opusStereo,
+				opusDtx,
+				opusFec,
+				opusPtime,
+				opusMaxPlaybackRate
 			} = store.getState().settings;
-
-			if (!config.centralAudioOptions)
-			{
-				throw new Error(
-					'Missing centralAudioOptions from app config! (See it in example config.)'
-				);
-			}
-
-			const {
-				sampleRate = 48000,
-				channelCount = 1,
-				volume = 1.0,
-				sampleSize = 16,
-				opusStereo = false,
-				opusDtx = true,
-				opusFec = true,
-				opusPtime = 20,
-				opusMaxPlaybackRate = 48000
-			} = config.centralAudioOptions;
 
 			if (start)
 			{
@@ -4336,14 +4333,13 @@ export default class RoomClient
 				{
 					stream = await this._screenSharing.start({
 						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate        : screenSharingFrameRate,
-						sampleRate       : sampleRate,
-						channelCount     : channelCount,
-						volume           : volume,
-						autoGainControl  : autoGainControl,
-						echoCancellation : echoCancellation,
-						noiseSuppression : noiseSuppression,
-						sampleSize       : sampleSize
+						frameRate : screenSharingFrameRate,
+						sampleRate,
+						channelCount,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
 					});
 
 				}
@@ -4530,13 +4526,12 @@ export default class RoomClient
 
 					await track.applyConstraints(
 						{
-							sampleRate       : sampleRate,
-							channelCount     : channelCount,
-							volume           : volume,
-							autoGainControl  : autoGainControl,
-							echoCancellation : echoCancellation,
-							noiseSuppression : noiseSuppression,
-							sampleSize       : sampleSize
+							sampleRate,
+							channelCount,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
 						}
 					);
 				}
@@ -4672,7 +4667,7 @@ export default class RoomClient
 	{
 		logger.debug('_setNoiseThreshold() [threshold:"%s"]', threshold);
 
-		this._hark.setThreshold(threshold);
+		this._hark?.setThreshold(threshold);
 
 		store.dispatch(
 			settingsActions.setNoiseThreshold(threshold));

@@ -236,7 +236,6 @@ This value must match exactly one of the values defined in aspectRatios.`,
 			tcp : true
 		}
 	},
-
 	// audio options
 	autoGainControl :
 	{
@@ -373,30 +372,6 @@ This value must match exactly one of the values defined in aspectRatios.`,
 				opusPtime            : 60, // minimum packet time (10, 20, 40, 60)
 				opusMaxPlaybackRate  : 48000 // default : 48000 and don't go higher
 			}
-		}
-	},
-
-	// To be removed once the advanced-audio-options PR is merged
-	centralAudioOptions :
-	{
-		doc     : 'The default audio preset.',
-		format  : Object,
-		default :
-		{
-			'autoGainControl'      : true,
-			'echoCancellation'     : true,
-			'noiseSuppression'     : true,
-			'voiceActivatedUnmute' : false,
-			'noiseThreshold'       : -60,
-			'sampleRate'           : 48000,
-			'channelCount'         : 1,
-			'sampleSize'           : 16,
-			'opusStereo'           : false,
-			'opusDtx'              : true,
-			'opusFec'              : true,
-			'opusPtime'            : 20,
-			'opusMaxPlaybackRate'  : 48000,
-			'volume'               : 1.0
 		}
 	},
 

@@ -271,9 +271,9 @@ AppearanceSettings.propTypes =
 	handleChangeMode                : PropTypes.func.isRequired,
 	handleChangeAspectRatio         : PropTypes.func.isRequired,
 	classes                         : PropTypes.object.isRequired,
-	intl                            : PropTypes.object.isRequired,
-	locale                          : PropTypes.object.isRequired,
-	localesList                     : PropTypes.object.isRequired
+	intl                            : PropTypes.object,
+	locale                          : PropTypes.string.isRequired,
+	localesList                     : PropTypes.array.isRequired
 };
 
 const mapStateToProps = (state) =>

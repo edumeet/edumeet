@@ -10,6 +10,7 @@ import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';
 import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
+import { AudioAnalyzer } from './AudioAnalyzer';
 
 const logger = new Logger('VideoView');
 
@@ -89,7 +90,7 @@ const styles = (theme) =>
 
 					// eslint-disable-next-line
 					gridTemplateAreas : '\
-				"AcodL		Acod	Acod	Acod	Acod" \
+					"AcodL		Acod	Acod	Acod	Acod" \
 					"VcodL		Vcod	Vcod	Vcod	Vcod" \
 					"ResL		Res		Res		Res		Res" \
 					"VPortL		VPort VPort VPort VPort" \
@@ -161,6 +162,14 @@ const styles = (theme) =>
 			{
 				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
+		},
+		audioAnalyzer :
+		{
+			width           : '30%',
+			height          : '30%',
+			minWidth        : '180px',
+			minHeight       : '120px',
+			backgroundColor : 'transparent'
 		}
 	});
 
@@ -180,8 +189,15 @@ class VideoView extends React.PureComponent
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
 
+		// Latest received audio track.
+		// @type {MediaStreamTrack}
+		this._audioTrack = null;
+
 		// Periodic timer for showing video resolution.
 		this._videoResolutionTimer = null;
+
+		// Audio Analyzer
+		this.audioAnalyzerContainer = React.createRef();
 	}
 
 	render()
@@ -192,6 +208,7 @@ class VideoView extends React.PureComponent
 			isScreen,
 			isExtraVideo,
 			showQuality,
+			showAudioAnalyzer,
 			displayName,
 			showPeerInfo,
 			videoContain,
@@ -211,7 +228,8 @@ class VideoView extends React.PureComponent
 			classes,
 			netInfo,
 			width,
-			height
+			height,
+			opusConfig
 		} = this.props;
 
 		const {
@@ -289,7 +307,7 @@ class VideoView extends React.PureComponent
 								<React.Fragment>
 									<span className={'AcodL'}>Acod: </span>
 									<span className={'Acod'}>
-										{audioCodec}
+										{audioCodec} {opusConfig}
 									</span>
 								</React.Fragment>
 							}
@@ -370,6 +388,13 @@ class VideoView extends React.PureComponent
 								}
 							</div>
 						}
+
+						{ showAudioAnalyzer &&
+							<div className={classnames(classes.audioAnalyzer)}
+								ref={this.audioAnalyzerContainer}
+							/>
+						}
+
 					</div>
 
 					{ showPeerInfo &&
@@ -424,9 +449,20 @@ class VideoView extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { videoTrack } = this.props;
+		const { videoTrack, audioTrack, showAudioAnalyzer } = this.props;
 
 		this._setTracks(videoTrack);
+
+		// Audio analyzer
+		if (showAudioAnalyzer)
+		{
+			this._setAudioMonitorTrack(audioTrack);
+		}
+		else if (this.audioAnalyzer)
+		{
+			this.audioAnalyzer.delete();
+			this.audioAnalyzer = null;
+		}
 	}
 
 	componentWillUnmount()
@@ -447,9 +483,19 @@ class VideoView extends React.PureComponent
 	{
 		if (prevProps !== this.props)
 		{
-			const { videoTrack } = this.props;
+			const { videoTrack, audioTrack, showAudioAnalyzer } = this.props;
 
 			this._setTracks(videoTrack);
+
+			if (showAudioAnalyzer)
+			{
+				this._setAudioMonitorTrack(audioTrack);
+			}
+			else if (this.audioAnalyzer)
+			{
+				this.audioAnalyzer.delete();
+				this.audioAnalyzer = null;
+			}
 		}
 	}
 
@@ -486,6 +532,25 @@ class VideoView extends React.PureComponent
 		}
 	}
 
+	_setAudioMonitorTrack(track)
+	{
+		if (!this.audioAnalyzer)
+		{
+			logger.debug('_setAudioMonitorTrack creating audioAnalyzer with dom:', this.audioAnalyzerContainer.current);
+			this.audioAnalyzer = new AudioAnalyzer(this.audioAnalyzerContainer.current);
+		}
+
+		if (track)
+		{
+			this.audioAnalyzer.addTrack(track);
+		}
+		else
+		{
+			// disconnects all the tracks
+			this.audioAnalyzer.removeTracks();
+		}
+	}
+
 	_showVideoResolution()
 	{
 		this._videoResolutionTimer = setInterval(() =>
@@ -512,6 +577,20 @@ class VideoView extends React.PureComponent
 	{
 		this.setState({ videoWidth: null, videoHeight: null });
 	}
+
+	handleMenuClick(event)
+	{
+		logger.debug('handleMenuClick', event.currentTarget);
+
+		this.menuAnchorElement = event.currentTarget;
+	}
+
+	handleMenuClose(event)
+	{
+		logger.debug('handleMenuClose', event.currentTarget);
+
+		this.menuAnchorElement = null;
+	}
 }
 
 VideoView.propTypes =
@@ -521,12 +600,14 @@ VideoView.propTypes =
 	isScreen                       : PropTypes.bool,
 	isExtraVideo   	               : PropTypes.bool,
 	showQuality                    : PropTypes.bool,
+	showAudioAnalyzer              : PropTypes.bool,
 	displayName                    : PropTypes.string,
 	showPeerInfo                   : PropTypes.bool,
 	videoContain                   : PropTypes.bool,
 	advancedMode                   : PropTypes.bool,
 	videoTrack                     : PropTypes.any,
 	videoVisible                   : PropTypes.bool.isRequired,
+	audioTrack                     : PropTypes.any,
 	consumerSpatialLayers          : PropTypes.number,
 	consumerTemporalLayers         : PropTypes.number,
 	consumerCurrentSpatialLayer    : PropTypes.number,
@@ -543,7 +624,8 @@ VideoView.propTypes =
 	classes                        : PropTypes.object.isRequired,
 	netInfo                        : PropTypes.object,
 	width                          : PropTypes.number,
-	height                         : PropTypes.number
+	height                         : PropTypes.number,
+	opusConfig                     : PropTypes.string
 };
 
 export default withStyles(styles)(VideoView);
