@@ -48,8 +48,14 @@ import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
 import randomString from 'random-string';
-import * as recordingActions from '../../actions/recorderActions';
-import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../recordingStates';
+import { recorder, RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../actions/recorderActions';
+import * as meActions from '../../actions/meActions';
+import { store } from '../../store';
+// import producers from '../../reducers/producers';
+// import logger from 'redux-logger';
+import Logger from '../../Logger';
+
+const logger = new Logger('Recorder');
 
 const styles = (theme) =>
 	({
@@ -272,8 +278,12 @@ const TopBar = (props) =>
 		locale,
 		localesList,
 		localRecordingState,
-		recordingInProgress
+		recordingInProgress,
+		producers
 	} = props;
+
+	// did it change?
+	recorder.checkMicProducer(producers);
 
 	useEffect(() =>
 	{
@@ -713,7 +723,7 @@ const TopBar = (props) =>
 						{ isSafari &&
 						<MenuItem
 							aria-label={recordingTooltip}
-							onClick={() =>
+							onClick={async () =>
 							{
 								handleMenuClose();
 								if (localRecordingState === RECORDING_START ||
@@ -724,8 +734,27 @@ const TopBar = (props) =>
 								}
 								else
 								{
-									recordingActions.startLocalRecording(roomClient);
-									// roomClient.startLocalRecording();
+
+									try
+									{
+										const recordingMimeType =
+										store.getState().settings.recorderPreferredMimeType;
+										const additionalAudioTracks = [];
+										const micProducer = Object.values(producers).find((p) => p.source === 'mic');
+
+										if (micProducer) additionalAudioTracks.push(micProducer.track);
+										await recorder.start({
+											additionalAudioTracks,
+											recordingMimeType
+										});
+
+										meActions.setLocalRecordingState(RECORDING_START);
+									}
+									catch (err)
+									{
+										logger.error('Error during starting the recording! error:%O', err.message);
+									}
+
 								}
 							}
 							}
@@ -988,7 +1017,8 @@ const TopBar = (props) =>
 						else
 						{
 							// roomClient.startLocalRecording();
-							recordingActions.startLocalRecording(roomClient);
+
+							// recordingActions.startLocalRecording(roomClient);
 
 						}
 					}
@@ -1272,7 +1302,10 @@ TopBar.propTypes =
 	locale               : PropTypes.string,
 	localesList          : PropTypes.array,
 	localRecordingState  : PropTypes.string,
-	recordingInProgress  : PropTypes.bool
+	recordingInProgress  : PropTypes.bool,
+	recordingMimeType    : PropTypes.string,
+	producers            : PropTypes.object
+
 };
 
 const makeMapStateToProps = () =>
@@ -1306,7 +1339,9 @@ const makeMapStateToProps = () =>
 			canLock              : hasLockPermission(state),
 			canPromote           : hasPromotionPermission(state),
 			locale               : state.intl.locale,
-			localesList          : state.intl.list
+			localesList          : state.intl.list,
+			recordingMimeType    : state.settings.recordingMimeType,
+			producers            : state.producers
 		});
 
 	return mapStateToProps;
@@ -1384,7 +1419,8 @@ export default withRoomContext(connect(
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.intl.locale === next.intl.locale &&
-				prev.intl.localesList === next.intl.localesList
+				prev.intl.localesList === next.intl.localesList &&
+				prev.producers === next.producers
 			);
 		}
 	}
