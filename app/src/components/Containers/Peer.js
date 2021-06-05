@@ -19,6 +19,9 @@ import NewWindowIcon from '@material-ui/icons/OpenInNew';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import Volume from './Volume';
 
 const styles = (theme) =>
@@ -236,6 +239,20 @@ const Peer = (props) =>
 		roomClient, width, height
 	]);
 
+	// menu
+	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
+	const [ showAudioAnalyzer, setShowAudioAnalyzer ] = React.useState(null);
+
+	const handleMenuOpen = (event) =>
+	{
+		setMenuAnchorElement(event.currentTarget);
+	};
+
+	const handleMenuClose = (event) =>
+	{
+		setMenuAnchorElement(null);
+	};
+
 	return (
 		<React.Fragment>
 			<div
@@ -308,6 +325,7 @@ const Peer = (props) =>
 							}, 2000);
 						}}
 					>
+
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'device.muteAudio',
@@ -365,6 +383,7 @@ const Peer = (props) =>
 						</Tooltip>
 
 						{ browser.platform !== 'mobile' &&
+							videoVisible && windowConsumer !== webcamConsumer.id &&
 							<Tooltip
 								title={intl.formatMessage({
 									id             : 'label.newWindow',
@@ -379,10 +398,6 @@ const Peer = (props) =>
 											defaultMessage : 'New window'
 										})}
 										className={classes.smallContainer}
-										disabled={
-											!videoVisible ||
-											(windowConsumer === webcamConsumer.id)
-										}
 										size='small'
 										color='primary'
 										onClick={() =>
@@ -399,10 +414,6 @@ const Peer = (props) =>
 											defaultMessage : 'New window'
 										})}
 										className={classes.fab}
-										disabled={
-											!videoVisible ||
-											(windowConsumer === webcamConsumer.id)
-										}
 										size='large'
 										onClick={() =>
 										{
@@ -415,48 +426,49 @@ const Peer = (props) =>
 							</Tooltip>
 						}
 
-						<Tooltip
-							title={intl.formatMessage({
-								id             : 'label.fullscreen',
-								defaultMessage : 'Fullscreen'
-							})}
-							placement={smallScreen || smallContainer ? 'top' : 'left'}
-						>
-							{ smallContainer ?
-								<IconButton
-									aria-label={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
-									})}
-									className={classes.smallContainer}
-									disabled={!videoVisible}
-									size='small'
-									color='primary'
-									onClick={() =>
-									{
-										toggleConsumerFullscreen(webcamConsumer);
-									}}
-								>
-									<FullScreenIcon />
-								</IconButton>
-								:
-								<Fab
-									aria-label={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
-									})}
-									className={classes.fab}
-									disabled={!videoVisible}
-									size='large'
-									onClick={() =>
-									{
-										toggleConsumerFullscreen(webcamConsumer);
-									}}
-								>
-									<FullScreenIcon />
-								</Fab>
-							}
-						</Tooltip>
+						{ videoVisible &&
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'label.fullscreen',
+									defaultMessage : 'Fullscreen'
+								})}
+								placement={smallScreen || smallContainer ? 'top' : 'left'}
+							>
+								{ smallContainer ?
+									<IconButton
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										className={classes.smallContainer}
+										size='small'
+										color='primary'
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(webcamConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</IconButton>
+									:
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										className={classes.fab}
+										disabled={!videoVisible}
+										size='large'
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(webcamConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</Fab>
+								}
+							</Tooltip>
+						}
 
 						{ mode === 'filmstrip' &&
 							<Tooltip
@@ -536,6 +548,57 @@ const Peer = (props) =>
 								}
 							</Tooltip>
 						}
+
+						<Tooltip
+							title={intl.formatMessage({
+								id             : 'device.options',
+								defaultMessage : 'Options'
+							})}
+							placement={smallScreen || smallContainer ? 'top' : 'left'}
+						>
+							{ smallContainer ?
+								<IconButton
+									aria-label={intl.formatMessage({
+										id             : 'device.options',
+										defaultMessage : 'Options'
+									})}
+									className={classes.smallContainer}
+									size='small'
+									onClick={handleMenuOpen}
+								>
+									<MoreHorizIcon />
+								</IconButton>
+								:
+								<Fab
+									aria-label={intl.formatMessage({
+										id             : 'device.options',
+										defaultMessage : 'Options'
+									})}
+									className={classes.fab}
+									size='large'
+									onClick={handleMenuOpen}
+								>
+									<MoreHorizIcon />
+								</Fab>
+							}
+						</Tooltip>
+						<Menu
+							anchorEl={menuAnchorElement}
+							keepMounted
+							open={Boolean(menuAnchorElement)}
+							onClose={handleMenuClose}
+						>
+							<MenuItem
+								onClick={() =>
+								{
+									setShowAudioAnalyzer(!showAudioAnalyzer);
+									handleMenuClose();
+								}}
+							>
+								{ showAudioAnalyzer ? 'Disable' : 'Enable' } audio analyzer
+							</MenuItem>
+						</Menu>
+
 					</div>
 
 					<VideoView
@@ -568,6 +631,8 @@ const Peer = (props) =>
 						videoScore={webcamConsumer ? webcamConsumer.score : null}
 						width={width}
 						height={height}
+						opusConfig={micConsumer && micConsumer.opusConfig}
+						showAudioAnalyzer={showAudioAnalyzer}
 					>
 						<Volume id={peer.id} />
 					</VideoView>

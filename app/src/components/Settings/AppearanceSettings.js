@@ -14,6 +14,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 import { withRoomContext } from '../../RoomContext';
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -70,14 +71,6 @@ const AppearanceSettings = (props) =>
 			id             : 'label.filmstrip',
 			defaultMessage : 'Filmstrip view'
 		})
-	} ];
-
-	const aspectRatios = window.config.aspectRatios || [ {
-		value : 1.333,
-		label : '4 : 3'
-	}, {
-		value : 1.777,
-		label : '16 : 9'
 	} ];
 
 	return (
@@ -166,7 +159,7 @@ const AppearanceSettings = (props) =>
 					autoWidth
 					className={classes.selectEmpty}
 				>
-					{ aspectRatios.map((aspectRatio, index) =>
+					{ config.aspectRatios.map((aspectRatio, index) =>
 					{
 						return (
 							<MenuItem key={index} value={aspectRatio.value}>
@@ -278,9 +271,9 @@ AppearanceSettings.propTypes =
 	handleChangeMode                : PropTypes.func.isRequired,
 	handleChangeAspectRatio         : PropTypes.func.isRequired,
 	classes                         : PropTypes.object.isRequired,
-	intl                            : PropTypes.object.isRequired,
-	locale                          : PropTypes.object.isRequired,
-	localesList                     : PropTypes.object.isRequired
+	intl                            : PropTypes.object,
+	locale                          : PropTypes.string.isRequired,
+	localesList                     : PropTypes.array.isRequired
 };
 
 const mapStateToProps = (state) =>

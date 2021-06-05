@@ -1,21 +1,23 @@
+import { config } from '../config';
+
 const initialState =
 {
 	displayName             : '',
 	selectedWebcam          : null,
 	selectedAudioDevice     : null,
 	advancedMode            : false,
-	autoGainControl         : true,
-	echoCancellation        : true,
-	noiseSuppression        : true,
-	voiceActivatedUnmute    : false,
-	noiseThreshold          : -50,
+	autoGainControl         : config.autoGainControl,
+	echoCancellation        : config.echoCancellation,
+	noiseSuppression        : config.noiseSuppression,
+	voiceActivatedUnmute    : config.voiceActivatedUnmute,
+	noiseThreshold          : config.noiseThreshold,
 	audioMuted              : false,
 	videoMuted              : false,
 	// low, medium, high, veryhigh, ultra
-	resolution              : window.config.defaultResolution || 'medium',
-	frameRate               : window.config.defaultFrameRate || 15,
-	screenSharingResolution : window.config.defaultScreenResolution || 'veryhigh',
-	screenSharingFrameRate  : window.config.defaultScreenSharingFrameRate || 5,
+	resolution              : config.resolution,
+	frameRate               : config.frameRate,
+	screenSharingResolution : config.screenResolution,
+	screenSharingFrameRate  : config.screenSharingFrameRate,
 	lastN                   : 4,
 	permanentTopBar         : true,
 	hiddenControls          : false,
@@ -23,12 +25,22 @@ const initialState =
 	notificationSounds      : true,
 	mirrorOwnVideo          : true,
 	hideNoVideoParticipants : false,
-	buttonControlBar        : window.config.buttonControlBar || false,
-	drawerOverlayed         : (typeof window.config.drawerOverlayed === 'undefined') ? true : window.config.drawerOverlayed,
-	aspectRatio             : window.config.viewAspectRatio || 1.777, // 16 : 9
+	buttonControlBar        : config.buttonControlBar,
+	drawerOverlayed         : config.drawerOverlayed,
+	aspectRatio             : config.aspectRatio,
 	mediaPerms              : { audio: true, video: true },
 	localPicture            : null,
-	...window.config.defaultAudio
+	audioPreset             : config.audioPreset,
+	audioPresets            : config.audioPresets,
+	sampleRate              : config.sampleRate,
+	channelCount            : config.channelCount,
+	sampleSize              : config.sampleSize,
+	opusStereo              : config.opusStereo,
+	opusDtx                 : config.opusDtx,
+	opusFec                 : config.opusFec,
+	opusPtime               : config.opusPtime,
+	opusMaxPlaybackRate     : config.opusMaxPlaybackRate,
+	enableOpusDetails       : false
 };
 
 const settings = (state = initialState, action) =>
@@ -68,14 +80,14 @@ const settings = (state = initialState, action) =>
 		{
 			const { sampleRate } = action.payload;
 
-			return { ...state, sampleRate };
+			return { ...state, sampleRate, opusMaxPlaybackRate: sampleRate };
 		}
 
 		case 'SET_CHANNEL_COUNT':
 		{
 			const { channelCount } = action.payload;
 
-			return { ...state, channelCount };
+			return { ...state, channelCount, opusStereo: channelCount > 1 };
 		}
 
 		case 'SET_VOLUME':
@@ -90,6 +102,13 @@ const settings = (state = initialState, action) =>
 			const { autoGainControl } = action.payload;
 
 			return { ...state, autoGainControl };
+		}
+
+		case 'SET_AUDIO_PRESET':
+		{
+			const { audioPreset } = action.payload;
+
+			return { ...state, audioPreset };
 		}
 
 		case 'SET_ECHO_CANCELLATION':
@@ -118,6 +137,48 @@ const settings = (state = initialState, action) =>
 			const { noiseThreshold } = action.payload;
 
 			return { ...state, noiseThreshold };
+		}
+
+		case 'SET_OPUS_STEREO':
+		{
+			const { opusStereo } = action.payload;
+
+			return { ...state, opusStereo };
+		}
+
+		case 'SET_OPUS_DTX':
+		{
+			const { opusDtx } = action.payload;
+
+			return { ...state, opusDtx };
+		}
+
+		case 'SET_OPUS_FEC':
+		{
+			const { opusFec } = action.payload;
+
+			return { ...state, opusFec };
+		}
+
+		case 'SET_OPUS_PTIME':
+		{
+			const { opusPtime } = action.payload;
+
+			return { ...state, opusPtime };
+		}
+
+		case 'SET_OPUS_MAX_PLAYBACK_RATE':
+		{
+			const { opusMaxPlaybackRate } = action.payload;
+
+			return { ...state, opusMaxPlaybackRate };
+		}
+
+		case 'SET_ENABLE_OPUS_DETAILS':
+		{
+			const { enableOpusDetails } = action.payload;
+
+			return { ...state, enableOpusDetails };
 		}
 
 		case 'SET_DEFAULT_AUDIO':
@@ -258,6 +319,11 @@ const settings = (state = initialState, action) =>
 			const { localPicture } = action.payload;
 
 			return { ...state, localPicture };
+		}
+
+		case 'SETTINGS_UPDATE':
+		{
+			return { ...state, ...action.payload };
 		}
 
 		default:

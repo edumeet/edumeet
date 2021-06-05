@@ -29,7 +29,7 @@ const permissions = require('../permissions'), {
 	MODERATE_ROOM
 } = permissions;
 
-const config = require('../config/config');
+const { config } = require('./config');
 
 const logger = new Logger('Room');
 
@@ -263,7 +263,7 @@ class Room extends EventEmitter
 		this._queue = new AwaitQueue();
 
 		// Locked flag.
-		this._locked = config.roomsUnlocked && Array.isArray(config.roomsUnlocked)
+		this._locked = config.roomsUnlocked.length
 			&& !config.roomsUnlocked.includes(roomId);
 
 		// if true: accessCode is a possibility to open the room
@@ -395,7 +395,7 @@ class Room extends EventEmitter
 		else if (this._hasAccess(peer, BYPASS_ROOM_LOCK))
 			this._peerJoining(peer);
 		else if (
-			'maxUsersPerRoom' in config &&
+			config.maxUsersPerRoom &&
 			(
 				Object.keys(this._peers).length +
 				this._lobby.peerList().length
@@ -674,7 +674,7 @@ class Room extends EventEmitter
 
 				let turnServers;
 
-				if ('turnAPIURI' in config)
+				if (config.turnAPIURI)
 				{
 					try
 					{
@@ -697,13 +697,13 @@ class Room extends EventEmitter
 					}
 					catch (error)
 					{
-						if ('backupTurnServers' in config)
+						if (config.backupTurnServers)
 							turnServers = config.backupTurnServers;
 
 						logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
 					}
 				}
-				else if ('backupTurnServers' in config)
+				else if (config.backupTurnServers)
 				{
 					turnServers = config.backupTurnServers;
 				}
@@ -1507,7 +1507,12 @@ class Room extends EventEmitter
 				if (!this._hasPermission(peer, MODERATE_CHAT))
 					throw new Error('peer not authorized');
 
+				if (!this._hasPermission(peer, MODERATE_FILES))
+					throw new Error('peer not authorized');
+
 				this._chatHistory = [];
+
+				this._fileHistory = [];
 
 				// Spread to others
 				this._notification(peer.socket, 'moderator:clearChat', null, true);
@@ -1625,31 +1630,17 @@ class Room extends EventEmitter
 				if (!this._hasPermission(peer, SHARE_FILE))
 					throw new Error('peer not authorized');
 
-				const { magnetUri } = request.data;
+				// const { magnetUri, time } = request.data;
+				const file = request.data;
 
-				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
-
-				// Spread to others
-				this._notification(peer.socket, 'sendFile', {
-					peerId    : peer.id,
-					magnetUri : magnetUri
-				}, true);
-
-				// Return no error
-				cb();
-
-				break;
-			}
-
-			case 'moderator:clearFileSharing':
-			{
-				if (!this._hasPermission(peer, MODERATE_FILES))
-					throw new Error('peer not authorized');
-
-				this._fileHistory = [];
+				this._fileHistory.push({ ...file });
 
 				// Spread to others
-				this._notification(peer.socket, 'moderator:clearFileSharing', null, true);
+				this._notification(
+					peer.socket,
+					'sendFile', { ...file },
+					true
+				);
 
 				// Return no error
 				cb();

@@ -31,8 +31,9 @@ import Help from './Controls/Help';
 import About from './Controls/About';
 import RolesManager from './Controls/RolesManager';
 import LeaveDialog from './LeaveDialog';
+import { config } from '../config';
 
-const TIMEOUT = window.config.hideTimeout || 5000;
+const TIMEOUT = config.hideTimeout || 5000;
 
 const styles = (theme) =>
 	({
@@ -42,7 +43,7 @@ const styles = (theme) =>
 			width                : '100%',
 			height               : '100%',
 			backgroundColor      : 'var(--background-color)',
-			backgroundImage      : `url(${window.config ? window.config.background : null})`,
+			backgroundImage      : `url(${config.background})`,
 			backgroundAttachment : 'fixed',
 			backgroundPosition   : 'center',
 			backgroundSize       : 'cover',
@@ -54,19 +55,19 @@ const styles = (theme) =>
 			flexShrink                     : 0,
 			[theme.breakpoints.down('lg')] :
 			{
-				width : '40vw'
+				width : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width : '50vw'
+				width : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width : '70vw'
+				width : '60vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width : '90vw'
+				width : '80vw'
 			}
 		},
 		drawerPaper :
@@ -74,19 +75,19 @@ const styles = (theme) =>
 			width                          : '30vw',
 			[theme.breakpoints.down('lg')] :
 			{
-				width : '40vw'
+				width : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width : '50vw'
+				width : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width : '70vw'
+				width : '60vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width : '90vw'
+				width : '80vw'
 			}
 		}
 	});

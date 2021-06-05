@@ -38,6 +38,7 @@ import randomString from 'random-string';
 import { useHistory, useLocation } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
+import { config } from '../config';
 
 const styles = (theme) =>
 	({
@@ -47,7 +48,7 @@ const styles = (theme) =>
 			width                : '100%',
 			height               : '100%',
 			backgroundColor      : 'var(--background-color)',
-			backgroundImage      : `url(${window.config ? window.config.background : null})`,
+			backgroundImage      : `url(${config.background})`,
 			backgroundAttachment : 'fixed',
 			backgroundPosition   : 'center',
 			backgroundSize       : 'cover',
@@ -205,13 +206,13 @@ const JoinDialog = ({
 		(location.pathname === '/') && history.push(encodeURIComponent(roomId));
 	});
 
-	const _askForPerms = () =>
+	/* const _askForPerms = () =>
 	{
 		if (mediaPerms.video || mediaPerms.audio)
 		{
 			navigator.mediaDevices.getUserMedia(mediaPerms);
 		}
-	};
+	}; */
 
 	const handleSetMediaPerms = (event, newMediaPerms) =>
 	{
@@ -294,6 +295,7 @@ const JoinDialog = ({
 		}
 	};
 
+	// TODO: prefix with the Edumeet server HTTP endpoint
 	fetch('/auth/check_login_status', {
 		credentials    : 'include',
 		method         : 'GET',
@@ -331,9 +333,9 @@ const JoinDialog = ({
 						alignItems='center'
 					>
 						<Grid item>
-							{ window.config.logo !=='' ?
-								<img alt='Logo' src={window.config.logo} /> :
-								<Typography variant='h5'> {window.config.title} </Typography>
+							{ config.logo ?
+								<img alt='Logo' src={config.logo} /> :
+								<Typography variant='h5'> {config.title} </Typography>
 							}
 						</Grid>
 
@@ -357,7 +359,7 @@ const JoinDialog = ({
 															className={classes.actionButton}
 															aria-label={locale.split(/[-_]/)[0]}
 															color='secondary'
-															disableRipple='true'
+															disableRipple
 															style={{ backgroundColor: 'transparent' }}
 															{...bindTrigger(popupState)}
 														>
@@ -384,7 +386,7 @@ const JoinDialog = ({
 											</PopupState>
 										</Grid>
 
-										{ window.config.loginEnabled &&
+										{ config.loginEnabled &&
 										<Grid item>
 											<div className={classes.loginLabel}>&nbsp;</div>
 										</Grid>
@@ -396,7 +398,7 @@ const JoinDialog = ({
 								{/* /LOCALE SELECTOR */}
 
 								{/* LOGIN BUTTON */}
-								{ window.config.loginEnabled &&
+								{ config.loginEnabled &&
 								<Grid item>
 									<Grid container direction='column' alignItems='center'>
 										<Grid item>
@@ -773,10 +775,10 @@ JoinDialog.propTypes =
 	setMediaPerms  	      : PropTypes.func.isRequired,
 	classes               : PropTypes.object.isRequired,
 	mediaPerms            : PropTypes.object.isRequired,
-	setAudioMuted         : PropTypes.bool.isRequired,
-	setVideoMuted         : PropTypes.bool.isRequired,
-	locale                : PropTypes.object.isRequired,
-	localesList           : PropTypes.object.isRequired
+	setAudioMuted         : PropTypes.func.isRequired,
+	setVideoMuted         : PropTypes.func.isRequired,
+	locale                : PropTypes.string.isRequired,
+	localesList           : PropTypes.array.isRequired
 
 };
 

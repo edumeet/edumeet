@@ -41,6 +41,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -50,22 +51,22 @@ const styles = (theme) =>
 			marginLeft                     : '30vw',
 			[theme.breakpoints.down('lg')] :
 			{
-				width      : 'calc(100% - 40vw)',
+				width      : 'calc(100% - 30vw)',
 				marginLeft : '40vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width      : 'calc(100% - 50vw)',
+				width      : 'calc(100% - 40vw)',
 				marginLeft : '50vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width      : 'calc(100% - 70vw)',
+				width      : 'calc(100% - 60vw)',
 				marginLeft : '70vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width      : 'calc(100% - 90vw)',
+				width      : 'calc(100% - 80vw)',
 				marginLeft : '90vw'
 			}
 		},
@@ -303,16 +304,16 @@ const TopBar = (props) =>
 							<MenuIcon />
 						</IconButton>
 					</PulsingBadge>
-					{ window.config.logo !=='' ?
+					{ config.logo !=='' ?
 						<img alt='Logo'
-							src={window.config.logo}
+							src={config.logo}
 							className={classes.logo}
 						/> :
 						<Typography
 							variant='h6'
 							noWrap color='inherit'
 						>
-							{window.config.title}
+							{config.title}
 						</Typography>
 					}
 					<div className={classes.grow} />
@@ -515,7 +516,7 @@ const TopBar = (props) =>
 						aria-label={locale.split(/[-_]/)[0]}
 						className={classes.actionButton}
 						color='secondary'
-						disableRipple='true'
+						disableRipple
 						onClick={(event) => handleMenuOpen(event, 'localeMenu')}
 					>
 						{locale.split(/[-_]/)[0]}
@@ -946,9 +947,9 @@ TopBar.propTypes =
 	canPromote           : PropTypes.bool.isRequired,
 	classes              : PropTypes.object.isRequired,
 	theme                : PropTypes.object.isRequired,
-	intl                 : PropTypes.object.isRequired,
-	locale               : PropTypes.object.isRequired,
-	localesList          : PropTypes.object.isRequired
+	intl                 : PropTypes.object,
+	locale               : PropTypes.string.isRequired,
+	localesList          : PropTypes.array.isRequired
 };
 
 const makeMapStateToProps = () =>

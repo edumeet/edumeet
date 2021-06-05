@@ -20,7 +20,8 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-// import { parseScalabilityMode } from 'mediasoup-client';
+import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
+import { config } from './config';
 
 let createTorrent;
 
@@ -33,21 +34,6 @@ let mediasoupClient;
 let io;
 
 let ScreenShare;
-
-let requestTimeout,
-	lastN,
-	mobileLastN;
-	// videoAspectRatio;
-
-if (process.env.NODE_ENV !== 'test')
-{
-	({
-		requestTimeout = 20000,
-		lastN = 4,
-		mobileLastN = 1
-		// videoAspectRatio = 1.777 // 16 : 9
-	} = window.config);
-}
 
 const logger = new Logger('RoomClient');
 
@@ -204,6 +190,8 @@ let store;
 
 let intl;
 
+const insertableStreamsSupported = Boolean(RTCRtpSender.prototype.createEncodedStreams);
+
 export default class RoomClient
 {
 	/**
@@ -264,14 +252,10 @@ export default class RoomClient
 		// Whether simulcast should be used.
 		this._useSimulcast = false;
 
-		if ('simulcast' in window.config)
-			this._useSimulcast = window.config.simulcast;
+		this._useSimulcast = config.simulcast;
 
 		// Whether simulcast should be used for sharing
-		this._useSharingSimulcast = false;
-
-		if ('simulcastSharing' in window.config)
-			this._useSharingSimulcast = window.config.simulcastSharing;
+		this._useSharingSimulcast = config.simulcastSharing;
 
 		this._muted = muted;
 
@@ -286,9 +270,9 @@ export default class RoomClient
 
 		// Alert sounds
 		this._soundAlerts = { 'default': { audio: new Audio('/sounds/notify.mp3') } };
-		if ('notificationSounds' in window.config)
+		if (config.notificationSounds)
 		{
-			for (const [ k, v ] of Object.entries(window.config.notificationSounds))
+			for (const [ k, v ] of Object.entries(config.notificationSounds))
 			{
 				if (v != null && v.play !== undefined)
 					this._soundAlerts[k] = {
@@ -316,9 +300,9 @@ export default class RoomClient
 
 		// Max spotlights
 		if (device.platform === 'desktop')
-			this._maxSpotlights = lastN;
+			this._maxSpotlights = config.lastN;
 		else
-			this._maxSpotlights = mobileLastN;
+			this._maxSpotlights = config.mobileLastN;
 
 		store.dispatch(
 			settingsActions.setLastN(this._maxSpotlights));
@@ -430,7 +414,7 @@ export default class RoomClient
 
 			const source = event.target;
 
-			const exclude = [ 'input', 'textarea' ];
+			const exclude = [ 'input', 'textarea', 'div' ];
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
@@ -585,7 +569,7 @@ export default class RoomClient
 
 			const source = event.target;
 
-			const exclude = [ 'input', 'textarea' ];
+			const exclude = [ 'input', 'textarea', 'div' ];
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
@@ -771,7 +755,7 @@ export default class RoomClient
 				called = true;
 				callback(new SocketTimeoutError('Request timed out'));
 			},
-			requestTimeout
+			config.requestTimeout
 		);
 
 		return (...args) =>
@@ -844,11 +828,7 @@ export default class RoomClient
 	{
 		logger.debug('sendRequest() [method:"%s", data:"%o"]', method, data);
 
-		const {
-			requestRetries = 3
-		} = window.config;
-
-		for (let tries = 0; tries < requestRetries; tries++)
+		for (let tries = 0; tries < config.requestRetries; tries++)
 		{
 			try
 			{
@@ -858,7 +838,7 @@ export default class RoomClient
 			{
 				if (
 					error instanceof SocketTimeoutError &&
-					tries < requestRetries
+					tries < config.requestRetries
 				)
 					logger.warn('sendRequest() | timeout, retrying [attempt:"%s"]', tries);
 				else
@@ -934,9 +914,22 @@ export default class RoomClient
 		try
 		{
 			store.dispatch(
-				chatActions.addUserMessage(chatMessage.text));
+				chatActions.addMessage(
+					{
+						...chatMessage,
+						// name    : 'Me',
+						sender  : 'client',
+						picture : undefined,
+						isRead  : true
+					}
+				)
+			);
+
+			store.dispatch(
+				chatActions.setIsScrollEnd(true));
 
 			await this.sendRequest('chatMessage', { chatMessage });
+
 		}
 		catch (error)
 		{
@@ -975,6 +968,56 @@ export default class RoomClient
 		});
 	}
 
+	async saveChat()
+	{
+		const html = window.document.getElementsByTagName('html')[0].cloneNode(true);
+
+		const chatEl = html.querySelector('#chatList');
+
+		html.querySelector('body').replaceChildren(chatEl);
+
+		const fileName= 'chat.html';
+
+		// remove unused tags
+		[ 'script', 'link' ].forEach((element) =>
+		{
+			const el = html.getElementsByTagName(element);
+
+			let i = el.length;
+
+			while (i--) el[i].parentNode.removeChild(el[i]);
+		});
+
+		// embed images
+		for await (const img of html.querySelectorAll('img'))
+		{
+			img.src = `${img.src}`;
+
+			await fetch(img.src)
+
+				.then((response) => response.blob())
+				.then((data) =>
+				{
+					const reader = new FileReader();
+
+					reader.readAsDataURL(data);
+
+					reader.onloadend = () => { img.src = reader.result; };
+				});
+		}
+
+		const blob = new Blob([ html.innerHTML ], { type: 'text/html;charset=utf-8' });
+
+		saveAs(blob, fileName);
+	}
+
+	sortChat(order)
+	{
+		store.dispatch(
+			chatActions.sortChat(order)
+		);
+	}
+
 	handleDownload(magnetUri)
 	{
 		store.dispatch(
@@ -1008,20 +1051,20 @@ export default class RoomClient
 			return;
 		}
 
-		let lastMove = 0;
+		// let lastMove = 0;
 
 		torrent.on('download', () =>
 		{
-			if (Date.now() - lastMove > 1000)
-			{
-				store.dispatch(
-					fileActions.setFileProgress(
-						torrent.magnetURI,
-						torrent.progress
-					));
+			// if (Date.now() - lastMove > 1000)
+			// {
+			store.dispatch(
+				fileActions.setFileProgress(
+					torrent.magnetURI,
+					torrent.progress
+				));
 
-				lastMove = Date.now();
-			}
+			// lastMove = Date.now();
+			// }
 		});
 
 		torrent.on('done', () =>
@@ -1034,7 +1077,7 @@ export default class RoomClient
 		});
 	}
 
-	async shareFiles(files)
+	async shareFiles(data)
 	{
 		store.dispatch(requestActions.notify(
 			{
@@ -1044,7 +1087,7 @@ export default class RoomClient
 				})
 			}));
 
-		createTorrent(files, (err, torrent) =>
+		createTorrent(data.attachment, (err, torrent) =>
 		{
 			if (err)
 			{
@@ -1072,18 +1115,21 @@ export default class RoomClient
 						})
 					}));
 
-				store.dispatch(fileActions.addFile(
-					this._peerId,
-					existingTorrent.magnetURI
-				));
+				const file = {
+					...data,
+					peerId    : this._peerId,
+					magnetUri : existingTorrent.magnetURI
+				};
 
-				this._sendFile(existingTorrent.magnetURI);
+				store.dispatch(fileActions.addFile(file));
+
+				this._sendFile(file);
 
 				return;
 			}
 
 			this._webTorrent.seed(
-				files,
+				data.attachment,
 				{ announceList: [ [ this._tracker ] ] },
 				(newTorrent) =>
 				{
@@ -1095,24 +1141,26 @@ export default class RoomClient
 							})
 						}));
 
-					store.dispatch(fileActions.addFile(
-						this._peerId,
-						newTorrent.magnetURI
-					));
+					const file = {
+						...data,
+						peerId    : this._peerId,
+						magnetUri : newTorrent.magnetURI
+					};
 
-					this._sendFile(newTorrent.magnetURI);
+					store.dispatch(fileActions.addFile(file));
+
+					this._sendFile(file);
 				});
 		});
 	}
 
-	// { file, name, picture }
-	async _sendFile(magnetUri)
+	async _sendFile(file)
 	{
-		logger.debug('sendFile() [magnetUri:"%o"]', magnetUri);
+		logger.debug('sendFile() [magnetUri:"%o"]', file.magnetUri);
 
 		try
 		{
-			await this.sendRequest('sendFile', { magnetUri });
+			await this.sendRequest('sendFile', file);
 		}
 		catch (error)
 		{
@@ -1275,7 +1323,7 @@ export default class RoomClient
 		this._hark = hark(this._harkStream,
 			{
 				play      : false,
-				interval  : 10,
+				interval  : 100,
 				threshold : store.getState().settings.noiseThreshold,
 				history   : 100
 			});
@@ -1284,6 +1332,8 @@ export default class RoomClient
 
 		this._hark.on('volume_change', (volume) =>
 		{
+			volume = Math.round(volume);
+
 			// Update only if there is a bigger diff 
 			if (this._micProducer && Math.abs(volume - this._hark.lastVolume) > 0.5)
 			{
@@ -1293,13 +1343,13 @@ export default class RoomClient
 				// at low levels
 				if (volume < this._hark.lastVolume)
 				{
-					volume =
+					volume = Math.round(
 						this._hark.lastVolume -
 						Math.pow(
 							(volume - this._hark.lastVolume) /
 							(100 + this._hark.lastVolume)
 							, 2
-						) * 10;
+						) * 10);
 				}
 
 				this._hark.lastVolume = volume;
@@ -1372,7 +1422,7 @@ export default class RoomClient
 	// https://bugs.chromium.org/p/chromium/issues/detail?id=796964
 	async updateMic({
 		start = false,
-		restart = false || this._device.flag !== 'firefox',
+		restart = true,
 		newDeviceId = null
 	} = {})
 	{
@@ -1407,27 +1457,16 @@ export default class RoomClient
 			const {
 				autoGainControl,
 				echoCancellation,
-				noiseSuppression
+				noiseSuppression,
+				sampleRate,
+				channelCount,
+				sampleSize,
+				opusStereo,
+				opusDtx,
+				opusFec,
+				opusPtime,
+				opusMaxPlaybackRate
 			} = store.getState().settings;
-
-			if (!window.config.centralAudioOptions)
-			{
-				throw new Error(
-					'Missing centralAudioOptions from app config! (See it in example config.)'
-				);
-			}
-
-			const {
-				sampleRate = 48000,
-				channelCount = 1,
-				volume = 1.0,
-				sampleSize = 16,
-				opusStereo = false,
-				opusDtx = true,
-				opusFec = true,
-				opusPtime = 20,
-				opusMaxPlaybackRate = 48000
-			} = window.config.centralAudioOptions;
 
 			if (
 				(restart && this._micProducer) ||
@@ -1450,7 +1489,6 @@ export default class RoomClient
 							deviceId : { ideal: deviceId },
 							sampleRate,
 							channelCount,
-							volume,
 							autoGainControl,
 							echoCancellation,
 							noiseSuppression,
@@ -1466,8 +1504,8 @@ export default class RoomClient
 				store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
 
 				const networkPriority =
-					window.config.networkPriorities?.audio ?
-						window.config.networkPriorities?.audio :
+					config.networkPriorities?.audio ?
+						config.networkPriorities?.audio :
 						DEFAULT_NETWORK_PRIORITIES.audio;
 
 				this._micProducer = await this._sendTransport.produce(
@@ -1532,7 +1570,6 @@ export default class RoomClient
 					{
 						sampleRate,
 						channelCount,
-						volume,
 						autoGainControl,
 						echoCancellation,
 						noiseSuppression,
@@ -1548,7 +1585,6 @@ export default class RoomClient
 						{
 							sampleRate,
 							channelCount,
-							volume,
 							autoGainControl,
 							echoCancellation,
 							noiseSuppression,
@@ -1665,8 +1701,8 @@ export default class RoomClient
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
 				const networkPriority =
-					window.config.networkPriorities?.mainVideo ?
-						window.config.networkPriorities?.mainVideo :
+					config.networkPriorities?.mainVideo ?
+						config.networkPriorities?.mainVideo :
 						DEFAULT_NETWORK_PRIORITIES.mainVideo;
 
 				if (this._useSimulcast)
@@ -1886,6 +1922,8 @@ export default class RoomClient
 			await this.sendRequest('moderator:clearChat');
 
 			store.dispatch(chatActions.clearChat());
+
+			store.dispatch(fileActions.clearFiles());
 		}
 		catch (error)
 		{
@@ -1896,6 +1934,7 @@ export default class RoomClient
 			roomActions.setClearChatInProgress(false));
 	}
 
+	/*
 	async clearFileSharing()
 	{
 		logger.debug('clearFileSharing()');
@@ -1917,6 +1956,7 @@ export default class RoomClient
 		store.dispatch(
 			roomActions.setClearFileSharingInProgress(false));
 	}
+	*/
 
 	async givePeerRole(peerId, roleId)
 	{
@@ -2430,7 +2470,7 @@ export default class RoomClient
 			resolutionScalings
 		} = consumer;
 		const adaptiveScalingFactor = Math.min(Math.max(
-			window.config.adaptiveScalingFactor || 0.75, 0.5), 1.0);
+			config.adaptiveScalingFactor || 0.75, 0.5), 1.0);
 
 		logger.debug(
 			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" resolutionScalings:[%s] viewportWidth:"%d", viewportHeight:"%d"]',
@@ -3087,7 +3127,7 @@ export default class RoomClient
 						const { peerId, chatMessage } = notification.data;
 
 						store.dispatch(
-							chatActions.addResponseMessage({ ...chatMessage, peerId }));
+							chatActions.addMessage({ ...chatMessage, peerId, isRead: false }));
 
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
@@ -3107,6 +3147,8 @@ export default class RoomClient
 					{
 						store.dispatch(chatActions.clearChat());
 
+						store.dispatch(fileActions.clearFiles());
+
 						store.dispatch(requestActions.notify(
 							{
 								text : intl.formatMessage({
@@ -3120,9 +3162,9 @@ export default class RoomClient
 
 					case 'sendFile':
 					{
-						const { peerId, magnetUri } = notification.data;
+						const file = notification.data;
 
-						store.dispatch(fileActions.addFile(peerId, magnetUri));
+						store.dispatch(fileActions.addFile({ ...file }));
 
 						store.dispatch(requestActions.notify(
 							{
@@ -3135,7 +3177,7 @@ export default class RoomClient
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
 							(store.getState().toolarea.toolAreaOpen &&
-							store.getState().toolarea.currentToolTab !== 'files')
+							store.getState().toolarea.currentToolTab !== 'chat')
 						) // Make sound
 						{
 							store.dispatch(
@@ -3146,6 +3188,7 @@ export default class RoomClient
 						break;
 					}
 
+					/*
 					case 'moderator:clearFileSharing':
 					{
 						store.dispatch(fileActions.clearFiles());
@@ -3160,6 +3203,7 @@ export default class RoomClient
 
 						break;
 					}
+					*/
 
 					case 'producerScore':
 					{
@@ -3238,6 +3282,16 @@ export default class RoomClient
 								appData : { ...appData, peerId } // Trick.
 							});
 
+						if (this._recvTransport.appData.encodedInsertableStreams)
+						{
+							const { enableOpusDetails } = store.getState().settings;
+
+							if (kind === 'audio' && enableOpusDetails)
+								opusReceiverTransform(consumer.rtpReceiver, consumer.id);
+							else
+								directReceiverTransform(consumer.rtpReceiver);
+						}
+
 						// Store in the map.
 						this._consumers.set(consumer.id, consumer);
 
@@ -3270,7 +3324,8 @@ export default class RoomClient
 							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
 							track                  : consumer.track,
 							score                  : score,
-							audioGain              : undefined
+							audioGain              : undefined,
+							opusConfig             : null
 						};
 
 						this._spotlights.addVideoConsumer(consumerStoreObject);
@@ -3290,7 +3345,7 @@ export default class RoomClient
 							if (!stream.getAudioTracks()[0])
 								throw new Error('request.newConsumer | given stream has no audio track');
 
-							consumer.hark = hark(stream, { play: false });
+							consumer.hark = hark(stream, { play: false, interval: 100 });
 
 							consumer.hark.on('volume_change', (volume) =>
 							{
@@ -3516,7 +3571,7 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
-		const { displayName } = store.getState().settings;
+		const { displayName, enableOpusDetails } = store.getState().settings;
 		const { picture } = store.getState().me;
 
 		try
@@ -3660,7 +3715,13 @@ export default class RoomClient
 					dtlsParameters,
 					iceServers         : this._turnServers,
 					// TODO: Fix for issue #72
-					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined
+					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined,
+					additionalSettings : {
+						encodedInsertableStreams : insertableStreamsSupported && enableOpusDetails
+					},
+					appData : {
+						encodedInsertableStreams : insertableStreamsSupported && enableOpusDetails
+					}
 				});
 
 			this._recvTransport.on(
@@ -3814,12 +3875,8 @@ export default class RoomClient
 					if (!this._muted)
 					{
 						await this.updateMic({ start: true });
-						let autoMuteThreshold = 4;
+						const autoMuteThreshold = config.autoMuteThreshold;
 
-						if ('autoMuteThreshold' in window.config)
-						{
-							autoMuteThreshold = window.config.autoMuteThreshold;
-						}
 						if (autoMuteThreshold >= 0 && peers.length >= autoMuteThreshold)
 						{
 							this.muteMic();
@@ -4064,8 +4121,8 @@ export default class RoomClient
 				let producer;
 
 				const networkPriority =
-					window.config.networkPriorities?.extraVideo ?
-						window.config.networkPriorities?.extraVideo :
+					config.networkPriorities?.extraVideo ?
+						config.networkPriorities?.extraVideo :
 						DEFAULT_NETWORK_PRIORITIES.extraVideo;
 
 				if (this._useSimulcast)
@@ -4257,27 +4314,16 @@ export default class RoomClient
 				echoCancellation,
 				noiseSuppression,
 				aspectRatio,
-				screenSharingFrameRate
+				screenSharingFrameRate,
+				sampleRate,
+				channelCount,
+				sampleSize,
+				opusStereo,
+				opusDtx,
+				opusFec,
+				opusPtime,
+				opusMaxPlaybackRate
 			} = store.getState().settings;
-
-			if (!window.config.centralAudioOptions)
-			{
-				throw new Error(
-					'Missing centralAudioOptions from app config! (See it in example config.)'
-				);
-			}
-
-			const {
-				sampleRate = 48000,
-				channelCount = 1,
-				volume = 1.0,
-				sampleSize = 16,
-				opusStereo = false,
-				opusDtx = true,
-				opusFec = true,
-				opusPtime = 20,
-				opusMaxPlaybackRate = 48000
-			} = window.config.centralAudioOptions;
 
 			if (start)
 			{
@@ -4287,14 +4333,13 @@ export default class RoomClient
 				{
 					stream = await this._screenSharing.start({
 						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate        : screenSharingFrameRate,
-						sampleRate       : sampleRate,
-						channelCount     : channelCount,
-						volume           : volume,
-						autoGainControl  : autoGainControl,
-						echoCancellation : echoCancellation,
-						noiseSuppression : noiseSuppression,
-						sampleSize       : sampleSize
+						frameRate : screenSharingFrameRate,
+						sampleRate,
+						channelCount,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
 					});
 
 				}
@@ -4314,8 +4359,8 @@ export default class RoomClient
 				logger.debug('screenSharing track settings:', track.getSettings());
 
 				const networkPriority =
-					window.config.networkPriorities?.screenShare ?
-						window.config.networkPriorities?.screenShare :
+					config.networkPriorities?.screenShare ?
+						config.networkPriorities?.screenShare :
 						DEFAULT_NETWORK_PRIORITIES.screenShare;
 
 				if (this._useSharingSimulcast)
@@ -4481,13 +4526,12 @@ export default class RoomClient
 
 					await track.applyConstraints(
 						{
-							sampleRate       : sampleRate,
-							channelCount     : channelCount,
-							volume           : volume,
-							autoGainControl  : autoGainControl,
-							echoCancellation : echoCancellation,
-							noiseSuppression : noiseSuppression,
-							sampleSize       : sampleSize
+							sampleRate,
+							channelCount,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
 						}
 					);
 				}
@@ -4623,7 +4667,7 @@ export default class RoomClient
 	{
 		logger.debug('_setNoiseThreshold() [threshold:"%s"]', threshold);
 
-		this._hark.setThreshold(threshold);
+		this._hark?.setThreshold(threshold);
 
 		store.dispatch(
 			settingsActions.setNoiseThreshold(threshold));
@@ -4882,10 +4926,8 @@ export default class RoomClient
 
 		if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
 			encodings = screenSharing ? VIDEO_SVC_ENCODINGS : VIDEO_KSVC_ENCODINGS;
-		else if ('simulcastProfiles' in window.config)
-			encodings = this._chooseEncodings(window.config.simulcastProfiles, size);
-		else if ('simulcastEncodings' in window.config)
-			encodings = window.config.simulcastEncodings;
+		else if (config.simulcastProfiles)
+			encodings = this._chooseEncodings(config.simulcastProfiles, size);
 		else
 			encodings = this._chooseEncodings(VIDEO_SIMULCAST_PROFILES, size);
 

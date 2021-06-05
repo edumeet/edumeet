@@ -262,7 +262,7 @@ class Filmstrip extends React.PureComponent
 	render()
 	{
 		const {
-			roomClient,
+			/* roomClient, */
 			peers,
 			myId,
 			advancedMode,

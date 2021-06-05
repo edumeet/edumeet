@@ -109,6 +109,8 @@
 	"label.leave": "Zakończ",
 	"label.chatInput": "Treść wiadomości...",
 	"label.chat": "Czat",
+	"label.chatNoMessages": "Brak wiadomości",
+	"label.chatNewMessages": "Nowe Wiadomości",
 	"label.filesharing": "Udostępnianie plików",
 	"label.participants": "Uczestnicy",
 	"label.shareFile": "Udostępnij plik",

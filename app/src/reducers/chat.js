@@ -1,38 +1,83 @@
-import
+const initialState =
 {
-	createNewMessage
-} from './helper';
+	order       : 'asc',
+	isScrollEnd : true,
+	messages    : [],
+	count       : 0,
+	countUnread : 0
+};
 
-const chat = (state = [], action) =>
+const chat = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
-		case 'ADD_NEW_USER_MESSAGE':
-		{
-			const { text } = action.payload;
-
-			const message = createNewMessage(text, 'client', 'Me', undefined);
-
-			return [ ...state, message ];
-		}
-
-		case 'ADD_NEW_RESPONSE_MESSAGE':
+		case 'ADD_MESSAGE':
 		{
 			const { message } = action.payload;
 
-			return [ ...state, message ];
+			return {
+				...state,
+				messages    : [ ...state.messages, message ],
+				count       : state.count + 1,
+				countUnread : message.sender === 'response' ? ++state.countUnread : state.countUnread
+			};
+
 		}
 
 		case 'ADD_CHAT_HISTORY':
 		{
 			const { chatHistory } = action.payload;
 
-			return [ ...state, ...chatHistory ];
+			chatHistory.forEach(
+				(item, index) => { chatHistory[index].isRead = true; }
+			);
+
+			return {
+				...state,
+				messages : chatHistory,
+				count    : chatHistory.length
+			};
 		}
 
 		case 'CLEAR_CHAT':
 		{
-			return [];
+			return {
+				...state,
+				messages    : [],
+				count       : 0,
+				countUnread : 0
+			};
+		}
+
+		case 'SORT_CHAT':
+		{
+			const { order } = action.payload;
+
+			return { ...state, order: order };
+		}
+
+		case 'SET_IS_SCROLL_END':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, isScrollEnd: flag };
+		}
+
+		case 'SET_IS_MESSAGE_READ':
+		{
+			const { id, isRead } = action.payload;
+
+			state.messages.forEach((key, index) =>
+			{
+				if (state.messages[index].time === Number(id))
+				{
+					state.messages[index].isRead = isRead;
+
+					state.countUnread--;
+				}
+			});
+
+			return { ...state };
 		}
 
 		default:
