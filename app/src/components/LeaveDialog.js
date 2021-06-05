@@ -5,7 +5,6 @@ import { withRoomContext } from '../RoomContext';
 import * as roomActions from '../actions/roomActions';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -57,7 +56,6 @@ const LeaveDialog = ({
 }) =>
 
 {
-
 	const buttonYes = useRef();
 
 	const handleEnterKey = (event) =>
