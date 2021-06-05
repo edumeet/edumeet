@@ -66,7 +66,11 @@ const LeaveDialog = ({
 	const handleLeaveWithSavingChat = () =>
 	{
 		roomClient.saveChat();
-		// roomClient.close();
+
+		setTimeout(() =>
+		{
+			roomClient.close();
+		}, 1000);
 	};
 
 	return (
