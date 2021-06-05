@@ -55,7 +55,8 @@ const LeaveDialog = ({
 	roomClient,
 	leaveOpen,
 	classes,
-	handleSetLeaveOpen
+	handleSetLeaveOpen,
+	chatCount
 }) =>
 
 {
@@ -129,10 +130,13 @@ const LeaveDialog = ({
 					onClick={handleLeaveWithSavingChat}
 					color='primary'
 					startIcon={<SaveIcon />}
+					disabled={chatCount === 0}
 				>
 					<FormattedMessage
 						id='label.leaveWithSavingChat'
-						defaultMessage='Yes (save chat)'
+						defaultMessage='Yes + save chat ({chatCount})'
+
+						values={{ chatCount: chatCount }}
 					/>
 				</Button>
 			</DialogActions>
@@ -145,12 +149,14 @@ LeaveDialog.propTypes =
 	roomClient         : PropTypes.object.isRequired,
 	leaveOpen          : PropTypes.bool.isRequired,
 	handleSetLeaveOpen : PropTypes.func.isRequired,
-	classes            : PropTypes.object.isRequired
+	classes            : PropTypes.object.isRequired,
+	chatCount          : PropTypes.number.isRequired
 };
 
 const mapStateToProps = (state) =>
 	({
-		leaveOpen : state.room.leaveOpen
+		leaveOpen : state.room.leaveOpen,
+		chatCount : state.chat.count
 	});
 
 const mapDispatchToProps = {
@@ -165,7 +171,8 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room.leaveOpen === next.room.leaveOpen
+				prev.room.leaveOpen === next.room.leaveOpen,
+				prev.chat.count === next.chat.count
 			);
 		}
 	}
