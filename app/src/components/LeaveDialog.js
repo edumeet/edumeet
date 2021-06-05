@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
@@ -59,6 +59,14 @@ const LeaveDialog = ({
 }) =>
 
 {
+
+	const buttonYes = useRef();
+
+	const handleEnterKey = (event) =>
+	{
+		if (event.key === 'Enter') buttonYes.current.click();
+	};
+
 	const handleStay = () => handleSetLeaveOpen(false);
 
 	const handleLeave = () => roomClient.close();
@@ -75,6 +83,7 @@ const LeaveDialog = ({
 
 	return (
 		<Dialog
+			onKeyDown={handleEnterKey}
 			open={leaveOpen}
 			onClose={() => handleSetLeaveOpen(false)}
 			classes={{
@@ -108,6 +117,7 @@ const LeaveDialog = ({
 					onClick={handleLeave}
 					color='primary'
 					startIcon={<MeetingRoomIcon />}
+					ref={buttonYes}
 				>
 					<FormattedMessage
 						id='label.yes'
