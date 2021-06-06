@@ -226,6 +226,7 @@ const TopBar = (props) =>
 		setExtraVideoOpen,
 		setHelpOpen,
 		setAboutOpen,
+		setLeaveOpen,
 		setLockDialogOpen,
 		setHideSelfView,
 		toggleToolArea,
@@ -529,7 +530,7 @@ const TopBar = (props) =>
 						className={classes.actionButton}
 						variant='contained'
 						color='secondary'
-						onClick={() => roomClient.close()}
+						onClick={() => setLeaveOpen(!room.leaveOpen)}
 					>
 						<FormattedMessage
 							id='label.leave'
@@ -932,6 +933,7 @@ TopBar.propTypes =
 	onFullscreen         : PropTypes.func.isRequired,
 	setToolbarsVisible   : PropTypes.func.isRequired,
 	setSettingsOpen      : PropTypes.func.isRequired,
+	setLeaveOpen         : PropTypes.func.isRequired,
 	setExtraVideoOpen    : PropTypes.func.isRequired,
 	setHelpOpen          : PropTypes.func.isRequired,
 	setAboutOpen         : PropTypes.func.isRequired,
@@ -1005,6 +1007,10 @@ const mapDispatchToProps = (dispatch) =>
 		setAboutOpen : (aboutOpen) =>
 		{
 			dispatch(roomActions.setAboutOpen(aboutOpen));
+		},
+		setLeaveOpen : (leaveOpen) =>
+		{
+			dispatch(roomActions.setLeaveOpen(leaveOpen));
 		},
 		setLockDialogOpen : (lockDialogOpen) =>
 		{

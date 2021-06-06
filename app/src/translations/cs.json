@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Přerušit všem sdílení obrazovky",
 	"room.hideSelfView": "Schovat své video",
 	"room.showSelfView": "Ukázat své video",
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Jste ztišen, chcete-li mluvit, podržte mezerník",
 
@@ -137,6 +139,9 @@
 	"label.login": "Přihlásit",
 	"label.logout": "Odhlásit",
 	"label.join": "Připojit",
+	"label.yes": null,
+	"label.no": null,
+	"label.leaveWithSavingChat": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",

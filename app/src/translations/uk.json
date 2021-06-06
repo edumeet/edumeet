@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Зупинити спільне використання екрану",
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": " У вас вимкнено звук, утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
 	"roles.gotRole": "Ви отримали роль {role}",
@@ -136,6 +138,9 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Налаштування",
 	"settings.camera": "Камера",

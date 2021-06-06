@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": null,
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": null,
 
@@ -137,6 +139,9 @@
 	"label.promoteAllPeers": null,
 	"label.moreActions": null,
 	"label.version": null,
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Paramètres",
 	"settings.camera": "Caméra",
