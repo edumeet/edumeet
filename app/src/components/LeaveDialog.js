@@ -60,7 +60,15 @@ const LeaveDialog = ({
 
 	const handleEnterKey = (event) =>
 	{
-		if (event.key === 'Enter') buttonYes.current.click();
+		if (event.key === 'Enter')
+		{
+			buttonYes.current.click();
+		}
+		else
+		if (event.key === 'Escape' || event.key === 'Esc')
+		{
+			handleSetLeaveOpen(false);
+		}
 	};
 
 	const handleStay = () => handleSetLeaveOpen(false);
