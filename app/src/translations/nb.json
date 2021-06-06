@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Stopp all skjermdeling",
 	"room.hideSelfView": "Skjule eget bilde",
 	"room.showSelfView": "Vis eget bilde",
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -137,6 +139,9 @@
 	"label.login": "Logg på",
 	"label.logout": "Logg av",
 	"label.join": "Gå inn",
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",

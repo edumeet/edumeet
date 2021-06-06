@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Alle Bildschirmfreigaben stoppen",
 	"room.hideSelfView": "Selbstansicht-Video ausblenden",
 	"room.showSelfView": "Selbstansicht-Video anzeigen",
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
 
@@ -137,6 +139,9 @@
 	"label.login": "Anmelden",
 	"label.logout": "Abmelden",
 	"label.join": "Eintreten",
+	"label.yes": null,
+	"label.no": null,
+	"label.leaveWithSavingChat": null,
 
 	"settings.settings": "Einstellungen",
 	"settings.camera": "Kamera",

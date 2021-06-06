@@ -67,6 +67,8 @@
 	"room.stopAllScreenSharing": null,
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "您已將麥克風靜音，請按下「空白鍵」來發言",
 
@@ -136,6 +138,9 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "設定",
 	"settings.camera": "視訊來源",

@@ -96,8 +96,8 @@ const LeaveDialog = ({
 		>
 			<DialogTitle id='form-dialog-title' dividers>
 				<FormattedMessage
-					id='room.xyz'
-					defaultMessage='Leaving confirmation'
+					id='room.leavingTheRoom'
+					defaultMessage='Leaving the room'
 				/>
 			</DialogTitle>
 			<DialogContent dividers>

@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "स्क्रीन का आदान-प्रदान स्थगित कीजिए ",
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "आप शांत हैं, बात करने के लिए स्पेस-बार दबाईए",
 
@@ -137,6 +139,9 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "सेटिंग",
 	"settings.camera": "कैमरा",

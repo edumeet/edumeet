@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Zatrzymaj wszystkie współdzielone ekrany",
 	"room.hideSelfView": "Ukryj pogląd swojego wideo",
 	"room.showSelfView": "Pokaż pogląd swojego wideo",
+	"room.leavingTheRoom": "Opuszczanie pokoju",
+	"room.leaveConfirmationMessage": "Czy na pewno chcesz opuścić pokój?",
 
 	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj SPACJĘ, aby mówić.",
 
@@ -137,6 +139,9 @@
 	"label.login": "Zaloguj",
 	"label.logout": "Wyloguj",
 	"label.join": "Dołącz",
+	"label.yes": "Tak",
+	"label.no": "Nie",
+	"label.leaveWithSavingChat": "Tak + zapis czat ({chatCount})",
 
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",

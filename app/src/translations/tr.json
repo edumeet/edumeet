@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Tüm ekran paylaşımlarını durdur",
 	"room.hideSelfView": "Kendi görüntümü gizle",
 	"room.showSelfView": "Kendi görüntümü göster",
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Sesiniz kapalı, konuşmak için SPACE tuşuna basılı tutun",
 
@@ -137,6 +139,9 @@
 	"label.login": "Giriş",
 	"label.logout": "Çıkış",
 	"label.join": "Bağlan",
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Ayarlar",
 	"settings.camera": "Kamera",

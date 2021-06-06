@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Ferma tutte le condivisioni schermo",
 	"room.hideSelfView": "Nascondi il tuo box video",
 	"room.showSelfView": "Visualizza il tuo box video",
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
@@ -137,6 +139,9 @@
 	"label.login": "Accesso",
 	"label.logout": "Uscita",
 	"label.join": "Entra",
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",

@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": "Összes képernyőmegosztás leállítása",
 	"room.hideSelfView": "Saját kamerakép elrejtése",
 	"room.showSelfView": "Saját kamerakép megjelenítése",
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 
@@ -137,6 +139,9 @@
 	"label.login": "Bejelentkezés",
 	"label.logout": "Kijelentkezés",
 	"label.join": "Kapcsolódás",
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Beállítások",
 	"settings.camera": "Kamera",

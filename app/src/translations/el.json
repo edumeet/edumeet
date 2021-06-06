@@ -68,6 +68,8 @@
 	"room.stopAllScreenSharing": null,
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": null,
 
@@ -137,6 +139,9 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Ρυθμίσεις",
 	"settings.camera": "Κάμερα",

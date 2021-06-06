@@ -66,6 +66,8 @@
 	"room.shortcutKeys": "Жылдам перне",
 	"room.browsePeersSpotlight": "Белсенді қатысушыларды қарау",
 	"room.stopAllScreenSharing": "Бүкіл экрандарды бөлісуді тоқтату",
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Сіз дыбыссызсыз, сөйлесу үшін БОС ОРЫН пернесін ұстап тұрыңыз",
 
@@ -135,6 +137,9 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Параметрлер",
 	"settings.camera": "Камера",

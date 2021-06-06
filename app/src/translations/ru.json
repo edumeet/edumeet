@@ -66,6 +66,8 @@
 	"room.shortcutKeys": "Горячие клавиши",
 	"room.browsePeersSpotlight": "Просматривать активных участников",
 	"room.stopAllScreenSharing": "Прекратить все совместные использования экрана",
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Вы отключены, удерживайте ПРОБЕЛ, чтобы говорить",
 
@@ -135,6 +137,9 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Настройки",
 	"settings.camera": "Камера",
