@@ -141,7 +141,7 @@
 	"label.join": "Dołącz",
 	"label.yes": "Tak",
 	"label.no": "Nie",
-	"label.leaveWithSavingChat": "Tak + zapis czat ({chatCount})",
+	"label.leaveWithSavingChat": "Tak + zapis czatu ({chatCount})",
 
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",
