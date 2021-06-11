@@ -477,6 +477,12 @@ class VideoView extends React.PureComponent
 			videoElement.onplay = null;
 			videoElement.onpause = null;
 		}
+
+		if (this.audioAnalyzer)
+		{
+			this.audioAnalyzer.delete();
+			this.audioAnalyzer = null;
+		}
 	}
 
 	componentDidUpdate(prevProps)

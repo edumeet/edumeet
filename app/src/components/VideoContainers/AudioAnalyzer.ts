@@ -251,7 +251,7 @@ export class AudioAnalyzer
 		const { canvas, canvasContext } = this;
 
 		if (!canvasContext || !canvas || !canvas.height)
-			return;
+			return false;
 
 		this.analyser!.getByteFrequencyData(this.frequencyArray!);
 
@@ -276,12 +276,14 @@ export class AudioAnalyzer
 		}
 
 		this.canvasColumn += 1;
+
+		return true;
 	}
 
 	renderLoop()
 	{
-		this.render();
-		setTimeout(() => requestAnimationFrame(this.renderLoop.bind(this)), 100);
+		if (this.render())
+			setTimeout(() => requestAnimationFrame(this.renderLoop.bind(this)), 100);
 	}
 
 }
