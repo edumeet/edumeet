@@ -280,11 +280,13 @@ const TopBar = (props) =>
 		localesList,
 		localRecordingState,
 		recordingInProgress,
-		producers
+		producers,
+		consumers
 	} = props;
 
 	// did it change?
 	recorder.checkMicProducer(producers);
+	recorder.checkAudioConsumer(consumers);
 
 	useEffect(() =>
 	{
@@ -816,6 +818,8 @@ const TopBar = (props) =>
 												}));
 										});
 
+										recorder.checkAudioConsumer(consumers);
+
 										meActions.setLocalRecordingState(RECORDING_START);
 									}
 									catch (err)
@@ -1090,6 +1094,7 @@ const TopBar = (props) =>
 								store.getState().settings.recorderPreferredMimeType;
 								const additionalAudioTracks = [];
 								const micProducer = Object.values(producers).find((p) => p.source === 'mic');
+								// const audioConsumers = Object.values(consumers).find((p) => p.source === 'audio');
 
 								if (micProducer) additionalAudioTracks.push(micProducer.track);
 								await recorder.startLocalRecording({
@@ -1453,8 +1458,8 @@ TopBar.propTypes =
 	localRecordingState  : PropTypes.string,
 	recordingInProgress  : PropTypes.bool,
 	recordingMimeType    : PropTypes.string,
-	producers            : PropTypes.object
-
+	producers            : PropTypes.object,
+	consumers            : PropTypes.object
 };
 
 const makeMapStateToProps = () =>
@@ -1490,7 +1495,8 @@ const makeMapStateToProps = () =>
 			locale               : state.intl.locale,
 			localesList          : state.intl.list,
 			recordingMimeType    : state.settings.recordingMimeType,
-			producers            : state.producers
+			producers            : state.producers,
+			consumers            : state.consumers
 		});
 
 	return mapStateToProps;
@@ -1569,7 +1575,8 @@ export default withRoomContext(connect(
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.intl.locale === next.intl.locale &&
 				prev.intl.localesList === next.intl.localesList &&
-				prev.producers === next.producers
+				prev.producers === next.producers &&
+				prev.consumers === next.consumers
 			);
 		}
 	}
