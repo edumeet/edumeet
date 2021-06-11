@@ -54,10 +54,9 @@ import { store } from '../../store';
 // import producers from '../../reducers/producers';
 // import logger from 'redux-logger';
 import Logger from '../../Logger';
-import * as requestActions from '../../actions/requestActions';
+import { config } from '../../config';
 
 const logger = new Logger('Recorder');
-import { config } from '../../config';
 
 const styles = (theme) =>
 	({

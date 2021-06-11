@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import { withSnackbar } from 'notistack';
 import * as notificationActions from '../../actions/notificationActions';
 import { config } from '../../config';
+import Button from '@material-ui/core/Button';
+import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
+import { FormattedMessage } from 'react-intl';
 
 class Notifications extends Component
 {

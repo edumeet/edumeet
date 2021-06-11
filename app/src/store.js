@@ -52,11 +52,6 @@ const migrations =
 	//	}
 };
 
-const saveSubsetFilter = createFilter(
-	'me',
-	[ 'loggedIn' ]
-);
-
 const persistConfig =
 {
 	key             : 'root',
