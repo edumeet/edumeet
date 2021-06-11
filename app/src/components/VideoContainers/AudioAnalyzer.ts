@@ -1,36 +1,52 @@
 import chroma from 'chroma-js';
 import Logger from '../../Logger';
+import deviceInfo from '../../deviceInfo';
 
 const logger = new Logger('AudioAnalyzer');
 
 // @ts-ignore
 const AudioContext = window.AudioContext || window.webkitAudioContext || false;
 
+const supportedBrowsers =
+{
+	'windows' : {
+		'microsoft edge' : '>18'
+	},
+	'safari'   : '>12',
+	'chrome'   : '>=74',
+	'chromium' : '>=74',
+	'opera'    : '>=62',
+	'firefox'  : '>=60'
+	// 'samsung internet for android' : '>=11.1.1.52'
+};
+
 export class AudioAnalyzer
 {
 	container : HTMLElement;
 
-	tracks : Map<MediaStreamTrack, MediaStreamAudioSourceNode>;
+	unsupportedBrowserElement : HTMLElement | null = null;
 
-	canvas : HTMLCanvasElement | null;
+	tracks : Map<MediaStreamTrack, MediaStreamAudioSourceNode> | null = null;
 
-	canvasContext : CanvasRenderingContext2D | null;
+	canvas : HTMLCanvasElement | null = null;
 
-	canvasColumn : number;
+	canvasContext : CanvasRenderingContext2D | null = null;
+
+	canvasColumn = 0;
 
 	colorScale : any;
 
-	context : AudioContext;
+	context : AudioContext | null = null;
 
-	analyser : AnalyserNode;
+	analyser : AnalyserNode | null = null;
 
-	frequencyArray : Uint8Array;
+	frequencyArray : Uint8Array | null = null;
 
 	private labelsWidth = 20;
 
 	private labelsSize = 10;
 
-	private resizeObserver : ResizeObserver;
+	private resizeObserver : ResizeObserver | null = null;
 
 	private resizeCanvasTimeout : any;
 
@@ -39,6 +55,28 @@ export class AudioAnalyzer
 		logger.debug('constructor', { container });
 
 		this.container = container;
+
+		// check if device is compatible
+		const device = deviceInfo();
+
+		if (!device.bowser.satisfies(supportedBrowsers))
+		{
+			logger.warn('unsupported browser', device);
+
+			this.unsupportedBrowserElement = document.createElement('i');
+			this.unsupportedBrowserElement.style.fontSize = '0.7rem';
+			this.unsupportedBrowserElement.style.color = '#ddd';
+			this.unsupportedBrowserElement.style.backgroundColor = '#111';
+			this.unsupportedBrowserElement.style.padding = '0.5rem';
+			this.unsupportedBrowserElement.style.display = 'block';
+			this.unsupportedBrowserElement.innerHTML =
+				'The audio analyzer is currently unsupported in your browser.';
+			this.container.append(this.unsupportedBrowserElement);
+
+			return;
+		}
+
+		//
 		this.tracks = new Map();
 
 		// canvas
@@ -77,8 +115,7 @@ export class AudioAnalyzer
 
 		// audio context
 		this.context = new AudioContext({
-			latencyHint : 'playback',
-			sampleRate  : 48000
+			latencyHint : 'playback'
 		});
 		this.analyser = new AnalyserNode(this.context, {
 			fftSize               : 2048,
@@ -93,22 +130,28 @@ export class AudioAnalyzer
 
 	addTrack(track: MediaStreamTrack)
 	{
+		if (!this.tracks)
+			return;
+
 		if (this.tracks.has(track))
 			return;
 
 		logger.debug('addTrack', { track });
 
 		const mediaStream = new MediaStream([ track ]);
-		const sourceNode = new MediaStreamAudioSourceNode(this.context, {
+		const sourceNode = new MediaStreamAudioSourceNode(this.context!, {
 			mediaStream
 		});
 
-		sourceNode.connect(this.analyser);
+		sourceNode.connect(this.analyser!);
 		this.tracks.set(track, sourceNode);
 	}
 
 	removeTracks()
 	{
+		if (!this.tracks)
+			return;
+
 		logger.debug('removeTracks');
 
 		if (this.analyser)
@@ -133,8 +176,12 @@ export class AudioAnalyzer
 		}
 
 		this.removeTracks();
-		this.resizeObserver.disconnect();
-		this.context.close();
+
+		if (this.resizeObserver)
+			this.resizeObserver.disconnect();
+
+		if (this.context)
+			this.context.close();
 	}
 
 	resizeCanvas()
@@ -198,7 +245,7 @@ export class AudioAnalyzer
 		if (!canvasContext || !canvas || !canvas.height)
 			return;
 
-		this.analyser.getByteFrequencyData(this.frequencyArray);
+		this.analyser!.getByteFrequencyData(this.frequencyArray!);
 
 		if (this.canvasColumn >= canvas.width)
 		{
@@ -210,10 +257,10 @@ export class AudioAnalyzer
 			canvasContext.putImageData(imageData, this.labelsWidth, 0);
 		}
 
-		for (let i = 0; i < this.frequencyArray.length; i++)
+		for (let i = 0; i < this.frequencyArray!.length; i++)
 		{
-			const color = this.colorScale(this.frequencyArray[i]);
-			const y = Math.log(i) / Math.log(this.frequencyArray.length);
+			const color = this.colorScale(this.frequencyArray![i]);
+			const y = Math.log(i) / Math.log(this.frequencyArray!.length);
 
 			canvasContext.fillStyle = color;
 			canvasContext.fillRect(
