@@ -64,11 +64,13 @@ export class AudioAnalyzer
 			logger.warn('unsupported browser', device);
 
 			this.unsupportedBrowserElement = document.createElement('i');
-			this.unsupportedBrowserElement.style.fontSize = '0.7rem';
-			this.unsupportedBrowserElement.style.color = '#ddd';
-			this.unsupportedBrowserElement.style.backgroundColor = '#111';
-			this.unsupportedBrowserElement.style.padding = '0.5rem';
-			this.unsupportedBrowserElement.style.display = 'block';
+			this.unsupportedBrowserElement.style.cssText = `
+				font-size: 0.7rem;
+				color: #ddd;
+				background-color: rgba(0, 0, 0, 0.9);
+				padding: 0.5rem;
+				display: block;			
+			`;
 			this.unsupportedBrowserElement.innerHTML =
 				'The audio analyzer is currently unsupported in your browser.';
 			this.container.append(this.unsupportedBrowserElement);
@@ -167,6 +169,12 @@ export class AudioAnalyzer
 	delete()
 	{
 		logger.debug('delete');
+
+		if (this.unsupportedBrowserElement)
+		{
+			this.container.removeChild(this.unsupportedBrowserElement);
+			this.unsupportedBrowserElement = null;
+		}
 
 		if (this.canvas)
 		{
