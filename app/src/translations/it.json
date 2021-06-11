@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
 
@@ -122,6 +124,8 @@
 	"label.leave": "Esci",
 	"label.chatInput": "Inserire messaggio...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Condivisione file",
 	"label.participants": "Partecipanti",
 	"label.shareFile": "Condividi file",
@@ -150,6 +154,10 @@
 	"label.join": "Entra",
 	"label.recordingInProgress": null,
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
+
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",
 	"settings.selectCamera": "Seleziona dispositivo video",
@@ -185,6 +193,7 @@
 	"settings.noiseThreshold": "Soglia di rumore",
 	"settings.mirrorOwnVideo": "Specchiare il proprio video",
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

@@ -13,6 +13,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import Close from '@material-ui/icons/Close';
 
 const tabs =
 [
@@ -110,7 +111,10 @@ const Settings = ({
 			{currentSettingsTab === 'appearance' && <AppearanceSettings />}
 			{currentSettingsTab === 'advanced' && <AdvancedSettings />}
 			<DialogActions>
-				<Button onClick={() => handleCloseSettings(false)} color='primary'>
+				<Button
+					onClick={() => handleCloseSettings(false)} color='primary'
+					startIcon={<Close />}
+				>
 					<FormattedMessage
 						id='label.close'
 						defaultMessage='Close'

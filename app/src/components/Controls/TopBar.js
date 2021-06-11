@@ -57,6 +57,7 @@ import Logger from '../../Logger';
 import * as requestActions from '../../actions/requestActions';
 
 const logger = new Logger('Recorder');
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -66,22 +67,22 @@ const styles = (theme) =>
 			marginLeft                     : '30vw',
 			[theme.breakpoints.down('lg')] :
 			{
-				width      : 'calc(100% - 40vw)',
+				width      : 'calc(100% - 30vw)',
 				marginLeft : '40vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				width      : 'calc(100% - 50vw)',
+				width      : 'calc(100% - 40vw)',
 				marginLeft : '50vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				width      : 'calc(100% - 70vw)',
+				width      : 'calc(100% - 60vw)',
 				marginLeft : '70vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width      : 'calc(100% - 90vw)',
+				width      : 'calc(100% - 80vw)',
 				marginLeft : '90vw'
 			}
 		},
@@ -265,6 +266,7 @@ const TopBar = (props) =>
 		setExtraVideoOpen,
 		setHelpOpen,
 		setAboutOpen,
+		setLeaveOpen,
 		setLockDialogOpen,
 		setHideSelfView,
 		toggleToolArea,
@@ -412,16 +414,16 @@ const TopBar = (props) =>
 							<MenuIcon />
 						</IconButton>
 					</PulsingBadge>
-					{ window.config.logo !== null ?
+					{ config.logo !=='' ?
 						<img alt='Logo'
-							src={window.config.logo}
+							src={config.logo}
 							className={classes.logo}
 						/> :
 						<Typography
 							variant='h6'
 							noWrap color='inherit'
 						>
-							{window.config.title}
+							{config.title}
 						</Typography>
 					}
 					<div className={classes.grow} />
@@ -653,7 +655,7 @@ const TopBar = (props) =>
 						className={classes.actionButton}
 						variant='contained'
 						color='secondary'
-						onClick={() => roomClient.close()}
+						onClick={() => setLeaveOpen(!room.leaveOpen)}
 					>
 						<FormattedMessage
 							id='label.leave'
@@ -1306,6 +1308,7 @@ TopBar.propTypes =
 	onFullscreen         : PropTypes.func.isRequired,
 	setToolbarsVisible   : PropTypes.func.isRequired,
 	setSettingsOpen      : PropTypes.func.isRequired,
+	setLeaveOpen         : PropTypes.func.isRequired,
 	setExtraVideoOpen    : PropTypes.func.isRequired,
 	setHelpOpen          : PropTypes.func.isRequired,
 	setAboutOpen         : PropTypes.func.isRequired,
@@ -1322,8 +1325,8 @@ TopBar.propTypes =
 	classes              : PropTypes.object.isRequired,
 	theme                : PropTypes.object.isRequired,
 	intl                 : PropTypes.object,
-	locale               : PropTypes.string,
-	localesList          : PropTypes.array,
+	locale               : PropTypes.string.isRequired,
+	localesList          : PropTypes.array.isRequired,
 	localRecordingState  : PropTypes.string,
 	recordingInProgress  : PropTypes.bool,
 	recordingMimeType    : PropTypes.string,
@@ -1392,6 +1395,10 @@ const mapDispatchToProps = (dispatch) =>
 		setAboutOpen : (aboutOpen) =>
 		{
 			dispatch(roomActions.setAboutOpen(aboutOpen));
+		},
+		setLeaveOpen : (leaveOpen) =>
+		{
+			dispatch(roomActions.setLeaveOpen(leaveOpen));
 		},
 		setLockDialogOpen : (lockDialogOpen) =>
 		{

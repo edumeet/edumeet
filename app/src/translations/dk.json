@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": null,
 
@@ -122,6 +124,8 @@
 	"label.leave": "Forlad",
 	"label.chatInput": "Indtast chatbesked ...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Fildeling",
 	"label.participants": "Deltagere",
 	"label.shareFile": "Del fil",
@@ -149,6 +153,9 @@
 	"label.logout": null,
 	"label.join": null,
 	"label.recordingInProgress": null,
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
 
 	"settings.settings": "Indstillinger",
 	"settings.camera": "Kamera",
@@ -185,6 +192,7 @@
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

@@ -97,6 +97,15 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
+		case 'SET_CONSUMER_AUDIO_GAIN':
+		{
+			const { consumerId, audioGain } = action.payload;
+			const consumer = state[consumerId];
+			const newConsumer = { ...consumer, audioGain };
+
+			return { ...state, [consumerId]: newConsumer };
+		}
+
 		case 'SET_CONSUMER_SCORE':
 		{
 			const { consumerId, score } = action.payload;
@@ -113,6 +122,19 @@ const consumers = (state = initialState, action) =>
 		case 'CLEAR_CONSUMERS':
 		{
 			return initialState;
+		}
+
+		case 'SET_CONSUMER_OPUS_CONFIG':
+		{
+			const { consumerId, opusConfig } = action.payload;
+			const consumer = state[consumerId];
+			const newConsumer =
+			{
+				...consumer,
+				opusConfig
+			};
+
+			return { ...state, [consumerId]: newConsumer };
 		}
 
 		default:

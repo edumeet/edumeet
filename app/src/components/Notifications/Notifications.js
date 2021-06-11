@@ -3,11 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withSnackbar } from 'notistack';
 import * as notificationActions from '../../actions/notificationActions';
-import Button from '@material-ui/core/Button';
-import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
-import { FormattedMessage } from 'react-intl';
-
-const notificationPosition = window.config.notificationPosition || 'right';
+import { config } from '../../config';
 
 class Notifications extends Component
 {
@@ -86,7 +82,7 @@ class Notifications extends Component
 					action           : notification.persist? okAction: null,
 					anchorOrigin     : {
 						vertical   : 'bottom',
-						horizontal : notificationPosition
+						horizontal : config.notificationPosition
 					}
 				}
 			);

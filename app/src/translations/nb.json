@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
 
@@ -122,6 +124,8 @@
 	"label.leave": "Avslutt",
 	"label.chatInput": "Skriv melding...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Fildeling",
 	"label.participants": "Deltakere",
 	"label.shareFile": "Del fil",
@@ -150,6 +154,10 @@
 	"label.join": "Gå inn",
 	"label.recordingInProgress": null,
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
+
 	"settings.settings": "Innstillinger",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Velg videoenhet",
@@ -185,6 +193,7 @@
 	"settings.noiseThreshold": "Støyterskel",
 	"settings.mirrorOwnVideo": "Vis eget bilde speilet for deg",
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

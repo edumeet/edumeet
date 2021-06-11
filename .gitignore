@@ -8,6 +8,9 @@ node_modules/
 !/server/config/config.example.js
 /server/public/
 /server/certs/
+/server/dist/
 !/server/certs/mediasoup-demo.localhost.*
 .vscode
 /app/public/config/*.pem
+package-lock.json
+yarn-error.log

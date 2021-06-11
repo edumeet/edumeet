@@ -2,8 +2,19 @@
 
 process.title = 'edumeet-server';
 
+import Logger from './lib/Logger';
+const Room = require('./lib/Room');
+const Peer = require('./lib/Peer');
+const userRoles = require('./userRoles');
+const {
+	loginHelper,
+	logoutHelper
+} = require('./httpHelper');
+const { config, configError } = require('./lib/config');
+const interactiveServer = require('./lib/interactiveServer');
+const promExporter = require('./lib/promExporter');
+
 const bcrypt = require('bcrypt');
-const config = require('./config/config');
 const fs = require('fs');
 const http = require('http');
 const spdy = require('spdy');
@@ -13,16 +24,8 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
-const Logger = require('./lib/Logger');
-const Room = require('./lib/Room');
-const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
-const userRoles = require('./userRoles');
-const {
-	loginHelper,
-	logoutHelper
-} = require('./httpHelper');
 // auth
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
@@ -30,14 +33,20 @@ const imsLti = require('ims-lti');
 const SAMLStrategy = require('passport-saml').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const redis = require('redis');
-const redisClient = redis.createClient(config.redisOptions);
-const { Issuer, Strategy, custom } = require('openid-client');
+const { Issuer, Strategy } = require('openid-client');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
-const interactiveServer = require('./lib/interactiveServer');
-const promExporter = require('./lib/promExporter');
 const { v4: uuidv4 } = require('uuid');
+
+if (configError)
+{
+	/* eslint-disable no-console */
+	console.error(`Invalid config file: ${configError}`);
+	process.exit(-1);
+}
+
+const redisClient = redis.createClient(config.redisOptions);
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -87,7 +96,7 @@ const tls =
 const app = express();
 
 app.use(helmet.hsts());
-const sharedCookieParser=cookieParser();
+const sharedCookieParser = cookieParser();
 
 app.use(sharedCookieParser);
 app.use(bodyParser.json({ limit: '5mb' }));
@@ -137,12 +146,6 @@ async function run()
 		// Open the interactive server.
 		await interactiveServer(rooms, peers);
 
-		// start Prometheus exporter
-		if (config.prometheus)
-		{
-			await promExporter(rooms, peers, config.prometheus);
-		}
-
 		if (typeof (config.auth) === 'undefined')
 		{
 			logger.warn('Auth is not configured properly!');
@@ -157,6 +160,12 @@ async function run()
 
 		// Run HTTPS server.
 		await runHttpsServer();
+
+		// start Prometheus exporter
+		if (config.prometheus.enabled)
+		{
+			await promExporter(mediasoupWorkers, rooms, peers);
+		}
 
 		// Run WebSocketServer.
 		await runWebSocketServer();
@@ -634,9 +643,13 @@ async function runHttpsServer()
 	});
 
 	// Serve all files in the public folder as static files.
-	app.use(express.static('public'));
+	app.use(express.static('public', {
+		maxAge : config.staticFilesCachePeriod
+	}));
 
-	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
+	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`, {
+		maxAge : config.staticFilesCachePeriod
+	}));
 
 	if (config.httpOnly === true)
 	{
@@ -648,13 +661,16 @@ async function runHttpsServer()
 		// https
 		mainListener = spdy.createServer(tls, app);
 
-		// http
-		const redirectListener = http.createServer(app);
+		// http -> https redirect server
+		if (config.listeningRedirectPort)
+		{
+			const redirectListener = http.createServer(app);
 
-		if (config.listeningHost)
-			redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
-		else
-			redirectListener.listen(config.listeningRedirectPort);
+			if (config.listeningHost)
+				redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
+			else
+				redirectListener.listen(config.listeningRedirectPort);
+		}
 	}
 
 	// https or http
@@ -800,14 +816,18 @@ async function runMediasoupWorkers()
 
 	logger.info('running %d mediasoup Workers...', numWorkers);
 
-	for (let i = 0; i < numWorkers; ++i)
+	const { logLevel, logTags, rtcMinPort, rtcMaxPort } = config.mediasoup.worker;
+	const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
+
+	for (let i = 0; i < numWorkers; i++)
 	{
 		const worker = await mediasoup.createWorker(
 			{
-				logLevel   : config.mediasoup.worker.logLevel,
-				logTags    : config.mediasoup.worker.logTags,
-				rtcMinPort : config.mediasoup.worker.rtcMinPort,
-				rtcMaxPort : config.mediasoup.worker.rtcMaxPort
+				logLevel,
+				logTags,
+				rtcMinPort : rtcMinPort + (i * portInterval),
+				rtcMaxPort : i === numWorkers - 1 ? rtcMaxPort
+					: rtcMinPort + ((i + 1) * portInterval) - 1
 			});
 
 		worker.on('died', () =>

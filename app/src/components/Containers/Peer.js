@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makePeerConsumerSelector } from '../Selectors';
 import PropTypes from 'prop-types';
@@ -17,6 +17,11 @@ import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import NewWindowIcon from '@material-ui/icons/OpenInNew';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
+import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
+import AddToQueueIcon from '@material-ui/icons/AddToQueue';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import Volume from './Volume';
 
 const styles = (theme) =>
@@ -40,6 +45,7 @@ const styles = (theme) =>
 			{
 				// transition  : 'filter .2s',
 				// filter      : 'grayscale(0)',
+				boxShadow   : 'var(--active-speaker-shadow)',
 				borderColor : 'var(--active-speaker-border-color)'
 			},
 			'&:not(.active-speaker):not(.screen)' :
@@ -97,6 +103,11 @@ const styles = (theme) =>
 			'&.hover'       :
 			{
 				opacity : 1
+			},
+			'&.smallContainer' :
+			{
+				flexDirection : 'row',
+				alignItems    : 'flex-start'
 			}
 		},
 		videoInfo :
@@ -155,8 +166,14 @@ const Peer = (props) =>
 		style,
 		smallContainer,
 		windowConsumer,
+		fullScreenConsumer,
 		classes,
-		theme
+		theme,
+		enableLayersSwitch,
+		width,
+		height,
+		isSelected,
+		mode
 	} = props;
 
 	const micEnabled = (
@@ -190,6 +207,51 @@ const Peer = (props) =>
 		rootStyle.backgroundImage = `url(${peer.picture})`;
 		rootStyle.backgroundSize = 'auto 100%';
 	}
+
+	useEffect(() =>
+	{
+		const handler = setTimeout(() =>
+		{
+			const consumer = webcamConsumer || screenConsumer;
+
+			if (!consumer)
+				return;
+
+			if (windowConsumer === consumer.id)
+			{
+				// if playing in external window, set the maximum quality levels
+				roomClient.setConsumerPreferredLayersMax(consumer);
+			}
+			else if (enableLayersSwitch && consumer?.type !== 'simple'
+				&& fullScreenConsumer !== consumer.id)
+			{
+				roomClient.adaptConsumerPreferredLayers(consumer, width, height);
+			}
+		}, 1000);
+
+		return () => { clearTimeout(handler); };
+	}, [
+		enableLayersSwitch,
+		webcamConsumer,
+		screenConsumer,
+		windowConsumer,
+		fullScreenConsumer,
+		roomClient, width, height
+	]);
+
+	// menu
+	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
+	const [ showAudioAnalyzer, setShowAudioAnalyzer ] = React.useState(null);
+
+	const handleMenuOpen = (event) =>
+	{
+		setMenuAnchorElement(event.currentTarget);
+	};
+
+	const handleMenuClose = (event) =>
+	{
+		setMenuAnchorElement(null);
+	};
 
 	return (
 		<React.Fragment>
@@ -241,7 +303,8 @@ const Peer = (props) =>
 					}
 
 					<div
-						className={classnames(classes.controls, hover ? 'hover' : null)}
+						className={classnames(classes.controls, hover ? 'hover' : null,
+							smallContainer? 'smallContainer' : null)}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -262,12 +325,13 @@ const Peer = (props) =>
 							}, 2000);
 						}}
 					>
+
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'device.muteAudio',
 								defaultMessage : 'Mute audio'
 							})}
-							placement={smallScreen ? 'top' : 'left'}
+							placement={smallScreen || smallContainer ? 'top' : 'left'}
 						>
 							{ smallContainer ?
 								<IconButton
@@ -319,12 +383,13 @@ const Peer = (props) =>
 						</Tooltip>
 
 						{ browser.platform !== 'mobile' &&
+							videoVisible && windowConsumer !== webcamConsumer.id &&
 							<Tooltip
 								title={intl.formatMessage({
 									id             : 'label.newWindow',
 									defaultMessage : 'New window'
 								})}
-								placement={smallScreen ? 'top' : 'left'}
+								placement={smallScreen || smallContainer ? 'top' : 'left'}
 							>
 								{ smallContainer ?
 									<IconButton
@@ -333,10 +398,6 @@ const Peer = (props) =>
 											defaultMessage : 'New window'
 										})}
 										className={classes.smallContainer}
-										disabled={
-											!videoVisible ||
-											(windowConsumer === webcamConsumer.id)
-										}
 										size='small'
 										color='primary'
 										onClick={() =>
@@ -353,10 +414,6 @@ const Peer = (props) =>
 											defaultMessage : 'New window'
 										})}
 										className={classes.fab}
-										disabled={
-											!videoVisible ||
-											(windowConsumer === webcamConsumer.id)
-										}
 										size='large'
 										onClick={() =>
 										{
@@ -369,48 +426,179 @@ const Peer = (props) =>
 							</Tooltip>
 						}
 
+						{ videoVisible &&
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'label.fullscreen',
+									defaultMessage : 'Fullscreen'
+								})}
+								placement={smallScreen || smallContainer ? 'top' : 'left'}
+							>
+								{ smallContainer ?
+									<IconButton
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										className={classes.smallContainer}
+										size='small'
+										color='primary'
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(webcamConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</IconButton>
+									:
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										className={classes.fab}
+										disabled={!videoVisible}
+										size='large'
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(webcamConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</Fab>
+								}
+							</Tooltip>
+						}
+
+						{ mode === 'filmstrip' &&
+							<Tooltip
+								title={isSelected ?
+									intl.formatMessage({
+										id             : 'tooltip.removeParticipantFromSpotlight',
+										defaultMessage : 'Remove from spotlight'
+									})
+									:
+									intl.formatMessage({
+										id             : 'tooltip.addParticipantToSpotlight',
+										defaultMessage : 'Add to spotlight'
+									})
+								}
+								placement={smallScreen || smallContainer ? 'top' : 'left'}
+							>
+								{ smallContainer ?
+									<IconButton
+										aria-label={isSelected ?
+											intl.formatMessage({
+												id             : 'tooltip.removeParticipantFromSpotlight',
+												defaultMessage : 'Remove from spotlight'
+											})
+											:
+											intl.formatMessage({
+												id             : 'tooltip.addParticipantToSpotlight',
+												defaultMessage : 'Add to spotlight'
+											})
+										}
+										className={classes.smallContainer}
+										size='small'
+										onClick={() =>
+										{
+											isSelected ?
+												roomClient.removeSelectedPeer(peer.id) :
+												mode === 'filmstrip' ?
+													roomClient.setSelectedPeer(peer.id) :
+													roomClient.addSelectedPeer(peer.id);
+										}}
+									>
+										{ isSelected ?
+											<RemoveFromQueueIcon />
+											:
+											<AddToQueueIcon />
+										}
+									</IconButton>
+									:
+									<Fab
+										aria-label={isSelected ?
+											intl.formatMessage({
+												id             : 'tooltip.removeParticipantFromSpotlight',
+												defaultMessage : 'Remove from spotlight'
+											})
+											:
+											intl.formatMessage({
+												id             : 'tooltip.addParticipantToSpotlight',
+												defaultMessage : 'Add to spotlight'
+											})
+										}
+										className={classes.fab}
+										size='large'
+										onClick={() =>
+										{
+											isSelected ?
+												roomClient.removeSelectedPeer(peer.id) :
+												mode === 'filmstrip' ?
+													roomClient.setSelectedPeer(peer.id) :
+													roomClient.addSelectedPeer(peer.id);
+										}}
+									>
+										{ isSelected ?
+											<RemoveFromQueueIcon />
+											:
+											<AddToQueueIcon />
+										}
+									</Fab>
+								}
+							</Tooltip>
+						}
+
 						<Tooltip
 							title={intl.formatMessage({
-								id             : 'label.fullscreen',
-								defaultMessage : 'Fullscreen'
+								id             : 'device.options',
+								defaultMessage : 'Options'
 							})}
-							placement={smallScreen ? 'top' : 'left'}
+							placement={smallScreen || smallContainer ? 'top' : 'left'}
 						>
 							{ smallContainer ?
 								<IconButton
 									aria-label={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
+										id             : 'device.options',
+										defaultMessage : 'Options'
 									})}
 									className={classes.smallContainer}
-									disabled={!videoVisible}
 									size='small'
-									color='primary'
-									onClick={() =>
-									{
-										toggleConsumerFullscreen(webcamConsumer);
-									}}
+									onClick={handleMenuOpen}
 								>
-									<FullScreenIcon />
+									<MoreHorizIcon />
 								</IconButton>
 								:
 								<Fab
 									aria-label={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
+										id             : 'device.options',
+										defaultMessage : 'Options'
 									})}
 									className={classes.fab}
-									disabled={!videoVisible}
 									size='large'
-									onClick={() =>
-									{
-										toggleConsumerFullscreen(webcamConsumer);
-									}}
+									onClick={handleMenuOpen}
 								>
-									<FullScreenIcon />
+									<MoreHorizIcon />
 								</Fab>
 							}
 						</Tooltip>
+						<Menu
+							anchorEl={menuAnchorElement}
+							keepMounted
+							open={Boolean(menuAnchorElement)}
+							onClose={handleMenuClose}
+						>
+							<MenuItem
+								onClick={() =>
+								{
+									setShowAudioAnalyzer(!showAudioAnalyzer);
+									handleMenuClose();
+								}}
+							>
+								{ showAudioAnalyzer ? 'Disable' : 'Enable' } audio analyzer
+							</MenuItem>
+						</Menu>
+
 					</div>
 
 					<VideoView
@@ -441,6 +629,10 @@ const Peer = (props) =>
 						videoCodec={webcamConsumer && webcamConsumer.codec}
 						audioScore={micConsumer ? micConsumer.score : null}
 						videoScore={webcamConsumer ? webcamConsumer.score : null}
+						width={width}
+						height={height}
+						opusConfig={micConsumer && micConsumer.opusConfig}
+						showAudioAnalyzer={showAudioAnalyzer}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -520,7 +712,7 @@ const Peer = (props) =>
 											id             : 'label.newWindow',
 											defaultMessage : 'New window'
 										})}
-										placement={smallScreen ? 'top' : 'left'}
+										placement={smallScreen || smallContainer ? 'top' : 'left'}
 									>
 										{ smallContainer ?
 											<IconButton
@@ -570,7 +762,7 @@ const Peer = (props) =>
 										id             : 'label.fullscreen',
 										defaultMessage : 'Fullscreen'
 									})}
-									placement={smallScreen ? 'top' : 'left'}
+									placement={smallScreen || smallContainer ? 'top' : 'left'}
 								>
 									{ smallContainer ?
 										<IconButton
@@ -634,6 +826,8 @@ const Peer = (props) =>
 								videoVisible={videoVisible}
 								videoCodec={consumer && consumer.codec}
 								videoScore={consumer ? consumer.score : null}
+								width={width}
+								height={height}
 							/>
 						</div>
 					</div>
@@ -704,7 +898,7 @@ const Peer = (props) =>
 										id             : 'label.newWindow',
 										defaultMessage : 'New window'
 									})}
-									placement={smallScreen ? 'top' : 'left'}
+									placement={smallScreen || smallContainer ? 'top' : 'left'}
 								>
 									<Fab
 										aria-label={intl.formatMessage({
@@ -732,7 +926,7 @@ const Peer = (props) =>
 									id             : 'label.fullscreen',
 									defaultMessage : 'Fullscreen'
 								})}
-								placement={smallScreen ? 'top' : 'left'}
+								placement={smallScreen || smallContainer ? 'top' : 'left'}
 							>
 								<Fab
 									aria-label={intl.formatMessage({
@@ -778,6 +972,8 @@ const Peer = (props) =>
 							videoVisible={screenVisible}
 							videoCodec={screenConsumer && screenConsumer.codec}
 							videoScore={screenConsumer ? screenConsumer.score : null}
+							width={width}
+							height={height}
 						/>
 					</div>
 				</div>
@@ -796,6 +992,7 @@ Peer.propTypes =
 	screenConsumer           : appPropTypes.Consumer,
 	extraVideoConsumers      : PropTypes.arrayOf(appPropTypes.Consumer),
 	windowConsumer           : PropTypes.string,
+	fullScreenConsumer       : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
 	browser                  : PropTypes.object.isRequired,
 	spacing                  : PropTypes.number,
@@ -804,7 +1001,12 @@ Peer.propTypes =
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
 	classes                  : PropTypes.object.isRequired,
-	theme                    : PropTypes.object.isRequired
+	theme                    : PropTypes.object.isRequired,
+	enableLayersSwitch       : PropTypes.bool,
+	width                    : PropTypes.number,
+	height                   : PropTypes.number,
+	isSelected               : PropTypes.bool,
+	mode                     : PropTypes.string.isRequired
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -814,11 +1016,14 @@ const makeMapStateToProps = (initialState, { id }) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer           : state.peers[id],
+			peer               : state.peers[id],
 			...getPeerConsumers(state, id),
-			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : id === state.room.activeSpeakerId,
-			browser        : state.me.browser
+			windowConsumer     : state.room.windowConsumer,
+			fullScreenConsumer : state.room.fullScreenConsumer,
+			activeSpeaker      : id === state.room.activeSpeakerId,
+			browser            : state.me.browser,
+			isSelected         : state.room.selectedPeers.includes(id),
+			mode               : state.room.mode
 		};
 	};
 
@@ -853,7 +1058,13 @@ export default withRoomContext(connect(
 				prev.consumers === next.consumers &&
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.windowConsumer === next.room.windowConsumer &&
-				prev.me.browser === next.me.browser
+				prev.room.fullScreenConsumer === next.room.fullScreenConsumer &&
+				prev.room.mode === next.room.mode &&
+				prev.room.selectedPeers === next.room.selectedPeers &&
+				prev.me.browser === next.me.browser &&
+				prev.enableLayersSwitch === next.enableLayersSwitch &&
+				prev.width === next.width &&
+				prev.height === next.height
 			);
 		}
 	}

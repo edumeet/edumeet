@@ -1,0 +1,12 @@
+redisOptions:
+  host: redis
+  port: 6379
+
+listeningPort: 3443
+listeningRedirectPort: 0
+httpOnly: false
+trustProxy: ''
+
+prometheus:
+  enabled: true
+  listen: 0.0.0.0

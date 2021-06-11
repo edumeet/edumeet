@@ -1,26 +1,33 @@
-// eslint-disable-next-line
-var config =
-{
-	loginEnabled    : false,
-	developmentPort : 3443,
-	productionPort  : 443,
-	// If the server component runs on a different host than the app
-	// you can uncomment the following line and specify the host name.
-	//serverHostname  : 'external-server.com',
+/**
+ * Edumeet App Configuration
+ *
+ * The configuration documentation is available also:
+ * - in the app/README.md file in the source tree
+ * - visiting the /?config=true page in a running instance
+ */
 
-	/**
-	 * Supported browsers version 
-	 * in bowser satisfy format.
-	 * See more:
-	 * https://www.npmjs.com/package/bowser#filtering-browsers
-	 * Otherwise you got a unsupported browser page
-	 */
-	supportedBrowsers :
-	{
+// eslint-disable-next-line
+var config = {
+
+	// If the login is enabled.
+	loginEnabled : false,
+
+	// The development server listening port.
+	developmentPort : 3443,
+
+	// The production server listening port.
+	productionPort : 443,
+
+	// If the server component runs on a different host than the app you can specify the host name.
+	serverHostname : '',
+
+	// Supported browsers version in bowser satisfy format.
+	supportedBrowsers : {
 		'windows' : {
 			'internet explorer' : '>12',
 			'microsoft edge'    : '>18'
 		},
+		'microsoft edge'               : '>18',
 		'safari'                       : '>12',
 		'firefox'                      : '>=60',
 		'chrome'                       : '>=74',
@@ -29,251 +36,331 @@ var config =
 		'samsung internet for android' : '>=11.1.1.52'
 	},
 
-	/**
-	 * Resolutions:
-	 * 
-	 * low ~ 320x240
-	 * medium ~ 640x480
-	 * high ~ 1280x720
-	 * veryhigh ~ 1920x1080
-	 * ultra ~ 3840x2560
-	 * 
-	 **/
+	// Network priorities.
+	networkPriorities : {
+		'audio'            : 'high',
+		'mainVideo'        : 'high',
+		'additionalVideos' : 'medium',
+		'screenShare'      : 'medium'
+	},
 
-	/**
-	 * Frame rates:
-	 * 
-	 * 1, 5, 10, 15, 20, 25, 30
-	 * 
-	 **/
-	// The aspect ratio of the videos as shown on
-	// the screen. This is changeable in client settings.
-	// This value must match one of the defined values in
-	// viewAspectRatios EXACTLY (e.g. 1.333)
-	viewAspectRatio  : 1.777,
-	// These are the selectable aspect ratios in the settings
-	viewAspectRatios : [ {
-		value : 1.333, // 4 / 3
-		label : '4 : 3'
-	}, {
-		value : 1.777, // 16 / 9
-		label : '16 : 9'
-	} ],
-	// The aspect ratio of the video from the camera
-	// this is not changeable in settings, only config
-	videoAspectRatio              : 1.777,
-	defaultResolution             : 'medium',
-	defaultFrameRate              : 15,
-	defaultScreenResolution       : 'veryhigh',
-	defaultScreenSharingFrameRate : 5,
-	// Enable or disable simulcast for webcam video
-	simulcast                     : true,
-	// Enable or disable simulcast for screen sharing video
-	simulcastSharing              : false,
-	// Simulcast encoding layers and levels
-	simulcastEncodings            :
-	[
-		{ scaleResolutionDownBy: 4 },
-		{ scaleResolutionDownBy: 2 },
-		{ scaleResolutionDownBy: 1 }
+	// The aspect ratio of the videos as shown on the screen.
+	// This value must match exactly one of the values defined in aspectRatios.
+	aspectRatio : 1.777,
+
+	// The selectable aspect ratios in the user settings.
+	aspectRatios : [
+		{
+			'value' : 1.333,
+			'label' : '4 : 3'
+		},
+		{
+			'value' : 1.777,
+			'label' : '16 : 9'
+		}
 	],
 
-	/**
-	 * Alternative simulcast setting:
-	 * [
-	 *   { maxBitRate: 50000 }, 
-	 *	 { maxBitRate: 1000000 },
-	 *	 { maxBitRate: 4800000 }
-	 *],
-	 **/
+	// The default video camera capture resolution.
+	resolution : 'medium',
 
-	/**
-	 * White listing browsers that support audio output device selection.
-	 * It is not yet fully implemented in Firefox.
-	 * See: https://bugzilla.mozilla.org/show_bug.cgi?id=1498512
-	 */
-	audioOutputSupportedBrowsers :
-	[
+	// The default video camera capture framerate.
+	frameRate : 15,
+
+	// The default screen sharing resolution.
+	screenResolution : 'veryhigh',
+
+	// The default screen sharing framerate.
+	screenSharingFrameRate : 5,
+
+	// Enable or disable simulcast for webcam video.
+	simulcast : true,
+
+	// Enable or disable simulcast for screen sharing video.
+	simulcastSharing : false,
+
+	// Define different encodings for various resolutions of the video.
+	simulcastProfiles : {
+		'320' : [
+			{
+				'scaleResolutionDownBy' : 1,
+				'maxBitRate'            : 250000
+			}
+		],
+		'640' : [
+			{
+				'scaleResolutionDownBy' : 2,
+				'maxBitRate'            : 250000
+			},
+			{
+				'scaleResolutionDownBy' : 1,
+				'maxBitRate'            : 900000
+			}
+		],
+		'1280' : [
+			{
+				'scaleResolutionDownBy' : 4,
+				'maxBitRate'            : 250000
+			},
+			{
+				'scaleResolutionDownBy' : 2,
+				'maxBitRate'            : 900000
+			},
+			{
+				'scaleResolutionDownBy' : 1,
+				'maxBitRate'            : 3000000
+			}
+		],
+		'1920' : [
+			{
+				'scaleResolutionDownBy' : 4,
+				'maxBitRate'            : 750000
+			},
+			{
+				'scaleResolutionDownBy' : 2,
+				'maxBitRate'            : 1500000
+			},
+			{
+				'scaleResolutionDownBy' : 1,
+				'maxBitRate'            : 4000000
+			}
+		],
+		'3840' : [
+			{
+				'scaleResolutionDownBy' : 4,
+				'maxBitRate'            : 1500000
+			},
+			{
+				'scaleResolutionDownBy' : 2,
+				'maxBitRate'            : 4000000
+			},
+			{
+				'scaleResolutionDownBy' : 1,
+				'maxBitRate'            : 10000000
+			}
+		]
+	},
+
+	// The adaptive spatial layer selection scaling factor in the range [0.5, 1.0].
+	adaptiveScalingFactor : 0.75,
+
+	// White listing browsers that support audio output device selection.
+	audioOutputSupportedBrowsers : [
 		'chrome',
 		'opera'
 	],
-	// Socket.io request timeout
-	requestTimeout   : 20000,
-	requestRetries   : 3,
-	transportOptions :
-	{
-		tcp : true
-	},
-	// defaults for audio setting on new clients / can be customized and overruled from client side
-	defaultAudio :
-	{
-		autoGainControl      : false, // default : false
-		echoCancellation     : true, // default : true 
-		noiseSuppression     : true, // default : true 
-		// Automatically unmute speaking above noisThereshold
-		voiceActivatedUnmute : false, // default : false 
-		// This is only for voiceActivatedUnmute and audio-indicator
-		noiseThreshold       : -60 // default -60
-	},
-	// Audio options for now only centrally from config file: 
-	centralAudioOptions :
-	{
-		// will not eat that much bandwith thanks to opus
-		sampleRate          : 48000, // default : 48000 and don't go higher
-		// usually mics are mono so this saves bandwidth
-		channelCount        : 1, // default : 1
-		volume              : 1.0, // default : 1.0
-		sampleSize          : 16, // default : 16
-		// usually mics are mono so this saves bandwidth
-		opusStereo          : false, // default : false
-		opusDtx             : true, // default : true / will save bandwidth 
-		opusFec             : true, // default : true / forward error correction
-		opusPtime           : '20', // default : 20 / minimum packet time (3, 5, 10, 20, 40, 60, 120)
-		opusMaxPlaybackRate : 48000 // default : 48000 and don't go higher
+
+	// The Socket.io request timeout.
+	requestTimeout : 20000,
+
+	// The Socket.io request maximum retries.
+	requestRetries : 3,
+
+	// The Mediasoup transport options.
+	transportOptions : {
+		'tcp' : true
 	},
 
-	/**
-	 * Set max number participants in one room that join 
-	 * unmuted. Next participant will join automatically muted
-	 * Default value is 4
-	 * 
-	 * Set it to 0 to auto mute all, 
-	 * Set it to negative (-1) to never automatically auto mute
-	 * but use it with caution
-	 * full mesh audio strongly decrease room capacity! 
-	 */
-	autoMuteThreshold    : 4,
-	background           : 'images/background.jpg',
-	defaultLayout        : 'democratic', // democratic, filmstrip
-	// If true, will show media control buttons in separate
-	// control bar, not in the ME container.
-	buttonControlBar     : false,
-	// If false, will push videos away to make room for side
-	// drawer. If true, will overlay side drawer over videos
-	drawerOverlayed      : true,
-	// Position of notifications
+	// Auto gain control enabled.
+	autoGainControl : true,
+
+	// Echo cancellation enabled.
+	echoCancellation : true,
+
+	// Noise suppression enabled.
+	noiseSuppression : true,
+
+	// Automatically unmute speaking above noiseThreshold.
+	voiceActivatedUnmute : false,
+
+	// This is only for voiceActivatedUnmute and audio-indicator.
+	noiseThreshold : -60,
+
+	// The audio sample rate.
+	sampleRate : 48000,
+
+	// The audio channels count.
+	channelCount : 1,
+
+	// The audio sample size count.
+	sampleSize : 16,
+
+	// If OPUS FEC stereo be enabled.
+	opusStereo : false,
+
+	// If OPUS DTX should be enabled.
+	opusDtx : true,
+
+	// If OPUS FEC should be enabled.
+	opusFec : true,
+
+	// The OPUS packet time.
+	opusPtime : 20,
+
+	// The OPUS playback rate.
+	opusMaxPlaybackRate : 48000,
+
+	// The audio preset
+	audioPreset : 'conference',
+
+	// The audio presets.
+	audioPresets : {
+		'conference' : {
+			'name'                 : 'Conference audio',
+			'autoGainControl'      : true,
+			'echoCancellation'     : true,
+			'noiseSuppression'     : true,
+			'voiceActivatedUnmute' : false,
+			'noiseThreshold'       : -60,
+			'sampleRate'           : 48000,
+			'channelCount'         : 1,
+			'sampleSize'           : 16,
+			'opusStereo'           : false,
+			'opusDtx'              : true,
+			'opusFec'              : true,
+			'opusPtime'            : 20,
+			'opusMaxPlaybackRate'  : 48000
+		},
+		'hifi' : {
+			'name'                 : 'HiFi streaming',
+			'autoGainControl'      : false,
+			'echoCancellation'     : false,
+			'noiseSuppression'     : false,
+			'voiceActivatedUnmute' : false,
+			'noiseThreshold'       : -60,
+			'sampleRate'           : 48000,
+			'channelCount'         : 2,
+			'sampleSize'           : 16,
+			'opusStereo'           : true,
+			'opusDtx'              : false,
+			'opusFec'              : true,
+			'opusPtime'            : 60,
+			'opusMaxPlaybackRate'  : 48000
+		}
+	},
+
+	// It sets the maximum number of participants in one room that can join unmuted.
+	// The next participant will join automatically muted.
+	// Set it to 0 to auto mute all.
+	// Set it to negative (-1) to never automatically auto mute but use it with caution, 
+	// full mesh audio strongly decrease room capacity!
+	autoMuteThreshold : 4,
+
+	// The page background image URL
+	background : 'images/background.jpg',
+
+	// The default layout.
+	defaultLayout : 'democratic',
+
+	// If true, the media control buttons will be shown in separate control bar, not in the ME container.
+	buttonControlBar : false,
+
+	// If false, will push videos away to make room for side drawer.
+	// If true, will overlay side drawer over videos.
+	drawerOverlayed : true,
+
+	// The position of the notifications.
 	notificationPosition : 'right',
-	// Timeout for autohiding topbar and button control bar
-	hideTimeout          : 3000,
-	// max number of participant that will be visible in 
-	// as speaker
-	lastN                : 4,
-	mobileLastN          : 1,
-	// Highest number of lastN the user can select manually in 
-	// userinteface
-	maxLastN             : 5,
-	// If truthy, users can NOT change number of speakers visible
-	lockLastN            : false,
-	// Show logo if "logo" is not null, else show title
-	// Set logo file name using logo.* pattern like "logo.png" to not track it by git 
-	logo                 : 'images/logo.edumeet.svg',
-	title                : 'edumeet',
-	// Service & Support URL
-	// if not set then not displayed on the about modals
-	supportUrl           : 'https://support.example.com',
-	// Privacy and dataprotection URL or path
-	// by default privacy/privacy.html
-	// that is a placeholder for your policies
-	//
-	// but an external url could be also used here	 
-	privacyUrl           : 'privacy/privacy.html',
-	theme                :
-	{
-		palette :
-		{
-			primary :
-			{
-				main : '#313131'
+
+	// It sets the notifications sounds.
+	// Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 
+	// 'chatMessage', 'sendFile', 'newPeer' and 'default'.
+	// Not defining a key is equivalent to using the default notification sound.
+	// Setting 'play' to null disables the sound notification.		
+	// 
+	notificationSounds : {
+		'chatMessage' : {
+			'play' : '/sounds/notify-chat.mp3'
+		},
+		'raisedHand' : {
+			'play' : '/sounds/notify-hand.mp3'
+		},
+		'default' : {
+			'delay' : 5000,
+			'play'  : '/sounds/notify.mp3'
+		}
+	},
+
+	// Timeout for auto hiding the topbar and the buttons control bar.
+	hideTimeout : 3000,
+
+	// The maximum number of participants that will be visible in as speaker.
+	lastN : 4,
+
+	// The maximum number of participants that will be visible in as speaker for mobile users.
+	mobileLastN : 1,
+
+	// The highest number of lastN the user can select manually in the user interface.
+	maxLastN : 5,
+
+	// If true, the users can not change the number of visible speakers.
+	lockLastN : false,
+
+	// If not null, it shows the logo loaded from the specified URL, otherwise it shows the title.
+	logo : 'images/logo.edumeet.svg',
+
+	// The title to show if the logo is not specified.
+	title : 'edumeet',
+
+	// The service & Support URL; if `null`, it will be not displayed on the about dialogs.
+	supportUrl : 'https://support.example.com',
+
+	// The privacy and data protection external URL or local HTML path.
+	privacyUrl : 'privacy/privacy.html',
+
+	// UI theme elements colors.
+	theme : {
+		'palette' : {
+			'primary' : {
+				'main' : '#313131'
 			}
 		},
-		overrides :
-		{
-			MuiAppBar :
-			{
-				colorPrimary :
-				{
-					backgroundColor : '#313131'
+		'overrides' : {
+			'MuiAppBar' : {
+				'colorPrimary' : {
+					'backgroundColor' : '#313131'
 				}
 			},
-			MuiButton :
-			{
-				containedPrimary :
-				{
-					backgroundColor : '#5F9B2D',
-					'&:hover'       :
-					{
-						backgroundColor : '#5F9B2D'
+			'MuiButton' : {
+				'containedPrimary' : {
+					'backgroundColor' : '#5F9B2D',
+					'&:hover'         : {
+						'backgroundColor' : '#5F9B2D'
 					}
 				},
-				containedSecondary :
-				{
-					backgroundColor : '#f50057',
-					'&:hover'       :
-					{
-						backgroundColor : '#f50057'
+				'containedSecondary' : {
+					'backgroundColor' : '#f50057',
+					'&:hover'         : {
+						'backgroundColor' : '#f50057'
 					}
 				}
-
 			},
-
-			/*
-			MuiIconButton :
-			{
-				colorPrimary :
-				{
-					backgroundColor : '#5F9B2D',
-					'&:hover'       :
-					{
-						backgroundColor : '#5F9B2D'
+			'MuiFab' : {
+				'primary' : {
+					'backgroundColor' : '#5F9B2D',
+					'&:hover'         : {
+						'backgroundColor' : '#5F9B2D'
 					}
 				},
-				colorSecondary :
-				{
-					backgroundColor : '#f50057',
-					'&:hover'       :
-					{
-						backgroundColor : '#f50057'
+				'secondary' : {
+					'backgroundColor' : '#f50057',
+					'&:hover'         : {
+						'backgroundColor' : '#f50057'
 					}
 				}
-
 			},
-			*/
-
-			MuiFab :
-			{
-				primary :
-				{
-					backgroundColor : '#5F9B2D',
-					'&:hover'       :
-					{
-						backgroundColor : '#5F9B2D'
-					}
-				},
-				secondary :
-				{
-					backgroundColor : '#f50057',
-					'&:hover'       :
-					{
-						backgroundColor : '#f50057'
-					}
-				}
-
-			},
-			MuiBadge :
-			{
-				colorPrimary :
-				{
-					backgroundColor : '#5F9B2D',
-					'&:hover'       :
-					{
-						backgroundColor : '#518029'
+			'MuiBadge' : {
+				'colorPrimary' : {
+					'backgroundColor' : '#5F9B2D',
+					'&:hover'         : {
+						'backgroundColor' : '#518029'
 					}
 				}
 			}
 		},
-		typography :
-		{
-			useNextVariants : true
+		'typography' : {
+			'useNextVariants' : true
 		}
 	}
 };
+
+// Generated with: `yarn gen-config-docs` from app/src/config.ts

@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "आप शांत हैं, बात करने के लिए स्पेस-बार दबाईए",
 
@@ -122,6 +124,8 @@
 	"label.leave": "बाहर जाईये",
 	"label.chatInput": "चैट संदेश दर्ज करें ...",
 	"label.chat": "चैट",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "फ़ाइल का आदान-प्रदान",
 	"label.participants": "प्रतिभागि",
 	"label.shareFile": "फ़ाइल का आदान-प्रदान",
@@ -150,6 +154,10 @@
 	"label.join": null,
 	"label.recordingInProgress": null,
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
+
 	"settings.settings": "सेटिंग",
 	"settings.camera": "कैमरा",
 	"settings.selectCamera": "कैमरे का चयन करें",
@@ -185,6 +193,7 @@
 	"settings.noiseThreshold": "शोर सीमा",
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
@@ -243,7 +252,7 @@
 	"moderator.muteVideo": " प्रबंधक ने आपका वीडिओ स्थगित कर दिया है",
 	"moderator.stopScreenSharing": " प्रबंधक ने आपके स्क्रीन का आदान-प्रदान रोक दिया है",
 
-	"unsupportedBrowser.titleUsnsupportedBrowser": "असमर्थित ब्राउज़र पाया है!",
+	"unsupportedBrowser.titleUnsupportedBrowser": "असमर्थित ब्राउज़र पाया है!",
 	"unsupportedBrowser.titlewebrtcUnavailable": " आवश्यक कार्यक्षमता आपके ब्राउज़र में नहीं है!",
 	"unsupportedBrowser.bodyText": "इस भेंटवार्ता के लिए आवश्यक कार्यक्षमता आपके ब्राउज़र में नहीं है. कृपया नवीनीकरण कीजिए या ब्राउज़र बदलिए अतः आपकी सेटिंग्स जांचीए. समर्थित ब्राउज़र:"
 }

@@ -1,12 +1,6 @@
-export const addUserMessage = (text) =>
+export const addMessage = (message) =>
 	({
-		type    : 'ADD_NEW_USER_MESSAGE',
-		payload : { text }
-	});
-
-export const addResponseMessage = (message) =>
-	({
-		type    : 'ADD_NEW_RESPONSE_MESSAGE',
+		type    : 'ADD_MESSAGE',
 		payload : { message }
 	});
 
@@ -20,3 +14,23 @@ export const clearChat = () =>
 	({
 		type : 'CLEAR_CHAT'
 	});
+
+export const sortChat = (order) =>
+	({
+		type    : 'SORT_CHAT',
+		payload : { order }
+	});
+
+export const setIsScrollEnd = (flag) =>
+	({
+		type    : 'SET_IS_SCROLL_END',
+		payload : { flag }
+	});
+
+export const setIsMessageRead = (id, isRead) =>
+{
+	return ({
+		type    : 'SET_IS_MESSAGE_READ',
+		payload : { id, isRead }
+	});
+};

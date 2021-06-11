@@ -77,6 +77,12 @@ export const toggleShowNotifications = () =>
 		type : 'TOGGLE_SHOW_NOTIFICATIONS'
 	});
 
+export const setAudioPreset = (audioPreset) =>
+	({
+		type    : 'SET_AUDIO_PRESET',
+		payload : { audioPreset }
+	});
+
 export const setEchoCancellation = (echoCancellation) =>
 	({
 		type    : 'SET_ECHO_CANCELLATION',
@@ -107,6 +113,62 @@ export const setNoiseThreshold = (noiseThreshold) =>
 		payload : { noiseThreshold }
 	});
 
+// Advanced audio settings
+export const setSampleRate = (sampleRate) =>
+	({
+		type    : 'SET_SAMPLE_RATE',
+		payload : { sampleRate }
+	});
+
+export const setChannelCount = (channelCount) =>
+	({
+		type    : 'SET_CHANNEL_COUNT',
+		payload : { channelCount }
+	});
+
+export const setSampleSize = (sampleSize) =>
+	({
+		type    : 'SET_SAMPLE_SIZE',
+		payload : { sampleSize }
+	});
+
+export const setOpusStereo = (opusStereo) =>
+	({
+		type    : 'SET_OPUS_STEREO',
+		payload : { opusStereo }
+	});
+
+export const setOpusDtx = (opusDtx) =>
+	({
+		type    : 'SET_OPUS_DTX',
+		payload : { opusDtx }
+	});
+
+export const setOpusFec = (opusFec) =>
+	({
+		type    : 'SET_OPUS_FEC',
+		payload : { opusFec }
+	});
+
+export const setOpusPtime = (opusPtime) =>
+	({
+		type    : 'SET_OPUS_PTIME',
+		payload : { opusPtime }
+	});
+
+export const setOpusMaxPlaybackRate = (opusMaxPlaybackRate) =>
+	({
+		type    : 'SET_OPUS_MAX_PLAYBACK_RATE',
+		payload : { opusMaxPlaybackRate }
+	});
+
+export const setEnableOpusDetails = (enableOpusDetails) =>
+	({
+		type    : 'SET_ENABLE_OPUS_DETAILS',
+		payload : { enableOpusDetails }
+	});
+
+// Default audio device
 export const setDefaultAudio = (audio) =>
 	({
 		type    : 'SET_DEFAULT_AUDIO',
@@ -131,6 +193,11 @@ export const setLastN = (lastN) =>
 export const toggleMirrorOwnVideo = () =>
 	({
 		type : 'TOGGLE_MIRROR_OWN_VIDEO'
+	});
+
+export const toggleHideNoVideoParticipants = () =>
+	({
+		type : 'TOGGLE_HIDE_NO_VIDEO_PARTICIPANTS'
 	});
 
 export const setMediaPerms = (mediaPerms) =>

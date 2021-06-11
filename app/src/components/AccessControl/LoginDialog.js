@@ -11,6 +11,7 @@ import CookieConsent from 'react-cookie-consent';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -20,7 +21,7 @@ const styles = (theme) =>
 			width                : '100%',
 			height               : '100%',
 			backgroundColor      : 'var(--background-color)',
-			backgroundImage      : `url(${window.config ? window.config.background : null})`,
+			backgroundImage      : `url(${config.background})`,
 			backgroundAttachment : 'fixed',
 			backgroundPosition   : 'center',
 			backgroundSize       : 'cover',
@@ -116,9 +117,9 @@ const ChooseRoom = ({
 			>
 				<DialogTitle>
 
-					{ window.config.logo !== null ?
-						<img alt='Logo' src={window.config.logo} /> :
-						<Typography variant='h5'> {window.config.title} </Typography>
+					{ config.logo ?
+						<img alt='Logo' src={config.logo} /> :
+						<Typography variant='h5'> {config.title} </Typography>
 					}
 					<hr />
 

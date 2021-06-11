@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": "Opuszczanie pokoju",
+	"room.leaveConfirmationMessage": "Czy na pewno chcesz opuścić pokój?",
 
 	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj SPACJĘ, aby mówić.",
 
@@ -122,6 +124,8 @@
 	"label.leave": "Zakończ",
 	"label.chatInput": "Treść wiadomości...",
 	"label.chat": "Czat",
+	"label.chatNoMessages": "Brak wiadomości",
+	"label.chatNewMessages": "Nowe Wiadomości",
 	"label.filesharing": "Udostępnianie plików",
 	"label.participants": "Uczestnicy",
 	"label.shareFile": "Udostępnij plik",
@@ -150,6 +154,10 @@
 	"label.join": "Dołącz",
 	"label.recordingInProgress": null,
 	
+	"label.yes": "Tak",
+	"label.no": "Nie",
+	"label.leaveWithSavingChat": "Tak + zapis czatu ({chatCount})",
+
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Urządzenie wideo",
@@ -185,6 +193,7 @@
 	"settings.noiseThreshold": "Próg szumu",
 	"settings.mirrorOwnVideo": "Lustrzany widok własnego wideo",
 	"settings.language": "Wybór języka",
+	"settings.hideNoVideoParticipants": "Ukrywanie uczestników bez wideo",
 	"settings.myPhotoButton": "Ustaw moje zdjęcie",
 	"settings.myPhotoLabel": "Maksymalny rozmiar pliku: 5MB, dozwolone: jpg, jpeg, png",
 	"settings.myPhotoSizeError": " plik jest zbyt duży",

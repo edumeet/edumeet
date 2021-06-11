@@ -12,6 +12,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -62,7 +63,7 @@ const AdvancedSettings = ({
 					defaultMessage : 'Notification sounds'
 				})}
 			/>
-			{ !window.config.lockLastN &&
+			{ !config.lockLastN &&
 				<form className={classes.setting} autoComplete='off'>
 					<FormControl className={classes.formControl}>
 						<Select
@@ -77,7 +78,7 @@ const AdvancedSettings = ({
 							className={classes.selectEmpty}
 						>
 							{ Array.from(
-								{ length: window.config.maxLastN || 10 },
+								{ length: config.maxLastN || 10 },
 								(_, i) => i + 1
 							).map((lastN) =>
 							{

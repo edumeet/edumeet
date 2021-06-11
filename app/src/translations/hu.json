@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": "{displayName} leállította a helyi rögzítést",
 	"room.recordingConsent": "A konferencián való részvételeddel beleegyezésed adod hogy a konferenciáról hang és videó felvétel, és/vagy élő közvetítés készüljön!",
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 
@@ -122,6 +124,8 @@
 	"label.leave": "Kilépés",
 	"label.chatInput": "Chat üzenet ...",
 	"label.chat": "Chat",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Fájl megosztás",
 	"label.participants": "Résztvevők",
 	"label.shareFile": "Fájl megosztása",
@@ -150,6 +154,10 @@
 	"label.join": "Kapcsolódás",
 	"label.recordingInProgress": "Felvétel készül..",
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
+
 	"settings.settings": "Beállítások",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Válassz videoeszközt",
@@ -185,6 +193,7 @@
 	"settings.noiseThreshold": "Zajszint",
 	"settings.mirrorOwnVideo": "Saját videókép tükrözése",
 	"settings.language": "Nyelv",
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
 
@@ -122,6 +124,8 @@
 	"label.leave": "Napusti",
 	"label.chatInput": "Uđi u razgovor porukama",
 	"label.chat": "Razgovor",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Dijeljenje datoteka",
 	"label.participants": "Sudionici",
 	"label.shareFile": "Dijeli datoteku",
@@ -150,6 +154,10 @@
 	"label.join": null,
 	"label.recordingInProgress": null,
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
+
 	"settings.settings": "Postavke",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Odaberi video uređaj",
@@ -185,6 +193,7 @@
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

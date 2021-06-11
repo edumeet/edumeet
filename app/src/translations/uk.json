@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": " У вас вимкнено звук, утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
 	"roles.gotRole": "Ви отримали роль {role}",
@@ -121,6 +123,8 @@
 	"label.leave": "Залишити",
 	"label.chatInput": "Введіть повідомлення чату ...",
 	"label.chat": "Чат",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Обмін файлами",
 	"label.participants": "Учасники",
 	"label.shareFile": "Надіслати файл",
@@ -149,6 +153,10 @@
 	"label.join": null,
 	"label.recordingInProgress": null,
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
+
 	"settings.settings": "Налаштування",
 	"settings.camera": "Камера",
 	"settings.selectCamera": "Вибрати відеопристрій",
@@ -184,6 +192,7 @@
 	"settings.noiseThreshold": "Поріг шуму",
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

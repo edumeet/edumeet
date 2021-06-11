@@ -8,8 +8,13 @@ import { createLogger } from 'redux-logger';
 import { createMigrate, persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+// import { createFilter } from 'redux-persist-transform-filter';
+import { diff } from 'deep-object-diff';
 import rootReducer from './reducers/rootReducer';
-import { createFilter } from 'redux-persist-transform-filter';
+import Logger from './Logger';
+import { config } from './config';
+
+const logger = new Logger('store');
 
 const migrations =
 {
@@ -30,16 +35,18 @@ const migrations =
 	},
 	1 : (state) =>
 	{
-		state.settings.sampleRate = undefined;
-		state.settings.channelCount = undefined;
-		state.settings.volume = undefined;
-		state.settings.sampleSize = undefined;
 		state.me = undefined;
+
+		return { ...state };
+	},
+	2 : (state) =>
+	{
+		state.settings.autoGainControl = true;
 
 		return { ...state };
 	}
 	// Next version
-	//	2 : (state) =>
+	//	4 : (state) =>
 	//	{
 	//		return { ...state };
 	//	}
@@ -56,14 +63,16 @@ const persistConfig =
 	storage         : storage,
 	// migrate will iterate state over all version-functions
 	// from migrations until version is reached
-	version         : 1,
-	migrate         : createMigrate(migrations, { debug: false }),
+	version         : 2,
+	migrate         : createMigrate(migrations, { debug: true }),
 	stateReconciler : autoMergeLevel2,
-	whitelist       : [ 'settings', 'intl' ],
-	transforms      : [
-		saveSubsetFilter
-	]
+	whitelist       : [ 'settings', 'intl', 'config' ]
 };
+
+/* const saveSubsetFilter = createFilter(
+	'me',
+	[ 'loggedIn' ]
+);*/
 
 const reduxMiddlewares =
 [
@@ -72,16 +81,17 @@ const reduxMiddlewares =
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
+	const LOG_IGNORE = [
+		'SET_PEER_VOLUME',
+		'SET_ROOM_ACTIVE_SPEAKER',
+		'ADD_TRANSPORT_STATS'
+	];
+
 	const reduxLogger = createLogger(
 		{
-			// filter VOLUME level actions from log
-			predicate : (getState, action) => !(
-				action.type === 'SET_PEER_VOLUME' ||
-				action.type === 'SET_ROOM_ACTIVE_SPEAKER'||
-				action.type === 'SET_IS_SPEAKING' ||
-				action.type === 'SET_AUTO_MUTED'
-			),
+			predicate : (getState, action) => LOG_IGNORE.indexOf(action.type) === -1,
 			duration  : true,
+			collapsed : true,
 			timestamp : false,
 			level     : 'info',
 			logErrors : true
@@ -115,4 +125,34 @@ export const store = createStore(
 	enhancer
 );
 
-export const persistor = persistStore(store);
+export const persistor = persistStore(store, null, () =>
+{
+	// Check if the app config differs from the stored version.
+	const currentConfig = store.getState().config;
+	const changed = diff(currentConfig, config);
+	const changedKeys = Object.keys(changed);
+
+	if (changedKeys.length)
+	{
+		logger.debug('store config changed:', changed);
+		const changedSettings = {};
+
+		changedKeys.forEach((key) =>
+		{
+			changedSettings[key] = config[key];
+		});
+
+		store.dispatch({ type: 'SETTINGS_UPDATE', payload: changedSettings });
+		store.dispatch({ type: 'CONFIG_SET', payload: config });
+	}
+});
+
+/*
+
+export const persistor = persistStore(store, {
+	transforms : [
+		saveSubsetFilter
+	]
+
+});
+*/

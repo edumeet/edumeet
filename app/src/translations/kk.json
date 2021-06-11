@@ -75,6 +75,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Сіз дыбыссызсыз, сөйлесу үшін БОС ОРЫН пернесін ұстап тұрыңыз",
 
@@ -120,6 +122,8 @@
 	"label.leave": "Шығу",
 	"label.chatInput": "Чат хабарламасын енгізіңіз...",
 	"label.chat": "Чат",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Файлмен бөлісу",
 	"label.participants": "Қатысушылар",
 	"label.shareFile": "Файлды бірге пайдалану",
@@ -148,6 +152,10 @@
 	"label.join": null,
 	"label.recordingInProgress": null,
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
+
 	"settings.settings": "Параметрлер",
 	"settings.camera": "Камера",
 	"settings.selectCamera": "Бейне құрылғыны таңдаңыз",
@@ -183,6 +191,7 @@
 	"settings.noiseThreshold": "Шу деңгейі",
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
@@ -242,7 +251,7 @@
 	"moderator.muteVideo": "одератор видеобейнеңізді өшірді",
 	"moderator.stopScreenSharing": "Модератор экранды бөлісуді тоқтатты",
 
-	"unsupportedBrowser.titleUsnsupportedBrowser": "Қолдау көрсетілмейтін браузер анықталды!",
+	"unsupportedBrowser.titleUnsupportedBrowser": "Қолдау көрсетілмейтін браузер анықталды!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Қажетті функционалдылық сіздің браузеріңізде қол жетімді емес!",
 	"unsupportedBrowser.bodyText": "Бұл бейнеконференция қызметі сіздің браузеріңіз қолдамайтын функцияны қажет етеді. Жаңартыңыз немесе басқа браузерге ауысыңыз немесе параметрлеріңізді тексеріңіз. Қолдау көрсетілетін браузерлер:"
 }

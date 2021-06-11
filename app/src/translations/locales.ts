@@ -1,3 +1,6 @@
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+
 const list = [
 	{
 		name   : 'English',
@@ -113,7 +116,8 @@ const list = [
 
 export const detect = () =>
 {
-	const localeFull = (navigator.language || navigator.browserLanguage).toLowerCase();
+	const localeFull = (navigator.language ||
+		(navigator as any).browserLanguage).toLowerCase();
 
 	// const localeCountry = localeFull.split(/[-_]/)[0];
 
@@ -124,27 +128,32 @@ export const detect = () =>
 
 export const getList = () => list;
 
-export const loadOne = (locale) =>
+export interface ILocale {
+  name: string;
+  file: string;
+  locale: string[];
+  messages: any;
+}
+
+export const loadOne = (locale: string): ILocale =>
 {
-	let res = {};
+	let res: any = {};
 
 	try
 	{
-		res = list.filter((item) =>
-			item.locale.includes(locale) || item.locale.includes(locale.split(/[-_]/)[0])
+		res = list.filter(
+			// (item) => item.locale.includes(locale) || item.locale.includes(locale.split(/[-_]/)[0])
+			(item) => item.locale.includes(locale)
 		)[0];
 
 		res.messages = require(`./${res.file}`);
 	}
-
 	catch
 	{
-
 		res = list.filter((item) => item.locale.includes('en'))[0];
 
 		res.messages = require(`./${res.file}`);
 	}
 
 	return res;
-
 };

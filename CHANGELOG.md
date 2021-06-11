@@ -8,6 +8,17 @@
   * IndexedDB and fallback to memory (array of blobs)
   * CLIENT.recoverRecording(`DB_NAME`)
   * Add new permission LOCAL_RECORD_ROOM
+## 3.5.0 or Next Version
+
+### Added
+
+* Add QoS set DSCP bits in IP header according to new option networkPriorities in app config
+  Our media traffic should get now higher priority where QoS has been implemented.
+  Routers will add higher priority or put media packets to low latency queue.
+  If QoS implemented in L2 too, then switches also set the L2 CoS bits according DSCP.
+  WIFI AP-s that implements QoS, also based on it could activate the multimedia extension MMS.
+  Hopefully it will help and add little bit more priority lower latency in congested networks.
+  At the time of this writing it is only implemented in Chrome.
 
 ## 3.4.0
 

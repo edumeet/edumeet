@@ -77,6 +77,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Jste ztišen, chcete-li mluvit, podržte mezerník",
 
@@ -125,6 +127,8 @@
 	"label.leave": "Opustit",
 	"label.chatInput": "Napište zprávu chatu",
 	"label.chat": "Chat",
+	"label.chatNoMessages": "Žádné zprávy",
+	"label.chatNewMessages": null,
 	"label.filesharing": "Sdílení souborů",
 	"label.participants": "Účastníci",
 	"label.shareFile": "Sdílet soubor",
@@ -154,6 +158,10 @@
 	"label.startRoomRecord": null,
 	"label.recordingInProgress": null,
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leaveWithSavingChat": null,
+
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Vyberte video zařízení",
@@ -189,6 +197,7 @@
 	"settings.noiseThreshold": "Mezní hodnota hluku",
 	"settings.mirrorOwnVideo": "Zrcadlové zobrazení vlastního videa",
 	"settings.language": "Vyberte jazyk",
+	"settings.hideNoVideoParticipants": "Zobrazovat jen účastníky s obrazem",
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,

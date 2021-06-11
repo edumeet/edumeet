@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { withRoomContext } from '../../../RoomContext';
+import { withRoomContext } from '../../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
-import { permissions } from '../../../permissions';
-import { makePermissionSelector } from '../../Selectors';
+import { permissions } from '../../../../permissions';
+import { makePermissionSelector } from '../../../Selectors';
 import Button from '@material-ui/core/Button';
 
 const styles = (theme) =>
@@ -28,19 +28,28 @@ const styles = (theme) =>
 		}
 	});
 
-const FileSharingModerator = (props) =>
+const ChatModerator = (props) =>
 {
 	const intl = useIntl();
 
 	const {
 		roomClient,
+		isChatModerator,
 		isFileSharingModerator,
 		room,
 		classes
 	} = props;
 
+	if (!isChatModerator)
+		return null;
+
 	if (!isFileSharingModerator)
 		return null;
+
+	const handleClearChat = () =>
+	{
+		roomClient.clearChat();
+	};
 
 	return (
 		<ul className={classes.root}>
@@ -52,38 +61,40 @@ const FileSharingModerator = (props) =>
 			</li>
 			<Button
 				aria-label={intl.formatMessage({
-					id             : 'room.clearFileSharing',
-					defaultMessage : 'Clear files'
+					id             : 'room.clearChat',
+					defaultMessage : 'Clear chat'
 				})}
 				className={classes.actionButton}
 				variant='contained'
 				color='secondary'
-				disabled={room.clearFileSharingInProgress}
-				onClick={() => roomClient.clearFileSharing()}
+				disabled={room.clearChatInProgress}
+				onClick={handleClearChat}
 			>
 				<FormattedMessage
-					id='room.clearFileSharing'
-					defaultMessage='Clear files'
+					id='room.clearChat'
+					defaultMessage='Clear chat'
 				/>
 			</Button>
 		</ul>
 	);
 };
 
-FileSharingModerator.propTypes =
+ChatModerator.propTypes =
 {
 	roomClient             : PropTypes.any.isRequired,
 	isFileSharingModerator : PropTypes.bool,
+	isChatModerator        : PropTypes.bool,
 	room                   : PropTypes.object,
 	classes                : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
 {
-	const hasPermission = makePermissionSelector(permissions.MODERATE_FILES);
+	const hasPermission = makePermissionSelector(permissions.MODERATE_CHAT);
 
 	const mapStateToProps = (state) =>
 		({
+			isChatModerator        : hasPermission(state),
 			isFileSharingModerator : hasPermission(state),
 			room                   : state.room
 		});
@@ -105,4 +116,4 @@ export default withRoomContext(connect(
 			);
 		}
 	}
-)(withStyles(styles)(FileSharingModerator)));
+)(withStyles(styles)(ChatModerator)));

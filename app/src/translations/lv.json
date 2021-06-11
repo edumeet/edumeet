@@ -76,6 +76,8 @@
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
 	"room.localRecordingSecurityError": null,
+	"room.leavingTheRoom": null,
+	"room.leaveConfirmationMessage": null,
 
 	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
 
@@ -121,6 +123,8 @@
 	"label.leave": "Pamest",
 	"label.chatInput": "Rakstiet tērziņa ziņu...",
 	"label.chat": "Tērzētava",
+	"label.chatNoMessages": null,
+	"label.chatNewMessages": null,
 	"label.filesharing": "Failu koplietošana",
 	"label.participants": "Dalībnieki",
 	"label.shareFile": "Koplietot failu",
@@ -147,6 +151,10 @@
 	"label.join": null,
 	"label.recordingInProgress": null,
 	
+	"label.yes": null,
+	"label.no": null,
+	"label.leavewithsavingchat": null,
+
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",
 	"settings.selectCamera": "Izvēlieties kameru (video ierīci)",
@@ -179,6 +187,7 @@
 	"settings.noiseThreshold": null,
 	"settings.mirrorOwnVideo": null,
 	"settings.language": null,
+	"settings.hideNoVideoParticipants": null,
 	"settings.myPhotoButton": null,
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
