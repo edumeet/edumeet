@@ -34,6 +34,9 @@ export default class BrowserRecorder extends EventEmitter
 		this.ctx = null;
 		this.dest = null;
 		this.gainNode = null;
+		this.audioConsumersMap = new Map();
+		this.micProducerId = null;
+		this.micProducerStreamSource = null;
 
 		this.RECORDING_CONSTRAINTS = {
 			videoBitsPerSecond : 8000000,
@@ -74,12 +77,6 @@ export default class BrowserRecorder extends EventEmitter
 
 		return new MediaStream(tracks);
 
-	}
-
-	addTrack(track)
-	{
-		// gainNode.disconnect(); if i want to delete previos streams
-		this.ctx.createMediaStreamSource(track).connect(this.dest);
 	}
 
 	async startLocalRecording(
@@ -485,12 +482,56 @@ export default class BrowserRecorder extends EventEmitter
 		// is it already appended to stream?
 		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused'))
 		{
+
 			const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
-			if (micProducer)
+			if (micProducer && this.micProducerId != micProducer.id)
 			{
-				this.addTrack(new MediaStream([ micProducer.track ]));
+
+				// delete/dc previous one 
+				if (this.micProducerStreamSource)
+				{
+					this.micProducerStreamSource.disconnect(this.dest);
+				}
+
+				this.micProducerStreamSource = this.ctx.createMediaStreamSource(
+					new MediaStream([ micProducer.track ])
+				);
+				this.micProducerStreamSource.connect(this.dest);
+
+				// set Mic id
+				this.micProducerId = micProducer.id;
 			}
+		}
+	}
+	checkAudioConsumer(consumers)
+	{
+		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused'))
+		{
+			const audioConsumers = Object.values(consumers).filter((p) => p.kind === 'audio');
+
+			for (let i = 0; i < audioConsumers.length; i++)
+			{
+				if (!this.audioConsumersMap.has(audioConsumers[i].id))
+				{
+					const audioConsumerStreamSource = this.ctx.createMediaStreamSource(
+						new MediaStream([ audioConsumers[i].track ])
+					);
+
+					audioConsumerStreamSource.connect(this.dest);
+					this.audioConsumersMap.set(audioConsumers[i].id, audioConsumerStreamSource);
+				}
+			}
+
+			for (const [ consumerId, aCStreamSource ] in this.audioConsumersMap.entries())
+			{
+				if (!audioConsumers.find((c) => consumerId == c.id))
+				{
+					aCStreamSource.disconnect(this.dest);
+					this.audioConsumersMap.delete(consumerId);
+				}
+			}
+
 		}
 	}
 }
