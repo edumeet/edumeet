@@ -4,16 +4,16 @@ import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
 import * as meActions from './actions/meActions';
 import { store } from './store';
-
+import * as requestActions from './actions/requestActions';
 import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
 
-const EventEmitter = require('events');
-
-export default class BrowserRecorder extends EventEmitter
+export default class BrowserRecorder
 {
 	constructor()
 	{
-		super();
+		// react
+		this.intl = null;
+
 		// MediaRecorder
 		this.recorder = null;
 		this.recordingMimeType = null;
@@ -199,7 +199,14 @@ export default class BrowserRecorder extends EventEmitter
 					switch (error.name)
 					{
 						case 'SecurityError':
-							this.emit('serror');
+							store.dispatch(requestActions.notify(
+								{
+									type : 'error',
+									text : this.intl.formatMessage({
+										id             : 'room.localRecordingSecurityError',
+										defaultMessage : 'Recording the specified source is not allowed due to security restrictions. Check you client settings!'
+									})
+								}));
 							break;
 						case 'InvalidStateError':
 						default:
@@ -270,8 +277,14 @@ export default class BrowserRecorder extends EventEmitter
 		}
 		catch (error)
 		{
-			this.emit('serror1');
-
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : this.intl.formatMessage({
+						id             : 'room.unexpectedErrorDuringLocalRecording',
+						defaultMessage : 'Unexpected error ocurred during local recording'
+					})
+				}));
 			this.logger.error('startLocalRecording() [error:"%o"]', error);
 
 			if (this.recorder) this.recorder.stop();
@@ -294,12 +307,24 @@ export default class BrowserRecorder extends EventEmitter
 
 			store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
 
-			this.emit('serror2');
-
+			store.dispatch(requestActions.notify(
+				{
+					text : this.intl.formatMessage({
+						id             : 'room.youStartedLocalRecording',
+						defaultMessage : 'You started local recording'
+					})
+				}));
 		}
 		catch (error)
 		{
-			this.emit('serror3');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : this.intl.formatMessage({
+						id             : 'room.unexpectedErrorDuringLocalRecording',
+						defaultMessage : 'Unexpected error ocurred during local recording'
+					})
+				}));
 			this.logger.error('startLocalRecording() [error:"%o"]', error);
 
 		}
@@ -311,7 +336,13 @@ export default class BrowserRecorder extends EventEmitter
 		{
 			this.recorder.stop();
 
-			this.emit('serror4');
+			store.dispatch(requestActions.notify(
+				{
+					text : this.intl.formatMessage({
+						id             : 'room.youStoppedLocalRecording',
+						defaultMessage : 'You stopped local recording'
+					})
+				}));
 
 			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
 
@@ -321,7 +352,14 @@ export default class BrowserRecorder extends EventEmitter
 		catch (error)
 		{
 
-			this.emit('serror5');
+			store.dispatch(requestActions.notify(
+				{
+					type : 'error',
+					text : this.intl.formatMessage({
+						id             : 'room.unexpectedErrorDuringLocalRecording',
+						defaultMessage : 'Unexpected error ocurred during local recording'
+					})
+				}));
 
 			this.logger.error('stopLocalRecording() [error:"%o"]', error);
 		}
