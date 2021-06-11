@@ -54,6 +54,7 @@ import { store } from '../../store';
 // import producers from '../../reducers/producers';
 // import logger from 'redux-logger';
 import Logger from '../../Logger';
+import * as requestActions from '../../actions/requestActions';
 
 const logger = new Logger('Recorder');
 
@@ -684,11 +685,11 @@ const TopBar = (props) =>
 									handleMenuClose();
 									if (localRecordingState === RECORDING_PAUSE)
 									{
-										roomClient.resumeLocalRecording();
+										recorder.resumeLocalRecording();
 									}
 									else
 									{
-										roomClient.pauseLocalRecording();
+										recorder.pauseLocalRecording();
 									}
 								}
 								}
@@ -730,7 +731,7 @@ const TopBar = (props) =>
 									localRecordingState === RECORDING_PAUSE ||
 									localRecordingState === RECORDING_RESUME)
 								{
-									roomClient.stopLocalRecording();
+									recorder.stopLocalRecording();
 								}
 								else
 								{
@@ -743,9 +744,76 @@ const TopBar = (props) =>
 										const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
 										if (micProducer) additionalAudioTracks.push(micProducer.track);
-										await recorder.start({
+										await recorder.startLocalRecording({
+											roomClient,
 											additionalAudioTracks,
 											recordingMimeType
+										});
+										recorder.removeAllListeners();
+										recorder.on('serror', () =>
+										{
+											store.dispatch(requestActions.notify(
+												{
+													type : 'error',
+													text : intl.formatMessage({
+														id             : 'room.localRecordingSecurityError',
+														defaultMessage : 'Recording the specified source is not allowed due to security restrictions. Check you client settings!'
+													})
+												}));
+										});
+
+										recorder.on('serror1', () =>
+										{
+											store.dispatch(requestActions.notify(
+												{
+													type : 'error',
+													text : intl.formatMessage({
+														id             : 'room.unexpectedErrorDuringLocalRecording',
+														defaultMessage : 'Unexpected error ocurred during local recording'
+													})
+												}));
+										});
+										recorder.on('serror2', () =>
+										{
+											store.dispatch(requestActions.notify(
+												{
+													text : intl.formatMessage({
+														id             : 'room.youStartedLocalRecording',
+														defaultMessage : 'You started local recording'
+													})
+												}));
+										});
+										recorder.on('serror3', () =>
+										{
+											store.dispatch(requestActions.notify(
+												{
+													type : 'error',
+													text : intl.formatMessage({
+														id             : 'room.unexpectedErrorDuringLocalRecording',
+														defaultMessage : 'Unexpected error ocurred during local recording'
+													})
+												}));
+										});
+										recorder.on('serror4', () =>
+										{
+											store.dispatch(requestActions.notify(
+												{
+													text : intl.formatMessage({
+														id             : 'room.youStoppedLocalRecording',
+														defaultMessage : 'You stopped local recording'
+													})
+												}));
+										});
+										recorder.on('serror5', () =>
+										{
+											store.dispatch(requestActions.notify(
+												{
+													type : 'error',
+													text : intl.formatMessage({
+														id             : 'room.unexpectedErrorDuringLocalRecording',
+														defaultMessage : 'Unexpected error ocurred during local recording'
+													})
+												}));
 										});
 
 										meActions.setLocalRecordingState(RECORDING_START);
@@ -965,11 +1033,11 @@ const TopBar = (props) =>
 							handleMenuClose();
 							if (localRecordingState === RECORDING_PAUSE)
 							{
-								roomClient.resumeLocalRecording();
+								recorder.resumeLocalRecording();
 							}
 							else
 							{
-								roomClient.pauseLocalRecording();
+								recorder.pauseLocalRecording();
 							}
 						}
 						}
@@ -1005,20 +1073,101 @@ const TopBar = (props) =>
 				}
 				<MenuItem
 					aria-label={recordingTooltip}
-					onClick={() =>
+					onClick={async () =>
 					{
 						handleMenuClose();
 						if (localRecordingState === RECORDING_START ||
 							localRecordingState === RECORDING_PAUSE ||
 							localRecordingState === RECORDING_RESUME)
 						{
-							roomClient.stopLocalRecording();
+							recorder.stopLocalRecording();
 						}
 						else
 						{
-							// roomClient.startLocalRecording();
+							try
+							{
+								const recordingMimeType =
+								store.getState().settings.recorderPreferredMimeType;
+								const additionalAudioTracks = [];
+								const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
-							// recordingActions.startLocalRecording(roomClient);
+								if (micProducer) additionalAudioTracks.push(micProducer.track);
+								await recorder.startLocalRecording({
+									roomClient,
+									additionalAudioTracks,
+									recordingMimeType
+								});
+								recorder.removeAllListeners();
+								recorder.on('serror', () =>
+								{
+									store.dispatch(requestActions.notify(
+										{
+											type : 'error',
+											text : intl.formatMessage({
+												id             : 'room.localRecordingSecurityError',
+												defaultMessage : 'Recording the specified source is not allowed due to security restrictions. Check you client settings!'
+											})
+										}));
+								});
+
+								recorder.on('serror1', () =>
+								{
+									store.dispatch(requestActions.notify(
+										{
+											type : 'error',
+											text : intl.formatMessage({
+												id             : 'room.unexpectedErrorDuringLocalRecording',
+												defaultMessage : 'Unexpected error ocurred during local recording'
+											})
+										}));
+								});
+								recorder.on('serror2', () =>
+								{
+									store.dispatch(requestActions.notify(
+										{
+											text : intl.formatMessage({
+												id             : 'room.youStartedLocalRecording',
+												defaultMessage : 'You started local recording'
+											})
+										}));
+								});
+								recorder.on('serror3', () =>
+								{
+									store.dispatch(requestActions.notify(
+										{
+											type : 'error',
+											text : intl.formatMessage({
+												id             : 'room.unexpectedErrorDuringLocalRecording',
+												defaultMessage : 'Unexpected error ocurred during local recording'
+											})
+										}));
+								});
+								recorder.on('serror4', () =>
+								{
+									store.dispatch(requestActions.notify(
+										{
+											text : intl.formatMessage({
+												id             : 'room.youStoppedLocalRecording',
+												defaultMessage : 'You stopped local recording'
+											})
+										}));
+								});
+								recorder.on('serror5', () =>
+								{
+									store.dispatch(requestActions.notify(
+										{
+											type : 'error',
+											text : intl.formatMessage({
+												id             : 'room.unexpectedErrorDuringLocalRecording',
+												defaultMessage : 'Unexpected error ocurred during local recording'
+											})
+										}));
+								});
+							}
+							catch (err)
+							{
+								logger.error('Error during starting the recording! error:%O', err.message);
+							}
 
 						}
 					}
