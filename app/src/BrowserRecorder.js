@@ -3,27 +3,26 @@ import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
 import * as meActions from './actions/meActions';
-import * as requestActions from './actions/requestActions';
 import { store } from './store';
-
-// Recoding STATE
 
 import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
 
-export default class BrowserRecorder
+const EventEmitter = require('events');
+
+export default class BrowserRecorder extends EventEmitter
 {
 	constructor()
 	{
+		super();
 		// MediaRecorder
 		this.recorder = null;
 		this.recordingMimeType = null;
+		this.recordingData = [];
 		this.recorderStream = null;
 		this.gdmStream = null;
-		// this.fileName = `${dbName}.webm`;
+		this.roomClient = null;
 		this.fileName = 'apple.webm';
 		this.logger = new Logger('Recorder');
-
-		// Redux TODO
 
 		// IndexedDB
 		this.idbDB = null;
@@ -32,10 +31,9 @@ export default class BrowserRecorder
 		this.idbStoreName = 'chunks';
 
 		// MIXER
-		this.ctx = new AudioContext();
-		this.dest = this.ctx.createMediaStreamDestination();
-		this.gainNode = this.ctx.createGain();
-		this.gainNode.connect(this.dest);
+		this.ctx = null;
+		this.dest = null;
+		this.gainNode = null;
 
 		this.RECORDING_CONSTRAINTS = {
 			videoBitsPerSecond : 8000000,
@@ -84,10 +82,20 @@ export default class BrowserRecorder
 		this.ctx.createMediaStreamSource(track).connect(this.dest);
 	}
 
-	async start({ additionalAudioTracks, recordingMimeType, constraints, micTrack = null })
+	async startLocalRecording(
+		{
+			roomClient, additionalAudioTracks, recordingMimeType
+		})
 	{
+		this.roomClient = roomClient;
 		this.recordingMimeType = recordingMimeType;
 		this.logger.debug('startLocalRecording()');
+
+		this.ctx = new AudioContext();
+		this.dest = this.ctx.createMediaStreamDestination();
+		this.gainNode = this.ctx.createGain();
+		this.gainNode.connect(this.dest);
+
 		// Check
 		if (typeof MediaRecorder === undefined)
 		{
@@ -115,7 +123,20 @@ export default class BrowserRecorder
 				});
 			});
 
-			this.recorderStream = this.mixer(micTrack, this.gdmStream);
+			if (additionalAudioTracks.length>0)
+			{
+				// add mic track
+				this.recorderStream = this.mixer(additionalAudioTracks[0], this.gdmStream);
+				// add other audio tracks
+				for (let i = 1; i < additionalAudioTracks.length; i++)
+				{
+					this.addTrack(additionalAudioTracks[i]);
+				}
+			}
+			else
+			{
+				this.recorderStream = this.mixer(null, this.gdmStream);
+			}
 
 			this.recorder = new MediaRecorder(
 				this.recorderStream, { mimeType: this.recordingMimeType }
@@ -129,11 +150,13 @@ export default class BrowserRecorder
 			else
 			{
 				this.idbName = Date.now();
+				const idbStoreName = this.idbStoreName;
+
 				this.idbDB = await openDB(this.idbName, 1,
 					{
 						upgrade(db)
 						{
-							db.createObjectStore(this.idbStoreName);
+							db.createObjectStore(idbStoreName);
 						}
 					}
 				);
@@ -179,14 +202,7 @@ export default class BrowserRecorder
 					switch (error.name)
 					{
 						case 'SecurityError':
-							this.store.dispatch(requestActions.notify(
-								{
-									type : 'error',
-									text : this.intl.formatMessage({
-										id             : 'room.localRecordingSecurityError',
-										defaultMessage : 'Recording the specified source is not allowed due to security restrictions. Check you client settings!'
-									})
-								}));
+							this.emit('serror');
 							break;
 						case 'InvalidStateError':
 						default:
@@ -251,23 +267,18 @@ export default class BrowserRecorder
 				};
 
 				this.recorder.start(this.RECORDING_SLICE_SIZE);
+				meActions.setLocalRecordingState(RECORDING_START);
 
 			}
 		}
 		catch (error)
 		{
-			this.store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : this.intl.formatMessage({
-						id             : 'room.unexpectedErrorDuringLocalRecording',
-						defaultMessage : 'Unexpected error ocurred during local recording'
-					})
-				}));
+			this.emit('serror1');
+
 			this.logger.error('startLocalRecording() [error:"%o"]', error);
 
 			if (this.recorder) this.recorder.stop();
-			this.store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
+			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
 			if (typeof this.gdmStream !== 'undefined' && this.gdmStream && typeof this.gdmStream.getTracks === 'function')
 			{
 				this.gdmStream.getTracks().forEach((track) => track.stop());
@@ -284,45 +295,28 @@ export default class BrowserRecorder
 		{
 			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
 
-			this.store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
+			store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
 
-			this.store.dispatch(requestActions.notify(
-				{
-					text : this.intl.formatMessage({
-						id             : 'room.youStartedLocalRecording',
-						defaultMessage : 'You started local recording'
-					})
-				}));
+			this.emit('serror2');
+
 		}
 		catch (error)
 		{
-			this.store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : this.intl.formatMessage({
-						id             : 'room.unexpectedErrorDuringLocalRecording',
-						defaultMessage : 'Unexpected error ocurred during local recording'
-					})
-				}));
+			this.emit('serror3');
 			this.logger.error('startLocalRecording() [error:"%o"]', error);
 
 		}
 	}
-	async stop()
+	async stopLocalRecording()
 	{
 		this.logger.debug('stopLocalRecording()');
 		try
 		{
 			this.recorder.stop();
 
-			this.store.dispatch(requestActions.notify(
-				{
-					text : this.intl.formatMessage({
-						id             : 'room.youStoppedLocalRecording',
-						defaultMessage : 'You stopped local recording'
-					})
-				}));
-			this.store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
+			this.emit('serror4');
+
+			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
 
 			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
 
@@ -330,17 +324,22 @@ export default class BrowserRecorder
 		catch (error)
 		{
 
-			this.store.dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : this.intl.formatMessage({
-						id             : 'room.unexpectedErrorDuringLocalRecording',
-						defaultMessage : 'Unexpected error ocurred during local recording'
-					})
-				}));
+			this.emit('serror5');
 
 			this.logger.error('stopLocalRecording() [error:"%o"]', error);
 		}
+	}
+	async pauseLocalRecording()
+	{
+		this.recorder.pause();
+		store.dispatch(meActions.setLocalRecordingState(RECORDING_PAUSE));
+		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_PAUSE });
+	}
+	async resumeLocalRecording()
+	{
+		this.recorder.resume();
+		store.dispatch(meActions.setLocalRecordingState(RECORDING_RESUME));
+		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_RESUME });
 	}
 	invokeSaveAsDialog(blob)
 	{
@@ -458,6 +457,8 @@ export default class BrowserRecorder
 		this.recordingMimeType = null;
 		this.recordingData = [];
 		this.recorder = null;
+		this.ctx.close();
+
 	}
 
 	recoverRecording(dbName)
@@ -482,7 +483,14 @@ export default class BrowserRecorder
 	checkMicProducer(producers)
 	{
 		// is it already appended to stream?
-		Object.values(producers).find((p) => p.source === 'mic');
-		// TODO 
+		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused'))
+		{
+			const micProducer = Object.values(producers).find((p) => p.source === 'mic');
+
+			if (micProducer)
+			{
+				this.addTrack(new MediaStream([ micProducer.track ]));
+			}
+		}
 	}
 }
