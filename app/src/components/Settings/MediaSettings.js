@@ -411,6 +411,37 @@ const MediaSettings = ({
 								/>
 							</FormHelperText>
 						</FormControl>
+						<FormControl className={classes.formControl}>
+							<Select
+								value={settings.recorderPreferredMimeType || ''}
+								onChange={(event) =>
+								{
+									if (event.target.value)
+										roomClient.updateRecorderPreferredMimeType(
+											{ recorderPreferredMimeType: event.target.value }
+										);
+
+								}}
+								name='Video recordings preferred mime type'
+								autoWidth
+								className={classes.selectEmpty}
+							>
+								{settings.recorderSupportedMimeTypes.map((mimetype, index) =>
+								{
+									return (
+										<MenuItem key={index} value={mimetype}>
+											{mimetype}
+										</MenuItem>
+									);
+								})}
+							</Select>
+							<FormHelperText>
+								<FormattedMessage
+									id='settings.recordingsPreferredMimeType'
+									defaultMessage='Select your preferred video mime type'
+								/>
+							</FormHelperText>
+						</FormControl>
 					</Collapse>
 				</List>
 			</form>}

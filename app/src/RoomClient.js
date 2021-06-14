@@ -20,6 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
+import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP } from './actions/recorderActions';
 import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
 import { config } from './config';
 
@@ -241,8 +242,12 @@ export default class RoomClient
 		this._basePath = basePath;
 
 		// Use displayName
+		this._displayName=null;
 		if (displayName)
+		{
 			store.dispatch(settingsActions.setDisplayName(displayName));
+			this._displayName=displayName;
+		}
 
 		this._tracker = 'wss://tracker.lab.vvc.niif.hu:443';
 
@@ -360,6 +365,9 @@ export default class RoomClient
 		{
 			store.dispatch(meActions.setPicture(store.getState().settings.localPicture));
 		}
+		store.dispatch(
+			settingsActions.setRecorderSupportedMimeTypes(this.getRecorderSupportedMimeTypes())
+		);
 
 		// Receive transport restart ICE object
 		this._recvRestartIce = { timer: null, restarting: false };
@@ -676,6 +684,8 @@ export default class RoomClient
 
 		store.dispatch(settingsActions.setDisplayName(displayName));
 
+		this._displayName=displayName;
+
 		if (!store.getState().settings.localPicture)
 		{
 			store.dispatch(meActions.setPicture(picture));
@@ -874,6 +884,9 @@ export default class RoomClient
 						displayName
 					})
 				}));
+
+			this._displayName=displayName;
+
 		}
 		catch (error)
 		{
@@ -1594,6 +1607,13 @@ export default class RoomClient
 				}
 			}
 
+			// TODO update recorder inputs 
+			/* 
+			if (recorder != null)
+			{
+				recorder.addTrack(new MediaStream([ this._micProducer.track ]));
+			}
+			*/
 			await this._updateAudioDevices();
 		}
 		catch (error)
@@ -2957,6 +2977,9 @@ export default class RoomClient
 								})
 							}));
 
+						if (peerId === this._peerId)
+							this._displayName=displayName;
+
 						break;
 					}
 
@@ -3057,6 +3080,9 @@ export default class RoomClient
 									displayName
 								})
 							}));
+
+						if (peerId === this._peerId)
+							this._displayName=displayName;
 
 						break;
 					}
@@ -3543,6 +3569,80 @@ export default class RoomClient
 						break;
 					}
 
+					case 'setLocalRecording':
+					{
+						const { peerId, localRecordingState } = notification.data;
+						const { me, peers } = store.getState();
+
+						let displayNameOfRecorder;
+
+						if (peerId === me.id)
+						{
+							displayNameOfRecorder = store.getState().settings.displayName;
+						}
+						else if (peers[peerId])
+							displayNameOfRecorder = store.getState().peers[peerId].displayName;
+						else
+							return;
+
+						// Save state to peer
+						store.dispatch(
+							peerActions.setPeerLocalRecordingState(peerId, localRecordingState));
+
+						switch (localRecordingState)
+						{
+							case RECORDING_START:
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingStarted',
+											defaultMessage : '{displayName} started local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							case RECORDING_RESUME:
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingResumed',
+											defaultMessage : '{displayName} resumed local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							case RECORDING_PAUSE:
+							{
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingPaused',
+											defaultMessage : '{displayName} paused local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							}
+							case RECORDING_STOP:
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingStopped',
+											defaultMessage : '{displayName} stopped local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							default:
+								break;
+						}
+						break;
+					}
+
 					default:
 					{
 						logger.error(
@@ -3938,6 +4038,48 @@ export default class RoomClient
 		}
 	}
 
+	getRecorderSupportedMimeTypes()
+	{
+		const mimeTypes = [];
+
+		const mimeTypeCapability = [
+
+			/* audio codecs
+			[ 'audio/wav', [] ],
+			[ 'audio/pcm', [] ],
+			[ 'audio/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'audio/ogg', [ 'Firefox' ] ],
+			[ 'audio/opus', [] ],
+			*/
+			[ 'video/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs="vp8, opus"', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs="vp9, opus"', [ 'Chrome' ] ],
+			[ 'video/webm;codecs="h264, opus"', [ 'Chrome' ] ],
+			[ 'video/mp4', [] ],
+			[ 'video/mpeg', [] ],
+			[ 'video/x-matroska;codecs=avc1', [ 'Chrome' ] ]
+		];
+
+		if (typeof MediaRecorder === 'undefined')
+		{
+			window.MediaRecorder = {
+				isTypeSupported : function()
+				{
+					return false;
+				}
+			};
+		}
+		mimeTypeCapability.forEach((item) =>
+		{
+			if (MediaRecorder.isTypeSupported(item[0]) && !mimeTypes.includes(item[0]))
+			{
+				mimeTypes.push(item[0]);
+			}
+		});
+
+		return mimeTypes;
+	}
+
 	async lockRoom()
 	{
 		logger.debug('lockRoom()');
@@ -4276,6 +4418,14 @@ export default class RoomClient
 		this._micProducer = null;
 
 		store.dispatch(meActions.setAudioInProgress(false));
+	}
+	async updateRecorderPreferredMimeType({ recorderPreferredMimeType = null } = {})
+	{
+		logger.debug('updateRecorderPreferredMimeType [mime-type: "%s"]',
+			recorderPreferredMimeType
+		);
+		store.dispatch(
+			settingsActions.setRecorderPreferredMimeType(recorderPreferredMimeType));
 	}
 
 	async updateScreenSharing({

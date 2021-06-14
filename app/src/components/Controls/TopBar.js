@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
 	lobbyPeersKeySelector,
 	peersLengthSelector,
 	raisedHandsSelector,
-	makePermissionSelector
+	makePermissionSelector,
+	recordingInProgressSelector
 } from '../Selectors';
 import { permissions } from '../../permissions';
 import * as appPropTypes from '../appPropTypes';
@@ -13,6 +14,7 @@ import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../actions/roomActions';
 import * as toolareaActions from '../../actions/toolareaActions';
+import * as notificationActions from '../../actions/notificationActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import AppBar from '@material-ui/core/AppBar';
@@ -41,7 +43,20 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
+import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
+import StopIcon from '@material-ui/icons/Stop';
+import randomString from 'random-string';
+import { recorder, RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../actions/recorderActions';
+import * as meActions from '../../actions/meActions';
+import { store } from '../../store';
+// import producers from '../../reducers/producers';
+// import logger from 'redux-logger';
+import Logger from '../../Logger';
 import { config } from '../../config';
+
+const logger = new Logger('Recorder');
 
 const styles = (theme) =>
 	({
@@ -173,12 +188,35 @@ const PulsingBadge = withStyles((theme) =>
 		}
 	}))(Badge);
 
+const RecIcon = withStyles(() =>
+	({
+		root :
+		{
+			animation : '$pulse 2s infinite ease-in-out'
+		},
+		'@keyframes pulse' :
+		{
+			'0%' :
+			{
+				transform : 'scale(.8)',
+				opacity   : 1
+			},
+			'100%' :
+			{
+				transform : 'scale(1.2)',
+				opacity   : 0
+			}
+		}
+	}))(FiberManualRecordIcon);
+
 const TopBar = (props) =>
 {
 	const intl = useIntl();
 	const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
 	const [ anchorEl, setAnchorEl ] = useState(null);
 	const [ currentMenu, setCurrentMenu ] = useState(null);
+	const [ recordingConsentNotificationId,
+		setRecordingConsentNotificationId ] = useState(null);
 
 	const handleExited = () =>
 	{
@@ -216,6 +254,7 @@ const TopBar = (props) =>
 		permanentTopBar,
 		drawerOverlayed,
 		toolAreaOpen,
+		isSafari,
 		isMobile,
 		loggedIn,
 		loginEnabled,
@@ -231,14 +270,61 @@ const TopBar = (props) =>
 		setHideSelfView,
 		toggleToolArea,
 		openUsersTab,
+		addNotification,
+		closeNotification,
 		unread,
 		canProduceExtraVideo,
 		canLock,
 		canPromote,
 		classes,
 		locale,
-		localesList
+		localesList,
+		localRecordingState,
+		recordingInProgress,
+		producers,
+		consumers
 	} = props;
+
+	// did it change?
+	recorder.checkMicProducer(producers);
+	recorder.checkAudioConsumer(consumers);
+
+	useEffect(() =>
+	{
+		if (
+			recordingInProgress &&
+			!recordingConsentNotificationId)
+		{
+			const notificationId = randomString({ length: 6 }).toLowerCase();
+
+			setRecordingConsentNotificationId(notificationId);
+			addNotification(
+				{
+					id   : notificationId,
+					type : 'warning',
+					text :
+					intl.formatMessage(
+						{
+							id             : 'room.recordingConsent',
+							defaultMessage : 'When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming'
+						}
+					),
+					persist : true
+				}
+			);
+		}
+		if (
+			!recordingInProgress
+			&& recordingConsentNotificationId)
+		{
+			closeNotification(recordingConsentNotificationId);
+			setRecordingConsentNotificationId(null);
+		}
+	},
+	[
+		localRecordingState, recordingInProgress, recordingConsentNotificationId,
+		addNotification, closeNotification, intl
+	]);
 
 	const isMenuOpen = Boolean(anchorEl);
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -252,6 +338,29 @@ const TopBar = (props) =>
 		intl.formatMessage({
 			id             : 'tooltip.lockRoom',
 			defaultMessage : 'Lock room'
+		});
+
+	const recordingTooltip = (localRecordingState === RECORDING_START ||
+								localRecordingState === RECORDING_RESUME) ?
+		intl.formatMessage({
+			id             : 'tooltip.stopLocalRecording',
+			defaultMessage : 'Stop local recording'
+		})
+		:
+		intl.formatMessage({
+			id             : 'tooltip.startLocalRecording',
+			defaultMessage : 'Start local recording'
+		});
+
+	const recordingPausedTooltip = localRecordingState === RECORDING_PAUSE ?
+		intl.formatMessage({
+			id             : 'tooltip.resumeLocalRecording',
+			defaultMessage : 'Resume local recording'
+		})
+		:
+		intl.formatMessage({
+			id             : 'tooltip.pauseLocalRecording',
+			defaultMessage : 'Pause local recording.'
 		});
 
 	const fullscreenTooltip = fullscreen ?
@@ -318,6 +427,21 @@ const TopBar = (props) =>
 					}
 					<div className={classes.grow} />
 					<div className={classes.sectionDesktop}>
+						{ recordingInProgress &&
+						<IconButton
+							disabled
+							color='inherit'
+							aria-label={intl.formatMessage(
+								{
+									id             : 'label.recordingInProgress',
+									defaultMessage : 'Recording in Progress..'
+								})}
+							className={classes.menuButton}
+						>
+							<RecIcon color='secondary' />
+						</IconButton>
+						}
+						<div className={classes.divider} />
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'label.moreActions',
@@ -550,6 +674,132 @@ const TopBar = (props) =>
 			>
 				{ currentMenu === 'moreActions' &&
 					<Paper>
+						{
+							(
+								localRecordingState === RECORDING_START ||
+								localRecordingState === RECORDING_RESUME ||
+								localRecordingState === RECORDING_PAUSE
+							)
+							&&
+							<MenuItem
+								aria-label={recordingPausedTooltip}
+								onClick={() =>
+								{
+									handleMenuClose();
+									if (localRecordingState === RECORDING_PAUSE)
+									{
+										recorder.resumeLocalRecording();
+									}
+									else
+									{
+										recorder.pauseLocalRecording();
+									}
+								}
+								}
+							>
+								<Badge
+									color='primary'
+								>
+									{ localRecordingState === RECORDING_PAUSE ?
+										<PauseCircleFilledIcon />
+										:
+										<PauseCircleOutlineIcon />
+									}
+								</Badge>
+								{ localRecordingState === RECORDING_PAUSE ?
+									<p className={classes.moreAction}>
+										<FormattedMessage
+											id='tooltip.resumeLocalRecording'
+											defaultMessage='Resume local recording'
+										/>
+									</p>
+									:
+									<p className={classes.moreAction}>
+										<FormattedMessage
+											id='tooltip.pauseLocalRecording'
+											defaultMessage='Pause local recording'
+										/>
+									</p>
+								}
+
+							</MenuItem>
+						}
+						{ isSafari &&
+						<MenuItem
+							aria-label={recordingTooltip}
+							onClick={async () =>
+							{
+								handleMenuClose();
+								if (localRecordingState === RECORDING_START ||
+									localRecordingState === RECORDING_PAUSE ||
+									localRecordingState === RECORDING_RESUME)
+								{
+									recorder.stopLocalRecording();
+								}
+								else
+								{
+
+									try
+									{
+										const recordingMimeType =
+										store.getState().settings.recorderPreferredMimeType;
+										const additionalAudioTracks = [];
+										const micProducer = Object.values(producers).find((p) => p.source === 'mic');
+
+										if (micProducer) additionalAudioTracks.push(micProducer.track);
+										await recorder.startLocalRecording({
+											roomClient,
+											additionalAudioTracks,
+											recordingMimeType
+										});
+
+										recorder.checkAudioConsumer(consumers);
+
+										meActions.setLocalRecordingState(RECORDING_START);
+									}
+									catch (err)
+									{
+										logger.error('Error during starting the recording! error:%O', err.message);
+									}
+
+								}
+							}
+							}
+						>
+							<Badge
+								color='primary'
+							>
+								{
+									(localRecordingState === RECORDING_START ||
+									localRecordingState === RECORDING_PAUSE ||
+									localRecordingState === RECORDING_RESUME) ?
+										<StopIcon />
+										:
+										<FiberManualRecordIcon />
+								}
+							</Badge>
+
+							{
+								(localRecordingState === RECORDING_START ||
+								localRecordingState === RECORDING_PAUSE ||
+								localRecordingState === RECORDING_RESUME) ?
+									<p className={classes.moreAction}>
+										<FormattedMessage
+											id='tooltip.stopLocalRecording'
+											defaultMessage='Stop local recording'
+										/>
+									</p>
+									:
+									<p className={classes.moreAction}>
+										<FormattedMessage
+											id='tooltip.startLocalRecording'
+											defaultMessage='Start local recording'
+										/>
+									</p>
+							}
+
+						</MenuItem>
+						}
 						<MenuItem
 							disabled={!canProduceExtraVideo}
 							onClick={() =>
@@ -678,6 +928,7 @@ const TopBar = (props) =>
 				open={isMobileMenuOpen}
 				onClose={handleMenuClose}
 				getContentAnchorEl={null}
+
 			>
 				{ loginEnabled &&
 					<MenuItem
@@ -705,6 +956,59 @@ const TopBar = (props) =>
 							</p>
 						}
 					</MenuItem>
+				}
+				{
+					(
+						localRecordingState === RECORDING_PAUSE ||
+						localRecordingState === RECORDING_RESUME ||
+						localRecordingState === RECORDING_START
+					)
+					&&
+					<MenuItem
+
+						aria-label={recordingPausedTooltip}
+						onClick={() =>
+						{
+							handleMenuClose();
+							if (localRecordingState === RECORDING_PAUSE)
+							{
+								recorder.resumeLocalRecording();
+							}
+							else
+							{
+								recorder.pauseLocalRecording();
+							}
+						}
+						}
+					>
+						<Badge
+							color='primary'
+						>
+							{ localRecordingState === RECORDING_PAUSE ?
+								<PauseCircleFilledIcon />
+								:
+								<PauseCircleOutlineIcon />
+							}
+						</Badge>
+
+						{ localRecordingState === RECORDING_PAUSE ?
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='tooltip.resumeLocalRecording'
+									defaultMessage='Resume local recording'
+								/>
+							</p>
+							:
+							<p className={classes.moreAction}>
+								<FormattedMessage
+									id='tooltip.pauseLocalRecording'
+									defaultMessage='Pause local recording'
+								/>
+							</p>
+						}
+
+					</MenuItem>
+
 				}
 				<MenuItem
 					aria-label={lockTooltip}
@@ -920,6 +1224,7 @@ TopBar.propTypes =
 {
 	roomClient           : PropTypes.object.isRequired,
 	room                 : appPropTypes.Room.isRequired,
+	isSafari         			 : PropTypes.bool,
 	isMobile             : PropTypes.bool.isRequired,
 	peersLength          : PropTypes.number,
 	lobbyPeers           : PropTypes.array,
@@ -941,6 +1246,8 @@ TopBar.propTypes =
 	setHideSelfView      : PropTypes.func.isRequired,
 	toggleToolArea       : PropTypes.func.isRequired,
 	openUsersTab         : PropTypes.func.isRequired,
+	addNotification      : PropTypes.func.isRequired,
+	closeNotification    : PropTypes.func.isRequired,
 	unread               : PropTypes.number.isRequired,
 	canProduceExtraVideo : PropTypes.bool.isRequired,
 	canLock              : PropTypes.bool.isRequired,
@@ -949,7 +1256,12 @@ TopBar.propTypes =
 	theme                : PropTypes.object.isRequired,
 	intl                 : PropTypes.object,
 	locale               : PropTypes.string.isRequired,
-	localesList          : PropTypes.array.isRequired
+	localesList          : PropTypes.array.isRequired,
+	localRecordingState  : PropTypes.string,
+	recordingInProgress  : PropTypes.bool,
+	recordingMimeType    : PropTypes.string,
+	producers            : PropTypes.object,
+	consumers            : PropTypes.object
 };
 
 const makeMapStateToProps = () =>
@@ -965,22 +1277,28 @@ const makeMapStateToProps = () =>
 
 	const mapStateToProps = (state) =>
 		({
-			room            : state.room,
-			isMobile        : state.me.browser.platform === 'mobile',
-			peersLength     : peersLengthSelector(state),
-			lobbyPeers      : lobbyPeersKeySelector(state),
-			permanentTopBar : state.settings.permanentTopBar,
-			drawerOverlayed : state.settings.drawerOverlayed,
-			toolAreaOpen    : state.toolarea.toolAreaOpen,
-			loggedIn        : state.me.loggedIn,
-			loginEnabled    : state.me.loginEnabled,
-			unread          : state.toolarea.unreadMessages +
+			room                : state.room,
+			isSafari            : state.me.browser.name !== 'safari',
+			isMobile            : state.me.browser.platform === 'mobile',
+			peersLength         : peersLengthSelector(state),
+			lobbyPeers          : lobbyPeersKeySelector(state),
+			permanentTopBar     : state.settings.permanentTopBar,
+			drawerOverlayed     : state.settings.drawerOverlayed,
+			toolAreaOpen        : state.toolarea.toolAreaOpen,
+			loggedIn            : state.me.loggedIn,
+			loginEnabled        : state.me.loginEnabled,
+			localRecordingState : state.me.localRecordingState,
+			recordingInProgress	: recordingInProgressSelector(state),
+			unread              : state.toolarea.unreadMessages +
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
 			canProduceExtraVideo : hasExtraVideoPermission(state),
 			canLock              : hasLockPermission(state),
 			canPromote           : hasPromotionPermission(state),
 			locale               : state.intl.locale,
-			localesList          : state.intl.list
+			localesList          : state.intl.list,
+			recordingMimeType    : state.settings.recordingMimeType,
+			producers            : state.producers,
+			consumers            : state.consumers
 		});
 
 	return mapStateToProps;
@@ -1028,6 +1346,14 @@ const mapDispatchToProps = (dispatch) =>
 		{
 			dispatch(toolareaActions.openToolArea());
 			dispatch(toolareaActions.setToolTab('users'));
+		},
+		addNotification : (notification) =>
+		{
+			dispatch(notificationActions.addNotification(notification));
+		},
+		closeNotification : (notificationId) =>
+		{
+			dispatch(notificationActions.closeNotification(notificationId));
 		}
 	});
 
@@ -1049,11 +1375,14 @@ export default withRoomContext(connect(
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&
 				prev.me.roles === next.me.roles &&
+				prev.me.localRecordingState === next.me.localRecordingState &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.intl.locale === next.intl.locale &&
-				prev.intl.localesList === next.intl.localesList
+				prev.intl.localesList === next.intl.localesList &&
+				prev.producers === next.producers &&
+				prev.consumers === next.consumers
 			);
 		}
 	}

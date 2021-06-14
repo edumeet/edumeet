@@ -14,3 +14,9 @@ export const removeAllNotifications = () =>
 	({
 		type : 'REMOVE_ALL_NOTIFICATIONS'
 	});
+
+export const closeNotification = (notificationId) =>
+	({
+		type    : 'CLOSE_NOTIFICATION',
+		payload : { notificationId }
+	});

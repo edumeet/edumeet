@@ -779,7 +779,6 @@ JoinDialog.propTypes =
 	setVideoMuted         : PropTypes.func.isRequired,
 	locale                : PropTypes.string.isRequired,
 	localesList           : PropTypes.array.isRequired
-
 };
 
 const mapStateToProps = (state) =>

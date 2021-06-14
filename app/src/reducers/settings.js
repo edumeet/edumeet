@@ -2,45 +2,46 @@ import { config } from '../config';
 
 const initialState =
 {
-	displayName             : '',
-	selectedWebcam          : null,
-	selectedAudioDevice     : null,
-	advancedMode            : false,
-	autoGainControl         : config.autoGainControl,
-	echoCancellation        : config.echoCancellation,
-	noiseSuppression        : config.noiseSuppression,
-	voiceActivatedUnmute    : config.voiceActivatedUnmute,
-	noiseThreshold          : config.noiseThreshold,
-	audioMuted              : false,
-	videoMuted              : false,
+	displayName               : '',
+	selectedWebcam            : null,
+	selectedAudioDevice       : null,
+	advancedMode              : false,
+	autoGainControl           : config.autoGainControl,
+	echoCancellation          : config.echoCancellation,
+	noiseSuppression          : config.noiseSuppression,
+	voiceActivatedUnmute      : config.voiceActivatedUnmute,
+	noiseThreshold            : config.noiseThreshold,
+	audioMuted                : false,
+	videoMuted                : false,
 	// low, medium, high, veryhigh, ultra
-	resolution              : config.resolution,
-	frameRate               : config.frameRate,
-	screenSharingResolution : config.screenResolution,
-	screenSharingFrameRate  : config.screenSharingFrameRate,
-	lastN                   : 4,
-	permanentTopBar         : true,
-	hiddenControls          : false,
-	showNotifications       : true,
-	notificationSounds      : true,
-	mirrorOwnVideo          : true,
-	hideNoVideoParticipants : false,
-	buttonControlBar        : config.buttonControlBar,
-	drawerOverlayed         : config.drawerOverlayed,
-	aspectRatio             : config.aspectRatio,
-	mediaPerms              : { audio: true, video: true },
-	localPicture            : null,
-	audioPreset             : config.audioPreset,
-	audioPresets            : config.audioPresets,
-	sampleRate              : config.sampleRate,
-	channelCount            : config.channelCount,
-	sampleSize              : config.sampleSize,
-	opusStereo              : config.opusStereo,
-	opusDtx                 : config.opusDtx,
-	opusFec                 : config.opusFec,
-	opusPtime               : config.opusPtime,
-	opusMaxPlaybackRate     : config.opusMaxPlaybackRate,
-	enableOpusDetails       : false
+	resolution                : config.resolution,
+	frameRate                 : config.frameRate,
+	screenSharingResolution   : config.screenResolution,
+	screenSharingFrameRate    : config.screenSharingFrameRate,
+	recorderPreferredMimeType : window.config.defaultRecorderMimeType || 'video/webm',
+	lastN                     : 4,
+	permanentTopBar           : true,
+	hiddenControls            : false,
+	showNotifications         : true,
+	notificationSounds        : true,
+	mirrorOwnVideo            : true,
+	hideNoVideoParticipants   : false,
+	buttonControlBar          : config.buttonControlBar,
+	drawerOverlayed           : config.drawerOverlayed,
+	aspectRatio               : config.aspectRatio,
+	mediaPerms                : { audio: true, video: true },
+	localPicture              : null,
+	audioPreset               : config.audioPreset,
+	audioPresets              : config.audioPresets,
+	sampleRate                : config.sampleRate,
+	channelCount              : config.channelCount,
+	sampleSize                : config.sampleSize,
+	opusStereo                : config.opusStereo,
+	opusDtx                   : config.opusDtx,
+	opusFec                   : config.opusFec,
+	opusPtime                 : config.opusPtime,
+	opusMaxPlaybackRate       : config.opusMaxPlaybackRate,
+	enableOpusDetails         : false
 };
 
 const settings = (state = initialState, action) =>
@@ -321,9 +322,18 @@ const settings = (state = initialState, action) =>
 			return { ...state, localPicture };
 		}
 
-		case 'SETTINGS_UPDATE':
+		case 'SET_RECORDER_SUPPORTED_MIME_TYPES':
 		{
-			return { ...state, ...action.payload };
+			const { recorderSupportedMimeTypes } = action.payload;
+
+			return { ...state, recorderSupportedMimeTypes };
+		}
+
+		case 'SET_RECORDER_PREFERRED_MIME_TYPE':
+		{
+			const { recorderPreferredMimeType } = action.payload;
+
+			return { ...state, recorderPreferredMimeType };
 		}
 
 		default:

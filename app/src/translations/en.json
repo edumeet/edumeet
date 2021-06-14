@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "Stop all screen sharing",
 	"room.hideSelfView": "Hide self view video",
 	"room.showSelfView": "Show self view video",
+	"unexpectedErrorDuringLocalRecording": "Unexpected error ocurred during local recording",
+	"room.youStartedLocalRecording": "You started local recording",
+	"room.youStoppedLocalRecording": "You stopped local recording",
+	"room.localRecordingStarted": "{displayName} started local recording",
+	"room.localRecordingPaused": "{displayName} paused local recording",
+	"room.localRecordingResumed": "{displayName} resumed local recording",
+	"room.localRecordingStopped": "{displayName} stopped local recording",
+	"room.recordingConsent": "When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming.",
+	"room.localRecordingSecurityError": "Recording the specified source is not allowed due to security restrictions. Check you client settings!",
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
@@ -101,6 +110,10 @@
 	"tooltip.muteParticipantAudioModerator": "Stop audio",
 	"tooltip.muteParticipantVideoModerator": "Stop video",
 	"tooltip.muteScreenSharingModerator": "Stop screen share",
+	"tooltip.startLocalRecording": "Start local recording",
+	"tooltip.stopLocalRecording": "Stop local recording",
+	"tooltip.pauseLocalRecording": "Pause local recording",
+	"tooltip.resumeLocalRecording": "Resume paused local recording",
 
 	"label.roomName": "Room name",
 	"label.chooseRoomButton": "Continue",
@@ -139,6 +152,8 @@
 	"label.login": "Login",
 	"label.logout": "Logout",
 	"label.join": "Join",
+	"label.recordingInProgress": "Recording in Progress..",
+	
 	"label.yes": null,
 	"label.no": null,
 	"label.leavewithsavingchat": null,
@@ -183,6 +198,8 @@
 	"settings.myPhotoLabel": "Max. file size: 5MB, accepted: jpg, jpeg, png",
 	"settings.myPhotoSizeError": " file is too large",
 	"settings.myPhotoTypeError": " is not a supported file extension",
+	"settings.codecs": "Codecs",
+	"settings.recordingsPreferredMimeType": "Select your preferred video mime type",
 
 	"filesharing.saveFileError": "Unable to save file",
 	"filesharing.startingFileShare": "Attempting to share file",
@@ -239,5 +256,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Detected unsupported browser!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Required functionality not available in your browser!",
-	"unsupportedBrowser.bodyText": "This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser, or check your settings. Supported browsers:"
+	"unsupportedBrowser.bodyText": "This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser or check your settings. Supported browsers:"
 }

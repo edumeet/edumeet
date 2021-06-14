@@ -66,6 +66,15 @@
 	"room.shortcutKeys": "Жылдам перне",
 	"room.browsePeersSpotlight": "Белсенді қатысушыларды қарау",
 	"room.stopAllScreenSharing": "Бүкіл экрандарды бөлісуді тоқтату",
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
@@ -99,6 +108,10 @@
 	"tooltip.muteParticipantAudioModerator": "Дыбысты барлық жерде өшіру",
 	"tooltip.muteParticipantVideoModerator": "Қатысушы бейнесін барлық жерде өшіру",
 	"tooltip.muteScreenSharingModerator": "Барлық жерде қатысушылардың экранын бөлісуді өшіру",
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Видеоконференция атауы",
 	"label.chooseRoomButton": "Жалғастыру",
@@ -137,6 +150,8 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.recordingInProgress": null,
+	
 	"label.yes": null,
 	"label.no": null,
 	"label.leavewithsavingchat": null,
@@ -181,6 +196,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Файлды сақтау мүмкін емес",
 	"filesharing.startingFileShare": "Файлды бөлісу әрекеті",

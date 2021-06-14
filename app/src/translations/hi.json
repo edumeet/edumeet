@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "स्क्रीन का आदान-प्रदान स्थगित कीजिए ",
 	"room.hideSelfView": null,
 	"room.showSelfView": null,
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
@@ -101,6 +110,10 @@
 	"tooltip.muteParticipantAudioModerator": "ऑडियो बंद करो",
 	"tooltip.muteParticipantVideoModerator": "वीडियो बंद करो",
 	"tooltip.muteScreenSharingModerator": "स्क्रीन शेयर बंद करो",
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "कमरे का नाम",
 	"label.chooseRoomButton": "जारी रखें",
@@ -139,6 +152,8 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
+	"label.recordingInProgress": null,
+	
 	"label.yes": null,
 	"label.no": null,
 	"label.leavewithsavingchat": null,
@@ -183,6 +198,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "फ़ाइल सहेजने में असमर्थ",
 	"filesharing.startingFileShare": "फ़ाइल के आदान-प्रदान का प्रयास है",
@@ -238,5 +254,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "असमर्थित ब्राउज़र पाया है!",
 	"unsupportedBrowser.titlewebrtcUnavailable": " आवश्यक कार्यक्षमता आपके ब्राउज़र में नहीं है!",
-	"unsupportedBrowser.bodyText": "इस भेंटवार्ता के लिए आवश्यक कार्यक्षमता आपके ब्राउज़र में नहीं है. कृपया नवीनीकरण कीजिए या ब्राउज़र बदलिए, अतः आपकी सेटिंग्स जांचीए. समर्थित ब्राउज़र:"
+	"unsupportedBrowser.bodyText": "इस भेंटवार्ता के लिए आवश्यक कार्यक्षमता आपके ब्राउज़र में नहीं है. कृपया नवीनीकरण कीजिए या ब्राउज़र बदलिए अतः आपकी सेटिंग्स जांचीए. समर्थित ब्राउज़र:"
 }

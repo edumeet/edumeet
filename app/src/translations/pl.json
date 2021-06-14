@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "Zatrzymaj wszystkie współdzielone ekrany",
 	"room.hideSelfView": "Ukryj pogląd swojego wideo",
 	"room.showSelfView": "Pokaż pogląd swojego wideo",
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 	"room.leavingTheRoom": "Opuszczanie pokoju",
 	"room.leaveConfirmationMessage": "Czy na pewno chcesz opuścić pokój?",
 
@@ -101,6 +110,10 @@
 	"tooltip.muteParticipantAudioModerator": "Wycisz uczestnika dla wszystkich",
 	"tooltip.muteParticipantVideoModerator": "Wyłącz wideo uczestnika dla wszystkich",
 	"tooltip.muteScreenSharingModerator": "Wyłącz współdzielenie ekranu przez uczestnika dla wszystkich",
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Nazwa pokoju",
 	"label.chooseRoomButton": "Kontynuuj",
@@ -139,6 +152,8 @@
 	"label.login": "Zaloguj",
 	"label.logout": "Wyloguj",
 	"label.join": "Dołącz",
+	"label.recordingInProgress": null,
+	
 	"label.yes": "Tak",
 	"label.no": "Nie",
 	"label.leaveWithSavingChat": "Tak + zapis czatu ({chatCount})",
@@ -183,6 +198,7 @@
 	"settings.myPhotoLabel": "Maksymalny rozmiar pliku: 5MB, dozwolone: jpg, jpeg, png",
 	"settings.myPhotoSizeError": " plik jest zbyt duży",
 	"settings.myPhotoTypeError": " nie jest obsługiwanym rozszerzeniem pliku",
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Nie można zapisać pliku",
 	"filesharing.startingFileShare": "Próba udostępnienia pliku",
@@ -239,5 +255,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Wykryto niekompatybilną przeglądarkę!",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Twoja przeglądarka nie wspiera wymaganej funkcjonalności!",
-	"unsupportedBrowser.bodyText": "Usługa wideokonferencji wymaga funkcjonalności, która nie jest wspierana przez Twoją przeglądarkę. Zaktualizuj przeglądarkę, zmień ją lub sprawdź jej ustawienia. Wspierane przeglądarki:"
+	"unsupportedBrowser.bodyText": "Usługa wideokonferencji wymaga funkcjonalności, która nie jest wspierana przez Twoją przeglądarkę. Zaktualizuj przeglądarkę zmień ją lub sprawdź jej ustawienia. Wspierane przeglądarki:"
 }

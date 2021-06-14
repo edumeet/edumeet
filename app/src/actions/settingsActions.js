@@ -217,8 +217,21 @@ export const setVideoMuted = (videoMuted) =>
 		type    : 'SET_VIDEO_MUTED',
 		payload : { videoMuted }
 	});
+
 export const setLocalPicture = (localPicture) =>
 	({
 		type    : 'SET_LOCAL_PICTURE',
 		payload : { localPicture }
+	});
+
+export const setRecorderSupportedMimeTypes = (recorderSupportedMimeTypes) =>
+	({
+		type    : 'SET_RECORDER_SUPPORTED_MIME_TYPES',
+		payload : { recorderSupportedMimeTypes: recorderSupportedMimeTypes }
+	});
+
+export const setRecorderPreferredMimeType = (recorderPreferredMimeType) =>
+	({
+		type    : 'SET_RECORDER_PREFERRED_MIME_TYPE',
+		payload : { recorderPreferredMimeType: recorderPreferredMimeType }
 	});

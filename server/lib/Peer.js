@@ -5,6 +5,14 @@ const userRoles = require('../userRoles');
 
 const logger = new Logger('Peer');
 
+// Recoding STATE
+const RECORDING_STOP='stop';
+const RECORDING_START='start';
+const RECORDING_PAUSE='pause';
+const RECORDING_RESUME='resume';
+
+const RECORDING_TYPE_LOCAL='local';
+
 class Peer extends EventEmitter
 {
 	constructor({ id, roomId, socket })
@@ -47,6 +55,10 @@ class Peer extends EventEmitter
 		this._raisedHand = false;
 
 		this._raisedHandTimestamp = null;
+
+		this._localRecordingState = null;
+
+		this._recordingStateHistory = [];
 
 		this._transports = new Map();
 
@@ -295,6 +307,31 @@ class Peer extends EventEmitter
 		return this._consumers;
 	}
 
+	get localRecordingState()
+	{
+		return this._localRecordingState;
+	}
+
+	get recordingStateHistory()
+	{
+		return this._recordingStateHistory;
+	}
+
+	set localRecordingState(recordingState)
+	{
+		this._localRecordingState=recordingState;
+		this.addRecordingStateHistory(recordingState, RECORDING_TYPE_LOCAL);
+	}
+
+	addRecordingStateHistory(recordingState, recordingType)
+	{
+		this.recordingStateHistory.push({
+			timestamp : Date.now(),
+			recordingState,
+			recordingType
+		});
+	}
+
 	addRole(newRole)
 	{
 		if (
@@ -385,12 +422,14 @@ class Peer extends EventEmitter
 	{
 		const peerInfo =
 		{
-			id                  : this.id,
-			displayName         : this.displayName,
-			picture             : this.picture,
-			roles               : this.roles.map((role) => role.id),
-			raisedHand          : this.raisedHand,
-			raisedHandTimestamp : this.raisedHandTimestamp
+			id                    : this.id,
+			displayName           : this.displayName,
+			picture               : this.picture,
+			roles                 : this.roles.map((role) => role.id),
+			raisedHand            : this.raisedHand,
+			raisedHandTimestamp   : this.raisedHandTimestamp,
+			localRecordingState   : this.localRecordingState,
+			recordingStateHistory : this.localRecordingStateHistory
 		};
 
 		return peerInfo;

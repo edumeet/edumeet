@@ -14,6 +14,21 @@ Try it online at https://letsmeet.no. You can add /roomname to the URL for speci
 * File sharing
 * Different layouts
 * Internationalization support
+* Local Recording
+
+## Local Recording
+
+* Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
+Local Recording creates a local IndexedDB with the name of the starting timestamp (unix timestamp format)  And a storage called chunks. All chunks read in an array and created a final blob that you can download. After blobs array concatenation as a big blob, this big blob saved as file, and finally we delete the temporary local IndexedDB.
+
+* **WARNINIG**: Take care that You need for local recording extra cpu, memory and disk space.
+  **You need to have good enough free disk space!!**
+Keep in mind that Browsers don't allow to use all the disk free capacity!
+See more info about browsers storage limits:
+  * <https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria#storage_limits>
+  * <https://chromium.googlesource.com/chromium/src/+/refs/heads/master/storage/browser/quota/quota_settings.cc#68>
+
+* If there is an error during recording, or browser crashed or you accidentally close your tab, you can recover and save to file your data stored in the IndexDB with the following way. Open browser console and run function CLIENT.recoverRecording(`DB_NAME`) Where `DB_NAME` is the name of Indexed DataBase, so the starting date in unix timestamp format of the recording. If you open your browser developer console and find IndexDB storage info, you can find the name of your IndexedDB recording. It is a unix timestamp, the timestamp of the start of your recording.
 
 ## Docker
 

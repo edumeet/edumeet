@@ -383,6 +383,12 @@ async function setupAuth()
 		typeof (config.auth.oidc.clientOptions) !== 'undefined'
 	)
 	{
+		if (config.auth.oidc.HttpOptions)
+		{
+			// Set http options to allow e.g. http proxy
+			custom.setHttpOptionsDefaults(config.auth.oidc.HttpOptions);
+		}
+
 		const oidcIssuer = await Issuer.discover(config.auth.oidc.issuerURL);
 
 		// Setup authentication

@@ -28,6 +28,7 @@ import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 import { LazyPreload } from './components/Loader/LazyPreload';
 import { detectDevice } from 'mediasoup-client';
+import { recorder } from './actions/recorderActions';
 
 import './index.css';
 
@@ -51,7 +52,9 @@ const supportedBrowsers =
 	'samsung internet for android' : '>=11.1.1.52'
 };
 
-const intl = createIntl();
+const intl = createIntl({ locale: 'en', defaultLocale: 'en' });
+
+recorder.intl = intl;
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {

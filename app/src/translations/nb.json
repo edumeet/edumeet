@@ -68,6 +68,15 @@
 	"room.stopAllScreenSharing": "Stopp all skjermdeling",
 	"room.hideSelfView": "Skjule eget bilde",
 	"room.showSelfView": "Vis eget bilde",
+	"room.unexpectedErrorDuringLocalRecording": null,
+	"room.youStartedLocalRecording": null,
+	"room.youStoppedLocalRecording": null,
+	"room.localRecordingStarted": null,
+	"room.localRecordingPaused": null,
+	"room.localRecordingResumed": null,
+	"room.localRecordingStopped": null,
+	"room.recordingConsent": null,
+	"room.localRecordingSecurityError": null,
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
@@ -101,6 +110,10 @@
 	"tooltip.muteParticipantAudioModerator": "Stopp lyd",
 	"tooltip.muteParticipantVideoModerator": "Stopp video",
 	"tooltip.muteScreenSharingModerator": "Stopp skjermdeling",
+	"tooltip.startLocalRecording": null,
+	"tooltip.stopLocalRecording": null,
+	"tooltip.pauseLocalRecording": null,
+	"tooltip.resumeLocalRecording": null,
 
 	"label.roomName": "Møtenavn",
 	"label.chooseRoomButton": "Fortsett",
@@ -139,6 +152,8 @@
 	"label.login": "Logg på",
 	"label.logout": "Logg av",
 	"label.join": "Gå inn",
+	"label.recordingInProgress": null,
+	
 	"label.yes": null,
 	"label.no": null,
 	"label.leavewithsavingchat": null,
@@ -183,6 +198,7 @@
 	"settings.myPhotoLabel": null,
 	"settings.myPhotoSizeError": null,
 	"settings.myPhotoTypeError": null,
+	"settings.codecs": null,
 
 	"filesharing.saveFileError": "Klarte ikke å lagre fil",
 	"filesharing.startingFileShare": "Starter fildeling",
@@ -239,5 +255,5 @@
 
 	"unsupportedBrowser.titleUnsupportedBrowser": "Nettleser ikke støttet",
 	"unsupportedBrowser.titlewebrtcUnavailable": "Funksjonalitet som kreves er ikke tilgjengelig i denne nettleseren",
-	"unsupportedBrowser.bodyText": "Denne møtetjenesten krever funksjonalitet som ikke er støttet i denne nettleseren. Vennligst oppgrader, bytt til en annen nettleser, eller sjekk innstillinger. Støttede nettlesere:"
+	"unsupportedBrowser.bodyText": "Denne møtetjenesten krever funksjonalitet som ikke er støttet i denne nettleseren. Vennligst oppgrader, bytt til en annen nettleser eller sjekk innstillinger. Støttede nettlesere:"
 }
