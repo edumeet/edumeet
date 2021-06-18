@@ -162,7 +162,7 @@ export default class BrowserRecorder
 			let chunkCounter = 0;
 
 			// Save a recorded chunk (blob) to indexedDB
-			const saveToDB = async function(data)
+			const saveToDB = async (data) =>
 			{
 				return await this.idbDB.put(this.idbStoreName, data, Date.now());
 			};
