@@ -1,6 +1,6 @@
 import Logger from '../Logger';
-import { store } from '../store';
-import * as consumerActions from '../actions/consumerActions';
+// import { store } from '../store';
+// import * as consumerActions from '../actions/consumerActions';
 
 const logger = new Logger('transforms.receiver');
 
@@ -82,15 +82,14 @@ const OPUS_FRAMES = [
  * @param receiver 
  * @param consumerId 
  */
-export function opusReceiverTransform(receiver: RTCRtpReceiver, consumerId: string)
+export function opusReceiverTransform(receiver: RTCRtpReceiver, cb: (opusConfig: string) => void)
 {
-	logger.debug('opusReceiverTransform', { receiver, consumerId });
-
 	// @ts-ignore
 	const receiverStreams = receiver.createEncodedStreams();
 	const readableStream = receiverStreams.readable || receiverStreams.readableStream;
 	const writableStream = receiverStreams.writable || receiverStreams.writableStream;
 
+	let lastOpusConfig: string|null = null
 	const transformStream = new window.TransformStream({
 		transform : (encodedFrame, controller) =>
 		{
@@ -103,14 +102,9 @@ export function opusReceiverTransform(receiver: RTCRtpReceiver, consumerId: stri
 				const frames = byte & 0x03; // eslint-disable-line no-bitwise
 
 				const opusConfig = `${OPUS_CONFIGS[config]} ${OPUS_STEREO[stereo]} ${OPUS_FRAMES[frames]}`;
-				const consumer = store.getState().consumers[consumerId];
-
-				if (consumer?.opusConfig !== opusConfig)
-				{
-					logger.debug('opusReceiverTransform',
-						{ config, stereo, frames, opusConfig });
-					store.dispatch(consumerActions.setConsumerOpusConfig(
-						consumerId, opusConfig));
+				if(lastOpusConfig !== opusConfig) {
+					lastOpusConfig = opusConfig
+					cb(opusConfig)
 				}
 			}
 

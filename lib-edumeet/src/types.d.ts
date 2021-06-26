@@ -28,6 +28,7 @@ export interface IEdumeetConfig {
     requestTimeout: number
     simulcast: IEdumeetSimulcastConfig
     torrentsEnabled: boolean
+    opusDetailsEnabled: boolean
     spotlights: {
         lastN: number
         hideNoVideoParticipants: boolean

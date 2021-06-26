@@ -7,6 +7,7 @@ import EdumeetTransport from './Transport';
 import EdumeetSignalingAPI from './SignalingAPI';
 import { IEdumeetConfig, IEdumeetConsumer, INotificationNewConsumer } from './types';
 import Logger from './Logger';
+import { opusReceiverTransform, directReceiverTransform } from './transforms/receiver'
 const logger = new Logger('Consumers');
 
 type ConsumerExtended = mediasoupClient.types.Consumer & {hark?: hark.Harker}
@@ -21,6 +22,7 @@ interface ConsumerEvents extends IEventsDescriptor {
 	audioDevicesUpdate: (payload: {devices: Devices}) => void
 	selectedPeerRemoved: (payload: {peerId: string }) => void
 	peerVolumeChange: (payload: { peerId: string, volume: number}) => void
+	consumerOpusConfigChange: (payload: { id: string, opusConfig: string }) => void
 }
 
 export default class EdumeetConsumers extends EventEmitterTyped<ConsumerEvents> {
@@ -152,13 +154,20 @@ export default class EdumeetConsumers extends EventEmitterTyped<ConsumerEvents> 
 
 
 		if (this.transport.recv.appData.encodedInsertableStreams) {
-			// TODO: reenable the feature
-			// const { enableOpusDetails } = store.getState().settings;
+			if(!consumer.rtpReceiver) {
+				throw new Error('Could not decode insertable stream. RTPReceiver is undefined')
+			}
+			const { opusDetailsEnabled } = this.config
 
-			// if (kind === 'audio' && enableOpusDetails)
-			// 	opusReceiverTransform(consumer.rtpReceiver, consumer.id);
-			// else
-			// 	directReceiverTransform(consumer.rtpReceiver);
+			if (kind === 'audio' && opusDetailsEnabled)
+				opusReceiverTransform(consumer.rtpReceiver, (opusConfig) => {
+					this.emit('consumerOpusConfigChange', { 
+						id: consumer.id,
+						opusConfig
+					});
+				});
+			else
+				directReceiverTransform(consumer.rtpReceiver);
 		}
 
 

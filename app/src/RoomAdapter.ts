@@ -103,7 +103,8 @@ export default class RoomAdapter
 			opusDtx,
 			opusFec,
 			opusPtime,
-			opusMaxPlaybackRate
+			opusMaxPlaybackRate,
+			enableOpusDetails
 		} = store.getState().settings;
 
 		// so far there was mistakenly `maxBitRate` used, but RTCRtpEncodingParameters
@@ -146,9 +147,10 @@ export default class RoomAdapter
 					),
 					profiles : config.simulcastProfiles
 				},
-				torrentsEnabled   : true,
-				networkPriorities : config.networkPriorities,
-				spotlights        : {
+				torrentsEnabled    : true,
+				opusDetailsEnabled : enableOpusDetails,
+				networkPriorities  : config.networkPriorities,
+				spotlights         : {
 					lastN                   : device.platform === 'desktop' ? config.lastN : config.mobileLastN,
 					hideNoVideoParticipants : hideNoVideoParticipants
 				},
@@ -836,6 +838,10 @@ export default class RoomAdapter
 					consumerActions.setConsumerScore(consumer.id, { score: consumer.score })
 				);
 			}
+		});
+		this.room.consumers.on('consumerOpusConfigChange', ({ id, opusConfig }) =>
+		{
+			store.dispatch(consumerActions.setConsumerOpusConfig(id, opusConfig));
 		});
 		this.room.consumers.on('selectedPeerRemoved', ({ peerId }) =>
 		{

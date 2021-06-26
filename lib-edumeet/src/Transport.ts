@@ -14,7 +14,8 @@ type TransportProps = {
 	isProduceEnabled: boolean
 	forceTcp: boolean,
 	iceTransportPolicy: 'all'|'relay'|undefined,
-	simulcastConfig: IEdumeetSimulcastConfig
+	simulcastConfig: IEdumeetSimulcastConfig,
+	insertableStreamsEnabled: boolean
 }
 
 export default class Transport {
@@ -25,6 +26,7 @@ export default class Transport {
 	private iceTransportPolicy: 'all'|'relay'|undefined
 	turnServers: RTCIceServer[] = []
 	private simulcastConfig: IEdumeetSimulcastConfig
+	private insertableStreamsEnabled =  false
 
 	send?: mediasoupClient.types.Transport|null
 	recv?: mediasoupClient.types.Transport|null
@@ -41,6 +43,7 @@ export default class Transport {
 		this.forceTcp = props.forceTcp;
 		this.iceTransportPolicy = props.iceTransportPolicy;
 		this.simulcastConfig = props.simulcastConfig;
+		this.insertableStreamsEnabled = props.insertableStreamsEnabled
 
 		this.api.on('disconnect', (reason: string) => {
 			if (this.send) {
@@ -155,7 +158,14 @@ export default class Transport {
 			iceCandidates,
 			dtlsParameters,
 			iceServers         : this.turnServers,
-			iceTransportPolicy : iceTransportPolicy
+			iceTransportPolicy : iceTransportPolicy,
+
+			additionalSettings : {
+				encodedInsertableStreams : this.insertableStreamsEnabled
+			},
+			appData : {
+				encodedInsertableStreams : this.insertableStreamsEnabled
+			}
 		});
 
 		this.recv.on(

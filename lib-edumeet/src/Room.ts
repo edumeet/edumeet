@@ -52,6 +52,10 @@ interface IRoomProps {
 	forceTcp: boolean
 }
 
+// @ts-ignore
+const insertableStreamsSupported = Boolean(RTCRtpSender.prototype.createEncodedStreams);
+
+
 export default class Room extends EventEmitterTyped<RoomEvents> {
 	private config: IEdumeetConfig
 	private _peerId: string
@@ -274,7 +278,9 @@ export default class Room extends EventEmitterTyped<RoomEvents> {
 			// because of an issue with firefox, we always enforce
 			// usage of TURN
 			// https://github.com/edumeet/edumeet/issues/72
-			iceTransportPolicy : this.bowser.satisfies({ firefox: '>0' }) ? 'relay' : 'all'
+			iceTransportPolicy : this.bowser.satisfies({ firefox: '>0' }) ? 'relay' : 'all',
+
+			insertableStreamsEnabled: insertableStreamsSupported && this.config.opusDetailsEnabled
 		});
 
 		// Producers
