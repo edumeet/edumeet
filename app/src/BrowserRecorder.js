@@ -5,7 +5,12 @@ import { openDB, deleteDB } from 'idb';
 import * as meActions from './actions/meActions';
 import { store } from './store';
 import * as requestActions from './actions/requestActions';
-import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
+
+export const RECORDING_START = 'start';
+export const RECORDING_STOP = 'stop';
+export const RECORDING_PAUSE = 'pause';
+export const RECORDING_RESUME = 'resume';
+export const RECORDING_INIT = null;
 
 export default class BrowserRecorder
 {
@@ -54,6 +59,48 @@ export default class BrowserRecorder
 
 		// 10 sec
 		this.RECORDING_SLICE_SIZE = 10000;
+	}
+
+	static getSupportedMimeTypes()
+	{
+		const mimeTypes = [];
+
+		const mimeTypeCapability = [
+
+			/* audio codecs
+			[ 'audio/wav', [] ],
+			[ 'audio/pcm', [] ],
+			[ 'audio/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'audio/ogg', [ 'Firefox' ] ],
+			[ 'audio/opus', [] ],
+			*/
+			[ 'video/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs="vp8, opus"', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs="vp9, opus"', [ 'Chrome' ] ],
+			[ 'video/webm;codecs="h264, opus"', [ 'Chrome' ] ],
+			[ 'video/mp4', [] ],
+			[ 'video/mpeg', [] ],
+			[ 'video/x-matroska;codecs=avc1', [ 'Chrome' ] ]
+		];
+
+		if (typeof MediaRecorder === 'undefined')
+		{
+			window.MediaRecorder = {
+				isTypeSupported : function()
+				{
+					return false;
+				}
+			};
+		}
+		mimeTypeCapability.forEach((item) =>
+		{
+			if (MediaRecorder.isTypeSupported(item[0]) && !mimeTypes.includes(item[0]))
+			{
+				mimeTypes.push(item[0]);
+			}
+		});
+
+		return mimeTypes;
 	}
 
 	mixer(audiotrack, videostream)

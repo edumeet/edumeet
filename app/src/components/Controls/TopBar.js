@@ -748,7 +748,7 @@ const TopBar = (props) =>
 
 										if (micProducer) additionalAudioTracks.push(micProducer.track);
 										await recorder.startLocalRecording({
-											roomClient,
+											roomClient : roomClient.room,
 											additionalAudioTracks,
 											recordingMimeType
 										});

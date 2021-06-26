@@ -11,7 +11,7 @@ import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
 import randomString from 'random-string';
 import Logger from './Logger';
 import debug from 'debug';
-import RoomClient from './RoomClient';
+import RoomAdapter from './RoomAdapter';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './actions/meActions';
@@ -63,9 +63,9 @@ if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production'
 
 const logger = new Logger();
 
-let roomClient;
+let roomAdapter;
 
-RoomClient.init({ store });
+RoomAdapter.init({ store });
 
 const theme = createMuiTheme(config.theme);
 
@@ -205,7 +205,7 @@ function run()
 		})
 	);
 
-	roomClient = new RoomClient(
+	roomAdapter = new RoomAdapter(
 		{
 			peerId,
 			accessCode,
@@ -218,14 +218,14 @@ function run()
 			basePath
 		});
 
-	global.CLIENT = roomClient;
+	global.CLIENT = roomAdapter;
 
 	render(
 		<Provider store={store}>
 			<MuiThemeProvider theme={theme}>
 				<IntlProvider value={intl}>
 					<PersistGate loading={<LoadingView />} persistor={persistor}>
-						<RoomContext.Provider value={roomClient}>
+						<RoomContext.Provider value={roomAdapter}>
 							<SnackbarProvider>
 								<Router basename={basePath}>
 									<Suspense fallback={<LoadingView />}>

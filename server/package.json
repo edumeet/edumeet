@@ -43,7 +43,7 @@
 		"ims-lti": "^3.0.2",
 		"json5": "^2.2.0",
 		"jsonwebtoken": "^8.5.1",
-		"mediasoup": "vpalmisano/mediasoup#3.7.1-build-with-system-openssl",
+		"mediasoup": "vpalmisano/mediasoup#3.7.15-build-with-system-openssl",
 		"openid-client": "^3.7.3",
 		"passport": "^0.4.0",
 		"passport-local": "^1.0.0",

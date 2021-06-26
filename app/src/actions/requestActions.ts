@@ -1,8 +1,17 @@
+// @ts-ignore
 import randomString from 'random-string';
 import * as notificationActions from './notificationActions';
 
 // This returns a redux-thunk action (a function).
-export const notify = ({ type = 'info', text, timeout }) =>
+export const notify = ({
+	type = 'info',
+	text,
+	timeout
+}: {
+    type?: 'info' | 'error';
+    text: string;
+    timeout?: number;
+}): any =>
 {
 	if (!timeout)
 	{
@@ -20,15 +29,14 @@ export const notify = ({ type = 'info', text, timeout }) =>
 		}
 	}
 
-	const notification =
-	{
-		id      : randomString({ length: 6 }).toLowerCase(),
-		type    : type,
-		text    : text,
-		timeout : timeout
+	const notification = {
+		id : randomString({ length: 6 }).toLowerCase(),
+		type,
+		text,
+		timeout
 	};
 
-	return (dispatch) =>
+	return (dispatch: any) =>
 	{
 		dispatch(notificationActions.addNotification(notification));
 
