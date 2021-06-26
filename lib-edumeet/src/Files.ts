@@ -172,7 +172,7 @@ export default class EdumeetFiles extends EventEmitterTyped<FileEvents> {
 		torrent.on('done', () => {
 			file.active = false
 			file.progress = 1
-			this.emit('downloadComplete', file)
+			this.emit('downloadCompleted', file)
 		});
 	}
 	handleFileHistory(history: Array<{peerId: string, magnetUri: string}>) {

@@ -386,7 +386,7 @@ class MessageList extends React.Component
 
 							}
 
-							return 0;
+							return null;
 						})
 					}
 
