@@ -117,14 +117,23 @@ cp app/public/config/config.example.js app/public/config/config.js
 
 * Set up the browser app:
 
+
 ```bash
-cd app
+cd lib-edumeet
 
 # using Yarn (recommended)
-yarn && yarn build
+yarn && yarn link
 
 # using NPM
-npm i && npm run build
+npm i && npm link
+
+cd ../app
+
+# using Yarn (recommended)
+yarn link lib-edumeet && yarn && yarn build
+
+# using NPM
+npm link lib-edumeet && npm i && npm run build
 ```
 
 This will build the client application and copy everything to `server/public` from where the server can host client code to browser requests.

@@ -28,7 +28,7 @@ also for the websocket connection.
 Rebuild the web application bundle:
 
 ```sh
-docker-compose exec -u $UID edumeet sh -c "cd app && yarn && yarn build"
+docker-compose exec -u $UID edumeet sh -c "cd lib-edumeet && yarn && cd ../app && yarn && yarn build"
 ```
 
 ## Known issues
