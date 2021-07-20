@@ -1,4 +1,4 @@
-import Logger from '../Logger';
+import Logger from '../../logger/Logger';
 
 const { Resolver } = require('dns').promises;
 const prom = require('prom-client');

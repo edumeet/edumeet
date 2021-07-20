@@ -2,17 +2,17 @@
 
 process.title = 'edumeet-server';
 
-import Logger from './lib/Logger';
+import Logger from './lib/logger/Logger';
 const Room = require('./lib/Room');
 const Peer = require('./lib/Peer');
-const userRoles = require('./userRoles');
+const userRoles = require('./lib/access/roles');
 const {
 	loginHelper,
 	logoutHelper
-} = require('./httpHelper');
-const { config, configError } = require('./lib/config');
-const interactiveServer = require('./lib/interactiveServer');
-const promExporter = require('./lib/promExporter');
+} = require('./lib/helpers/httpHelper');
+const { config, configError } = require('./lib/config/config');
+const interactiveServer = require('./lib/interactive/Server');
+const promExporter = require('./lib/stats/promExporter');
 
 const bcrypt = require('bcrypt');
 const fs = require('fs');
