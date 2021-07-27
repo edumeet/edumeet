@@ -174,7 +174,7 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room.leaveOpen === next.room.leaveOpen,
+				prev.room.leaveOpen === next.room.leaveOpen &&
 				prev.chat.count === next.chat.count
 			);
 		}
