@@ -520,12 +520,10 @@ const Me = (props) =>
 															/>
 															<SettingsVoiceIcon
 																clipPath='url(#cut-off-indicator)'
-																style={
-																	(
-																		{ 'position': 'absolute' },
-																		{ 'opacity': '0.6' }
-																	)
-																}
+																style={{
+																	'position' : 'absolute',
+																	'opacity'  : '0.6'
+																}}
 																color={me.isAutoMuted ?
 																	'primary' : 'default'}
 															/>
@@ -583,12 +581,10 @@ const Me = (props) =>
 															/>
 															<SettingsVoiceIcon
 																clipPath='url(#cut-off-indicator)'
-																style={
-																	(
-																		{ 'position': 'absolute' },
-																		{ 'opacity': '0.6' }
-																	)
-																}
+																style={{
+																	'position' : 'absolute',
+																	'opacity'  : '0.6'
+																}}
 																color={me.isAutoMuted ?
 																	'primary' : 'default'}
 															/>
