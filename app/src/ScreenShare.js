@@ -318,14 +318,14 @@ export default class ScreenShare
 			{
 				case 'firefox':
 				{
-					if (device.version < 66.0)
+					if (device.bowser.satisfies({ firefox: '<66' }))
 						return new FirefoxScreenShare();
 					else
 						return new DisplayMediaScreenShare();
 				}
 				case 'safari':
 				{
-					if (device.version >= 13.0)
+					if (device.bowser.satisfies({ safari: '>=13' }))
 						return new DisplayMediaScreenShare();
 					else
 						return new DefaultScreenShare();
