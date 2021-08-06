@@ -22,12 +22,17 @@ export default function deviceInfo()
 	else
 		flag = 'unknown';
 
+	if (flag == 'safari')
+		browserVersion = '14.0';
+	else
+		browserVersion = browser.getBrowserVersion();
+		
 	return {
 		flag,
 		os       : browser.getOSName(true), // ios, android, linux...
 		platform : browser.getPlatformType(true), // mobile, desktop, tablet
 		name     : browser.getBrowserName(true),
-		version  : browser.getBrowserVersion(),
+		version  : browserVersion,
 		bowser   : browser
 	};
 }
