@@ -8,6 +8,7 @@ export default function deviceInfo()
 	const browser = bowser.getParser(ua);
 
 	let flag;
+	let browserVersion;
 
 	if (browser.satisfies({ chrome: '>=0', chromium: '>=0' }))
 		flag = 'chrome';
