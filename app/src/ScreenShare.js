@@ -237,7 +237,7 @@ export default class ScreenShare
 				}
 				case 'safari':
 				{
-					if (device.version >= 13.0)
+					if (device.version >= '13.0')
 						return new DisplayMediaScreenShare();
 					else
 						return new DefaultScreenShare();
