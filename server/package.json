@@ -20,7 +20,7 @@
 		"connect": "ts-node connect.js",
 		"lint": "eslint -c .eslintrc.json --ext .js,.ts *.js *.ts lib/",
 		"format": "prettier --write '**/*.ts' && npm run lint --fix",
-		"gen-config-docs": "ts-node lib/config/gen_docs.ts"
+		"gen-config-docs": "ts-node gen-config-docs.ts"
 	},
 	"dependencies": {
 		"awaitqueue": "^1.0.0",

@@ -1,4 +1,4 @@
-import { configDocs } from './config';
+import { configDocs } from '../lib/config/config';
 import { writeFile } from 'fs/promises';
 
 function formatJson(data)
