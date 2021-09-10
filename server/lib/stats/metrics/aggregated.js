@@ -1,4 +1,4 @@
-import Logger from '../Logger';
+import Logger from '../../logger/Logger';
 
 const promClient = require('prom-client');
 const pidusage = require('pidusage');

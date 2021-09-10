@@ -1,20 +1,20 @@
-import Logger from './Logger';
+import Logger from './logger/Logger';
 
 const EventEmitter = require('events').EventEmitter;
 const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
 const Lobby = require('./Lobby');
-const { SocketTimeoutError, NotFoundInMediasoupError } = require('./errors');
+const { SocketTimeoutError, NotFoundInMediasoupError } = require('./helpers/errors');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
-const userRoles = require('../userRoles');
+const userRoles = require('./access/roles');
 
 import {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
-} from '../access';
+} from './access/access';
 
-const permissions = require('../permissions'), {
+const permissions = require('./access/perms'), {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
 	MODIFY_ROLE,
@@ -30,7 +30,7 @@ const permissions = require('../permissions'), {
 	LOCAL_RECORD_ROOM
 } = permissions;
 
-const { config } = require('./config');
+const { config } = require('./config/config');
 
 const logger = new Logger('Room');
 

@@ -7,13 +7,13 @@ import yaml from 'yaml';
 import toml from 'toml';
 import { cpus } from 'os';
 
-import Logger from './Logger';
+import Logger from '../logger/Logger';
 
-import * as userRoles from '../userRoles';
+import * as userRoles from '../access/roles';
 import {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
-} from '../access';
+} from '../access/access';
 import {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
@@ -27,7 +27,7 @@ import {
 	SHARE_FILE,
 	MODERATE_FILES,
 	MODERATE_ROOM
-} from '../permissions';
+} from '../access/perms';
 
 const logger = new Logger('config');
 

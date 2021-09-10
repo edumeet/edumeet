@@ -2,12 +2,12 @@
 // const fs = require('fs');
 // const tunnel = require('tunnel');
 
-const userRoles = require('../userRoles');
+const userRoles = require('../lib/access/roles');
 
 const {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
-} = require('../access');
+} = require('../lib/access/access');
 
 const {
 	CHANGE_ROOM_LOCK,
@@ -23,7 +23,7 @@ const {
 	MODERATE_FILES,
 	MODERATE_ROOM,
 	LOCAL_RECORD_ROOM
-} = require('../permissions');
+} = require('../lib/access/perms');
 
 // const AwaitQueue = require('awaitqueue');
 // const axios = require('axios');
