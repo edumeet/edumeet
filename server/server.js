@@ -604,7 +604,7 @@ async function runHttpsServer()
 {
 	app.use(compression());
 
-	app.use('/.well-known/acme-challenge', express.static('public/.well-known/acme-challenge'));
+	app.use('/.well-known/acme-challenge', express.static('dist/public/.well-known/acme-challenge'));
 
 	app.all('*', async (req, res, next) =>
 	{
@@ -643,7 +643,7 @@ async function runHttpsServer()
 	});
 
 	// Serve all files in the public folder as static files.
-	app.use(express.static('public', {
+	app.use(express.static('dist/public', {
 		maxAge : config.staticFilesCachePeriod
 	}));
 
