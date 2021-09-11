@@ -78,7 +78,7 @@
 	"scripts": {
 		"analyze": "source-map-explorer build/static/js/*",
 		"start": "HTTPS=true PORT=4443 react-scripts start",
-		"build": "react-scripts build && DEST='../server/dist/public' && rm -rf $DEST && mkdir -p $DEST && mv -T build/ $DEST",
+		"build": "react-scripts build && rm -rf ../server/public && DEST='../server/dist/public' && rm -rf $DEST && mkdir -p $DEST && mv -T build/ $DEST",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"electron": "electron --no-sandbox .",
