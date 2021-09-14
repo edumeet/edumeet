@@ -485,7 +485,7 @@ let configLoaded = false;
 // Load config from file
 for (const format of [ 'json', 'json5', 'yaml', 'yml', 'toml' ]) // eslint-disable-line no-restricted-syntax
 {
-	const filepath = path.normalize(`${__dirname}/../config/config.${format}`);
+	const filepath = path.normalize(`${__dirname}/../../config/config.${format}`);
 
 	if (fs.existsSync(filepath))
 	{
@@ -505,7 +505,7 @@ for (const format of [ 'json', 'json5', 'yaml', 'yml', 'toml' ]) // eslint-disab
 
 if (!configLoaded)
 {
-	logger.warn(`No config file found in ${path.normalize(`${__dirname}/../config/`)}, using defaults.`);
+	logger.warn(`No config file found in ${path.normalize(`${__dirname}/../../config/`)}, using defaults.`);
 	configSchema.load({});
 }
 
@@ -521,13 +521,13 @@ catch (error: any)
 }
 
 // load additional config module (no validation is performed)
-const configModuleFilepath = path.normalize(`${__dirname}/../config/config.js`);
+const configModuleFilepath = path.normalize(`${__dirname}/../../config/config.js`);
 if (fs.existsSync(configModuleFilepath))
 {
 	try
 	{
 		logger.info(`Loading config module from ${configModuleFilepath}`);
-		const configModule = require('../config/config.js'); // eslint-disable-line @typescript-eslint/no-var-requires
+		const configModule = require('../../config/config.js'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 		Object.assign(config, configModule);
 	}
