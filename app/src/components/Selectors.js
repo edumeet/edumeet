@@ -20,6 +20,8 @@ const peersKeySelector = createSelector(
 	(peers) => Object.keys(peers)
 );
 
+export const showVodSelect = (state) => state.room.vodObject;
+
 export const peersValueSelector = createSelector(
 	peersSelector,
 	(peers) => Object.values(peers)
@@ -337,4 +339,3 @@ export const recordingInProgressSelector = createSelector(
 	}
 );
 
-export const showVodSelect = (state) => state.room.vodObject;
