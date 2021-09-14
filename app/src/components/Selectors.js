@@ -338,4 +338,3 @@ export const recordingInProgressSelector = createSelector(
 			return false;
 	}
 );
-
