@@ -240,3 +240,21 @@ export const setHideSelfView = (hideSelfView) =>
 		type    : 'SET_HIDE_SELF_VIEW',
 		payload : { hideSelfView }
 	});
+
+export const openVod = (vodObject) =>
+	({
+		type    : 'OPEN_VOD',
+		payload : { vodObject }
+	});
+
+export const setToggleVodInProgress = (flag) =>
+	({
+		type    : 'SET_TOGGLE_VOD_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const closeVod = () =>
+	({
+		type    : 'CLOSE_VOD',
+		payload : { vodObject: null }
+	});

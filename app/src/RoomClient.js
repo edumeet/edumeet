@@ -2098,6 +2098,93 @@ export default class RoomClient
 			peerActions.setStopPeerScreenSharingInProgress(peerId, false));
 	}
 
+	async updateVod(vodTime, event)
+	{
+		const vodObject = store.getState().room.vodObject;
+
+		vodObject.time = vodTime;
+
+		switch (event)
+		{
+			case 'play':
+			{
+				vodObject.isPlaying = true;
+
+				break;
+			}
+			case 'pause':
+			{
+				vodObject.isPlaying = false;
+
+				break;
+			}
+		}
+
+		logger.debug('updateVod() [vodObject:"%o"]', vodObject);
+
+		store.dispatch(
+			roomActions.setToggleVodInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:updateVod', { vodObject });
+		}
+		catch (error)
+		{
+			logger.error('updateVod() [error:"%o"]', error);
+
+			store.dispatch(roomActions.closeVod());
+		}
+
+		store.dispatch(
+			roomActions.setToggleVodInProgress(false));
+	}
+
+	async toggleVod()
+	{
+		// TODO-VoDSync - change the hardcoded value to something from gui
+		const vodUrl = 'https://vod.conf.medvc.eu/edumeet/sv.mp4';
+
+		const currentVodObject = store.getState().room.vodObject;
+
+		let vodObject;
+
+		if (currentVodObject === null)
+		{
+			vodObject = {
+				url                : vodUrl,
+				time               : 0,
+				isPlaying          : false,
+				startPlayTimestamp : 0,
+				peerId             : this._peerId
+			};
+		}
+		else
+		{
+			vodObject = null;
+		}
+
+		logger.debug('toggleVod() [vodObject:"%o"]', vodObject);
+
+		store.dispatch(
+			roomActions.setToggleVodInProgress(true));
+
+		try
+		{
+			await this.sendRequest('moderator:toggleVod', { vodObject });
+
+			store.dispatch(
+				roomActions.openVod(vodObject));
+		}
+		catch (error)
+		{
+			logger.error('toggleVod() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setToggleVodInProgress(false));
+	}
+
 	async muteAllPeers()
 	{
 		logger.debug('muteAllPeers()');
@@ -3169,6 +3256,24 @@ export default class RoomClient
 						break;
 					}
 
+					case 'updateVod':
+					{
+						const { vodObject } = notification.data;
+
+						store.dispatch(
+							roomActions.openVod(vodObject));
+
+						break;
+					}
+
+					case 'closeVod':
+					{
+						store.dispatch(
+							roomActions.closeVod());
+
+						break;
+					}
+
 					case 'moderator:clearChat':
 					{
 						store.dispatch(chatActions.clearChat());
@@ -3278,6 +3383,13 @@ export default class RoomClient
 						}
 
 						this._spotlights.closePeer(peerId);
+
+						const vodObject = store.getState().room.vodObject;
+
+						if (vodObject && vodObject.peerId === peerId)
+						{
+							store.dispatch(roomActions.closeVod());
+						}
 
 						store.dispatch(
 							peerActions.removePeer(peerId));
@@ -3873,6 +3985,7 @@ export default class RoomClient
 				allowWhenRoleMissing,
 				chatHistory,
 				fileHistory,
+				vodHistory,
 				lastNHistory,
 				locked,
 				lobbyPeers,
@@ -3939,6 +4052,15 @@ export default class RoomClient
 
 			(fileHistory.length > 0) && store.dispatch(
 				fileActions.addFileHistory(fileHistory));
+
+			if (vodHistory)
+			{
+				store.dispatch(roomActions.openVod(vodHistory));
+			}
+			else
+			{
+				store.dispatch(roomActions.closeVod());
+			}
 
 			locked ?
 				store.dispatch(roomActions.setRoomLocked()) :

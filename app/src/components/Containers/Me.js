@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	meProducersSelector,
-	makePermissionSelector
+	makePermissionSelector,
+	showVodSelect
 } from '../Selectors';
 import { permissions } from '../../permissions';
 import { withRoomContext } from '../../RoomContext';
@@ -60,6 +61,10 @@ const styles = (theme) =>
 			'&.screen' :
 			{
 				order : 2
+			},
+			'&.vod' :
+			{
+				order : 3
 			}
 		},
 		fab :
@@ -183,7 +188,8 @@ const Me = (props) =>
 		hasScreenPermission,
 		transports,
 		noiseVolume,
-		classes
+		classes,
+		vodObject
 	} = props;
 
 	const videoVisible = (
@@ -988,6 +994,21 @@ const Me = (props) =>
 					</div>
 				</div>
 			}
+			{(vodObject !== null) && (vodObject.peerId === me.id) &&
+			<div className={classnames(classes.root, 'vod')} style={spacingStyle}>
+				<div className={classes.viewContainer} style={style}>
+					<VideoView
+						isMe
+						isVod
+						vodObject={vodObject}
+						vodOnEvent={(time, event) =>
+						{
+							roomClient.updateVod(time, event);
+						}}
+					/>
+				</div>
+			</div>
+			}
 		</React.Fragment>
 	);
 };
@@ -1012,7 +1033,8 @@ Me.propTypes =
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired,
-	transports          : PropTypes.object.isRequired
+	transports          : PropTypes.object.isRequired,
+	vodObject           : PropTypes.object
 };
 
 const makeMapStateToProps = () =>
@@ -1047,7 +1069,8 @@ const makeMapStateToProps = () =>
 			hasVideoPermission  : canShareVideo(state),
 			hasScreenPermission : canShareScreen(state),
 			noiseVolume         : noise,
-			transports          : state.transports
+			transports          : state.transports,
+			vodObject           : showVodSelect(state)
 		};
 	};
 

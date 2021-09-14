@@ -281,6 +281,8 @@ class Room extends EventEmitter
 
 		this._fileHistory = [];
 
+		this._vodHistory = null;
+
 		this._lastN = [];
 
 		this._peers = {};
@@ -326,6 +328,8 @@ class Room extends EventEmitter
 		this._chatHistory = null;
 
 		this._fileHistory = null;
+
+		this._vodHistory = null;
 
 		this._lobby.close();
 
@@ -841,6 +845,11 @@ class Room extends EventEmitter
 		if (peer.joined)
 			this._notification(peer.socket, 'peerClosed', { peerId: peer.id }, true);
 
+		if (this._vodHistory && this._vodHistory.peerId === peer.id)
+		{
+			this._vodHistory = null;
+		}
+
 		// Remove from lastN
 		this._lastN = this._lastN.filter((id) => id !== peer.id);
 
@@ -926,6 +935,23 @@ class Room extends EventEmitter
 				if (this._hasPermission(peer, PROMOTE_PEER))
 					lobbyPeers = this._lobby.peerList();
 
+				// Make a copy in order not to change the stored object 
+				let vodObject = null;
+
+				if (this._vodHistory)
+				{
+					vodObject = Object.assign({}, this._vodHistory);
+				}
+
+				if (vodObject && vodObject.isPlaying)
+				{
+					// the +1000 ms is a magic number, as we cannot know exactly the transmission 
+					// and processing time
+					const vodOffset = (Date.now() - vodObject.startPlayTimestamp + 1000) / 1000;
+
+					vodObject.time = vodObject.time + vodOffset;
+				}
+
 				cb(null, {
 					roles                : peer.roles.map((role) => role.id),
 					peers                : peerInfos,
@@ -936,6 +962,7 @@ class Room extends EventEmitter
 					allowWhenRoleMissing : roomAllowWhenRoleMissing,
 					chatHistory          : this._chatHistory,
 					fileHistory          : this._fileHistory,
+					vodHistory           : vodObject,
 					lastNHistory         : this._lastN,
 					locked               : this._locked,
 					lobbyPeers           : lobbyPeers,
@@ -1762,6 +1789,72 @@ class Room extends EventEmitter
 				// Spread to others
 				this._notification(peer.socket, 'moderator:stopVideo', null, true);
 
+				cb();
+
+				break;
+			}
+
+			case 'moderator:updateVod':
+			{
+				// TODO-VoDSync a new permission for VoD sync showing should be introduced
+				// or now permission at all should be required
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { vodObject } = request.data;
+
+				if (!this._vodHistory || this._vodHistory.peerId !== peer.id)
+					throw new Error('peer not authorized to change vod state');
+
+				if (!this._vodHistory.isPlaying && vodObject.isPlaying)
+				{
+					vodObject.startPlayTimestamp = Date.now();
+				}
+
+				if (this._vodHistory.isPlaying && !vodObject.isPlaying)
+				{
+					vodObject.startPlayTimestamp = 0;
+				}
+
+				this._vodHistory = vodObject;
+
+				// Spread to others
+				this._notification(peer.socket, 'updateVod', {
+					vodObject : vodObject
+				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:toggleVod':
+			{
+				// TODO-VoDSync a new permission for VoD sync showing should be introduced
+				// or now permission at all should be required
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { vodObject } = request.data;
+
+				if (vodObject === null)
+				{
+					this._vodHistory = null;
+
+					// Spread to others
+					this._notification(peer.socket, 'closeVod', null, true);
+				}
+				else
+				{
+					this._vodHistory = vodObject;
+
+					// Spread to others
+					this._notification(peer.socket, 'updateVod', {
+						vodObject : vodObject
+					}, true);
+				}
+				// Return no error
 				cb();
 
 				break;
