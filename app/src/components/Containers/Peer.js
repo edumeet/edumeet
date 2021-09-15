@@ -549,55 +549,59 @@ const Peer = (props) =>
 							</Tooltip>
 						}
 
-						<Tooltip
-							title={intl.formatMessage({
-								id             : 'device.options',
-								defaultMessage : 'Options'
-							})}
-							placement={smallScreen || smallContainer ? 'top' : 'left'}
-						>
-							{ smallContainer ?
-								<IconButton
-									aria-label={intl.formatMessage({
-										id             : 'device.options',
-										defaultMessage : 'Options'
-									})}
-									className={classes.smallContainer}
-									size='small'
-									onClick={handleMenuOpen}
-								>
-									<MoreHorizIcon />
-								</IconButton>
-								:
-								<Fab
-									aria-label={intl.formatMessage({
-										id             : 'device.options',
-										defaultMessage : 'Options'
-									})}
-									className={classes.fab}
-									size='large'
-									onClick={handleMenuOpen}
-								>
-									<MoreHorizIcon />
-								</Fab>
-							}
-						</Tooltip>
-						<Menu
-							anchorEl={menuAnchorElement}
-							keepMounted
-							open={Boolean(menuAnchorElement)}
-							onClose={handleMenuClose}
-						>
-							<MenuItem
-								onClick={() =>
-								{
-									setShowAudioAnalyzer(!showAudioAnalyzer);
-									handleMenuClose();
-								}}
+						{advancedMode &&
+						<React.Fragment>
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'device.options',
+									defaultMessage : 'Options'
+								})}
+								placement={smallScreen || smallContainer ? 'top' : 'left'}
 							>
-								{ showAudioAnalyzer ? 'Disable' : 'Enable' } audio analyzer
-							</MenuItem>
-						</Menu>
+								{ smallContainer ?
+									<IconButton
+										aria-label={intl.formatMessage({
+											id             : 'device.options',
+											defaultMessage : 'Options'
+										})}
+										className={classes.smallContainer}
+										size='small'
+										onClick={handleMenuOpen}
+									>
+										<MoreHorizIcon />
+									</IconButton>
+									:
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'device.options',
+											defaultMessage : 'Options'
+										})}
+										className={classes.fab}
+										size='large'
+										onClick={handleMenuOpen}
+									>
+										<MoreHorizIcon />
+									</Fab>
+								}
+							</Tooltip>
+							<Menu
+								anchorEl={menuAnchorElement}
+								keepMounted
+								open={Boolean(menuAnchorElement)}
+								onClose={handleMenuClose}
+							>
+								<MenuItem
+									onClick={() =>
+									{
+										setShowAudioAnalyzer(!showAudioAnalyzer);
+										handleMenuClose();
+									}}
+								>
+									{ showAudioAnalyzer ? 'Disable' : 'Enable' } audio analyzer
+								</MenuItem>
+							</Menu>
+						</React.Fragment>
+						}
 
 					</div>
 
