@@ -389,10 +389,10 @@ class VideoView extends React.PureComponent
 							</div>
 						}
 
-						{ showAudioAnalyzer &&
-							<div className={classnames(classes.audioAnalyzer)}
-								ref={this.audioAnalyzerContainer}
-							/>
+						{showAudioAnalyzer && advancedMode &&
+						<div className={classnames(classes.audioAnalyzer)}
+							ref={this.audioAnalyzerContainer}
+						/>
 						}
 
 					</div>
@@ -454,7 +454,7 @@ class VideoView extends React.PureComponent
 		this._setTracks(videoTrack);
 
 		// Audio analyzer
-		if (showAudioAnalyzer)
+		if (showAudioAnalyzer && this.props.advancedMode)
 		{
 			this._setAudioMonitorTrack(audioTrack);
 		}
@@ -493,7 +493,7 @@ class VideoView extends React.PureComponent
 
 			this._setTracks(videoTrack);
 
-			if (showAudioAnalyzer)
+			if (showAudioAnalyzer && this.props.advancedMode)
 			{
 				this._setAudioMonitorTrack(audioTrack);
 			}
