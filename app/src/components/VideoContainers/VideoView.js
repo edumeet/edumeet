@@ -71,7 +71,8 @@ const styles = (theme) =>
 		{
 			display            : 'flex',
 			transitionProperty : 'opacity',
-			transitionDuration : '.15s'
+			transitionDuration : '.15s',
+			alignItems         : 'flex-start'
 		},
 		box :
 		{
@@ -137,11 +138,11 @@ const styles = (theme) =>
 			'&.audioAnalyzer' :
 			{
 				width           : '30%',
-				height          : '31%',
+				height          : '30%',
 				minWidth        : '180px',
 				minHeight       : '120px',
 				marginLeft      : theme.spacing(0.5),
-				backgroundColor : 'black'
+				backgroundColor : 'rgba(0, 0, 0, 0.25)'
 			}
 		},
 		peer :
@@ -303,6 +304,7 @@ class VideoView extends React.PureComponent
 			<div className={classes.root}>
 				<div className={classes.info}>
 					<div className={classes.media}>
+						{(audioCodec || videoCodec) &&
 						<div className={classnames(classes.box, 'left', { hidden: !advancedMode })}>
 							{ audioCodec &&
 								<React.Fragment>
@@ -382,6 +384,7 @@ class VideoView extends React.PureComponent
 							}
 
 						</div>
+						}
 
 						{showAudioAnalyzer && advancedMode &&
 						<div
