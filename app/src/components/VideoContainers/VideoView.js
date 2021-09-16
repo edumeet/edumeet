@@ -384,7 +384,8 @@ class VideoView extends React.PureComponent
 						</div>
 
 						{showAudioAnalyzer && advancedMode &&
-						<div className={classnames(classes.box, 'audioAnalyzer')}
+						<div
+							className={classnames(classes.box, 'audioAnalyzer')}
 							ref={this.audioAnalyzerContainer}
 						/>
 						}
