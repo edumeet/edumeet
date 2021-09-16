@@ -133,21 +133,16 @@ const styles = (theme) =>
 			'&.hidden' :
 			{
 				display : 'none'
+			},
+			'&.audioAnalyzer' :
+			{
+				width           : '30%',
+				height          : '31%',
+				minWidth        : '180px',
+				minHeight       : '120px',
+				marginLeft      : theme.spacing(0.5),
+				backgroundColor : 'black'
 			}
-		},
-		audioAnalyzer :
-		{
-			width           : '30%',
-			height          : '30%',
-			minWidth        : '180px',
-			minHeight       : '120px',
-			padding         : theme.spacing(0.5),
-			marginLeft      : theme.spacing(0.5),
-			backgroundColor : 'black',
-			color           : 'rgba(255, 255, 255, 0.7)',
-			userSelect      : 'none',
-			borderRadius    : 2,
-			fontSize        : '0.8em'
 		},
 		peer :
 		{
@@ -389,7 +384,7 @@ class VideoView extends React.PureComponent
 						</div>
 
 						{showAudioAnalyzer && advancedMode &&
-						<div className={classnames(classes.audioAnalyzer)}
+						<div className={classnames(classes.box, 'audioAnalyzer')}
 							ref={this.audioAnalyzerContainer}
 						/>
 						}
