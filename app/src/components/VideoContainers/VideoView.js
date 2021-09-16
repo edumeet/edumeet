@@ -135,6 +135,20 @@ const styles = (theme) =>
 				display : 'none'
 			}
 		},
+		audioAnalyzer :
+		{
+			width           : '30%',
+			height          : '30%',
+			minWidth        : '180px',
+			minHeight       : '120px',
+			padding         : theme.spacing(0.5),
+			marginLeft      : theme.spacing(0.5),
+			backgroundColor : 'black',
+			color           : 'rgba(255, 255, 255, 0.7)',
+			userSelect      : 'none',
+			borderRadius    : 2,
+			fontSize        : '0.8em'
+		},
 		peer :
 		{
 			display : 'flex'
@@ -162,14 +176,6 @@ const styles = (theme) =>
 			{
 				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
-		},
-		audioAnalyzer :
-		{
-			width           : '30%',
-			height          : '30%',
-			minWidth        : '180px',
-			minHeight       : '120px',
-			backgroundColor : 'transparent'
 		}
 	});
 
@@ -381,18 +387,19 @@ class VideoView extends React.PureComponent
 							}
 
 						</div>
+
+						{showAudioAnalyzer && advancedMode &&
+						<div className={classnames(classes.audioAnalyzer)}
+							ref={this.audioAnalyzerContainer}
+						/>
+						}
+
 						{ showQuality &&
 							<div className={classnames(classes.box, 'right')}>
 								{
 									quality
 								}
 							</div>
-						}
-
-						{showAudioAnalyzer && advancedMode &&
-						<div className={classnames(classes.audioAnalyzer)}
-							ref={this.audioAnalyzerContainer}
-						/>
 						}
 
 					</div>
