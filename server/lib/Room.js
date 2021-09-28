@@ -904,7 +904,8 @@ class Room extends EventEmitter
 				const {
 					displayName,
 					picture,
-					rtpCapabilities
+					rtpCapabilities,
+					returning
 				} = request.data;
 
 				// Store client data into the Peer data object.
@@ -965,7 +966,7 @@ class Room extends EventEmitter
 					this._notification(
 						otherPeer.socket,
 						'newPeer',
-						peer.peerInfo
+						{...peer.peerInfo, returning }
 					);
 				}
 

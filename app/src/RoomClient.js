@@ -2830,7 +2830,7 @@ export default class RoomClient
 
 					case 'roomBack':
 					{
-						await this._joinRoom({ joinVideo, joinAudio });
+						await this._joinRoom({ joinVideo, joinAudio, returning: true });
 
 						break;
 					}
@@ -3243,24 +3243,33 @@ export default class RoomClient
 
 					case 'newPeer':
 					{
-						const { id, displayName, picture, roles } = notification.data;
+						const {
+							id,
+							displayName,
+							picture,
+							roles,
+							returning
+						} = notification.data;
 
 						store.dispatch(peerActions.addPeer(
 							{ id, displayName, picture, roles, consumers: [] }));
 
 						this._spotlights.newPeer(id);
 
-						this._soundNotification(notification.method);
+						if (!returning)
+						{
+							this._soundNotification(notification.method);
 
-						store.dispatch(requestActions.notify(
-							{
-								text : intl.formatMessage({
-									id             : 'room.newPeer',
-									defaultMessage : '{displayName} joined the room'
-								}, {
-									displayName
-								})
-							}));
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'room.newPeer',
+										defaultMessage : '{displayName} joined the room'
+									}, {
+										displayName
+									})
+								}));
+						}
 
 						break;
 					}
@@ -3667,7 +3676,7 @@ export default class RoomClient
 		});
 	}
 
-	async _joinRoom({ joinVideo, joinAudio })
+	async _joinRoom({ joinVideo, joinAudio, returning })
 	{
 		logger.debug('_joinRoom()');
 
@@ -3882,7 +3891,8 @@ export default class RoomClient
 				{
 					displayName     : displayName,
 					picture         : picture,
-					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
+					rtpCapabilities : this._mediasoupDevice.rtpCapabilities,
+					returning       : returning
 				});
 
 			logger.debug(
