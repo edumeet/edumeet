@@ -92,12 +92,13 @@ class Peer extends EventEmitter
 	{
 		if (this.socket)
 		{
-			this.socket.on('disconnect', () =>
+			this.socket.on('disconnect', (reason) =>
 			{
+				logger.info('"disconnect" event [id: %s], [reason: %s]',
+					this.id, reason);
+
 				if (this.closed)
 					return;
-
-				logger.debug('"disconnect" event [id:%s]', this.id);
 
 				this.close();
 			});
