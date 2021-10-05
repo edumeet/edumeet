@@ -44,6 +44,7 @@
 		"json5": "^2.2.0",
 		"jsonwebtoken": "^8.5.1",
 		"mediasoup": "3.7.18",
+		"moment": "^2.29.1",
 		"openid-client": "^3.7.3",
 		"passport": "^0.4.0",
 		"passport-local": "^1.0.0",

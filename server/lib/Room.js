@@ -8,6 +8,7 @@ const { SocketTimeoutError, NotFoundInMediasoupError } = require('./helpers/erro
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const userRoles = require('./access/roles');
+const moment = require('moment');
 
 import {
 	BYPASS_ROOM_LOCK,
@@ -280,6 +281,13 @@ class Room extends EventEmitter
 		this._chatHistory = [];
 
 		this._fileHistory = [];
+
+		this._countdownTimer = {
+			total     : null,
+			left      : null,
+			ref       : null,
+			isRunning : false
+		};
 
 		this._lastN = [];
 
@@ -881,6 +889,69 @@ class Room extends EventEmitter
 		}
 	}
 
+	runTimer(peer)
+	{
+
+		clearInterval(this._countdownTimer.ref);
+
+		this._countdownTimer.ref = setInterval(() =>
+		{
+			let left = moment(`1000-01-01 ${this._countdownTimer.left}`).unix();
+
+			const end = moment('1000-01-01 00:00:00').unix();
+
+			left--;
+
+			if (left >= end)
+			{
+
+				this._countdownTimer.left = moment.unix(left).format('HH:mm:ss');
+
+				logger.debug('ALA!!! runTimer', left, this._countdownTimer.left, left,
+					end);
+
+				// Spread to others
+				this._notification(
+					peer.socket,
+					'moderator:setCountdownTimer',
+					{
+						left      : this._countdownTimer.left,
+						isRunning : this._countdownTimer.isRunning
+					},
+					true,
+					true
+				);
+			}
+			else
+			{
+				clearInterval(this._countdownTimer.ref);
+			}
+
+		}, 1000);
+
+	}
+
+	stopTimer(peer)
+	{
+
+		logger.debug('ALA!!! stopTimer ');
+
+		clearInterval(this._countdownTimer.ref);
+
+		// Spread to others
+		this._notification(
+			peer.socket,
+			'moderator:setCountdownTimer',
+			{
+				left      : this._countdownTimer.left,
+				isRunning : this._countdownTimer.isRunning
+			},
+			true,
+			true
+		);
+
+	}
+
 	async _handleSocketRequest(peer, request, cb)
 	{
 		const router =
@@ -966,7 +1037,7 @@ class Room extends EventEmitter
 					this._notification(
 						otherPeer.socket,
 						'newPeer',
-						{...peer.peerInfo, returning }
+						{ ...peer.peerInfo, returning }
 					);
 				}
 
@@ -1678,6 +1749,65 @@ class Room extends EventEmitter
 					'sendFile', { ...file },
 					true
 				);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:setCountdownTimer':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { left } = request.data;
+
+				this._countdownTimer.total = left;
+
+				this._countdownTimer.left = this._countdownTimer.total;
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:startCountdownTimer':
+			{
+
+				logger.debug('moderator:startCountdownTimer ');
+
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				// if (!this._countdownTimer.isRunning)
+				// {
+				this._countdownTimer.isRunning = true;
+
+				this.runTimer(peer);
+				// }
+
+				// Return no error
+				cb();
+
+				break;
+
+			}
+
+			case 'moderator:stopCountdownTimer':
+			{
+				logger.debug('moderator:stopCountdownTimer ');
+
+				if (this._countdownTimer.isRunning)
+				{
+					if (!this._hasPermission(peer, MODERATE_ROOM))
+						throw new Error('peer not authorized');
+
+					this._countdownTimer.isRunning = false;
+
+					this.stopTimer(peer);
+				}
 
 				// Return no error
 				cb();

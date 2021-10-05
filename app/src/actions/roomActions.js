@@ -240,3 +240,9 @@ export const setHideSelfView = (hideSelfView) =>
 		type    : 'SET_HIDE_SELF_VIEW',
 		payload : { hideSelfView }
 	});
+
+export const setCountdownTimer = (left, isRunning) =>
+	({
+		type    : 'SET_COUNTDOWN_TIMER',
+		payload : { left, isRunning }
+	});

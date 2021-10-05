@@ -41,7 +41,12 @@ const initialState =
 	clearFileSharingInProgress    : false,
 	roomPermissions               : null,
 	userRoles                     : null,
-	allowWhenRoleMissing          : null
+	allowWhenRoleMissing          : null,
+	countdownTimer                :
+	{
+		left      : '00:00:00',
+		isRunning : false
+	}
 };
 
 const room = (state = initialState, action) =>
@@ -307,6 +312,21 @@ const room = (state = initialState, action) =>
 			const { hideSelfView } = action.payload;
 
 			return { ...state, hideSelfView };
+		}
+
+		case 'SET_COUNTDOWN_TIMER':
+		{
+			const { left, isRunning } = action.payload;
+
+			return {
+				...state,
+				countdownTimer :
+					{
+						left      : left,
+						isRunning : isRunning
+					}
+			};
+
 		}
 
 		default:

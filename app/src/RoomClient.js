@@ -1190,6 +1190,56 @@ export default class RoomClient
 		}
 	}
 
+	async setCountdownTimer(left)
+	{
+		logger.debug('startCountdown()');
+
+		store.dispatch(
+			roomActions.setCountdownTimer(left, false));
+
+		try
+		{
+			await this.sendRequest(
+				'moderator:setCountdownTimer', { left: left }
+			);
+		}
+		catch (error)
+		{
+			logger.error('setCountdownTimer() [error:"%o"]', error);
+		}
+
+	}
+
+	async startCountdownTimer()
+	{
+		logger.debug('startCountdown()');
+
+		try
+		{
+			await this.sendRequest('moderator:startCountdownTimer');
+		}
+		catch (error)
+		{
+			logger.error('startCountdownTimer() [error:"%o"]', error);
+		}
+
+	}
+
+	async stopCountdownTimer()
+	{
+		logger.debug('stopCountdownTimer()');
+
+		try
+		{
+			await this.sendRequest('moderator:stopCountdownTimer');
+		}
+		catch (error)
+		{
+			logger.error('stopCountdownTimer() [error:"%o"]', error);
+		}
+
+	}
+
 	async muteMic()
 	{
 		logger.debug('muteMic()');
@@ -3211,6 +3261,29 @@ export default class RoomClient
 							this._soundNotification(notification.method);
 						}
 
+						break;
+					}
+
+					case 'moderator:setCountdownTimer':
+					{
+
+						const { left, isRunning } = notification.data;
+
+						store.dispatch(roomActions.setCountdownTimer(
+							left, isRunning));
+
+						/*
+						if (left > 100000)
+						{
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'xxx',
+										defaultMessage : `${left}: ABC`
+									})
+								}));
+						}
+						*/
 						break;
 					}
 

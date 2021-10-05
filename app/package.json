@@ -24,8 +24,8 @@
 		"@types/react": "^17.0.3",
 		"@types/react-dom": "^17.0.3",
 		"bowser": "^2.7.0",
-		"classnames": "^2.2.6",
 		"chroma-js": "^2.1.1",
+		"classnames": "^2.2.6",
 		"convict": "^6.0.1",
 		"convict-format-with-validator": "^6.0.1",
 		"create-torrent": "^4.4.1",
@@ -42,8 +42,6 @@
 		"idb": "^6.0.0",
 		"is-electron": "^2.2.0",
 		"marked": "^0.8.0",
-		"material-ui-popup-state": "^1.7.1",
-		"mediasoup-client": "^3.6.21",
 		"material-ui-popup-state": "^1.8.0",
 		"mediasoup-client": "^3.6.29",
 		"notistack": "^0.9.5",
@@ -71,8 +69,8 @@
 		"socket.io-client": "^2.4.0",
 		"source-map-explorer": "^2.1.0",
 		"streamsaver": "^2.0.5",
-		"web-streams-polyfill": "^3.0.2",
 		"typescript": "^4.2.4",
+		"web-streams-polyfill": "^3.0.2",
 		"webtorrent": "^0.108.1"
 	},
 	"scripts": {
