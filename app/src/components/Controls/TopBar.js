@@ -47,6 +47,7 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import randomString from 'random-string';
 import { recorder, RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../actions/recorderActions';
 import * as meActions from '../../actions/meActions';
@@ -426,6 +427,20 @@ const TopBar = (props) =>
 						</Typography>
 					}
 					<div className={classes.grow} />
+					<Tooltip
+						title={intl.formatMessage({
+							id             : 'label.moreActions',
+							defaultMessage : 'More actions'
+						})}
+					>
+						<Button
+							color='inherit'
+							startIcon={<HourglassEmptyIcon />}
+						>
+							{room.countdownTimer.left}
+						</Button>
+					</Tooltip>
+
 					<div className={classes.sectionDesktop}>
 						{ recordingInProgress &&
 						<IconButton
