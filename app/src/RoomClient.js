@@ -3958,7 +3958,8 @@ export default class RoomClient
 				lastNHistory,
 				locked,
 				lobbyPeers,
-				accessCode
+				accessCode,
+				countdownTimer
 			} = await this.sendRequest(
 				'join',
 				{
@@ -4022,6 +4023,13 @@ export default class RoomClient
 
 			(fileHistory.length > 0) && store.dispatch(
 				fileActions.addFileHistory(fileHistory));
+
+			store.dispatch(
+				roomActions.setCountdownTimer(
+					countdownTimer.left,
+					countdownTimer.isRunning
+				)
+			);
 
 			locked ?
 				store.dispatch(roomActions.setRoomLocked()) :

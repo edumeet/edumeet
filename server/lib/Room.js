@@ -283,8 +283,8 @@ class Room extends EventEmitter
 		this._fileHistory = [];
 
 		this._countdownTimer = {
-			total     : null,
-			left      : null,
+			total     : '00:00:00',
+			left      : '00:00:00',
 			ref       : null,
 			isRunning : false
 		};
@@ -1011,7 +1011,8 @@ class Room extends EventEmitter
 					lastNHistory         : this._lastN,
 					locked               : this._locked,
 					lobbyPeers           : lobbyPeers,
-					accessCode           : this._accessCode
+					accessCode           : this._accessCode,
+					countdownTimer       : this._countdownTimer
 				});
 
 				// Mark the new Peer as joined.
