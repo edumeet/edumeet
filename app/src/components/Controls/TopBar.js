@@ -26,6 +26,7 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Badge from '@material-ui/core/Badge';
+import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
@@ -427,19 +428,11 @@ const TopBar = (props) =>
 						</Typography>
 					}
 					<div className={classes.grow} />
-					<Tooltip
-						title={intl.formatMessage({
-							id             : 'label.moreActions',
-							defaultMessage : 'More actions'
-						})}
-					>
-						<Button
-							color='inherit'
-							startIcon={<HourglassEmptyIcon />}
-						>
-							{room.countdownTimer.left}
-						</Button>
-					</Tooltip>
+					<Chip
+						label={room.countdownTimer.left}
+						color='secondary'
+						deleteIcon={<HourglassEmptyIcon />}
+					/>
 
 					<div className={classes.sectionDesktop}>
 						{ recordingInProgress &&
