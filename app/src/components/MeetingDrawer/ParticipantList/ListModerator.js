@@ -6,11 +6,12 @@ import { withRoomContext } from '../../../RoomContext';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
-import Grid from '@material-ui/core/Grid';
+import PauseIcon from '@material-ui/icons/Pause';
 
 const styles = (theme) =>
 	({
@@ -113,7 +114,12 @@ const ListModerator = (props) =>
 							disabled={room.countdownTimer.left === '00:00:00'}
 							onClick={() => roomClient.stopCountdownTimer()}
 						>
-							<StopIcon/>
+							{(!room.countdownTimer.isRunning ||
+								room.countdownTimer.left !== '00:00:00')
+								? <PauseIcon/>
+								:
+								<StopIcon/>
+							}
 						</IconButton>
 					</Grid>
 				}
@@ -130,7 +136,7 @@ const ListModerator = (props) =>
 					size='small'
 					disabled={
 						room.countdownTimer.isRunning ||
-					room.countdownTimer.left === '00:00:00'
+						room.countdownTimer.left === '00:00:00'
 					}
 					onClick={(e) => roomClient.setCountdownTimer('00:00:00')}
 				>
