@@ -3267,6 +3267,10 @@ export default class RoomClient
 					case 'moderator:setCountdownTimer':
 					{
 
+						const arr = [
+							'00:00:00'
+						];
+
 						const { left, isRunning } = notification.data;
 
 						store.dispatch(roomActions.setCountdownTimer(
