@@ -3284,7 +3284,7 @@ export default class RoomClient
 									text : intl.formatMessage({
 										id             : 'xxx',
 										defaultMessage : 'Time is up'
-									}),
+									})
 								}));
 
 							this._soundNotification('countdownTimer');

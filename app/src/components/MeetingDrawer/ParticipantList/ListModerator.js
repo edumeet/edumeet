@@ -6,6 +6,8 @@ import { withRoomContext } from '../../../RoomContext';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import IconButton from '@material-ui/core/IconButton';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 const styles = (theme) =>
 	({
@@ -66,6 +68,23 @@ const ListModerator = (props) =>
 				}}
 				onChange={(e) => { roomClient.setCountdownTimer(e.target.value); }}
 			/>
+			<IconButton fullWidth
+				aria-label={intl.formatMessage({
+					// id             : 'room.muteAll',
+					id             : 'start.countdown',
+					defaultMessage : 'Start'
+				})}
+				className={classes.button}
+				variant='contained'
+				color='secondary'
+				disabled={
+					room.countdownTimer.isRunning ||
+					room.countdownTimer.left === '00:00:00'
+				}
+				onClick={(e) => roomClient.setCountdownTimer('00:00:00')}
+			>
+				<HighlightOffIcon/>
+			</IconButton>
 
 			{!room.countdownTimer.isRunning ?
 				<Button fullWidth
