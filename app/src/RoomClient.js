@@ -3285,7 +3285,6 @@ export default class RoomClient
 										id             : 'xxx',
 										defaultMessage : 'Time is up'
 									}),
-									timeout : 10000
 								}));
 
 							this._soundNotification('countdownTimer');
