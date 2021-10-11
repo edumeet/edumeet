@@ -440,6 +440,9 @@ Setting 'play' to null disables the sound notification.
 			raisedHand : {
 				play : '/sounds/notify-hand.mp3'
 			},
+			countdownTimer : {
+				play : '/sounds/notify-timeup.wav'
+			},
 			default : {
 				delay : 5000, // minimum delay between alert sounds [ms]
 				play  : '/sounds/notify.mp3'

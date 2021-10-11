@@ -3283,6 +3283,8 @@ export default class RoomClient
 									}),
 									timeout : 10000
 								}));
+
+							this._soundNotification('countdownTimer');
 						}
 
 						break;
