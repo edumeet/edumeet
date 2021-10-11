@@ -8,6 +8,9 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import StopIcon from '@material-ui/icons/Stop';
+import Grid from '@material-ui/core/Grid';
 
 const styles = (theme) =>
 	({
@@ -45,85 +48,95 @@ const ListModerator = (props) =>
 
 	return (
 		<div className={classes.root}>
-			<TextField fullWidth
-				aria-label={intl.formatMessage({
-					id             : 'set.countdown',
-					defaultMessage : 'Set timer'
-				})}
-				className={classes.textfield}
-				variant='outlined'
-				label='timer (hh:mm:ss)'
-				disabled={
-					room.countdownTimer.isRunning &&
-					room.countdownTimer.left !== '00:00:00'
-				}
-				type='time'
-				value={room.countdownTimer.left}
-				size='small'
-				InputLabelProps={{
-					shrink : true
-				}}
-				inputProps={{
-					step : 1
-				}}
-				onChange={(e) => { roomClient.setCountdownTimer(e.target.value); }}
-			/>
-			<IconButton fullWidth
-				aria-label={intl.formatMessage({
-					// id             : 'room.muteAll',
-					id             : 'start.countdown',
-					defaultMessage : 'Start'
-				})}
-				className={classes.button}
-				variant='contained'
-				color='secondary'
-				disabled={
-					room.countdownTimer.isRunning ||
-					room.countdownTimer.left === '00:00:00'
-				}
-				onClick={(e) => roomClient.setCountdownTimer('00:00:00')}
+			<Grid
+				container
+				wrap='nowrap'
+				alignItems='center'
 			>
-				<HighlightOffIcon/>
-			</IconButton>
+				<Grid item xs={10}>
+					<TextField fullWidth
+						aria-label={intl.formatMessage({
+							id             : 'set.countdown',
+							defaultMessage : 'Set timer'
+						})}
+						className={classes.textfield}
+						variant='outlined'
+						label='timer (hh:mm:ss)'
+						disabled={
+							room.countdownTimer.isRunning &&
+					room.countdownTimer.left !== '00:00:00'
+						}
+						type='time'
+						value={room.countdownTimer.left}
+						size='small'
+						InputLabelProps={{
+							shrink : true
+						}}
+						inputProps={{
+							step : 1
+						}}
+						onChange={(e) => { roomClient.setCountdownTimer(e.target.value); }}
+					/>
+				</Grid>
 
-			{!room.countdownTimer.isRunning ?
-				<Button fullWidth
+				{!room.countdownTimer.isRunning ?
+
+					<Grid item xs={1}>
+						<IconButton
+							aria-label={intl.formatMessage({
+								// id             : 'room.muteAll',
+								id             : 'start.countdown',
+								defaultMessage : 'Start'
+							})}
+							className={classes.button}
+							variant='contained'
+							color='secondary'
+							size='small'
+							disabled={room.countdownTimer.left === '00:00:00'}
+							onClick={(e) => roomClient.startCountdownTimer()}
+						>
+							<PlayArrowIcon/>
+						</IconButton>
+					</Grid>
+					:
+
+					<Grid item xs={1}>
+						<IconButton fullWidth
+							aria-label={intl.formatMessage({
+								id             : 'stop.countdown',
+								defaultMessage : 'Stop countdown'
+							})}
+							className={classes.button}
+							variant='contained'
+							color='secondary'
+							size='small'
+							disabled={room.countdownTimer.left === '00:00:00'}
+							onClick={() => roomClient.stopCountdownTimer()}
+						>
+							<StopIcon/>
+						</IconButton>
+					</Grid>
+				}
+
+				<IconButton
 					aria-label={intl.formatMessage({
-						// id             : 'room.muteAll',
+					// id             : 'room.muteAll',
 						id             : 'start.countdown',
 						defaultMessage : 'Start'
 					})}
 					className={classes.button}
 					variant='contained'
 					color='secondary'
-					disabled={room.countdownTimer.left === '00:00:00'}
-					onClick={(e) => roomClient.startCountdownTimer()}
+					size='small'
+					disabled={
+						room.countdownTimer.isRunning ||
+					room.countdownTimer.left === '00:00:00'
+					}
+					onClick={(e) => roomClient.setCountdownTimer('00:00:00')}
 				>
-					<FormattedMessage
-						// id='room.muteAll'
-						id='start'
-						defaultMessage='Start'
-					/>
-
-				</Button>
-				:
-				<Button fullWidth
-					aria-label={intl.formatMessage({
-						id             : 'stop.countdown',
-						defaultMessage : 'Stop countdown'
-					})}
-					className={classes.button}
-					variant='contained'
-					color='secondary'
-					disabled={room.countdownTimer.left === '00:00:00'}
-					onClick={() => roomClient.stopCountdownTimer()}
-				>
-					<FormattedMessage
-						id='stop'
-						defaultMessage='Stop'
-					/>
-				</Button>
-			}
+					<HighlightOffIcon/>
+				</IconButton>
+			</Grid>
 
 			<Button
 				aria-label={intl.formatMessage({
