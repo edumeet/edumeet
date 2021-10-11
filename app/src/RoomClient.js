@@ -3272,18 +3272,19 @@ export default class RoomClient
 						store.dispatch(roomActions.setCountdownTimer(
 							left, isRunning));
 
-						/*
-						if (left > 100000)
+						if (arr.includes(left))
 						{
 							store.dispatch(requestActions.notify(
 								{
+									type : 'info',
 									text : intl.formatMessage({
 										id             : 'xxx',
-										defaultMessage : `${left}: ABC`
-									})
+										defaultMessage : 'Time is up'
+									}),
+									timeout : 10000
 								}));
 						}
-						*/
+
 						break;
 					}
 
