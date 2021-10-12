@@ -12,6 +12,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
 import PauseIcon from '@material-ui/icons/Pause';
+import Switch from '@material-ui/core/Switch';
 
 const styles = (theme) =>
 	({
@@ -47,6 +48,16 @@ const ListModerator = (props) =>
 		classes
 	} = props;
 
+	const [ state, setState ] = React.useState({
+		checkedA : true,
+		checkedB : true
+	});
+
+	const handleChange = (event) =>
+	{
+		setState({ ...state, [event.target.name]: event.target.checked });
+	};
+
 	return (
 		<div className={classes.root}>
 			<Grid
@@ -54,7 +65,7 @@ const ListModerator = (props) =>
 				wrap='nowrap'
 				alignItems='center'
 			>
-				<Grid item xs={10}>
+				<Grid item xs={8}>
 					<TextField fullWidth
 						aria-label={intl.formatMessage({
 							id             : 'set.countdown',
@@ -100,7 +111,6 @@ const ListModerator = (props) =>
 						</IconButton>
 					</Grid>
 					:
-
 					<Grid item xs={1}>
 						<IconButton fullWidth
 							aria-label={intl.formatMessage({
@@ -144,6 +154,17 @@ const ListModerator = (props) =>
 						<HighlightOffIcon/>
 					</IconButton>
 				</Grid>
+				<Grid item xs={1}>
+					<Switch
+						className={classes.button}
+						checked={state.checkedB}
+						onChange={handleChange}
+						name='checkedB'
+						color='secondary'
+						size='small'
+					/>
+				</Grid>
+
 			</Grid>
 
 			<Button
