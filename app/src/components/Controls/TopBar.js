@@ -156,6 +156,10 @@ const styles = (theme) =>
 		moreAction :
 		{
 			margin : theme.spacing(0.5, 0, 0.5, 1.5)
+		},
+		countdownTimer :
+		{
+			marginLeft : theme.spacing(2.5)
 		}
 	});
 
@@ -427,9 +431,12 @@ const TopBar = (props) =>
 							{config.title}
 						</Typography>
 					}
+
 					<div className={classes.grow} />
+
 					{room.countdownTimer.isEnabled &&
 					<Chip
+						className={classes.countdownTimer}
 						label={room.countdownTimer.left}
 						color='secondary'
 						deleteIcon={<HourglassEmptyIcon />}
