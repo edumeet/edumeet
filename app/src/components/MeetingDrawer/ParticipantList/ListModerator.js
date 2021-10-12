@@ -168,6 +168,9 @@ const ListModerator = (props) =>
 					<Switch
 						className={classes.button}
 						checked={room.countdownTimer.isEnabled}
+						disabled={
+							room.countdownTimer.isRunning
+						}
 						onChange={(e) =>
 						{
 							roomClient.toggleCountdownTimer(
