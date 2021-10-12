@@ -75,8 +75,9 @@ const ListModerator = (props) =>
 						variant='outlined'
 						label='timer (hh:mm:ss)'
 						disabled={
-							room.countdownTimer.isRunning &&
-					room.countdownTimer.left !== '00:00:00'
+							!room.countdownTimer.isEnabled ||
+							(room.countdownTimer.isRunning &&
+							room.countdownTimer.left !== '00:00:00')
 						}
 						type='time'
 						value={room.countdownTimer.left}
@@ -104,7 +105,10 @@ const ListModerator = (props) =>
 							variant='contained'
 							color='secondary'
 							size='small'
-							disabled={room.countdownTimer.left === '00:00:00'}
+							disabled={
+								!room.countdownTimer.isEnabled ||
+								room.countdownTimer.left === '00:00:00'
+							}
 							onClick={(e) => roomClient.startCountdownTimer()}
 						>
 							<PlayArrowIcon/>
@@ -121,7 +125,10 @@ const ListModerator = (props) =>
 							variant='contained'
 							color='secondary'
 							size='small'
-							disabled={room.countdownTimer.left === '00:00:00'}
+							disabled={
+								!room.countdownTimer.isEnabled ||
+								room.countdownTimer.left === '00:00:00'
+							}
 							onClick={() => roomClient.stopCountdownTimer()}
 						>
 							{(!room.countdownTimer.isRunning ||
@@ -146,8 +153,11 @@ const ListModerator = (props) =>
 						color='secondary'
 						size='small'
 						disabled={
-							room.countdownTimer.isRunning ||
-						room.countdownTimer.left === '00:00:00'
+							!room.countdownTimer.isEnabled ||
+							(
+								room.countdownTimer.isRunning ||
+								room.countdownTimer.left === '00:00:00'
+							)
 						}
 						onClick={(e) => roomClient.setCountdownTimer('00:00:00')}
 					>
