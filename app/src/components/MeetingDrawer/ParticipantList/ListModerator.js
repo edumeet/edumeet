@@ -65,7 +65,7 @@ const ListModerator = (props) =>
 				wrap='nowrap'
 				alignItems='center'
 			>
-				<Grid item xs={8}>
+				<Grid item xs={9}>
 					<TextField fullWidth
 						aria-label={intl.formatMessage({
 							id             : 'set.countdown',
