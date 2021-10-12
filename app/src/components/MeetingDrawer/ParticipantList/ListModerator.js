@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -10,7 +10,6 @@ import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import StopIcon from '@material-ui/icons/Stop';
 import PauseIcon from '@material-ui/icons/Pause';
 import Switch from '@material-ui/core/Switch';
 
@@ -48,14 +47,9 @@ const ListModerator = (props) =>
 		classes
 	} = props;
 
-	const [ state, setState ] = React.useState({
-		checkedA : true,
-		checkedB : true
-	});
-
 	const countDownTimer =
 	{
-		inputRef : React.useRef(null),
+		inputRef : useRef(null),
 
 		handleFocus : () =>
 		{
@@ -71,11 +65,6 @@ const ListModerator = (props) =>
 				clearTimeout(timeout);
 			};
 		}
-	};
-
-	const handleChange = (event) =>
-	{
-		setState({ ...state, [event.target.name]: event.target.checked });
 	};
 
 	return (
@@ -130,7 +119,7 @@ const ListModerator = (props) =>
 								!room.countdownTimer.isEnabled ||
 								room.countdownTimer.left === '00:00:00'
 							}
-							onClick={(e) => roomClient.startCountdownTimer()}
+							onClick={() => roomClient.startCountdownTimer()}
 						>
 							<PlayArrowIcon/>
 						</IconButton>
@@ -157,12 +146,7 @@ const ListModerator = (props) =>
 								countDownTimer.handleFocus();
 							}}
 						>
-							{(!room.countdownTimer.isRunning ||
-								room.countdownTimer.left !== '00:00:00')
-								? <PauseIcon/>
-								:
-								<StopIcon/>
-							}
+							 <PauseIcon/>
 						</IconButton>
 					</Grid>
 				}
@@ -185,7 +169,7 @@ const ListModerator = (props) =>
 								room.countdownTimer.left === '00:00:00'
 							)
 						}
-						onClick={(e) =>
+						onClick={() =>
 						{
 							roomClient.setCountdownTimer('00:00:00');
 
@@ -202,7 +186,7 @@ const ListModerator = (props) =>
 						disabled={
 							room.countdownTimer.isRunning
 						}
-						onChange={(e) =>
+						onChange={() =>
 						{
 							roomClient.toggleCountdownTimer(
 								!room.countdownTimer.isEnabled
