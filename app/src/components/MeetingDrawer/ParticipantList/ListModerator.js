@@ -124,24 +124,26 @@ const ListModerator = (props) =>
 					</Grid>
 				}
 
-				<IconButton
-					aria-label={intl.formatMessage({
-					// id             : 'room.muteAll',
-						id             : 'start.countdown',
-						defaultMessage : 'Start'
-					})}
-					className={classes.button}
-					variant='contained'
-					color='secondary'
-					size='small'
-					disabled={
-						room.countdownTimer.isRunning ||
+				<Grid item xs={1}>
+					<IconButton
+						aria-label={intl.formatMessage({
+							// id             : 'room.muteAll',
+							id             : 'start.countdown',
+							defaultMessage : 'Start'
+						})}
+						className={classes.button}
+						variant='contained'
+						color='secondary'
+						size='small'
+						disabled={
+							room.countdownTimer.isRunning ||
 						room.countdownTimer.left === '00:00:00'
-					}
-					onClick={(e) => roomClient.setCountdownTimer('00:00:00')}
-				>
-					<HighlightOffIcon/>
-				</IconButton>
+						}
+						onClick={(e) => roomClient.setCountdownTimer('00:00:00')}
+					>
+						<HighlightOffIcon/>
+					</IconButton>
+				</Grid>
 			</Grid>
 
 			<Button
