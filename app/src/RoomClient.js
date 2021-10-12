@@ -3292,12 +3292,12 @@ export default class RoomClient
 							'00:00:00'
 						];
 
-						const { isEnabled, left, isRunning } = notification.data;
+						const { left, isRunning } = notification.data;
 
 						store.dispatch(roomActions.setCountdownTimer(
 							left, isRunning));
 
-						if (arr.includes(left) && isRunning && isEnabled)
+						if (arr.includes(left) && !isRunning)
 						{
 							store.dispatch(requestActions.notify(
 								{
