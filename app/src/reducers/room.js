@@ -44,6 +44,7 @@ const initialState =
 	allowWhenRoleMissing          : null,
 	countdownTimer                :
 	{
+		isEnabled : true,
 		left      : '00:00:00',
 		isRunning : false
 	}
@@ -318,13 +319,23 @@ const room = (state = initialState, action) =>
 		{
 			const { left, isRunning } = action.payload;
 
+			state.countdownTimer.left = left;
+
+			state.countdownTimer.isRunning = isRunning;
+
 			return {
-				...state,
-				countdownTimer :
-					{
-						left      : left,
-						isRunning : isRunning
-					}
+				...state
+			};
+
+		}
+		case 'TOGGLE_COUNTDOWN_TIMER':
+		{
+			const { isEnabled } = action.payload;
+
+			state.countdownTimer.isEnabled = isEnabled;
+
+			return {
+				...state
 			};
 
 		}

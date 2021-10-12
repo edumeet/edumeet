@@ -283,6 +283,7 @@ class Room extends EventEmitter
 		this._fileHistory = [];
 
 		this._countdownTimer = {
+			isEnabled : true,
 			total     : '00:00:00',
 			left      : '00:00:00',
 			ref       : null,
@@ -1747,6 +1748,32 @@ class Room extends EventEmitter
 				this._notification(
 					peer.socket,
 					'sendFile', { ...file },
+					true
+				);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'moderator:toggleCountdownTimer':
+			{
+				if (!this._hasPermission(peer, MODERATE_ROOM))
+					throw new Error('peer not authorized');
+
+				const { isEnabled } = request.data;
+
+				this._countdownTimer.isEnabled = isEnabled;
+
+				// Spread to others
+				this._notification(
+					peer.socket,
+					'moderator:toggleCountdownTimer',
+					{
+						isEnabled : this._countdownTimer.isEnabled
+					},
+					true,
 					true
 				);
 

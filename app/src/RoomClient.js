@@ -1190,6 +1190,27 @@ export default class RoomClient
 		}
 	}
 
+	async toggleCountdownTimer(isEnabled)
+	{
+		logger.debug('moderator:toggleCountdownTimer()');
+
+		store.dispatch(
+			roomActions.toggleCountdownTimer(isEnabled)
+		);
+
+		try
+		{
+			await this.sendRequest(
+				'moderator:toggleCountdownTimer', { isEnabled: isEnabled }
+			);
+		}
+		catch (error)
+		{
+			logger.error('moderator:toggleCountdownTimer() [error:"%o"]', error);
+		}
+
+	}
+
 	async setCountdownTimer(left)
 	{
 		logger.debug('startCountdown()');
@@ -3271,12 +3292,12 @@ export default class RoomClient
 							'00:00:00'
 						];
 
-						const { left, isRunning } = notification.data;
+						const { isEnabled, left, isRunning } = notification.data;
 
 						store.dispatch(roomActions.setCountdownTimer(
 							left, isRunning));
 
-						if (arr.includes(left))
+						if (arr.includes(left) && isRunning && isEnabled)
 						{
 							store.dispatch(requestActions.notify(
 								{
@@ -3289,6 +3310,24 @@ export default class RoomClient
 
 							this._soundNotification('countdownTimer');
 						}
+
+						break;
+					}
+
+					case 'moderator:toggleCountdownTimer':
+					{
+						const { isEnabled } = notification.data;
+
+						store.dispatch(roomActions.toggleCountdownTimer(isEnabled));
+
+						store.dispatch(requestActions.notify(
+							{
+								type : 'info',
+								text : intl.formatMessage({
+									id             : 'xxx',
+									defaultMessage : 'Countdown timer is updated'
+								})
+							}));
 
 						break;
 					}
@@ -4034,6 +4073,12 @@ export default class RoomClient
 				roomActions.setCountdownTimer(
 					countdownTimer.left,
 					countdownTimer.isRunning
+				)
+			);
+
+			store.dispatch(
+				roomActions.toggleCountdownTimer(
+					countdownTimer.isEnabled
 				)
 			);
 

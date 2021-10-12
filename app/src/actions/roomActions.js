@@ -246,3 +246,9 @@ export const setCountdownTimer = (left, isRunning) =>
 		type    : 'SET_COUNTDOWN_TIMER',
 		payload : { left, isRunning }
 	});
+
+export const toggleCountdownTimer = (isEnabled) =>
+	({
+		type    : 'TOGGLE_COUNTDOWN_TIMER',
+		payload : { isEnabled }
+	});

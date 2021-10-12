@@ -157,8 +157,13 @@ const ListModerator = (props) =>
 				<Grid item xs={1}>
 					<Switch
 						className={classes.button}
-						checked={state.checkedB}
-						onChange={handleChange}
+						checked={room.countdownTimer.isEnabled}
+						onChange={(e) =>
+						{
+							roomClient.toggleCountdownTimer(
+								!room.countdownTimer.isEnabled
+							);
+						}}
 						name='checkedB'
 						color='secondary'
 						size='small'
