@@ -428,11 +428,13 @@ const TopBar = (props) =>
 						</Typography>
 					}
 					<div className={classes.grow} />
+					{room.countdownTimer.isEnabled &&
 					<Chip
 						label={room.countdownTimer.left}
 						color='secondary'
 						deleteIcon={<HourglassEmptyIcon />}
 					/>
+					}
 
 					<div className={classes.sectionDesktop}>
 						{ recordingInProgress &&
