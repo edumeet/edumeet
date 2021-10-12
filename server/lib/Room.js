@@ -902,30 +902,29 @@ class Room extends EventEmitter
 
 			left--;
 
-			if (left >= end)
-			{
-
-				this._countdownTimer.left = moment.unix(left).format('HH:mm:ss');
-
-				logger.debug('ALA!!! runTimer', left, this._countdownTimer.left, left,
-					end);
-
-				// Spread to others
-				this._notification(
-					peer.socket,
-					'moderator:setCountdownTimer',
-					{
-						left      : this._countdownTimer.left,
-						isRunning : this._countdownTimer.isRunning
-					},
-					true,
-					true
-				);
-			}
-			else
+			if (left <= end)
 			{
 				clearInterval(this._countdownTimer.ref);
+
+				this._countdownTimer.isRunning = false;
 			}
+
+			this._countdownTimer.left = moment.unix(left).format('HH:mm:ss');
+
+			logger.debug('ALA!!! runTimer', left, this._countdownTimer.left, left,
+				end);
+
+			// Spread to others
+			this._notification(
+				peer.socket,
+				'moderator:setCountdownTimer',
+				{
+					left      : this._countdownTimer.left,
+					isRunning : this._countdownTimer.isRunning
+				},
+				true,
+				true
+			);
 
 		}, 1000);
 
