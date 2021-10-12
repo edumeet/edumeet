@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -53,6 +53,26 @@ const ListModerator = (props) =>
 		checkedB : true
 	});
 
+	const countDownTimer =
+	{
+		inputRef : React.useRef(null),
+
+		handleFocus : () =>
+		{
+			countDownTimer.inputRef.current.focus();
+
+			const timeout = setTimeout(() =>
+			{
+				countDownTimer.inputRef.current.focus();
+			}, 200);
+
+			return () =>
+			{
+				clearTimeout(timeout);
+			};
+		}
+	};
+
 	const handleChange = (event) =>
 	{
 		setState({ ...state, [event.target.name]: event.target.checked });
@@ -71,6 +91,7 @@ const ListModerator = (props) =>
 							id             : 'set.countdown',
 							defaultMessage : 'Set timer'
 						})}
+						inputRef={countDownTimer.inputRef}
 						className={classes.textfield}
 						variant='outlined'
 						label='timer (hh:mm:ss)'
@@ -129,7 +150,12 @@ const ListModerator = (props) =>
 								!room.countdownTimer.isEnabled ||
 								room.countdownTimer.left === '00:00:00'
 							}
-							onClick={() => roomClient.stopCountdownTimer()}
+							onClick={() =>
+							{
+								roomClient.stopCountdownTimer();
+
+								countDownTimer.handleFocus();
+							}}
 						>
 							{(!room.countdownTimer.isRunning ||
 								room.countdownTimer.left !== '00:00:00')
@@ -159,7 +185,12 @@ const ListModerator = (props) =>
 								room.countdownTimer.left === '00:00:00'
 							)
 						}
-						onClick={(e) => roomClient.setCountdownTimer('00:00:00')}
+						onClick={(e) =>
+						{
+							roomClient.setCountdownTimer('00:00:00');
+
+							countDownTimer.handleFocus();
+						}}
 					>
 						<HighlightOffIcon/>
 					</IconButton>
@@ -176,6 +207,8 @@ const ListModerator = (props) =>
 							roomClient.toggleCountdownTimer(
 								!room.countdownTimer.isEnabled
 							);
+
+							countDownTimer.handleFocus();
 						}}
 						name='checkedB'
 						color='secondary'
