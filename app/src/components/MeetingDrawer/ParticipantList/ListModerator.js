@@ -34,7 +34,15 @@ const styles = (theme) =>
 			marginTop   : theme.spacing(1),
 			marginRight : theme.spacing(1),
 			flexGrow    : '1'
+		},
+		countdownTimer :
+		{
+			marginTop      : theme.spacing(1),
+			marginRight    : theme.spacing(2),
+			flexGrow       : '1',
+			justifyContent : 'space-between'
 		}
+
 	});
 
 const ListModerator = (props) =>
@@ -70,11 +78,12 @@ const ListModerator = (props) =>
 	return (
 		<div className={classes.root}>
 			<Grid
+				className={classes.countdownTimer}
 				container
 				wrap='nowrap'
 				alignItems='center'
 			>
-				<Grid item xs={9}>
+				<Grid item xs={8}>
 					<TextField fullWidth
 						aria-label={intl.formatMessage({
 							id             : 'set.countdown',
