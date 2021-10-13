@@ -111,6 +111,35 @@ const ListModerator = (props) =>
 					/>
 				</Grid>
 
+				<Grid item xs={1}>
+					<IconButton
+						aria-label={intl.formatMessage({
+							// id             : 'room.muteAll',
+							id             : 'start.countdown',
+							defaultMessage : 'Start'
+						})}
+						className={classes.button}
+						variant='contained'
+						color='secondary'
+						size='small'
+						disabled={
+							!room.countdownTimer.isEnabled ||
+							(
+								room.countdownTimer.isRunning ||
+								room.countdownTimer.left === '00:00:00'
+							)
+						}
+						onClick={() =>
+						{
+							roomClient.setCountdownTimer('00:00:00');
+
+							countDownTimer.handleFocus();
+						}}
+					>
+						<HighlightOffIcon/>
+					</IconButton>
+				</Grid>
+
 				{!room.countdownTimer.isRunning ?
 
 					<Grid item xs={1}>
@@ -159,35 +188,6 @@ const ListModerator = (props) =>
 						</IconButton>
 					</Grid>
 				}
-
-				<Grid item xs={1}>
-					<IconButton
-						aria-label={intl.formatMessage({
-							// id             : 'room.muteAll',
-							id             : 'start.countdown',
-							defaultMessage : 'Start'
-						})}
-						className={classes.button}
-						variant='contained'
-						color='secondary'
-						size='small'
-						disabled={
-							!room.countdownTimer.isEnabled ||
-							(
-								room.countdownTimer.isRunning ||
-								room.countdownTimer.left === '00:00:00'
-							)
-						}
-						onClick={() =>
-						{
-							roomClient.setCountdownTimer('00:00:00');
-
-							countDownTimer.handleFocus();
-						}}
-					>
-						<HighlightOffIcon/>
-					</IconButton>
-				</Grid>
 				<Grid item xs={1}>
 					<Switch
 						className={classes.button}
