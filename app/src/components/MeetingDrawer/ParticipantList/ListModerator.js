@@ -108,6 +108,17 @@ const ListModerator = (props) =>
 							step : 1
 						}}
 						onChange={(e) => { roomClient.setCountdownTimer(e.target.value); }}
+						onKeyPress={(e) =>
+						{
+							if (room.countdownTimer.left !== '00:00:00')
+							{
+								if (e.key === 'Enter')
+								{
+									roomClient.startCountdownTimer();
+									e.preventDefault();
+								}
+							}
+						}}
 					/>
 				</Grid>
 
