@@ -28,8 +28,6 @@ See more info about browsers storage limits:
   * <https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria#storage_limits>
   * <https://chromium.googlesource.com/chromium/src/+/refs/heads/master/storage/browser/quota/quota_settings.cc#68>
 
-* If there is an error during recording, or browser crashed or you accidentally close your tab, you can recover and save to file your data stored in the IndexDB with the following way. Open browser console and run function CLIENT.recoverRecording(`DB_NAME`) Where `DB_NAME` is the name of Indexed DataBase, so the starting date in unix timestamp format of the recording. If you open your browser developer console and find IndexDB storage info, you can find the name of your IndexedDB recording. It is a unix timestamp, the timestamp of the start of your recording.
-
 ## Docker
 
 If you want the automatic approach, you can find a docker image [here](https://hub.docker.com/r/edumeet/edumeet/).
