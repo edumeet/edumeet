@@ -724,7 +724,7 @@ const TopBar = (props) =>
 
 							</MenuItem>
 						}
-						{ isSafari &&
+						{ config.localRecordingEnabled && isSafari &&
 						<MenuItem
 							aria-label={recordingTooltip}
 							onClick={async () =>
