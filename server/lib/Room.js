@@ -286,9 +286,10 @@ class Room extends EventEmitter
 			isEnabled : true,
 			total     : '00:00:00',
 			left      : '00:00:00',
-			ref       : null,
 			isRunning : false
 		};
+
+		this._countDownTimerRef = null;
 
 		this._lastN = [];
 
@@ -335,6 +336,13 @@ class Room extends EventEmitter
 		this._chatHistory = null;
 
 		this._fileHistory = null;
+
+		if (this._countDownTimerRef)
+			clearInterval(this._countDownTimerRef);
+
+		this._countDownTimerRef = null;
+
+		this._countdownTimer = null;
 
 		this._lobby.close();
 
@@ -890,12 +898,12 @@ class Room extends EventEmitter
 		}
 	}
 
-	runTimer(peer)
+	async runTimer(peer)
 	{
 
-		clearInterval(this._countdownTimer.ref);
+		clearInterval(this._countDownTimerRef);
 
-		this._countdownTimer.ref = setInterval(() =>
+		this._countDownTimerRef = setInterval(() =>
 		{
 			let left = moment(`1000-01-01 ${this._countdownTimer.left}`).unix();
 
@@ -903,11 +911,11 @@ class Room extends EventEmitter
 
 			left--;
 
-			if (left <= end)
+			if (left <= end || this.checkEmpty())
 			{
-				clearInterval(this._countdownTimer.ref);
-
+				clearInterval(this._countDownTimerRef);
 				this._countdownTimer.isRunning = false;
+				this._countdownTimer.left = '00:00:00';
 			}
 
 			this._countdownTimer.left = moment.unix(left).format('HH:mm:ss');
@@ -936,7 +944,7 @@ class Room extends EventEmitter
 
 		logger.debug('ALA!!! stopTimer ');
 
-		clearInterval(this._countdownTimer.ref);
+		clearInterval(this._countDownTimerRef);
 
 		// Spread to others
 		this._notification(
