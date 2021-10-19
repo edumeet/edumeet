@@ -195,9 +195,7 @@ const CountdownTimer = (props) =>
 					<Switch
 						className={classes.button}
 						checked={isEnabled}
-						disabled={
-							isRunning
-						}
+						disabled={isRunning}
 						onChange={() =>
 						{
 							roomClient.toggleCountdownTimer(!isEnabled);
