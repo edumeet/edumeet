@@ -911,13 +911,6 @@ class Room extends EventEmitter
 
 			left--;
 
-			if (left <= end || this.checkEmpty())
-			{
-				clearInterval(this._countDownTimerRef);
-				this._countdownTimer.isRunning = false;
-				this._countdownTimer.left = '00:00:00';
-			}
-
 			this._countdownTimer.left = moment.unix(left).format('HH:mm:ss');
 
 			logger.debug('ALA!!! runTimer', left, this._countdownTimer.left, left,
@@ -935,6 +928,25 @@ class Room extends EventEmitter
 				true
 			);
 
+			if (left === end || this.checkEmpty())
+			{
+				clearInterval(this._countDownTimerRef);
+
+				this._countdownTimer.isRunning = false;
+				this._countdownTimer.left = '00:00:00';
+
+				this._notification(
+					peer.socket,
+					'moderator:setCountdownTimer',
+					{
+						left      : this._countdownTimer.left,
+						isRunning : this._countdownTimer.isRunning
+					},
+					true,
+					true
+				);
+			}
+
 		}, 1000);
 
 	}
@@ -945,6 +957,7 @@ class Room extends EventEmitter
 		logger.debug('ALA!!! stopTimer ');
 
 		clearInterval(this._countDownTimerRef);
+		this._countdownTimer.isRunning = false;
 
 		// Spread to others
 		this._notification(
@@ -1801,6 +1814,18 @@ class Room extends EventEmitter
 				this._countdownTimer.total = left;
 
 				this._countdownTimer.left = this._countdownTimer.total;
+
+				// Spread to others
+				this._notification(
+					peer.socket,
+					'moderator:setCountdownTimer',
+					{
+						left      : this._countdownTimer.left,
+						isRunning : this._countdownTimer.isRunning
+					},
+					true,
+					true
+				);
 
 				// Return no error
 				cb();

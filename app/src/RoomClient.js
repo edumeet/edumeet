@@ -3297,7 +3297,7 @@ export default class RoomClient
 						store.dispatch(roomActions.setCountdownTimer(
 							left, isRunning));
 
-						if (arr.includes(left) && !isRunning)
+						if (arr.includes(left) && isRunning)
 						{
 							store.dispatch(requestActions.notify(
 								{
