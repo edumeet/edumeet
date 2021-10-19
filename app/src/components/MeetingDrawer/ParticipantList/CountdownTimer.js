@@ -22,11 +22,12 @@ const styles = (theme) =>
 			marginRight : -theme.spacing(1),
 			marginTop   : -theme.spacing(1)
 		},
-		button :
+		container :
 		{
-			marginTop   : theme.spacing(1),
-			marginRight : theme.spacing(1),
-			flexGrow    : '1'
+			marginTop      : theme.spacing(1),
+			marginRight    : theme.spacing(2),
+			flexGrow       : '1',
+			justifyContent : 'space-between'
 		},
 		textfield :
 		{
@@ -34,12 +35,11 @@ const styles = (theme) =>
 			marginRight : theme.spacing(1),
 			flexGrow    : '1'
 		},
-		countdownTimer :
+		button :
 		{
-			marginTop      : theme.spacing(1),
-			marginRight    : theme.spacing(2),
-			flexGrow       : '1',
-			justifyContent : 'space-between'
+			marginTop   : theme.spacing(1),
+			marginRight : theme.spacing(1),
+			flexGrow    : '1'
 		}
 
 	});
@@ -50,55 +50,51 @@ const CountdownTimer = (props) =>
 
 	const {
 		roomClient,
-		room,
+		isEnabled,
+		isRunning,
+		left,
 		classes
 	} = props;
 
-	const countDownTimer =
+	const inputRef = useRef(null);
+
+	const handleFocus = () =>
 	{
-		inputRef : useRef(null),
+		inputRef.current.focus();
 
-		handleFocus : () =>
+		const timeout = setTimeout(() =>
 		{
-			countDownTimer.inputRef.current.focus();
+			inputRef.current.focus();
+		}, 200);
 
-			const timeout = setTimeout(() =>
-			{
-				countDownTimer.inputRef.current.focus();
-			}, 200);
-
-			return () =>
-			{
-				clearTimeout(timeout);
-			};
-		}
+		return () =>
+		{
+			clearTimeout(timeout);
+		};
 	};
 
 	return (
 		<div className={classes.root}>
 			<Grid
-				className={classes.countdownTimer}
+				className={classes.container}
 				container
 				wrap='nowrap'
 				alignItems='center'
 			>
 				<Grid item xs={8}>
+					{/* TextField  set time */}
 					<TextField fullWidth
 						aria-label={intl.formatMessage({
 							id             : 'set.countdown',
 							defaultMessage : 'Set timer'
 						})}
-						inputRef={countDownTimer.inputRef}
+						inputRef={inputRef}
 						className={classes.textfield}
 						variant='outlined'
 						label='timer (hh:mm:ss)'
-						disabled={
-							!room.countdownTimer.isEnabled ||
-							(room.countdownTimer.isRunning &&
-							room.countdownTimer.left !== '00:00:00')
-						}
+						disabled={!isEnabled || (isRunning && left !== '00:00:00')}
 						type='time'
-						value={room.countdownTimer.left}
+						value={left}
 						size='small'
 						InputLabelProps={{
 							shrink : true
@@ -109,7 +105,7 @@ const CountdownTimer = (props) =>
 						onChange={(e) => { roomClient.setCountdownTimer(e.target.value); }}
 						onKeyPress={(e) =>
 						{
-							if (room.countdownTimer.left !== '00:00:00')
+							if (left !== '00:00:00')
 							{
 								if (e.key === 'Enter')
 								{
@@ -119,12 +115,13 @@ const CountdownTimer = (props) =>
 							}
 						}}
 					/>
+					{/* /TextField  set time */}
 				</Grid>
 
 				<Grid item xs={1}>
+					{/* Button reset time */}
 					<IconButton
 						aria-label={intl.formatMessage({
-							// id             : 'room.muteAll',
 							id             : 'start.countdown',
 							defaultMessage : 'Start'
 						})}
@@ -133,29 +130,28 @@ const CountdownTimer = (props) =>
 						color='secondary'
 						size='small'
 						disabled={
-							!room.countdownTimer.isEnabled ||
+							!isEnabled ||
 							(
-								room.countdownTimer.isRunning ||
-								room.countdownTimer.left === '00:00:00'
+								isRunning ||
+								left === '00:00:00'
 							)
 						}
 						onClick={() =>
 						{
 							roomClient.setCountdownTimer('00:00:00');
-
-							countDownTimer.handleFocus();
+							handleFocus();
 						}}
 					>
 						<HighlightOffIcon/>
 					</IconButton>
+					{/* /Button reset */}
 				</Grid>
 
-				{!room.countdownTimer.isRunning ?
-
+				{!isRunning ?
 					<Grid item xs={1}>
+						{/* Button start countdown */}
 						<IconButton
 							aria-label={intl.formatMessage({
-								// id             : 'room.muteAll',
 								id             : 'start.countdown',
 								defaultMessage : 'Start'
 							})}
@@ -163,17 +159,16 @@ const CountdownTimer = (props) =>
 							variant='contained'
 							color='secondary'
 							size='small'
-							disabled={
-								!room.countdownTimer.isEnabled ||
-								room.countdownTimer.left === '00:00:00'
-							}
+							disabled={!isEnabled || left === '00:00:00'}
 							onClick={() => roomClient.startCountdownTimer()}
 						>
 							<PlayArrowIcon/>
 						</IconButton>
+						{/* /Button start countdown */}
 					</Grid>
 					:
 					<Grid item xs={1}>
+						{/* Button stop countdown */}
 						<IconButton fullWidth
 							aria-label={intl.formatMessage({
 								id             : 'stop.countdown',
@@ -183,42 +178,37 @@ const CountdownTimer = (props) =>
 							variant='contained'
 							color='secondary'
 							size='small'
-							disabled={
-								!room.countdownTimer.isEnabled ||
-								room.countdownTimer.left === '00:00:00'
-							}
+							disabled={!isEnabled || left === '00:00:00'}
 							onClick={() =>
 							{
 								roomClient.stopCountdownTimer();
-
-								countDownTimer.handleFocus();
+								handleFocus();
 							}}
 						>
 							 <PauseIcon/>
 						</IconButton>
+						{/* /Button stop countdown */}
 					</Grid>
 				}
 				<Grid item xs={1}>
+					{/* Switch toggle show/hide */}
 					<Switch
 						className={classes.button}
-						checked={room.countdownTimer.isEnabled}
+						checked={isEnabled}
 						disabled={
-							room.countdownTimer.isRunning
+							isRunning
 						}
 						onChange={() =>
 						{
-							roomClient.toggleCountdownTimer(
-								!room.countdownTimer.isEnabled
-							);
-
-							countDownTimer.handleFocus();
+							roomClient.toggleCountdownTimer(!isEnabled);
+							handleFocus();
 						}}
 						name='checkedB'
 						color='secondary'
 						size='small'
 					/>
+					{/* /Switch toggle show/hide */}
 				</Grid>
-
 			</Grid>
 		</div>
 	);
@@ -227,12 +217,16 @@ const CountdownTimer = (props) =>
 CountdownTimer.propTypes =
 {
 	roomClient : PropTypes.any.isRequired,
-	room       : PropTypes.object.isRequired,
-	classes    : PropTypes.object.isRequired
+	classes    : PropTypes.object.isRequired,
+	isEnabled  : PropTypes.bool.isRequired,
+	isRunning  : PropTypes.bool.isRequired,
+	left       : PropTypes.string.isRequired
 };
 
 const mapStateToProps = (state) => ({
-	room : state.room
+	isEnabled : state.room.countdownTimer.isEnabled,
+	isRunning : state.room.countdownTimer.isRunning,
+	left      : state.room.countdownTimer.left
 });
 
 export default withRoomContext(connect(
@@ -243,7 +237,9 @@ export default withRoomContext(connect(
 		areStatesEqual : (next, prev) =>
 		{
 			return (
-				prev.room === next.room
+				prev.isEnabled === next.room.countdownTimer.isEnabled,
+				prev.isRunning === next.room.countdownTimer.isRunning,
+				prev.left === next.room.countdownTimer.left
 			);
 		}
 	}
