@@ -680,7 +680,14 @@ export default class RoomClient
 	{
 		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);
 
-		const { displayName, picture } = data;
+		const { picture } = data;
+
+		let displayName;
+
+		if (typeof (data.displayName) === 'undefined' || !data.displayName) 
+			displayName = '';
+		else 
+			displayName = data.displayName;
 
 		store.dispatch(settingsActions.setDisplayName(displayName));
 
