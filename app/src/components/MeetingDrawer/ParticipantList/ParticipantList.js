@@ -13,6 +13,7 @@ import { FormattedMessage } from 'react-intl';
 import ListPeer from './ListPeer';
 import ListMe from './ListMe';
 import ListModerator from './ListModerator';
+import CountdownTimer from './CountdownTimer';
 import Volume from '../../Containers/Volume';
 
 const styles = (theme) =>
@@ -88,6 +89,7 @@ class ParticipantList extends React.PureComponent
 								defaultMessage='Moderator actions'
 							/>
 						</li>
+						<CountdownTimer />
 						<ListModerator />
 					</ul>
 				}
