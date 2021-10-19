@@ -684,7 +684,7 @@ export default class RoomClient
 
 		let displayName;
 
-		if (typeof (data.displayName) === 'undefined' || !data.displayName) 
+		if (typeof(data.displayName) === 'undefined' || !data.displayName)
 			displayName = '';
 		else 
 			displayName = data.displayName;

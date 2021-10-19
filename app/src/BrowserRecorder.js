@@ -523,7 +523,7 @@ export default class BrowserRecorder
 
 			const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
-			if (micProducer && this.micProducerId != micProducer.id)
+			if (micProducer && this.micProducerId !== micProducer.id)
 			{
 
 				// delete/dc previous one 
@@ -563,7 +563,7 @@ export default class BrowserRecorder
 
 			for (const [ consumerId, aCStreamSource ] in this.audioConsumersMap.entries())
 			{
-				if (!audioConsumers.find((c) => consumerId == c.id))
+				if (!audioConsumers.find((c) => consumerId === c.id))
 				{
 					aCStreamSource.disconnect(this.dest);
 					this.audioConsumersMap.delete(consumerId);
