@@ -538,7 +538,7 @@ if (fs.existsSync(configModuleFilepath))
 }
 
 // eslint-disable-next-line
-// logger.debug('Using config:', config);
+logger.debug('Using config:', config);
 
 //
 export {
