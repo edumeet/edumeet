@@ -5,7 +5,7 @@ import { ipaddress, url } from 'convict-format-with-validator';
 import json5 from 'json5';
 import yaml from 'yaml';
 import toml from 'toml';
-import { cpus } from 'os';
+import { cpus, networkInterfaces } from 'os';
 
 import Logger from '../logger/Logger';
 
@@ -31,6 +31,9 @@ import {
 
 const logger = new Logger('config');
 
+// add network interfaces list
+const ifaceWhiteListRegex = '^(eth.*)|(ens.*)|(br.*)'
+
 // add parsers
 convict.addParser([
 	{ extension: 'json', parse: JSON.parse },
@@ -44,6 +47,28 @@ function assert(assertion: Boolean, msg: string)
 {
 	if (!assertion)
 		throw new Error(msg);
+}
+// add automatic IP detection
+function getListenIps() {
+	let listenIP = [];
+	const ifaces = networkInterfaces();
+	Object.keys(ifaces).forEach(function (ifname) {
+		if (ifname.match(ifaceWhiteListRegex)) {
+			ifaces[ifname].forEach(function (iface) {
+				if (
+					(iface.family !== "IPv4" &&
+						(iface.family !== "IPv6" || iface.scopeid !== 0)) ||
+					iface.internal !== false
+				) {
+					// skip over internal (i.e. 127.0.0.1) and non-ipv4 or ipv6 non global addresses
+					return;
+				}
+				listenIP.push({ ip: iface.address, announcedIp: null });
+			});
+		}
+	});
+	logger.info('discovered IP adresses:', JSON.stringify(listenIP, null, 4));
+	return listenIP;
 }
 
 const isFloat = {
@@ -318,9 +343,7 @@ const configSchema = convict({
 			listenIps : {
 				doc     : 'The Mediasoup listen IPs. [TransportListenIp](https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp)',
 				format  : Array,
-				default : [
-					{ ip: '0.0.0.0', announcedIp: null }
-				]
+				default : getListenIps()
 			},
 			initialAvailableOutgoingBitrate : {
 				doc     : 'The Mediasoup initial available outgoing bitrate (in bps). [WebRtcTransportOptions](https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions)',
