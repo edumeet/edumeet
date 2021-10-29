@@ -441,7 +441,7 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden       : !videoVisible,
+						hidden       : !videoVisible || (!isMe && store.getState().me.localRecordingState==='start'),
 						'isMirrored' : isMirrored,
 						contain      : videoContain
 					})}
