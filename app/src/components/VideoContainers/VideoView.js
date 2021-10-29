@@ -11,6 +11,7 @@ import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
 import { AudioAnalyzer } from './AudioAnalyzer';
+import { store } from '../../store';
 
 const logger = new Logger('VideoView');
 
@@ -427,7 +428,9 @@ class VideoView extends React.PureComponent
 									</React.Fragment>
 									:
 									<span className={classes.displayNameStatic}>
-										{displayName}
+										{
+											(store.getState().me.localRecordingState==='start') ? '':displayName
+										}
 									</span>
 								}
 							</div>
