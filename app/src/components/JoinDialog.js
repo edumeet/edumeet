@@ -75,7 +75,8 @@ const styles = (theme) =>
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width : '90vw'
+				width  : '90vw',
+				margin : 0
 			}
 		},
 		accountButton :
