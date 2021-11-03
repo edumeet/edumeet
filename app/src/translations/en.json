@@ -77,8 +77,8 @@
 	"room.localRecordingStopped": "{displayName} stopped local recording",
 	"room.recordingConsent": "When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming.",
 	"room.localRecordingSecurityError": "Recording the specified source is not allowed due to security restrictions. Check you client settings!",
-	"room.leavingTheRoom": null,
-	"room.leaveConfirmationMessage": null,
+	"room.leavingTheRoom": "Leaving the room",
+	"room.leaveConfirmationMessage": "Do you want to leave the room?",
 
 	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
 
@@ -154,9 +154,9 @@
 	"label.join": "Join",
 	"label.recordingInProgress": "Recording in Progress..",
 	
-	"label.yes": null,
-	"label.no": null,
-	"label.leaveWithSavingChat": null,
+	"label.yes": "Yes",
+	"label.no": "No",
+	"label.leaveWithSavingChat": "Yes + save chat ({chatCount})",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
