@@ -84,8 +84,14 @@ const styles = (theme) =>
 		},
 		accountButtonAvatar :
 		{
-			width  : 50,
-			height : 50
+			width                         : 50,
+			height                        : 50,
+			[theme.breakpoints.down(400)] :
+			{
+				width  : 35,
+				height : 35
+			}
+
 		},
 
 		green :
