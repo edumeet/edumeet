@@ -104,11 +104,11 @@ const styles = (theme) =>
 		},
 		joinButton :
 		{
-			background : '#2e7031',
-			color      : 'white',
-			'&:hover'  : {
-				backgroundColor : '#2e7031'
+			[theme.breakpoints.down(600)] :
+			{
+				'width' : '100%'
 			}
+
 		},
 		mediaDevicesAnySelectedButton :
 		{
@@ -580,6 +580,7 @@ const JoinDialog = ({
 							direction='row'
 							justify='space-between'
 							alignItems='flex-end'
+							spacing={1}
 						>
 
 							{/* MEDIA PERMISSIONS TOGGLE BUTTONS */}
@@ -653,13 +654,14 @@ const JoinDialog = ({
 							{/* /MEDIA PERMISSION BUTTONS */}
 
 							{/* JOIN/AUTH BUTTON */}
-							<Grid item>
+							<Grid item className={classes.joinButton}>
 								<Button
 									onClick={handleJoin}
 									variant='contained'
 									color='primary'
 									id='joinButton'
 									disabled={displayName === ''}
+									fullWidth
 								>
 									<FormattedMessage
 										id='label.join'
