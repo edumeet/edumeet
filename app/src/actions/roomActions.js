@@ -240,3 +240,8 @@ export const setHideSelfView = (hideSelfView) =>
 		type    : 'SET_HIDE_SELF_VIEW',
 		payload : { hideSelfView }
 	});
+export const addConsentForRecording = (recordingid, peerid) =>
+	({
+		type    : 'ADD_CONSENT_RECORDING',
+		payload : { recordingid, peerid }
+	});

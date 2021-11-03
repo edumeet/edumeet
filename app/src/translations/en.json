@@ -76,6 +76,8 @@
 	"room.localRecordingResumed": "{displayName} resumed local recording",
 	"room.localRecordingStopped": "{displayName} stopped local recording",
 	"room.recordingConsent": "When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming.",
+	"room.recordingConsentAccept": "Accept",
+	"room.recordingConsentDeny": "Deny",
 	"room.localRecordingSecurityError": "Recording the specified source is not allowed due to security restrictions. Check you client settings!",
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,

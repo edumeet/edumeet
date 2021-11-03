@@ -4,6 +4,12 @@ export const addNotification = (notification) =>
 		payload : { notification }
 	});
 
+export const addConsentNotification = (notification) =>
+	({
+		type    : 'ADD_CONSENT_NOTIFICATION',
+		payload : { notification }
+	});
+
 export const removeNotification = (notificationId) =>
 	({
 		type    : 'REMOVE_NOTIFICATION',

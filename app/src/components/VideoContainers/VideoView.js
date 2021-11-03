@@ -429,7 +429,7 @@ class VideoView extends React.PureComponent
 									:
 									<span className={classes.displayNameStatic}>
 										{
-											(store.getState().me.localRecordingState==='start') ? '':displayName
+											(store.getState().me.localRecordingState==='start' && store.getState().room.recordingConsents.size === 0) ? '':displayName
 										}
 									</span>
 								}
@@ -441,7 +441,7 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden       : !videoVisible || (!isMe && store.getState().me.localRecordingState==='start'),
+						hidden       : !videoVisible || (!isMe && store.getState().me.localRecordingState==='start' && store.getState().room.recordingConsents.size === 0),
 						'isMirrored' : isMirrored,
 						contain      : videoContain
 					})}

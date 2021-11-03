@@ -6,7 +6,8 @@ import {
 	peersLengthSelector,
 	raisedHandsSelector,
 	makePermissionSelector,
-	recordingInProgressSelector
+	recordingInProgressSelector,
+	recordingInProgressPeersSelector
 } from '../Selectors';
 import { permissions } from '../../permissions';
 import * as appPropTypes from '../appPropTypes';
@@ -55,6 +56,7 @@ import { store } from '../../store';
 // import logger from 'redux-logger';
 import Logger from '../../Logger';
 import { config } from '../../config';
+import me from '../../reducers/me';
 
 const logger = new Logger('Recorder');
 
@@ -255,6 +257,7 @@ const TopBar = (props) =>
 		drawerOverlayed,
 		toolAreaOpen,
 		isSafari,
+		meId,
 		isMobile,
 		loggedIn,
 		loginEnabled,
@@ -270,17 +273,19 @@ const TopBar = (props) =>
 		setHideSelfView,
 		toggleToolArea,
 		openUsersTab,
-		addNotification,
+		addConsentNotification,
 		closeNotification,
 		unread,
 		canProduceExtraVideo,
 		canLock,
+		canRecord,
 		canPromote,
 		classes,
 		locale,
 		localesList,
 		localRecordingState,
 		recordingInProgress,
+		recordingPeers,
 		producers,
 		consumers
 	} = props;
@@ -298,7 +303,7 @@ const TopBar = (props) =>
 			const notificationId = randomString({ length: 6 }).toLowerCase();
 
 			setRecordingConsentNotificationId(notificationId);
-			addNotification(
+			addConsentNotification(
 				{
 					id   : notificationId,
 					type : 'warning',
@@ -309,7 +314,10 @@ const TopBar = (props) =>
 							defaultMessage : 'When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming'
 						}
 					),
-					persist : true
+					peerid         : meId,
+					roomClient     : roomClient,
+					recordingPeers : recordingPeers,
+					persist        : true
 				}
 			);
 		}
@@ -323,7 +331,7 @@ const TopBar = (props) =>
 	},
 	[
 		localRecordingState, recordingInProgress, recordingConsentNotificationId,
-		addNotification, closeNotification, intl
+		addConsentNotification, closeNotification, intl, meId, recordingPeers, roomClient
 	]);
 
 	const isMenuOpen = Boolean(anchorEl);
@@ -724,7 +732,8 @@ const TopBar = (props) =>
 
 							</MenuItem>
 						}
-						{ config.localRecordingEnabled && isSafari &&
+						{ config.localRecordingEnabled && isSafari
+						&& canRecord &&
 						<MenuItem
 							aria-label={recordingTooltip}
 							onClick={async () =>
@@ -1222,46 +1231,49 @@ const TopBar = (props) =>
 
 TopBar.propTypes =
 {
-	roomClient           : PropTypes.object.isRequired,
-	room                 : appPropTypes.Room.isRequired,
-	isSafari         			 : PropTypes.bool,
-	isMobile             : PropTypes.bool.isRequired,
-	peersLength          : PropTypes.number,
-	lobbyPeers           : PropTypes.array,
-	permanentTopBar      : PropTypes.bool.isRequired,
-	drawerOverlayed      : PropTypes.bool.isRequired,
-	toolAreaOpen         : PropTypes.bool.isRequired,
-	loggedIn             : PropTypes.bool.isRequired,
-	loginEnabled         : PropTypes.bool.isRequired,
-	fullscreenEnabled    : PropTypes.bool,
-	fullscreen           : PropTypes.bool,
-	onFullscreen         : PropTypes.func.isRequired,
-	setToolbarsVisible   : PropTypes.func.isRequired,
-	setSettingsOpen      : PropTypes.func.isRequired,
-	setLeaveOpen         : PropTypes.func.isRequired,
-	setExtraVideoOpen    : PropTypes.func.isRequired,
-	setHelpOpen          : PropTypes.func.isRequired,
-	setAboutOpen         : PropTypes.func.isRequired,
-	setLockDialogOpen    : PropTypes.func.isRequired,
-	setHideSelfView      : PropTypes.func.isRequired,
-	toggleToolArea       : PropTypes.func.isRequired,
-	openUsersTab         : PropTypes.func.isRequired,
-	addNotification      : PropTypes.func.isRequired,
-	closeNotification    : PropTypes.func.isRequired,
-	unread               : PropTypes.number.isRequired,
-	canProduceExtraVideo : PropTypes.bool.isRequired,
-	canLock              : PropTypes.bool.isRequired,
-	canPromote           : PropTypes.bool.isRequired,
-	classes              : PropTypes.object.isRequired,
-	theme                : PropTypes.object.isRequired,
-	intl                 : PropTypes.object,
-	locale               : PropTypes.string.isRequired,
-	localesList          : PropTypes.array.isRequired,
-	localRecordingState  : PropTypes.string,
-	recordingInProgress  : PropTypes.bool,
-	recordingMimeType    : PropTypes.string,
-	producers            : PropTypes.object,
-	consumers            : PropTypes.object
+	roomClient             : PropTypes.object.isRequired,
+	room                   : appPropTypes.Room.isRequired,
+	isSafari           			 : PropTypes.bool,
+	meId           				    : PropTypes.string,
+	isMobile               : PropTypes.bool.isRequired,
+	peersLength            : PropTypes.number,
+	lobbyPeers             : PropTypes.array,
+	permanentTopBar        : PropTypes.bool.isRequired,
+	drawerOverlayed        : PropTypes.bool.isRequired,
+	toolAreaOpen           : PropTypes.bool.isRequired,
+	loggedIn               : PropTypes.bool.isRequired,
+	loginEnabled           : PropTypes.bool.isRequired,
+	fullscreenEnabled      : PropTypes.bool,
+	fullscreen             : PropTypes.bool,
+	onFullscreen           : PropTypes.func.isRequired,
+	setToolbarsVisible     : PropTypes.func.isRequired,
+	setSettingsOpen        : PropTypes.func.isRequired,
+	setLeaveOpen           : PropTypes.func.isRequired,
+	setExtraVideoOpen      : PropTypes.func.isRequired,
+	setHelpOpen            : PropTypes.func.isRequired,
+	setAboutOpen           : PropTypes.func.isRequired,
+	setLockDialogOpen      : PropTypes.func.isRequired,
+	setHideSelfView        : PropTypes.func.isRequired,
+	toggleToolArea         : PropTypes.func.isRequired,
+	openUsersTab           : PropTypes.func.isRequired,
+	addConsentNotification : PropTypes.func.isRequired,
+	closeNotification      : PropTypes.func.isRequired,
+	unread                 : PropTypes.number.isRequired,
+	canProduceExtraVideo   : PropTypes.bool.isRequired,
+	canLock                : PropTypes.bool.isRequired,
+	canRecord              : PropTypes.bool.isRequired,
+	canPromote             : PropTypes.bool.isRequired,
+	classes                : PropTypes.object.isRequired,
+	theme                  : PropTypes.object.isRequired,
+	intl                   : PropTypes.object,
+	locale                 : PropTypes.string.isRequired,
+	localesList            : PropTypes.array.isRequired,
+	localRecordingState    : PropTypes.string,
+	recordingInProgress    : PropTypes.bool,
+	recordingPeers         : PropTypes.array,
+	recordingMimeType      : PropTypes.string,
+	producers              : PropTypes.object,
+	consumers              : PropTypes.object
 };
 
 const makeMapStateToProps = () =>
@@ -1272,6 +1284,8 @@ const makeMapStateToProps = () =>
 	const hasLockPermission =
 		makePermissionSelector(permissions.CHANGE_ROOM_LOCK);
 
+	const hasRecordPermission =
+		makePermissionSelector(permissions.LOCAL_RECORD_ROOM);
 	const hasPromotionPermission =
 		makePermissionSelector(permissions.PROMOTE_PEER);
 
@@ -1279,6 +1293,7 @@ const makeMapStateToProps = () =>
 		({
 			room                : state.room,
 			isSafari            : state.me.browser.name !== 'safari',
+			meId                : state.me.id,
 			isMobile            : state.me.browser.platform === 'mobile',
 			peersLength         : peersLengthSelector(state),
 			lobbyPeers          : lobbyPeersKeySelector(state),
@@ -1289,10 +1304,12 @@ const makeMapStateToProps = () =>
 			loginEnabled        : state.me.loginEnabled,
 			localRecordingState : state.me.localRecordingState,
 			recordingInProgress	: recordingInProgressSelector(state),
+			recordingPeers      : recordingInProgressPeersSelector(state),
 			unread              : state.toolarea.unreadMessages +
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
 			canProduceExtraVideo : hasExtraVideoPermission(state),
 			canLock              : hasLockPermission(state),
+			canRecord            : hasRecordPermission(state),
 			canPromote           : hasPromotionPermission(state),
 			locale               : state.intl.locale,
 			localesList          : state.intl.list,
@@ -1347,9 +1364,9 @@ const mapDispatchToProps = (dispatch) =>
 			dispatch(toolareaActions.openToolArea());
 			dispatch(toolareaActions.setToolTab('users'));
 		},
-		addNotification : (notification) =>
+		addConsentNotification : (notification) =>
 		{
-			dispatch(notificationActions.addNotification(notification));
+			dispatch(notificationActions.addConsentNotification(notification));
 		},
 		closeNotification : (notificationId) =>
 		{

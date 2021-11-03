@@ -2851,6 +2851,14 @@ export default class RoomClient
 						break;
 					}
 
+					case 'addConsentForRecording':
+					{
+						store.dispatch(
+							roomActions.addConsentForRecording());
+
+						break;
+					}
+
 					case 'unlockRoom':
 					{
 						store.dispatch(
@@ -4121,6 +4129,23 @@ export default class RoomClient
 				}));
 
 			logger.error('lockRoom() [error:"%o"]', error);
+		}
+	}
+	async addConsentForRecording(recordingid, peerid)
+	{
+		logger.debug('addConsentForRecording()');
+
+		try
+		{
+			// await this.sendRequest('addConsentForRecording');
+			store.dispatch(
+				roomActions.addConsentForRecording(recordingid, peerid));
+
+		}
+		catch (error)
+		{
+
+			logger.error('addConsentForRecording() [error:"%o"]', error);
 		}
 	}
 

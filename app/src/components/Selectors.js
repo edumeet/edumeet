@@ -331,3 +331,30 @@ export const recordingInProgressSelector = createSelector(
 			return false;
 	}
 );
+
+export const recordingInProgressPeersSelector = createSelector(
+	peersValueSelector,
+	meSelector,
+	(peers, me) =>
+	{
+		const recordingpeers = [];
+
+		if (
+			me.localRecordingState === RECORDING_START ||
+			me.localRecordingState === RECORDING_RESUME
+		)
+		{
+			recordingpeers.push(me.id);
+		}
+		peers.forEach((e) =>
+		{
+			if (e.localRecordingState === RECORDING_START ||
+				e.localRecordingState === RECORDING_RESUME)
+			{
+				recordingpeers.push(e.id);
+			}
+		});
+
+		return recordingpeers;
+	}
+);
