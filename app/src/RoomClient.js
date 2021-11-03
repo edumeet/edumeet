@@ -2853,8 +2853,10 @@ export default class RoomClient
 
 					case 'addConsentForRecording':
 					{
+						const { recordingid, peerid } = notification.data;
+
 						store.dispatch(
-							roomActions.addConsentForRecording());
+							roomActions.addConsentForRecording(recordingid, peerid));
 
 						break;
 					}
@@ -4137,7 +4139,7 @@ export default class RoomClient
 
 		try
 		{
-			// await this.sendRequest('addConsentForRecording');
+			await this.sendRequest('addConsentForRecording', { recordingid: recordingid, peerid: peerid });
 			store.dispatch(
 				roomActions.addConsentForRecording(recordingid, peerid));
 

@@ -72,7 +72,12 @@ class ConsentNotifications extends Component
 						size='small'
 						color='default'
 						startIcon={<VerifiedUserIcon />}
-						onClick={() => { this.props.closeSnackbar(key); }}
+						onClick={() =>
+						{
+							notification.roomClient.addConsentForRecording(notification.recordingPeers,
+								notification.peerid);
+							this.props.closeSnackbar(key);
+						}}
 					>
 						<FormattedMessage id='room.recordingConsentAccept' defaultMessage='I Accept' />
 					</Button>
@@ -83,8 +88,6 @@ class ConsentNotifications extends Component
 						startIcon={<Lock />}
 						onClick={() =>
 						{
-							notification.roomClient.addConsentForRecording(notification.recordingPeers,
-								notification.peerid);
 							this.props.closeSnackbar(key);
 						}}
 					>
