@@ -316,16 +316,33 @@ const room = (state = initialState, action) =>
 
 			const recordingConsents = state.recordingConsents;
 
-			if (recordingConsents.has(recordingid))
+			let recConsents;
+
+			recordingid.forEach((rid) =>
 			{
-				recordingConsents.set(
-					recordingid, recordingConsents.get(recordingid).push(peerid)
-				);
-			}
-			else
-			{
-				recordingConsents.set(recordingid, [ peerid ]);
-			}
+				if (recordingConsents.has(rid))
+				{
+					recConsents = recordingConsents.get(rid);
+					recConsents.push(peerid);
+					recordingConsents.set(
+						rid, recConsents
+					);
+				}
+				else
+				{
+					recordingConsents.set(rid, [ peerid ]);
+				}
+			});
+
+			return { ...state, recordingConsents };
+		}
+		case 'REMOVE_CONSENT_RECORDING':
+		{
+			const { recordingid } = action.payload;
+
+			const recordingConsents = state.recordingConsents;
+
+			recordingConsents.delete(recordingid);
 
 			return { ...state, recordingConsents };
 		}

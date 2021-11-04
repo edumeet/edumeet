@@ -1595,6 +1595,22 @@ class Room extends EventEmitter
 				break;
 			}
 
+			case 'removeConsentForRecording':
+			{
+
+				const {recordingid} = request.data;
+				// Spread to others
+				this._notification(peer.socket, 'removeConsentForRecording', {
+					peerId : peer.id,
+					recordingid: recordingid
+				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
 			case 'unlockRoom':
 			{
 				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK))

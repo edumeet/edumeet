@@ -245,3 +245,8 @@ export const addConsentForRecording = (recordingid, peerid) =>
 		type    : 'ADD_CONSENT_RECORDING',
 		payload : { recordingid, peerid }
 	});
+export const removeConsentForRecording = (recordingid) =>
+	({
+		type    : 'REMOVE_CONSENT_RECORDING',
+		payload : { recordingid }
+	});

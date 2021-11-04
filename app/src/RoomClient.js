@@ -2861,6 +2861,16 @@ export default class RoomClient
 						break;
 					}
 
+					case 'removeConsentForRecording':
+					{
+						const { recordingid } = notification.data;
+
+						store.dispatch(
+							roomActions.removeConsentForRecording(recordingid));
+
+						break;
+					}
+
 					case 'unlockRoom':
 					{
 						store.dispatch(

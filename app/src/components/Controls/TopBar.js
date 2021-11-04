@@ -743,7 +743,7 @@ const TopBar = (props) =>
 									localRecordingState === RECORDING_PAUSE ||
 									localRecordingState === RECORDING_RESUME)
 								{
-									recorder.stopLocalRecording();
+									recorder.stopLocalRecording(meId);
 								}
 								else
 								{

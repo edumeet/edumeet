@@ -3,6 +3,7 @@ import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
 import * as meActions from './actions/meActions';
+import * as roomActions from './actions/roomActions';
 import { store } from './store';
 import * as requestActions from './actions/requestActions';
 import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
@@ -329,7 +330,7 @@ export default class BrowserRecorder
 
 		}
 	}
-	async stopLocalRecording()
+	async stopLocalRecording(meId)
 	{
 		this.logger.debug('stopLocalRecording()');
 		try
@@ -345,8 +346,9 @@ export default class BrowserRecorder
 				}));
 
 			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
-
+			store.dispatch(roomActions.removeConsentForRecording(meId));
 			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
+			await this.roomClient.sendRequest('removeConsentForRecording', { recordingid: meId });
 
 		}
 		catch (error)

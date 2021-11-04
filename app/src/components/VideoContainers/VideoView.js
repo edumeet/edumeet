@@ -232,7 +232,8 @@ class VideoView extends React.PureComponent
 			netInfo,
 			width,
 			height,
-			opusConfig
+			opusConfig,
+			peer
 		} = this.props;
 
 		const {
@@ -429,7 +430,17 @@ class VideoView extends React.PureComponent
 									:
 									<span className={classes.displayNameStatic}>
 										{
-											(store.getState().me.localRecordingState==='start' && store.getState().room.recordingConsents.size === 0) ? '':displayName
+											(
+												(store.getState().me.localRecordingState==='start' || store.getState().me.localRecordingState==='resume') &&
+												!(
+													store.getState().room.recordingConsents.get(
+														store.getState().me.id
+													)!==undefined &&
+													store.getState().room.recordingConsents.get(
+														store.getState().me.id
+													).includes(peer.id)
+												)
+											) ? '':displayName
 										}
 									</span>
 								}
@@ -441,7 +452,20 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden       : !videoVisible || (!isMe && store.getState().me.localRecordingState==='start' && store.getState().room.recordingConsents.size === 0),
+						hidden : !videoVisible || (!isMe &&
+							(
+								(store.getState().me.localRecordingState==='start' ||
+								store.getState().me.localRecordingState==='resume') &&
+								!(
+									store.getState().room.recordingConsents.get(
+										store.getState().me.id
+									)!==undefined &&
+									store.getState().room.recordingConsents.get(
+										store.getState().me.id
+									).includes(peer.id)
+								)
+							)
+						),
 						'isMirrored' : isMirrored,
 						contain      : videoContain
 					})}
@@ -640,7 +664,8 @@ VideoView.propTypes =
 	netInfo                        : PropTypes.object,
 	width                          : PropTypes.number,
 	height                         : PropTypes.number,
-	opusConfig                     : PropTypes.string
+	opusConfig                     : PropTypes.string,
+	peer                           : PropTypes.string
 };
 
 export default withStyles(styles)(VideoView);
