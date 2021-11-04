@@ -966,7 +966,7 @@ class Room extends EventEmitter
 					this._notification(
 						otherPeer.socket,
 						'newPeer',
-						{...peer.peerInfo, returning }
+						{ ...peer.peerInfo, returning }
 					);
 				}
 

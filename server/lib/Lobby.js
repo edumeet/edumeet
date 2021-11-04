@@ -70,9 +70,11 @@ class Lobby extends EventEmitter
 		}
 
 		const lobby = this;
-		setTimeout(function() {
-				lobby._promoteAllPeersLoop(lobby, peerArray, 0);
-			}, 200);
+
+		setTimeout(function()
+		{
+			lobby._promoteAllPeersLoop(lobby, peerArray, 0);
+		}, 200);
 	}
 
 	_promoteAllPeersLoop(lobby, peerArray, index)
@@ -82,13 +84,14 @@ class Lobby extends EventEmitter
 		const peer = lobby._peers[peerArray[index]];
 
 		if (peer && lobby._peers[peer.id] && !lobby._peers[peer.id].closed)
-				lobby.promotePeer(peer.id);
+			lobby.promotePeer(peer.id);
 
 		index++;
 
-		setTimeout(function() {
-				lobby._promoteAllPeersLoop(lobby, peerArray, index);
-			}, 200);
+		setTimeout(function()
+		{
+			lobby._promoteAllPeersLoop(lobby, peerArray, index);
+		}, 200);
 	}
 
 	promotePeer(peerId)

@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import *  as path from 'path';
+import * as path from 'path';
 import convict from 'convict';
 import { ipaddress, url } from 'convict-format-with-validator';
 import json5 from 'json5';
@@ -522,6 +522,7 @@ catch (error: any)
 
 // load additional config module (no validation is performed)
 const configModuleFilepath = path.normalize(`${__dirname}/../../config/config.js`);
+
 if (fs.existsSync(configModuleFilepath))
 {
 	try
