@@ -518,9 +518,7 @@ class Room extends EventEmitter
 
 		let maxVolume = -1000;
 
-		// let debugRouterId = null;
-
-		this._audioLevelObservers.forEach((audioLevelObject, routerId) =>
+		this._audioLevelObservers.forEach((audioLevelObject) =>
 		{
 			const tmpPeerId = audioLevelObject.peerId;
 
@@ -528,7 +526,6 @@ class Room extends EventEmitter
 			{
 				maxVolume = audioLevelObject.volume;
 				peerId = tmpPeerId;
-				// debugRouterId = routerId;
 			}
 		});
 
