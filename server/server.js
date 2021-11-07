@@ -731,9 +731,9 @@ async function runWebSocketServer()
 
 		queue.push(async () =>
 		{
-			const { token } = socket.handshake.session;
-
 			const room = await getOrCreateRoom({ roomId });
+
+			const token = room.getToken(peerId);
 
 			let peer = peers.get(peerId);
 			let returning = false;
