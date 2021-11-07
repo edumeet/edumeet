@@ -284,11 +284,11 @@ class MessageList extends React.Component
 						:
 						items.map((item, index) =>
 						{
-							const prev = (index > 0) ? items[index-1].name : null;
+							const prev = (index > 0) ? items[index-1].peerId : null;
 
-							const curr = item.name;
+							const curr = item.peerId;
 
-							const next = (index < items.length - 1) ? items[index+1].name : null;
+							const next = (index < items.length - 1) ? items[index+1].peerId : null;
 
 							let format = null;
 
@@ -318,7 +318,7 @@ class MessageList extends React.Component
 										name={item.name}
 										text={item.text}
 										isseen={item.isRead}
-										sender={settings.displayName === item.name ?
+										sender={me.id === item.peerId ?
 											'client' : item.sender
 										}
 										self={item.sender === 'client'}
@@ -375,7 +375,7 @@ class MessageList extends React.Component
 										name={item.name}
 										avatar={filePicture || EmptyAvatar}
 										isseen={item.isRead}
-										sender={settings.displayName === item.name ?
+										sender={me.id === item.peerId ?
 											'client' : item.sender
 										}
 										self={item.sender === 'client'}

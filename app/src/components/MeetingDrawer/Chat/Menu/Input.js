@@ -74,6 +74,7 @@ const ChatInput = (props) =>
 	const {
 		roomClient,
 		displayName,
+		peerId,
 		picture,
 		canChat,
 		canShare,
@@ -107,6 +108,7 @@ const ChatInput = (props) =>
 				sender  : 'response',
 				isRead  : null,
 				name    : displayName,
+				peerId  : peerId,
 				picture : picture,
 				text    : message
 			});
@@ -125,6 +127,7 @@ const ChatInput = (props) =>
 				sender     : 'response',
 				isRead     : null,
 				name       : displayName,
+				peerId     : peerId,
 				picture    : picture,
 				attachment : e.target.files
 			});
@@ -518,6 +521,7 @@ ChatInput.propTypes =
 {
 	roomClient    : PropTypes.object.isRequired,
 	displayName   : PropTypes.string,
+	peerId        : PropTypes.string.isRequired,
 	picture       : PropTypes.string,
 	canChat       : PropTypes.bool.isRequired,
 	canShare      : PropTypes.bool.isRequired,
@@ -535,6 +539,7 @@ const makeMapStateToProps = () =>
 	const mapStateToProps = (state) =>
 		({
 			displayName   : state.settings.displayName,
+			peerId        : state.me.id,
 			picture       : state.me.picture,
 			canChat       : hasPermission(state),
 			canShare      : hasPermission(state),
