@@ -23,6 +23,7 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Volume from './Volume';
+import me from '../../reducers/me';
 
 const styles = (theme) =>
 	({
@@ -173,7 +174,9 @@ const Peer = (props) =>
 		width,
 		height,
 		isSelected,
-		mode
+		mode,
+		meLocalRecordingState,
+		recordingConsents
 	} = props;
 
 	const micEnabled = (
@@ -950,6 +953,7 @@ const Peer = (props) =>
 							</Tooltip>
 						</div>
 						<VideoView
+							peer={peer}
 							showQuality
 							advancedMode={advancedMode}
 							videoContain
@@ -973,7 +977,16 @@ const Peer = (props) =>
 							}
 							videoMultiLayer={screenConsumer && screenConsumer.type !== 'simple'}
 							videoTrack={screenConsumer && screenConsumer.track}
-							videoVisible={screenVisible}
+							videoVisible={
+								screenVisible && (meLocalRecordingState!=='start' ||
+									(
+										(meLocalRecordingState==='start' || meLocalRecordingState==='resume') &&
+										recordingConsents!==undefined &&
+										recordingConsents.get('recordingid')!==undefined
+										// && recordingConsents.get('recordingid').includes(peer.id)
+									)
+								)
+							}
 							videoCodec={screenConsumer && screenConsumer.codec}
 							videoScore={screenConsumer ? screenConsumer.score : null}
 							width={width}
@@ -1010,7 +1023,9 @@ Peer.propTypes =
 	width                    : PropTypes.number,
 	height                   : PropTypes.number,
 	isSelected               : PropTypes.bool,
-	mode                     : PropTypes.string.isRequired
+	mode                     : PropTypes.string.isRequired,
+	meLocalRecordingState    : PropTypes.string,
+	recordingConsents        : PropTypes.object
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -1020,14 +1035,16 @@ const makeMapStateToProps = (initialState, { id }) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer               : state.peers[id],
+			peer                  : state.peers[id],
 			...getPeerConsumers(state, id),
-			windowConsumer     : state.room.windowConsumer,
-			fullScreenConsumer : state.room.fullScreenConsumer,
-			activeSpeaker      : id === state.room.activeSpeakerId,
-			browser            : state.me.browser,
-			isSelected         : state.room.selectedPeers.includes(id),
-			mode               : state.room.mode
+			windowConsumer        : state.room.windowConsumer,
+			fullScreenConsumer    : state.room.fullScreenConsumer,
+			activeSpeaker         : id === state.room.activeSpeakerId,
+			browser               : state.me.browser,
+			isSelected            : state.room.selectedPeers.includes(id),
+			mode                  : state.room.mode,
+			meLocalRecordingState : state.me.localRecordingState,
+			recordingConsents     : state.room.recordingConsents
 		};
 	};
 
@@ -1066,9 +1083,12 @@ export default withRoomContext(connect(
 				prev.room.mode === next.room.mode &&
 				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.me.browser === next.me.browser &&
+				prev.me.browser === next.me.browser &&
+				prev.me.localRecordingState === next.me.localRecordingState &&
 				prev.enableLayersSwitch === next.enableLayersSwitch &&
 				prev.width === next.width &&
-				prev.height === next.height
+				prev.height === next.height &&
+				prev.room.recordingConsents === next.room.recordingConsents
 			);
 		}
 	}

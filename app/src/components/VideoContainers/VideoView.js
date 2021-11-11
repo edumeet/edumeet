@@ -431,7 +431,10 @@ class VideoView extends React.PureComponent
 									<span className={classes.displayNameStatic}>
 										{
 											(
-												(store.getState().me.localRecordingState==='start' || store.getState().me.localRecordingState==='resume') &&
+												(
+													store.getState().me.localRecordingState==='start' ||
+													store.getState().me.localRecordingState==='resume'
+												) &&
 												!(
 													store.getState().room.recordingConsents.get(
 														'recordingid'
@@ -439,13 +442,6 @@ class VideoView extends React.PureComponent
 													store.getState().room.recordingConsents.get(
 														'recordingid'
 													).includes(peer.id)
-
-												/* store.getState().room.recordingConsents.get(
-														store.getState().me.id
-													)!==undefined &&
-													store.getState().room.recordingConsents.get(
-														store.getState().me.id
-													).includes(peer.id) */
 												)
 											) ? '':displayName
 										}
@@ -459,10 +455,13 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden : !videoVisible || (!isMe &&
+						hidden : (!videoVisible ||
 							(
-								(store.getState().me.localRecordingState==='start' ||
-								store.getState().me.localRecordingState==='resume') &&
+								!isMe &&
+								(
+									store.getState().me.localRecordingState==='start' ||
+									store.getState().me.localRecordingState==='resume'
+								) &&
 								!(
 									store.getState().room.recordingConsents.get(
 										'recordingid'
@@ -470,13 +469,6 @@ class VideoView extends React.PureComponent
 									store.getState().room.recordingConsents.get(
 										'recordingid'
 									).includes(peer.id)
-
-								/* store.getState().room.recordingConsents.get(
-										store.getState().me.id
-									)!==undefined &&
-									store.getState().room.recordingConsents.get(
-										store.getState().me.id
-									).includes(peer.id) */
 								)
 							)
 						),
