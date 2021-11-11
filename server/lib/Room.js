@@ -1595,6 +1595,8 @@ class Room extends EventEmitter
 				break;
 			}
 
+			/* 
+			This would clear the localrecording consents, it will be intruduced in a later version
 			case 'removeConsentForRecording':
 			{
 
@@ -1609,7 +1611,7 @@ class Room extends EventEmitter
 				cb();
 
 				break;
-			}
+			} */
 
 			case 'unlockRoom':
 			{

@@ -434,11 +434,18 @@ class VideoView extends React.PureComponent
 												(store.getState().me.localRecordingState==='start' || store.getState().me.localRecordingState==='resume') &&
 												!(
 													store.getState().room.recordingConsents.get(
+														'recordingid'
+													)!==undefined &&
+													store.getState().room.recordingConsents.get(
+														'recordingid'
+													).includes(peer.id)
+
+												/* store.getState().room.recordingConsents.get(
 														store.getState().me.id
 													)!==undefined &&
 													store.getState().room.recordingConsents.get(
 														store.getState().me.id
-													).includes(peer.id)
+													).includes(peer.id) */
 												)
 											) ? '':displayName
 										}
@@ -458,11 +465,18 @@ class VideoView extends React.PureComponent
 								store.getState().me.localRecordingState==='resume') &&
 								!(
 									store.getState().room.recordingConsents.get(
+										'recordingid'
+									)!==undefined &&
+									store.getState().room.recordingConsents.get(
+										'recordingid'
+									).includes(peer.id)
+
+								/* store.getState().room.recordingConsents.get(
 										store.getState().me.id
 									)!==undefined &&
 									store.getState().room.recordingConsents.get(
 										store.getState().me.id
-									).includes(peer.id)
+									).includes(peer.id) */
 								)
 							)
 						),

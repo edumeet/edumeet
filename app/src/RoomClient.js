@@ -2853,14 +2853,17 @@ export default class RoomClient
 
 					case 'addConsentForRecording':
 					{
+						// eslint-disable-next-line no-unused-vars
 						const { recordingid, peerid } = notification.data;
 
 						store.dispatch(
-							roomActions.addConsentForRecording(recordingid, peerid));
+							roomActions.addConsentForRecording('recordingid', peerid));
 
 						break;
 					}
 
+					/* 
+					This would clear the localrecording consents, it will be intruduced in a later version
 					case 'removeConsentForRecording':
 					{
 						const { recordingid } = notification.data;
@@ -2869,7 +2872,7 @@ export default class RoomClient
 							roomActions.removeConsentForRecording(recordingid));
 
 						break;
-					}
+					} */
 
 					case 'unlockRoom':
 					{
@@ -4151,7 +4154,7 @@ export default class RoomClient
 		{
 			await this.sendRequest('addConsentForRecording', { recordingid: recordingid, peerid: peerid });
 			store.dispatch(
-				roomActions.addConsentForRecording(recordingid, peerid));
+				roomActions.addConsentForRecording('recordingid', peerid));
 
 		}
 		catch (error)

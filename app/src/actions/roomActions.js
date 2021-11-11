@@ -245,8 +245,11 @@ export const addConsentForRecording = (recordingid, peerid) =>
 		type    : 'ADD_CONSENT_RECORDING',
 		payload : { recordingid, peerid }
 	});
+
+/*
+This would clear the localrecording consents, it will be intruduced in a later version
 export const removeConsentForRecording = (recordingid) =>
 	({
 		type    : 'REMOVE_CONSENT_RECORDING',
 		payload : { recordingid }
-	});
+	}); */

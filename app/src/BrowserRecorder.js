@@ -346,10 +346,11 @@ export default class BrowserRecorder
 				}));
 
 			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
-			store.dispatch(roomActions.removeConsentForRecording(meId));
 			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
-			await this.roomClient.sendRequest('removeConsentForRecording', { recordingid: meId });
-
+			// This would clear the localrecording consents, it will be intruduced in a later version
+			// Localrecording conents are stored in the store.room.recordingconsents
+			// store.dispatch(roomActions.removeConsentForRecording(meId));
+			// await this.roomClient.sendRequest('removeConsentForRecording', { recordingid: meId });
 		}
 		catch (error)
 		{

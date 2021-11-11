@@ -312,7 +312,11 @@ const room = (state = initialState, action) =>
 
 		case 'ADD_CONSENT_RECORDING':
 		{
-			const { recordingid, peerid } = action.payload;
+			/* const { recordingid, peerid } = action.payload; */
+
+			const { peerid } = action.payload;
+
+			const recordingid = [ 'recordingid' ];
 
 			const recordingConsents = state.recordingConsents;
 
@@ -336,6 +340,9 @@ const room = (state = initialState, action) =>
 
 			return { ...state, recordingConsents };
 		}
+
+		/* 
+		This would clear the localrecording consents, it will be intruduced in a later version
 		case 'REMOVE_CONSENT_RECORDING':
 		{
 			const { recordingid } = action.payload;
@@ -346,7 +353,7 @@ const room = (state = initialState, action) =>
 
 			return { ...state, recordingConsents };
 		}
-
+ 		*/
 		default:
 			return state;
 	}
