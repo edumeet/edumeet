@@ -523,12 +523,10 @@ export default class BrowserRecorder
 		// is it already appended to stream?
 		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused'))
 		{
-
 			const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
-			if (micProducer && this.micProducerId != micProducer.id)
+			if (micProducer && this.micProducerId !== micProducer.id)
 			{
-
 				// delete/dc previous one 
 				if (this.micProducerStreamSource)
 				{
@@ -547,9 +545,13 @@ export default class BrowserRecorder
 	}
 	checkAudioConsumer(consumers)
 	{
-		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused'))
+		const recordingConsents = store.getState().room.recordingConsents.get(
+			'recordingid'
+		);
+
+		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused') && recordingConsents!==undefined)
 		{
-			const audioConsumers = Object.values(consumers).filter((p) => p.kind === 'audio');
+			const audioConsumers = Object.values(consumers).filter((p) => p.kind === 'audio' && recordingConsents.includes(p.peerId));
 
 			for (let i = 0; i < audioConsumers.length; i++)
 			{
@@ -566,7 +568,7 @@ export default class BrowserRecorder
 
 			for (const [ consumerId, aCStreamSource ] in this.audioConsumersMap.entries())
 			{
-				if (!audioConsumers.find((c) => consumerId == c.id))
+				if (!audioConsumers.find((c) => consumerId === c.id))
 				{
 					aCStreamSource.disconnect(this.dest);
 					this.audioConsumersMap.delete(consumerId);
