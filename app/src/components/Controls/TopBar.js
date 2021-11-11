@@ -756,7 +756,8 @@ const TopBar = (props) =>
 										const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
 										if (micProducer) additionalAudioTracks.push(micProducer.track);
-										await recorder.startLocalRecording({
+
+										recorder.startLocalRecording({
 											roomClient,
 											additionalAudioTracks,
 											recordingMimeType
@@ -764,7 +765,6 @@ const TopBar = (props) =>
 
 										recorder.checkAudioConsumer(consumers);
 
-										meActions.setLocalRecordingState(RECORDING_START);
 									}
 									catch (err)
 									{

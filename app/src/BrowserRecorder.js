@@ -107,6 +107,8 @@ export default class BrowserRecorder
 
 		try
 		{
+			store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
+
 			// Screensharing
 			this.gdmStream = await navigator.mediaDevices.getDisplayMedia(
 				this.RECORDING_CONSTRAINTS
@@ -305,8 +307,6 @@ export default class BrowserRecorder
 		try
 		{
 			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
-
-			store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
 
 			store.dispatch(requestActions.notify(
 				{
