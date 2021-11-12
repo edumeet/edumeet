@@ -756,11 +756,13 @@ const TopBar = (props) =>
 										const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
 										if (micProducer) additionalAudioTracks.push(micProducer.track);
+										const roomname = room.name;
 
 										recorder.startLocalRecording({
 											roomClient,
 											additionalAudioTracks,
-											recordingMimeType
+											recordingMimeType,
+											roomname
 										});
 
 										recorder.checkAudioConsumer(consumers);

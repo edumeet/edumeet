@@ -46,7 +46,7 @@ export default class BrowserRecorder
 			displaySurface : 'browser',
 			width          : { ideal: 1920 }
 		},
-			audio    : true,
+			audio    : false,
 			advanced : [
 				{ width: 1920, height: 1080 },
 				{ width: 1280, height: 720 }
@@ -82,7 +82,7 @@ export default class BrowserRecorder
 
 	async startLocalRecording(
 		{
-			roomClient, additionalAudioTracks, recordingMimeType
+			roomClient, additionalAudioTracks, recordingMimeType, roomname
 		})
 	{
 		this.roomClient = roomClient;
@@ -138,9 +138,16 @@ export default class BrowserRecorder
 				this.recorderStream = this.mixer(null, this.gdmStream);
 			}
 
+			const dt = new Date();
+			const rdt = `${dt.getFullYear() }-${ (`0${ dt.getMonth()+1}`).slice(-2) }-${ (`0${ dt.getDate()}`).slice(-2) }_${dt.getHours() }_${(`0${ dt.getMinutes()}`).slice(-2) }_${dt.getSeconds()}`;
+
 			this.recorder = new MediaRecorder(
 				this.recorderStream, { mimeType: this.recordingMimeType }
 			);
+
+			const ext = this.recorder.mimeType.split(';')[0].split('/')[1];
+
+			this.fileName = `${roomname}-recording-${rdt}.${ext}`;
 
 			if (typeof indexedDB === 'undefined' || typeof indexedDB.open === 'undefined')
 			{
@@ -523,7 +530,7 @@ export default class BrowserRecorder
 		// is it already appended to stream?
 		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused'))
 		{
-			const micProducer = Object.values(producers).find((p) => p.source === 'mic');
+			const micProducer = Object.values(producers).find((p) => p.kind === 'audio');
 
 			if (micProducer && this.micProducerId !== micProducer.id)
 			{
