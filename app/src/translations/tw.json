@@ -157,6 +157,13 @@
 	"label.yes": null,
 	"label.no": null,
 	"label.leaveWithSavingChat": null,
+	"label.send": null,
+	"label.bold": null,
+	"label.italic": null,
+	"label.underline": null,
+	"label.sortAscending": null,
+	"label.sortDescending": null,
+	"label.saveChat": null,
 
 	"settings.settings": "設定",
 	"settings.camera": "視訊來源",

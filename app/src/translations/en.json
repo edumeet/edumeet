@@ -153,10 +153,16 @@
 	"label.logout": "Logout",
 	"label.join": "Join",
 	"label.recordingInProgress": "Recording in Progress..",
-	
 	"label.yes": "Yes",
 	"label.no": "No",
 	"label.leaveWithSavingChat": "Yes + save chat ({chatCount})",
+	"label.send": "Send",
+	"label.bold": "Bold",
+	"label.italic": "Italic",
+	"label.underline": "Underline",
+	"label.sortAscending": "Sort ascending",
+	"label.sortDescending": "Sort descending",
+	"label.saveChat": "Save Chat",
 
 	"settings.settings": "Settings",
 	"settings.camera": "Camera",
