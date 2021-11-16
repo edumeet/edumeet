@@ -99,7 +99,7 @@ class Room extends EventEmitter
 		{
 			for (const router of worker._routers)
 			{
-				const routerId = router._internal.routerId;
+				const routerId = router._internal.routerId || router.id;
 
 				if (workerLoads.has(worker._pid))
 				{
@@ -129,7 +129,7 @@ class Room extends EventEmitter
 				{
 					for (const router of worker._routers)
 					{
-						const routerId = router._internal.routerId;
+						const routerId = router._internal.routerId || router.id;
 
 						if (mediasoupRouters.has(routerId))
 						{
@@ -150,7 +150,7 @@ class Room extends EventEmitter
 					{
 						for (const router of worker._routers)
 						{
-							const routerId = router._internal.routerId;
+							const routerId = router._internal.routerId || router.id;
 
 							// on purpose we check if the worker load is below the limit,
 							// as in reality the worker load is imortant,
@@ -175,7 +175,7 @@ class Room extends EventEmitter
 				{
 					for (const router of worker._routers)
 					{
-						const routerId = router._internal.routerId;
+						const routerId = router._internal.routerId || router.id;
 
 						if (mediasoupRouters.has(routerId))
 						{
