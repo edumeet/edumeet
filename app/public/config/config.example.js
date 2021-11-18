@@ -336,9 +336,9 @@ var config = {
 			},
 			'MuiFab' : {
 				'primary' : {
-					'backgroundColor' : '#5F9B2D',
+					'backgroundColor' : '#518029',
 					'&:hover'         : {
-						'backgroundColor' : '#5F9B2D'
+						'backgroundColor' : '#518029'
 					}
 				},
 				'secondary' : {
