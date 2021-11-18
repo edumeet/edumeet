@@ -296,9 +296,18 @@ const TopBar = (props) =>
 
 	useEffect(() =>
 	{
+		const hasConsent = (
+			(
+				store.getState().room.recordingConsents.get('recordingid')!==undefined &&
+				store.getState().room.recordingConsents.get('recordingid').includes(meId)
+			) || (recordingPeers.includes(meId) && recordingPeers.length<2)
+		);
+
 		if (
 			recordingInProgress &&
-			!recordingConsentNotificationId)
+			!recordingConsentNotificationId &&
+			!hasConsent
+		)
 		{
 			const notificationId = randomString({ length: 6 }).toLowerCase();
 
