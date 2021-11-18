@@ -5,6 +5,8 @@ import { withSnackbar } from 'notistack';
 import * as notificationActions from '../../actions/notificationActions';
 import { config } from '../../config';
 import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 
 import { FormattedMessage } from 'react-intl';
@@ -67,32 +69,36 @@ class ConsentNotifications extends Component
 			// customized
 			const okAction = (key) => (
 				<Fragment>
-					<Button
-						variant='contained'
-						size='small'
-						color='default'
-						startIcon={<VerifiedUserIcon />}
-						onClick={() =>
-						{
-							notification.roomClient.addConsentForRecording(notification.recordingPeers,
-								notification.peerid);
-							this.props.closeSnackbar(key);
-						}}
-					>
-						<FormattedMessage id='room.recordingConsentAccept' defaultMessage='I Accept' />
-					</Button>
-					<Button
-						variant='contained'
-						size='small'
-						color='default'
-						startIcon={<Lock />}
-						onClick={() =>
-						{
-							this.props.closeSnackbar(key);
-						}}
-					>
-						<FormattedMessage id='room.recordingConsentDeny' defaultMessage='Deny' />
-					</Button>
+					<ButtonGroup>
+						<Button
+							variant='contained'
+							size='small'
+							color='primary'
+							startIcon={<VerifiedUserIcon />}
+							onClick={() =>
+							{
+								notification.roomClient.addConsentForRecording(
+									notification.recordingPeers,
+									notification.peerid
+								);
+								this.props.closeSnackbar(key);
+							}}
+						>
+							<FormattedMessage id='room.recordingConsentAccept' defaultMessage='I Accept' />
+						</Button>
+						<Button
+							variant='contained'
+							size='small'
+							color='secondary'
+							startIcon={<Lock />}
+							onClick={() =>
+							{
+								this.props.closeSnackbar(key);
+							}}
+						>
+							<FormattedMessage id='room.recordingConsentDeny' defaultMessage='Deny' />
+						</Button>
+					</ButtonGroup>
 
 				</Fragment>
 			);
