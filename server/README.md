@@ -54,7 +54,7 @@ Look at the default `config/config.example.js` file for documentation.
 | routerScaleSize | Room size before spreading to a new router. | `"nat"` | ``40`` |
 | requestTimeout | Socket timeout value (ms). | `"nat"` | ``20000`` |
 | requestRetries | Socket retries when a timeout occurs. | `"nat"` | ``3`` |
-| mediasoup.numWorkers | The number of Mediasoup workers to spawn. Defaults to the available CPUs count. | `"nat"` | ``8`` |
+| mediasoup.numWorkers | The number of Mediasoup workers to spawn. Defaults to the available CPUs count. | `"nat"` | ``4`` |
 | mediasoup.worker.logLevel | The Mediasoup log level. | `"string"` | ``"warn"`` |
 | mediasoup.worker.logTags | The Mediasoup log tags. | `"array"` | ``[  "info",  "ice",  "dtls",  "rtp",  "srtp",  "rtcp"]`` |
 | mediasoup.worker.rtcMinPort | The Mediasoup start listening port number. | `"port"` | ``40000`` |
