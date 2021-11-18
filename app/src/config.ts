@@ -528,6 +528,7 @@ Setting 'play' to null disables the sound notification.
 						backgroundColor : '#313131'
 					}
 				},
+
 				MuiButton :
 				{
 					containedPrimary :
@@ -576,12 +577,13 @@ Setting 'play' to null disables the sound notification.
 				{
 					primary :
 					{
-						backgroundColor : '#5F9B2D',
+						backgroundColor : '#518029',
 						'&:hover'       :
 						{
-							backgroundColor : '#5F9B2D'
+							backgroundColor : '#518029'
 						}
 					},
+
 					secondary :
 					{
 						backgroundColor : '#f50057',

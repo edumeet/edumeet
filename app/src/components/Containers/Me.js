@@ -552,7 +552,7 @@ const Me = (props) =>
 												color={micState === 'on' ?
 													settings.voiceActivatedUnmute ?
 														me.isAutoMuted ? 'secondary' : 'primary'
-														: 'primary'
+														: 'default'
 													: 'secondary'
 												}
 												size='large'
@@ -613,7 +613,7 @@ const Me = (props) =>
 													!hasVideoPermission ||
 													me.webcamInProgress
 												}
-												color={webcamState === 'on' ? 'primary' : 'secondary'}
+												color={webcamState === 'on' ? 'default' : 'secondary'}
 												size='small'
 												onClick={() =>
 												{
@@ -642,7 +642,7 @@ const Me = (props) =>
 													!hasVideoPermission ||
 													me.webcamInProgress
 												}
-												color={webcamState === 'on' ? 'primary' : 'secondary'}
+												color={webcamState === 'on' ? 'default' : 'secondary'}
 												size='large'
 												onClick={() =>
 												{
@@ -679,7 +679,8 @@ const Me = (props) =>
 														!me.canShareScreen ||
 														me.screenShareInProgress
 													}
-													color={screenState === 'on' ? 'primary' : 'secondary'}
+													// color='primary'
+													color={screenState === 'on' ? 'primary' : 'default'}
 													size='small'
 													onClick={() =>
 													{
@@ -705,7 +706,8 @@ const Me = (props) =>
 														!me.canShareScreen ||
 														me.screenShareInProgress
 													}
-													color={screenState === 'on' ? 'primary' : 'secondary'}
+													color={screenState === 'on' ? 'primary' : 'default'}
+													// color='primary'
 													size='large'
 													onClick={() =>
 													{

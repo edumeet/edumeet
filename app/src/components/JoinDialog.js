@@ -97,7 +97,7 @@ const styles = (theme) =>
 
 		green :
 		{
-			color : '#5F9B2D'
+			color : 'rgba(0, 153, 0, 1)'
 		},
 		red :
 		{
