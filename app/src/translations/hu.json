@@ -76,6 +76,8 @@
 	"room.localRecordingResumed": "{displayName} visszaindította a helyi rögzítést",
 	"room.localRecordingStopped": "{displayName} leállította a helyi rögzítést",
 	"room.recordingConsent": "A konferencián való részvételeddel beleegyezésed adod hogy a konferenciáról hang és videó felvétel, és/vagy élő közvetítés készüljön!",
+	"room.recordingConsentAccept": "Elfogadás",
+	"room.recordingConsentDeny": "Elutasítás",
 	"room.localRecordingSecurityError": null,
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,

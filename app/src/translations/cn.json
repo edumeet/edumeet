@@ -75,6 +75,8 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.recordingConsentAccept": null,
+	"room.recordingConsentDeny": null,
 	"room.localRecordingSecurityError": null,
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
