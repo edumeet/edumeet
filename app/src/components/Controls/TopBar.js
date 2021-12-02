@@ -50,13 +50,9 @@ import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
 import randomString from 'random-string';
 import { recorder, RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../actions/recorderActions';
-import * as meActions from '../../actions/meActions';
-import { store } from '../../store';
-// import producers from '../../reducers/producers';
-// import logger from 'redux-logger';
+
 import Logger from '../../Logger';
 import { config } from '../../config';
-import me from '../../reducers/me';
 
 const logger = new Logger('Recorder');
 
@@ -286,6 +282,7 @@ const TopBar = (props) =>
 		localRecordingState,
 		recordingInProgress,
 		recordingPeers,
+		recordingMimeType,
 		producers,
 		consumers
 	} = props;
@@ -298,8 +295,8 @@ const TopBar = (props) =>
 	{
 		const hasConsent = (
 			(
-				store.getState().room.recordingConsents.get('recordingid')!==undefined &&
-				store.getState().room.recordingConsents.get('recordingid').includes(meId)
+				room.recordingConsents.get('recordingid')!==undefined &&
+				room.recordingConsents.get('recordingid').includes(meId)
 			) || (recordingPeers.includes(meId) && recordingPeers.length<2)
 		);
 
@@ -759,8 +756,6 @@ const TopBar = (props) =>
 
 									try
 									{
-										const recordingMimeType =
-										store.getState().settings.recorderPreferredMimeType;
 										const additionalAudioTracks = [];
 										const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
