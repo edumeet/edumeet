@@ -3,7 +3,6 @@ import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
 import * as meActions from './actions/meActions';
-import * as roomActions from './actions/roomActions';
 import { store } from './store';
 import * as requestActions from './actions/requestActions';
 import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
@@ -337,6 +336,7 @@ export default class BrowserRecorder
 
 		}
 	}
+	// eslint-disable-next-line no-unused-vars
 	async stopLocalRecording(meId)
 	{
 		this.logger.debug('stopLocalRecording()');
