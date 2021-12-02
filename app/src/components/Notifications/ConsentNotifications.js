@@ -10,10 +10,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 
 import { FormattedMessage } from 'react-intl';
-import * as roomActions from '../../actions/roomActions';
 import Lock from '@material-ui/icons/Lock';
-import RoomClient from '../../RoomClient';
-
 class ConsentNotifications extends Component
 {
 	displayed = [];
