@@ -23,7 +23,6 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Volume from './Volume';
-import me from '../../reducers/me';
 
 const styles = (theme) =>
 	({
