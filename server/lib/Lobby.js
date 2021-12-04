@@ -62,12 +62,7 @@ class Lobby extends EventEmitter
 	{
 		logger.info('promoteAllPeers()');
 
-		const peerArray = [];
-
-		for (const peer in this._peers)
-		{
-			peerArray.push(peer);
-		}
+		const peerArray = Object.keys(this._peers);
 
 		const lobby = this;
 
