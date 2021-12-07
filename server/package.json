@@ -19,7 +19,7 @@
 		"dev": "nodemon --exec ts-node --ignore dist/ -e js,ts server.js",
 		"connect": "ts-node connect.js",
 		"lint": "eslint ./ --ext .js,.ts; exit 0",
-		"lint:fix": "eslint ./ --fix --ext .js,.ts; exit 0",
+		"lint-fix": "eslint ./ --fix --ext .js,.ts; exit 0",
 		"gen-config-docs": "ts-node utils/gen-config-docs.ts"
 	},
 	"dependencies": {
