@@ -218,7 +218,7 @@ const ButtonControlBar = (props) =>
 					})}
 					className={classes.fab}
 					disabled={!me.canSendMic || me.audioInProgress}
-					color={micState === 'on' ? 'primary' : 'secondary'}
+					color={micState === 'on' ? 'default' : 'secondary'}
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
 					{
@@ -245,7 +245,7 @@ const ButtonControlBar = (props) =>
 					})}
 					className={classes.fab}
 					disabled={!me.canSendWebcam || me.webcamInProgress}
-					color={webcamState === 'on' ? 'primary' : 'secondary'}
+					color={webcamState === 'on' ? 'defaut' : 'secondary'}
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
 					{
@@ -270,7 +270,7 @@ const ButtonControlBar = (props) =>
 						})}
 						className={classes.fab}
 						disabled={!me.canShareScreen || me.screenShareInProgress}
-						color={screenState === 'on' ? 'primary' : 'secondary'}
+						color={screenState === 'on' ? 'default' : 'secondary'}
 						size={smallScreen ? 'large' : 'medium'}
 						onClick={() =>
 						{
