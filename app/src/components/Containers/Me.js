@@ -408,6 +408,7 @@ const Me = (props) =>
 				style={spacingStyle}
 			>
 
+				{/* PTT */}
 				{ me.browser.platform !== 'mobile' && smallContainer &&
 				<div className={classnames(
 					classes.ptt,
@@ -420,7 +421,10 @@ const Me = (props) =>
 					/>
 				</div>
 				}
+				{/* /PTT */}
+
 				<div className={classes.viewContainer} style={style}>
+					{/* PTT */}
 					{ me.browser.platform !== 'mobile' && !smallContainer &&
 						<div className={classnames(
 							classes.ptt,
@@ -433,6 +437,9 @@ const Me = (props) =>
 							/>
 						</div>
 					}
+					{/* /PTT */}
+
+					{/* ====== */}
 					<p className={
 						classnames(
 							classes.meTag,
@@ -445,6 +452,8 @@ const Me = (props) =>
 							defaultMessage='ME'
 						/>
 					</p>
+
+					{/* CONTROLS BUTTONS (inside) */}
 					{ !settings.buttonControlBar &&
 						<div
 							className={classnames(
@@ -473,6 +482,7 @@ const Me = (props) =>
 							}}
 						>
 							<React.Fragment>
+								{/* MICROPHONE yy*/}
 								<Tooltip title={micTip} placement='left'>
 									{ smallContainer ?
 										<div>
@@ -599,6 +609,9 @@ const Me = (props) =>
 										</div>
 									}
 								</Tooltip>
+								{/* /MICROPHONE */}
+
+								{/* WEBCAM */}
 								<Tooltip title={webcamTip} placement='left'>
 									{ smallContainer ?
 										<div>
@@ -660,6 +673,9 @@ const Me = (props) =>
 										</div>
 									}
 								</Tooltip>
+								{/* /WEBCAM */}
+
+								{/* SCREENSHARING */}
 								{ me.browser.platform !== 'mobile' &&
 									<Tooltip open={screenShareTooltipOpen}
 										onClose={screenShareTooltipHandleClose}
@@ -723,7 +739,9 @@ const Me = (props) =>
 										}
 									</Tooltip>
 								}
+								{/* /SCREENSHARING */}
 
+								{/* MORE BUTTON */}
 								{advancedMode &&
 								<React.Fragment>
 									<Tooltip
@@ -779,10 +797,12 @@ const Me = (props) =>
 
 								</React.Fragment>
 								}
+								{/* /MORE BUTTON */}
 
 							</React.Fragment>
 						</div>
 					}
+					{/* /CONTROLS BUTTONS (inside) */}
 
 					<VideoView
 						isMe
