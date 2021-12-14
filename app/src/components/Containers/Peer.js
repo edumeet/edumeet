@@ -108,6 +108,13 @@ const styles = (theme) =>
 			{
 				flexDirection : 'row',
 				alignItems    : 'flex-start'
+			},
+			'&.horizontal' : {
+
+				flexDirection : 'row'
+			},
+			'&.vertical' : {
+				flexDirection : 'column'
 			}
 		},
 		videoInfo :
@@ -239,6 +246,38 @@ const Peer = (props) =>
 		roomClient, width, height
 	]);
 
+	const [ buttonSize, setButtonSize ] = useState('large');
+
+	const [ buttonsDirection, setButtonsDirection ] = useState('horizontal');
+
+	useEffect(() =>
+	{
+		if (height > 0 && height <= 250)
+		{
+			setButtonsDirection('horizontal');
+			setButtonSize('small');
+		}
+
+		else if (height > 250 && height <= 350)
+		{
+			setButtonsDirection('vertical');
+			setButtonSize('small');
+		}
+
+		else if (height > 350 && height <= 400)
+		{
+			setButtonsDirection('vertical');
+			setButtonSize('medium');
+		}
+
+		else if (height > 400)
+		{
+			setButtonsDirection('vertical');
+			setButtonSize('large');
+		}
+
+	}, [ height ]);
+
 	// menu
 	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
 	const [ showAudioAnalyzer, setShowAudioAnalyzer ] = React.useState(null);
@@ -248,7 +287,7 @@ const Peer = (props) =>
 		setMenuAnchorElement(event.currentTarget);
 	};
 
-	const handleMenuClose = (event) =>
+	const handleMenuClose = () =>
 	{
 		setMenuAnchorElement(null);
 	};
@@ -303,8 +342,11 @@ const Peer = (props) =>
 					}
 
 					<div
-						className={classnames(classes.controls, hover ? 'hover' : null,
-							smallContainer? 'smallContainer' : null)}
+						className={classnames(
+							classes.controls, hover ? 'hover' : null,
+							smallContainer? 'smallContainer' : null,
+							buttonsDirection
+						)}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -365,7 +407,7 @@ const Peer = (props) =>
 									className={classes.fab}
 									disabled={!micConsumer}
 									color={micEnabled ? 'default' : 'secondary'}
-									size='large'
+									size={buttonSize}
 									onClick={() =>
 									{
 										micEnabled ?
@@ -414,7 +456,7 @@ const Peer = (props) =>
 											defaultMessage : 'New window'
 										})}
 										className={classes.fab}
-										size='large'
+										size={buttonSize}
 										onClick={() =>
 										{
 											toggleConsumerWindow(webcamConsumer);
@@ -458,7 +500,7 @@ const Peer = (props) =>
 										})}
 										className={classes.fab}
 										disabled={!videoVisible}
-										size='large'
+										size={buttonSize}
 										onClick={() =>
 										{
 											toggleConsumerFullscreen(webcamConsumer);
@@ -529,7 +571,7 @@ const Peer = (props) =>
 											})
 										}
 										className={classes.fab}
-										size='large'
+										size={buttonSize}
 										onClick={() =>
 										{
 											isSelected ?
@@ -577,7 +619,7 @@ const Peer = (props) =>
 											defaultMessage : 'Options'
 										})}
 										className={classes.fab}
-										size='large'
+										size={buttonSize}
 										onClick={handleMenuOpen}
 									>
 										<MoreHorizIcon />
@@ -689,7 +731,11 @@ const Peer = (props) =>
 							}
 
 							<div
-								className={classnames(classes.controls, hover ? 'hover' : null)}
+								className={classnames(
+									classes.controls,
+									hover ? 'hover' : null,
+									buttonsDirection
+								)}
 								onMouseOver={() => setHover(true)}
 								onMouseOut={() => setHover(false)}
 								onTouchStart={() =>
@@ -749,7 +795,7 @@ const Peer = (props) =>
 													!videoVisible ||
 													(windowConsumer === consumer.id)
 												}
-												size='large'
+												size={buttonSize}
 												onClick={() =>
 												{
 													toggleConsumerWindow(consumer);
@@ -793,7 +839,7 @@ const Peer = (props) =>
 											})}
 											className={classes.fab}
 											disabled={!videoVisible}
-											size='large'
+											size={buttonSize}
 											onClick={() =>
 											{
 												toggleConsumerFullscreen(consumer);
@@ -840,7 +886,11 @@ const Peer = (props) =>
 
 			{ screenConsumer &&
 				<div
-					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
+					className={classnames(
+						classes.root, 'screen',
+						hover ? 'hover' : null,
+						buttonsDirection
+					)}
 					onMouseOver={() => setHover(true)}
 					onMouseOut={() => setHover(false)}
 					onTouchStart={() =>
