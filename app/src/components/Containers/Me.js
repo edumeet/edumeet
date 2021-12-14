@@ -531,12 +531,17 @@ const Me = (props) =>
 								<Tooltip title={micTip} placement='left'>
 									{ smallContainer ?
 										<div>
-											<IconButton
+											<Fab
+											// <IconButton
 												aria-label={intl.formatMessage({
 													id             : 'device.muteAudio',
 													defaultMessage : 'Mute audio'
 												})}
-												className={classes.smallContainer}
+												// className={classes.smallContainer}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												disabled={
 													!me.canSendMic ||
 													!hasAudioPermission ||
@@ -589,16 +594,22 @@ const Me = (props) =>
 														:
 														<MicOffIcon />
 												}
-											</IconButton>
+											</Fab>
+											{/* </IconButton> */}
 										</div>
 										:
 										<div>
 											<Fab
+												// style={classes.smallest}
 												aria-label={intl.formatMessage({
 													id             : 'device.muteAudio',
 													defaultMessage : 'Mute audio'
 												})}
-												className={classes.fab}
+												// className={classes.fab}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												disabled={
 													!me.canSendMic ||
 													!hasAudioPermission ||
@@ -661,12 +672,17 @@ const Me = (props) =>
 								<Tooltip title={webcamTip} placement='left'>
 									{ smallContainer ?
 										<div>
-											<IconButton
+											<Fab
+											// <IconButton
 												aria-label={intl.formatMessage({
 													id             : 'device.startVideo',
 													defaultMessage : 'Start video'
 												})}
-												className={classes.smallContainer}
+												// className={classes.smallContainer}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												disabled={
 													!me.canSendWebcam ||
 													!hasVideoPermission ||
@@ -686,7 +702,8 @@ const Me = (props) =>
 													:
 													<VideoOffIcon />
 												}
-											</IconButton>
+												{/* </IconButton> */}
+											</Fab>
 										</div>
 										:
 										<div>
@@ -695,7 +712,11 @@ const Me = (props) =>
 													id             : 'device.startVideo',
 													defaultMessage : 'Start video'
 												})}
-												className={classes.fab}
+												// className={classes.fab}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												disabled={
 													!me.canSendWebcam ||
 													!hasVideoPermission ||
@@ -731,12 +752,17 @@ const Me = (props) =>
 									>
 										{ smallContainer ?
 											<div>
-												<IconButton
+												<Fab
+												// <IconButton
 													aria-label={intl.formatMessage({
 														id             : 'device.startScreenSharing',
 														defaultMessage : 'Start screen sharing'
 													})}
-													className={classes.smallContainer}
+													// className={classes.smallContainer}
+													className={classnames(
+														classes.fab,
+														smallContainer ? 'smallest': null
+													)}
 													disabled={
 														!hasScreenPermission ||
 														!me.canShareScreen ||
@@ -754,7 +780,8 @@ const Me = (props) =>
 													}}
 												>
 													<ScreenIcon/>
-												</IconButton>
+													{/* </IconButton> */}
+												</Fab>
 											</div>
 											:
 											<div>
@@ -763,7 +790,11 @@ const Me = (props) =>
 														id             : 'device.startScreenSharing',
 														defaultMessage : 'Start screen sharing'
 													})}
-													className={classes.fab}
+													//	className={classes.fab}
+													className={classnames(
+														classes.fab,
+														smallContainer ? 'smallest': null
+													)}
 													disabled={
 														!hasScreenPermission ||
 														!me.canShareScreen ||
@@ -800,24 +831,34 @@ const Me = (props) =>
 										placement={smallContainer ? 'top' : 'left'}
 									>
 										{ smallContainer ?
-											<IconButton
+											<Fab
+											// <IconButton
 												aria-label={intl.formatMessage({
 													id             : 'device.options',
 													defaultMessage : 'Options'
 												})}
-												className={classes.smallContainer}
+												// className={classes.smallContainer}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												size='small'
 												onClick={handleMenuOpen}
 											>
 												<MoreHorizIcon />
-											</IconButton>
+												{/* </IconButton> */}
+											</Fab>
 											:
 											<Fab
 												aria-label={intl.formatMessage({
 													id             : 'device.options',
 													defaultMessage : 'Options'
 												})}
-												className={classes.fab}
+												// className={classes.fab}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												size={buttonSize}
 
 												onClick={handleMenuOpen}
@@ -955,12 +996,17 @@ const Me = (props) =>
 								<Tooltip title={webcamTip} placement='left'>
 									{ smallContainer ?
 										<div>
-											<IconButton
+											<Fab
+											// <IconButton
 												aria-label={intl.formatMessage({
 													id             : 'device.stopVideo',
 													defaultMessage : 'Stop video'
 												})}
-												className={classes.smallContainer}
+												// className={classes.smallContainer}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												disabled={!me.canSendWebcam || me.webcamInProgress}
 												size='small'
 												color='primary'
@@ -971,7 +1017,8 @@ const Me = (props) =>
 											>
 												<VideoIcon />
 
-											</IconButton>
+												{/* </IconButton> */}
+											</Fab>
 										</div>
 										:
 										<div>
@@ -980,7 +1027,11 @@ const Me = (props) =>
 													id             : 'device.stopVideo',
 													defaultMessage : 'Stop video'
 												})}
-												className={classes.fab}
+												// className={classes.fab}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												disabled={!me.canSendWebcam || me.webcamInProgress}
 												size={smallContainer ? 'small' : 'large'}
 												onClick={() =>
