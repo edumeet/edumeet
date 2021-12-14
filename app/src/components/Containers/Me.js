@@ -68,7 +68,8 @@ const styles = (theme) =>
 			'&.smallest'  : {
 				width     : 30,
 				height    : 30,
-				minHeight : 30
+				minHeight : 30,
+				margin    : theme.spacing(0.5)
 			}
 		},
 		smallContainer :
@@ -378,13 +379,13 @@ const Me = (props) =>
 
 	useEffect(() =>
 	{
-		if (height > 0 && height <= 250)
+		if (height > 0 && height <= 200)
 		{
 			// setButtonsDirection('horizontal');
 			setButtonSize('small');
 		}
 
-		else if (height > 250 && height <= 320)
+		else if (height > 200 && height <= 320)
 		{
 			// setButtonsDirection('vertical');
 			setButtonSize('small');
