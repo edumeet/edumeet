@@ -114,7 +114,6 @@ const styles = (theme) =>
 			width          : '100%',
 			height         : '100%',
 			display        : 'flex',
-			flexDirection  : 'column',
 			justifyContent : 'center',
 			alignItems     : 'flex-end',
 			padding        : theme.spacing(1),
@@ -129,6 +128,13 @@ const styles = (theme) =>
 			'&.hover' :
 			{
 				opacity : 1
+			},
+			'&.horizontal' : {
+
+				flexDirection : 'row'
+			},
+			'&.vertical' : {
+				flexDirection : 'column'
 			}
 		},
 		ptt :
@@ -183,7 +189,8 @@ const Me = (props) =>
 		hasScreenPermission,
 		transports,
 		noiseVolume,
-		classes
+		classes,
+		height
 	} = props;
 
 	const videoVisible = (
@@ -361,6 +368,38 @@ const Me = (props) =>
 		return () => clearInterval(poll);
 	}, [ roomClient, advancedMode ]);
 
+	const [ buttonSize, setButtonSize ] = useState('large');
+
+	const [ buttonsDirection, setButtonsDirection ] = useState('horizontal');
+
+	useEffect(() =>
+	{
+		if (height > 0 && height <= 250)
+		{
+			setButtonsDirection('horizontal');
+			setButtonSize('small');
+		}
+
+		else if (height > 250 && height <= 350)
+		{
+			setButtonsDirection('vertical');
+			setButtonSize('small');
+		}
+
+		else if (height > 350 && height <= 400)
+		{
+			setButtonsDirection('vertical');
+			setButtonSize('medium');
+		}
+
+		else if (height > 400)
+		{
+			setButtonsDirection('vertical');
+			setButtonSize('large');
+		}
+
+	}, [ height ]);
+
 	// menu
 	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
 	const [ showAudioAnalyzer, setShowAudioAnalyzer ] = React.useState(null);
@@ -370,7 +409,7 @@ const Me = (props) =>
 		setMenuAnchorElement(event.currentTarget);
 	};
 
-	const handleMenuClose = (event) =>
+	const handleMenuClose = () =>
 	{
 		setMenuAnchorElement(null);
 	};
@@ -459,7 +498,8 @@ const Me = (props) =>
 							className={classnames(
 								classes.controls,
 								settings.hiddenControls ? 'hide' : null,
-								hover ? 'hover' : null
+								hover ? 'hover' : null,
+								buttonsDirection
 							)}
 							onMouseOver={() => setHover(true)}
 							onMouseOut={() => setHover(false)}
@@ -565,7 +605,8 @@ const Me = (props) =>
 														: 'default'
 													: 'secondary'
 												}
-												size='large'
+
+												size={buttonSize}
 												onClick={() =>
 												{
 													if (micState === 'off')
@@ -656,7 +697,8 @@ const Me = (props) =>
 													me.webcamInProgress
 												}
 												color={webcamState === 'on' ? 'default' : 'secondary'}
-												size='large'
+												size={buttonSize}
+
 												onClick={() =>
 												{
 													webcamState === 'on' ?
@@ -724,7 +766,8 @@ const Me = (props) =>
 													}
 													color={screenState === 'on' ? 'primary' : 'default'}
 													// color='primary'
-													size='large'
+													size={buttonSize}
+
 													onClick={() =>
 													{
 														if (screenState === 'off')
@@ -770,7 +813,8 @@ const Me = (props) =>
 													defaultMessage : 'Options'
 												})}
 												className={classes.fab}
-												size='large'
+												size={buttonSize}
+
 												onClick={handleMenuOpen}
 											>
 												<MoreHorizIcon />
@@ -1040,7 +1084,8 @@ Me.propTypes =
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired,
-	transports          : PropTypes.object.isRequired
+	transports          : PropTypes.object.isRequired,
+	height              : PropTypes.number
 };
 
 const makeMapStateToProps = () =>
@@ -1097,7 +1142,8 @@ export default withRoomContext(connect(
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
-				prev.transports === next.transports
+				prev.transports === next.transports &&
+				prev.height === next.height
 			);
 		}
 	}
