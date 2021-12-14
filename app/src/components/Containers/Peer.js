@@ -92,7 +92,6 @@ const styles = (theme) =>
 			height          : '100%',
 			backgroundColor : 'rgba(0, 0, 0, 0.3)',
 			display         : 'flex',
-			flexDirection   : 'column',
 			justifyContent  : 'center',
 			alignItems      : 'flex-end',
 			padding         : theme.spacing(1),
