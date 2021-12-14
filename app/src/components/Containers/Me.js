@@ -95,7 +95,7 @@ const styles = (theme) =>
 			transform  : 'translate(-50%, -50%)',
 			color      : 'rgba(255, 255, 255, 0.5)',
 			fontSize   : '7em',
-			zIndex     : 30,
+			zIndex     : 1,
 			margin     : 0,
 			opacity    : 0,
 			transition : 'opacity 0.1s ease-in-out',
