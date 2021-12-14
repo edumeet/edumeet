@@ -380,13 +380,13 @@ const Me = (props) =>
 			setButtonSize('small');
 		}
 
-		else if (height > 250 && height <= 350)
+		else if (height > 250 && height <= 320)
 		{
 			setButtonsDirection('vertical');
 			setButtonSize('small');
 		}
 
-		else if (height > 350 && height <= 400)
+		else if (height > 320 && height <= 400)
 		{
 			setButtonsDirection('vertical');
 			setButtonSize('medium');
