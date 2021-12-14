@@ -370,31 +370,31 @@ const Me = (props) =>
 
 	const [ buttonSize, setButtonSize ] = useState('large');
 
-	const [ buttonsDirection, setButtonsDirection ] = useState('horizontal');
+	const [ buttonsDirection, setButtonsDirection ] = useState('vertical');
 
 	useEffect(() =>
 	{
 		if (height > 0 && height <= 250)
 		{
-			setButtonsDirection('horizontal');
+			// setButtonsDirection('horizontal');
 			setButtonSize('small');
 		}
 
 		else if (height > 250 && height <= 320)
 		{
-			setButtonsDirection('vertical');
+			// setButtonsDirection('vertical');
 			setButtonSize('small');
 		}
 
 		else if (height > 320 && height <= 400)
 		{
-			setButtonsDirection('vertical');
+			// setButtonsDirection('vertical');
 			setButtonSize('medium');
 		}
 
 		else if (height > 400)
 		{
-			setButtonsDirection('vertical');
+			// setButtonsDirection('vertical');
 			setButtonSize('large');
 		}
 
