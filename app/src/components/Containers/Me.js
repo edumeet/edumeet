@@ -116,13 +116,6 @@ const styles = (theme) =>
 			'&.hover' :
 			{
 				opacity : 1
-			},
-			'&.horizontal' : {
-
-				flexDirection : 'row'
-			},
-			'&.vertical' : {
-				flexDirection : 'column'
 			}
 		},
 		ptt :
@@ -366,42 +359,53 @@ const Me = (props) =>
 
 	const [ smallContainer, setSmallContainer ] = useState(true);
 
-	// eslint-disable-next-line no-unused-vars
-	const [ buttonsDirection, setButtonsDirection ] = useState('vertical');
+	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
+		{
+			flexDirection : 'row'
+		}
+	);
 
 	useEffect(() =>
 	{
-
-		// eslint-disable-next-line
-		console.log("Me:size", size)
-
 		switch (size)
 		{
 			case 'smallest':
-				setButtonsDirection('horizontal');
 				setButtonSize('small');
 				setSmallContainer(true);
+
+				setControlsAdditionalStyles({
+					flexDirection : 'row'
+				});
 
 				break;
 
 			case 'small':
-				setButtonsDirection('vertical');
 				setButtonSize('small');
-				setSmallContainer(false);
+				setSmallContainer(true);
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
 
 				break;
 
 			case 'medium':
-				setButtonsDirection('vertical');
 				setButtonSize('medium');
-				setSmallContainer(false);
+				setSmallContainer(true);
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
 
 				break;
 
 			case 'large':
-				setButtonsDirection('vertical');
 				setButtonSize('large');
-				setSmallContainer(false);
+				setSmallContainer(true);
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
 
 				break;
 
@@ -505,11 +509,11 @@ const Me = (props) =>
 					{/* CONTROLS BUTTONS (inside) */}
 					{ !settings.buttonControlBar &&
 						<div
+							style={{ ...controlsAdditionalStyles }}
 							className={classnames(
 								classes.controls,
 								settings.hiddenControls ? 'hide' : null,
-								hover ? 'hover' : null,
-								buttonsDirection
+								hover ? 'hover' : null
 							)}
 							onMouseOver={() => setHover(true)}
 							onMouseOut={() => setHover(false)}

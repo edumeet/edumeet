@@ -95,13 +95,6 @@ const styles = (theme) =>
 			'&.hover'       :
 			{
 				opacity : 1
-			},
-			'&.horizontal' : {
-
-				flexDirection : 'row'
-			},
-			'&.vertical' : {
-				flexDirection : 'column'
 			}
 		},
 		videoInfo :
@@ -189,6 +182,7 @@ const Peer = (props) =>
 
 	const rootStyle =
 	{
+		'border' : '3px solid red',
 		'margin' : spacing,
 		...style
 	};
@@ -240,42 +234,53 @@ const Peer = (props) =>
 
 	const [ smallContainer, setSmallContainer ] = useState(true);
 
-	// eslint-disable-next-line no-unused-vars
-	const [ buttonsDirection, setButtonsDirection ] = useState('vertical');
+	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
+		{
+			flexDirection : 'row'
+		}
+	);
 
 	useEffect(() =>
 	{
-
-		// eslint-disable-next-line
-		console.log("Peer:size", size)
-
 		switch (size)
 		{
 			case 'smallest':
-				setButtonsDirection('horizontal');
 				setButtonSize('small');
 				setSmallContainer(true);
+
+				setControlsAdditionalStyles({
+					flexDirection : 'row'
+				});
 
 				break;
 
 			case 'small':
-				setButtonsDirection('vertical');
 				setButtonSize('small');
-				setSmallContainer(false);
+				setSmallContainer(true);
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
 
 				break;
 
 			case 'medium':
-				setButtonsDirection('vertical');
 				setButtonSize('medium');
-				setSmallContainer(false);
+				setSmallContainer(true);
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
 
 				break;
 
 			case 'large':
-				setButtonsDirection('vertical');
 				setButtonSize('large');
-				setSmallContainer(false);
+				setSmallContainer(true);
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
 
 				break;
 
@@ -301,6 +306,7 @@ const Peer = (props) =>
 	return (
 		<React.Fragment>
 			<div
+				style={rootStyle}
 				className={
 					classnames(
 						classes.root,
@@ -328,7 +334,6 @@ const Peer = (props) =>
 						setHover(false);
 					}, 2000);
 				}}
-				style={rootStyle}
 			>
 				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible &&
@@ -348,11 +353,12 @@ const Peer = (props) =>
 					}
 
 					<div
+
 						className={classnames(
 							classes.controls, hover ? 'hover' : null,
-							size === 'smallest' ? 'smallest': null,
-							buttonsDirection
+							size === 'smallest' ? 'smallest': null
 						)}
+						style={{ ...controlsAdditionalStyles }}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -618,6 +624,7 @@ const Peer = (props) =>
 			{
 				return (
 					<div key={consumer.id}
+						style={rootStyle}
 						className={
 							classnames(
 								classes.root,
@@ -645,7 +652,6 @@ const Peer = (props) =>
 								setHover(false);
 							}, 2000);
 						}}
-						style={rootStyle}
 					>
 						<div className={classnames(classes.viewContainer)}>
 							{ !videoVisible &&
@@ -662,9 +668,9 @@ const Peer = (props) =>
 							<div
 								className={classnames(
 									classes.controls,
-									hover ? 'hover' : null,
-									buttonsDirection
+									hover ? 'hover' : null
 								)}
+								style={{ ...controlsAdditionalStyles }}
 								onMouseOver={() => setHover(true)}
 								onMouseOut={() => setHover(false)}
 								onTouchStart={() =>
@@ -786,10 +792,10 @@ const Peer = (props) =>
 
 			{ screenConsumer &&
 				<div
+					style={{ ...rootStyle, ...controlsAdditionalStyles }}
 					className={classnames(
 						classes.root, 'screen',
-						hover ? 'hover' : null,
-						buttonsDirection
+						hover ? 'hover' : null
 					)}
 					onMouseOver={() => setHover(true)}
 					onMouseOut={() => setHover(false)}
@@ -810,7 +816,6 @@ const Peer = (props) =>
 							setHover(false);
 						}, 2000);
 					}}
-					style={rootStyle}
 				>
 					<div className={classnames(classes.viewContainer)}>
 						{ !screenVisible &&
