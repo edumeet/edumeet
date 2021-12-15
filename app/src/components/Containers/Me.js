@@ -72,19 +72,6 @@ const styles = (theme) =>
 				margin    : theme.spacing(0.5)
 			}
 		},
-		smallContainer :
-		{
-			backgroundColor : 'rgba(255, 255, 255, 0.9)',
-			margin          : '0.5vmin',
-			padding         : '0.5vmin',
-			boxShadow       : '0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12)',
-			pointerEvents   : 'auto',
-			transition      : 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-			'&:hover'       :
-			{
-				backgroundColor : 'rgba(213, 213, 213, 1)'
-			}
-		},
 		viewContainer :
 		{
 			position : 'relative',
@@ -107,10 +94,6 @@ const styles = (theme) =>
 			'&.hover'  :
 			{
 				opacity : 1
-			},
-			'&.smallContainer' :
-			{
-				fontSize : '3em'
 			}
 		},
 		controls :
