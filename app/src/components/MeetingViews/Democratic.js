@@ -181,8 +181,6 @@ class Democratic extends React.PureComponent
 					advancedMode={advancedMode}
 					spacing={6}
 					style={style}
-					width={this.state.peerWidth}
-					height={this.state.peerHeight}
 				/>
 				}
 				{ spotlightsPeers.map((peer) =>
@@ -195,8 +193,6 @@ class Democratic extends React.PureComponent
 							spacing={6}
 							style={style}
 							enableLayersSwitch
-							width={this.state.peerWidth}
-							height={this.state.peerHeight}
 						/>
 					);
 				})}

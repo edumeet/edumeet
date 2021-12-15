@@ -181,8 +181,6 @@ const Peer = (props) =>
 		classes,
 		theme,
 		enableLayersSwitch,
-		width,
-		height,
 		isSelected,
 		mode
 	} = props;
@@ -212,6 +210,10 @@ const Peer = (props) =>
 		'margin' : spacing,
 		...style
 	};
+
+	const width = style.width;
+
+	const height = style.height;
 
 	if (peer.picture)
 	{
@@ -976,8 +978,6 @@ Peer.propTypes =
 	classes                  : PropTypes.object.isRequired,
 	theme                    : PropTypes.object.isRequired,
 	enableLayersSwitch       : PropTypes.bool,
-	width                    : PropTypes.number,
-	height                   : PropTypes.number,
 	isSelected               : PropTypes.bool,
 	mode                     : PropTypes.string.isRequired
 };
@@ -1035,9 +1035,7 @@ export default withRoomContext(connect(
 				prev.room.mode === next.room.mode &&
 				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.me.browser === next.me.browser &&
-				prev.enableLayersSwitch === next.enableLayersSwitch &&
-				prev.width === next.width &&
-				prev.height === next.height
+				prev.enableLayersSwitch === next.enableLayersSwitch
 			);
 		}
 	}

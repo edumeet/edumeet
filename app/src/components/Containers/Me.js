@@ -193,9 +193,13 @@ const Me = (props) =>
 		hasScreenPermission,
 		transports,
 		noiseVolume,
-		classes,
-		height
+		classes
 	} = props;
+
+	// eslint-disable-next-line no-unused-vars
+	const width = style.width;
+
+	const height = style.height;
 
 	const videoVisible = (
 		Boolean(webcamProducer) &&
@@ -949,8 +953,7 @@ Me.propTypes =
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired,
-	transports          : PropTypes.object.isRequired,
-	height              : PropTypes.number
+	transports          : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -1007,8 +1010,7 @@ export default withRoomContext(connect(
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
-				prev.transports === next.transports &&
-				prev.height === next.height
+				prev.transports === next.transports
 			);
 		}
 	}
