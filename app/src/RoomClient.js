@@ -2704,6 +2704,15 @@ export default class RoomClient
 				this._webcamProducer = null;
 			}
 
+			for (const producer of this._extraVideoProducers.values())
+			{
+				producer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(producer.id));
+			}
+			this._extraVideoProducers.clear();
+
 			if (this._micProducer)
 			{
 				this._micProducer.close();
