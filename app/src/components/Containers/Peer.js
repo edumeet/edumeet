@@ -64,7 +64,14 @@ const styles = (theme) =>
 		},
 		fab :
 		{
-			margin : theme.spacing(1)
+			margin       : theme.spacing(1),
+			'&.smallest' : {
+				width     : 30,
+				height    : 30,
+				minHeight : 30,
+				margin    : theme.spacing(0.5)
+			}
+
 		},
 		smallContainer :
 		{
