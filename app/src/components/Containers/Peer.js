@@ -258,31 +258,33 @@ const Peer = (props) =>
 
 	useEffect(() =>
 	{
-		if (height > 0 && height <= 250)
+		if (height > 0 && height <= 200)
 		{
 			// setButtonsDirection('horizontal');
-			setButtonSize('small');
+			setContainerSize('small');
+			setSmallContainer(true);
 		}
 
-		else if (height > 250 && height <= 320)
+		else if (height > 200 && height <= 320)
 		{
 			// setButtonsDirection('vertical');
-			setButtonSize('small');
+			setContainerSize('small');
+			setSmallContainer(false);
 		}
 
 		else if (height > 320 && height <= 400)
 		{
 			// setButtonsDirection('vertical');
-			setButtonSize('medium');
+			setContainerSize('medium');
+			setSmallContainer(false);
 		}
 
 		else if (height > 400)
 		{
 			// setButtonsDirection('vertical');
-			setButtonSize('large');
+			setContainerSize('large');
+			setSmallContainer(false);
 		}
-
-	}, [ height ]);
 
 	// menu
 	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
