@@ -183,7 +183,6 @@ const Me = (props) =>
 		activeSpeaker,
 		spacing,
 		style,
-		smallContainer,
 		advancedMode,
 		micProducer,
 		webcamProducer,
@@ -373,7 +372,9 @@ const Me = (props) =>
 		return () => clearInterval(poll);
 	}, [ roomClient, advancedMode ]);
 
-	const [ buttonSize, setButtonSize ] = useState('large');
+	const [ containerSize, setContainerSize ] = useState('large');
+
+	const [ smallContainer, setSmallContainer ] = useState(true);
 
 	const [ buttonsDirection, setButtonsDirection ] = useState('vertical');
 
@@ -382,25 +383,29 @@ const Me = (props) =>
 		if (height > 0 && height <= 200)
 		{
 			// setButtonsDirection('horizontal');
-			setButtonSize('small');
+			setContainerSize('small');
+			setSmallContainer(true);
 		}
 
 		else if (height > 200 && height <= 320)
 		{
 			// setButtonsDirection('vertical');
-			setButtonSize('small');
+			setContainerSize('small');
+			setSmallContainer(false);
 		}
 
 		else if (height > 320 && height <= 400)
 		{
 			// setButtonsDirection('vertical');
-			setButtonSize('medium');
+			setContainerSize('medium');
+			setSmallContainer(false);
 		}
 
 		else if (height > 400)
 		{
 			// setButtonsDirection('vertical');
-			setButtonSize('large');
+			setContainerSize('large');
+			setSmallContainer(false);
 		}
 
 	}, [ height ]);
@@ -551,7 +556,7 @@ const Me = (props) =>
 												: 'secondary'
 											}
 
-											size={buttonSize}
+											size={containerSize}
 											onClick={() =>
 											{
 												if (micState === 'off')
@@ -614,7 +619,7 @@ const Me = (props) =>
 													me.webcamInProgress
 											}
 											color={webcamState === 'on' ? 'default' : 'secondary'}
-											size={buttonSize}
+											size={containerSize}
 
 											onClick={() =>
 											{
@@ -656,7 +661,7 @@ const Me = (props) =>
 														me.screenShareInProgress
 												}
 												color={screenState === 'on' ? 'primary' : 'default'}
-												size={buttonSize}
+												size={containerSize}
 
 												onClick={() =>
 												{
@@ -692,7 +697,7 @@ const Me = (props) =>
 												classes.fab,
 												smallContainer ? 'smallest': null
 											)}
-											size={buttonSize}
+											size={containerSize}
 
 											onClick={handleMenuOpen}
 										>
