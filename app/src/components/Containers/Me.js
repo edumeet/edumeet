@@ -68,7 +68,7 @@ const styles = (theme) =>
 			'&.smallest'  : {
 				width     : 30,
 				height    : 30,
-				minHeight : 30,
+				minHeight : 'auto',
 				margin    : theme.spacing(0.5)
 			}
 		},
