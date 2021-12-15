@@ -386,65 +386,34 @@ const Peer = (props) =>
 							})}
 							placement={smallScreen || smallContainer ? 'top' : 'left'}
 						>
-							{ smallContainer ?
-								<div>
-									<IconButton
-										aria-label={intl.formatMessage({
-											id             : 'device.muteAudio',
-											defaultMessage : 'Mute audio'
-										})}
-										// className={classes.smallContainer}
-										className={classnames(
-											classes.fab,
-											smallContainer ? 'smallest': null
-										)}
-										disabled={!micConsumer}
-										color='primary'
-										size='small'
-										onClick={() =>
-										{
-											micEnabled ?
-												roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-												roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-										}}
-									>
-										{ micEnabled ?
-											<VolumeUpIcon />
-											:
-											<VolumeOffIcon />
-										}
-									</IconButton>
-								</div>
-								:
-								<div>
-									<Fab
-										aria-label={intl.formatMessage({
-											id             : 'device.muteAudio',
-											defaultMessage : 'Mute audio'
-										})}
-										// className={classes.fab}
-										className={classnames(
-											classes.fab,
-											smallContainer ? 'smallest': null
-										)}
-										disabled={!micConsumer}
-										color={micEnabled ? 'default' : 'secondary'}
-										size={containerSize}
-										onClick={() =>
-										{
-											micEnabled ?
-												roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-												roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-										}}
-									>
-										{ micEnabled ?
-											<VolumeUpIcon />
-											:
-											<VolumeOffIcon />
-										}
-									</Fab>
-								</div>
-							}
+							<div>
+								<Fab
+									aria-label={intl.formatMessage({
+										id             : 'device.muteAudio',
+										defaultMessage : 'Mute audio'
+									})}
+									// className={classes.fab}
+									className={classnames(
+										classes.fab,
+										smallContainer ? 'smallest': null
+									)}
+									disabled={!micConsumer}
+									color={micEnabled ? 'default' : 'secondary'}
+									size={containerSize}
+									onClick={() =>
+									{
+										micEnabled ?
+											roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
+											roomClient.modifyPeerConsumer(peer.id, 'mic', false);
+									}}
+								>
+									{ micEnabled ?
+										<VolumeUpIcon />
+										:
+										<VolumeOffIcon />
+									}
+								</Fab>
+							</div>
 						</Tooltip>
 
 						{ browser.platform !== 'mobile' &&
@@ -456,50 +425,26 @@ const Peer = (props) =>
 								})}
 								placement={smallScreen || smallContainer ? 'top' : 'left'}
 							>
-								{ smallContainer ?
-									<div>
-										<IconButton
-											aria-label={intl.formatMessage({
-												id             : 'label.newWindow',
-												defaultMessage : 'New window'
-											})}
-											// className={classes.smallContainer}
-											className={classnames(
-												classes.fab,
-												smallContainer ? 'smallest': null
-											)}
-											size='small'
-											color='primary'
-											onClick={() =>
-											{
-												toggleConsumerWindow(webcamConsumer);
-											}}
-										>
-											<NewWindowIcon />
-										</IconButton>
-									</div>
-									:
-									<div>
-										<Fab
-											aria-label={intl.formatMessage({
-												id             : 'label.newWindow',
-												defaultMessage : 'New window'
-											})}
-											// className={classes.fab}
-											className={classnames(
-												classes.fab,
-												smallContainer ? 'smallest': null
-											)}
-											size={containerSize}
-											onClick={() =>
-											{
-												toggleConsumerWindow(webcamConsumer);
-											}}
-										>
-											<NewWindowIcon />
-										</Fab>
-									</div>
-								}
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.newWindow',
+											defaultMessage : 'New window'
+										})}
+										// className={classes.fab}
+										className={classnames(
+											classes.fab,
+											smallContainer ? 'smallest': null
+										)}
+										size={containerSize}
+										onClick={() =>
+										{
+											toggleConsumerWindow(webcamConsumer);
+										}}
+									>
+										<NewWindowIcon />
+									</Fab>
+								</div>
 							</Tooltip>
 						}
 
@@ -511,51 +456,27 @@ const Peer = (props) =>
 								})}
 								placement={smallScreen || smallContainer ? 'top' : 'left'}
 							>
-								{ smallContainer ?
-									<div>
-										<IconButton
-											aria-label={intl.formatMessage({
-												id             : 'label.fullscreen',
-												defaultMessage : 'Fullscreen'
-											})}
-											// className={classes.smallContainer}
-											className={classnames(
-												classes.fab,
-												smallContainer ? 'smallest': null
-											)}
-											size='small'
-											color='primary'
-											onClick={() =>
-											{
-												toggleConsumerFullscreen(webcamConsumer);
-											}}
-										>
-											<FullScreenIcon />
-										</IconButton>
-									</div>
-									:
-									<div>
-										<Fab
-											aria-label={intl.formatMessage({
-												id             : 'label.fullscreen',
-												defaultMessage : 'Fullscreen'
-											})}
-											// className={classes.fab}
-											className={classnames(
-												classes.fab,
-												smallContainer ? 'smallest': null
-											)}
-											disabled={!videoVisible}
-											size={containerSize}
-											onClick={() =>
-											{
-												toggleConsumerFullscreen(webcamConsumer);
-											}}
-										>
-											<FullScreenIcon />
-										</Fab>
-									</div>
-								}
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										// className={classes.fab}
+										className={classnames(
+											classes.fab,
+											smallContainer ? 'smallest': null
+										)}
+										disabled={!videoVisible}
+										size={containerSize}
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(webcamConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</Fab>
+								</div>
 							</Tooltip>
 						}
 
@@ -574,80 +495,41 @@ const Peer = (props) =>
 								}
 								placement={smallScreen || smallContainer ? 'top' : 'left'}
 							>
-								{ smallContainer ?
-									<div>
-										<IconButton
-											aria-label={isSelected ?
-												intl.formatMessage({
-													id             : 'tooltip.removeParticipantFromSpotlight',
-													defaultMessage : 'Remove from spotlight'
-												})
-												:
-												intl.formatMessage({
-													id             : 'tooltip.addParticipantToSpotlight',
-													defaultMessage : 'Add to spotlight'
-												})
-											}
-											// className={classes.smallContainer}
-											className={classnames(
-												classes.fab,
-												smallContainer ? 'smallest': null
-											)}
-											size='small'
-											onClick={() =>
-											{
-												isSelected ?
-													roomClient.removeSelectedPeer(peer.id) :
-													mode === 'filmstrip' ?
-														roomClient.setSelectedPeer(peer.id) :
-														roomClient.addSelectedPeer(peer.id);
-											}}
-										>
-											{ isSelected ?
-												<RemoveFromQueueIcon />
-												:
-												<AddToQueueIcon />
-											}
-										</IconButton>
-
-									</div>
-									:
-									<div>
-										<Fab
-											aria-label={isSelected ?
-												intl.formatMessage({
-													id             : 'tooltip.removeParticipantFromSpotlight',
-													defaultMessage : 'Remove from spotlight'
-												})
-												:
-												intl.formatMessage({
-													id             : 'tooltip.addParticipantToSpotlight',
-													defaultMessage : 'Add to spotlight'
-												})
-											}
-											// className={classes.fab}
-											className={classnames(
-												classes.fab,
-												smallContainer ? 'smallest': null
-											)}
-											size={containerSize}
-											onClick={() =>
-											{
-												isSelected ?
-													roomClient.removeSelectedPeer(peer.id) :
-													mode === 'filmstrip' ?
-														roomClient.setSelectedPeer(peer.id) :
-														roomClient.addSelectedPeer(peer.id);
-											}}
-										>
-											{ isSelected ?
-												<RemoveFromQueueIcon />
-												:
-												<AddToQueueIcon />
-											}
-										</Fab>
-									</div>
-								}
+								<div>
+									<Fab
+										aria-label={isSelected ?
+											intl.formatMessage({
+												id             : 'tooltip.removeParticipantFromSpotlight',
+												defaultMessage : 'Remove from spotlight'
+											})
+											:
+											intl.formatMessage({
+												id             : 'tooltip.addParticipantToSpotlight',
+												defaultMessage : 'Add to spotlight'
+											})
+										}
+										// className={classes.fab}
+										className={classnames(
+											classes.fab,
+											smallContainer ? 'smallest': null
+										)}
+										size={containerSize}
+										onClick={() =>
+										{
+											isSelected ?
+												roomClient.removeSelectedPeer(peer.id) :
+												mode === 'filmstrip' ?
+													roomClient.setSelectedPeer(peer.id) :
+													roomClient.addSelectedPeer(peer.id);
+										}}
+									>
+										{ isSelected ?
+											<RemoveFromQueueIcon />
+											:
+											<AddToQueueIcon />
+										}
+									</Fab>
+								</div>
 							</Tooltip>
 						}
 
@@ -660,43 +542,23 @@ const Peer = (props) =>
 								})}
 								placement={smallScreen || smallContainer ? 'top' : 'left'}
 							>
-								{ smallContainer ?
-									<div>
-										<IconButton
-											aria-label={intl.formatMessage({
-												id             : 'device.options',
-												defaultMessage : 'Options'
-											})}
-											// className={classes.smallContainer}
-											className={classnames(
-												classes.fab,
-												smallContainer ? 'smallest': null
-											)}
-											size='small'
-											onClick={handleMenuOpen}
-										>
-											<MoreHorizIcon />
-										</IconButton>
-									</div>
-									:
-									<div>
-										<Fab
-											aria-label={intl.formatMessage({
-												id             : 'device.options',
-												defaultMessage : 'Options'
-											})}
-											// className={classes.fab}
-											className={classnames(
-												classes.fab,
-												smallContainer ? 'smallest': null
-											)}
-											size={containerSize}
-											onClick={handleMenuOpen}
-										>
-											<MoreHorizIcon />
-										</Fab>
-									</div>
-								}
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'device.options',
+											defaultMessage : 'Options'
+										})}
+										// className={classes.fab}
+										className={classnames(
+											classes.fab,
+											smallContainer ? 'smallest': null
+										)}
+										size={containerSize}
+										onClick={handleMenuOpen}
+									>
+										<MoreHorizIcon />
+									</Fab>
+								</div>
 							</Tooltip>
 							<Menu
 								anchorEl={menuAnchorElement}
@@ -836,58 +698,30 @@ const Peer = (props) =>
 										})}
 										placement={smallScreen || smallContainer ? 'top' : 'left'}
 									>
-										{ smallContainer ?
-											<div>
-												<IconButton
-													aria-label={intl.formatMessage({
-														id             : 'label.newWindow',
-														defaultMessage : 'New window'
-													})}
-													// className={classes.smallContainer}
-													className={classnames(
-														classes.fab,
-														smallContainer ? 'smallest': null
-													)}
-													disabled={
-														!videoVisible ||
+										<div>
+											<Fab
+												aria-label={intl.formatMessage({
+													id             : 'label.newWindow',
+													defaultMessage : 'New window'
+												})}
+												// className={classes.fab}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
+												disabled={
+													!videoVisible ||
 													(windowConsumer === consumer.id)
-													}
-													size='small'
-													color='primary'
-													onClick={() =>
-													{
-														toggleConsumerWindow(consumer);
-													}}
-												>
-													<NewWindowIcon />
-												</IconButton>
-											</div>
-											:
-											<div>
-												<Fab
-													aria-label={intl.formatMessage({
-														id             : 'label.newWindow',
-														defaultMessage : 'New window'
-													})}
-													// className={classes.fab}
-													className={classnames(
-														classes.fab,
-														smallContainer ? 'smallest': null
-													)}
-													disabled={
-														!videoVisible ||
-													(windowConsumer === consumer.id)
-													}
-													size={containerSize}
-													onClick={() =>
-													{
-														toggleConsumerWindow(consumer);
-													}}
-												>
-													<NewWindowIcon />
-												</Fab>
-											</div>
-										}
+												}
+												size={containerSize}
+												onClick={() =>
+												{
+													toggleConsumerWindow(consumer);
+												}}
+											>
+												<NewWindowIcon />
+											</Fab>
+										</div>
 									</Tooltip>
 								}
 
@@ -898,52 +732,27 @@ const Peer = (props) =>
 									})}
 									placement={smallScreen || smallContainer ? 'top' : 'left'}
 								>
-									{ smallContainer ?
-										<div>
-											<IconButton
-												aria-label={intl.formatMessage({
-													id             : 'label.fullscreen',
-													defaultMessage : 'Fullscreen'
-												})}
-												// className={classes.smallContainer}
-												className={classnames(
-													classes.fab,
-													smallContainer ? 'smallest': null
-												)}
-												disabled={!videoVisible}
-												size='small'
-												color='primary'
-												onClick={() =>
-												{
-													toggleConsumerFullscreen(consumer);
-												}}
-											>
-												<FullScreenIcon />
-											</IconButton>
-										</div>
-										:
-										<div>
-											<Fab
-												aria-label={intl.formatMessage({
-													id             : 'label.fullscreen',
-													defaultMessage : 'Fullscreen'
-												})}
-												// className={classes.fab}
-												className={classnames(
-													classes.fab,
-													smallContainer ? 'smallest': null
-												)}
-												disabled={!videoVisible}
-												size={containerSize}
-												onClick={() =>
-												{
-													toggleConsumerFullscreen(consumer);
-												}}
-											>
-												<FullScreenIcon />
-											</Fab>
-										</div>
-									}
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'label.fullscreen',
+												defaultMessage : 'Fullscreen'
+											})}
+											// className={classes.fab}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
+											disabled={!videoVisible}
+											size={containerSize}
+											onClick={() =>
+											{
+												toggleConsumerFullscreen(consumer);
+											}}
+										>
+											<FullScreenIcon />
+										</Fab>
+									</div>
 								</Tooltip>
 							</div>
 
@@ -1066,7 +875,7 @@ const Peer = (props) =>
 												!screenVisible ||
 											(windowConsumer === screenConsumer.id)
 											}
-											size={smallContainer ? 'small' : 'large'}
+											size={containerSize}
 											onClick={() =>
 											{
 												toggleConsumerWindow(screenConsumer);
@@ -1099,7 +908,7 @@ const Peer = (props) =>
 											smallContainer ? 'smallest': null
 										)}
 										disabled={!screenVisible}
-										size={smallContainer ? 'small' : 'large'}
+										size={containerSize}
 										onClick={() =>
 										{
 											toggleConsumerFullscreen(screenConsumer);
