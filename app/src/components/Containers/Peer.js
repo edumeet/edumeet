@@ -177,7 +177,6 @@ const Peer = (props) =>
 		toggleConsumerWindow,
 		spacing,
 		style,
-		smallContainer,
 		windowConsumer,
 		fullScreenConsumer,
 		classes,
@@ -252,7 +251,9 @@ const Peer = (props) =>
 		roomClient, width, height
 	]);
 
-	const [ buttonSize, setButtonSize ] = useState('large');
+	const [ containerSize, setContainerSize ] = useState('large');
+
+	const [ smallContainer, setSmallContainer ] = useState(true);
 
 	const [ buttonsDirection, setButtonsDirection ] = useState('vertical');
 
@@ -285,6 +286,8 @@ const Peer = (props) =>
 			setContainerSize('large');
 			setSmallContainer(false);
 		}
+
+	}, [ height ]);
 
 	// menu
 	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
@@ -390,7 +393,11 @@ const Peer = (props) =>
 											id             : 'device.muteAudio',
 											defaultMessage : 'Mute audio'
 										})}
-										className={classes.smallContainer}
+										// className={classes.smallContainer}
+										className={classnames(
+											classes.fab,
+											smallContainer ? 'smallest': null
+										)}
 										disabled={!micConsumer}
 										color='primary'
 										size='small'
@@ -415,10 +422,14 @@ const Peer = (props) =>
 											id             : 'device.muteAudio',
 											defaultMessage : 'Mute audio'
 										})}
-										className={classes.fab}
+										// className={classes.fab}
+										className={classnames(
+											classes.fab,
+											smallContainer ? 'smallest': null
+										)}
 										disabled={!micConsumer}
 										color={micEnabled ? 'default' : 'secondary'}
-										size={buttonSize}
+										size={containerSize}
 										onClick={() =>
 										{
 											micEnabled ?
@@ -452,7 +463,11 @@ const Peer = (props) =>
 												id             : 'label.newWindow',
 												defaultMessage : 'New window'
 											})}
-											className={classes.smallContainer}
+											// className={classes.smallContainer}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
 											size='small'
 											color='primary'
 											onClick={() =>
@@ -470,8 +485,12 @@ const Peer = (props) =>
 												id             : 'label.newWindow',
 												defaultMessage : 'New window'
 											})}
-											className={classes.fab}
-											size={buttonSize}
+											// className={classes.fab}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
+											size={containerSize}
 											onClick={() =>
 											{
 												toggleConsumerWindow(webcamConsumer);
@@ -499,7 +518,11 @@ const Peer = (props) =>
 												id             : 'label.fullscreen',
 												defaultMessage : 'Fullscreen'
 											})}
-											className={classes.smallContainer}
+											// className={classes.smallContainer}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
 											size='small'
 											color='primary'
 											onClick={() =>
@@ -517,9 +540,13 @@ const Peer = (props) =>
 												id             : 'label.fullscreen',
 												defaultMessage : 'Fullscreen'
 											})}
-											className={classes.fab}
+											// className={classes.fab}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
 											disabled={!videoVisible}
-											size={buttonSize}
+											size={containerSize}
 											onClick={() =>
 											{
 												toggleConsumerFullscreen(webcamConsumer);
@@ -561,7 +588,11 @@ const Peer = (props) =>
 													defaultMessage : 'Add to spotlight'
 												})
 											}
-											className={classes.smallContainer}
+											// className={classes.smallContainer}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
 											size='small'
 											onClick={() =>
 											{
@@ -594,8 +625,12 @@ const Peer = (props) =>
 													defaultMessage : 'Add to spotlight'
 												})
 											}
-											className={classes.fab}
-											size={buttonSize}
+											// className={classes.fab}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
+											size={containerSize}
 											onClick={() =>
 											{
 												isSelected ?
@@ -632,7 +667,11 @@ const Peer = (props) =>
 												id             : 'device.options',
 												defaultMessage : 'Options'
 											})}
-											className={classes.smallContainer}
+											// className={classes.smallContainer}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
 											size='small'
 											onClick={handleMenuOpen}
 										>
@@ -646,8 +685,12 @@ const Peer = (props) =>
 												id             : 'device.options',
 												defaultMessage : 'Options'
 											})}
-											className={classes.fab}
-											size={buttonSize}
+											// className={classes.fab}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
+											size={containerSize}
 											onClick={handleMenuOpen}
 										>
 											<MoreHorizIcon />
@@ -800,7 +843,11 @@ const Peer = (props) =>
 														id             : 'label.newWindow',
 														defaultMessage : 'New window'
 													})}
-													className={classes.smallContainer}
+													// className={classes.smallContainer}
+													className={classnames(
+														classes.fab,
+														smallContainer ? 'smallest': null
+													)}
 													disabled={
 														!videoVisible ||
 													(windowConsumer === consumer.id)
@@ -822,12 +869,16 @@ const Peer = (props) =>
 														id             : 'label.newWindow',
 														defaultMessage : 'New window'
 													})}
-													className={classes.fab}
+													// className={classes.fab}
+													className={classnames(
+														classes.fab,
+														smallContainer ? 'smallest': null
+													)}
 													disabled={
 														!videoVisible ||
 													(windowConsumer === consumer.id)
 													}
-													size={buttonSize}
+													size={containerSize}
 													onClick={() =>
 													{
 														toggleConsumerWindow(consumer);
@@ -854,7 +905,11 @@ const Peer = (props) =>
 													id             : 'label.fullscreen',
 													defaultMessage : 'Fullscreen'
 												})}
-												className={classes.smallContainer}
+												// className={classes.smallContainer}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												disabled={!videoVisible}
 												size='small'
 												color='primary'
@@ -873,9 +928,13 @@ const Peer = (props) =>
 													id             : 'label.fullscreen',
 													defaultMessage : 'Fullscreen'
 												})}
-												className={classes.fab}
+												// className={classes.fab}
+												className={classnames(
+													classes.fab,
+													smallContainer ? 'smallest': null
+												)}
 												disabled={!videoVisible}
-												size={buttonSize}
+												size={containerSize}
 												onClick={() =>
 												{
 													toggleConsumerFullscreen(consumer);
@@ -998,7 +1057,11 @@ const Peer = (props) =>
 												id             : 'label.newWindow',
 												defaultMessage : 'New window'
 											})}
-											className={classes.fab}
+											// className={classes.fab}
+											className={classnames(
+												classes.fab,
+												smallContainer ? 'smallest': null
+											)}
 											disabled={
 												!screenVisible ||
 											(windowConsumer === screenConsumer.id)
@@ -1030,7 +1093,11 @@ const Peer = (props) =>
 											id             : 'label.fullscreen',
 											defaultMessage : 'Fullscreen'
 										})}
-										className={classes.fab}
+										// className={classes.fab}
+										className={classnames(
+											classes.fab,
+											smallContainer ? 'smallest': null
+										)}
 										disabled={!screenVisible}
 										size={smallContainer ? 'small' : 'large'}
 										onClick={() =>
