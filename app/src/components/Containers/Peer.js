@@ -215,6 +215,8 @@ const Peer = (props) =>
 
 	const height = style.height;
 
+	const size = style.size;
+
 	if (peer.picture)
 	{
 		rootStyle.backgroundImage = `url(${peer.picture})`;
@@ -252,7 +254,7 @@ const Peer = (props) =>
 		roomClient, width, height
 	]);
 
-	const [ containerSize, setContainerSize ] = useState('large');
+	const [ buttonSize, setButtonSize ] = useState('large');
 
 	const [ smallContainer, setSmallContainer ] = useState(true);
 
@@ -261,35 +263,44 @@ const Peer = (props) =>
 
 	useEffect(() =>
 	{
-		if (height > 0 && height <= 200)
-		{
-			// setButtonsDirection('horizontal');
-			setContainerSize('small');
-			setSmallContainer(true);
-		}
 
-		else if (height > 200 && height <= 320)
-		{
-			// setButtonsDirection('vertical');
-			setContainerSize('small');
-			setSmallContainer(false);
-		}
+		// eslint-disable-next-line
+		console.log("Peer:size", size)
 
-		else if (height > 320 && height <= 400)
+		switch (size)
 		{
-			// setButtonsDirection('vertical');
-			setContainerSize('medium');
-			setSmallContainer(false);
-		}
+			case 'smallest':
+				setButtonsDirection('horizontal');
+				setButtonSize('small');
+				setSmallContainer(true);
 
-		else if (height > 400)
-		{
-			// setButtonsDirection('vertical');
-			setContainerSize('large');
-			setSmallContainer(false);
-		}
+				break;
 
-	}, [ height ]);
+			case 'small':
+				setButtonsDirection('vertical');
+				setButtonSize('small');
+				setSmallContainer(false);
+
+				break;
+
+			case 'medium':
+				setButtonsDirection('vertical');
+				setButtonSize('medium');
+				setSmallContainer(false);
+
+				break;
+
+			case 'large':
+				setButtonsDirection('vertical');
+				setButtonSize('large');
+				setSmallContainer(false);
+
+				break;
+
+			default:
+
+		}
+	}, [ size ]);
 
 	// menu
 	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
@@ -357,7 +368,7 @@ const Peer = (props) =>
 					<div
 						className={classnames(
 							classes.controls, hover ? 'hover' : null,
-							smallContainer? 'smallContainer' : null,
+							size === 'smallest' ? 'smallest': null,
 							buttonsDirection
 						)}
 						onMouseOver={() => setHover(true)}
@@ -397,11 +408,11 @@ const Peer = (props) =>
 									// className={classes.fab}
 									className={classnames(
 										classes.fab,
-										smallContainer ? 'smallest': null
+										size === 'smallest' ? 'smallest': null
 									)}
 									disabled={!micConsumer}
 									color={micEnabled ? 'default' : 'secondary'}
-									size={containerSize}
+									size={buttonSize}
 									onClick={() =>
 									{
 										micEnabled ?
@@ -436,9 +447,9 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											classes.fab,
-											smallContainer ? 'smallest': null
+											size === 'smallest' ? 'smallest': null
 										)}
-										size={containerSize}
+										size={buttonSize}
 										onClick={() =>
 										{
 											toggleConsumerWindow(webcamConsumer);
@@ -467,10 +478,10 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											classes.fab,
-											smallContainer ? 'smallest': null
+											size === 'smallest' ? 'smallest': null
 										)}
 										disabled={!videoVisible}
-										size={containerSize}
+										size={buttonSize}
 										onClick={() =>
 										{
 											toggleConsumerFullscreen(webcamConsumer);
@@ -513,9 +524,9 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											classes.fab,
-											smallContainer ? 'smallest': null
+											size === 'smallest' ? 'smallest': null
 										)}
-										size={containerSize}
+										size={buttonSize}
 										onClick={() =>
 										{
 											isSelected ?
@@ -553,9 +564,9 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											classes.fab,
-											smallContainer ? 'smallest': null
+											size === 'smallest' ? 'smallest': null
 										)}
-										size={containerSize}
+										size={buttonSize}
 										onClick={handleMenuOpen}
 									>
 										<MoreHorizIcon />
@@ -709,13 +720,13 @@ const Peer = (props) =>
 												// className={classes.fab}
 												className={classnames(
 													classes.fab,
-													smallContainer ? 'smallest': null
+													size === 'smallest' ? 'smallest': null
 												)}
 												disabled={
 													!videoVisible ||
 													(windowConsumer === consumer.id)
 												}
-												size={containerSize}
+												size={buttonSize}
 												onClick={() =>
 												{
 													toggleConsumerWindow(consumer);
@@ -743,10 +754,10 @@ const Peer = (props) =>
 											// className={classes.fab}
 											className={classnames(
 												classes.fab,
-												smallContainer ? 'smallest': null
+												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={!videoVisible}
-											size={containerSize}
+											size={buttonSize}
 											onClick={() =>
 											{
 												toggleConsumerFullscreen(consumer);
@@ -871,13 +882,13 @@ const Peer = (props) =>
 											// className={classes.fab}
 											className={classnames(
 												classes.fab,
-												smallContainer ? 'smallest': null
+												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={
 												!screenVisible ||
 											(windowConsumer === screenConsumer.id)
 											}
-											size={containerSize}
+											size={buttonSize}
 											onClick={() =>
 											{
 												toggleConsumerWindow(screenConsumer);
@@ -907,10 +918,10 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											classes.fab,
-											smallContainer ? 'smallest': null
+											size === 'smallest' ? 'smallest': null
 										)}
 										disabled={!screenVisible}
-										size={containerSize}
+										size={buttonSize}
 										onClick={() =>
 										{
 											toggleConsumerFullscreen(screenConsumer);

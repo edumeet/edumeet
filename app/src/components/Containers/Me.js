@@ -199,7 +199,10 @@ const Me = (props) =>
 	// eslint-disable-next-line no-unused-vars
 	const width = style.width;
 
+	// eslint-disable-next-line no-unused-vars
 	const height = style.height;
+
+	const size = style.size;
 
 	const videoVisible = (
 		Boolean(webcamProducer) &&
@@ -376,7 +379,7 @@ const Me = (props) =>
 		return () => clearInterval(poll);
 	}, [ roomClient, advancedMode ]);
 
-	const [ containerSize, setContainerSize ] = useState('large');
+	const [ buttonSize, setButtonSize ] = useState('large');
 
 	const [ smallContainer, setSmallContainer ] = useState(true);
 
@@ -385,35 +388,44 @@ const Me = (props) =>
 
 	useEffect(() =>
 	{
-		if (height > 0 && height <= 200)
-		{
-			// setButtonsDirection('horizontal');
-			setContainerSize('small');
-			setSmallContainer(true);
-		}
 
-		else if (height > 200 && height <= 320)
-		{
-			// setButtonsDirection('vertical');
-			setContainerSize('small');
-			setSmallContainer(false);
-		}
+		// eslint-disable-next-line
+		console.log("Me:size", size)
 
-		else if (height > 320 && height <= 400)
+		switch (size)
 		{
-			// setButtonsDirection('vertical');
-			setContainerSize('medium');
-			setSmallContainer(false);
-		}
+			case 'smallest':
+				setButtonsDirection('horizontal');
+				setButtonSize('small');
+				setSmallContainer(true);
 
-		else if (height > 400)
-		{
-			// setButtonsDirection('vertical');
-			setContainerSize('large');
-			setSmallContainer(false);
-		}
+				break;
 
-	}, [ height ]);
+			case 'small':
+				setButtonsDirection('vertical');
+				setButtonSize('small');
+				setSmallContainer(false);
+
+				break;
+
+			case 'medium':
+				setButtonsDirection('vertical');
+				setButtonSize('medium');
+				setSmallContainer(false);
+
+				break;
+
+			case 'large':
+				setButtonsDirection('vertical');
+				setButtonSize('large');
+				setSmallContainer(false);
+
+				break;
+
+			default:
+
+		}
+	}, [ size ]);
 
 	// menu
 	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
@@ -547,7 +559,7 @@ const Me = (props) =>
 											})}
 											className={classnames(
 												classes.fab,
-												smallContainer ? 'smallest': null
+												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={
 												!me.canSendMic ||
@@ -561,7 +573,7 @@ const Me = (props) =>
 												: 'secondary'
 											}
 
-											size={containerSize}
+											size={buttonSize}
 											onClick={() =>
 											{
 												if (micState === 'off')
@@ -616,7 +628,7 @@ const Me = (props) =>
 											})}
 											className={classnames(
 												classes.fab,
-												smallContainer ? 'smallest': null
+												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={
 												!me.canSendWebcam ||
@@ -624,7 +636,7 @@ const Me = (props) =>
 													me.webcamInProgress
 											}
 											color={webcamState === 'on' ? 'default' : 'secondary'}
-											size={containerSize}
+											size={buttonSize}
 
 											onClick={() =>
 											{
@@ -658,7 +670,7 @@ const Me = (props) =>
 												})}
 												className={classnames(
 													classes.fab,
-													smallContainer ? 'smallest': null
+													size === 'smallest' ? 'smallest': null
 												)}
 												disabled={
 													!hasScreenPermission ||
@@ -666,7 +678,7 @@ const Me = (props) =>
 														me.screenShareInProgress
 												}
 												color={screenState === 'on' ? 'primary' : 'default'}
-												size={containerSize}
+												size={buttonSize}
 
 												onClick={() =>
 												{
@@ -700,9 +712,9 @@ const Me = (props) =>
 											})}
 											className={classnames(
 												classes.fab,
-												smallContainer ? 'smallest': null
+												size === 'smallest' ? 'smallest': null
 											)}
-											size={containerSize}
+											size={buttonSize}
 
 											onClick={handleMenuOpen}
 										>
@@ -801,7 +813,7 @@ const Me = (props) =>
 								classnames(
 									classes.meTag,
 									hover ? 'hover' : null,
-									smallContainer ? 'smallContainer' : null
+									size === 'smallest' ? 'smallest': null
 								)}
 							>
 								<FormattedMessage
@@ -845,10 +857,10 @@ const Me = (props) =>
 											// className={classes.fab}
 											className={classnames(
 												classes.fab,
-												smallContainer ? 'smallest': null
+												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={!me.canSendWebcam || me.webcamInProgress}
-											size={smallContainer ? 'small' : 'large'}
+											size={buttonSize}
 											onClick={() =>
 											{
 												roomClient.disableExtraVideo(producer.id);
@@ -909,7 +921,7 @@ const Me = (props) =>
 							classnames(
 								classes.meTag,
 								hover ? 'hover' : null,
-								smallContainer ? 'smallContainer' : null
+								smallContainer ? 'smallest': null
 							)}
 						>
 							<FormattedMessage

@@ -273,6 +273,28 @@ class Filmstrip extends React.PureComponent
 			classes
 		} = this.props;
 
+		let size=null;
+
+		if (this.state.filmStripHeight > 0 && this.state.filmStripHeight <= 200)
+		{
+			size='smallest';
+		}
+
+		else if (this.state.filmStripHeight > 200 && this.state.filmStripHeight <= 320)
+		{
+			size='small';
+		}
+
+		else if (this.state.filmStripHeight > 320 && this.state.filmStripHeight <= 400)
+		{
+			size='medium';
+		}
+
+		else if (this.state.filmStripHeight > 400)
+		{
+			size='large';
+		}
+
 		const activePeerId = this.getActivePeerId();
 
 		const speakerStyle =
@@ -284,7 +306,9 @@ class Filmstrip extends React.PureComponent
 		const peerStyle =
 		{
 			width  : this.state.filmStripWidth,
-			height : this.state.filmStripHeight
+			height : this.state.filmStripHeight,
+			size   : size
+
 		};
 
 		return (
