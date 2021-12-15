@@ -380,6 +380,7 @@ const Me = (props) =>
 
 	const [ smallContainer, setSmallContainer ] = useState(true);
 
+	// eslint-disable-next-line no-unused-vars
 	const [ buttonsDirection, setButtonsDirection ] = useState('vertical');
 
 	useEffect(() =>
