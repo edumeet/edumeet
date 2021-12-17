@@ -213,8 +213,8 @@ const TopBar = (props) =>
 	const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
 	const [ anchorEl, setAnchorEl ] = useState(null);
 	const [ currentMenu, setCurrentMenu ] = useState(null);
-	const [ recordingConsentNotificationId,
-		setRecordingConsentNotificationId ] = useState(null);
+	const [ recordingNotificationsId,
+		setRecordingNotificationsId ] = useState(null);
 
 	const handleExited = () =>
 	{
@@ -269,7 +269,7 @@ const TopBar = (props) =>
 		setHideSelfView,
 		toggleToolArea,
 		openUsersTab,
-		addConsentNotification,
+		addNotification,
 		closeNotification,
 		unread,
 		canProduceExtraVideo,
@@ -302,14 +302,14 @@ const TopBar = (props) =>
 
 		if (
 			recordingInProgress &&
-			!recordingConsentNotificationId &&
+			!recordingNotificationsId &&
 			!hasConsent
 		)
 		{
 			const notificationId = randomString({ length: 6 }).toLowerCase();
 
-			setRecordingConsentNotificationId(notificationId);
-			addConsentNotification(
+			setRecordingNotificationsId(notificationId);
+			addNotification(
 				{
 					id   : notificationId,
 					type : 'warning',
@@ -329,15 +329,15 @@ const TopBar = (props) =>
 		}
 		if (
 			!recordingInProgress
-			&& recordingConsentNotificationId)
+			&& recordingNotificationsId)
 		{
-			closeNotification(recordingConsentNotificationId);
-			setRecordingConsentNotificationId(null);
+			closeNotification(recordingNotificationsId);
+			setRecordingNotificationsId(null);
 		}
 	},
 	[
-		localRecordingState, recordingInProgress, recordingConsentNotificationId,
-		addConsentNotification, closeNotification, intl, meId, recordingPeers, roomClient,
+		localRecordingState, recordingInProgress, recordingNotificationsId,
+		addNotification, closeNotification, intl, meId, recordingPeers, roomClient,
 		room
 	]);
 
@@ -1238,49 +1238,49 @@ const TopBar = (props) =>
 
 TopBar.propTypes =
 {
-	roomClient             : PropTypes.object.isRequired,
-	room                   : appPropTypes.Room.isRequired,
-	isSafari           			 : PropTypes.bool,
-	meId           				    : PropTypes.string,
-	isMobile               : PropTypes.bool.isRequired,
-	peersLength            : PropTypes.number,
-	lobbyPeers             : PropTypes.array,
-	permanentTopBar        : PropTypes.bool.isRequired,
-	drawerOverlayed        : PropTypes.bool.isRequired,
-	toolAreaOpen           : PropTypes.bool.isRequired,
-	loggedIn               : PropTypes.bool.isRequired,
-	loginEnabled           : PropTypes.bool.isRequired,
-	fullscreenEnabled      : PropTypes.bool,
-	fullscreen             : PropTypes.bool,
-	onFullscreen           : PropTypes.func.isRequired,
-	setToolbarsVisible     : PropTypes.func.isRequired,
-	setSettingsOpen        : PropTypes.func.isRequired,
-	setLeaveOpen           : PropTypes.func.isRequired,
-	setExtraVideoOpen      : PropTypes.func.isRequired,
-	setHelpOpen            : PropTypes.func.isRequired,
-	setAboutOpen           : PropTypes.func.isRequired,
-	setLockDialogOpen      : PropTypes.func.isRequired,
-	setHideSelfView        : PropTypes.func.isRequired,
-	toggleToolArea         : PropTypes.func.isRequired,
-	openUsersTab           : PropTypes.func.isRequired,
-	addConsentNotification : PropTypes.func.isRequired,
-	closeNotification      : PropTypes.func.isRequired,
-	unread                 : PropTypes.number.isRequired,
-	canProduceExtraVideo   : PropTypes.bool.isRequired,
-	canLock                : PropTypes.bool.isRequired,
-	canRecord              : PropTypes.bool.isRequired,
-	canPromote             : PropTypes.bool.isRequired,
-	classes                : PropTypes.object.isRequired,
-	theme                  : PropTypes.object.isRequired,
-	intl                   : PropTypes.object,
-	locale                 : PropTypes.string.isRequired,
-	localesList            : PropTypes.array.isRequired,
-	localRecordingState    : PropTypes.string,
-	recordingInProgress    : PropTypes.bool,
-	recordingPeers         : PropTypes.array,
-	recordingMimeType      : PropTypes.string,
-	producers              : PropTypes.object,
-	consumers              : PropTypes.object
+	roomClient           : PropTypes.object.isRequired,
+	room                 : appPropTypes.Room.isRequired,
+	isSafari         			 : PropTypes.bool,
+	meId         				    : PropTypes.string,
+	isMobile             : PropTypes.bool.isRequired,
+	peersLength          : PropTypes.number,
+	lobbyPeers           : PropTypes.array,
+	permanentTopBar      : PropTypes.bool.isRequired,
+	drawerOverlayed      : PropTypes.bool.isRequired,
+	toolAreaOpen         : PropTypes.bool.isRequired,
+	loggedIn             : PropTypes.bool.isRequired,
+	loginEnabled         : PropTypes.bool.isRequired,
+	fullscreenEnabled    : PropTypes.bool,
+	fullscreen           : PropTypes.bool,
+	onFullscreen         : PropTypes.func.isRequired,
+	setToolbarsVisible   : PropTypes.func.isRequired,
+	setSettingsOpen      : PropTypes.func.isRequired,
+	setLeaveOpen         : PropTypes.func.isRequired,
+	setExtraVideoOpen    : PropTypes.func.isRequired,
+	setHelpOpen          : PropTypes.func.isRequired,
+	setAboutOpen         : PropTypes.func.isRequired,
+	setLockDialogOpen    : PropTypes.func.isRequired,
+	setHideSelfView      : PropTypes.func.isRequired,
+	toggleToolArea       : PropTypes.func.isRequired,
+	openUsersTab         : PropTypes.func.isRequired,
+	addNotification      : PropTypes.func.isRequired,
+	closeNotification    : PropTypes.func.isRequired,
+	unread               : PropTypes.number.isRequired,
+	canProduceExtraVideo : PropTypes.bool.isRequired,
+	canLock              : PropTypes.bool.isRequired,
+	canRecord            : PropTypes.bool.isRequired,
+	canPromote           : PropTypes.bool.isRequired,
+	classes              : PropTypes.object.isRequired,
+	theme                : PropTypes.object.isRequired,
+	intl                 : PropTypes.object,
+	locale               : PropTypes.string.isRequired,
+	localesList          : PropTypes.array.isRequired,
+	localRecordingState  : PropTypes.string,
+	recordingInProgress  : PropTypes.bool,
+	recordingPeers       : PropTypes.array,
+	recordingMimeType    : PropTypes.string,
+	producers            : PropTypes.object,
+	consumers            : PropTypes.object
 };
 
 const makeMapStateToProps = () =>
@@ -1371,9 +1371,9 @@ const mapDispatchToProps = (dispatch) =>
 			dispatch(toolareaActions.openToolArea());
 			dispatch(toolareaActions.setToolTab('users'));
 		},
-		addConsentNotification : (notification) =>
+		addNotification : (notification) =>
 		{
-			dispatch(notificationActions.addConsentNotification(notification));
+			dispatch(notificationActions.addNotification(notification));
 		},
 		closeNotification : (notificationId) =>
 		{

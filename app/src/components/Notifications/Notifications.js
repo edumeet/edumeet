@@ -5,9 +5,12 @@ import { withSnackbar } from 'notistack';
 import * as notificationActions from '../../actions/notificationActions';
 import { config } from '../../config';
 import Button from '@material-ui/core/Button';
-import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
-import { FormattedMessage } from 'react-intl';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 
+import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
+
+import { FormattedMessage } from 'react-intl';
+import Lock from '@material-ui/icons/Lock';
 class Notifications extends Component
 {
 	displayed = [];
@@ -63,15 +66,37 @@ class Notifications extends Component
 			// customized
 			const okAction = (key) => (
 				<Fragment>
-					<Button
-						variant='contained'
-						size='small'
-						color='default'
-						startIcon={<VerifiedUserIcon />}
-						onClick={() => { this.props.closeSnackbar(key); }}
-					>
-						<FormattedMessage id='room.consentUnderstand' defaultMessage='I understand' />
-					</Button>
+					<ButtonGroup>
+						<Button
+							variant='contained'
+							size='small'
+							color='primary'
+							startIcon={<VerifiedUserIcon />}
+							onClick={() =>
+							{
+								notification.roomClient.addConsentForRecording(
+									notification.recordingPeers,
+									notification.peerid
+								);
+								this.props.closeSnackbar(key);
+							}}
+						>
+							<FormattedMessage id='room.recordingConsentAccept' defaultMessage='I Accept' />
+						</Button>
+						<Button
+							variant='contained'
+							size='small'
+							color='secondary'
+							startIcon={<Lock />}
+							onClick={() =>
+							{
+								this.props.closeSnackbar(key);
+							}}
+						>
+							<FormattedMessage id='room.recordingConsentDeny' defaultMessage='Deny' />
+						</Button>
+					</ButtonGroup>
+
 				</Fragment>
 			);
 
@@ -81,6 +106,9 @@ class Notifications extends Component
 					variant          : notification.type,
 					autoHideDuration : notification.timeout,
 					persist          : notification.persist,
+					peerid       			 : notification.peerid,
+					roomClient       : notification.roomClient,
+					recordingPeers   : notification.recordingPeers,
 					key              : notification.id,
 					action           : notification.persist? okAction: null,
 					anchorOrigin     : {

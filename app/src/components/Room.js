@@ -15,7 +15,6 @@ import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import Notifications from './Notifications/Notifications';
-import ConsentNotifications from './Notifications/ConsentNotifications';
 import MeetingDrawer from './MeetingDrawer/MeetingDrawer';
 import Democratic from './MeetingViews/Democratic';
 import Filmstrip from './MeetingViews/Filmstrip';
@@ -213,7 +212,7 @@ class Room extends React.PureComponent
 				<AudioPeers />
 
 				{ showNotifications &&
-					<ConsentNotifications />
+					<Notifications />
 				}
 
 				<CssBaseline />
