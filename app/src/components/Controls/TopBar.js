@@ -337,7 +337,8 @@ const TopBar = (props) =>
 	},
 	[
 		localRecordingState, recordingInProgress, recordingConsentNotificationId,
-		addConsentNotification, closeNotification, intl, meId, recordingPeers, roomClient
+		addConsentNotification, closeNotification, intl, meId, recordingPeers, roomClient,
+		room
 	]);
 
 	const isMenuOpen = Boolean(anchorEl);
@@ -1319,7 +1320,7 @@ const makeMapStateToProps = () =>
 			canPromote           : hasPromotionPermission(state),
 			locale               : state.intl.locale,
 			localesList          : state.intl.list,
-			recordingMimeType    : state.settings.recordingMimeType,
+			recordingMimeType    : state.settings.recorderPreferredMimeType,
 			producers            : state.producers,
 			consumers            : state.consumers
 		});
@@ -1405,7 +1406,9 @@ export default withRoomContext(connect(
 				prev.intl.locale === next.intl.locale &&
 				prev.intl.localesList === next.intl.localesList &&
 				prev.producers === next.producers &&
-				prev.consumers === next.consumers
+				prev.consumers === next.consumers &&
+				prev.settings.recorderPreferredMimeType ===
+				next.settings.recorderPreferredMimeType
 			);
 		}
 	}

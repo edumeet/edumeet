@@ -608,6 +608,8 @@ const Peer = (props) =>
 					</div>
 
 					<VideoView
+						meLocalRecordingState={meLocalRecordingState}
+						recordingConsents={recordingConsents}
 						showQuality
 						advancedMode={advancedMode}
 						peer={peer}
@@ -808,6 +810,8 @@ const Peer = (props) =>
 							</div>
 
 							<VideoView
+								meLocalRecordingState={meLocalRecordingState}
+								recordingConsents={recordingConsents}
 								showQuality
 								advancedMode={advancedMode}
 								peer={peer}
@@ -952,6 +956,8 @@ const Peer = (props) =>
 							</Tooltip>
 						</div>
 						<VideoView
+							meLocalRecordingState={meLocalRecordingState}
+							recordingConsents={recordingConsents}
 							peer={peer}
 							showQuality
 							advancedMode={advancedMode}

@@ -135,12 +135,11 @@ class ConsentNotifications extends Component
 
 ConsentNotifications.propTypes =
 {
-	notifications          : PropTypes.array.isRequired,
-	closeNotification      : PropTypes.func.isRequired,
-	enqueueSnackbar        : PropTypes.func.isRequired,
-	addConsentForRecording : PropTypes.func.isRequired,
-	closeSnackbar          : PropTypes.func.isRequired,
-	removeNotification     : PropTypes.func.isRequired
+	notifications      : PropTypes.array.isRequired,
+	closeNotification  : PropTypes.func.isRequired,
+	enqueueSnackbar    : PropTypes.func.isRequired,
+	closeSnackbar      : PropTypes.func.isRequired,
+	removeNotification : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>

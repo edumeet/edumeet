@@ -167,6 +167,8 @@ const Me = (props) =>
 
 	const {
 		roomClient,
+		meLocalRecordingState,
+		recordingConsents,
 		me,
 		settings,
 		activeSpeaker,
@@ -783,6 +785,8 @@ const Me = (props) =>
 					}
 
 					<VideoView
+						meLocalRecordingState={meLocalRecordingState}
+						recordingConsents={recordingConsents}
 						isMe
 						isMirrored={settings.mirrorOwnVideo}
 						VideoView
@@ -925,6 +929,8 @@ const Me = (props) =>
 							</div>
 
 							<VideoView
+								meLocalRecordingState={meLocalRecordingState}
+								recordingConsents={recordingConsents}
 								isMe
 								isMirrored={settings.mirrorOwnVideo}
 								isExtraVideo
@@ -983,6 +989,8 @@ const Me = (props) =>
 						</p>
 
 						<VideoView
+							meLocalRecordingState={meLocalRecordingState}
+							recordingConsents={recordingConsents}
 							isMe
 							isScreen
 							advancedMode={advancedMode}
@@ -1000,25 +1008,27 @@ const Me = (props) =>
 
 Me.propTypes =
 {
-	roomClient          : PropTypes.any.isRequired,
-	advancedMode        : PropTypes.bool,
-	me                  : appPropTypes.Me.isRequired,
-	settings            : PropTypes.object,
-	activeSpeaker       : PropTypes.bool,
-	micProducer         : appPropTypes.Producer,
-	webcamProducer      : appPropTypes.Producer,
-	screenProducer      : appPropTypes.Producer,
-	extraVideoProducers : PropTypes.arrayOf(appPropTypes.Producer),
-	spacing             : PropTypes.number,
-	style               : PropTypes.object,
-	smallContainer      : PropTypes.bool,
-	hasAudioPermission  : PropTypes.bool.isRequired,
-	hasVideoPermission  : PropTypes.bool.isRequired,
-	hasScreenPermission : PropTypes.bool.isRequired,
-	noiseVolume         : PropTypes.number,
-	classes             : PropTypes.object.isRequired,
-	theme               : PropTypes.object.isRequired,
-	transports          : PropTypes.object.isRequired
+	meLocalRecordingState : PropTypes.string,
+	recordingConsents     : PropTypes.object,
+	roomClient            : PropTypes.any.isRequired,
+	advancedMode          : PropTypes.bool,
+	me                    : appPropTypes.Me.isRequired,
+	settings              : PropTypes.object,
+	activeSpeaker         : PropTypes.bool,
+	micProducer           : appPropTypes.Producer,
+	webcamProducer        : appPropTypes.Producer,
+	screenProducer        : appPropTypes.Producer,
+	extraVideoProducers   : PropTypes.arrayOf(appPropTypes.Producer),
+	spacing               : PropTypes.number,
+	style                 : PropTypes.object,
+	smallContainer        : PropTypes.bool,
+	hasAudioPermission    : PropTypes.bool.isRequired,
+	hasVideoPermission    : PropTypes.bool.isRequired,
+	hasScreenPermission   : PropTypes.bool.isRequired,
+	noiseVolume           : PropTypes.number,
+	classes               : PropTypes.object.isRequired,
+	theme                 : PropTypes.object.isRequired,
+	transports            : PropTypes.object.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -1045,15 +1055,17 @@ const makeMapStateToProps = () =>
 		else { noise = 10; }
 
 		return {
-			me                  : state.me,
+			me                    : state.me,
 			...meProducersSelector(state),
-			settings            : state.settings,
-			activeSpeaker       : state.me.id === state.room.activeSpeakerId,
-			hasAudioPermission  : canShareAudio(state),
-			hasVideoPermission  : canShareVideo(state),
-			hasScreenPermission : canShareScreen(state),
-			noiseVolume         : noise,
-			transports          : state.transports
+			settings              : state.settings,
+			activeSpeaker         : state.me.id === state.room.activeSpeakerId,
+			hasAudioPermission    : canShareAudio(state),
+			hasVideoPermission    : canShareVideo(state),
+			hasScreenPermission   : canShareScreen(state),
+			noiseVolume           : noise,
+			transports            : state.transports,
+			meLocalRecordingState : state.me.localRecordingState,
+			recordingConsents     : state.room.recordingConsents
 		};
 	};
 
@@ -1075,7 +1087,9 @@ export default withRoomContext(connect(
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
-				prev.transports === next.transports
+				prev.transports === next.transports &&
+				prev.me.localRecordingState === next.me.localRecordingState &&
+				prev.room.recordingConsents === next.room.recordingConsents
 			);
 		}
 	}

@@ -11,7 +11,6 @@ import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
 import { AudioAnalyzer } from './AudioAnalyzer';
-import { store } from '../../store';
 
 const logger = new Logger('VideoView');
 
@@ -206,6 +205,8 @@ class VideoView extends React.PureComponent
 	render()
 	{
 		const {
+			meLocalRecordingState,
+			recordingConsents,
 			isMe,
 			isMirrored,
 			isScreen,
@@ -301,6 +302,11 @@ class VideoView extends React.PureComponent
 				}
 			}
 		}
+
+		// eslint-disable-next-line no-console
+		console.log('remus : ');
+		// eslint-disable-next-line no-console
+		console.log(recordingConsents);
 
 		return (
 			<div className={classes.root}>
@@ -432,14 +438,14 @@ class VideoView extends React.PureComponent
 										{
 											(
 												(
-													store.getState().me.localRecordingState==='start' ||
-													store.getState().me.localRecordingState==='resume'
+													meLocalRecordingState==='start' ||
+													meLocalRecordingState==='resume'
 												) &&
 												!(
-													store.getState().room.recordingConsents.get(
+													recordingConsents.get(
 														'recordingid'
 													)!==undefined &&
-													store.getState().room.recordingConsents.get(
+													recordingConsents.get(
 														'recordingid'
 													).includes(peer.id)
 												)
@@ -459,14 +465,14 @@ class VideoView extends React.PureComponent
 							(
 								!isMe &&
 								(
-									store.getState().me.localRecordingState==='start' ||
-									store.getState().me.localRecordingState==='resume'
+									meLocalRecordingState==='start' ||
+									meLocalRecordingState==='resume'
 								) &&
 								!(
-									store.getState().room.recordingConsents.get(
+									recordingConsents.get(
 										'recordingid'
 									)!==undefined &&
-									store.getState().room.recordingConsents.get(
+									recordingConsents.get(
 										'recordingid'
 									).includes(peer.id)
 								)
@@ -640,6 +646,8 @@ class VideoView extends React.PureComponent
 
 VideoView.propTypes =
 {
+	meLocalRecordingState          : PropTypes.string,
+	recordingConsents              : PropTypes.object,
 	isMe                           : PropTypes.bool,
 	isMirrored                     : PropTypes.bool,
 	isScreen                       : PropTypes.bool,
