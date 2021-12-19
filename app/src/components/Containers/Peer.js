@@ -6,7 +6,6 @@ import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 import * as roomActions from '../../actions/roomActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
@@ -154,7 +153,6 @@ const Peer = (props) =>
 		windowConsumer,
 		fullScreenConsumer,
 		classes,
-		theme,
 		enableLayersSwitch,
 		isSelected,
 		mode
@@ -177,8 +175,6 @@ const Peer = (props) =>
 		!screenConsumer.locallyPaused &&
 		!screenConsumer.remotelyPaused
 	);
-
-	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 	const rootStyle =
 	{
@@ -231,8 +227,6 @@ const Peer = (props) =>
 
 	const [ buttonSize, setButtonSize ] = useState('large');
 
-	const [ smallContainer, setSmallContainer ] = useState(true);
-
 	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
 		{
 			flexDirection : 'row'
@@ -245,7 +239,6 @@ const Peer = (props) =>
 		{
 			case 'smallest':
 				setButtonSize('small');
-				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
 					flexDirection : 'row'
@@ -255,7 +248,6 @@ const Peer = (props) =>
 
 			case 'small':
 				setButtonSize('small');
-				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
@@ -265,7 +257,6 @@ const Peer = (props) =>
 
 			case 'medium':
 				setButtonSize('medium');
-				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
@@ -275,7 +266,6 @@ const Peer = (props) =>
 
 			case 'large':
 				setButtonSize('large');
-				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
@@ -384,7 +374,7 @@ const Peer = (props) =>
 								id             : 'device.muteAudio',
 								defaultMessage : 'Mute audio'
 							})}
-							placement={smallScreen || smallContainer ? 'top' : 'left'}
+							placement={size === 'smallest' ? 'top' : 'left'}
 						>
 							<div>
 								<Fab
@@ -423,7 +413,7 @@ const Peer = (props) =>
 									id             : 'label.newWindow',
 									defaultMessage : 'New window'
 								})}
-								placement={smallScreen || smallContainer ? 'top' : 'left'}
+								placement={size === 'smallest' ? 'top' : 'left'}
 							>
 								<div>
 									<Fab
@@ -454,7 +444,7 @@ const Peer = (props) =>
 									id             : 'label.fullscreen',
 									defaultMessage : 'Fullscreen'
 								})}
-								placement={smallScreen || smallContainer ? 'top' : 'left'}
+								placement={size === 'smallest' ? 'top' : 'left'}
 							>
 								<div>
 									<Fab
@@ -493,7 +483,7 @@ const Peer = (props) =>
 										defaultMessage : 'Add to spotlight'
 									})
 								}
-								placement={smallScreen || smallContainer ? 'top' : 'left'}
+								placement={size === 'smallest' ? 'top' : 'left'}
 							>
 								<div>
 									<Fab
@@ -540,7 +530,7 @@ const Peer = (props) =>
 									id             : 'device.options',
 									defaultMessage : 'Options'
 								})}
-								placement={smallScreen || smallContainer ? 'top' : 'left'}
+								placement={size === 'smallest' ? 'top' : 'left'}
 							>
 								<div>
 									<Fab
@@ -696,7 +686,7 @@ const Peer = (props) =>
 											id             : 'label.newWindow',
 											defaultMessage : 'New window'
 										})}
-										placement={smallScreen || smallContainer ? 'top' : 'left'}
+										placement={size === 'smallest' ? 'top' : 'left'}
 									>
 										<div>
 											<Fab
@@ -730,7 +720,7 @@ const Peer = (props) =>
 										id             : 'label.fullscreen',
 										defaultMessage : 'Fullscreen'
 									})}
-									placement={smallScreen || smallContainer ? 'top' : 'left'}
+									placement={size === 'smallest' ? 'top' : 'left'}
 								>
 									<div>
 										<Fab
@@ -856,7 +846,7 @@ const Peer = (props) =>
 										id             : 'label.newWindow',
 										defaultMessage : 'New window'
 									})}
-									placement={smallScreen || smallContainer ? 'top' : 'left'}
+									placement={size === 'smallest' ? 'top' : 'left'}
 								>
 
 									<div>
@@ -892,7 +882,7 @@ const Peer = (props) =>
 									id             : 'label.fullscreen',
 									defaultMessage : 'Fullscreen'
 								})}
-								placement={smallScreen || smallContainer ? 'top' : 'left'}
+								placement={size === 'smallest' ? 'top' : 'left'}
 							>
 
 								<div>
@@ -970,7 +960,6 @@ Peer.propTypes =
 	browser                  : PropTypes.object.isRequired,
 	spacing                  : PropTypes.number,
 	style                    : PropTypes.object,
-	smallContainer           : PropTypes.bool,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
 	classes                  : PropTypes.object.isRequired,

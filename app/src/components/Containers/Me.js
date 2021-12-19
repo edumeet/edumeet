@@ -363,8 +363,6 @@ const Me = (props) =>
 
 	const [ buttonSize, setButtonSize ] = useState('large');
 
-	const [ smallContainer, setSmallContainer ] = useState(true);
-
 	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
 		{
 			flexDirection : 'row'
@@ -377,7 +375,6 @@ const Me = (props) =>
 		{
 			case 'smallest':
 				setButtonSize('small');
-				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
 					flexDirection : 'row',
@@ -389,7 +386,6 @@ const Me = (props) =>
 
 			case 'small':
 				setButtonSize('small');
-				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
@@ -399,7 +395,6 @@ const Me = (props) =>
 
 			case 'medium':
 				setButtonSize('medium');
-				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
@@ -409,7 +404,6 @@ const Me = (props) =>
 
 			case 'large':
 				setButtonSize('large');
-				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
@@ -494,8 +488,7 @@ const Me = (props) =>
 					<p className={
 						classnames(
 							classes.meTag,
-							hover ? 'hover' : null,
-							smallContainer ? 'smallContainer' : null
+							hover ? 'hover' : null
 						)}
 					>
 						<FormattedMessage
@@ -688,7 +681,7 @@ const Me = (props) =>
 											id             : 'device.options',
 											defaultMessage : 'Options'
 										})}
-										placement={smallContainer ? 'top' : 'left'}
+										placement={size === 'smallest' ? 'bottom' : 'left'}
 									>
 										<Fab
 											aria-label={intl.formatMessage({
@@ -905,8 +898,7 @@ const Me = (props) =>
 						<p className={
 							classnames(
 								classes.meTag,
-								hover ? 'hover' : null,
-								smallContainer ? 'smallest': null
+								hover ? 'hover' : null
 							)}
 						>
 							<FormattedMessage
@@ -944,7 +936,6 @@ Me.propTypes =
 	extraVideoProducers : PropTypes.arrayOf(appPropTypes.Producer),
 	spacing             : PropTypes.number,
 	style               : PropTypes.object,
-	smallContainer      : PropTypes.bool,
 	hasAudioPermission  : PropTypes.bool.isRequired,
 	hasVideoPermission  : PropTypes.bool.isRequired,
 	hasScreenPermission : PropTypes.bool.isRequired,

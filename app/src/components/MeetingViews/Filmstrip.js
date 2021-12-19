@@ -342,7 +342,6 @@ class Filmstrip extends React.PureComponent
 								<Me
 									advancedMode={advancedMode}
 									style={peerStyle}
-									smallContainer
 								/>
 								}
 							</div>
@@ -365,7 +364,6 @@ class Filmstrip extends React.PureComponent
 												advancedMode={advancedMode}
 												id={peerId}
 												style={peerStyle}
-												smallContainer
 												enableLayersSwitch={activePeerId !== peerId}
 											/>
 										</div>
