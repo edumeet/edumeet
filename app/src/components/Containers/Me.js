@@ -380,7 +380,9 @@ const Me = (props) =>
 				setSmallContainer(true);
 
 				setControlsAdditionalStyles({
-					flexDirection : 'row'
+					flexDirection : 'row',
+					alignItems    : 'flex-start'
+
 				});
 
 				break;
