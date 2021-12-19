@@ -61,17 +61,6 @@ const styles = (theme) =>
 				order : 2
 			}
 		},
-		fab :
-		{
-			margin        : theme.spacing(1),
-			pointerEvents : 'auto',
-			'&.smallest'  : {
-				width     : 30,
-				height    : 30,
-				minHeight : 'auto',
-				margin    : theme.spacing(0.5)
-			}
-		},
 		viewContainer :
 		{
 			position : 'relative',
@@ -116,7 +105,19 @@ const styles = (theme) =>
 			'&.hover' :
 			{
 				opacity : 1
+			},
+			'& .fab' :
+			{
+				margin        : theme.spacing(1),
+				pointerEvents : 'auto',
+				'&.smallest'  : {
+					width     : 30,
+					height    : 30,
+					minHeight : 'auto',
+					margin    : theme.spacing(0.5)
+				}
 			}
+
 		},
 		ptt :
 		{
@@ -536,7 +537,7 @@ const Me = (props) =>
 												defaultMessage : 'Mute audio'
 											})}
 											className={classnames(
-												classes.fab,
+												'fab',
 												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={
@@ -605,7 +606,7 @@ const Me = (props) =>
 												defaultMessage : 'Start video'
 											})}
 											className={classnames(
-												classes.fab,
+												'fab',
 												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={
@@ -647,7 +648,7 @@ const Me = (props) =>
 													defaultMessage : 'Start screen sharing'
 												})}
 												className={classnames(
-													classes.fab,
+													'fab',
 													size === 'smallest' ? 'smallest': null
 												)}
 												disabled={
@@ -689,7 +690,7 @@ const Me = (props) =>
 												defaultMessage : 'Options'
 											})}
 											className={classnames(
-												classes.fab,
+												'fab',
 												size === 'smallest' ? 'smallest': null
 											)}
 											size={buttonSize}
@@ -834,7 +835,7 @@ const Me = (props) =>
 											})}
 											// className={classes.fab}
 											className={classnames(
-												classes.fab,
+												'fab',
 												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={!me.canSendWebcam || me.webcamInProgress}

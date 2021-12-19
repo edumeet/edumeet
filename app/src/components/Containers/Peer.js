@@ -60,17 +60,6 @@ const styles = (theme) =>
 				order : 3
 			}
 		},
-		fab :
-		{
-			margin       : theme.spacing(1),
-			'&.smallest' : {
-				width     : 30,
-				height    : 30,
-				minHeight : 'auto',
-				margin    : theme.spacing(0.5)
-			}
-
-		},
 		viewContainer :
 		{
 			position : 'relative',
@@ -94,7 +83,19 @@ const styles = (theme) =>
 			'&.hover'       :
 			{
 				opacity : 1
+			},
+			'& .fab' :
+			{
+				margin       : theme.spacing(1),
+				'&.smallest' : {
+					width     : 30,
+					height    : 30,
+					minHeight : 'auto',
+					margin    : theme.spacing(0.5)
+				}
+
 			}
+
 		},
 		videoInfo :
 		{
@@ -241,7 +242,8 @@ const Peer = (props) =>
 				setButtonSize('small');
 
 				setControlsAdditionalStyles({
-					flexDirection : 'row'
+					flexDirection : 'row',
+					alignItems    : 'flex-start'
 				});
 
 				break;
@@ -384,7 +386,7 @@ const Peer = (props) =>
 									})}
 									// className={classes.fab}
 									className={classnames(
-										classes.fab,
+										'fab',
 										size === 'smallest' ? 'smallest': null
 									)}
 									disabled={!micConsumer}
@@ -423,7 +425,7 @@ const Peer = (props) =>
 										})}
 										// className={classes.fab}
 										className={classnames(
-											classes.fab,
+											'fab',
 											size === 'smallest' ? 'smallest': null
 										)}
 										size={buttonSize}
@@ -454,7 +456,7 @@ const Peer = (props) =>
 										})}
 										// className={classes.fab}
 										className={classnames(
-											classes.fab,
+											'fab',
 											size === 'smallest' ? 'smallest': null
 										)}
 										disabled={!videoVisible}
@@ -500,7 +502,7 @@ const Peer = (props) =>
 										}
 										// className={classes.fab}
 										className={classnames(
-											classes.fab,
+											'fab',
 											size === 'smallest' ? 'smallest': null
 										)}
 										size={buttonSize}
@@ -540,7 +542,7 @@ const Peer = (props) =>
 										})}
 										// className={classes.fab}
 										className={classnames(
-											classes.fab,
+											'fab',
 											size === 'smallest' ? 'smallest': null
 										)}
 										size={buttonSize}
@@ -696,7 +698,7 @@ const Peer = (props) =>
 												})}
 												// className={classes.fab}
 												className={classnames(
-													classes.fab,
+													'fab',
 													size === 'smallest' ? 'smallest': null
 												)}
 												disabled={
@@ -730,7 +732,7 @@ const Peer = (props) =>
 											})}
 											// className={classes.fab}
 											className={classnames(
-												classes.fab,
+												'fab',
 												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={!videoVisible}
@@ -855,9 +857,8 @@ const Peer = (props) =>
 												id             : 'label.newWindow',
 												defaultMessage : 'New window'
 											})}
-											// className={classes.fab}
 											className={classnames(
-												classes.fab,
+												'fab',
 												size === 'smallest' ? 'smallest': null
 											)}
 											disabled={
@@ -893,7 +894,7 @@ const Peer = (props) =>
 										})}
 										// className={classes.fab}
 										className={classnames(
-											classes.fab,
+											'fab',
 											size === 'smallest' ? 'smallest': null
 										)}
 										disabled={!screenVisible}
