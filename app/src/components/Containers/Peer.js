@@ -123,7 +123,7 @@ const styles = (theme) =>
 				borderRadius  : 6,
 				userSelect    : 'none',
 				pointerEvents : 'none',
-				fontSize      : 20,
+				fontSize      : '1.5vw',
 				color         : 'rgba(255, 255, 255, 0.55)'
 			}
 		}

@@ -75,7 +75,7 @@ const styles = (theme) =>
 			left       : '50%',
 			transform  : 'translate(-50%, -50%)',
 			color      : 'rgba(255, 255, 255, 0.5)',
-			fontSize   : '7em',
+			fontSize   : '1.5vw',
 			zIndex     : 1,
 			margin     : 0,
 			opacity    : 0,
