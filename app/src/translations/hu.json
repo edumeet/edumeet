@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Némítva vagy, ha beszélnél nyomd le a SZÓKÖZ billentyűt",
+	"me.mutedPTT": "Némítva vagy{br}ha beszélnél nyomd le a SZÓKÖZ billentyűt",
 
 	"roles.gotRole": "{role} szerepet kaptál",
 	"roles.lostRole": "Elvesztetted a {role} szerepet",

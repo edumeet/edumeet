@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Utišani ste, pritisnite i držite SPACE tipku za razgovor",
+	"me.mutedPTT": "Utišani ste{br}pritisnite i držite SPACE tipku za razgovor",
 
 	"roles.gotRole": "Dodijeljena vam je uloga: {role}",
 	"roles.lostRole": "Uloga: {role} je povučena",

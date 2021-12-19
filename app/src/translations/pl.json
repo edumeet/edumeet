@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": "Opuszczanie pokoju",
 	"room.leaveConfirmationMessage": "Czy na pewno chcesz opuścić pokój?",
 
-	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj SPACJĘ, aby mówić.",
+	"me.mutedPTT": "Masz wyciszony mikrofon{br}przytrzymaj SPACJĘ, aby mówić.",
 
 	"roles.gotRole": "Uzyskałeś rolę: {role}",
 	"roles.lostRole": "Utraciłeś rolę: {role}",

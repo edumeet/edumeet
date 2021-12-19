@@ -162,12 +162,12 @@ class Democratic extends React.PureComponent
 
 		let size=null;
 
-		if (this.state.peerHeight > 0 && this.state.peerHeight <= 200)
+		if (this.state.peerHeight > 0 && this.state.peerHeight <= 170)
 		{
 			size='smallest';
 		}
 
-		else if (this.state.peerHeight > 200 && this.state.peerHeight <= 320)
+		else if (this.state.peerHeight > 170 && this.state.peerHeight <= 320)
 		{
 			size='small';
 		}

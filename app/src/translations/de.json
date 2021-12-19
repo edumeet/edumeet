@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Du bist stummgeschaltet. Halte die LEERTASTE um zu sprechen",
+	"me.mutedPTT": "Du bist stummgeschaltet{br}Halte die LEERTASTE um zu sprechen",
 
 	"roles.gotRole": "Rolle erhalten: {role}",
 	"roles.lostRole": "Rolle entzogen: {role}",

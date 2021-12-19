@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Du er dempet, hold nede SPACE for å snakke",
+	"me.mutedPTT": "Du er dempet{br}hold nede SPACE for å snakke",
 
 	"roles.gotRole": "Du fikk rollen: {role}",
 	"roles.lostRole": "Du mistet rollen: {role}",

@@ -275,12 +275,12 @@ class Filmstrip extends React.PureComponent
 
 		let size=null;
 
-		if (this.state.filmStripHeight > 0 && this.state.filmStripHeight <= 200)
+		if (this.state.filmStripHeight > 0 && this.state.filmStripHeight <= 170)
 		{
 			size='smallest';
 		}
 
-		else if (this.state.filmStripHeight > 200 && this.state.filmStripHeight <= 320)
+		else if (this.state.filmStripHeight > 170 && this.state.filmStripHeight <= 320)
 		{
 			size='small';
 		}

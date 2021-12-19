@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Вы отключены, удерживайте ПРОБЕЛ, чтобы говорить",
+	"me.mutedPTT": "Вы отключены{br}удерживайте ПРОБЕЛ, чтобы говорить",
 
 	"roles.gotRole": "Вам присвоена роль: {role}",
 	"roles.lostRole": "У вас убрана роль: {role}",

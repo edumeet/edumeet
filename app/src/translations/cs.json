@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Jste ztišen, chcete-li mluvit, podržte mezerník",
+	"me.mutedPTT": "Jste ztišen{br}chcete-li mluvit, podržte mezerník",
 
 	"roles.gotRole": "Máte roli: {role}",
 	"roles.lostRole": "Byla Vám odebrána role: {role}",

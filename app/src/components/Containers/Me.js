@@ -120,28 +120,34 @@ const styles = (theme) =>
 		},
 		ptt :
 		{
-			position        : 'absolute',
-			float           : 'left',
-			top             : '25%',
-			left            : '50%',
-			transform       : 'translate(-50%, 0%)',
-			color           : 'rgba(255, 255, 255, 0.7)',
-			fontSize        : '1.3em',
-			backgroundColor : 'rgba(245, 0, 87, 0.70)',
-			margin          : '4px',
-			padding         : theme.spacing(2),
-			zIndex          : 1200,
-			borderRadius    : '20px',
-			textAlign       : 'center',
-			opacity         : 0,
-			transition      : 'opacity 1s ease',
-			pointerEvents   : 'none',
-			'&.enabled'     :
+			position       : 'absolute',
+			width          : '100%',
+			height         : '100%',
+			display        : 'flex',
+			justifyContent : 'center',
+			alignItems     : 'center',
+			zIndex         : 1200,
+			opacity        : 0,
+			transition     : 'opacity 1s ease',
+			pointerEvents  : 'none',
+			padding        : theme.spacing(1),
+			'& div'        :
+			{
+				color           : 'rgba(255, 255, 255, 0.7)',
+				backgroundColor : 'rgba(245, 0, 87, 0.70)',
+				borderRadius    : '20px',
+				textAlign       : 'center',
+				opacity         : 1,
+				padding         : theme.spacing(1),
+				margin          : theme.spacing(1)
+			},
+			'&.enabled' :
 			{
 				transition : 'opacity 0.1s',
 				opacity    : 1
 			}
 		}
+
 	});
 
 const Me = (props) =>
@@ -461,33 +467,23 @@ const Me = (props) =>
 				style={spacingStyle}
 			>
 
-				{/* PTT */}
-				{ me.browser.platform !== 'mobile' && smallContainer &&
-				<div className={classnames(
-					classes.ptt,
-					(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
-				)}
-				>
-					<FormattedMessage
-						id='me.mutedPTT'
-						defaultMessage='You are muted, hold down SPACE-BAR to talk'
-					/>
-				</div>
-				}
-				{/* /PTT */}
-
 				<div className={classes.viewContainer} style={style}>
 					{/* PTT */}
-					{ me.browser.platform !== 'mobile' && !smallContainer &&
+					{ me.browser.platform !== 'mobile' && size !== 'smallest' &&
 						<div className={classnames(
 							classes.ptt,
 							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
 						)}
 						>
-							<FormattedMessage
-								id='me.mutedPTT'
-								defaultMessage='You are muted, hold down SPACE-BAR to talk'
-							/>
+							<div>
+								<FormattedMessage
+									id='me.mutedPTT'
+									defaultMessage='You are muted, {br} hold down SPACE-BAR to talk'
+									values={{
+										br : <br />
+									}}
+								/>
+							</div>
 						</div>
 					}
 					{/* /PTT */}

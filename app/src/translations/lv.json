@@ -79,7 +79,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
+	"me.mutedPTT": "Jūs esat noklusināts{br}Turiet taustiņu SPACE-BAR, lai runātu",
 
 	"roles.gotRole": "Jūs ieguvāt lomu: {role}",
 	"roles.lostRole": "Jūs zaudējāt lomu: {role}",

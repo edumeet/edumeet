@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": " У вас вимкнено звук, утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
+	"me.mutedPTT": " У вас вимкнено звук{br}утримуйте клавішу SPACE-BAR (пробіл), щоб говорити",
 	"roles.gotRole": "Ви отримали роль {role}",
 	"roles.lostRole": "Ви втратили роль {role}",
 

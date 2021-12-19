@@ -79,7 +79,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "您已將麥克風靜音，請按下「空白鍵」來發言",
+	"me.mutedPTT": "您已將麥克風靜音{br}請按下「空白鍵」來發言",
 
 	"roles.gotRole": "您已取得身份: {role}",
 	"roles.lostRole": "您的 {role} 身份已被撤銷",

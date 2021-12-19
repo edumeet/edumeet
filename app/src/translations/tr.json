@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Sesiniz kapalı, konuşmak için SPACE tuşuna basılı tutun",
+	"me.mutedPTT": "Sesiniz kapalı{br}konuşmak için SPACE tuşuna basılı tutun",
 
 	"roles.gotRole": "{role} rolü size verildi",
 	"roles.lostRole": "{role} rolü sizden alındı",

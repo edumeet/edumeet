@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": "Leaving the room",
 	"room.leaveConfirmationMessage": "Do you want to leave the room?",
 
-	"me.mutedPTT": "You are muted, hold down SPACE-BAR to talk",
+	"me.mutedPTT": "You are muted{br}hold down SPACE-BAR to talk",
 
 	"roles.gotRole": "You got the role: {role}",
 	"roles.lostRole": "You lost the role: {role}",

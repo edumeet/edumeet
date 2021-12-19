@@ -78,7 +78,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Сіз дыбыссызсыз, сөйлесу үшін БОС ОРЫН пернесін ұстап тұрыңыз",
+	"me.mutedPTT": "Сіз дыбыссызсыз{br}сөйлесу үшін БОС ОРЫН пернесін ұстап тұрыңыз",
 
 	"roles.gotRole": "Сізге рөл тағайындалды: {role}",
 	"roles.lostRole": "Сіздің рөл алынып тасталды: {role}",

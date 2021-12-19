@@ -182,7 +182,6 @@ const Peer = (props) =>
 
 	const rootStyle =
 	{
-		'border' : '3px solid red',
 		'margin' : spacing,
 		...style
 	};

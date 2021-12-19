@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
+	"me.mutedPTT": "Sei mutato{br}tieni premuto SPAZIO per parlare",
 
 	"roles.gotRole": "Hai ottenuto il ruolo: {role}",
 	"roles.lostRole": "Hai perso il ruolo: {role}",
