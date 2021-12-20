@@ -180,9 +180,7 @@ const Me = (props) =>
 
 	// const width = style.width;
 
-	// const height = style.height;
-
-	const size = style.size;
+	const height = style.height;
 
 	const [ buttonSize, setButtonSize ] = useState('large');
 
@@ -199,68 +197,74 @@ const Me = (props) =>
 		}
 	);
 
+	const [ size, setSize ] = useState('medium');
+
 	useEffect(() =>
 	{
-		switch (size)
+		if (height > 0 && height <= 170)
 		{
-			case 'smallest':
-				setButtonSize('small');
+			setSize('smallest');
 
-				setControlsAdditionalStyles({
-					flexDirection : 'row',
-					alignItems    : 'flex-start'
+			setButtonSize('small');
 
-				});
+			setControlsAdditionalStyles({
+				flexDirection : 'row',
+				alignItems    : 'flex-start'
 
-				setMeTagAdditionalStyles({
-					fontSize : '0em'
-				});
+			});
 
-				break;
-
-			case 'small':
-				setButtonSize('small');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setMeTagAdditionalStyles({
-					fontSize : '2.0em'
-				});
-
-				break;
-
-			case 'medium':
-				setButtonSize('medium');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setMeTagAdditionalStyles({
-					fontSize : '2.5em'
-				});
-
-				break;
-
-			case 'large':
-				setButtonSize('large');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setMeTagAdditionalStyles({
-					fontSize : '3.0em'
-				});
-
-				break;
-
-			default:
+			setMeTagAdditionalStyles({
+				fontSize : '0em'
+			});
 
 		}
-	}, [ size ]);
+
+		else if (height > 170 && height <= 320)
+		{
+
+			setSize('small');
+
+			setButtonSize('small');
+
+			setControlsAdditionalStyles({
+				flexDirection : 'column'
+			});
+
+			setMeTagAdditionalStyles({
+				fontSize : '2.0em'
+			});
+
+		}
+
+		else if (height > 320 && height <= 400)
+		{
+			setButtonSize('medium');
+
+			setControlsAdditionalStyles({
+				flexDirection : 'column'
+			});
+
+			setMeTagAdditionalStyles({
+				fontSize : '2.5em'
+			});
+
+		}
+
+		else if (height > 400)
+		{
+			setButtonSize('large');
+
+			setControlsAdditionalStyles({
+				flexDirection : 'column'
+			});
+
+			setMeTagAdditionalStyles({
+				fontSize : '3.0em'
+			});
+
+		}
+
+	}, [ height ]);
 
 	const videoVisible = (
 		Boolean(webcamProducer) &&

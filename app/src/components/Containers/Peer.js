@@ -186,7 +186,90 @@ const Peer = (props) =>
 
 	const height = style.height;
 
-	const size = style.size;
+	const [ buttonSize, setButtonSize ] = useState('large');
+
+	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
+		{
+			flexDirection : 'row'
+		}
+	);
+
+	const [ videoInfoAdditionalStyles, setVideoInfoAdditionalStyles ] = useState(
+		{
+			fontSize : '1.5vh'
+		}
+	);
+
+	const [ size, setSize ] = useState('medium');
+
+	useEffect(() =>
+	{
+		if (height > 0 && height <= 170)
+		{
+			setSize('smallest');
+
+			setButtonSize('small');
+
+			setControlsAdditionalStyles({
+				flexDirection : 'row',
+				alignItems    : 'flex-start'
+			});
+
+			setVideoInfoAdditionalStyles({
+				fontSize : '0em'
+			});
+
+		}
+
+		else if (height > 170 && height <= 320)
+		{
+			setSize('small');
+
+			setButtonSize('small');
+
+			setControlsAdditionalStyles({
+				flexDirection : 'column'
+			});
+
+			setVideoInfoAdditionalStyles({
+				fontSize : '1.2em'
+			});
+
+		}
+
+		else if (height > 320 && height <= 400)
+		{
+			setSize('medium');
+
+			setButtonSize('medium');
+
+			setControlsAdditionalStyles({
+				flexDirection : 'column'
+			});
+
+			setVideoInfoAdditionalStyles({
+				fontSize : '2.0em'
+			});
+
+		}
+
+		else if (height > 400)
+		{
+			setSize('large');
+
+			setButtonSize('large');
+
+			setControlsAdditionalStyles({
+				flexDirection : 'column'
+			});
+
+			setVideoInfoAdditionalStyles({
+				fontSize : '3.0em'
+			});
+
+		}
+
+	}, [ height ]);
 
 	if (peer.picture)
 	{
@@ -224,81 +307,6 @@ const Peer = (props) =>
 		fullScreenConsumer,
 		roomClient, width, height
 	]);
-
-	const [ buttonSize, setButtonSize ] = useState('large');
-
-	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
-		{
-			flexDirection : 'row'
-		}
-	);
-
-	const [ videoInfoAdditionalStyles, setVideoInfoAdditionalStyles ] = useState(
-		{
-			fontSize : '1.5vh'
-		}
-	);
-
-	useEffect(() =>
-	{
-		switch (size)
-		{
-			case 'smallest':
-				setButtonSize('small');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'row',
-					alignItems    : 'flex-start'
-				});
-
-				setVideoInfoAdditionalStyles({
-					fontSize : '0em'
-				});
-
-				break;
-
-			case 'small':
-				setButtonSize('small');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setVideoInfoAdditionalStyles({
-					fontSize : '2.0em'
-				});
-				break;
-
-			case 'medium':
-				setButtonSize('medium');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setVideoInfoAdditionalStyles({
-					fontSize : '2.5em'
-				});
-
-				break;
-
-			case 'large':
-				setButtonSize('large');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setVideoInfoAdditionalStyles({
-					fontSize : '3.0em'
-				});
-
-				break;
-
-			default:
-
-		}
-	}, [ size ]);
 
 	// menu
 	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
