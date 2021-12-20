@@ -501,7 +501,7 @@ const Me = (props) =>
 					}
 					{/* /PTT */}
 
-					{/* ====== */}
+					{/* ME TAG */}
 					<p
 						style={{ ...meTagAdditionalStyles }}
 						className={
@@ -515,6 +515,7 @@ const Me = (props) =>
 							defaultMessage='ME'
 						/>
 					</p>
+					{/* /ME TAG */}
 
 					{/* CONTROLS BUTTONS (inside) */}
 					{ !settings.buttonControlBar &&
