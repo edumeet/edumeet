@@ -547,7 +547,7 @@ const Me = (props) =>
 							}}
 						>
 							<React.Fragment>
-								{/* MICROPHONE yy*/}
+								{/* MICROPHONE */}
 								<Tooltip title={micTip} placement='left'>
 									<div>
 										<Fab
