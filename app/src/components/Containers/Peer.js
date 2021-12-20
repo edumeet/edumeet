@@ -200,14 +200,10 @@ const Peer = (props) =>
 		}
 	);
 
-	const [ size, setSize ] = useState('medium');
-
 	useEffect(() =>
 	{
 		if (height > 0 && height <= 170)
 		{
-			setSize('smallest');
-
 			setButtonSize('small');
 
 			setControlsAdditionalStyles({
@@ -223,8 +219,6 @@ const Peer = (props) =>
 
 		else if (height > 170 && height <= 320)
 		{
-			setSize('small');
-
 			setButtonSize('small');
 
 			setControlsAdditionalStyles({
@@ -239,8 +233,6 @@ const Peer = (props) =>
 
 		else if (height > 320 && height <= 400)
 		{
-			setSize('medium');
-
 			setButtonSize('medium');
 
 			setControlsAdditionalStyles({
@@ -255,8 +247,6 @@ const Peer = (props) =>
 
 		else if (height > 400)
 		{
-			setSize('large');
-
 			setButtonSize('large');
 
 			setControlsAdditionalStyles({
@@ -377,7 +367,7 @@ const Peer = (props) =>
 
 						className={classnames(
 							classes.controls, hover ? 'hover' : null,
-							size === 'smallest' ? 'smallest': null
+							height <= 170 ? 'smallest': null
 						)}
 						style={{ ...controlsAdditionalStyles }}
 						onMouseOver={() => setHover(true)}
@@ -406,7 +396,7 @@ const Peer = (props) =>
 								id             : 'device.muteAudio',
 								defaultMessage : 'Mute audio'
 							})}
-							placement={size === 'smallest' ? 'top' : 'left'}
+							placement={height <= 170 ? 'top' : 'left'}
 						>
 							<div>
 								<Fab
@@ -417,7 +407,7 @@ const Peer = (props) =>
 									// className={classes.fab}
 									className={classnames(
 										'fab',
-										size === 'smallest' ? 'smallest': null
+										height <= 170 ? 'smallest': null
 									)}
 									disabled={!micConsumer}
 									color={micEnabled ? 'default' : 'secondary'}
@@ -445,7 +435,7 @@ const Peer = (props) =>
 									id             : 'label.newWindow',
 									defaultMessage : 'New window'
 								})}
-								placement={size === 'smallest' ? 'top' : 'left'}
+								placement={height <= 170 ? 'top' : 'left'}
 							>
 								<div>
 									<Fab
@@ -456,7 +446,7 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											'fab',
-											size === 'smallest' ? 'smallest': null
+											height <= 170 ? 'smallest': null
 										)}
 										size={buttonSize}
 										onClick={() =>
@@ -476,7 +466,7 @@ const Peer = (props) =>
 									id             : 'label.fullscreen',
 									defaultMessage : 'Fullscreen'
 								})}
-								placement={size === 'smallest' ? 'top' : 'left'}
+								placement={height <= 170 ? 'top' : 'left'}
 							>
 								<div>
 									<Fab
@@ -487,7 +477,7 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											'fab',
-											size === 'smallest' ? 'smallest': null
+											height <= 170 ? 'smallest': null
 										)}
 										disabled={!videoVisible}
 										size={buttonSize}
@@ -515,7 +505,7 @@ const Peer = (props) =>
 										defaultMessage : 'Add to spotlight'
 									})
 								}
-								placement={size === 'smallest' ? 'top' : 'left'}
+								placement={height <= 170 ? 'top' : 'left'}
 							>
 								<div>
 									<Fab
@@ -533,7 +523,7 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											'fab',
-											size === 'smallest' ? 'smallest': null
+											height <= 170 ? 'smallest': null
 										)}
 										size={buttonSize}
 										onClick={() =>
@@ -562,7 +552,7 @@ const Peer = (props) =>
 									id             : 'device.options',
 									defaultMessage : 'Options'
 								})}
-								placement={size === 'smallest' ? 'top' : 'left'}
+								placement={height <= 170 ? 'top' : 'left'}
 							>
 								<div>
 									<Fab
@@ -573,7 +563,7 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											'fab',
-											size === 'smallest' ? 'smallest': null
+											height <= 170 ? 'smallest': null
 										)}
 										size={buttonSize}
 										onClick={handleMenuOpen}
@@ -721,7 +711,7 @@ const Peer = (props) =>
 											id             : 'label.newWindow',
 											defaultMessage : 'New window'
 										})}
-										placement={size === 'smallest' ? 'top' : 'left'}
+										placement={height <= 170 ? 'top' : 'left'}
 									>
 										<div>
 											<Fab
@@ -732,7 +722,7 @@ const Peer = (props) =>
 												// className={classes.fab}
 												className={classnames(
 													'fab',
-													size === 'smallest' ? 'smallest': null
+													height <= 170 ? 'smallest': null
 												)}
 												disabled={
 													!videoVisible ||
@@ -755,7 +745,7 @@ const Peer = (props) =>
 										id             : 'label.fullscreen',
 										defaultMessage : 'Fullscreen'
 									})}
-									placement={size === 'smallest' ? 'top' : 'left'}
+									placement={height <= 170 ? 'top' : 'left'}
 								>
 									<div>
 										<Fab
@@ -766,7 +756,7 @@ const Peer = (props) =>
 											// className={classes.fab}
 											className={classnames(
 												'fab',
-												size === 'smallest' ? 'smallest': null
+												height <= 170 ? 'smallest': null
 											)}
 											disabled={!videoVisible}
 											size={buttonSize}
@@ -884,7 +874,7 @@ const Peer = (props) =>
 										id             : 'label.newWindow',
 										defaultMessage : 'New window'
 									})}
-									placement={size === 'smallest' ? 'top' : 'left'}
+									placement={height <= 170 ? 'top' : 'left'}
 								>
 
 									<div>
@@ -895,7 +885,7 @@ const Peer = (props) =>
 											})}
 											className={classnames(
 												'fab',
-												size === 'smallest' ? 'smallest': null
+												height <= 170 ? 'smallest': null
 											)}
 											disabled={
 												!screenVisible ||
@@ -919,7 +909,7 @@ const Peer = (props) =>
 									id             : 'label.fullscreen',
 									defaultMessage : 'Fullscreen'
 								})}
-								placement={size === 'smallest' ? 'top' : 'left'}
+								placement={height <= 170 ? 'top' : 'left'}
 							>
 
 								<div>
@@ -931,7 +921,7 @@ const Peer = (props) =>
 										// className={classes.fab}
 										className={classnames(
 											'fab',
-											size === 'smallest' ? 'smallest': null
+											height <= 170 ? 'smallest': null
 										)}
 										disabled={!screenVisible}
 										size={buttonSize}

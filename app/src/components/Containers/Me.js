@@ -116,7 +116,6 @@ const styles = (theme) =>
 					margin    : theme.spacing(0.5)
 				}
 			}
-
 		},
 		ptt :
 		{
@@ -197,20 +196,15 @@ const Me = (props) =>
 		}
 	);
 
-	const [ size, setSize ] = useState('medium');
-
 	useEffect(() =>
 	{
 		if (height > 0 && height <= 170)
 		{
-			setSize('smallest');
-
 			setButtonSize('small');
 
 			setControlsAdditionalStyles({
 				flexDirection : 'row',
 				alignItems    : 'flex-start'
-
 			});
 
 			setMeTagAdditionalStyles({
@@ -221,8 +215,6 @@ const Me = (props) =>
 
 		else if (height > 170 && height <= 320)
 		{
-
-			setSize('small');
 
 			setButtonSize('small');
 
@@ -490,7 +482,7 @@ const Me = (props) =>
 
 				<div className={classes.viewContainer} style={style}>
 					{/* PTT */}
-					{ me.browser.platform !== 'mobile' && size !== 'smallest' &&
+					{ me.browser.platform !== 'mobile' && height <= 170 &&
 						<div className={classnames(
 							classes.ptt,
 							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
@@ -564,7 +556,7 @@ const Me = (props) =>
 											})}
 											className={classnames(
 												'fab',
-												size === 'smallest' ? 'smallest': null
+												height <= 170 ? 'smallest': null
 											)}
 											disabled={
 												!me.canSendMic ||
@@ -633,7 +625,7 @@ const Me = (props) =>
 											})}
 											className={classnames(
 												'fab',
-												size === 'smallest' ? 'smallest': null
+												height <= 170 ? 'smallest': null
 											)}
 											disabled={
 												!me.canSendWebcam ||
@@ -675,7 +667,7 @@ const Me = (props) =>
 												})}
 												className={classnames(
 													'fab',
-													size === 'smallest' ? 'smallest': null
+													height <= 170 ? 'smallest': null
 												)}
 												disabled={
 													!hasScreenPermission ||
@@ -708,7 +700,7 @@ const Me = (props) =>
 											id             : 'device.options',
 											defaultMessage : 'Options'
 										})}
-										placement={size === 'smallest' ? 'bottom' : 'left'}
+										placement={height <= 170 ? 'bottom' : 'left'}
 									>
 										<Fab
 											aria-label={intl.formatMessage({
@@ -717,7 +709,7 @@ const Me = (props) =>
 											})}
 											className={classnames(
 												'fab',
-												size === 'smallest' ? 'smallest': null
+												height <= 170 ? 'smallest': null
 											)}
 											size={buttonSize}
 
@@ -820,7 +812,7 @@ const Me = (props) =>
 									classnames(
 										classes.meTag,
 										hover ? 'hover' : null,
-										size === 'smallest' ? 'smallest': null
+										height <= 170 ? 'smallest': null
 									)}
 							>
 								<FormattedMessage
@@ -863,7 +855,7 @@ const Me = (props) =>
 											})}
 											className={classnames(
 												'fab',
-												size === 'smallest' ? 'smallest': null
+												height <= 170 ? 'smallest': null
 											)}
 											disabled={!me.canSendWebcam || me.webcamInProgress}
 											size={buttonSize}
