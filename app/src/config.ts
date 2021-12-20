@@ -581,7 +581,12 @@ Setting 'play' to null disables the sound notification.
 						'&:hover'       :
 						{
 							backgroundColor : '#518029'
+						},
+						'&:disabled' : {
+							color           : '#999898',
+							backgroundColor : '#323131'
 						}
+
 					},
 
 					secondary :
@@ -590,10 +595,16 @@ Setting 'play' to null disables the sound notification.
 						'&:hover'       :
 						{
 							backgroundColor : '#f50057'
+						},
+						'&:disabled' : {
+							color           : '#999898',
+							backgroundColor : '#323131'
 						}
+
 					}
 
 				},
+
 				MuiBadge :
 				{
 					colorPrimary :
