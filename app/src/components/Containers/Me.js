@@ -548,7 +548,10 @@ const Me = (props) =>
 						>
 							<React.Fragment>
 								{/* MICROPHONE */}
-								<Tooltip title={micTip} placement='left'>
+								<Tooltip
+									title={micTip}
+									placement={height <= 190 ? 'bottom' : 'left'}
+								>
 									<div>
 										<Fab
 											aria-label={intl.formatMessage({
@@ -617,7 +620,10 @@ const Me = (props) =>
 								{/* /MICROPHONE */}
 
 								{/* WEBCAM */}
-								<Tooltip title={webcamTip} placement='left'>
+								<Tooltip
+									title={webcamTip}
+									placement={height <= 190 ? 'bottom' : 'left'}
+								>
 									<div>
 										<Fab
 											aria-label={intl.formatMessage({
@@ -658,7 +664,8 @@ const Me = (props) =>
 									<Tooltip open={screenShareTooltipOpen}
 										onClose={screenShareTooltipHandleClose}
 										onOpen={screenShareTooltipHandleOpen}
-										title={screenTip} placement='left'
+										title={screenTip}
+										placement={height <= 190 ? 'bottom' : 'left'}
 									>
 										<div>
 											<Fab
@@ -701,7 +708,7 @@ const Me = (props) =>
 											id             : 'device.options',
 											defaultMessage : 'Options'
 										})}
-										placement={height <= 170 ? 'bottom' : 'left'}
+										placement={height <= 190 ? 'bottom' : 'left'}
 									>
 										<Fab
 											aria-label={intl.formatMessage({
@@ -847,7 +854,10 @@ const Me = (props) =>
 									}, 2000);
 								}}
 							>
-								<Tooltip title={webcamTip} placement='left'>
+								<Tooltip
+									title={webcamTip}
+									placement={height <= 190 ? 'bottom' : 'left'}
+								>
 									<div>
 										<Fab
 											aria-label={intl.formatMessage({

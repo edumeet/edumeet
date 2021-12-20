@@ -396,7 +396,7 @@ const Peer = (props) =>
 								id             : 'device.muteAudio',
 								defaultMessage : 'Mute audio'
 							})}
-							placement={height <= 170 ? 'top' : 'left'}
+							placement={height <= 190 ? 'bottom' : 'left'}
 						>
 							<div>
 								<Fab
@@ -435,7 +435,7 @@ const Peer = (props) =>
 									id             : 'label.newWindow',
 									defaultMessage : 'New window'
 								})}
-								placement={height <= 170 ? 'top' : 'left'}
+								placement={height <= 190 ? 'bottom' : 'left'}
 							>
 								<div>
 									<Fab
@@ -466,7 +466,7 @@ const Peer = (props) =>
 									id             : 'label.fullscreen',
 									defaultMessage : 'Fullscreen'
 								})}
-								placement={height <= 170 ? 'top' : 'left'}
+								placement={height <= 190 ? 'bottom' : 'left'}
 							>
 								<div>
 									<Fab
@@ -505,7 +505,7 @@ const Peer = (props) =>
 										defaultMessage : 'Add to spotlight'
 									})
 								}
-								placement={height <= 170 ? 'top' : 'left'}
+								placement={height <= 190 ? 'bottom' : 'left'}
 							>
 								<div>
 									<Fab
@@ -552,7 +552,7 @@ const Peer = (props) =>
 									id             : 'device.options',
 									defaultMessage : 'Options'
 								})}
-								placement={height <= 170 ? 'top' : 'left'}
+								placement={height <= 190 ? 'bottom' : 'left'}
 							>
 								<div>
 									<Fab
@@ -711,7 +711,7 @@ const Peer = (props) =>
 											id             : 'label.newWindow',
 											defaultMessage : 'New window'
 										})}
-										placement={height <= 170 ? 'top' : 'left'}
+										placement={height <= 190 ? 'bottom' : 'left'}
 									>
 										<div>
 											<Fab
@@ -745,7 +745,7 @@ const Peer = (props) =>
 										id             : 'label.fullscreen',
 										defaultMessage : 'Fullscreen'
 									})}
-									placement={height <= 170 ? 'top' : 'left'}
+									placement={height <= 190 ? 'bottom' : 'left'}
 								>
 									<div>
 										<Fab
@@ -874,7 +874,7 @@ const Peer = (props) =>
 										id             : 'label.newWindow',
 										defaultMessage : 'New window'
 									})}
-									placement={height <= 170 ? 'top' : 'left'}
+									placement={height <= 190 ? 'bottom' : 'left'}
 								>
 
 									<div>
@@ -909,7 +909,7 @@ const Peer = (props) =>
 									id             : 'label.fullscreen',
 									defaultMessage : 'Fullscreen'
 								})}
-								placement={height <= 170 ? 'top' : 'left'}
+								placement={height <= 190 ? 'bottom' : 'left'}
 							>
 
 								<div>
