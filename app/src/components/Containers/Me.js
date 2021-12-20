@@ -178,13 +178,89 @@ const Me = (props) =>
 		classes
 	} = props;
 
-	// eslint-disable-next-line no-unused-vars
-	const width = style.width;
+	// const width = style.width;
 
-	// eslint-disable-next-line no-unused-vars
-	const height = style.height;
+	// const height = style.height;
 
 	const size = style.size;
+
+	const [ buttonSize, setButtonSize ] = useState('large');
+
+	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
+
+		{
+			flexDirection : 'row'
+		}
+	);
+
+	const [ meTagAdditionalStyles, setMeTagAdditionalStyles ] = useState(
+		{
+			fontSize : '1.5vh'
+		}
+	);
+
+	useEffect(() =>
+	{
+		switch (size)
+		{
+			case 'smallest':
+				setButtonSize('small');
+
+				setControlsAdditionalStyles({
+					flexDirection : 'row',
+					alignItems    : 'flex-start'
+
+				});
+
+				setMeTagAdditionalStyles({
+					fontSize : '0em'
+				});
+
+				break;
+
+			case 'small':
+				setButtonSize('small');
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
+
+				setMeTagAdditionalStyles({
+					fontSize : '2.0em'
+				});
+
+				break;
+
+			case 'medium':
+				setButtonSize('medium');
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
+
+				setMeTagAdditionalStyles({
+					fontSize : '2.5em'
+				});
+
+				break;
+
+			case 'large':
+				setButtonSize('large');
+
+				setControlsAdditionalStyles({
+					flexDirection : 'column'
+				});
+
+				setMeTagAdditionalStyles({
+					fontSize : '3.0em'
+				});
+
+				break;
+
+			default:
+
+		}
+	}, [ size ]);
 
 	const videoVisible = (
 		Boolean(webcamProducer) &&
@@ -360,84 +436,6 @@ const Me = (props) =>
 
 		return () => clearInterval(poll);
 	}, [ roomClient, advancedMode ]);
-
-	const [ buttonSize, setButtonSize ] = useState('large');
-
-	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
-
-		{
-			flexDirection : 'row'
-		}
-	);
-
-	const [ meTagAdditionalStyles, setMeTagAdditionalStyles ] = useState(
-		{
-			fontSize : '1.5vh'
-		}
-	);
-
-	useEffect(() =>
-	{
-		switch (size)
-		{
-			case 'smallest':
-				setButtonSize('small');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'row',
-					alignItems    : 'flex-start'
-
-				});
-
-				setMeTagAdditionalStyles({
-					fontSize : '1.5em'
-				});
-
-				break;
-
-			case 'small':
-				setButtonSize('small');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setMeTagAdditionalStyles({
-					fontSize : '2.0em'
-				});
-
-				break;
-
-			case 'medium':
-				setButtonSize('medium');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setMeTagAdditionalStyles({
-					fontSize : '2.5em'
-				});
-
-				break;
-
-			case 'large':
-				setButtonSize('large');
-
-				setControlsAdditionalStyles({
-					flexDirection : 'column'
-				});
-
-				setMeTagAdditionalStyles({
-					fontSize : '3.0em'
-				});
-
-				break;
-
-			default:
-
-		}
-	}, [ size ]);
 
 	// menu
 	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);

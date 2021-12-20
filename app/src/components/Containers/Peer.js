@@ -252,7 +252,7 @@ const Peer = (props) =>
 				});
 
 				setVideoInfoAdditionalStyles({
-					fontSize : '1.5em'
+					fontSize : '0em'
 				});
 
 				break;
