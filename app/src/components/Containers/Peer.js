@@ -202,7 +202,7 @@ const Peer = (props) =>
 
 	useEffect(() =>
 	{
-		if (height > 0 && height <= 180)
+		if (height > 0 && height <= 190)
 		{
 			setButtonSize('small');
 
@@ -217,7 +217,7 @@ const Peer = (props) =>
 
 		}
 
-		else if (height > 180 && height <= 320)
+		else if (height > 190 && height <= 320)
 		{
 			setButtonSize('small');
 
