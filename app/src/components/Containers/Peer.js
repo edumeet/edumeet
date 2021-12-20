@@ -123,7 +123,6 @@ const styles = (theme) =>
 				borderRadius  : 6,
 				userSelect    : 'none',
 				pointerEvents : 'none',
-				fontSize      : '1.5vw',
 				color         : 'rgba(255, 255, 255, 0.55)'
 			}
 		}
@@ -234,6 +233,12 @@ const Peer = (props) =>
 		}
 	);
 
+	const [ videoInfoAdditionalStyles, setVideoInfoAdditionalStyles ] = useState(
+		{
+			fontSize : '1.5vh'
+		}
+	);
+
 	useEffect(() =>
 	{
 		switch (size)
@@ -246,6 +251,10 @@ const Peer = (props) =>
 					alignItems    : 'flex-start'
 				});
 
+				setVideoInfoAdditionalStyles({
+					fontSize : '1.5em'
+				});
+
 				break;
 
 			case 'small':
@@ -255,6 +264,9 @@ const Peer = (props) =>
 					flexDirection : 'column'
 				});
 
+				setVideoInfoAdditionalStyles({
+					fontSize : '2.0em'
+				});
 				break;
 
 			case 'medium':
@@ -264,6 +276,10 @@ const Peer = (props) =>
 					flexDirection : 'column'
 				});
 
+				setVideoInfoAdditionalStyles({
+					fontSize : '2.5em'
+				});
+
 				break;
 
 			case 'large':
@@ -271,6 +287,10 @@ const Peer = (props) =>
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
+				});
+
+				setVideoInfoAdditionalStyles({
+					fontSize : '3.0em'
 				});
 
 				break;
@@ -328,11 +348,13 @@ const Peer = (props) =>
 			>
 				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible &&
-						<div className={classnames(
-							classes.videoInfo,
-							'hide',
-							hover ? 'hover' : null
-						)}
+						<div
+							style={{ ...videoInfoAdditionalStyles }}
+							className={classnames(
+								classes.videoInfo,
+								'hide',
+								hover ? 'hover' : null
+							)}
 						>
 							<p>
 								<FormattedMessage
@@ -646,7 +668,10 @@ const Peer = (props) =>
 					>
 						<div className={classnames(classes.viewContainer)}>
 							{ !videoVisible &&
-								<div className={classes.videoInfo}>
+								<div
+									style={{ ...videoInfoAdditionalStyles }}
+									className={classes.videoInfo}
+								>
 									<p>
 										<FormattedMessage
 											id='room.videoPaused'
@@ -810,7 +835,10 @@ const Peer = (props) =>
 				>
 					<div className={classnames(classes.viewContainer)}>
 						{ !screenVisible &&
-							<div className={classes.videoInfo}>
+							<div
+								style={{ ...videoInfoAdditionalStyles }}
+								className={classes.videoInfo}
+							>
 								<p>
 									<FormattedMessage
 										id='room.videoPaused'

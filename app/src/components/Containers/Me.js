@@ -75,7 +75,6 @@ const styles = (theme) =>
 			left       : '50%',
 			transform  : 'translate(-50%, -50%)',
 			color      : 'rgba(255, 255, 255, 0.5)',
-			fontSize   : '1.5vw',
 			zIndex     : 1,
 			margin     : 0,
 			opacity    : 0,
@@ -365,8 +364,15 @@ const Me = (props) =>
 	const [ buttonSize, setButtonSize ] = useState('large');
 
 	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
+
 		{
 			flexDirection : 'row'
+		}
+	);
+
+	const [ meTagAdditionalStyles, setMeTagAdditionalStyles ] = useState(
+		{
+			fontSize : '1.5vh'
 		}
 	);
 
@@ -383,6 +389,10 @@ const Me = (props) =>
 
 				});
 
+				setMeTagAdditionalStyles({
+					fontSize : '1.5em'
+				});
+
 				break;
 
 			case 'small':
@@ -390,6 +400,10 @@ const Me = (props) =>
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
+				});
+
+				setMeTagAdditionalStyles({
+					fontSize : '2.0em'
 				});
 
 				break;
@@ -401,6 +415,10 @@ const Me = (props) =>
 					flexDirection : 'column'
 				});
 
+				setMeTagAdditionalStyles({
+					fontSize : '2.5em'
+				});
+
 				break;
 
 			case 'large':
@@ -408,6 +426,10 @@ const Me = (props) =>
 
 				setControlsAdditionalStyles({
 					flexDirection : 'column'
+				});
+
+				setMeTagAdditionalStyles({
+					fontSize : '3.0em'
 				});
 
 				break;
@@ -486,11 +508,13 @@ const Me = (props) =>
 					{/* /PTT */}
 
 					{/* ====== */}
-					<p className={
-						classnames(
-							classes.meTag,
-							hover ? 'hover' : null
-						)}
+					<p
+						style={{ ...meTagAdditionalStyles }}
+						className={
+							classnames(
+								classes.meTag,
+								hover ? 'hover' : null
+							)}
 					>
 						<FormattedMessage
 							id='room.me'
@@ -788,12 +812,14 @@ const Me = (props) =>
 						style={spacingStyle}
 					>
 						<div className={classes.viewContainer} style={style}>
-							<p className={
-								classnames(
-									classes.meTag,
-									hover ? 'hover' : null,
-									size === 'smallest' ? 'smallest': null
-								)}
+							<p
+								style={{ ...meTagAdditionalStyles }}
+								className={
+									classnames(
+										classes.meTag,
+										hover ? 'hover' : null,
+										size === 'smallest' ? 'smallest': null
+									)}
 							>
 								<FormattedMessage
 									id='room.me'
@@ -833,7 +859,6 @@ const Me = (props) =>
 												id             : 'device.stopVideo',
 												defaultMessage : 'Stop video'
 											})}
-											// className={classes.fab}
 											className={classnames(
 												'fab',
 												size === 'smallest' ? 'smallest': null
@@ -896,11 +921,14 @@ const Me = (props) =>
 					style={spacingStyle}
 				>
 					<div className={classes.viewContainer} style={style}>
-						<p className={
-							classnames(
-								classes.meTag,
-								hover ? 'hover' : null
-							)}
+						<p
+
+							style={{ ...meTagAdditionalStyles }}
+							className={
+								classnames(
+									classes.meTag,
+									hover ? 'hover' : null
+								)}
 						>
 							<FormattedMessage
 								id='room.me'
