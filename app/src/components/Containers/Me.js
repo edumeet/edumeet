@@ -482,7 +482,7 @@ const Me = (props) =>
 
 				<div className={classes.viewContainer} style={style}>
 					{/* PTT */}
-					{ me.browser.platform !== 'mobile' && height <= 170 &&
+					{ me.browser.platform !== 'mobile' && height >= 170 &&
 						<div className={classnames(
 							classes.ptt,
 							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
