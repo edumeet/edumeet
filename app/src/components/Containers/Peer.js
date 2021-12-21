@@ -77,7 +77,7 @@ const styles = (theme) =>
 			alignItems      : 'flex-end',
 			padding         : theme.spacing(1),
 			zIndex          : 21,
-			opacity         : 0,
+			opacity         : 1,
 			transition      : 'opacity 0.3s',
 			touchAction     : 'none',
 			'&.hover'       :
@@ -197,7 +197,11 @@ const Peer = (props) =>
 		}
 	);
 
-	const [ videoInfoAdditionalStyles, setVideoInfoAdditionalStyles ] = useState();
+	const [ videoInfoAdditionalStyles, setVideoInfoAdditionalStyles ] = useState(
+		{
+			style : {}
+		}
+	);
 
 	// Dinamic properties/style values
 	useEffect(() =>
@@ -221,7 +225,9 @@ const Peer = (props) =>
 			});
 
 			setVideoInfoAdditionalStyles({
-				fontSize : '0em'
+				style : {
+					fontSize : '0em'
+				}
 			});
 		}
 
@@ -239,7 +245,7 @@ const Peer = (props) =>
 			});
 
 			setVideoInfoAdditionalStyles({
-				'style' : {
+				style : {
 					fontSize : '1.5em'
 				}
 			});
@@ -258,7 +264,9 @@ const Peer = (props) =>
 			});
 
 			setVideoInfoAdditionalStyles({
-				fontSize : '1.6em'
+				style : {
+					fontSize : '1.6em'
+				}
 			});
 		}
 
@@ -275,7 +283,9 @@ const Peer = (props) =>
 			});
 
 			setVideoInfoAdditionalStyles({
-				fontSize : '2.3em'
+				style : {
+					fontSize : '2.3em'
+				}
 			});
 		}
 
@@ -292,7 +302,10 @@ const Peer = (props) =>
 			});
 
 			setVideoInfoAdditionalStyles({
-				fontSize : '3.0em'
+
+				style : {
+					fontSize : '3.0em'
+				}
 			});
 		}
 
@@ -384,7 +397,7 @@ const Peer = (props) =>
 				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible &&
 						<div
-							style={{ ...videoInfoAdditionalStyles }}
+							style={{ ...videoInfoAdditionalStyles.style }}
 							className={classnames(
 								classes.videoInfo,
 								'hide',
@@ -692,7 +705,7 @@ const Peer = (props) =>
 						<div className={classnames(classes.viewContainer)}>
 							{ !videoVisible &&
 								<div
-									style={{ ...videoInfoAdditionalStyles }}
+									style={{ ...videoInfoAdditionalStyles.style }}
 									className={classes.videoInfo}
 								>
 									<p>
@@ -855,7 +868,7 @@ const Peer = (props) =>
 					<div className={classnames(classes.viewContainer)}>
 						{ !screenVisible &&
 							<div
-								style={{ ...videoInfoAdditionalStyles }}
+								style={{ ...videoInfoAdditionalStyles.style }}
 								className={classes.videoInfo}
 							>
 								<p>

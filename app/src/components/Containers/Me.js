@@ -186,7 +186,11 @@ const Me = (props) =>
 		}
 	);
 
-	const [ meTagAdditionalStyles, setMeTagAdditionalStyles ] = useState(null);
+	const [ meTagAdditionalStyles, setMeTagAdditionalStyles ] = useState(
+		{
+			style : {}
+		}
+	);
 
 	// Dinamic properties/style values
 	useEffect(() =>
@@ -210,7 +214,9 @@ const Me = (props) =>
 			});
 
 			setMeTagAdditionalStyles({
-				fontSize : '0em'
+				style : {
+					fontSize : '0em'
+				}
 			});
 		}
 
@@ -228,7 +234,7 @@ const Me = (props) =>
 			});
 
 			setMeTagAdditionalStyles({
-				'style' : {
+				style : {
 					fontSize : '2.0em'
 				}
 			});
@@ -247,7 +253,9 @@ const Me = (props) =>
 			});
 
 			setMeTagAdditionalStyles({
-				fontSize : '3.0em'
+				style : {
+					fontSize : '3.0em'
+				}
 			});
 		}
 
@@ -264,7 +272,9 @@ const Me = (props) =>
 			});
 
 			setMeTagAdditionalStyles({
-				fontSize : '4em'
+				style : {
+					fontSize : '4em'
+				}
 			});
 		}
 
@@ -281,7 +291,9 @@ const Me = (props) =>
 			});
 
 			setMeTagAdditionalStyles({
-				fontSize : '5.0em'
+				'style' : {
+					fontSize : '5.0em'
+				}
 			});
 		}
 
@@ -532,7 +544,7 @@ const Me = (props) =>
 
 					{/* ME TAG */}
 					<p
-						style={{ ...meTagAdditionalStyles }}
+						style={{ ...meTagAdditionalStyles.style }}
 						className={
 							classnames(
 								classes.meTag,
@@ -836,7 +848,7 @@ const Me = (props) =>
 					>
 						<div className={classes.viewContainer} style={style}>
 							<p
-								style={{ ...meTagAdditionalStyles }}
+								style={{ ...meTagAdditionalStyles.style }}
 								className={
 									classnames(
 										classes.meTag,
@@ -947,7 +959,7 @@ const Me = (props) =>
 					<div className={classes.viewContainer} style={style}>
 						<p
 
-							style={{ ...meTagAdditionalStyles }}
+							style={{ ...meTagAdditionalStyles.style }}
 							className={
 								classnames(
 									classes.meTag,
