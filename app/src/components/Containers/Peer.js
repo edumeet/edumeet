@@ -240,7 +240,7 @@ const Peer = (props) =>
 
 			setVideoInfoAdditionalStyles({
 				'style' : {
-					fontSize : '2.0em'
+					fontSize : '1.5em'
 				}
 			});
 		}
@@ -258,7 +258,7 @@ const Peer = (props) =>
 			});
 
 			setVideoInfoAdditionalStyles({
-				fontSize : '3.0em'
+				fontSize : '1.6em'
 			});
 		}
 
@@ -275,7 +275,7 @@ const Peer = (props) =>
 			});
 
 			setVideoInfoAdditionalStyles({
-				fontSize : '4em'
+				fontSize : '2.3em'
 			});
 		}
 
@@ -292,7 +292,7 @@ const Peer = (props) =>
 			});
 
 			setVideoInfoAdditionalStyles({
-				fontSize : '5.0em'
+				fontSize : '3.0em'
 			});
 		}
 
