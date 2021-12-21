@@ -231,6 +231,15 @@ const Peer = (props) =>
 			});
 		}
 
+		if (height > 120)
+		{
+			setVideoInfoAdditionalStyles({
+				style : {
+					fontSize : '1em'
+				}
+			});
+		}
+
 		if (height > 170)
 		{
 			setControlsAdditionalStyles({
@@ -260,12 +269,6 @@ const Peer = (props) =>
 				btn : {
 					style : {},
 					size  : 'small'
-				}
-			});
-
-			setVideoInfoAdditionalStyles({
-				style : {
-					fontSize : '1.6em'
 				}
 			});
 		}

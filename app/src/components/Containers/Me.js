@@ -215,7 +215,7 @@ const Me = (props) =>
 
 			setMeTagAdditionalStyles({
 				style : {
-					fontSize : '0em'
+					fontSize : '2em'
 				}
 			});
 		}
@@ -235,7 +235,7 @@ const Me = (props) =>
 
 			setMeTagAdditionalStyles({
 				style : {
-					fontSize : '2.0em'
+					fontSize : '3.0em'
 				}
 			});
 		}
