@@ -187,33 +187,39 @@ const Peer = (props) =>
 
 	const height = style.height;
 
-	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
+	const [ controls, setControls ] = useState(
 		{
-			style : {},
-			btn   : {
+			root : {
+				style : {}
+			},
+			item : {
 				style : {},
 				size  : ''
 			}
 		}
 	);
 
-	const [ videoInfoAdditionalStyles, setVideoInfoAdditionalStyles ] = useState(
+	const [ videoInfo, setVideoInfo ] = useState(
 		{
-			style : {}
+			root : {
+				style : {}
+			}
 		}
 	);
 
-	// Dinamic properties/style values
+	// Extend styles/props values
 	useEffect(() =>
 	{
 		if (height > 0)
 		{
-			setControlsAdditionalStyles({
-				style : {
-					flexDirection : 'row',
-					alignItems    : 'flex-start'
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'row',
+						alignItems    : 'flex-start'
+					}
 				},
-				btn : {
+				item : {
 					style : {
 						width     : 30,
 						height    : 30,
@@ -224,49 +230,59 @@ const Peer = (props) =>
 				}
 			});
 
-			setVideoInfoAdditionalStyles({
-				style : {
-					fontSize : '0em'
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '0em'
+					}
 				}
 			});
 		}
 
 		if (height > 120)
 		{
-			setVideoInfoAdditionalStyles({
-				style : {
-					fontSize : '1em'
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '1em'
+					}
 				}
 			});
 		}
 
 		if (height > 170)
 		{
-			setControlsAdditionalStyles({
-				style : {
-					flexDirection : 'row',
-					alignItems    : 'flex-start'
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'row',
+						alignItems    : 'flex-start'
+					}
 				},
-				btn : {
+				item : {
 					style : {},
 					size  : 'small'
 				}
 			});
 
-			setVideoInfoAdditionalStyles({
-				style : {
-					fontSize : '1.5em'
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '1.5em'
+					}
 				}
 			});
 		}
 
 		if (height > 190)
 		{
-			setControlsAdditionalStyles({
-				style : {
-					flexDirection : 'column'
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
 				},
-				btn : {
+				item : {
 					style : {},
 					size  : 'small'
 				}
@@ -275,39 +291,46 @@ const Peer = (props) =>
 
 		if (height > 320)
 		{
-			setControlsAdditionalStyles({
-				style : {
-					flexDirection : 'column'
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
 				},
-				btn : {
+				item : {
 					style : {},
 					size  : 'medium'
 				}
 			});
 
-			setVideoInfoAdditionalStyles({
-				style : {
-					fontSize : '2.3em'
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '2.3em'
+					}
 				}
 			});
 		}
 
 		if (height > 400)
 		{
-			setControlsAdditionalStyles({
-				style : {
-					flexDirection : 'column'
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
 				},
-				btn : {
+				item : {
 					style : {},
 					size  : 'large'
 				}
 			});
 
-			setVideoInfoAdditionalStyles({
-
-				style : {
-					fontSize : '3.0em'
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '3.0em'
+					}
 				}
 			});
 		}
@@ -400,7 +423,7 @@ const Peer = (props) =>
 				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible &&
 						<div
-							style={{ ...videoInfoAdditionalStyles.style }}
+							style={{ ...videoInfo.root.style }}
 							className={classnames(
 								classes.videoInfo,
 								'hide',
@@ -422,7 +445,7 @@ const Peer = (props) =>
 							classes.controls, hover ? 'hover' : null,
 							height <= 170 ? 'smallest': null
 						)}
-						style={{ ...controlsAdditionalStyles.style }}
+						style={{ ...controls.root.style }}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -458,11 +481,11 @@ const Peer = (props) =>
 										defaultMessage : 'Mute audio'
 									})}
 									// className={classes.fab}
-									style={{ ...controlsAdditionalStyles.btn.style }}
+									style={{ ...controls.item.style }}
 									className={classnames('fab')}
 									disabled={!micConsumer}
 									color={micEnabled ? 'default' : 'secondary'}
-									size={controlsAdditionalStyles.btn.size}
+									size={controls.item.size}
 									onClick={() =>
 									{
 										micEnabled ?
@@ -494,9 +517,9 @@ const Peer = (props) =>
 											id             : 'label.newWindow',
 											defaultMessage : 'New window'
 										})}
-										style={{ ...controlsAdditionalStyles.btn.style }}
+										style={{ ...controls.item.style }}
 										className={classnames('fab')}
-										size={controlsAdditionalStyles.btn.size}
+										size={controls.item.size}
 										onClick={() =>
 										{
 											toggleConsumerWindow(webcamConsumer);
@@ -523,10 +546,10 @@ const Peer = (props) =>
 											defaultMessage : 'Fullscreen'
 										})}
 										// className={classes.fab}
-										style={{ ...controlsAdditionalStyles.btn.style }}
+										style={{ ...controls.item.style }}
 										className={classnames('fab')}
 										disabled={!videoVisible}
-										size={controlsAdditionalStyles.btn.size}
+										size={controls.item.size}
 										onClick={() =>
 										{
 											toggleConsumerFullscreen(webcamConsumer);
@@ -567,9 +590,9 @@ const Peer = (props) =>
 											})
 										}
 										// className={classes.fab}
-										style={{ ...controlsAdditionalStyles.btn.style }}
+										style={{ ...controls.item.style }}
 										className={classnames('fab')}
-										size={controlsAdditionalStyles.btn.size}
+										size={controls.item.size}
 										onClick={() =>
 										{
 											isSelected ?
@@ -604,9 +627,9 @@ const Peer = (props) =>
 											id             : 'device.options',
 											defaultMessage : 'Options'
 										})}
-										style={{ ...controlsAdditionalStyles.btn.style }}
+										style={{ ...controls.item.style }}
 										className={classnames('fab')}
-										size={controlsAdditionalStyles.btn.size}
+										size={controls.item.size}
 										onClick={handleMenuOpen}
 									>
 										<MoreHorizIcon />
@@ -708,7 +731,7 @@ const Peer = (props) =>
 						<div className={classnames(classes.viewContainer)}>
 							{ !videoVisible &&
 								<div
-									style={{ ...videoInfoAdditionalStyles.style }}
+									style={{ ...videoInfo.root.style }}
 									className={classes.videoInfo}
 								>
 									<p>
@@ -725,7 +748,7 @@ const Peer = (props) =>
 									classes.controls,
 									hover ? 'hover' : null
 								)}
-								style={{ ...controlsAdditionalStyles }}
+								style={{ ...controls.root.style }}
 								onMouseOver={() => setHover(true)}
 								onMouseOut={() => setHover(false)}
 								onTouchStart={() =>
@@ -761,13 +784,13 @@ const Peer = (props) =>
 													defaultMessage : 'New window'
 												})}
 												// className={classes.fab}
-												style={{ ...controlsAdditionalStyles.btn.style }}
+												style={{ ...controls.item.style }}
 												className={classnames('fab')}
 												disabled={
 													!videoVisible ||
 													(windowConsumer === consumer.id)
 												}
-												size={controlsAdditionalStyles.btn.size}
+												size={controls.item.size}
 												onClick={() =>
 												{
 													toggleConsumerWindow(consumer);
@@ -793,10 +816,10 @@ const Peer = (props) =>
 												defaultMessage : 'Fullscreen'
 											})}
 											// className={classes.fab}
-											style={{ ...controlsAdditionalStyles.btn.style }}
+											style={{ ...controls.item.style }}
 											className={classnames('fab')}
 											disabled={!videoVisible}
-											size={controlsAdditionalStyles.btn.size}
+											size={controls.item.size}
 											onClick={() =>
 											{
 												toggleConsumerFullscreen(consumer);
@@ -843,7 +866,7 @@ const Peer = (props) =>
 
 			{ screenConsumer &&
 				<div
-					style={{ ...rootStyle, ...controlsAdditionalStyles }}
+					style={{ ...rootStyle, ...controls.root.style }}
 					className={classnames(
 						classes.root, 'screen',
 						hover ? 'hover' : null
@@ -871,7 +894,7 @@ const Peer = (props) =>
 					<div className={classnames(classes.viewContainer)}>
 						{ !screenVisible &&
 							<div
-								style={{ ...videoInfoAdditionalStyles.style }}
+								style={{ ...videoInfo.root.style }}
 								className={classes.videoInfo}
 							>
 								<p>
@@ -920,13 +943,13 @@ const Peer = (props) =>
 												id             : 'label.newWindow',
 												defaultMessage : 'New window'
 											})}
-											style={{ ...controlsAdditionalStyles.btn.style }}
+											style={{ ...controls.item.style }}
 											className={classnames('fab')}
 											disabled={
 												!screenVisible ||
 											(windowConsumer === screenConsumer.id)
 											}
-											size={controlsAdditionalStyles.btn.size}
+											size={controls.item.size}
 											onClick={() =>
 											{
 												toggleConsumerWindow(screenConsumer);
@@ -959,7 +982,7 @@ const Peer = (props) =>
 											height <= 170 ? 'smallest': null
 										)}
 										disabled={!screenVisible}
-										size={controlsAdditionalStyles.btn.size}
+										size={controls.item.size}
 										onClick={() =>
 										{
 											toggleConsumerFullscreen(screenConsumer);
