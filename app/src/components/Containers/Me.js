@@ -108,13 +108,7 @@ const styles = (theme) =>
 			'& .fab' :
 			{
 				margin        : theme.spacing(1),
-				pointerEvents : 'auto',
-				'&.smallest'  : {
-					width     : 30,
-					height    : 30,
-					minHeight : 'auto',
-					margin    : theme.spacing(0.5)
-				}
+				pointerEvents : 'auto'
 			}
 		},
 		ptt :
@@ -174,89 +168,124 @@ const Me = (props) =>
 		hasScreenPermission,
 		transports,
 		noiseVolume,
-		classes
+		classes,
+		theme
 	} = props;
 
 	// const width = style.width;
 
 	const height = style.height;
 
-	const [ buttonSize, setButtonSize ] = useState('large');
-
 	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
-
 		{
-			flexDirection : 'row'
+			style : {},
+			btn   : {
+				style : {},
+				size  : ''
+			}
 		}
 	);
 
-	const [ meTagAdditionalStyles, setMeTagAdditionalStyles ] = useState(
-		{
-			fontSize : '1.5vh'
-		}
-	);
+	const [ meTagAdditionalStyles, setMeTagAdditionalStyles ] = useState(null);
 
+	// Dinamic properties/style values
 	useEffect(() =>
 	{
-		if (height > 0 && height <= 190)
+		if (height > 0)
 		{
-			setButtonSize('small');
-
 			setControlsAdditionalStyles({
-				flexDirection : 'row',
-				alignItems    : 'flex-start'
+				style : {
+					flexDirection : 'row',
+					alignItems    : 'flex-start'
+				},
+				btn : {
+					style : {
+						width     : 30,
+						height    : 30,
+						minHeight : 'auto',
+						margin    : theme.spacing(0.5)
+					},
+					size : 'small'
+				}
 			});
 
 			setMeTagAdditionalStyles({
 				fontSize : '0em'
 			});
-
 		}
 
-		else if (height > 190 && height <= 320)
+		if (height > 170)
 		{
-
-			setButtonSize('small');
-
 			setControlsAdditionalStyles({
-				flexDirection : 'column'
+				style : {
+					flexDirection : 'row',
+					alignItems    : 'flex-start'
+				},
+				btn : {
+					style : {},
+					size  : 'small'
+				}
 			});
 
 			setMeTagAdditionalStyles({
-				fontSize : '2.0em'
+				'style' : {
+					fontSize : '2.0em'
+				}
 			});
-
 		}
 
-		else if (height > 320 && height <= 400)
+		if (height > 190)
 		{
-			setButtonSize('medium');
-
 			setControlsAdditionalStyles({
-				flexDirection : 'column'
-			});
-
-			setMeTagAdditionalStyles({
-				fontSize : '2.5em'
-			});
-
-		}
-
-		else if (height > 400)
-		{
-			setButtonSize('large');
-
-			setControlsAdditionalStyles({
-				flexDirection : 'column'
+				style : {
+					flexDirection : 'column'
+				},
+				btn : {
+					style : {},
+					size  : 'small'
+				}
 			});
 
 			setMeTagAdditionalStyles({
 				fontSize : '3.0em'
 			});
-
 		}
 
-	}, [ height ]);
+		if (height > 320)
+		{
+			setControlsAdditionalStyles({
+				style : {
+					flexDirection : 'column'
+				},
+				btn : {
+					style : {},
+					size  : 'medium'
+				}
+			});
+
+			setMeTagAdditionalStyles({
+				fontSize : '4em'
+			});
+		}
+
+		if (height > 400)
+		{
+			setControlsAdditionalStyles({
+				style : {
+					flexDirection : 'column'
+				},
+				btn : {
+					style : {},
+					size  : 'large'
+				}
+			});
+
+			setMeTagAdditionalStyles({
+				fontSize : '5.0em'
+			});
+		}
+
+	}, [ height, theme ]);
 
 	const videoVisible = (
 		Boolean(webcamProducer) &&
@@ -520,7 +549,7 @@ const Me = (props) =>
 					{/* CONTROLS BUTTONS (inside) */}
 					{ !settings.buttonControlBar &&
 						<div
-							style={{ ...controlsAdditionalStyles }}
+							style={{ ...controlsAdditionalStyles.style }}
 							className={classnames(
 								classes.controls,
 								settings.hiddenControls ? 'hide' : null,
@@ -558,10 +587,8 @@ const Me = (props) =>
 												id             : 'device.muteAudio',
 												defaultMessage : 'Mute audio'
 											})}
-											className={classnames(
-												'fab',
-												height <= 170 ? 'smallest': null
-											)}
+											style={{ ...controlsAdditionalStyles.btn.style }}
+											className={classnames('fab')}
 											disabled={
 												!me.canSendMic ||
 													!hasAudioPermission ||
@@ -574,7 +601,7 @@ const Me = (props) =>
 												: 'secondary'
 											}
 
-											size={buttonSize}
+											size={controlsAdditionalStyles.btn.size}
 											onClick={() =>
 											{
 												if (micState === 'off')
@@ -630,17 +657,15 @@ const Me = (props) =>
 												id             : 'device.startVideo',
 												defaultMessage : 'Start video'
 											})}
-											className={classnames(
-												'fab',
-												height <= 170 ? 'smallest': null
-											)}
+											style={{ ...controlsAdditionalStyles.btn.style }}
+											className={classnames('fab')}
 											disabled={
 												!me.canSendWebcam ||
 													!hasVideoPermission ||
 													me.webcamInProgress
 											}
 											color={webcamState === 'on' ? 'default' : 'secondary'}
-											size={buttonSize}
+											size={controlsAdditionalStyles.btn.size}
 
 											onClick={() =>
 											{
@@ -673,17 +698,15 @@ const Me = (props) =>
 													id             : 'device.startScreenSharing',
 													defaultMessage : 'Start screen sharing'
 												})}
-												className={classnames(
-													'fab',
-													height <= 170 ? 'smallest': null
-												)}
+												style={{ ...controlsAdditionalStyles.btn.style }}
+												className={classnames('fab')}
 												disabled={
 													!hasScreenPermission ||
 														!me.canShareScreen ||
 														me.screenShareInProgress
 												}
 												color={screenState === 'on' ? 'primary' : 'default'}
-												size={buttonSize}
+												size={controlsAdditionalStyles.btn.size}
 
 												onClick={() =>
 												{
@@ -715,11 +738,9 @@ const Me = (props) =>
 												id             : 'device.options',
 												defaultMessage : 'Options'
 											})}
-											className={classnames(
-												'fab',
-												height <= 170 ? 'smallest': null
-											)}
-											size={buttonSize}
+											style={{ ...controlsAdditionalStyles.btn.style }}
+											className={classnames('fab')}
+											size={controlsAdditionalStyles.btn.size}
 
 											onClick={handleMenuOpen}
 										>
@@ -864,12 +885,10 @@ const Me = (props) =>
 												id             : 'device.stopVideo',
 												defaultMessage : 'Stop video'
 											})}
-											className={classnames(
-												'fab',
-												height <= 170 ? 'smallest': null
-											)}
+											style={{ ...controlsAdditionalStyles.btn.style }}
+											className={classnames('fab')}
 											disabled={!me.canSendWebcam || me.webcamInProgress}
-											size={buttonSize}
+											size={controlsAdditionalStyles.btn.size}
 											onClick={() =>
 											{
 												roomClient.disableExtraVideo(producer.id);

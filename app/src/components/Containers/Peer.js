@@ -155,7 +155,8 @@ const Peer = (props) =>
 		classes,
 		enableLayersSwitch,
 		isSelected,
-		mode
+		mode,
+		theme
 	} = props;
 
 	const micEnabled = (
@@ -186,80 +187,116 @@ const Peer = (props) =>
 
 	const height = style.height;
 
-	const [ buttonSize, setButtonSize ] = useState('large');
-
 	const [ controlsAdditionalStyles, setControlsAdditionalStyles ] = useState(
 		{
-			flexDirection : 'row'
+			style : {},
+			btn   : {
+				style : {},
+				size  : ''
+			}
 		}
 	);
 
-	const [ videoInfoAdditionalStyles, setVideoInfoAdditionalStyles ] = useState(
-		{
-			fontSize : '1.5vh'
-		}
-	);
+	const [ videoInfoAdditionalStyles, setVideoInfoAdditionalStyles ] = useState();
 
+	// Dinamic properties/style values
 	useEffect(() =>
 	{
-		if (height > 0 && height <= 190)
+		if (height > 0)
 		{
-			setButtonSize('small');
-
 			setControlsAdditionalStyles({
-				flexDirection : 'row',
-				alignItems    : 'flex-start'
+				style : {
+					flexDirection : 'row',
+					alignItems    : 'flex-start'
+				},
+				btn : {
+					style : {
+						width     : 30,
+						height    : 30,
+						minHeight : 'auto',
+						margin    : theme.spacing(0.5)
+					},
+					size : 'small'
+				}
 			});
 
 			setVideoInfoAdditionalStyles({
 				fontSize : '0em'
 			});
-
 		}
 
-		else if (height > 190 && height <= 320)
+		if (height > 170)
 		{
-			setButtonSize('small');
-
 			setControlsAdditionalStyles({
-				flexDirection : 'column'
+				style : {
+					flexDirection : 'row',
+					alignItems    : 'flex-start'
+				},
+				btn : {
+					style : {},
+					size  : 'small'
+				}
 			});
 
 			setVideoInfoAdditionalStyles({
-				fontSize : '1.2em'
+				'style' : {
+					fontSize : '2.0em'
+				}
 			});
-
 		}
 
-		else if (height > 320 && height <= 400)
+		if (height > 190)
 		{
-			setButtonSize('medium');
-
 			setControlsAdditionalStyles({
-				flexDirection : 'column'
-			});
-
-			setVideoInfoAdditionalStyles({
-				fontSize : '2.0em'
-			});
-
-		}
-
-		else if (height > 400)
-		{
-			setButtonSize('large');
-
-			setControlsAdditionalStyles({
-				flexDirection : 'column'
+				style : {
+					flexDirection : 'column'
+				},
+				btn : {
+					style : {},
+					size  : 'small'
+				}
 			});
 
 			setVideoInfoAdditionalStyles({
 				fontSize : '3.0em'
 			});
-
 		}
 
-	}, [ height ]);
+		if (height > 320)
+		{
+			setControlsAdditionalStyles({
+				style : {
+					flexDirection : 'column'
+				},
+				btn : {
+					style : {},
+					size  : 'medium'
+				}
+			});
+
+			setVideoInfoAdditionalStyles({
+				fontSize : '4em'
+			});
+		}
+
+		if (height > 400)
+		{
+			setControlsAdditionalStyles({
+				style : {
+					flexDirection : 'column'
+				},
+				btn : {
+					style : {},
+					size  : 'large'
+				}
+			});
+
+			setVideoInfoAdditionalStyles({
+				fontSize : '5.0em'
+			});
+		}
+
+	}, [ height, theme ]);
 
 	if (peer.picture)
 	{
@@ -369,7 +406,7 @@ const Peer = (props) =>
 							classes.controls, hover ? 'hover' : null,
 							height <= 170 ? 'smallest': null
 						)}
-						style={{ ...controlsAdditionalStyles }}
+						style={{ ...controlsAdditionalStyles.style }}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -405,13 +442,11 @@ const Peer = (props) =>
 										defaultMessage : 'Mute audio'
 									})}
 									// className={classes.fab}
-									className={classnames(
-										'fab',
-										height <= 170 ? 'smallest': null
-									)}
+									style={{ ...controlsAdditionalStyles.btn.style }}
+									className={classnames('fab')}
 									disabled={!micConsumer}
 									color={micEnabled ? 'default' : 'secondary'}
-									size={buttonSize}
+									size={controlsAdditionalStyles.btn.size}
 									onClick={() =>
 									{
 										micEnabled ?
@@ -443,12 +478,9 @@ const Peer = (props) =>
 											id             : 'label.newWindow',
 											defaultMessage : 'New window'
 										})}
-										// className={classes.fab}
-										className={classnames(
-											'fab',
-											height <= 170 ? 'smallest': null
-										)}
-										size={buttonSize}
+										style={{ ...controlsAdditionalStyles.btn.style }}
+										className={classnames('fab')}
+										size={controlsAdditionalStyles.btn.size}
 										onClick={() =>
 										{
 											toggleConsumerWindow(webcamConsumer);
@@ -475,12 +507,10 @@ const Peer = (props) =>
 											defaultMessage : 'Fullscreen'
 										})}
 										// className={classes.fab}
-										className={classnames(
-											'fab',
-											height <= 170 ? 'smallest': null
-										)}
+										style={{ ...controlsAdditionalStyles.btn.style }}
+										className={classnames('fab')}
 										disabled={!videoVisible}
-										size={buttonSize}
+										size={controlsAdditionalStyles.btn.size}
 										onClick={() =>
 										{
 											toggleConsumerFullscreen(webcamConsumer);
@@ -521,11 +551,9 @@ const Peer = (props) =>
 											})
 										}
 										// className={classes.fab}
-										className={classnames(
-											'fab',
-											height <= 170 ? 'smallest': null
-										)}
-										size={buttonSize}
+										style={{ ...controlsAdditionalStyles.btn.style }}
+										className={classnames('fab')}
+										size={controlsAdditionalStyles.btn.size}
 										onClick={() =>
 										{
 											isSelected ?
@@ -560,12 +588,9 @@ const Peer = (props) =>
 											id             : 'device.options',
 											defaultMessage : 'Options'
 										})}
-										// className={classes.fab}
-										className={classnames(
-											'fab',
-											height <= 170 ? 'smallest': null
-										)}
-										size={buttonSize}
+										style={{ ...controlsAdditionalStyles.btn.style }}
+										className={classnames('fab')}
+										size={controlsAdditionalStyles.btn.size}
 										onClick={handleMenuOpen}
 									>
 										<MoreHorizIcon />
@@ -720,15 +745,13 @@ const Peer = (props) =>
 													defaultMessage : 'New window'
 												})}
 												// className={classes.fab}
-												className={classnames(
-													'fab',
-													height <= 170 ? 'smallest': null
-												)}
+												style={{ ...controlsAdditionalStyles.btn.style }}
+												className={classnames('fab')}
 												disabled={
 													!videoVisible ||
 													(windowConsumer === consumer.id)
 												}
-												size={buttonSize}
+												size={controlsAdditionalStyles.btn.size}
 												onClick={() =>
 												{
 													toggleConsumerWindow(consumer);
@@ -754,12 +777,10 @@ const Peer = (props) =>
 												defaultMessage : 'Fullscreen'
 											})}
 											// className={classes.fab}
-											className={classnames(
-												'fab',
-												height <= 170 ? 'smallest': null
-											)}
+											style={{ ...controlsAdditionalStyles.btn.style }}
+											className={classnames('fab')}
 											disabled={!videoVisible}
-											size={buttonSize}
+											size={controlsAdditionalStyles.btn.size}
 											onClick={() =>
 											{
 												toggleConsumerFullscreen(consumer);
@@ -883,15 +904,13 @@ const Peer = (props) =>
 												id             : 'label.newWindow',
 												defaultMessage : 'New window'
 											})}
-											className={classnames(
-												'fab',
-												height <= 170 ? 'smallest': null
-											)}
+											style={{ ...controlsAdditionalStyles.btn.style }}
+											className={classnames('fab')}
 											disabled={
 												!screenVisible ||
 											(windowConsumer === screenConsumer.id)
 											}
-											size={buttonSize}
+											size={controlsAdditionalStyles.btn.size}
 											onClick={() =>
 											{
 												toggleConsumerWindow(screenConsumer);
@@ -924,7 +943,7 @@ const Peer = (props) =>
 											height <= 170 ? 'smallest': null
 										)}
 										disabled={!screenVisible}
-										size={buttonSize}
+										size={controlsAdditionalStyles.btn.size}
 										onClick={() =>
 										{
 											toggleConsumerFullscreen(screenConsumer);
