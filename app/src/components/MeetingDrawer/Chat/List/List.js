@@ -217,8 +217,7 @@ class MessageList extends React.Component
 			files,
 			me,
 			peers,
-			intl,
-			settings
+			intl
 		} = this.props;
 
 		const items = [ ...chat.messages, ...files.files ];
@@ -405,7 +404,6 @@ MessageList.propTypes =
 	classes   : PropTypes.object.isRequired,
 
 	files            : PropTypes.object.isRequired,
-	settings         : PropTypes.object.isRequired,
 	me               : appPropTypes.Me.isRequired,
 	peers            : PropTypes.object.isRequired,
 	intl             : PropTypes.object.isRequired,
@@ -420,8 +418,7 @@ const mapStateToProps = (state) =>
 		myPicture : state.me.picture,
 		me        : state.me,
 		peers     : state.peers,
-		files     : state.files,
-		settings  : state.settings
+		files     : state.files
 
 	});
 
@@ -449,8 +446,7 @@ export default connect(
 				prev.files === next.files &&
 				prev.me.picture === next.me.picture &&
 				prev.me === next.me &&
-				prev.peers === next.peers &&
-				prev.settings === next.settings
+				prev.peers === next.peers
 			);
 		}
 	}
