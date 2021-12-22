@@ -268,7 +268,7 @@ class Room extends React.PureComponent
 
 				<View advancedMode={advancedMode} />
 
-				{ buttonControlBar &&
+				{ (buttonControlBar || room.hideSelfView) &&
 					<ButtonControlBar />
 				}
 

@@ -1343,7 +1343,7 @@ export default class RoomClient
 		this._hark = hark(this._harkStream,
 			{
 				play      : false,
-				interval  : 100,
+				interval  : 10,
 				threshold : store.getState().settings.noiseThreshold,
 				history   : 100
 			});

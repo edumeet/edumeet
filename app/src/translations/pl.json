@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": "Opuszczanie pokoju",
 	"room.leaveConfirmationMessage": "Czy na pewno chcesz opuścić pokój?",
 
-	"me.mutedPTT": "Masz wyciszony mikrofon, przytrzymaj SPACJĘ, aby mówić.",
+	"me.mutedPTT": "Masz wyciszony mikrofon{br}przytrzymaj SPACJĘ, aby mówić.",
 
 	"roles.gotRole": "Uzyskałeś rolę: {role}",
 	"roles.lostRole": "Utraciłeś rolę: {role}",
@@ -152,11 +152,17 @@
 	"label.login": "Zaloguj",
 	"label.logout": "Wyloguj",
 	"label.join": "Dołącz",
-	"label.recordingInProgress": null,
-	
+	"label.recordingInProgress": null,	
 	"label.yes": "Tak",
 	"label.no": "Nie",
 	"label.leaveWithSavingChat": "Tak + zapis czatu ({chatCount})",
+	"label.send": null,
+	"label.bold": null,
+	"label.italic": null,
+	"label.underline": null,
+	"label.sortAscending": null,
+	"label.sortDescending": null,
+	"label.saveChat": null,
 
 	"settings.settings": "Ustawienia",
 	"settings.camera": "Kamera",

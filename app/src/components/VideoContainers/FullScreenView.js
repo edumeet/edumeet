@@ -170,7 +170,7 @@ const FullScreenView = (props) =>
 		{
 			roomClient.adaptConsumerPreferredLayers(consumer, size[0], size[1]);
 		}
-	}, [ size, fullScreenConsumer ]);
+	}, [ size, fullScreenConsumer, consumer, roomClient ]);
 
 	if (!consumer)
 		return null;

@@ -336,15 +336,23 @@ var config = {
 			},
 			'MuiFab' : {
 				'primary' : {
-					'backgroundColor' : '#5F9B2D',
+					'backgroundColor' : '#518029',
 					'&:hover'         : {
-						'backgroundColor' : '#5F9B2D'
+						'backgroundColor' : '#518029'
+					},
+					'&:disabled' : {
+						'color'           : '#999898',
+						'backgroundColor' : '#323131'
 					}
 				},
 				'secondary' : {
 					'backgroundColor' : '#f50057',
 					'&:hover'         : {
 						'backgroundColor' : '#f50057'
+					},
+					'&:disabled' : {
+						'color'           : '#999898',
+						'backgroundColor' : '#323131'
 					}
 				}
 			},

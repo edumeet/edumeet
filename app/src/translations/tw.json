@@ -79,7 +79,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "您已將麥克風靜音，請按下「空白鍵」來發言",
+	"me.mutedPTT": "您已將麥克風靜音{br}請按下「空白鍵」來發言",
 
 	"roles.gotRole": "您已取得身份: {role}",
 	"roles.lostRole": "您的 {role} 身份已被撤銷",
@@ -153,10 +153,16 @@
 	"label.join": null,
 	"label.recordingInProgress": null,
 	
-	"settings.settings": "設置",
 	"label.yes": null,
 	"label.no": null,
-	"label.leavewithsavingchat": null,
+	"label.leaveWithSavingChat": null,
+	"label.send": null,
+	"label.bold": null,
+	"label.italic": null,
+	"label.underline": null,
+	"label.sortAscending": null,
+	"label.sortDescending": null,
+	"label.saveChat": null,
 
 	"settings.settings": "設定",
 	"settings.camera": "視訊來源",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -57,20 +57,6 @@ const styles = (theme) => ({
 
 const ChatInput = (props) =>
 {
-	const intl = useIntl();
-
-	const [ editorState, setEditorState ] = React.useState(
-		() => EditorState.createEmpty()
-	);
-
-	const [ message, setMessage ] = useState('');
-
-	useEffect(() =>
-	{
-		setMessage(stateToHTML(editorState.getCurrentContent(), { defaultBlockTag: null }));
-
-	}, [ editorState ]);
-
 	const {
 		roomClient,
 		displayName,
@@ -82,8 +68,19 @@ const ChatInput = (props) =>
 		browser,
 		canShareFiles,
 		chat,
-		files
+		files,
+		toolAreaOpen
 	} = props;
+
+	const intl = useIntl();
+
+	const [ editorState, setEditorState ] = React.useState(
+		() => EditorState.createEmpty()
+	);
+
+	const [ message, setMessage ] = useState('');
+
+	const inputRef = useRef(null);
 
 	const chatItemsLength = files.length + chat.messages.length;
 
@@ -133,6 +130,18 @@ const ChatInput = (props) =>
 			});
 		}
 	};
+
+	useEffect(() =>
+	{
+		setMessage(stateToHTML(editorState.getCurrentContent(), { defaultBlockTag: null }));
+
+	}, [ editorState ]);
+
+	// Autofocus on input when chat is visible
+	useEffect(() =>
+	{
+		inputRef.current.focus();
+	}, [ toolAreaOpen ]);
 
 	const handleKeyCommand = (command) =>
 	{
@@ -192,6 +201,7 @@ const ChatInput = (props) =>
 							handleReturn={handleReturn}
 							plugins={[ singleLinePlugin ]}
 							blockRenderMap={singleLinePlugin.blockRenderMap}
+							ref={inputRef}
 						/>
 					</div>
 					{/* /Input field */}
@@ -529,7 +539,8 @@ ChatInput.propTypes =
 	browser       : PropTypes.object.isRequired,
 	canShareFiles : PropTypes.bool.isRequired,
 	chat          : PropTypes.isRequired,
-	files         : PropTypes.isRequired
+	files         : PropTypes.isRequired,
+	toolAreaOpen  : PropTypes.bool.isRequired
 };
 
 const makeMapStateToProps = () =>
@@ -546,7 +557,8 @@ const makeMapStateToProps = () =>
 			browser       : state.me.browser,
 			canShareFiles : state.me.canShareFiles,
 			chat          : state.chat,
-			files         : state.files
+			files         : state.files,
+			toolAreaOpen  : state.toolarea.toolAreaOpen
 		});
 
 	return mapStateToProps;
@@ -569,7 +581,8 @@ export default withRoomContext(
 					prev.settings.displayName === next.settings.displayName &&
 					prev.me.picture === next.me.picture &&
 					prev.chat === next.chat &&
-					prev.files === next.files
+					prev.files === next.files &&
+					prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen
 				);
 			}
 		}

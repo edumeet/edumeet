@@ -14,7 +14,6 @@ import { useIntl, FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
 import Volume from './Volume';
 import Fab from '@material-ui/core/Fab';
-import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
@@ -62,24 +61,6 @@ const styles = (theme) =>
 				order : 2
 			}
 		},
-		fab :
-		{
-			margin        : theme.spacing(1),
-			pointerEvents : 'auto'
-		},
-		smallContainer :
-		{
-			backgroundColor : 'rgba(255, 255, 255, 0.9)',
-			margin          : '0.5vmin',
-			padding         : '0.5vmin',
-			boxShadow       : '0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12)',
-			pointerEvents   : 'auto',
-			transition      : 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-			'&:hover'       :
-			{
-				backgroundColor : 'rgba(213, 213, 213, 1)'
-			}
-		},
 		viewContainer :
 		{
 			position : 'relative',
@@ -94,18 +75,13 @@ const styles = (theme) =>
 			left       : '50%',
 			transform  : 'translate(-50%, -50%)',
 			color      : 'rgba(255, 255, 255, 0.5)',
-			fontSize   : '7em',
-			zIndex     : 30,
+			zIndex     : 1,
 			margin     : 0,
 			opacity    : 0,
 			transition : 'opacity 0.1s ease-in-out',
 			'&.hover'  :
 			{
 				opacity : 1
-			},
-			'&.smallContainer' :
-			{
-				fontSize : '3em'
 			}
 		},
 		controls :
@@ -114,7 +90,6 @@ const styles = (theme) =>
 			width          : '100%',
 			height         : '100%',
 			display        : 'flex',
-			flexDirection  : 'column',
 			justifyContent : 'center',
 			alignItems     : 'flex-end',
 			padding        : theme.spacing(1),
@@ -129,32 +104,43 @@ const styles = (theme) =>
 			'&.hover' :
 			{
 				opacity : 1
+			},
+			'& .fab' :
+			{
+				margin        : theme.spacing(1),
+				pointerEvents : 'auto'
 			}
 		},
 		ptt :
 		{
-			position        : 'absolute',
-			float           : 'left',
-			top             : '25%',
-			left            : '50%',
-			transform       : 'translate(-50%, 0%)',
-			color           : 'rgba(255, 255, 255, 0.7)',
-			fontSize        : '1.3em',
-			backgroundColor : 'rgba(245, 0, 87, 0.70)',
-			margin          : '4px',
-			padding         : theme.spacing(2),
-			zIndex          : 1200,
-			borderRadius    : '20px',
-			textAlign       : 'center',
-			opacity         : 0,
-			transition      : 'opacity 1s ease',
-			pointerEvents   : 'none',
-			'&.enabled'     :
+			position       : 'absolute',
+			width          : '100%',
+			height         : '100%',
+			display        : 'flex',
+			justifyContent : 'center',
+			alignItems     : 'center',
+			zIndex         : 1200,
+			opacity        : 0,
+			transition     : 'opacity 1s ease',
+			pointerEvents  : 'none',
+			padding        : theme.spacing(1),
+			'& div'        :
+			{
+				color           : 'rgba(255, 255, 255, 0.7)',
+				backgroundColor : 'rgba(245, 0, 87, 0.70)',
+				borderRadius    : '20px',
+				textAlign       : 'center',
+				opacity         : 1,
+				padding         : theme.spacing(1),
+				margin          : theme.spacing(1)
+			},
+			'&.enabled' :
 			{
 				transition : 'opacity 0.1s',
 				opacity    : 1
 			}
 		}
+
 	});
 
 const Me = (props) =>
@@ -172,7 +158,6 @@ const Me = (props) =>
 		activeSpeaker,
 		spacing,
 		style,
-		smallContainer,
 		advancedMode,
 		micProducer,
 		webcamProducer,
@@ -183,8 +168,161 @@ const Me = (props) =>
 		hasScreenPermission,
 		transports,
 		noiseVolume,
-		classes
+		classes,
+		theme
 	} = props;
+
+	// const width = style.width;
+
+	const height = style.height;
+
+	const [ controls, setControls ] = useState(
+		{
+			root : {
+				style : {}
+			},
+			item : {
+				style : {},
+				size  : ''
+			}
+		}
+
+	);
+
+	const [ meTag, setMeTag ] = useState(
+		{
+			root : {
+				style : {}
+			}
+		}
+	);
+
+	// Extend styles/props values
+	useEffect(() =>
+	{
+		if (height > 0)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'row',
+						alignItems    : 'flex-start'
+					}
+				},
+				item : {
+					style : {
+						width     : 30,
+						height    : 30,
+						minHeight : 'auto',
+						margin    : theme.spacing(0.5)
+					},
+					size : 'small'
+				}
+			});
+
+			setMeTag({
+				root : {
+					style : {
+						fontSize : '2em'
+					}
+				}
+			});
+		}
+
+		if (height > 170)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'row',
+						alignItems    : 'flex-start'
+					}
+				},
+				item : {
+					style : {},
+					size  : 'small'
+				}
+			});
+
+			setMeTag({
+				root : {
+					style : {
+						fontSize : '3.0em'
+					} }
+			});
+		}
+
+		if (height > 190)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
+				},
+				item : {
+					style : {},
+					size  : 'small'
+				}
+			});
+
+			setMeTag({
+				root : {
+					style : {
+						fontSize : '3.0em'
+					}
+				}
+			});
+		}
+
+		if (height > 320)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
+				},
+				item : {
+					style : {},
+					size  : 'medium'
+				}
+			});
+
+			setMeTag({
+				root : {
+					style : {
+						fontSize : '4em'
+					}
+				}
+			});
+		}
+
+		if (height > 400)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
+				},
+				item : {
+					style : {},
+					size  : 'large'
+				}
+			});
+
+			setMeTag({
+				root : {
+					style : {
+						fontSize : '5.0em'
+					}
+				}
+
+			});
+		}
+
+	}, [ height, theme ]);
 
 	const videoVisible = (
 		Boolean(webcamProducer) &&
@@ -370,7 +508,7 @@ const Me = (props) =>
 		setMenuAnchorElement(event.currentTarget);
 	};
 
-	const handleMenuClose = (event) =>
+	const handleMenuClose = () =>
 	{
 		setMenuAnchorElement(null);
 	};
@@ -408,45 +546,47 @@ const Me = (props) =>
 				style={spacingStyle}
 			>
 
-				{ me.browser.platform !== 'mobile' && smallContainer &&
-				<div className={classnames(
-					classes.ptt,
-					(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
-				)}
-				>
-					<FormattedMessage
-						id='me.mutedPTT'
-						defaultMessage='You are muted, hold down SPACE-BAR to talk'
-					/>
-				</div>
-				}
 				<div className={classes.viewContainer} style={style}>
-					{ me.browser.platform !== 'mobile' && !smallContainer &&
+					{/* PTT */}
+					{ me.browser.platform !== 'mobile' && height >= 170 &&
 						<div className={classnames(
 							classes.ptt,
 							(micState === 'muted' && me.isSpeaking) ? 'enabled' : null
 						)}
 						>
-							<FormattedMessage
-								id='me.mutedPTT'
-								defaultMessage='You are muted, hold down SPACE-BAR to talk'
-							/>
+							<div>
+								<FormattedMessage
+									id='me.mutedPTT'
+									defaultMessage='You are muted, {br} hold down SPACE-BAR to talk'
+									values={{
+										br : <br />
+									}}
+								/>
+							</div>
 						</div>
 					}
-					<p className={
-						classnames(
-							classes.meTag,
-							hover ? 'hover' : null,
-							smallContainer ? 'smallContainer' : null
-						)}
+					{/* /PTT */}
+
+					{/* ME TAG */}
+					<p
+						style={{ ...meTag.root.style }}
+						className={
+							classnames(
+								classes.meTag,
+								hover ? 'hover' : null
+							)}
 					>
 						<FormattedMessage
 							id='room.me'
 							defaultMessage='ME'
 						/>
 					</p>
+					{/* /ME TAG */}
+
+					{/* CONTROLS BUTTONS (inside) */}
 					{ !settings.buttonControlBar &&
 						<div
+							style={{ ...controls.root.style }}
 							className={classnames(
 								classes.controls,
 								settings.hiddenControls ? 'hide' : null,
@@ -473,255 +613,154 @@ const Me = (props) =>
 							}}
 						>
 							<React.Fragment>
-								<Tooltip title={micTip} placement='left'>
-									{ smallContainer ?
-										<div>
-											<IconButton
-												aria-label={intl.formatMessage({
-													id             : 'device.muteAudio',
-													defaultMessage : 'Mute audio'
-												})}
-												className={classes.smallContainer}
-												disabled={
-													!me.canSendMic ||
+								{/* MICROPHONE */}
+								<Tooltip
+									title={micTip}
+									placement={height <= 190 ? 'bottom' : 'left'}
+								>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.muteAudio',
+												defaultMessage : 'Mute audio'
+											})}
+											style={{ ...controls.item.style }}
+											className={classnames('fab')}
+											disabled={
+												!me.canSendMic ||
 													!hasAudioPermission ||
 													me.audioInProgress
-												}
-												color={micState === 'on' ?
-													settings.voiceActivatedUnmute ?
-														me.isAutoMuted ? 'secondary'
-															: 'primary'
-														: 'default'
-													: 'secondary'
-												}
-												size='small'
-												onClick={() =>
-												{
-													if (micState === 'off')
-														roomClient.updateMic({ start: true });
-													else if (micState === 'on')
-														roomClient.muteMic();
-													else
-														roomClient.unmuteMic();
-												}}
-											>
-												{settings.voiceActivatedUnmute ?
-													micState === 'on' ?
-														<React.Fragment>
-															<svg style={{ 'position': 'absolute' }}>
-																<defs>
-																	<clipPath id='cut-off-indicator'>
-																		<rect x='0' y='0' width='24' height={24 - 2.4 * noiseVolume} />
-																	</clipPath>
-																</defs>
-															</svg>
-															<SettingsVoiceIcon style={{ 'position': 'absolute' }}
-																color={'default'}
-															/>
-															<SettingsVoiceIcon
-																clipPath='url(#cut-off-indicator)'
-																style={{
-																	'position' : 'absolute',
-																	'opacity'  : '0.6'
-																}}
-																color={me.isAutoMuted ?
-																	'primary' : 'default'}
-															/>
-														</React.Fragment>
-														: <MicOffIcon />
-													: micState === 'on' ?
-														<MicIcon />
-														:
-														<MicOffIcon />
-												}
-											</IconButton>
-										</div>
-										:
-										<div>
-											<Fab
-												aria-label={intl.formatMessage({
-													id             : 'device.muteAudio',
-													defaultMessage : 'Mute audio'
-												})}
-												className={classes.fab}
-												disabled={
-													!me.canSendMic ||
-													!hasAudioPermission ||
-													me.audioInProgress
-												}
-												color={micState === 'on' ?
-													settings.voiceActivatedUnmute ?
-														me.isAutoMuted ? 'secondary' : 'primary'
-														: 'primary'
-													: 'secondary'
-												}
-												size='large'
-												onClick={() =>
-												{
-													if (micState === 'off')
-														roomClient.updateMic({ start: true });
-													else if (micState === 'on')
-														roomClient.muteMic();
-													else
-														roomClient.unmuteMic();
-												}}
-											>
-												{ settings.voiceActivatedUnmute ?
-													micState === 'on' ?
-														<React.Fragment>
-															<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
-																<defs>
-																	<clipPath id='cut-off-indicator'>
-																		<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
-																	</clipPath>
-																</defs>
-															</svg>
-															<SettingsVoiceIcon style={{ 'position': 'absolute' }}
-																color={'default'}
-															/>
-															<SettingsVoiceIcon
-																clipPath='url(#cut-off-indicator)'
-																style={{
-																	'position' : 'absolute',
-																	'opacity'  : '0.6'
-																}}
-																color={me.isAutoMuted ?
-																	'primary' : 'default'}
-															/>
-														</React.Fragment>
-														: <MicOffIcon />
-													: micState === 'on' ?
-														<MicIcon />
-														:
-														<MicOffIcon />
-												}
-											</Fab>
-										</div>
-									}
+											}
+											color={micState === 'on' ?
+												settings.voiceActivatedUnmute ?
+													me.isAutoMuted ? 'secondary' : 'primary'
+													: 'default'
+												: 'secondary'
+											}
+
+											size={controls.item.size}
+											onClick={() =>
+											{
+												if (micState === 'off')
+													roomClient.updateMic({ start: true });
+												else if (micState === 'on')
+													roomClient.muteMic();
+												else
+													roomClient.unmuteMic();
+											}}
+										>
+											{ settings.voiceActivatedUnmute ?
+												micState === 'on' ?
+													<React.Fragment>
+														<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
+															<defs>
+																<clipPath id='cut-off-indicator'>
+																	<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
+																</clipPath>
+															</defs>
+														</svg>
+														<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+															color={'default'}
+														/>
+														<SettingsVoiceIcon
+															clipPath='url(#cut-off-indicator)'
+															style={{
+																'position' : 'absolute',
+																'opacity'  : '0.6'
+															}}
+															color={me.isAutoMuted ?
+																'primary' : 'default'}
+														/>
+													</React.Fragment>
+													: <MicOffIcon />
+												: micState === 'on' ?
+													<MicIcon />
+													:
+													<MicOffIcon />
+											}
+										</Fab>
+									</div>
 								</Tooltip>
-								<Tooltip title={webcamTip} placement='left'>
-									{ smallContainer ?
-										<div>
-											<IconButton
-												aria-label={intl.formatMessage({
-													id             : 'device.startVideo',
-													defaultMessage : 'Start video'
-												})}
-												className={classes.smallContainer}
-												disabled={
-													!me.canSendWebcam ||
+								{/* /MICROPHONE */}
+
+								{/* WEBCAM */}
+								<Tooltip
+									title={webcamTip}
+									placement={height <= 190 ? 'bottom' : 'left'}
+								>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.startVideo',
+												defaultMessage : 'Start video'
+											})}
+											style={{ ...controls.item.style }}
+											className={classnames('fab')}
+											disabled={
+												!me.canSendWebcam ||
 													!hasVideoPermission ||
 													me.webcamInProgress
-												}
-												color={webcamState === 'on' ? 'primary' : 'secondary'}
-												size='small'
-												onClick={() =>
-												{
-													webcamState === 'on' ?
-														roomClient.disableWebcam() :
-														roomClient.updateWebcam({ start: true });
-												}}
-											>
-												{ webcamState === 'on' ?
-													<VideoIcon />
-													:
-													<VideoOffIcon />
-												}
-											</IconButton>
-										</div>
-										:
-										<div>
-											<Fab
-												aria-label={intl.formatMessage({
-													id             : 'device.startVideo',
-													defaultMessage : 'Start video'
-												})}
-												className={classes.fab}
-												disabled={
-													!me.canSendWebcam ||
-													!hasVideoPermission ||
-													me.webcamInProgress
-												}
-												color={webcamState === 'on' ? 'primary' : 'secondary'}
-												size='large'
-												onClick={() =>
-												{
-													webcamState === 'on' ?
-														roomClient.disableWebcam() :
-														roomClient.updateWebcam({ start: true });
-												}}
-											>
-												{ webcamState === 'on' ?
-													<VideoIcon />
-													:
-													<VideoOffIcon />
-												}
-											</Fab>
-										</div>
-									}
+											}
+											color={webcamState === 'on' ? 'default' : 'secondary'}
+											size={controls.item.size}
+
+											onClick={() =>
+											{
+												webcamState === 'on' ?
+													roomClient.disableWebcam() :
+													roomClient.updateWebcam({ start: true });
+											}}
+										>
+											{ webcamState === 'on' ?
+												<VideoIcon />
+												:
+												<VideoOffIcon />
+											}
+										</Fab>
+									</div>
 								</Tooltip>
+								{/* /WEBCAM */}
+
+								{/* SCREENSHARING */}
 								{ me.browser.platform !== 'mobile' &&
 									<Tooltip open={screenShareTooltipOpen}
 										onClose={screenShareTooltipHandleClose}
 										onOpen={screenShareTooltipHandleOpen}
-										title={screenTip} placement='left'
+										title={screenTip}
+										placement={height <= 190 ? 'bottom' : 'left'}
 									>
-										{ smallContainer ?
-											<div>
-												<IconButton
-													aria-label={intl.formatMessage({
-														id             : 'device.startScreenSharing',
-														defaultMessage : 'Start screen sharing'
-													})}
-													className={classes.smallContainer}
-													disabled={
-														!hasScreenPermission ||
+										<div>
+											<Fab
+												aria-label={intl.formatMessage({
+													id             : 'device.startScreenSharing',
+													defaultMessage : 'Start screen sharing'
+												})}
+												style={{ ...controls.item.style }}
+												className={classnames('fab')}
+												disabled={
+													!hasScreenPermission ||
 														!me.canShareScreen ||
 														me.screenShareInProgress
-													}
-													color={screenState === 'on' ? 'primary' : 'secondary'}
-													size='small'
-													onClick={() =>
-													{
-														if (screenState === 'off')
-															roomClient.updateScreenSharing({ start: true });
-														else if (screenState === 'on')
-															roomClient.disableScreenSharing();
-													}}
-												>
-													<ScreenIcon/>
-												</IconButton>
-											</div>
-											:
-											<div>
-												<Fab
-													aria-label={intl.formatMessage({
-														id             : 'device.startScreenSharing',
-														defaultMessage : 'Start screen sharing'
-													})}
-													className={classes.fab}
-													disabled={
-														!hasScreenPermission ||
-														!me.canShareScreen ||
-														me.screenShareInProgress
-													}
-													color={screenState === 'on' ? 'primary' : 'secondary'}
-													size='large'
-													onClick={() =>
-													{
-														if (screenState === 'off')
-															roomClient.updateScreenSharing({ start: true });
-														else if (screenState === 'on')
-															roomClient.disableScreenSharing();
-													}}
-												>
-													<ScreenIcon/>
-												</Fab>
-											</div>
-										}
+												}
+												color={screenState === 'on' ? 'primary' : 'default'}
+												size={controls.item.size}
+
+												onClick={() =>
+												{
+													if (screenState === 'off')
+														roomClient.updateScreenSharing({ start: true });
+													else if (screenState === 'on')
+														roomClient.disableScreenSharing();
+												}}
+											>
+												<ScreenIcon/>
+											</Fab>
+										</div>
 									</Tooltip>
 								}
+								{/* /SCREENSHARING */}
 
+								{/* MORE BUTTON */}
 								{advancedMode &&
 								<React.Fragment>
 									<Tooltip
@@ -729,33 +768,21 @@ const Me = (props) =>
 											id             : 'device.options',
 											defaultMessage : 'Options'
 										})}
-										placement={smallContainer ? 'top' : 'left'}
+										placement={height <= 190 ? 'bottom' : 'left'}
 									>
-										{ smallContainer ?
-											<IconButton
-												aria-label={intl.formatMessage({
-													id             : 'device.options',
-													defaultMessage : 'Options'
-												})}
-												className={classes.smallContainer}
-												size='small'
-												onClick={handleMenuOpen}
-											>
-												<MoreHorizIcon />
-											</IconButton>
-											:
-											<Fab
-												aria-label={intl.formatMessage({
-													id             : 'device.options',
-													defaultMessage : 'Options'
-												})}
-												className={classes.fab}
-												size='large'
-												onClick={handleMenuOpen}
-											>
-												<MoreHorizIcon />
-											</Fab>
-										}
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.options',
+												defaultMessage : 'Options'
+											})}
+											style={{ ...controls.item.style }}
+											className={classnames('fab')}
+											size={controls.item.size}
+
+											onClick={handleMenuOpen}
+										>
+											<MoreHorizIcon />
+										</Fab>
 									</Tooltip>
 
 									<Menu
@@ -777,10 +804,12 @@ const Me = (props) =>
 
 								</React.Fragment>
 								}
+								{/* /MORE BUTTON */}
 
 							</React.Fragment>
 						</div>
 					}
+					{/* /CONTROLS BUTTONS (inside) */}
 
 					<VideoView
 						isMe
@@ -843,12 +872,14 @@ const Me = (props) =>
 						style={spacingStyle}
 					>
 						<div className={classes.viewContainer} style={style}>
-							<p className={
-								classnames(
-									classes.meTag,
-									hover ? 'hover' : null,
-									smallContainer ? 'smallContainer' : null
-								)}
+							<p
+								style={{ ...meTag.root.style }}
+								className={
+									classnames(
+										classes.meTag,
+										hover ? 'hover' : null,
+										height <= 170 ? 'smallest': null
+									)}
 							>
 								<FormattedMessage
 									id='room.me'
@@ -881,46 +912,28 @@ const Me = (props) =>
 									}, 2000);
 								}}
 							>
-								<Tooltip title={webcamTip} placement='left'>
-									{ smallContainer ?
-										<div>
-											<IconButton
-												aria-label={intl.formatMessage({
-													id             : 'device.stopVideo',
-													defaultMessage : 'Stop video'
-												})}
-												className={classes.smallContainer}
-												disabled={!me.canSendWebcam || me.webcamInProgress}
-												size='small'
-												color='primary'
-												onClick={() =>
-												{
-													roomClient.disableExtraVideo(producer.id);
-												}}
-											>
-												<VideoIcon />
-
-											</IconButton>
-										</div>
-										:
-										<div>
-											<Fab
-												aria-label={intl.formatMessage({
-													id             : 'device.stopVideo',
-													defaultMessage : 'Stop video'
-												})}
-												className={classes.fab}
-												disabled={!me.canSendWebcam || me.webcamInProgress}
-												size={smallContainer ? 'small' : 'large'}
-												onClick={() =>
-												{
-													roomClient.disableExtraVideo(producer.id);
-												}}
-											>
-												<VideoIcon />
-											</Fab>
-										</div>
-									}
+								<Tooltip
+									title={webcamTip}
+									placement={height <= 190 ? 'bottom' : 'left'}
+								>
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'device.stopVideo',
+												defaultMessage : 'Stop video'
+											})}
+											style={{ ...controls.item.style }}
+											className={classnames('fab')}
+											disabled={!me.canSendWebcam || me.webcamInProgress}
+											size={controls.item.size}
+											onClick={() =>
+											{
+												roomClient.disableExtraVideo(producer.id);
+											}}
+										>
+											<VideoIcon />
+										</Fab>
+									</div>
 								</Tooltip>
 							</div>
 
@@ -969,12 +982,14 @@ const Me = (props) =>
 					style={spacingStyle}
 				>
 					<div className={classes.viewContainer} style={style}>
-						<p className={
-							classnames(
-								classes.meTag,
-								hover ? 'hover' : null,
-								smallContainer ? 'smallContainer' : null
-							)}
+						<p
+
+							style={{ ...meTag.root.style }}
+							className={
+								classnames(
+									classes.meTag,
+									hover ? 'hover' : null
+								)}
 						>
 							<FormattedMessage
 								id='room.me'
@@ -1011,7 +1026,6 @@ Me.propTypes =
 	extraVideoProducers : PropTypes.arrayOf(appPropTypes.Producer),
 	spacing             : PropTypes.number,
 	style               : PropTypes.object,
-	smallContainer      : PropTypes.bool,
 	hasAudioPermission  : PropTypes.bool.isRequired,
 	hasVideoPermission  : PropTypes.bool.isRequired,
 	hasScreenPermission : PropTypes.bool.isRequired,

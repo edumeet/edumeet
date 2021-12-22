@@ -75,7 +75,8 @@ const styles = (theme) =>
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				width : '90vw'
+				width  : '90vw',
+				margin : 0
 			}
 		},
 		accountButton :
@@ -84,13 +85,19 @@ const styles = (theme) =>
 		},
 		accountButtonAvatar :
 		{
-			width  : 50,
-			height : 50
+			width                         : 50,
+			height                        : 50,
+			[theme.breakpoints.down(400)] :
+			{
+				width  : 35,
+				height : 35
+			}
+
 		},
 
 		green :
 		{
-			color : '#5F9B2D'
+			color : 'rgba(0, 153, 0, 1)'
 		},
 		red :
 		{
@@ -98,11 +105,11 @@ const styles = (theme) =>
 		},
 		joinButton :
 		{
-			background : '#2e7031',
-			color      : 'white',
-			'&:hover'  : {
-				backgroundColor : '#2e7031'
+			[theme.breakpoints.down(600)] :
+			{
+				'width' : '100%'
 			}
+
 		},
 		mediaDevicesAnySelectedButton :
 		{
@@ -574,6 +581,7 @@ const JoinDialog = ({
 							direction='row'
 							justify='space-between'
 							alignItems='flex-end'
+							spacing={1}
 						>
 
 							{/* MEDIA PERMISSIONS TOGGLE BUTTONS */}
@@ -647,13 +655,14 @@ const JoinDialog = ({
 							{/* /MEDIA PERMISSION BUTTONS */}
 
 							{/* JOIN/AUTH BUTTON */}
-							<Grid item>
+							<Grid item className={classes.joinButton}>
 								<Button
 									onClick={handleJoin}
 									variant='contained'
 									color='primary'
 									id='joinButton'
 									disabled={displayName === ''}
+									fullWidth
 								>
 									<FormattedMessage
 										id='label.join'
