@@ -21,7 +21,7 @@ can be found here: [config.example.js](public/config/config.example.js).
 | :--- | :---------- | :----- | :------------ |
 | loginEnabled | If the login is enabled. | `"boolean"` | ``false`` |
 | developmentPort | The development server listening port. | `"port"` | ``3443`` |
-| productionPort | The production server listening port. | `"port"` | ``443`` |
+| productionPort | The production server listening port. | `"port"` | ``8443`` |
 | serverHostname | If the server component runs on a different host than the app you can specify the host name. | `"string"` | ``""`` |
 | supportedBrowsers | Supported browsers version in bowser satisfy format. | `"object"` | ``{  "windows": {    "internet explorer": ">12",    "microsoft edge": ">18"  },  "microsoft edge": ">18",  "safari": ">12",  "firefox": ">=60",  "chrome": ">=74",  "chromium": ">=74",  "opera": ">=62",  "samsung internet for android": ">=11.1.1.52"}`` |
 | networkPriorities | Network priorities. | `"object"` | ``{  "audio": "high",  "mainVideo": "high",  "additionalVideos": "medium",  "screenShare": "medium"}`` |
