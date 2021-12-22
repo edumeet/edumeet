@@ -54,13 +54,13 @@ Look at the default `config/config.example.js` file for documentation.
 | routerScaleSize | Room size before spreading to a new router. | `"nat"` | ``40`` |
 | requestTimeout | Socket timeout value (ms). | `"nat"` | ``20000`` |
 | requestRetries | Socket retries when a timeout occurs. | `"nat"` | ``3`` |
-| mediasoup.numWorkers | The number of Mediasoup workers to spawn. Defaults to the available CPUs count. | `"nat"` | ``8`` |
+| mediasoup.numWorkers | The number of Mediasoup workers to spawn. Defaults to the available CPUs count. | `"nat"` | ``4`` |
 | mediasoup.worker.logLevel | The Mediasoup log level. | `"string"` | ``"warn"`` |
 | mediasoup.worker.logTags | The Mediasoup log tags. | `"array"` | ``[  "info",  "ice",  "dtls",  "rtp",  "srtp",  "rtcp"]`` |
 | mediasoup.worker.rtcMinPort | The Mediasoup start listening port number. | `"port"` | ``40000`` |
 | mediasoup.worker.rtcMaxPort | The Mediasoup end listening port number. | `"port"` | ``49999`` |
 | mediasoup.router.mediaCodecs | The Mediasoup codecs settings. [supportedRtpCapabilities](https://github.com/versatica/mediasoup/blob/v3/src/supportedRtpCapabilities.ts) | `"*"` | ``[  {    "kind": "audio",    "mimeType": "audio/opus",    "clockRate": 48000,    "channels": 2  },  {    "kind": "video",    "mimeType": "video/VP8",    "clockRate": 90000,    "parameters": {      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/VP9",    "clockRate": 90000,    "parameters": {      "profile-id": 2,      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/h264",    "clockRate": 90000,    "parameters": {      "packetization-mode": 1,      "profile-level-id": "4d0032",      "level-asymmetry-allowed": 1,      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/h264",    "clockRate": 90000,    "parameters": {      "packetization-mode": 1,      "profile-level-id": "42e01f",      "level-asymmetry-allowed": 1,      "x-google-start-bitrate": 1000    }  }]`` |
-| mediasoup.webRtcTransport.listenIps | The Mediasoup listen IPs. [TransportListenIp](https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp) | `"array"` | ``[  {    "ip": "0.0.0.0",    "announcedIp": null  }]`` |
+| mediasoup.webRtcTransport.listenIps | The Mediasoup listen IPs. [TransportListenIp](https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp) | `"array"` | ``[  {    "ip": "192.168.246.104",    "announcedIp": null  }]`` |
 | mediasoup.webRtcTransport.initialAvailableOutgoingBitrate | The Mediasoup initial available outgoing bitrate (in bps). [WebRtcTransportOptions](https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions) | `"nat"` | ``1000000`` |
 | mediasoup.webRtcTransport.maxIncomingBitrate | The Mediasoup maximum incoming bitrate for each transport. (in bps). [setMaxIncomingBitrate](https://mediasoup.org/documentation/v3/mediasoup/api/#transport-setMaxIncomingBitrate) | `"nat"` | ``1500000`` |
 | prometheus.enabled | Enables the Prometheus metrics exporter. | `"boolean"` | ``false`` |

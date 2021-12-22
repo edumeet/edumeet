@@ -217,8 +217,7 @@ class MessageList extends React.Component
 			files,
 			me,
 			peers,
-			intl,
-			settings
+			intl
 		} = this.props;
 
 		const items = [ ...chat.messages, ...files.files ];
@@ -284,11 +283,13 @@ class MessageList extends React.Component
 						:
 						items.map((item, index) =>
 						{
-							const prev = (index > 0) ? items[index-1].name : null;
+							const prev = (index > 0) ?
+								`${items[index-1].peerId}-${items[index-1].name}` : null;
 
-							const curr = item.name;
+							const curr = `${item.peerId}-${item.name}`;
 
-							const next = (index < items.length - 1) ? items[index+1].name : null;
+							const next = (index < items.length - 1) ?
+								`${items[index+1].peerId}-${items[index+1].name}` : null;
 
 							let format = null;
 
@@ -318,7 +319,7 @@ class MessageList extends React.Component
 										name={item.name}
 										text={item.text}
 										isseen={item.isRead}
-										sender={settings.displayName === item.name ?
+										sender={me.id === item.peerId ?
 											'client' : item.sender
 										}
 										self={item.sender === 'client'}
@@ -375,7 +376,7 @@ class MessageList extends React.Component
 										name={item.name}
 										avatar={filePicture || EmptyAvatar}
 										isseen={item.isRead}
-										sender={settings.displayName === item.name ?
+										sender={me.id === item.peerId ?
 											'client' : item.sender
 										}
 										self={item.sender === 'client'}
@@ -403,7 +404,6 @@ MessageList.propTypes =
 	classes   : PropTypes.object.isRequired,
 
 	files            : PropTypes.object.isRequired,
-	settings         : PropTypes.object.isRequired,
 	me               : appPropTypes.Me.isRequired,
 	peers            : PropTypes.object.isRequired,
 	intl             : PropTypes.object.isRequired,
@@ -418,8 +418,7 @@ const mapStateToProps = (state) =>
 		myPicture : state.me.picture,
 		me        : state.me,
 		peers     : state.peers,
-		files     : state.files,
-		settings  : state.settings
+		files     : state.files
 
 	});
 
@@ -447,8 +446,7 @@ export default connect(
 				prev.files === next.files &&
 				prev.me.picture === next.me.picture &&
 				prev.me === next.me &&
-				prev.peers === next.peers &&
-				prev.settings === next.settings
+				prev.peers === next.peers
 			);
 		}
 	}

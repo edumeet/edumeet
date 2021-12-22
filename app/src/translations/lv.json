@@ -79,7 +79,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Jūs esat noklusināts. Turiet taustiņu SPACE-BAR, lai runātu",
+	"me.mutedPTT": "Jūs esat noklusināts{br}Turiet taustiņu SPACE-BAR, lai runātu",
 
 	"roles.gotRole": "Jūs ieguvāt lomu: {role}",
 	"roles.lostRole": "Jūs zaudējāt lomu: {role}",
@@ -149,11 +149,17 @@
 	"label.login": null,
 	"label.logout": null,
 	"label.join": null,
-	"label.recordingInProgress": null,
-	
+	"label.recordingInProgress": null,	
 	"label.yes": null,
 	"label.no": null,
-	"label.leavewithsavingchat": null,
+	"label.leaveWithSavingChat": null,
+	"label.send": null,
+	"label.bold": null,
+	"label.italic": null,
+	"label.underline": null,
+	"label.sortAscending": null,
+	"label.sortDescending": null,
+	"label.saveChat": null,
 
 	"settings.settings": "Iestatījumi",
 	"settings.camera": "Kamera",

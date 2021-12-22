@@ -18,8 +18,8 @@
 		"build": "mkdir -p dist && find dist/* -maxdepth 0 ! -name public -exec rm -rf {} \\; && tsc && ln -s ../certs dist/certs && chmod 755 dist/server.js && touch 'dist/ __AUTO_GENERATED_CONTENT_REFRESHED_AFTER_REBUILDING!__ '",
 		"dev": "nodemon --exec ts-node --ignore dist/ -e js,ts server.js",
 		"connect": "ts-node connect.js",
-		"lint": "eslint -c .eslintrc.json --ext .js,.ts *.js *.ts lib/",
-		"format": "prettier --write '**/*.ts' && npm run lint --fix",
+		"lint": "eslint ./ --ext .js,.ts; exit 0",
+		"lint-fix": "eslint ./ --fix --ext .js,.ts; exit 0",
 		"gen-config-docs": "ts-node utils/gen-config-docs.ts"
 	},
 	"dependencies": {
@@ -76,13 +76,7 @@
 		"@typescript-eslint/eslint-plugin": "^4.21.0",
 		"@typescript-eslint/parser": "^4.21.0",
 		"eslint": "6.8.0",
-		"eslint-config-airbnb-typescript": "^12.3.1",
-		"eslint-config-prettier": "^8.1.0",
 		"eslint-plugin-import": "^2.22.1",
-		"eslint-plugin-prettier": "^3.3.1",
-		"prettier": "^2.2.1",
-		"prettier-cli": "^0.1.0",
-		"prettier-eslint": "^12.0.0",
 		"ts-node": "^9.1.1",
 		"typescript": "^4.2.4"
 	}

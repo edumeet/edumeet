@@ -5,12 +5,6 @@ const userRoles = require('./access/roles');
 
 const logger = new Logger('Peer');
 
-// Recoding STATE
-const RECORDING_STOP='stop';
-const RECORDING_START='start';
-const RECORDING_PAUSE='pause';
-const RECORDING_RESUME='resume';
-
 const RECORDING_TYPE_LOCAL='local';
 
 class Peer extends EventEmitter

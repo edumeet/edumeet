@@ -235,7 +235,7 @@ const ButtonControlBar = (props) =>
 					color={micState === 'on' ?
 						settings.voiceActivatedUnmute ?
 							me.isAutoMuted ? 'secondary' : 'primary'
-							: 'primary'
+							: 'default'
 						: 'secondary'
 					}
 					size={smallScreen ? 'large' : 'medium'}
@@ -292,7 +292,7 @@ const ButtonControlBar = (props) =>
 						!hasVideoPermission ||
 						me.webcamInProgress
 					}
-					color={webcamState === 'on' ? 'primary' : 'secondary'}
+					color={webcamState === 'on' ? 'defaut' : 'secondary'}
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
 					{
@@ -321,7 +321,7 @@ const ButtonControlBar = (props) =>
 							!me.canShareScreen ||
 							me.screenShareInProgress
 						}
-						color={screenState === 'on' ? 'primary' : 'secondary'}
+						color={screenState === 'on' ? 'default' : 'secondary'}
 						size={smallScreen ? 'large' : 'medium'}
 						onClick={() =>
 						{

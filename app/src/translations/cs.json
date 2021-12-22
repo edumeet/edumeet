@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Jste ztišen, chcete-li mluvit, podržte mezerník",
+	"me.mutedPTT": "Jste ztišen{br}chcete-li mluvit, podržte mezerník",
 
 	"roles.gotRole": "Máte roli: {role}",
 	"roles.lostRole": "Byla Vám odebrána role: {role}",
@@ -157,10 +157,16 @@
 	"label.join": "Připojit",
 	"label.startRoomRecord": null,
 	"label.recordingInProgress": null,
-	
 	"label.yes": null,
 	"label.no": null,
 	"label.leaveWithSavingChat": null,
+	"label.send": null,
+	"label.bold": null,
+	"label.italic": null,
+	"label.underline": null,
+	"label.sortAscending": null,
+	"label.sortDescending": null,
+	"label.saveChat": null,
 
 	"settings.settings": "Nastavení",
 	"settings.camera": "Kamera",

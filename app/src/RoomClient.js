@@ -1343,7 +1343,7 @@ export default class RoomClient
 		this._hark = hark(this._harkStream,
 			{
 				play      : false,
-				interval  : 100,
+				interval  : 10,
 				threshold : store.getState().settings.noiseThreshold,
 				history   : 100
 			});
@@ -2703,6 +2703,15 @@ export default class RoomClient
 
 				this._webcamProducer = null;
 			}
+
+			for (const producer of this._extraVideoProducers.values())
+			{
+				producer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(producer.id));
+			}
+			this._extraVideoProducers.clear();
 
 			if (this._micProducer)
 			{

@@ -80,7 +80,7 @@
 	"room.leavingTheRoom": null,
 	"room.leaveConfirmationMessage": null,
 
-	"me.mutedPTT": "Sei mutato, tieni premuto SPAZIO per parlare",
+	"me.mutedPTT": "Sei mutato{br}tieni premuto SPAZIO per parlare",
 
 	"roles.gotRole": "Hai ottenuto il ruolo: {role}",
 	"roles.lostRole": "Hai perso il ruolo: {role}",
@@ -152,11 +152,17 @@
 	"label.login": "Accesso",
 	"label.logout": "Uscita",
 	"label.join": "Entra",
-	"label.recordingInProgress": null,
-	
+	"label.recordingInProgress": null,	
 	"label.yes": null,
 	"label.no": null,
-	"label.leavewithsavingchat": null,
+	"label.leaveWithSavingChat": null,
+	"label.send": null,
+	"label.bold": null,
+	"label.italic": null,
+	"label.underline": null,
+	"label.sortAscending": null,
+	"label.sortDescending": null,
+	"label.saveChat": null,
 
 	"settings.settings": "Impostazioni",
 	"settings.camera": "Videocamera",

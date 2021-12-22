@@ -80,10 +80,12 @@ const SpeakerPeer = (props) =>
 		fullScreenConsumer,
 		spacing,
 		style,
-		classes,
-		width,
-		height
+		classes
 	} = props;
+
+	const width = style.width;
+
+	const height = style.height;
 
 	const videoVisible = (
 		Boolean(webcamConsumer) &&
@@ -254,9 +256,7 @@ SpeakerPeer.propTypes =
 	fullScreenConsumer : PropTypes.string,
 	spacing            : PropTypes.number,
 	style              : PropTypes.object,
-	classes            : PropTypes.object.isRequired,
-	width              : PropTypes.number,
-	height             : PropTypes.number
+	classes            : PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state, { id }) =>
@@ -281,9 +281,7 @@ export default withRoomContext(connect(
 			return (
 				prev.peers === next.peers &&
 				prev.consumers === next.consumers &&
-				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
-				prev.width === next.width &&
-				prev.height === next.height
+				prev.room.activeSpeakerId === next.room.activeSpeakerId
 			);
 		}
 	}

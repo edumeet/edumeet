@@ -153,10 +153,16 @@
 	"label.moreActions": null,
 	"label.version": null,
 	"label.recordingInProgress": null,
-	
 	"label.yes": null,
 	"label.no": null,
-	"label.leavewithsavingchat": null,
+	"label.leaveWithSavingChat": null,
+	"label.send": null,
+	"label.bold": null,
+	"label.italic": null,
+	"label.underline": null,
+	"label.sortAscending": null,
+	"label.sortDescending": null,
+	"label.saveChat": null,
 
 	"settings.settings": "Ajustes",
 	"settings.camera": "Cámara",

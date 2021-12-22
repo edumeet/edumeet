@@ -36,6 +36,15 @@ const styles = (theme) =>
 				width : '90vw'
 			}
 		},
+		dialogActions :
+		{
+			flexDirection                  : 'row',
+			[theme.breakpoints.down('xs')] :
+			{
+				flexDirection : 'column'
+			}
+		},
+
 		logo :
 		{
 			marginLeft  : theme.spacing(1.5),
@@ -106,7 +115,7 @@ const LeaveDialog = ({
 					defaultMessage='Do you want to leave the room?'
 				/>
 			</DialogContent>
-			<DialogActions>
+			<DialogActions className={classes.dialogActions}>
 				<Button
 					onClick={handleStay}
 					color='primary'
