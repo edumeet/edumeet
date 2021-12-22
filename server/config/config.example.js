@@ -217,7 +217,7 @@ module.exports =
 	},
 	*/
 	// eslint-disable-next-line no-unused-vars
-	userMapping           : async ({ peer, room, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (userinfo.picture != null)
 		{
