@@ -63,9 +63,8 @@ let statusLogger = null;
 if ('StatusLogger' in config)
 	statusLogger = new config.StatusLogger();
 
-// mediasoup Workers.
-// @type {Array<mediasoup.Worker>}
-const mediasoupWorkers = [];
+// mediasoup Workers Map.
+const mediasoupWorkers = new Map();
 
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
@@ -164,7 +163,7 @@ async function run()
 		// start Prometheus exporter
 		if (config.prometheus.enabled)
 		{
-			await promExporter(mediasoupWorkers, rooms, peers);
+			await promExporter(mediasoupWorkers.values(), rooms, peers);
 		}
 
 		// Run WebSocketServer.
@@ -843,7 +842,9 @@ async function runMediasoupWorkers()
 			setTimeout(() => process.exit(1), 2000);
 		});
 
-		mediasoupWorkers.push(worker);
+		worker.appData.routerIds = new Set();
+
+		mediasoupWorkers.set(worker.pid, worker);
 	}
 }
 
