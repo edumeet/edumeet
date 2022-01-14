@@ -301,6 +301,8 @@ class Room extends EventEmitter
 		this._handleLobby();
 
 		this._handleAudioLevelObservers();
+
+		this._tokens = new Map();
 	}
 
 	isLocked()
@@ -356,8 +358,15 @@ class Room extends EventEmitter
 
 		this._mediasoupRouters.clear();
 
+		this._tokens.clear();
+
 		// Emit 'close' event.
 		this.emit('close');
+	}
+
+	getToken(peerId)
+	{
+		return this._tokens.get(peerId);
 	}
 
 	verifyPeer({ id, token })
@@ -669,9 +678,7 @@ class Room extends EventEmitter
 			{
 				const token = jwt.sign({ id: peer.id }, this._uuid, { noTimestamp: true });
 
-				peer.socket.handshake.session.token = token;
-				peer.socket.handshake.session.touch();
-				peer.socket.handshake.session.save();
+				this._tokens.set(peer.id, token);
 
 				let turnServers;
 

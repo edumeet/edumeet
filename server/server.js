@@ -731,9 +731,13 @@ async function runWebSocketServer()
 
 		queue.push(async () =>
 		{
-			const { token } = socket.handshake.session;
-
 			const room = await getOrCreateRoom({ roomId });
+
+			let token = null;
+			if (socket.handshake.session.peerId === peerId)
+			{
+				token = room.getToken(peerId);
+			}
 
 			let peer = peers.get(peerId);
 			let returning = false;
@@ -790,6 +794,7 @@ async function runWebSocketServer()
 
 			room.handlePeer({ peer, returning });
 
+			socket.handshake.session.peerId = peer.id;
 			socket.handshake.session.touch();
 			socket.handshake.session.save();
 
