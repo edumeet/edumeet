@@ -5,11 +5,7 @@ const userRoles = require('./access/roles');
 
 const logger = new Logger('Peer');
 
-// Recoding STATE
-const RECORDING_STOP='stop';
-const RECORDING_START='start';
-const RECORDING_PAUSE='pause';
-const RECORDING_RESUME='resume';
+import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../reducers/recorder';
 
 const RECORDING_TYPE_LOCAL='local';
 

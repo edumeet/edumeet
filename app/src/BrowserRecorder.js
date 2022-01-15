@@ -2,10 +2,9 @@ import Logger from './Logger';
 import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
-import * as meActions from './actions/meActions';
 import { store } from './store';
 import * as requestActions from './actions/requestActions';
-import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
+import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './reducers/recorder';
 
 export default class BrowserRecorder
 {
@@ -585,3 +584,4 @@ export default class BrowserRecorder
 		}
 	}
 }
+export const recorder = new BrowserRecorder();

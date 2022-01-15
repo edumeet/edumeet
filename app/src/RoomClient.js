@@ -20,7 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP } from './actions/recorderActions';
+import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP } from './reducers/recorder';
 import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
 import { config } from './config';
 

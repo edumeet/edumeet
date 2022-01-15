@@ -168,13 +168,6 @@ const me = (state = initialState, action) =>
 			return { ...state, isAutoMuted: flag };
 		}
 
-		case 'SET_LOCAL_RECORDING_STATE':
-		{
-			const { localRecordingState } = action.payload;
-
-			return { ...state, localRecordingState };
-		}
-
 		default:
 			return state;
 	}

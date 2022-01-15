@@ -49,7 +49,7 @@ import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
 import randomString from 'random-string';
-import { recorder, RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../actions/recorderActions';
+import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from './../../reducers/recorder';
 
 import Logger from '../../Logger';
 import { config } from '../../config';
