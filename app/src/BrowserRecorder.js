@@ -203,7 +203,7 @@ export default class BrowserRecorder
 
 				this.recorder.onerror = (error) =>
 				{
-					this.logger.err(`Recorder onerror: ${error}`);
+					this.logger.error(`Recorder onerror: ${error}`);
 					switch (error.name)
 					{
 						case 'SecurityError':
