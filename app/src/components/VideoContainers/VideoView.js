@@ -205,7 +205,7 @@ class VideoView extends React.PureComponent
 	render()
 	{
 		const {
-			meLocalRecordingState,
+			localRecordingState,
 			recordingConsents,
 			isMe,
 			isMirrored,
@@ -302,6 +302,10 @@ class VideoView extends React.PureComponent
 				}
 			}
 		}
+		// eslint-disable-next-line no-console
+		console.log('recordingConsents');
+		// eslint-disable-next-line no-console
+		console.log(recordingConsents);
 
 		return (
 			<div className={classes.root}>
@@ -433,16 +437,11 @@ class VideoView extends React.PureComponent
 										{
 											(
 												(
-													meLocalRecordingState==='start' ||
-													meLocalRecordingState==='resume'
-												) &&
-												!(
-													recordingConsents.get(
-														'recordingid'
-													)!==undefined &&
-													recordingConsents.get(
-														'recordingid'
-													).includes(peer.id)
+													localRecordingState==='start' ||
+													localRecordingState==='resume'
+												)&&
+												(
+													!recordingConsents.includes(peer.id)
 												)
 											) ? '':displayName
 										}
@@ -460,16 +459,11 @@ class VideoView extends React.PureComponent
 							(
 								!isMe &&
 								(
-									meLocalRecordingState==='start' ||
-									meLocalRecordingState==='resume'
-								) &&
-								!(
-									recordingConsents.get(
-										'recordingid'
-									)!==undefined &&
-									recordingConsents.get(
-										'recordingid'
-									).includes(peer.id)
+									localRecordingState==='start' ||
+									localRecordingState==='resume'
+								)&&
+								(
+									!recordingConsents.includes(peer.id)
 								)
 							)
 						),
@@ -641,8 +635,8 @@ class VideoView extends React.PureComponent
 
 VideoView.propTypes =
 {
-	meLocalRecordingState          : PropTypes.string,
-	recordingConsents              : PropTypes.object,
+	localRecordingState            : PropTypes.string,
+	recordingConsents              : PropTypes.array,
 	isMe                           : PropTypes.bool,
 	isMirrored                     : PropTypes.bool,
 	isScreen                       : PropTypes.bool,

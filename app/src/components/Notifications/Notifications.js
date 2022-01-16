@@ -6,9 +6,7 @@ import * as notificationActions from '../../actions/notificationActions';
 import { config } from '../../config';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
-
 import { FormattedMessage } from 'react-intl';
 import Lock from '@material-ui/icons/Lock';
 class Notifications extends Component
@@ -75,8 +73,7 @@ class Notifications extends Component
 							onClick={() =>
 							{
 								notification.roomClient.addConsentForRecording(
-									notification.recordingPeers,
-									notification.peerid
+									'agreed'
 								);
 								this.props.closeSnackbar(key);
 							}}
@@ -90,6 +87,9 @@ class Notifications extends Component
 							startIcon={<Lock />}
 							onClick={() =>
 							{
+								notification.roomClient.addConsentForRecording(
+									'denied'
+								);
 								this.props.closeSnackbar(key);
 							}}
 						>
@@ -108,7 +108,6 @@ class Notifications extends Component
 					persist          : notification.persist,
 					peerid       			 : notification.peerid,
 					roomClient       : notification.roomClient,
-					recordingPeers   : notification.recordingPeers,
 					key              : notification.id,
 					action           : notification.persist? okAction: null,
 					anchorOrigin     : {

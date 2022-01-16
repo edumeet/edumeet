@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { RECORDING_INIT, RECORDING_START, RECORDING_STOP, RECORDING_PAUSE, RECORDING_RESUME } from '../reducers/recorder';
 
 const meRolesSelect = (state) => state.me.roles;
 const userRolesSelect = (state) => state.room.userRoles;
@@ -10,6 +9,7 @@ const consumersSelect = (state) => state.consumers;
 const spotlightsSelector = (state) => state.room.spotlights;
 const peersSelector = (state) => state.peers;
 const meSelector = (state) => state.me;
+const recorderReducerSelect = (state) => state.recorderReducer;
 const lobbyPeersSelector = (state) => state.lobbyPeers;
 const getPeerConsumers = (state, id) =>
 	(state.peers[id] ? state.peers[id].consumers : null);
@@ -304,27 +304,33 @@ export const makePermissionSelector = (permission) =>
 
 export const recordingInProgressSelector = createSelector(
 	peersValueSelector,
-	meSelector,
-	(peers, me) =>
+	recorderReducerSelect,
+	(peers, recorderReducer) =>
 	{
 		if (
-			me.localRecordingState === RECORDING_START ||
-			me.localRecordingState === RECORDING_RESUME ||
+			recorderReducer.localRecordingState.status === 'start' ||
+			recorderReducer.localRecordingState.status === 'resume' ||
 			peers.findIndex((e) =>
-				e.localRecordingState === RECORDING_START ||
-				e.localRecordingState === RECORDING_RESUME
+				e.localRecordingState !== undefined &&
+				(
+					e.localRecordingState === 'start' ||
+					e.localRecordingState === 'resume'
+				)
 			) !== -1
 		)
 		{
 			return true;
 		}
 		else if (
-			me.localRecordingState === RECORDING_INIT ||
-			me.localRecordingState === RECORDING_STOP ||
-			me.localRecordingState === RECORDING_PAUSE ||
+			recorderReducer.localRecordingState.status === 'init' ||
+			recorderReducer.localRecordingState.status === 'stop' ||
+			recorderReducer.localRecordingState.status === 'pause' ||
 			peers.findIndex((e) =>
-				e.localRecordingState === RECORDING_START ||
-				e.localRecordingState === RECORDING_RESUME
+				e.localRecordingState !== undefined &&
+				(
+					e.localRecordingState === 'start' ||
+					e.localRecordingState === 'resume'
+				)
 			) === -1
 
 		)
@@ -332,24 +338,54 @@ export const recordingInProgressSelector = createSelector(
 	}
 );
 
+export const recordingConsentsPeersSelector = createSelector(
+	peersValueSelector,
+	(peers) =>
+	{
+		const recordingconsents = [];
+
+		peers.forEach((e) =>
+		{
+			if (
+				e.localRecordingConsent !== undefined &&
+				e.localRecordingConsent === 'agreed'
+			)
+			{
+				recordingconsents.push(e.id);
+			}
+		});
+
+		return recordingconsents;
+	}
+);
+
 export const recordingInProgressPeersSelector = createSelector(
 	peersValueSelector,
 	meSelector,
-	(peers, me) =>
+	recorderReducerSelect,
+	(peers, me, recorderReducer) =>
 	{
 		const recordingpeers = [];
 
 		if (
-			me.localRecordingState === RECORDING_START ||
-			me.localRecordingState === RECORDING_RESUME
+			recorderReducer !== undefined &&
+			(
+				recorderReducer.localRecordingState.status === 'start' ||
+				recorderReducer.localRecordingState.status === 'resume'
+			)
 		)
 		{
 			recordingpeers.push(me.id);
 		}
 		peers.forEach((e) =>
 		{
-			if (e.localRecordingState === RECORDING_START ||
-				e.localRecordingState === RECORDING_RESUME)
+			if (
+				e.recorderReducer !== undefined &&
+				(
+					e.recorderReducer.localRecordingState.status === 'start' ||
+					e.recorderReducer.localRecordingState.status === 'resume'
+				)
+			)
 			{
 				recordingpeers.push(e.id);
 			}

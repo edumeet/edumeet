@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	meProducersSelector,
-	makePermissionSelector
+	makePermissionSelector,
+	recordingConsentsPeersSelector
 } from '../Selectors';
 import { permissions } from '../../permissions';
 import { withRoomContext } from '../../RoomContext';
@@ -167,8 +168,7 @@ const Me = (props) =>
 
 	const {
 		roomClient,
-		meLocalRecordingState,
-		recordingConsents,
+		localRecordingState,
 		me,
 		settings,
 		activeSpeaker,
@@ -185,7 +185,8 @@ const Me = (props) =>
 		hasScreenPermission,
 		transports,
 		noiseVolume,
-		classes
+		classes,
+		recordingConsents
 	} = props;
 
 	const videoVisible = (
@@ -785,7 +786,7 @@ const Me = (props) =>
 					}
 
 					<VideoView
-						meLocalRecordingState={meLocalRecordingState}
+						localRecordingState={localRecordingState}
 						recordingConsents={recordingConsents}
 						isMe
 						isMirrored={settings.mirrorOwnVideo}
@@ -929,7 +930,7 @@ const Me = (props) =>
 							</div>
 
 							<VideoView
-								meLocalRecordingState={meLocalRecordingState}
+								localRecordingState={localRecordingState}
 								recordingConsents={recordingConsents}
 								isMe
 								isMirrored={settings.mirrorOwnVideo}
@@ -989,7 +990,7 @@ const Me = (props) =>
 						</p>
 
 						<VideoView
-							meLocalRecordingState={meLocalRecordingState}
+							localRecordingState={localRecordingState}
 							recordingConsents={recordingConsents}
 							isMe
 							isScreen
@@ -1008,27 +1009,28 @@ const Me = (props) =>
 
 Me.propTypes =
 {
-	meLocalRecordingState : PropTypes.string,
-	recordingConsents     : PropTypes.object,
-	roomClient            : PropTypes.any.isRequired,
-	advancedMode          : PropTypes.bool,
-	me                    : appPropTypes.Me.isRequired,
-	settings              : PropTypes.object,
-	activeSpeaker         : PropTypes.bool,
-	micProducer           : appPropTypes.Producer,
-	webcamProducer        : appPropTypes.Producer,
-	screenProducer        : appPropTypes.Producer,
-	extraVideoProducers   : PropTypes.arrayOf(appPropTypes.Producer),
-	spacing               : PropTypes.number,
-	style                 : PropTypes.object,
-	smallContainer        : PropTypes.bool,
-	hasAudioPermission    : PropTypes.bool.isRequired,
-	hasVideoPermission    : PropTypes.bool.isRequired,
-	hasScreenPermission   : PropTypes.bool.isRequired,
-	noiseVolume           : PropTypes.number,
-	classes               : PropTypes.object.isRequired,
-	theme                 : PropTypes.object.isRequired,
-	transports            : PropTypes.object.isRequired
+	localRecordingState : PropTypes.string,
+	roomClient          : PropTypes.any.isRequired,
+	advancedMode        : PropTypes.bool,
+	me                  : appPropTypes.Me.isRequired,
+	settings            : PropTypes.object,
+	activeSpeaker       : PropTypes.bool,
+	micProducer         : appPropTypes.Producer,
+	webcamProducer      : appPropTypes.Producer,
+	screenProducer      : appPropTypes.Producer,
+	extraVideoProducers : PropTypes.arrayOf(appPropTypes.Producer),
+	spacing             : PropTypes.number,
+	style               : PropTypes.object,
+	smallContainer      : PropTypes.bool,
+	hasAudioPermission  : PropTypes.bool.isRequired,
+	hasVideoPermission  : PropTypes.bool.isRequired,
+	hasScreenPermission : PropTypes.bool.isRequired,
+	noiseVolume         : PropTypes.number,
+	classes             : PropTypes.object.isRequired,
+	theme               : PropTypes.object.isRequired,
+	transports          : PropTypes.object.isRequired,
+	recordingConsents   : PropTypes.array
+
 };
 
 const makeMapStateToProps = () =>
@@ -1055,17 +1057,17 @@ const makeMapStateToProps = () =>
 		else { noise = 10; }
 
 		return {
-			me                    : state.me,
+			me                  : state.me,
 			...meProducersSelector(state),
-			settings              : state.settings,
-			activeSpeaker         : state.me.id === state.room.activeSpeakerId,
-			hasAudioPermission    : canShareAudio(state),
-			hasVideoPermission    : canShareVideo(state),
-			hasScreenPermission   : canShareScreen(state),
-			noiseVolume           : noise,
-			transports            : state.transports,
-			meLocalRecordingState : state.me.localRecordingState,
-			recordingConsents     : state.room.recordingConsents
+			settings            : state.settings,
+			activeSpeaker       : state.me.id === state.room.activeSpeakerId,
+			hasAudioPermission  : canShareAudio(state),
+			hasVideoPermission  : canShareVideo(state),
+			hasScreenPermission : canShareScreen(state),
+			noiseVolume         : noise,
+			transports          : state.transports,
+			localRecordingState : state.recorderReducer.localRecordingState.status,
+			recordingConsents   : recordingConsentsPeersSelector(state)
 		};
 	};
 
@@ -1088,8 +1090,9 @@ export default withRoomContext(connect(
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
 				prev.transports === next.transports &&
-				prev.me.localRecordingState === next.me.localRecordingState &&
-				prev.room.recordingConsents === next.room.recordingConsents
+				prev.recorderReducer.localRecordingState.status ===
+				next.recorderReducer.localRecordingState.status &&
+				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}
 	}

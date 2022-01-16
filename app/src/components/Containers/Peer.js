@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { makePeerConsumerSelector } from '../Selectors';
+import { makePeerConsumerSelector, recordingConsentsPeersSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
@@ -174,7 +174,7 @@ const Peer = (props) =>
 		height,
 		isSelected,
 		mode,
-		meLocalRecordingState,
+		localRecordingState,
 		recordingConsents
 	} = props;
 
@@ -608,7 +608,7 @@ const Peer = (props) =>
 					</div>
 
 					<VideoView
-						meLocalRecordingState={meLocalRecordingState}
+						localRecordingState={localRecordingState}
 						recordingConsents={recordingConsents}
 						showQuality
 						advancedMode={advancedMode}
@@ -810,7 +810,7 @@ const Peer = (props) =>
 							</div>
 
 							<VideoView
-								meLocalRecordingState={meLocalRecordingState}
+								localRecordingState={localRecordingState}
 								recordingConsents={recordingConsents}
 								showQuality
 								advancedMode={advancedMode}
@@ -956,7 +956,7 @@ const Peer = (props) =>
 							</Tooltip>
 						</div>
 						<VideoView
-							meLocalRecordingState={meLocalRecordingState}
+							localRecordingState={localRecordingState}
 							recordingConsents={recordingConsents}
 							peer={peer}
 							showQuality
@@ -983,13 +983,9 @@ const Peer = (props) =>
 							videoMultiLayer={screenConsumer && screenConsumer.type !== 'simple'}
 							videoTrack={screenConsumer && screenConsumer.track}
 							videoVisible={
-								screenVisible && (meLocalRecordingState!=='start' ||
-									(
-										(meLocalRecordingState==='start' || meLocalRecordingState==='resume') &&
-										recordingConsents!==undefined &&
-										recordingConsents.get('recordingid')!==undefined
-										// && recordingConsents.get('recordingid').includes(peer.id)
-									)
+								screenVisible && (
+									localRecordingState!=='start' ||
+									localRecordingState!=='resume'
 								)
 							}
 							videoCodec={screenConsumer && screenConsumer.codec}
@@ -1029,8 +1025,9 @@ Peer.propTypes =
 	height                   : PropTypes.number,
 	isSelected               : PropTypes.bool,
 	mode                     : PropTypes.string.isRequired,
-	meLocalRecordingState    : PropTypes.string,
-	recordingConsents        : PropTypes.object
+	localRecordingState      : PropTypes.string,
+	recordingConsents        : PropTypes.array
+
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -1040,16 +1037,17 @@ const makeMapStateToProps = (initialState, { id }) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer                  : state.peers[id],
+			peer                : state.peers[id],
 			...getPeerConsumers(state, id),
-			windowConsumer        : state.room.windowConsumer,
-			fullScreenConsumer    : state.room.fullScreenConsumer,
-			activeSpeaker         : id === state.room.activeSpeakerId,
-			browser               : state.me.browser,
-			isSelected            : state.room.selectedPeers.includes(id),
-			mode                  : state.room.mode,
-			meLocalRecordingState : state.me.localRecordingState,
-			recordingConsents     : state.room.recordingConsents
+			windowConsumer      : state.room.windowConsumer,
+			fullScreenConsumer  : state.room.fullScreenConsumer,
+			activeSpeaker       : id === state.room.activeSpeakerId,
+			browser             : state.me.browser,
+			isSelected          : state.room.selectedPeers.includes(id),
+			mode                : state.room.mode,
+			localRecordingState : state.recorderReducer.localRecordingState.status,
+			recordingConsents   : recordingConsentsPeersSelector(state)
+
 		};
 	};
 
@@ -1089,11 +1087,12 @@ export default withRoomContext(connect(
 				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.me.browser === next.me.browser &&
 				prev.me.browser === next.me.browser &&
-				prev.me.localRecordingState === next.me.localRecordingState &&
 				prev.enableLayersSwitch === next.enableLayersSwitch &&
 				prev.width === next.width &&
 				prev.height === next.height &&
-				prev.room.recordingConsents === next.room.recordingConsents
+				prev.recorderReducer.localRecordingState.status ===
+				next.recorderReducer.localRecordingState.status &&
+				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}
 	}

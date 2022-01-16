@@ -1577,16 +1577,13 @@ class Room extends EventEmitter
 
 				break;
 			}
-
 			case 'addConsentForRecording':
 			{
-
-				const {recordingid,peerid} = request.data;
+				const {consent} = request.data;
 				// Spread to others
 				this._notification(peer.socket, 'addConsentForRecording', {
 					peerId : peer.id,
-					peerid : peerid, 
-					recordingid: recordingid
+					consent: consent
 				}, true);
 
 				// Return no error
@@ -1594,25 +1591,6 @@ class Room extends EventEmitter
 
 				break;
 			}
-
-			/* 
-			This would clear the localrecording consents, it will be intruduced in a later version
-			case 'removeConsentForRecording':
-			{
-
-				const {recordingid} = request.data;
-				// Spread to others
-				this._notification(peer.socket, 'removeConsentForRecording', {
-					peerId : peer.id,
-					recordingid: recordingid
-				}, true);
-
-				// Return no error
-				cb();
-
-				break;
-			} */
-
 			case 'unlockRoom':
 			{
 				if (!this._hasPermission(peer, CHANGE_ROOM_LOCK))

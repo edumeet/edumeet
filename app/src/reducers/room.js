@@ -22,7 +22,6 @@ const initialState =
 	mode                          : config.defaultLayout,
 	selectedPeers                 : [],
 	spotlights                    : [],
-	recordingConsents             : new Map(),
 	rolesManagerPeer              : null, // peerId
 	settingsOpen                  : false,
 	extraVideoOpen                : false,
@@ -310,50 +309,6 @@ const room = (state = initialState, action) =>
 			return { ...state, hideSelfView };
 		}
 
-		case 'ADD_CONSENT_RECORDING':
-		{
-			/* const { recordingid, peerid } = action.payload; */
-
-			const { peerid } = action.payload;
-
-			const recordingid = [ 'recordingid' ];
-
-			const recordingConsents = state.recordingConsents;
-
-			let recConsents;
-
-			recordingid.forEach((rid) =>
-			{
-				if (recordingConsents.has(rid))
-				{
-					recConsents = recordingConsents.get(rid);
-					recConsents.push(peerid);
-					recordingConsents.set(
-						rid, recConsents
-					);
-				}
-				else
-				{
-					recordingConsents.set(rid, [ peerid ]);
-				}
-			});
-
-			return { ...state, recordingConsents };
-		}
-
-		/* 
-		This would clear the localrecording consents, it will be intruduced in a later version
-		case 'REMOVE_CONSENT_RECORDING':
-		{
-			const { recordingid } = action.payload;
-
-			const recordingConsents = state.recordingConsents;
-
-			recordingConsents.delete(recordingid);
-
-			return { ...state, recordingConsents };
-		}
- 		*/
 		default:
 			return state;
 	}

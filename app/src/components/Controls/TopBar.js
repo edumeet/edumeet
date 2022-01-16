@@ -7,7 +7,8 @@ import {
 	raisedHandsSelector,
 	makePermissionSelector,
 	recordingInProgressSelector,
-	recordingInProgressPeersSelector
+	recordingInProgressPeersSelector,
+	recordingConsentsPeersSelector
 } from '../Selectors';
 import { permissions } from '../../permissions';
 import * as appPropTypes from '../appPropTypes';
@@ -49,7 +50,7 @@ import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
 import randomString from 'random-string';
-import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from './../../reducers/recorder';
+import { recorder } from './../../BrowserRecorder';
 
 import Logger from '../../Logger';
 import { config } from '../../config';
@@ -284,20 +285,27 @@ const TopBar = (props) =>
 		recordingPeers,
 		recordingMimeType,
 		producers,
-		consumers
+		consumers,
+		recordingConsents
 	} = props;
 
 	// did it change?
 	recorder.checkMicProducer(producers);
-	recorder.checkAudioConsumer(consumers);
+	recorder.checkAudioConsumer(consumers, recordingConsents);
 
 	useEffect(() =>
 	{
+		// someone else is recording (need consent) or only me(dont need consent notif)
 		const hasConsent = (
 			(
-				room.recordingConsents.get('recordingid')!==undefined &&
-				room.recordingConsents.get('recordingid').includes(meId)
-			) || (recordingPeers.includes(meId) && recordingPeers.length<2)
+				(
+					localRecordingState === undefined ||
+					localRecordingState.consent!=='init'
+				)
+				|| (
+					recordingPeers.includes(meId) && recordingPeers.length === 1
+				)
+			)
 		);
 
 		if (
@@ -320,10 +328,9 @@ const TopBar = (props) =>
 							defaultMessage : 'When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming'
 						}
 					),
-					peerid         : meId,
-					roomClient     : roomClient,
-					recordingPeers : recordingPeers,
-					persist        : true
+					peerid     : meId,
+					roomClient : roomClient,
+					persist    : true
 				}
 			);
 		}
@@ -355,8 +362,8 @@ const TopBar = (props) =>
 			defaultMessage : 'Lock room'
 		});
 
-	const recordingTooltip = (localRecordingState === RECORDING_START ||
-								localRecordingState === RECORDING_RESUME) ?
+	const recordingTooltip = (localRecordingState.status === 'start' ||
+								localRecordingState.status === 'resume') ?
 		intl.formatMessage({
 			id             : 'tooltip.stopLocalRecording',
 			defaultMessage : 'Stop local recording'
@@ -367,7 +374,7 @@ const TopBar = (props) =>
 			defaultMessage : 'Start local recording'
 		});
 
-	const recordingPausedTooltip = localRecordingState === RECORDING_PAUSE ?
+	const recordingPausedTooltip = localRecordingState.status === 'pause' ?
 		intl.formatMessage({
 			id             : 'tooltip.resumeLocalRecording',
 			defaultMessage : 'Resume local recording'
@@ -691,9 +698,9 @@ const TopBar = (props) =>
 					<Paper>
 						{
 							(
-								localRecordingState === RECORDING_START ||
-								localRecordingState === RECORDING_RESUME ||
-								localRecordingState === RECORDING_PAUSE
+								localRecordingState.status === 'start' ||
+								localRecordingState.status === 'resume' ||
+								localRecordingState.status === 'pause'
 							)
 							&&
 							<MenuItem
@@ -701,7 +708,7 @@ const TopBar = (props) =>
 								onClick={() =>
 								{
 									handleMenuClose();
-									if (localRecordingState === RECORDING_PAUSE)
+									if (localRecordingState.status === 'pause')
 									{
 										recorder.resumeLocalRecording();
 									}
@@ -715,13 +722,13 @@ const TopBar = (props) =>
 								<Badge
 									color='primary'
 								>
-									{ localRecordingState === RECORDING_PAUSE ?
+									{ localRecordingState.status === 'pause' ?
 										<PauseCircleFilledIcon />
 										:
 										<PauseCircleOutlineIcon />
 									}
 								</Badge>
-								{ localRecordingState === RECORDING_PAUSE ?
+								{ localRecordingState.status === 'pause' ?
 									<p className={classes.moreAction}>
 										<FormattedMessage
 											id='tooltip.resumeLocalRecording'
@@ -746,9 +753,9 @@ const TopBar = (props) =>
 							onClick={async () =>
 							{
 								handleMenuClose();
-								if (localRecordingState === RECORDING_START ||
-									localRecordingState === RECORDING_PAUSE ||
-									localRecordingState === RECORDING_RESUME)
+								if (localRecordingState.status === 'start' ||
+									localRecordingState.status === 'pause' ||
+									localRecordingState.status === 'resume')
 								{
 									recorder.stopLocalRecording(meId);
 								}
@@ -786,9 +793,9 @@ const TopBar = (props) =>
 								color='primary'
 							>
 								{
-									(localRecordingState === RECORDING_START ||
-									localRecordingState === RECORDING_PAUSE ||
-									localRecordingState === RECORDING_RESUME) ?
+									(localRecordingState.status === 'start' ||
+									localRecordingState.status === 'pause' ||
+									localRecordingState.status === 'resume') ?
 										<StopIcon />
 										:
 										<FiberManualRecordIcon />
@@ -796,9 +803,9 @@ const TopBar = (props) =>
 							</Badge>
 
 							{
-								(localRecordingState === RECORDING_START ||
-								localRecordingState === RECORDING_PAUSE ||
-								localRecordingState === RECORDING_RESUME) ?
+								(localRecordingState.status === 'start' ||
+								localRecordingState.status === 'pause' ||
+								localRecordingState.status === 'resume') ?
 									<p className={classes.moreAction}>
 										<FormattedMessage
 											id='tooltip.stopLocalRecording'
@@ -975,9 +982,9 @@ const TopBar = (props) =>
 				}
 				{
 					(
-						localRecordingState === RECORDING_PAUSE ||
-						localRecordingState === RECORDING_RESUME ||
-						localRecordingState === RECORDING_START
+						localRecordingState.status === 'pause' ||
+						localRecordingState.status === 'resume' ||
+						localRecordingState.status === 'start'
 					)
 					&&
 					<MenuItem
@@ -986,7 +993,7 @@ const TopBar = (props) =>
 						onClick={() =>
 						{
 							handleMenuClose();
-							if (localRecordingState === RECORDING_PAUSE)
+							if (localRecordingState.status === 'pause')
 							{
 								recorder.resumeLocalRecording();
 							}
@@ -1000,14 +1007,14 @@ const TopBar = (props) =>
 						<Badge
 							color='primary'
 						>
-							{ localRecordingState === RECORDING_PAUSE ?
+							{ localRecordingState.status === 'pause' ?
 								<PauseCircleFilledIcon />
 								:
 								<PauseCircleOutlineIcon />
 							}
 						</Badge>
 
-						{ localRecordingState === RECORDING_PAUSE ?
+						{ localRecordingState.status === 'pause' ?
 							<p className={classes.moreAction}>
 								<FormattedMessage
 									id='tooltip.resumeLocalRecording'
@@ -1280,7 +1287,8 @@ TopBar.propTypes =
 	recordingPeers       : PropTypes.array,
 	recordingMimeType    : PropTypes.string,
 	producers            : PropTypes.object,
-	consumers            : PropTypes.object
+	consumers            : PropTypes.object,
+	recordingConsents    : PropTypes.array
 };
 
 const makeMapStateToProps = () =>
@@ -1309,9 +1317,10 @@ const makeMapStateToProps = () =>
 			toolAreaOpen        : state.toolarea.toolAreaOpen,
 			loggedIn            : state.me.loggedIn,
 			loginEnabled        : state.me.loginEnabled,
-			localRecordingState : state.me.localRecordingState,
+			localRecordingState : state.recorderReducer.localRecordingState,
 			recordingInProgress	: recordingInProgressSelector(state),
 			recordingPeers      : recordingInProgressPeersSelector(state),
+			recordingConsents   : recordingConsentsPeersSelector(state),
 			unread              : state.toolarea.unreadMessages +
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
 			canProduceExtraVideo : hasExtraVideoPermission(state),
@@ -1399,7 +1408,8 @@ export default withRoomContext(connect(
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&
 				prev.me.roles === next.me.roles &&
-				prev.me.localRecordingState === next.me.localRecordingState &&
+				prev.recorderReducer.localRecordingState.status ===
+				next.recorderReducer.localRecordingState.status &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
@@ -1408,7 +1418,8 @@ export default withRoomContext(connect(
 				prev.producers === next.producers &&
 				prev.consumers === next.consumers &&
 				prev.settings.recorderPreferredMimeType ===
-				next.settings.recorderPreferredMimeType
+				next.settings.recorderPreferredMimeType &&
+				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}
 	}

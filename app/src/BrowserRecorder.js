@@ -4,7 +4,7 @@ import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
 import { store } from './store';
 import * as requestActions from './actions/requestActions';
-import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './reducers/recorder';
+import * as recorderActions from './actions/recorderActions';
 
 export default class BrowserRecorder
 {
@@ -105,7 +105,7 @@ export default class BrowserRecorder
 
 		try
 		{
-			store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
+			store.dispatch(recorderActions.setLocalRecordingState('start'));
 
 			// Screensharing
 			this.gdmStream = await navigator.mediaDevices.getDisplayMedia(
@@ -279,7 +279,7 @@ export default class BrowserRecorder
 				};
 
 				this.recorder.start(this.RECORDING_SLICE_SIZE);
-				meActions.setLocalRecordingState(RECORDING_START);
+				recorderActions.setLocalRecordingState('start');
 
 			}
 		}
@@ -296,7 +296,7 @@ export default class BrowserRecorder
 			this.logger.error('startLocalRecording() [error:"%o"]', error);
 
 			if (this.recorder) this.recorder.stop();
-			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
+			store.dispatch(recorderActions.setLocalRecordingState('stop'));
 			if (typeof this.gdmStream !== 'undefined' && this.gdmStream && typeof this.gdmStream.getTracks === 'function')
 			{
 				this.gdmStream.getTracks().forEach((track) => track.stop());
@@ -311,7 +311,9 @@ export default class BrowserRecorder
 
 		try
 		{
-			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
+			// eslint-disable-next-line no-console
+			console.log(this.recorderReducer);
+			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'start' });
 
 			store.dispatch(requestActions.notify(
 				{
@@ -351,12 +353,9 @@ export default class BrowserRecorder
 					})
 				}));
 
-			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
-			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
-			// This would clear the localrecording consents, it will be intruduced in a later version
-			// Localrecording conents are stored in the store.room.recordingconsents
-			// store.dispatch(roomActions.removeConsentForRecording(meId));
-			// await this.roomClient.sendRequest('removeConsentForRecording', { recordingid: meId });
+			store.dispatch(recorderActions.setLocalRecordingState('stop'));
+			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'stop' });
+
 		}
 		catch (error)
 		{
@@ -376,14 +375,14 @@ export default class BrowserRecorder
 	async pauseLocalRecording()
 	{
 		this.recorder.pause();
-		store.dispatch(meActions.setLocalRecordingState(RECORDING_PAUSE));
-		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_PAUSE });
+		store.dispatch(recorderActions.setLocalRecordingState('pause'));
+		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'pause' });
 	}
 	async resumeLocalRecording()
 	{
 		this.recorder.resume();
-		store.dispatch(meActions.setLocalRecordingState(RECORDING_RESUME));
-		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_RESUME });
+		store.dispatch(recorderActions.setLocalRecordingState('resume'));
+		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'resume' });
 	}
 	invokeSaveAsDialog(blob)
 	{
@@ -549,12 +548,8 @@ export default class BrowserRecorder
 			}
 		}
 	}
-	checkAudioConsumer(consumers)
+	checkAudioConsumer(consumers, recordingConsents)
 	{
-		const recordingConsents = store.getState().room.recordingConsents.get(
-			'recordingid'
-		);
-
 		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused') && recordingConsents!==undefined)
 		{
 			const audioConsumers = Object.values(consumers).filter((p) => p.kind === 'audio' && recordingConsents.includes(p.peerId));

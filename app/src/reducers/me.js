@@ -19,8 +19,7 @@ const initialState =
 	raisedHandInProgress  : false,
 	loggedIn              : false,
 	isSpeaking            : false,
-	isAutoMuted           : true,
-	localRecordingState   : null
+	isAutoMuted           : true
 };
 
 const me = (state = initialState, action) =>

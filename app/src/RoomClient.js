@@ -14,13 +14,13 @@ import * as fileActions from './actions/fileActions';
 import * as lobbyPeerActions from './actions/lobbyPeerActions';
 import * as consumerActions from './actions/consumerActions';
 import * as producerActions from './actions/producerActions';
+import * as recorderActions from './actions/recorderActions';
 import * as notificationActions from './actions/notificationActions';
 import * as transportActions from './actions/transportActions';
 import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP } from './reducers/recorder';
 import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
 import { config } from './config';
 
@@ -2851,29 +2851,6 @@ export default class RoomClient
 						break;
 					}
 
-					case 'addConsentForRecording':
-					{
-						// eslint-disable-next-line no-unused-vars
-						const { recordingid, peerid } = notification.data;
-
-						store.dispatch(
-							roomActions.addConsentForRecording('recordingid', peerid));
-
-						break;
-					}
-
-					/* 
-					This would clear the localrecording consents, it will be intruduced in a later version
-					case 'removeConsentForRecording':
-					{
-						const { recordingid } = notification.data;
-
-						store.dispatch(
-							roomActions.removeConsentForRecording(recordingid));
-
-						break;
-					} */
-
 					case 'unlockRoom':
 					{
 						store.dispatch(
@@ -3600,7 +3577,16 @@ export default class RoomClient
 
 						break;
 					}
+					case 'addConsentForRecording':
+					{
+						// eslint-disable-next-line no-unused-vars
+						const { peerId, consent } = notification.data;
 
+						store.dispatch(
+							peerActions.setPeerLocalRecordingConsent(peerId, consent));
+
+						break;
+					}
 					case 'setLocalRecording':
 					{
 						const { peerId, localRecordingState } = notification.data;
@@ -3623,7 +3609,7 @@ export default class RoomClient
 
 						switch (localRecordingState)
 						{
-							case RECORDING_START:
+							case 'start':
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -3634,7 +3620,7 @@ export default class RoomClient
 										})
 									}));
 								break;
-							case RECORDING_RESUME:
+							case 'resume':
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -3645,7 +3631,7 @@ export default class RoomClient
 										})
 									}));
 								break;
-							case RECORDING_PAUSE:
+							case 'pause':
 							{
 								store.dispatch(requestActions.notify(
 									{
@@ -3658,7 +3644,7 @@ export default class RoomClient
 									}));
 								break;
 							}
-							case RECORDING_STOP:
+							case 'stop':
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -4146,23 +4132,6 @@ export default class RoomClient
 			logger.error('lockRoom() [error:"%o"]', error);
 		}
 	}
-	async addConsentForRecording(recordingid, peerid)
-	{
-		logger.debug('addConsentForRecording()');
-
-		try
-		{
-			await this.sendRequest('addConsentForRecording', { recordingid: recordingid, peerid: peerid });
-			store.dispatch(
-				roomActions.addConsentForRecording('recordingid', peerid));
-
-		}
-		catch (error)
-		{
-
-			logger.error('addConsentForRecording() [error:"%o"]', error);
-		}
-	}
 
 	async unlockRoom()
 	{
@@ -4198,6 +4167,22 @@ export default class RoomClient
 		}
 	}
 
+	async addConsentForRecording(consent)
+	{
+		logger.debug('addConsentForRecording()');
+
+		try
+		{
+			store.dispatch(
+				recorderActions.setLocalRecordingConsent(consent));
+			await this.sendRequest('addConsentForRecording', { consent });
+		}
+		catch (error)
+		{
+
+			logger.error('addConsentForRecording() [error:"%o"]', error);
+		}
+	}
 	async setAccessCode(code)
 	{
 		logger.debug('setAccessCode()');

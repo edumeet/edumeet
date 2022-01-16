@@ -1,5 +1,10 @@
-export const setLocalRecordingState = (localRecordingState) =>
+export const setLocalRecordingState = (status) =>
 	({
 		type    : 'SET_LOCAL_RECORDING_STATE',
-		payload : { localRecordingState }
+		payload : { status }
+	});
+export const setLocalRecordingConsent = (agreed) =>
+	({
+		type    : 'SET_LOCAL_RECORDING_CONSENT',
+		payload : { agreed }
 	});

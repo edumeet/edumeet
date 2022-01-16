@@ -1,10 +1,11 @@
-const initialState = null;
+const initialState = {
+	localRecordingState : {
+		status  : 'init',
+		consent : 'init'
+	}
+}
 
-export const RECORDING_INIT = 'init';
-export const RECORDING_START = 'start';
-export const RECORDING_STOP = 'stop';
-export const RECORDING_PAUSE = 'pause';
-export const RECORDING_RESUME = 'resume';
+;
 
 const recorderReducer = (state = initialState, action) =>
 {
@@ -12,9 +13,30 @@ const recorderReducer = (state = initialState, action) =>
 	{
 		case 'SET_LOCAL_RECORDING_STATE':
 		{
-			const { localRecordingState } = action.payload;
+			const { status } = action.payload;
 
-			return { ...state, localRecordingState };
+			// eslint-disable-next-line no-console
+			console.log(action.payload);
+
+			const localRecordingState = state['localRecordingState'];
+
+			localRecordingState.status = status;
+
+			return { ...state,
+				localRecordingState : localRecordingState
+			};
+		}
+
+		case 'SET_LOCAL_RECORDING_CONSENT':
+		{
+			const { agreed } = action.payload;
+			const localRecordingState = state['localRecordingState'];
+
+			localRecordingState.consent = agreed;
+
+			return { ...state,
+				localRecordingState : localRecordingState
+			};
 		}
 
 		default:
