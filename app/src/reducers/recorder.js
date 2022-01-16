@@ -15,9 +15,6 @@ const recorderReducer = (state = initialState, action) =>
 		{
 			const { status } = action.payload;
 
-			// eslint-disable-next-line no-console
-			console.log(action.payload);
-
 			const localRecordingState = state['localRecordingState'];
 
 			localRecordingState.status = status;

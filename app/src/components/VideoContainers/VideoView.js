@@ -302,10 +302,6 @@ class VideoView extends React.PureComponent
 				}
 			}
 		}
-		// eslint-disable-next-line no-console
-		console.log('recordingConsents');
-		// eslint-disable-next-line no-console
-		console.log(recordingConsents);
 
 		return (
 			<div className={classes.root}>

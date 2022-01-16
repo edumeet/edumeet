@@ -322,8 +322,7 @@ export default class BrowserRecorder
 
 		try
 		{
-			// eslint-disable-next-line no-console
-			console.log(this.recorderReducer);
+
 			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'start' });
 
 			store.dispatch(requestActions.notify(
