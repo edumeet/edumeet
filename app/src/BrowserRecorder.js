@@ -20,7 +20,7 @@ export default class BrowserRecorder
 		this.recorderStream = null;
 		this.gdmStream = null;
 		this.roomClient = null;
-		this.fileName = 'apple.webm';
+		this.fileName = 'default.webm';
 		this.logger = new Logger('Recorder');
 
 		// IndexedDB
