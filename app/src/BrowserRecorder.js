@@ -279,6 +279,17 @@ export default class BrowserRecorder
 				};
 
 				this.recorder.start(this.RECORDING_SLICE_SIZE);
+				// abort so it dose not look stuck
+
+				window.onbeforeunload = () =>
+				{
+					if (this.recorder !== null)
+					{
+						this.stopLocalRecording();
+
+						// evt.returnValue = 'Are you sure you want to leave? Recording in process';
+					}
+				};
 				recorderActions.setLocalRecordingState('start');
 
 			}
@@ -338,7 +349,7 @@ export default class BrowserRecorder
 		}
 	}
 	// eslint-disable-next-line no-unused-vars
-	async stopLocalRecording(meId)
+	async stopLocalRecording()
 	{
 		this.logger.debug('stopLocalRecording()');
 		try
