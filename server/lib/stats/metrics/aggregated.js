@@ -76,7 +76,7 @@ module.exports = function(workers, rooms_, peers_, config)
 		try
 		{
 			// iterate workers
-			for (const worker of workers)
+			for (const worker of workers.values())
 			{
 				// worker process stats
 				const workerStats = await pidusage(worker.pid);

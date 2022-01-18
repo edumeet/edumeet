@@ -138,10 +138,10 @@ module.exports = async function(workers, rooms, peers, registry, config)
 	const mConsumer = newMetrics('consumer');
 	const mProducer = newMetrics('producer');
 
-	for (const worker of workers)
+	for (const worker of workers.values())
 	{
 		logger.debug(`visiting worker ${worker.pid}`);
-		for (const router of worker.appData.routers)
+		for (const router of worker.appData.routers.values())
 		{
 			logger.debug(`visiting router ${router.id}`);
 			for (const [ transportId, transport ] of router.appData.transports)

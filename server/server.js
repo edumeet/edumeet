@@ -163,7 +163,7 @@ async function run()
 		// start Prometheus exporter
 		if (config.prometheus.enabled)
 		{
-			await promExporter(mediasoupWorkers.values(), rooms, peers);
+			await promExporter(mediasoupWorkers, rooms, peers);
 		}
 
 		// Run WebSocketServer.
