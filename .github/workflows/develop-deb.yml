@@ -37,7 +37,7 @@ jobs:
         cd ../server
         cat <<< $(jq '.bundleDependencies += .dependencies' package.json) > package.json
         yarn install
-        yarn build
+        yarn pack
         VERSION=$(cat package.json | jq -r '.version')
         DATE=$(date)
         mkdir -p /home/runner/package
