@@ -1,9 +1,8 @@
 name: Deployer
 
-on:
+on:  workflow_dispatch
 #  push:
-  workflow_dispatch:
-    branches: [ develop ]
+#    branches: [ develop ]
 #  pull_request:
 #    branches: [ develop ]
 
