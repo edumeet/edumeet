@@ -1,8 +1,8 @@
 name: Deployer-develop
 
-on:  workflow_dispatch
-#  push:
-#    branches: [ develop ]
+on:  # workflow_dispatch
+  push:
+    branches: [ develop ]
 #  pull_request:
 #    branches: [ develop ]
 
