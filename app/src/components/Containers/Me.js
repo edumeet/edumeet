@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	meProducersSelector,
-	makePermissionSelector
+	makePermissionSelector,
+	recordingConsentsPeersSelector
 } from '../Selectors';
 import { permissions } from '../../permissions';
 import { withRoomContext } from '../../RoomContext';
@@ -169,7 +170,9 @@ const Me = (props) =>
 		transports,
 		noiseVolume,
 		classes,
-		theme
+		theme,
+		recordingConsents,
+		localRecordingState
 	} = props;
 
 	// const width = style.width;
@@ -812,6 +815,8 @@ const Me = (props) =>
 					{/* /CONTROLS BUTTONS (inside) */}
 
 					<VideoView
+						localRecordingState={localRecordingState}
+						recordingConsents={recordingConsents}
 						isMe
 						isMirrored={settings.mirrorOwnVideo}
 						VideoView
@@ -938,6 +943,8 @@ const Me = (props) =>
 							</div>
 
 							<VideoView
+								localRecordingState={localRecordingState}
+								recordingConsents={recordingConsents}
 								isMe
 								isMirrored={settings.mirrorOwnVideo}
 								isExtraVideo
@@ -998,6 +1005,8 @@ const Me = (props) =>
 						</p>
 
 						<VideoView
+							localRecordingState={localRecordingState}
+							recordingConsents={recordingConsents}
 							isMe
 							isScreen
 							advancedMode={advancedMode}
@@ -1032,7 +1041,9 @@ Me.propTypes =
 	noiseVolume         : PropTypes.number,
 	classes             : PropTypes.object.isRequired,
 	theme               : PropTypes.object.isRequired,
-	transports          : PropTypes.object.isRequired
+	transports          : PropTypes.object.isRequired,
+	localRecordingState : PropTypes.string,
+	recordingConsents   : PropTypes.array
 };
 
 const makeMapStateToProps = () =>
@@ -1067,7 +1078,9 @@ const makeMapStateToProps = () =>
 			hasVideoPermission  : canShareVideo(state),
 			hasScreenPermission : canShareScreen(state),
 			noiseVolume         : noise,
-			transports          : state.transports
+			transports          : state.transports,
+			localRecordingState : state.recorderReducer.localRecordingState.status,
+			recordingConsents   : recordingConsentsPeersSelector(state)
 		};
 	};
 
@@ -1089,7 +1102,10 @@ export default withRoomContext(connect(
 				prev.peers === next.peers &&
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
-				prev.transports === next.transports
+				prev.transports === next.transports &&
+				prev.recorderReducer.localRecordingState.status ===
+				next.recorderReducer.localRecordingState.status &&
+				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}
 	}

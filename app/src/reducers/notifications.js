@@ -11,6 +11,15 @@ const notifications = (state = [], action) =>
 			return [ ...state, notification ];
 		}
 
+		case 'ADD_CONSENT_NOTIFICATION':
+		{
+			const { notification } = action.payload;
+
+			notification.toBeClosed=false;
+
+			return [ ...state, notification ];
+		}
+
 		case 'REMOVE_NOTIFICATION':
 		{
 			const { notificationId } = action.payload;

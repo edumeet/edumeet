@@ -28,7 +28,7 @@ import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 import { LazyPreload } from './components/Loader/LazyPreload';
 import { detectDevice } from 'mediasoup-client';
-import { recorder } from './actions/recorderActions';
+import { recorder } from './BrowserRecorder';
 
 import './index.css';
 

@@ -202,6 +202,13 @@ This value must match exactly one of the values defined in aspectRatios.`,
 		default : 0.75
 	},
 
+	localRecordingEnabled :
+	{
+		doc     : 'If set to true Local Recording feature will be enabled.',
+		format  : 'Boolean',
+		default : false
+	},
+
 	/**
 	 * White listing browsers that support audio output device selection.
 	 * It is not yet fully implemented in Firefox.

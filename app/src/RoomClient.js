@@ -20,7 +20,7 @@ import Spotlights from './Spotlights';
 import { permissions } from './permissions';
 import * as locales from './translations/locales';
 import { createIntl } from 'react-intl';
-import { RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP } from './actions/recorderActions';
+import * as recorderActions from './actions/recorderActions';
 import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
 import { config } from './config';
 
@@ -3593,7 +3593,16 @@ export default class RoomClient
 
 						break;
 					}
+					case 'addConsentForRecording':
+					{
+						// eslint-disable-next-line no-unused-vars
+						const { peerId, consent } = notification.data;
 
+						store.dispatch(
+							peerActions.setPeerLocalRecordingConsent(peerId, consent));
+
+						break;
+					}
 					case 'setLocalRecording':
 					{
 						const { peerId, localRecordingState } = notification.data;
@@ -3616,7 +3625,7 @@ export default class RoomClient
 
 						switch (localRecordingState)
 						{
-							case RECORDING_START:
+							case 'start':
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -3627,7 +3636,7 @@ export default class RoomClient
 										})
 									}));
 								break;
-							case RECORDING_RESUME:
+							case 'resume':
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -3638,7 +3647,7 @@ export default class RoomClient
 										})
 									}));
 								break;
-							case RECORDING_PAUSE:
+							case 'pause':
 							{
 								store.dispatch(requestActions.notify(
 									{
@@ -3651,7 +3660,7 @@ export default class RoomClient
 									}));
 								break;
 							}
-							case RECORDING_STOP:
+							case 'stop':
 								store.dispatch(requestActions.notify(
 									{
 										text : intl.formatMessage({
@@ -4171,6 +4180,23 @@ export default class RoomClient
 				}));
 
 			logger.error('unlockRoom() [error:"%o"]', error);
+		}
+	}
+
+	async addConsentForRecording(consent)
+	{
+		logger.debug('addConsentForRecording()');
+
+		try
+		{
+			store.dispatch(
+				recorderActions.setLocalRecordingConsent(consent));
+			await this.sendRequest('addConsentForRecording', { consent });
+		}
+		catch (error)
+		{
+
+			logger.error('addConsentForRecording() [error:"%o"]', error);
 		}
 	}
 

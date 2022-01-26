@@ -104,3 +104,9 @@ export const setPeerLocalRecordingState = (peerId, localRecordingState) =>
 		type    : 'SET_PEER_LOCAL_RECORDING_STATE',
 		payload : { peerId, localRecordingState }
 	});
+
+export const setPeerLocalRecordingConsent = (peerId, consent) =>
+	({
+		type    : 'SET_PEER_LOCAL_RECORDING_CONSENT',
+		payload : { peerId, consent }
+	});

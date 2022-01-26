@@ -8,6 +8,7 @@ import consumers from './consumers';
 import peerVolumes from './peerVolumes';
 import notifications from './notifications';
 import chat from './chat';
+import recorderReducer from './recorder';
 import toolarea from './toolarea';
 import files from './files';
 import settings from './settings';
@@ -30,6 +31,7 @@ export default combineReducers({
 	toolarea,
 	files,
 	settings,
+	recorderReducer,
 	// intl : intlReducer
 	intl,
 	config
