@@ -76,7 +76,7 @@ module.exports = function(workers, rooms_, peers_, config)
 		try
 		{
 			// iterate workers
-			for (const worker of workers)
+			for (const worker of workers.values())
 			{
 				// worker process stats
 				const workerStats = await pidusage(worker.pid);
@@ -84,106 +84,81 @@ module.exports = function(workers, rooms_, peers_, config)
 				workersCpu.push(workerStats.cpu / 100);
 				workersMemory.push(workerStats.memory);
 
-				// iterate routers
-				for (const router of worker._routers.values())
+				// iterate producers
+				for (const producer of worker.appData.producers.values())
 				{
-					// iterate transports
-					for (const transport of router._transports.values())
+					let stats = [];
+
+					try
 					{
-						/* let stats = [];
-                        try
-                        {
-                            stats = await transport.getStats();
-                        }
-                        catch(err)
-                        {
-                            logger.error('transport.getStats error:', err.message);
-                            continue;
-                        }
-                        for (const s of stats)
-                        {
-                            if (s.type !== 'webrtc-transport'){
-                                continue;
-                            }
-                        } */
-
-						// iterate producers
-						for (const producer of transport._producers.values())
+						stats = await producer.getStats();
+					}
+					catch (err)
+					{
+						logger.error('producer.getStats error:', err.message);
+						continue;
+					}
+					for (const s of stats)
+					{
+						if (s.type !== 'inbound-rtp')
 						{
-							let stats = [];
-
-							try
-							{
-								stats = await producer.getStats();
-							}
-							catch (err)
-							{
-								logger.error('producer.getStats error:', err.message);
-								continue;
-							}
-							for (const s of stats)
-							{
-								if (s.type !== 'inbound-rtp')
-								{
-									continue;
-								}
-								if (s.kind === 'video')
-								{
-									videoBitratesIn.push(s.bitrate);
-									videoScoresIn.push(s.score);
-								}
-								else if (s.kind === 'audio')
-								{
-									audioBitratesIn.push(s.bitrate);
-									audioScoresIn.push(s.score);
-								}
-								packetsCountsIn.push(s.packetCount || 0);
-								packetsLostsIn.push(s.packetsLost || 0);
-								packetsRetransmittedIn.push(s.packetsRetransmitted || 0);
-							}
+							continue;
 						}
-
-						// iterate consumers
-						for (const consumer of transport._consumers.values())
+						if (s.kind === 'video')
 						{
-							if (consumer.type === 'pipe')
-							{
-								continue;
-							}
-							let stats = [];
-
-							try
-							{
-								stats = await consumer.getStats();
-							}
-							catch (err)
-							{
-								logger.error('consumer.getStats error:', err.message);
-								continue;
-							}
-							for (const s of stats)
-							{
-								if (s.type !== 'outbound-rtp')
-								{
-									continue;
-								}
-								if (s.kind === 'video')
-								{
-									videoBitratesOut.push(s.bitrate || 0);
-									spatialLayersOut.push(consumer.currentLayers
-										? consumer.currentLayers.spatialLayer : 0);
-									temporalLayersOut.push(consumer.currentLayers
-										? consumer.currentLayers.temporalLayer : 0);
-								}
-								else if (s.kind === 'audio')
-								{
-									audioBitratesOut.push(s.bitrate || 0);
-								}
-								roundTripTimesOut.push(s.roundTripTime || 0);
-								packetsCountsOut.push(s.packetCount || 0);
-								packetsLostsOut.push(s.packetsLost || 0);
-							}
+							videoBitratesIn.push(s.bitrate);
+							videoScoresIn.push(s.score);
 						}
+						else if (s.kind === 'audio')
+						{
+							audioBitratesIn.push(s.bitrate);
+							audioScoresIn.push(s.score);
+						}
+						packetsCountsIn.push(s.packetCount || 0);
+						packetsLostsIn.push(s.packetsLost || 0);
+						packetsRetransmittedIn.push(s.packetsRetransmitted || 0);
+					}
+				}
+
+				// iterate consumers
+				for (const consumer of worker.appData.consumers.values())
+				{
+					if (consumer.type === 'pipe')
+					{
+						continue;
+					}
+					let stats = [];
+
+					try
+					{
+						stats = await consumer.getStats();
+					}
+					catch (err)
+					{
+						logger.error('consumer.getStats error:', err.message);
+						continue;
+					}
+					for (const s of stats)
+					{
+						if (s.type !== 'outbound-rtp')
+						{
+							continue;
+						}
+						if (s.kind === 'video')
+						{
+							videoBitratesOut.push(s.bitrate || 0);
+							spatialLayersOut.push(consumer.currentLayers
+								? consumer.currentLayers.spatialLayer : 0);
+							temporalLayersOut.push(consumer.currentLayers
+								? consumer.currentLayers.temporalLayer : 0);
+						}
+						else if (s.kind === 'audio')
+						{
+							audioBitratesOut.push(s.bitrate || 0);
+						}
+						roundTripTimesOut.push(s.roundTripTime || 0);
+						packetsCountsOut.push(s.packetCount || 0);
+						packetsLostsOut.push(s.packetsLost || 0);
 					}
 				}
 			}

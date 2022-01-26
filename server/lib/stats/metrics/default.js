@@ -138,13 +138,13 @@ module.exports = async function(workers, rooms, peers, registry, config)
 	const mConsumer = newMetrics('consumer');
 	const mProducer = newMetrics('producer');
 
-	for (const worker of workers)
+	for (const worker of workers.values())
 	{
 		logger.debug(`visiting worker ${worker.pid}`);
-		for (const router of worker._routers)
+		for (const router of worker.appData.routers.values())
 		{
 			logger.debug(`visiting router ${router.id}`);
-			for (const [ transportId, transport ] of router._transports)
+			for (const [ transportId, transport ] of router.appData.transports)
 			{
 				logger.debug(`visiting transport ${transportId}`);
 				const transportJson = await transport.dump();
@@ -161,11 +161,11 @@ module.exports = async function(workers, rooms, peers, registry, config)
 				const remoteAddr = await addr(iceSelectedTuple.remoteIp,
 					iceSelectedTuple.remotePort);
 
-				for (const [ producerId, producer ] of transport._producers)
+				for (const [ producerId, producer ] of transport.appData.producers)
 				{
 					logger.debug(`visiting producer ${producerId}`);
 					const { roomId, peerId, displayName, userAgent, kind, codec } =
-                        commonLabels(producer, (peer) => peer._producers.has(producerId));
+						commonLabels(producer, (peer) => peer._producers.has(producerId));
 					const a = await producer.getStats();
 
 					for (const x of a)
@@ -193,7 +193,7 @@ module.exports = async function(workers, rooms, peers, registry, config)
 						}
 					}
 				}
-				for (const [ consumerId, consumer ] of transport._consumers)
+				for (const [ consumerId, consumer ] of transport.appData.consumers)
 				{
 					logger.debug(`visiting consumer ${consumerId}`);
 					const { roomId, peerId, displayName, userAgent, kind, codec } =
