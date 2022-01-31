@@ -2,10 +2,9 @@ import Logger from './Logger';
 import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
-import * as meActions from './actions/meActions';
 import { store } from './store';
 import * as requestActions from './actions/requestActions';
-import { RECORDING_PAUSE, RECORDING_RESUME, RECORDING_STOP, RECORDING_START } from './actions/recorderActions';
+import * as recorderActions from './actions/recorderActions';
 
 export default class BrowserRecorder
 {
@@ -21,7 +20,7 @@ export default class BrowserRecorder
 		this.recorderStream = null;
 		this.gdmStream = null;
 		this.roomClient = null;
-		this.fileName = 'apple.webm';
+		this.fileName = 'default.webm';
 		this.logger = new Logger('Recorder');
 
 		// IndexedDB
@@ -45,7 +44,7 @@ export default class BrowserRecorder
 			displaySurface : 'browser',
 			width          : { ideal: 1920 }
 		},
-			audio    : true,
+			audio    : false,
 			advanced : [
 				{ width: 1920, height: 1080 },
 				{ width: 1280, height: 720 }
@@ -81,7 +80,7 @@ export default class BrowserRecorder
 
 	async startLocalRecording(
 		{
-			roomClient, additionalAudioTracks, recordingMimeType
+			roomClient, additionalAudioTracks, recordingMimeType, roomname
 		})
 	{
 		this.roomClient = roomClient;
@@ -106,6 +105,8 @@ export default class BrowserRecorder
 
 		try
 		{
+			store.dispatch(recorderActions.setLocalRecordingState('start'));
+
 			// Screensharing
 			this.gdmStream = await navigator.mediaDevices.getDisplayMedia(
 				this.RECORDING_CONSTRAINTS
@@ -135,9 +136,16 @@ export default class BrowserRecorder
 				this.recorderStream = this.mixer(null, this.gdmStream);
 			}
 
+			const dt = new Date();
+			const rdt = `${dt.getFullYear() }-${ (`0${ dt.getMonth()+1}`).slice(-2) }-${ (`0${ dt.getDate()}`).slice(-2) }_${dt.getHours() }_${(`0${ dt.getMinutes()}`).slice(-2) }_${dt.getSeconds()}`;
+
 			this.recorder = new MediaRecorder(
 				this.recorderStream, { mimeType: this.recordingMimeType }
 			);
+
+			const ext = this.recorder.mimeType.split(';')[0].split('/')[1];
+
+			this.fileName = `${roomname}-recording-${rdt}.${ext}`;
 
 			if (typeof indexedDB === 'undefined' || typeof indexedDB.open === 'undefined')
 			{
@@ -195,7 +203,7 @@ export default class BrowserRecorder
 
 				this.recorder.onerror = (error) =>
 				{
-					this.logger.err(`Recorder onerror: ${error}`);
+					this.logger.error(`Recorder onerror: ${error}`);
 					switch (error.name)
 					{
 						case 'SecurityError':
@@ -271,7 +279,18 @@ export default class BrowserRecorder
 				};
 
 				this.recorder.start(this.RECORDING_SLICE_SIZE);
-				meActions.setLocalRecordingState(RECORDING_START);
+				// abort so it dose not look stuck
+
+				window.onbeforeunload = () =>
+				{
+					if (this.recorder !== null)
+					{
+						this.stopLocalRecording();
+
+						// evt.returnValue = 'Are you sure you want to leave? Recording in process';
+					}
+				};
+				recorderActions.setLocalRecordingState('start');
 
 			}
 		}
@@ -288,7 +307,7 @@ export default class BrowserRecorder
 			this.logger.error('startLocalRecording() [error:"%o"]', error);
 
 			if (this.recorder) this.recorder.stop();
-			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
+			store.dispatch(recorderActions.setLocalRecordingState('stop'));
 			if (typeof this.gdmStream !== 'undefined' && this.gdmStream && typeof this.gdmStream.getTracks === 'function')
 			{
 				this.gdmStream.getTracks().forEach((track) => track.stop());
@@ -303,9 +322,8 @@ export default class BrowserRecorder
 
 		try
 		{
-			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_START });
 
-			store.dispatch(meActions.setLocalRecordingState(RECORDING_START));
+			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'start' });
 
 			store.dispatch(requestActions.notify(
 				{
@@ -329,6 +347,7 @@ export default class BrowserRecorder
 
 		}
 	}
+	// eslint-disable-next-line no-unused-vars
 	async stopLocalRecording()
 	{
 		this.logger.debug('stopLocalRecording()');
@@ -344,9 +363,8 @@ export default class BrowserRecorder
 					})
 				}));
 
-			store.dispatch(meActions.setLocalRecordingState(RECORDING_STOP));
-
-			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_STOP });
+			store.dispatch(recorderActions.setLocalRecordingState('stop'));
+			await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'stop' });
 
 		}
 		catch (error)
@@ -367,14 +385,14 @@ export default class BrowserRecorder
 	async pauseLocalRecording()
 	{
 		this.recorder.pause();
-		store.dispatch(meActions.setLocalRecordingState(RECORDING_PAUSE));
-		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_PAUSE });
+		store.dispatch(recorderActions.setLocalRecordingState('pause'));
+		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'pause' });
 	}
 	async resumeLocalRecording()
 	{
 		this.recorder.resume();
-		store.dispatch(meActions.setLocalRecordingState(RECORDING_RESUME));
-		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: RECORDING_RESUME });
+		store.dispatch(recorderActions.setLocalRecordingState('resume'));
+		await this.roomClient.sendRequest('setLocalRecording', { localRecordingState: 'resume' });
 	}
 	invokeSaveAsDialog(blob)
 	{
@@ -520,12 +538,10 @@ export default class BrowserRecorder
 		// is it already appended to stream?
 		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused'))
 		{
-
-			const micProducer = Object.values(producers).find((p) => p.source === 'mic');
+			const micProducer = Object.values(producers).find((p) => p.kind === 'audio');
 
 			if (micProducer && this.micProducerId !== micProducer.id)
 			{
-
 				// delete/dc previous one 
 				if (this.micProducerStreamSource)
 				{
@@ -542,11 +558,11 @@ export default class BrowserRecorder
 			}
 		}
 	}
-	checkAudioConsumer(consumers)
+	checkAudioConsumer(consumers, recordingConsents)
 	{
-		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused'))
+		if (this.recorder != null && (this.recorder.state === 'recording' || this.recorder.state === 'paused') && recordingConsents!==undefined)
 		{
-			const audioConsumers = Object.values(consumers).filter((p) => p.kind === 'audio');
+			const audioConsumers = Object.values(consumers).filter((p) => p.kind === 'audio' && recordingConsents.includes(p.peerId));
 
 			for (let i = 0; i < audioConsumers.length; i++)
 			{
@@ -573,3 +589,4 @@ export default class BrowserRecorder
 		}
 	}
 }
+export const recorder = new BrowserRecorder();

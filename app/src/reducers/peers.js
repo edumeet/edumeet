@@ -97,6 +97,12 @@ const peer = (state = initialState, action) =>
 				localRecordingState : action.payload.localRecordingState
 			};
 
+		case 'SET_PEER_LOCAL_RECORDING_CONSENT':
+			return {
+				...state,
+				localRecordingConsent : action.payload.consent
+			};
+
 		default:
 			return state;
 	}
@@ -147,7 +153,16 @@ const peers = (state = initialState, action) =>
 
 			return { ...state, [oldPeer.id]: peer(oldPeer, action) };
 		}
+		case 'SET_PEER_LOCAL_RECORDING_CONSENT':
+		{
+			const oldPeer = state[action.payload.peerId];
 
+			// NOTE: This means that the Peer was closed before, so it's ok.
+			if (!oldPeer)
+				return state;
+
+			return { ...state, [oldPeer.id]: peer(oldPeer, action) };
+		}
 		case 'CLEAR_PEERS':
 		{
 			return initialState;

@@ -74,6 +74,8 @@
 	"room.localRecordingResumed": null,
 	"room.localRecordingStopped": null,
 	"room.recordingConsent": null,
+	"room.recordingConsentAccept" : null,
+	"room.recordingConsentDeny"   : null,
 	"room.localRecordingSecurityError": null,
 	"room.hideSelfView": "Kendi görüntümü gizle",
 	"room.showSelfView": "Kendi görüntümü göster",

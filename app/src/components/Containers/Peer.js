@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { makePeerConsumerSelector } from '../Selectors';
+import { makePeerConsumerSelector, recordingConsentsPeersSelector } from '../Selectors';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
@@ -156,7 +156,9 @@ const Peer = (props) =>
 		enableLayersSwitch,
 		isSelected,
 		mode,
-		theme
+		theme,
+		localRecordingState,
+		recordingConsents
 	} = props;
 
 	const micEnabled = (
@@ -658,6 +660,8 @@ const Peer = (props) =>
 					</div>
 
 					<VideoView
+						localRecordingState={localRecordingState}
+						recordingConsents={recordingConsents}
 						showQuality
 						advancedMode={advancedMode}
 						peer={peer}
@@ -832,6 +836,8 @@ const Peer = (props) =>
 							</div>
 
 							<VideoView
+								localRecordingState={localRecordingState}
+								recordingConsents={recordingConsents}
 								showQuality
 								advancedMode={advancedMode}
 								peer={peer}
@@ -994,6 +1000,8 @@ const Peer = (props) =>
 							</Tooltip>
 						</div>
 						<VideoView
+							localRecordingState={localRecordingState}
+							recordingConsents={recordingConsents}
 							showQuality
 							advancedMode={advancedMode}
 							videoContain
@@ -1051,7 +1059,9 @@ Peer.propTypes =
 	theme                    : PropTypes.object.isRequired,
 	enableLayersSwitch       : PropTypes.bool,
 	isSelected               : PropTypes.bool,
-	mode                     : PropTypes.string.isRequired
+	mode                     : PropTypes.string.isRequired,
+	localRecordingState      : PropTypes.string,
+	recordingConsents        : PropTypes.array
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -1061,14 +1071,16 @@ const makeMapStateToProps = (initialState, { id }) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer               : state.peers[id],
+			peer                : state.peers[id],
 			...getPeerConsumers(state, id),
-			windowConsumer     : state.room.windowConsumer,
-			fullScreenConsumer : state.room.fullScreenConsumer,
-			activeSpeaker      : id === state.room.activeSpeakerId,
-			browser            : state.me.browser,
-			isSelected         : state.room.selectedPeers.includes(id),
-			mode               : state.room.mode
+			windowConsumer      : state.room.windowConsumer,
+			fullScreenConsumer  : state.room.fullScreenConsumer,
+			activeSpeaker       : id === state.room.activeSpeakerId,
+			browser             : state.me.browser,
+			isSelected          : state.room.selectedPeers.includes(id),
+			mode                : state.room.mode,
+			localRecordingState : state.recorderReducer.localRecordingState.status,
+			recordingConsents   : recordingConsentsPeersSelector(state)
 		};
 	};
 
@@ -1107,7 +1119,10 @@ export default withRoomContext(connect(
 				prev.room.mode === next.room.mode &&
 				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.me.browser === next.me.browser &&
-				prev.enableLayersSwitch === next.enableLayersSwitch
+				prev.enableLayersSwitch === next.enableLayersSwitch &&
+				prev.recorderReducer.localRecordingState.status ===
+				next.recorderReducer.localRecordingState.status &&
+				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}
 	}

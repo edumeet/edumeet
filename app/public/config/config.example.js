@@ -143,6 +143,9 @@ var config = {
 	// The adaptive spatial layer selection scaling factor in the range [0.5, 1.0].
 	adaptiveScalingFactor : 0.75,
 
+	// If set to true Local Recording feature will be enabled.
+	localRecordingEnabled : false,
+
 	// White listing browsers that support audio output device selection.
 	audioOutputSupportedBrowsers : [
 		'chrome',

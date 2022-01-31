@@ -231,7 +231,10 @@ class VideoView extends React.PureComponent
 			netInfo,
 			width,
 			height,
-			opusConfig
+			opusConfig,
+			localRecordingState,
+			recordingConsents,
+			peer
 		} = this.props;
 
 		const {
@@ -427,7 +430,17 @@ class VideoView extends React.PureComponent
 									</React.Fragment>
 									:
 									<span className={classes.displayNameStatic}>
-										{displayName}
+										{
+											(
+												(
+													localRecordingState==='start' ||
+													localRecordingState==='resume'
+												)&&
+												(
+													!recordingConsents.includes(peer.id)
+												)
+											) ? '':displayName
+										}
 									</span>
 								}
 							</div>
@@ -438,7 +451,18 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden       : !videoVisible,
+						hidden : (!videoVisible ||
+							(
+								!isMe &&
+								(
+									localRecordingState==='start' ||
+									localRecordingState==='resume'
+								)&&
+								(
+									!recordingConsents.includes(peer.id)
+								)
+							)
+						),
 						'isMirrored' : isMirrored,
 						contain      : videoContain
 					})}
@@ -637,7 +661,11 @@ VideoView.propTypes =
 	netInfo                        : PropTypes.object,
 	width                          : PropTypes.number,
 	height                         : PropTypes.number,
-	opusConfig                     : PropTypes.string
+	opusConfig                     : PropTypes.string,
+	localRecordingState            : PropTypes.string,
+	recordingConsents              : PropTypes.array,
+	peer                           : PropTypes.string
+
 };
 
 export default withStyles(styles)(VideoView);

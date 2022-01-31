@@ -6,7 +6,9 @@ import {
 	peersLengthSelector,
 	raisedHandsSelector,
 	makePermissionSelector,
-	recordingInProgressSelector
+	recordingInProgressSelector,
+	recordingInProgressPeersSelector,
+	recordingConsentsPeersSelector
 } from '../Selectors';
 import { permissions } from '../../permissions';
 import * as appPropTypes from '../appPropTypes';
@@ -48,11 +50,8 @@ import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
 import randomString from 'random-string';
-import { recorder, RECORDING_START, RECORDING_PAUSE, RECORDING_RESUME } from '../../actions/recorderActions';
-import * as meActions from '../../actions/meActions';
-import { store } from '../../store';
-// import producers from '../../reducers/producers';
-// import logger from 'redux-logger';
+import { recorder } from './../../BrowserRecorder';
+
 import Logger from '../../Logger';
 import { config } from '../../config';
 
@@ -215,8 +214,8 @@ const TopBar = (props) =>
 	const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
 	const [ anchorEl, setAnchorEl ] = useState(null);
 	const [ currentMenu, setCurrentMenu ] = useState(null);
-	const [ recordingConsentNotificationId,
-		setRecordingConsentNotificationId ] = useState(null);
+	const [ recordingNotificationsId,
+		setRecordingNotificationsId ] = useState(null);
 
 	const handleExited = () =>
 	{
@@ -255,6 +254,7 @@ const TopBar = (props) =>
 		drawerOverlayed,
 		toolAreaOpen,
 		isSafari,
+		meId,
 		isMobile,
 		loggedIn,
 		loginEnabled,
@@ -275,29 +275,48 @@ const TopBar = (props) =>
 		unread,
 		canProduceExtraVideo,
 		canLock,
+		canRecord,
 		canPromote,
 		classes,
 		locale,
 		localesList,
 		localRecordingState,
 		recordingInProgress,
+		recordingPeers,
+		recordingMimeType,
 		producers,
-		consumers
+		consumers,
+		recordingConsents
 	} = props;
 
 	// did it change?
 	recorder.checkMicProducer(producers);
-	recorder.checkAudioConsumer(consumers);
+	recorder.checkAudioConsumer(consumers, recordingConsents);
 
 	useEffect(() =>
 	{
+		// someone else is recording (need consent) or only me(dont need consent notif)
+		const hasConsent = (
+			(
+				(
+					localRecordingState === undefined ||
+					localRecordingState.consent!=='init'
+				)
+				|| (
+					recordingPeers.includes(meId) && recordingPeers.length === 1
+				)
+			)
+		);
+
 		if (
 			recordingInProgress &&
-			!recordingConsentNotificationId)
+			!recordingNotificationsId &&
+			!hasConsent
+		)
 		{
 			const notificationId = randomString({ length: 6 }).toLowerCase();
 
-			setRecordingConsentNotificationId(notificationId);
+			setRecordingNotificationsId(notificationId);
 			addNotification(
 				{
 					id   : notificationId,
@@ -309,21 +328,24 @@ const TopBar = (props) =>
 							defaultMessage : 'When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming'
 						}
 					),
-					persist : true
+					peerid     : meId,
+					roomClient : roomClient,
+					persist    : true
 				}
 			);
 		}
 		if (
 			!recordingInProgress
-			&& recordingConsentNotificationId)
+			&& recordingNotificationsId)
 		{
-			closeNotification(recordingConsentNotificationId);
-			setRecordingConsentNotificationId(null);
+			closeNotification(recordingNotificationsId);
+			setRecordingNotificationsId(null);
 		}
 	},
 	[
-		localRecordingState, recordingInProgress, recordingConsentNotificationId,
-		addNotification, closeNotification, intl
+		localRecordingState, recordingInProgress, recordingNotificationsId,
+		addNotification, closeNotification, intl, meId, recordingPeers, roomClient,
+		room
 	]);
 
 	const isMenuOpen = Boolean(anchorEl);
@@ -340,8 +362,8 @@ const TopBar = (props) =>
 			defaultMessage : 'Lock room'
 		});
 
-	const recordingTooltip = (localRecordingState === RECORDING_START ||
-								localRecordingState === RECORDING_RESUME) ?
+	const recordingTooltip = (localRecordingState.status === 'start' ||
+								localRecordingState.status === 'resume') ?
 		intl.formatMessage({
 			id             : 'tooltip.stopLocalRecording',
 			defaultMessage : 'Stop local recording'
@@ -352,7 +374,7 @@ const TopBar = (props) =>
 			defaultMessage : 'Start local recording'
 		});
 
-	const recordingPausedTooltip = localRecordingState === RECORDING_PAUSE ?
+	const recordingPausedTooltip = localRecordingState.status === 'pause' ?
 		intl.formatMessage({
 			id             : 'tooltip.resumeLocalRecording',
 			defaultMessage : 'Resume local recording'
@@ -676,9 +698,9 @@ const TopBar = (props) =>
 					<Paper>
 						{
 							(
-								localRecordingState === RECORDING_START ||
-								localRecordingState === RECORDING_RESUME ||
-								localRecordingState === RECORDING_PAUSE
+								localRecordingState.status === 'start' ||
+								localRecordingState.status === 'resume' ||
+								localRecordingState.status === 'pause'
 							)
 							&&
 							<MenuItem
@@ -686,7 +708,7 @@ const TopBar = (props) =>
 								onClick={() =>
 								{
 									handleMenuClose();
-									if (localRecordingState === RECORDING_PAUSE)
+									if (localRecordingState.status === 'pause')
 									{
 										recorder.resumeLocalRecording();
 									}
@@ -700,13 +722,13 @@ const TopBar = (props) =>
 								<Badge
 									color='primary'
 								>
-									{ localRecordingState === RECORDING_PAUSE ?
+									{ localRecordingState.status === 'pause' ?
 										<PauseCircleFilledIcon />
 										:
 										<PauseCircleOutlineIcon />
 									}
 								</Badge>
-								{ localRecordingState === RECORDING_PAUSE ?
+								{ localRecordingState.status === 'pause' ?
 									<p className={classes.moreAction}>
 										<FormattedMessage
 											id='tooltip.resumeLocalRecording'
@@ -724,38 +746,39 @@ const TopBar = (props) =>
 
 							</MenuItem>
 						}
-						{ isSafari &&
+						{ config.localRecordingEnabled && isSafari
+						&& canRecord &&
 						<MenuItem
 							aria-label={recordingTooltip}
 							onClick={async () =>
 							{
 								handleMenuClose();
-								if (localRecordingState === RECORDING_START ||
-									localRecordingState === RECORDING_PAUSE ||
-									localRecordingState === RECORDING_RESUME)
+								if (localRecordingState.status === 'start' ||
+									localRecordingState.status === 'pause' ||
+									localRecordingState.status === 'resume')
 								{
-									recorder.stopLocalRecording();
+									recorder.stopLocalRecording(meId);
 								}
 								else
 								{
 
 									try
 									{
-										const recordingMimeType =
-										store.getState().settings.recorderPreferredMimeType;
 										const additionalAudioTracks = [];
 										const micProducer = Object.values(producers).find((p) => p.source === 'mic');
 
 										if (micProducer) additionalAudioTracks.push(micProducer.track);
-										await recorder.startLocalRecording({
+										const roomname = room.name;
+
+										recorder.startLocalRecording({
 											roomClient,
 											additionalAudioTracks,
-											recordingMimeType
+											recordingMimeType,
+											roomname
 										});
 
 										recorder.checkAudioConsumer(consumers);
 
-										meActions.setLocalRecordingState(RECORDING_START);
 									}
 									catch (err)
 									{
@@ -770,9 +793,9 @@ const TopBar = (props) =>
 								color='primary'
 							>
 								{
-									(localRecordingState === RECORDING_START ||
-									localRecordingState === RECORDING_PAUSE ||
-									localRecordingState === RECORDING_RESUME) ?
+									(localRecordingState.status === 'start' ||
+									localRecordingState.status === 'pause' ||
+									localRecordingState.status === 'resume') ?
 										<StopIcon />
 										:
 										<FiberManualRecordIcon />
@@ -780,9 +803,9 @@ const TopBar = (props) =>
 							</Badge>
 
 							{
-								(localRecordingState === RECORDING_START ||
-								localRecordingState === RECORDING_PAUSE ||
-								localRecordingState === RECORDING_RESUME) ?
+								(localRecordingState.status === 'start' ||
+								localRecordingState.status === 'pause' ||
+								localRecordingState.status === 'resume') ?
 									<p className={classes.moreAction}>
 										<FormattedMessage
 											id='tooltip.stopLocalRecording'
@@ -959,9 +982,9 @@ const TopBar = (props) =>
 				}
 				{
 					(
-						localRecordingState === RECORDING_PAUSE ||
-						localRecordingState === RECORDING_RESUME ||
-						localRecordingState === RECORDING_START
+						localRecordingState.status === 'pause' ||
+						localRecordingState.status === 'resume' ||
+						localRecordingState.status === 'start'
 					)
 					&&
 					<MenuItem
@@ -970,7 +993,7 @@ const TopBar = (props) =>
 						onClick={() =>
 						{
 							handleMenuClose();
-							if (localRecordingState === RECORDING_PAUSE)
+							if (localRecordingState.status === 'pause')
 							{
 								recorder.resumeLocalRecording();
 							}
@@ -984,14 +1007,14 @@ const TopBar = (props) =>
 						<Badge
 							color='primary'
 						>
-							{ localRecordingState === RECORDING_PAUSE ?
+							{ localRecordingState.status === 'pause' ?
 								<PauseCircleFilledIcon />
 								:
 								<PauseCircleOutlineIcon />
 							}
 						</Badge>
 
-						{ localRecordingState === RECORDING_PAUSE ?
+						{ localRecordingState.status === 'pause' ?
 							<p className={classes.moreAction}>
 								<FormattedMessage
 									id='tooltip.resumeLocalRecording'
@@ -1225,6 +1248,7 @@ TopBar.propTypes =
 	roomClient           : PropTypes.object.isRequired,
 	room                 : appPropTypes.Room.isRequired,
 	isSafari         			 : PropTypes.bool,
+	meId         				    : PropTypes.string,
 	isMobile             : PropTypes.bool.isRequired,
 	peersLength          : PropTypes.number,
 	lobbyPeers           : PropTypes.array,
@@ -1251,6 +1275,7 @@ TopBar.propTypes =
 	unread               : PropTypes.number.isRequired,
 	canProduceExtraVideo : PropTypes.bool.isRequired,
 	canLock              : PropTypes.bool.isRequired,
+	canRecord            : PropTypes.bool.isRequired,
 	canPromote           : PropTypes.bool.isRequired,
 	classes              : PropTypes.object.isRequired,
 	theme                : PropTypes.object.isRequired,
@@ -1259,9 +1284,11 @@ TopBar.propTypes =
 	localesList          : PropTypes.array.isRequired,
 	localRecordingState  : PropTypes.string,
 	recordingInProgress  : PropTypes.bool,
+	recordingPeers       : PropTypes.array,
 	recordingMimeType    : PropTypes.string,
 	producers            : PropTypes.object,
-	consumers            : PropTypes.object
+	consumers            : PropTypes.object,
+	recordingConsents    : PropTypes.array
 };
 
 const makeMapStateToProps = () =>
@@ -1272,6 +1299,8 @@ const makeMapStateToProps = () =>
 	const hasLockPermission =
 		makePermissionSelector(permissions.CHANGE_ROOM_LOCK);
 
+	const hasRecordPermission =
+		makePermissionSelector(permissions.LOCAL_RECORD_ROOM);
 	const hasPromotionPermission =
 		makePermissionSelector(permissions.PROMOTE_PEER);
 
@@ -1279,6 +1308,7 @@ const makeMapStateToProps = () =>
 		({
 			room                : state.room,
 			isSafari            : state.me.browser.name !== 'safari',
+			meId                : state.me.id,
 			isMobile            : state.me.browser.platform === 'mobile',
 			peersLength         : peersLengthSelector(state),
 			lobbyPeers          : lobbyPeersKeySelector(state),
@@ -1287,16 +1317,19 @@ const makeMapStateToProps = () =>
 			toolAreaOpen        : state.toolarea.toolAreaOpen,
 			loggedIn            : state.me.loggedIn,
 			loginEnabled        : state.me.loginEnabled,
-			localRecordingState : state.me.localRecordingState,
+			localRecordingState : state.recorderReducer.localRecordingState,
 			recordingInProgress	: recordingInProgressSelector(state),
+			recordingPeers      : recordingInProgressPeersSelector(state),
+			recordingConsents   : recordingConsentsPeersSelector(state),
 			unread              : state.toolarea.unreadMessages +
 				state.toolarea.unreadFiles + raisedHandsSelector(state),
 			canProduceExtraVideo : hasExtraVideoPermission(state),
 			canLock              : hasLockPermission(state),
+			canRecord            : hasRecordPermission(state),
 			canPromote           : hasPromotionPermission(state),
 			locale               : state.intl.locale,
 			localesList          : state.intl.list,
-			recordingMimeType    : state.settings.recordingMimeType,
+			recordingMimeType    : state.settings.recorderPreferredMimeType,
 			producers            : state.producers,
 			consumers            : state.consumers
 		});
@@ -1375,14 +1408,18 @@ export default withRoomContext(connect(
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&
 				prev.me.roles === next.me.roles &&
-				prev.me.localRecordingState === next.me.localRecordingState &&
+				prev.recorderReducer.localRecordingState.status ===
+				next.recorderReducer.localRecordingState.status &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.intl.locale === next.intl.locale &&
 				prev.intl.localesList === next.intl.localesList &&
 				prev.producers === next.producers &&
-				prev.consumers === next.consumers
+				prev.consumers === next.consumers &&
+				prev.settings.recorderPreferredMimeType ===
+				next.settings.recorderPreferredMimeType &&
+				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}
 	}
