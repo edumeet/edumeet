@@ -76,7 +76,7 @@ $ sudo systemctl start edumeet
 * Install all the required dependencies and NodeJS v14 (Debian/Ubuntu):
 
 ```bash
-sudo apt install -y curl git python build-essential redis openssl libssl-dev pkg-config
+sudo apt install -y curl git python python3-pip build-essential redis openssl libssl-dev pkg-config
 curl -fsSL https://deb.nodesource.com/setup_14.x | sudo bash -
 sudo apt update && sudo apt install -y nodejs
 ```
