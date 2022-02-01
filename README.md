@@ -4,19 +4,39 @@ A WebRTC meeting service using [mediasoup](https://mediasoup.org).
 
 ![demo](demo.gif)
 
-Try it online at https://letsmeet.no. You can add /roomname to the URL for specifying a room.
+Try it online at [letsmeet.no](https://letsmeet.no)
 
 ## Features
 
-* Audio/Video
-* Chat
-* Screen sharing
-* File sharing
-* Different layouts
-* Internationalization support
-* Local Recording
+### Audio/Video streaming
+You can share your microphone and camera + additional video stream
 
-## Local Recording
+### Video layouts
+You can choose between **Democratic** and **Filmstrip** views. More in progress.
+
+### Screen sharing
+You can share your screen to make some presentation right from your desktop
+
+### File sharing
+You can share your files with the peers (torrent solution under the hood)
+
+### Chat messages
+You can make a text conversation with peers
+
+### Multi-Languages
+We support [22 languages](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) but/and we need your help! 
+
+If you want to help us with translations 
+1. take a certain language file you want to translate
+2. find the _null_  values and replace them based on the _en.json_ file
+3. make a Pull Request, or send us a [e-mail](roman@drozd.it) with file 
+
+Thanks so much in advance!
+
+### Authorization
+oidc, saml, and local text-based database  
+
+### Local Recording
 * Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
 Local Recording creates a local IndexedDB with the name of the starting timestamp (unix timestamp format)  And a storage called chunks. All chunks read in an array and created a final blob that you can download. After blobs array concatenation as a big blob, this big blob saved as file, and finally we delete the temporary local IndexedDB.
 
@@ -31,50 +51,40 @@ See more info about browsers storage limits:
 
 ## Docker
 
-If you want the automatic approach, you can find a docker image [here](https://hub.docker.com/r/edumeet/edumeet/).
+Get docker image [here](https://hub.docker.com/r/edumeet/edumeet/)
 
-## Ansible
+## Ansible (based on Docker)
 
-If you want the ansible approach, you can find ansible role [here](https://github.com/edumeet/edumeet-ansible/).
+See [more](https://github.com/edumeet/edumeet-ansible/).
+
 [![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
 
-## Package Installation
+## .deb package (for debian-based systems)
 
 If you want to install it on the Debian & Ubuntu based operating systems.
 
-* Prerequisites:
-edumeet will run on nodejs v14.x (tested with v14.18.3 version).
-To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
+* Prerequisites: [node v14.x](https://github.com/nodesource/distributions/blob/master/README.md#debinstall) (tested with v14.18.3 version)
 
-* Download .deb package from [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
-
-* Unzip the file
+* Get package [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
 
 ```bash
-$ unzip edumeet.zip
+# Unzip the file
+unzip edumeet.zip
+
+# Install the package
+sudo apt install edumeet/edumeet.deb
+
+# After package installation, don't forget the configure ip address in config file.
+sudo nano /etc/meeting/server-config.js
+
+# Finally, start the service by (it's enabled by default)
+sudo systemctl start edumeet
 ```
 
-* Install the package
+## Manual installation (build)
 
-```bash
-$ sudo apt install edumeet/edumeet.deb
-```
-
-* After package installation, don't forget the configure ip address in config file.
-
-```bash
-$ sudo nano /etc/meeting/server-config.js
-```
-
-* Finally, start the service by (it's enabled by default)
-
-```bash
-$ sudo systemctl start edumeet
-```
-
-## Manual installation
-
-* Install all the required dependencies and NodeJS v14 (Debian/Ubuntu):
+### install
+Note: We strongly recommend to always use a _yarn_ package manager.
 
 ```bash
 # Install all the required dependencies and NodeJS v14 (Debian/Ubuntu) and Yarn package manager:
@@ -90,24 +100,35 @@ git clone https://github.com/edumeet/edumeet.git
 cd edumeet
 
 # switch to the "develop" branch to get the latest version for developing
-# git checkout develop
+git checkout develop 
+```
 
-# configure
-cp server/config/config.example.js server/config/config.js
-cp app/public/config/config.example.js app/public/config/config.js
-
-# build
+### build
+```bash
 cd app
 yarn && yarn build
 
 cd ../server
 yarn && yarn build
-
 ```
 
-* Configuration can be made by creating ./server/config/config.yaml file and running build. (recommended)
-* OR editing [./server/config/config.js](https://github.com/edumeet/edumeet/blob/develop/server/README.md)
-* Example config.yaml : 
+### configure
+
+Note: Edumeet will start on the default settings (if you don't create your own configuration files)
+
+Important! You must always **rebuild** the edumeet when you change something in the configuration  files. 
+
+#### use template (example)
+Just clone the example files and adjust them
+
+```bash
+cp server/config/config.example.js server/config/config.js
+cp app/public/config/config.example.js app/public/config/config.js
+```
+
+#### create your own config (yaml or json)
+
+Example when _config.yaml_:
 ```yaml 
 turnAPIKey: "<KEY>"
 turnAPIURI: "https://api.turn.geant.org/turn"
@@ -117,70 +138,81 @@ mediasoup:
     - ip: "<serverip>"
       announcedIp: ""
 ```
+Example when _config.js_
+```javascript
+var config =
+{
+	developmentPort : 8443,
+	productionPort  : 3443
+};
+```
 
-## For developers
+Full documentation and list of all settings:
+| destination | location | 
+| ---   | ---      |
+| app side | [./app/README.md](https://github.com/edumeet/edumeet/blob/develop/app/README.md) |
+| srv side | [./server/README.md](https://github.com/edumeet/edumeet/blob/develop/server/README.md) | 
+
+### Run 
+
+#### locally (for development)
 
 * The newest build is always in **develop branch** if you want to make a contribution/pull request use it instead of master branch.
 
-* You can run a live build from app folder and running :
 ```bash
+# You can run a live build from app folder and running :
 app$ yarn start
-```
 
-*  Also you need to start a server in server folder too. 
-```bash
+# Also you need to start a server in server folder too. 
 server$ yarn start
 ```
 
-* Firewall rules to run it localy (persist until restart)
+#### locally
+
+```bash
+# Run the Node.js server application in a terminal:
+cd server
+yarn start
+```
+
+Note: Do not run the server as root. Instead, do redirects  on the firewall:
 ```bash
 sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8443
 sudo iptables -t nat -A OUTPUT -p tcp --dport 443 -o lo -j REDIRECT --to-port 8443
 sudo iptables -t nat -A PREROUTING -p tcp --dport 3443 -j REDIRECT --to-ports 8443
 sudo iptables -t nat -A OUTPUT -p tcp --dport 3443 -o lo -j REDIRECT --to-port 8443
+
+# make it persistent
+sudo apt install iptables-persistent
+sudo iptables-save > /etc/iptables/rules.v4
+sudo ip6tables-save > /etc/iptables/rules.v6
 ```
 
-## Run it locally
-
-* Run the Node.js server application in a terminal:
-
-```bash
-cd server
-yarn start
-```
-
-* Note: Do not run the server as root. If you need to use port 80/443 make a iptables-mapping for that or use systemd configuration for that (see further down this doc).
 * Test your service in a webRTC enabled browser: `https://yourDomainOrIPAdress:3443/roomname`
 
-## Deploy it in a server
-
-* Stop your locally running server. Copy systemd-service file `edumeet.service` to `/etc/systemd/system/` and check location path settings:
+#### as a service (systemd)
 
 ```bash
+# Stop your locally running server. Copy systemd-service file `edumeet.service` to `/etc/systemd/system/` and check location path settings:
 cp edumeet.service /etc/systemd/system/
 
 # modify the install paths, if required
 sudo edit /etc/systemd/system/edumeet.service
-```
 
-* Reload systemd configuration and start service:
-
-```bash
+# Reload systemd configuration and start service:
 sudo systemctl daemon-reload
 sudo systemctl start edumeet
-```
 
-* If you want to start edumeet at boot time:
-
-```bash
+# If you want to start edumeet at boot time:
 sudo systemctl enable edumeet
 ```
 
 ## Ports and firewall
-
-* 3443/tcp (default https webserver and signaling - adjustable in `server/config.js`)
-* 4443/tcp (default `npm start` port for developing with live browser reload, not needed in production environments - adjustable in app/package.json)
-* 40000-49999/udp/tcp (media ports - adjustable in `server/config.js`)
+| Port | protocol | description |
+| ---- | ----------- | ----------- |
+|3443 | tcp | default https webserver and signaling - adjustable in `server/config.js`) |
+| 4443 | tcp | default `yarn start` port for developing with live browser reload, not needed in production environments - adjustable in app/package.json) |
+| 40000-49999 | udp, tcp | media ports - adjustable in `server/config.js` |
 
 ## Load balanced installation
 
@@ -192,13 +224,15 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 
 ## TURN configuration
 
-* You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! Add your server and credentials to `server/config/config.js`
+You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! 
+Add your server and credentials to `server/config/config.js`
 
 ## Community-driven support
-
-* Open mailing list: community@lists.edumeet.org
-* Subscribe: lists.edumeet.org/sympa/subscribe/community/
-* Open archive: lists.edumeet.org/sympa/arc/community/
+| Type                |                                                |
+| -----------         | -----------                                    |
+| Open mailing list   | community@lists.edumeet.org                    |
+| Subscribe           | lists.edumeet.org/sympa/subscribe/community/   |
+| Open archive        | lists.edumeet.org/sympa/arc/community/         |
 
 ## Authors
 
