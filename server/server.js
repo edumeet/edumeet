@@ -17,7 +17,11 @@ const promExporter = require('./lib/stats/promExporter');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const http = require('http');
-const spdy = require('spdy');
+// Since is not working anymore with node.js > 15 and express 5 is not ready yet for http2 
+// deactivaiting spdy for now :(
+// https://github.com/spdy-http2/node-spdy/issues/380
+const https = require('https');
+// const spdy = require('spdy');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -658,7 +662,7 @@ async function runHttpsServer()
 	else
 	{
 		// https
-		mainListener = spdy.createServer(tls, app);
+		mainListener = https.createServer(tls, app);
 
 		// http -> https redirect server
 		if (config.listeningRedirectPort)
