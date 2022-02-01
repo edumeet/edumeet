@@ -206,7 +206,7 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.10.tgz#774f43868964f3cfe4ced1f5417fe15818a4eaea"
   integrity sha512-6iihJ/Pp5fsFJ/aEDGyvT4pHGmCpq7ToQ/yf4bl5SbVAvwpspYJ+v3jO7n8UyjhQVHTy+KNszOozDdv+O6sovQ==
 
-"@types/node@^16.11.7":
+"@types/node@^16.9.1":
   version "16.11.22"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.22.tgz#e704150225bfc4195f8ce68a7ac8da02b753549a"
   integrity sha512-DYNtJWauMQ9RNpesl4aVothr97/tIJM8HbyOXJ0AYT1Z2bEjLHyfjOBPAQQVMLf8h3kSShYfNk8Wnto8B2zHUA==
@@ -503,6 +503,11 @@ awaitqueue@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/awaitqueue/-/awaitqueue-1.0.1.tgz#f1f8ccd9b3f8a07d8222faf5382198fe44557c32"
   integrity sha512-v5XFR8slds87u7WkjWUtuMXUBEaqfg1WJ8yxrUDbo8aodUQLEVag0MZYBptRP/TmMGOYn0YHS6ar8aqVCJVynA==
+
+awaitqueue@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/awaitqueue/-/awaitqueue-2.3.3.tgz#35e6568970fcac3de1644a2c28abc1074045b570"
+  integrity sha512-RbzQg6VtPUtyErm55iuQLTrBJ2uihy5BKBOEkyBwv67xm5Fn2o/j+Bz+a5BmfSoe2oZ5dcz9Z3fExS8pL+LLhw==
 
 axios@^0.21.1:
   version "0.21.4"
@@ -2154,14 +2159,16 @@ media-typer@0.3.0:
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
 
-mediasoup@3.9.2:
-  version "3.9.2"
-  resolved "https://registry.yarnpkg.com/mediasoup/-/mediasoup-3.9.2.tgz#1c6dbf6b4073e372f161e8b9c31da29d1bbcae4b"
-  integrity sha512-KIERRBHl8byqSnjh1NpZvDsOqWrzrsgSTMtGLm6WvlgjUaNvcJonjthpfBRE9myRv9amDUivodIeV/zgsKhGMg==
+mediasoup@3.8.9:
+  version "3.8.4"
+  resolved "https://registry.yarnpkg.com/mediasoup/-/mediasoup-3.8.4.tgz#c327f702f2e78f475208f4cf2eb7e38b2edadfe2"
+  integrity sha512-l6rQwjcWN5VJ85yg8darZyPjSQVlE1GqrR1mIjUVa0F8MX6jOxsscXNzFisxTly4ngB2DTjnI8HEabmD5a5Vog==
   dependencies:
-    "@types/node" "^16.11.7"
+    "@types/node" "^16.9.1"
+    awaitqueue "^2.3.3"
     debug "^4.3.2"
     h264-profile-level-id "^1.0.1"
+    netstring "^0.3.0"
     random-number "^0.0.9"
     supports-color "^9.0.2"
     uuid "^8.3.2"
@@ -2284,6 +2291,11 @@ negotiator@0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
   integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
+
+netstring@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/netstring/-/netstring-0.3.0.tgz#868dc5b20c58d3f7305531d49368eaaabd19b712"
+  integrity sha1-ho3FsgxY0/cwVTHUk2jqqr0ZtxI=
 
 nice-try@^1.0.4:
   version "1.0.5"
