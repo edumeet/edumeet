@@ -17,9 +17,10 @@ Try it online at https://letsmeet.no. You can add /roomname to the URL for speci
 * Local Recording
 
 ## Local Recording
-
 * Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
 Local Recording creates a local IndexedDB with the name of the starting timestamp (unix timestamp format)  And a storage called chunks. All chunks read in an array and created a final blob that you can download. After blobs array concatenation as a big blob, this big blob saved as file, and finally we delete the temporary local IndexedDB.
+
+* Local recording is **disabled** by default. You can enable it by setting localRecordingEnabled to true in  (./app/public/config/config.js)
 
 * **WARNINIG**: Take care that You need for local recording extra cpu, memory and disk space.
   **You need to have good enough free disk space!!**
@@ -42,7 +43,7 @@ If you want the ansible approach, you can find ansible role [here](https://githu
 If you want to install it on the Debian & Ubuntu based operating systems.
 
 * Prerequisites:
-edumeet will run on nodejs v14.x (tested with v14.15.4 version).
+edumeet will run on nodejs v14.x (tested with v14.18.3 version).
 To install see here [here](https://github.com/nodesource/distributions/blob/master/README.md#debinstall).
 
 * Download .deb package from [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
@@ -76,67 +77,67 @@ $ sudo systemctl start edumeet
 * Install all the required dependencies and NodeJS v14 (Debian/Ubuntu):
 
 ```bash
-sudo apt install -y curl git python python3-pip build-essential redis openssl libssl-dev pkg-config
+# Install all the required dependencies and NodeJS v14 (Debian/Ubuntu) and Yarn package manager:
+sudo apt update && sudo apt install -y curl git python python3-pip build-essential redis openssl libssl-dev pkg-config
 curl -fsSL https://deb.nodesource.com/setup_14.x | sudo bash -
-sudo apt update && sudo apt install -y nodejs
-```
-
-* Install the Yarn package manager (recommended):
-
-```bash
 curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
 echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-sudo apt update && sudo apt install -y yarn
-```
+sudo apt update && sudo apt install -y yarn nodejs
 
-* Clone the project:
-
-```bash
+# get version
 git clone https://github.com/edumeet/edumeet.git
+
 cd edumeet
 
 # switch to the "develop" branch to get the latest version for developing
-git checkout develop
-```
+# git checkout develop
 
-* Copy `server/config/config.example.js` to `server/config/config.js` :
-
-```bash
+# configure
 cp server/config/config.example.js server/config/config.js
-```
-
-* Copy `app/public/config/config.example.js` to `app/public/config/config.js` :
-
-```bash
 cp app/public/config/config.example.js app/public/config/config.js
-```
 
-* Edit your two `config.js` with appropriate settings (listening IP/port, logging options, **valid** TLS certificate, don't forget ip setting in last section in server config: (webRtcTransport), etc).
-
-* Set up the browser app:
-
-```bash
+# build
 cd app
-
-# using Yarn (recommended)
 yarn && yarn build
 
-# using NPM
-npm i && npm run build
+cd ../server
+yarn && yarn build
+
 ```
 
-This will build the client application and copy everything to `server/public` from where the server can host client code to browser requests.
+* Configuration can be made by creating ./server/config/config.yaml file and running build. (recommended)
+* OR editing [./server/config/config.js](https://github.com/edumeet/edumeet/blob/develop/server/README.md)
+* Example config.yaml : 
+```yaml 
+turnAPIKey: "<KEY>"
+turnAPIURI: "https://api.turn.geant.org/turn"
+mediasoup:
+  webRtcTransport:
+    listenIps:
+    - ip: "<serverip>"
+      announcedIp: ""
+```
 
-* Set up the server:
+## For developers
 
+* The newest build is always in **develop branch** if you want to make a contribution/pull request use it instead of master branch.
+
+* You can run a live build from app folder and running :
 ```bash
-cd ../server
+app$ yarn start
+```
 
-# using Yarn (recommended)
-yarn && yarn build
+*  Also you need to start a server in server folder too. 
+```bash
+server$ yarn start
+```
 
-# using NPM
-npm i && npm run build
+* Firewall rules to run it localy (persist until restart)
+```bash
+sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8443
+sudo iptables -t nat -A OUTPUT -p tcp --dport 443 -o lo -j REDIRECT --to-port 8443
+sudo iptables -t nat -A PREROUTING -p tcp --dport 3443 -j REDIRECT --to-ports 8443
+sudo iptables -t nat -A OUTPUT -p tcp --dport 3443 -o lo -j REDIRECT --to-port 8443
 ```
 
 ## Run it locally
@@ -145,12 +146,7 @@ npm i && npm run build
 
 ```bash
 cd server
-
-# using Yarn (recommended)
 yarn start
-
-# using NPM
-npm run start
 ```
 
 * Note: Do not run the server as root. If you need to use port 80/443 make a iptables-mapping for that or use systemd configuration for that (see further down this doc).
