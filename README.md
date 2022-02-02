@@ -16,11 +16,11 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 | **File sharing** | You can share your files with the peers (torrent solution under the hood) |
 | **Chat messages**  | You can make a text conversation with peers |
 | **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them.(**disabled by default**) |
-| **Multi-Languages**  | We support 22 languages |
+| **Multi-Languages**  | We support 22 languages but/and we need your [help](#contribute-translations)! |
 | **Authorization**  | Supported types: **OIDC**, **SAML**, **local text-based database** |
 
 
-### ➡️➡️➡️ Contribute translations! ⬅️⬅️⬅️
+### Contribute translations! 
 <details>
   <summary>How to contribute?</summary>
   
@@ -38,7 +38,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 
 ### Local Recording 🆕
 <details>
-  <summary>How does it work?</summary>
+  <summary>See more</summary>
   
   * Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
 Local Recording creates a local IndexedDB with the name of the starting timestamp (unix timestamp format)  And a storage called chunks. All chunks read in an array and created a final blob that you can download. After blobs array concatenation as a big blob, this big blob saved as file, and finally we delete the temporary local IndexedDB.
