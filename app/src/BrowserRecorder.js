@@ -3,8 +3,8 @@ import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
 import { store } from './store/store';
-import * as requestActions from './actions/requestActions';
-import * as recorderActions from './actions/recorderActions';
+import * as requestActions from './store/actions/requestActions';
+import * as recorderActions from './store/actions/recorderActions';
 
 export default class BrowserRecorder
 {

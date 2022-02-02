@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withSnackbar } from 'notistack';
-import * as notificationActions from '../../actions/notificationActions';
+import * as notificationActions from '../../store/actions/notificationActions';
 import { config } from '../../config';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';

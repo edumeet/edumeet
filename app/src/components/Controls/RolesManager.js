@@ -7,7 +7,7 @@ import {
 	makePermissionSelector
 } from '../../store/selectors';
 import { permissions } from '../../permissions';
-import * as roomActions from '../../actions/roomActions';
+import * as roomActions from '../../store/actions/roomActions';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';

@@ -14,7 +14,7 @@ import debug from 'debug';
 import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
-import * as meActions from './actions/meActions';
+import * as meActions from './store/actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
 import ConfigDocumentation from './components/ConfigDocumentation';
 import ConfigError from './components/ConfigError';

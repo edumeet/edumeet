@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../RoomContext';
 import classnames from 'classnames';
 import isElectron from 'is-electron';
-import * as settingsActions from '../actions/settingsActions';
+import * as settingsActions from '../store/actions/settingsActions';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
