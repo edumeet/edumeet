@@ -18,7 +18,13 @@ const bcrypt = require('bcrypt');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const spdy = require('spdy');
+
+if (process.versions.node.split('.')[0] < 15)
+{
+	/* eslint-disable no-unused-vars */
+	const spdy = require('spdy');
+}
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -386,6 +392,7 @@ async function setupAuth()
 		if (config.auth.oidc.HttpOptions)
 		{
 			// Set http options to allow e.g. http proxy
+			// TODO check with Misi what this is about
 			custom.setHttpOptionsDefaults(config.auth.oidc.HttpOptions);
 		}
 
@@ -662,13 +669,14 @@ async function runHttpsServer()
 		// spdy is not working anymore with node.js > 15 and express 5 
 		// is not ready yet for http2
 		// https://github.com/spdy-http2/node-spdy/issues/380
-		if (process.versions.node.split('.')[0] >= 15)
+		if (typeof(spdy) === 'undefined')
 		{
 			logger.info('Found node.js version >= 15 disabling spdy / http2 and using node.js/https module');
 			mainListener = https.createServer(tls, app);
 		}
 		else
 		{
+			/* eslint-disable no-undef */
 			mainListener = spdy.createServer(tls, app);
 		}
 
