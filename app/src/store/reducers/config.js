@@ -1,4 +1,4 @@
-import { config as defaultConfig } from '../config';
+import { config as defaultConfig } from '../../config';
 
 const initialState =
 {

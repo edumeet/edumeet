@@ -10,7 +10,7 @@ import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 // import { createFilter } from 'redux-persist-transform-filter';
 import { diff } from 'deep-object-diff';
-import rootReducer from '../reducers/rootReducer';
+import rootReducer from './reducers/rootReducer';
 import Logger from '../Logger';
 import { config } from '../config';
 
