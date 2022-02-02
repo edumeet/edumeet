@@ -1079,7 +1079,7 @@ const makeMapStateToProps = (initialState, { id }) =>
 			browser             : state.me.browser,
 			isSelected          : state.room.selectedPeers.includes(id),
 			mode                : state.room.mode,
-			localRecordingState : state.recorderReducer.localRecordingState.status,
+			localRecordingState : state.recorder.localRecordingState.status,
 			recordingConsents   : recordingConsentsPeersSelector(state)
 		};
 	};
@@ -1120,8 +1120,8 @@ export default withRoomContext(connect(
 				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.me.browser === next.me.browser &&
 				prev.enableLayersSwitch === next.enableLayersSwitch &&
-				prev.recorderReducer.localRecordingState.status ===
-				next.recorderReducer.localRecordingState.status &&
+				prev.recorder.localRecordingState.status ===
+				next.recorder.localRecordingState.status &&
 				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}

@@ -1079,7 +1079,7 @@ const makeMapStateToProps = () =>
 			hasScreenPermission : canShareScreen(state),
 			noiseVolume         : noise,
 			transports          : state.transports,
-			localRecordingState : state.recorderReducer.localRecordingState.status,
+			localRecordingState : state.recorder.localRecordingState.status,
 			recordingConsents   : recordingConsentsPeersSelector(state)
 		};
 	};
@@ -1103,8 +1103,8 @@ export default withRoomContext(connect(
 				prev.producers === next.producers &&
 				prev.settings === next.settings &&
 				prev.transports === next.transports &&
-				prev.recorderReducer.localRecordingState.status ===
-				next.recorderReducer.localRecordingState.status &&
+				prev.recorder.localRecordingState.status ===
+				next.recorder.localRecordingState.status &&
 				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}

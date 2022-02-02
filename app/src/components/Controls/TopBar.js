@@ -1317,7 +1317,7 @@ const makeMapStateToProps = () =>
 			toolAreaOpen        : state.toolarea.toolAreaOpen,
 			loggedIn            : state.me.loggedIn,
 			loginEnabled        : state.me.loginEnabled,
-			localRecordingState : state.recorderReducer.localRecordingState,
+			localRecordingState : state.recorder.localRecordingState,
 			recordingInProgress	: recordingInProgressSelector(state),
 			recordingPeers      : recordingInProgressPeersSelector(state),
 			recordingConsents   : recordingConsentsPeersSelector(state),
@@ -1408,8 +1408,8 @@ export default withRoomContext(connect(
 				prev.me.loginEnabled === next.me.loginEnabled &&
 				prev.me.picture === next.me.picture &&
 				prev.me.roles === next.me.roles &&
-				prev.recorderReducer.localRecordingState.status ===
-				next.recorderReducer.localRecordingState.status &&
+				prev.recorder.localRecordingState.status ===
+				next.recorder.localRecordingState.status &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&

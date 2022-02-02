@@ -8,7 +8,7 @@ import consumers from './consumers';
 import peerVolumes from './peerVolumes';
 import notifications from './notifications';
 import chat from './chat';
-import recorderReducer from './recorder';
+import recorder from './recorder';
 import toolarea from './toolarea';
 import files from './files';
 import settings from './settings';
@@ -18,6 +18,7 @@ import { config } from '../../config';
 // import { intlReducer } from 'react-intl-redux';
 
 export default combineReducers({
+	// intl : intlReducer,
 	room,
 	me,
 	producers,
@@ -27,12 +28,11 @@ export default combineReducers({
 	lobbyPeers,
 	peerVolumes,
 	notifications,
-	chat,
 	toolarea,
+	chat,
 	files,
 	settings,
-	recorderReducer,
-	// intl : intlReducer
+	recorder,
 	intl,
 	config
 });
