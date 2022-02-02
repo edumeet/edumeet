@@ -6,35 +6,33 @@ A WebRTC meeting service using [mediasoup](https://mediasoup.org).
 
 Try it online at [letsmeet.no](https://letsmeet.no)
 
-## Features
+## Main features
 
-### Audio/Video streaming
-You can share your microphone and camera + additional video stream
-
-### Video layouts
-You can choose between **Democratic** and **Filmstrip** views. More in progress.
-
-### Screen sharing
-You can share your screen to make some presentation right from your desktop
-
-### File sharing
-You can share your files with the peers (torrent solution under the hood)
-
-### Chat messages
-You can make a text conversation with peers
+| Feature  | Description |
+| ------------- | ------------- |
+| **Audio/Video streaming** | You can share your microphone and camera + additional video stream  |
+| **Video layouts** | You can choose between **Democratic** and **Filmstrip** views. More in progress. |
+| **Screen sharing** | You can share your screen to make some presentation right from your desktop |
+| **File sharing** | You can share your files with the peers (torrent solution under the hood) |
+| **Chat messages**  | You can make a text conversation with peers |
 
 ### Multi-Languages
-We support [22 languages](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) but/and we need your help! 
+We support 22 languages but/and we need your help! 
 
 If you want to help us with translations 
-1. take a certain language file you want to translate
-2. find the _null_  values and replace them based on the _en.json_ file
-3. make a Pull Request, or send us a [e-mail](roman@drozd.it) with file 
+1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) you want to translate
+2. find the _null_  values
+>	"settings.language": null,
+3. replace them based on the _en.json_ file
+> "settings.language": "Select language",
+4. make a Pull Request, or send us a [e-mail](mailto:roman@drozd.it) with file 
 
 Thanks so much in advance!
 
-### Authorization
-oidc, saml, and local text-based database  
+### Supported authorization types
+* OIDC
+* SAML
+* Local text-based database  
 
 ### Local Recording
 * Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
