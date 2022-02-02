@@ -23,7 +23,7 @@ import LoginDialog from './components/AccessControl/LoginDialog';
 import LoadingView from './components/Loader/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
-import { persistor, store } from './store';
+import { persistor, store } from './store/store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 import { LazyPreload } from './components/Loader/LazyPreload';

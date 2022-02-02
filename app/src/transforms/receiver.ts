@@ -1,5 +1,5 @@
 import Logger from '../Logger';
-import { store } from '../store';
+import { store } from '../store/store';
 import * as consumerActions from '../actions/consumerActions';
 
 const logger = new Logger('transforms.receiver');
