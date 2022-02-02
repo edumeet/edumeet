@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { raisedHandsSelector } from '../Selectors';
+import { raisedHandsSelector } from '../../store/selectors';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../actions/toolareaActions';

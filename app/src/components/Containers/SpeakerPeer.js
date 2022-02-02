@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { makePeerConsumerSelector } from '../Selectors';
+import { makePeerConsumerSelector } from '../../store/selectors';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';

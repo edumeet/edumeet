@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { makePeerConsumerSelector, recordingConsentsPeersSelector } from '../Selectors';
+import { makePeerConsumerSelector, recordingConsentsPeersSelector } from '../../store/selectors';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';

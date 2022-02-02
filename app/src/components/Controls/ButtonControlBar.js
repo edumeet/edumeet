@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import {
 	meProducersSelector,
 	makePermissionSelector
-} from '../Selectors';
+} from '../../store/selectors';
 import { permissions } from '../../permissions';
 import { withStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';

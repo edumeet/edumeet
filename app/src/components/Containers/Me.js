@@ -4,7 +4,7 @@ import {
 	meProducersSelector,
 	makePermissionSelector,
 	recordingConsentsPeersSelector
-} from '../Selectors';
+} from '../../store/selectors';
 import { permissions } from '../../permissions';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';

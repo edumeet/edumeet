@@ -9,7 +9,7 @@ import {
 	recordingInProgressSelector,
 	recordingInProgressPeersSelector,
 	recordingConsentsPeersSelector
-} from '../Selectors';
+} from '../../store/selectors';
 import { permissions } from '../../permissions';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';

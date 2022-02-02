@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {
 	lobbyPeersKeySelector,
 	makePermissionSelector
-} from '../../Selectors';
+} from '../../../store/selectors';
 import { permissions } from '../../../permissions';
 import * as appPropTypes from '../../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';

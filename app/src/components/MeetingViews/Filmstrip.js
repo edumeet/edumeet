@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import {
 	videoBoxesSelector
-} from '../Selectors';
+} from '../../store/selectors';
 import { withRoomContext } from '../../RoomContext';
 import Me from '../Containers/Me';
 import Peer from '../Containers/Peer';

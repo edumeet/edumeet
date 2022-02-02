@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import { withRoomContext } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
 import { permissions } from '../../../permissions';
-import { makePermissionSelector } from '../../Selectors';
+import { makePermissionSelector } from '../../../store/selectors';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';

@@ -5,7 +5,7 @@ import { withRoomContext } from '../../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
 import { permissions } from '../../../../permissions';
-import { makePermissionSelector } from '../../../Selectors';
+import { makePermissionSelector } from '../../../../store/selectors';
 import Button from '@material-ui/core/Button';
 
 const styles = (theme) =>
