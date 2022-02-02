@@ -17,9 +17,10 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 | **Chat messages**  | You can make a text conversation with peers |
 | **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them.(**disabled by default**) |
 | **Multi-Languages**  | We support 22 languages |
+| **Authorization**  | Supported types: **OIDC**, **SAML**, **local text-based database** |
 
 
-### Contribute translations!
+### ➡️➡️➡️ Contribute translations! ⬅️⬅️⬅️
 <details>
   <summary>How to contribute?</summary>
   
@@ -34,12 +35,8 @@ Try it online at [letsmeet.no](https://letsmeet.no)
   Thanks so much in advance!
 </details>
 
-### Supported authorization types
-* OIDC
-* SAML
-* Local text-based database  
 
-### Local Recording
+### Local Recording 🆕
 <details>
   <summary>How does it work?</summary>
   
