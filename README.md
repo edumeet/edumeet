@@ -15,19 +15,24 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 | **Screen sharing** | You can share your screen to make some presentation right from your desktop |
 | **File sharing** | You can share your files with the peers (torrent solution under the hood) |
 | **Chat messages**  | You can make a text conversation with peers |
+| **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them.(**disabled by default**) |
+| **Multi-Languages**  | We support 22 languages |
 
-### Multi-Languages
-We support 22 languages but/and we need your help! 
 
-If you want to help us with translations 
-1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) you want to translate
-2. find the _null_  values
->	"settings.language": null,
-3. replace them based on the _en.json_ file
-> "settings.language": "Select language",
-4. make a Pull Request, or send us a [e-mail](mailto:roman@drozd.it) with file 
-
-Thanks so much in advance!
+### Contribute translations!
+<details>
+  <summary>How to contribute?</summary>
+  
+  ### Steps
+  1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) you want to translate
+  2. find the _null_  values
+  >	"settings.language": null,
+  3. replace them based on the _en.json_ file
+  > "settings.language": "Select language",
+  4. make a Pull Request, or send us a [e-mail](mailto:roman@drozd.it) with file
+  
+  Thanks so much in advance!
+</details>
 
 ### Supported authorization types
 * OIDC
@@ -35,7 +40,10 @@ Thanks so much in advance!
 * Local text-based database  
 
 ### Local Recording
-* Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
+<details>
+  <summary>How does it work?</summary>
+  
+  * Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
 Local Recording creates a local IndexedDB with the name of the starting timestamp (unix timestamp format)  And a storage called chunks. All chunks read in an array and created a final blob that you can download. After blobs array concatenation as a big blob, this big blob saved as file, and finally we delete the temporary local IndexedDB.
 
 * Local recording is **disabled** by default. You can enable it by setting localRecordingEnabled to true in  (./app/public/config/config.js)
@@ -46,6 +54,8 @@ Keep in mind that Browsers don't allow to use all the disk free capacity!
 See more info about browsers storage limits:
   * <https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria#storage_limits>
   * <https://chromium.googlesource.com/chromium/src/+/refs/heads/master/storage/browser/quota/quota_settings.cc#68>
+
+</details>
 
 ## Docker
 
