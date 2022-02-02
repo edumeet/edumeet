@@ -1,5 +1,4 @@
-# edumeet
-
+# ![edumeet logo](/app/public/images/logo.edumeet.svg)
 A WebRTC meeting service using [mediasoup](https://mediasoup.org).
 
 ![demo](demo.gif)
@@ -16,15 +15,14 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 | **File sharing** | You can share your files with the peers (torrent solution under the hood) |
 | **Chat messages**  | You can make a text conversation with peers |
 | **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them.(**disabled by default**) |
-| **Multi-Languages**  | We support 22 languages but/and we need your [help](#contribute-translations)! |
 | **Authorization**  | Supported types: **OIDC**, **SAML**, **local text-based database** |
 
 
-### Contribute translations! 
+#### Multi-Languages translations! 
 <details>
   <summary>How to contribute?</summary>
   
-  ### Steps
+  #### Steps
   1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) you want to translate
   2. find the _null_  values
   >	"settings.language": null,
@@ -36,7 +34,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 </details>
 
 
-### Local Recording 🆕
+#### Local Recording
 <details>
   <summary>See more</summary>
   
