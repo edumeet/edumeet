@@ -549,19 +549,19 @@ class Room extends EventEmitter
 			{
 				const { producer, volume } = volumes[0];
 
-				const audioLevelObject = this._audioLevelObservers.get(routerId);
+				const audioLevelObj = this._audioLevelObservers.get(routerId);
 
-				audioLevelObject.peerId = producer.appData.peerId;
-				audioLevelObject.volume = volume;
+				audioLevelObj.peerId = producer.appData.peerId;
+				audioLevelObj.volume = volume;
 				this._sendActiveSpeakerInfo();
 			});
 
 			audioLevelObject.audioLevelObserver.on('silence', () =>
 			{
-				const audioLevelObject = this._audioLevelObservers.get(routerId);
+				const audioLevelObj = this._audioLevelObservers.get(routerId);
 
-				audioLevelObject.peerId = null;
-				audioLevelObject.volume = -1000;
+				audioLevelObj.peerId = null;
+				audioLevelObj.volume = -1000;
 				this._sendActiveSpeakerInfo();
 			});
 		});
