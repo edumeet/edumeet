@@ -3,7 +3,7 @@
 The app configuration file should be a valid javascript file defining a single
 `config` object containing the properties that you need to modify.
 
-Example `public/config.js`:
+Example `public/config/config.js`:
 ```javascript
 var config =
 {
