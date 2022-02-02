@@ -18,7 +18,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 | **Authorization**  | Supported types: **OIDC**, **SAML**, **local text-based database** |
 
 
-#### Multi-Languages translations! 
+#### Multi-Languages 
 <details>
   <summary>How to contribute?</summary>
   
