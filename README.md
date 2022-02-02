@@ -1,5 +1,7 @@
-# ![edumeet logo](/app/public/images/logo.edumeet.svg)
+# ![edumeet logo](/app/public/images/logo.edumeet.svg) 
 A WebRTC meeting service using [mediasoup](https://mediasoup.org).
+
+Official website: [edumeet.org](https://edumeet.org)
 
 ![demo](demo.gif)
 
