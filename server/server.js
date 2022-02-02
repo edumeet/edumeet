@@ -659,7 +659,8 @@ async function runHttpsServer()
 	else
 	{
 		// https
-		// spdy is not working anymore with node.js > 15 and express 5 is not ready yet for http2
+		// spdy is not working anymore with node.js > 15 and express 5 
+		// is not ready yet for http2
 		// https://github.com/spdy-http2/node-spdy/issues/380
 		if (process.versions.node.split('.')[0] >= 15)
 		{

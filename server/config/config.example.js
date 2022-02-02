@@ -105,7 +105,7 @@ module.exports =
 					passwordHash : '$2b$10$PAXXw.6cL3zJLd7ZX.AnL.sFg2nxjQPDmMmGSOQYIJSa0TrZ9azG6',
 					displayName  : 'Alice',
 					emails       : [ { value: 'alice@atlanta.com' } ],
-					meet_roles   : [ ]
+					meetRoles   : [ ]
 				},
 				{
 					id           : 2,
@@ -113,7 +113,7 @@ module.exports =
 					passwordHash : '$2b$10$BzAkXcZ54JxhHTqCQcFn8.H6klY/G48t4jDBeTE2d2lZJk/.tvv0G',
 					displayName  : 'Bob',
 					emails       : [ { value: 'bob@biloxi.com' } ],
-					meet_roles   : [ ]
+					meetRoles   : [ ]
 				}
 			]
 		}
@@ -169,16 +169,16 @@ module.exports =
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (
-			Array.isArray(userinfo.meet_roles) &&
-			userinfo.meet_roles.includes('moderator')
+			Array.isArray(userinfo.meetRoles) &&
+			userinfo.meetRoles.includes('moderator')
 		)
 		{
 			peer.addRole(userRoles.MODERATOR);
 		}
 
 		if (
-			Array.isArray(userinfo.meet_roles) &&
-			userinfo.meet_roles.includes('meetingadmin')
+			Array.isArray(userinfo.meetRoles) &&
+			userinfo.meetRoles.includes('meetingadmin')
 		)
 		{
 			peer.addRole(userRoles.ADMIN);

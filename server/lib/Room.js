@@ -67,7 +67,10 @@ const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 class Room extends EventEmitter
 {
 
-	static getLeastLoadedRouter(allMediasoupWorkersOnServer, allPeersOnServer, mediasoupRoutersOfRoom)
+	static getLeastLoadedRouter(
+		allMediasoupWorkersOnServer,
+		allPeersOnServer,
+		mediasoupRoutersOfRoom)
 	{
 		const routerLoads = new Map();
 		const workerLoads = new Map();
@@ -1563,11 +1566,12 @@ class Room extends EventEmitter
 
 			case 'addConsentForRecording':
 			{
-				const {consent} = request.data;
+				const { consent } = request.data;
 				// Spread to others
+
 				this._notification(peer.socket, 'addConsentForRecording', {
-					peerId : peer.id,
-					consent: consent
+					peerId  : peer.id,
+					consent : consent
 				}, true);
 
 				// Return no error
