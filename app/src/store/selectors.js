@@ -9,7 +9,7 @@ const consumersSelect = (state) => state.consumers;
 const spotlightsSelector = (state) => state.room.spotlights;
 const peersSelector = (state) => state.peers;
 const meSelector = (state) => state.me;
-const recorderReducerSelect = (state) => state.recorderReducer;
+const recorderSelect = (state) => state.recorder;
 const lobbyPeersSelector = (state) => state.lobbyPeers;
 const getPeerConsumers = (state, id) =>
 	(state.peers[id] ? state.peers[id].consumers : null);
@@ -304,12 +304,12 @@ export const makePermissionSelector = (permission) =>
 
 export const recordingInProgressSelector = createSelector(
 	peersValueSelector,
-	recorderReducerSelect,
-	(peers, recorderReducer) =>
+	recorderSelect,
+	(peers, recorder) =>
 	{
 		if (
-			recorderReducer.localRecordingState.status === 'start' ||
-			recorderReducer.localRecordingState.status === 'resume' ||
+			recorder.localRecordingState.status === 'start' ||
+			recorder.localRecordingState.status === 'resume' ||
 			peers.findIndex((e) =>
 				e.localRecordingState !== undefined &&
 				(
@@ -322,9 +322,9 @@ export const recordingInProgressSelector = createSelector(
 			return true;
 		}
 		else if (
-			recorderReducer.localRecordingState.status === 'init' ||
-			recorderReducer.localRecordingState.status === 'stop' ||
-			recorderReducer.localRecordingState.status === 'pause' ||
+			recorder.localRecordingState.status === 'init' ||
+			recorder.localRecordingState.status === 'stop' ||
+			recorder.localRecordingState.status === 'pause' ||
 			peers.findIndex((e) =>
 				e.localRecordingState !== undefined &&
 				(
@@ -362,16 +362,16 @@ export const recordingConsentsPeersSelector = createSelector(
 export const recordingInProgressPeersSelector = createSelector(
 	peersValueSelector,
 	meSelector,
-	recorderReducerSelect,
-	(peers, me, recorderReducer) =>
+	recorderSelect,
+	(peers, me, recorder) =>
 	{
 		const recordingpeers = [];
 
 		if (
-			recorderReducer !== undefined &&
+			recorder !== undefined &&
 			(
-				recorderReducer.localRecordingState.status === 'start' ||
-				recorderReducer.localRecordingState.status === 'resume'
+				recorder.localRecordingState.status === 'start' ||
+				recorder.localRecordingState.status === 'resume'
 			)
 		)
 		{
@@ -380,10 +380,10 @@ export const recordingInProgressPeersSelector = createSelector(
 		peers.forEach((e) =>
 		{
 			if (
-				e.recorderReducer !== undefined &&
+				e.recorder !== undefined &&
 				(
-					e.recorderReducer.localRecordingState.status === 'start' ||
-					e.recorderReducer.localRecordingState.status === 'resume'
+					e.recorder.localRecordingState.status === 'start' ||
+					e.recorder.localRecordingState.status === 'resume'
 				)
 			)
 			{

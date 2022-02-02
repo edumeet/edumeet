@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { makePeerConsumerSelector } from '../../Selectors';
+import { makePeerConsumerSelector } from '../../../store/selectors';
 import { withStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../../actions/roomActions';
+import * as roomActions from '../../../store/actions/roomActions';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../../appPropTypes';
 import { withRoomContext } from '../../../RoomContext';

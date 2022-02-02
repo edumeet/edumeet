@@ -7,7 +7,7 @@ const initialState = {
 
 ;
 
-const recorderReducer = (state = initialState, action) =>
+const recorder = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
@@ -41,4 +41,4 @@ const recorderReducer = (state = initialState, action) =>
 	}
 };
 
-export default recorderReducer;
+export default recorder;

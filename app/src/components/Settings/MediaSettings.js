@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import * as appPropTypes from '../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../RoomContext';
-import * as settingsActions from '../../actions/settingsActions';
+import * as settingsActions from '../../store/actions/settingsActions';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';

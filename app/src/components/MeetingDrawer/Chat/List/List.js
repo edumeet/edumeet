@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import * as appPropTypes from '../../../appPropTypes';
-import * as chatActions from '../../../../actions/chatActions';
+import * as chatActions from '../../../../store/actions/chatActions';
 import classnames from 'classnames';
 import Message from './Item/Message';
 import File from './Item/File';

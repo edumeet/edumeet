@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { makePeerConsumerSelector, recordingConsentsPeersSelector } from '../Selectors';
+import { makePeerConsumerSelector, recordingConsentsPeersSelector } from '../../store/selectors';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../actions/roomActions';
+import * as roomActions from '../../store/actions/roomActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -1079,7 +1079,7 @@ const makeMapStateToProps = (initialState, { id }) =>
 			browser             : state.me.browser,
 			isSelected          : state.room.selectedPeers.includes(id),
 			mode                : state.room.mode,
-			localRecordingState : state.recorderReducer.localRecordingState.status,
+			localRecordingState : state.recorder.localRecordingState.status,
 			recordingConsents   : recordingConsentsPeersSelector(state)
 		};
 	};
@@ -1120,8 +1120,8 @@ export default withRoomContext(connect(
 				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.me.browser === next.me.browser &&
 				prev.enableLayersSwitch === next.enableLayersSwitch &&
-				prev.recorderReducer.localRecordingState.status ===
-				next.recorderReducer.localRecordingState.status &&
+				prev.recorder.localRecordingState.status ===
+				next.recorder.localRecordingState.status &&
 				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}

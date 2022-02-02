@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../../RoomContext';
 import { useIntl } from 'react-intl';
 import { permissions } from '../../../../permissions';
-import { makePermissionSelector } from '../../../Selectors';
+import { makePermissionSelector } from '../../../../store/selectors';
 import Paper from '@material-ui/core/Paper';
 import { Grid } from '@material-ui/core';
 import { EditorState, RichUtils, ContentState } from 'draft-js';

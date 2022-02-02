@@ -1,6 +1,6 @@
 import Logger from '../Logger';
-import { store } from '../store';
-import * as consumerActions from '../actions/consumerActions';
+import { store } from '../store/store';
+import * as consumerActions from '../store/actions/consumerActions';
 
 const logger = new Logger('transforms.receiver');
 

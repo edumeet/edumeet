@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {
 	spotlightPeersSelector,
 	videoBoxesSelector
-} from '../Selectors';
+} from '../../store/selectors';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';

@@ -2,22 +2,22 @@ import { combineReducers } from 'redux';
 import room from './room';
 import me from './me';
 import producers from './producers';
+import consumers from './consumers';
+import transports from './transports';
 import peers from './peers';
 import lobbyPeers from './lobbyPeers';
-import consumers from './consumers';
 import peerVolumes from './peerVolumes';
 import notifications from './notifications';
-import chat from './chat';
-import recorderReducer from './recorder';
 import toolarea from './toolarea';
+import chat from './chat';
 import files from './files';
+import recorder from './recorder';
 import settings from './settings';
-import transports from './transports';
-import intl from './intl';
 import config from './config';
-// import { intlReducer } from 'react-intl-redux';
+import intl from './intl';
 
 export default combineReducers({
+	// intl : intlReducer,
 	room,
 	me,
 	producers,
@@ -27,12 +27,11 @@ export default combineReducers({
 	lobbyPeers,
 	peerVolumes,
 	notifications,
-	chat,
 	toolarea,
+	chat,
 	files,
+	recorder,
 	settings,
-	recorderReducer,
-	// intl : intlReducer
-	intl,
-	config
+	config,
+	intl
 });

@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { raisedHandsSelector } from '../Selectors';
+import { raisedHandsSelector } from '../../store/selectors';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import * as toolareaActions from '../../actions/toolareaActions';
-import * as settingsActions from '../../actions/settingsActions';
+import * as toolareaActions from '../../store/actions/toolareaActions';
+import * as settingsActions from '../../store/actions/settingsActions';
 import { useIntl } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import * as appPropTypes from '../appPropTypes';
-import * as roomActions from '../../actions/roomActions';
+import * as roomActions from '../../store/actions/roomActions';
 import { withRoomContext } from '../../RoomContext';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import VideoView from './VideoView';
