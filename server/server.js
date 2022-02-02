@@ -17,11 +17,8 @@ const promExporter = require('./lib/stats/promExporter');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const http = require('http');
-// Since is not working anymore with node.js > 15 and express 5 is not ready yet for http2 
-// deactivaiting spdy for now :(
-// https://github.com/spdy-http2/node-spdy/issues/380
 const https = require('https');
-// const spdy = require('spdy');
+const spdy = require('spdy');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -662,7 +659,17 @@ async function runHttpsServer()
 	else
 	{
 		// https
-		mainListener = https.createServer(tls, app);
+		// spdy is not working anymore with node.js > 15 and express 5 is not ready yet for http2
+		// https://github.com/spdy-http2/node-spdy/issues/380
+		if (process.versions.node.split('.')[0] >= 15)
+		{
+			logger.info('Found node.js version >= 15 disabling spdy / http2 and using node.js/https module');
+			mainListener = https.createServer(tls, app);
+		}
+		else
+		{
+			mainListener = spdy.createServer(tls, app);
+		}
 
 		// http -> https redirect server
 		if (config.listeningRedirectPort)
@@ -735,8 +742,8 @@ async function runWebSocketServer()
 		queue.push(async () =>
 		{
 			const room = await getOrCreateRoom({ roomId });
-
 			let token = null;
+
 			if (socket.handshake.session.peerId === peerId)
 			{
 				token = room.getToken(peerId);
@@ -820,7 +827,7 @@ async function runWebSocketServer()
  */
 async function runMediasoupWorkers()
 {
-	mediasoup.observer.on("newworker", (worker) =>
+	mediasoup.observer.on('newworker', (worker) =>
 	{
 		worker.appData.routers = new Map();
 		worker.appData.transports = new Map();
@@ -829,13 +836,13 @@ async function runMediasoupWorkers()
 		worker.appData.dataProducers = new Map();
 		worker.appData.dataConsumers = new Map();
 
-		worker.observer.on("close", () =>
+		worker.observer.on('close', () =>
 		{
 			// not needed as we have 'died' listiner below
-			logger.debug("worker closed [worker.pid:%d]", worker.pid);
+			logger.debug('worker closed [worker.pid:%d]', worker.pid);
 		});
 
-		worker.observer.on("newrouter", (router) =>
+		worker.observer.on('newrouter', (router) =>
 		{
 			router.appData.transports = new Map();
 			router.appData.producers = new Map();
@@ -845,12 +852,12 @@ async function runMediasoupWorkers()
 			router.appData.worker = worker;
 			worker.appData.routers.set(router.id, router);
 
-			router.observer.on("close", () =>
+			router.observer.on('close', () =>
 			{
 				worker.appData.routers.delete(router.id);
 			});
 
-			router.observer.on("newtransport", (transport) =>
+			router.observer.on('newtransport', (transport) =>
 			{
 				transport.appData.producers = new Map();
 				transport.appData.consumers = new Map();
@@ -859,19 +866,19 @@ async function runMediasoupWorkers()
 				transport.appData.router = router;
 				router.appData.transports.set(transport.id, transport);
 
-				transport.observer.on("close", () =>
+				transport.observer.on('close', () =>
 				{
 					router.appData.transports.delete(transport.id);
 				});
 
-				transport.observer.on("newproducer", (producer) =>
+				transport.observer.on('newproducer', (producer) =>
 				{
 					producer.appData.transport = transport;
 					transport.appData.producers.set(producer.id, producer);
 					router.appData.producers.set(producer.id, producer);
 					worker.appData.producers.set(producer.id, producer);
 
-					producer.observer.on("close", () =>
+					producer.observer.on('close', () =>
 					{
 						transport.appData.producers.delete(producer.id);
 						router.appData.producers.delete(producer.id);
@@ -879,14 +886,14 @@ async function runMediasoupWorkers()
 					});
 				});
 
-				transport.observer.on("newconsumer", (consumer) =>
+				transport.observer.on('newconsumer', (consumer) =>
 				{
 					consumer.appData.transport = transport;
 					transport.appData.consumers.set(consumer.id, consumer);
 					router.appData.consumers.set(consumer.id, consumer);
 					worker.appData.consumers.set(consumer.id, consumer);
 
-					consumer.observer.on("close", () =>
+					consumer.observer.on('close', () =>
 					{
 						transport.appData.consumers.delete(consumer.id);
 						router.appData.consumers.delete(consumer.id);
@@ -894,14 +901,14 @@ async function runMediasoupWorkers()
 					});
 				});
 
-				transport.observer.on("newdataproducer", (dataProducer) =>
+				transport.observer.on('newdataproducer', (dataProducer) =>
 				{
 					dataProducer.appData.transport = transport;
 					transport.appData.dataProducers.set(dataProducer.id, dataProducer);
 					router.appData.dataProducers.set(dataProducer.id, dataProducer);
 					worker.appData.dataProducers.set(dataProducer.id, dataProducer);
 
-					dataProducer.observer.on("close", () =>
+					dataProducer.observer.on('close', () =>
 					{
 						transport.appData.dataProducers.delete(dataProducer.id);
 						router.appData.dataProducers.delete(dataProducer.id);
@@ -909,14 +916,14 @@ async function runMediasoupWorkers()
 					});
 				});
 
-				transport.observer.on("newdataconsumer", (dataConsumer) =>
+				transport.observer.on('newdataconsumer', (dataConsumer) =>
 				{
 					dataConsumer.appData.transport = transport;
 					transport.appData.dataConsumers.set(dataConsumer.id, dataConsumer);
 					router.appData.dataConsumers.set(dataConsumer.id, dataConsumer);
 					worker.appData.dataConsumers.set(dataConsumer.id, dataConsumer);
 
-					dataConsumer.observer.on("close", () =>
+					dataConsumer.observer.on('close', () =>
 					{
 						transport.appData.dataConsumers.delete(dataConsumer.id);
 						router.appData.dataConsumers.delete(dataConsumer.id);
