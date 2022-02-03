@@ -469,6 +469,7 @@ const Peer = (props) =>
 						}}
 					>
 
+						{micConsumer &&
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'device.muteAudio',
@@ -485,7 +486,6 @@ const Peer = (props) =>
 									// className={classes.fab}
 									style={{ ...controls.item.style }}
 									className={classnames('fab')}
-									disabled={!micConsumer}
 									color={micEnabled ? 'default' : 'secondary'}
 									size={controls.item.size}
 									onClick={() =>
@@ -503,6 +503,7 @@ const Peer = (props) =>
 								</Fab>
 							</div>
 						</Tooltip>
+						}
 
 						{ browser.platform !== 'mobile' &&
 							videoVisible && windowConsumer !== webcamConsumer.id &&
