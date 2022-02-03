@@ -31,7 +31,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
   >	"settings.language": null,
   3. replace them based on the _en.json_ file
   > "settings.language": "Select language",
-  4. make a Pull Request, or send us a [e-mail](mailto:roman@drozd.it) with file
+  4. make a Pull Request, or send us a [e-mail](mailto:community@lists.edumeet.org) with file
   
   Thanks so much in advance!
 </details>
@@ -62,8 +62,6 @@ Get docker image [here](https://hub.docker.com/r/edumeet/edumeet/)
 ## Ansible (based on Docker)
 
 See [more](https://github.com/edumeet/edumeet-ansible/).
-
-[![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
 
 ## .deb package (for debian-based systems)
 
@@ -230,6 +228,8 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 
 ## TURN configuration
 
+If you are part of the GEANT eduGAIN, you can request your turn api key at [https://turn.geant.org/](https://turn.geant.org/)
+	
 You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! 
 Add your server and credentials to `server/config/config.js`
 
