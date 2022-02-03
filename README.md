@@ -5,8 +5,6 @@ Official website: [edumeet.org](https://edumeet.org)
 
 https://user-images.githubusercontent.com/37835902/152279867-639db9bc-bf78-430f-b96f-d17733527474.mp4
 
-![demo](https://github.com/edumeet/edumeet/blob/develop/docs/assets/demo.mp4)
-
 Try it online at [letsmeet.no](https://letsmeet.no)
 
 ## Main features
