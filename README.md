@@ -24,9 +24,8 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 <details>
   <summary>Help us with translations:exclamation:</summary>
   
-  #### How to contribute?
+  ##### How to contribute?
 	
-  ##### Steps
   1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) you want to translate
   2. find the _null_  values
   >	"settings.language": null,
