@@ -7,11 +7,11 @@ Example `public/config/config.js`:
 ```javascript
 var config =
 {
-	developmentPort : 8443,
-	productionPort  : 3443
+	developmentPort : 3443,
+	productionPort  : 8443
 };
 ```
-
+The actual app-config of a running edumeet instance can you get on https://yourinstance:yourport/?config=true
 An example configuration file with all properties set to default values
 can be found here: [config.example.js](public/config/config.example.js).
 
