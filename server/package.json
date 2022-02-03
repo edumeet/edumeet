@@ -15,7 +15,7 @@
 	"main": "lib/index.js",
 	"scripts": {
 		"start": "node dist/server.js",
-		"build": "mkdir -p dist && find dist/* -maxdepth 0 ! -name public -exec rm -rf {} \\; && tsc && ln -s ../certs dist/certs && chmod 755 dist/server.js && touch 'dist/ __AUTO_GENERATED_CONTENT_REFRESHED_AFTER_REBUILDING!__ '",
+		"build": "mkdir -p dist && find dist/* -maxdepth 0 ! -name public -exec rm -rf {} \\; && tsc && ln -s ../certs dist/certs && chmod 755 dist/server.js && ( [ -f config/config.yaml ] && cp config/config.yaml dist/config/ ) | true && touch 'dist/ __AUTO_GENERATED_CONTENT_REFRESHED_AFTER_REBUILDING!__ '",
 		"dev": "nodemon --exec ts-node --ignore dist/ -e js,ts server.js",
 		"connect": "ts-node connect.js",
 		"lint": "eslint ./ --ext .js,.ts; exit 0",
