@@ -20,7 +20,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 | **Authorization**  | Supported types: **OIDC**, **SAML**, **local db (text-based)** |
 
 
-**Multi-Languages (22 languages)** 
+**Internationalization (22 languages)** 
 <details>
   <summary>Help us with translations:exclamation:</summary>
   
