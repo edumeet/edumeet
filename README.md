@@ -11,20 +11,22 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 
 | Feature  | Description |
 | ------------- | ------------- |
-| **Audio/Video streaming** | You can share your microphone and camera + additional video stream  |
+| **A/V streaming** | You can share your microphone and camera + additional video stream  |
 | **Video layouts** | You can choose between **Democratic** and **Filmstrip** views. More in progress. |
 | **Screen sharing** | You can share your screen to make some presentation right from your desktop |
 | **File sharing** | You can share your files with the peers (torrent solution under the hood) |
 | **Chat messages**  | You can make a text conversation with peers |
-| **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them.(**disabled by default**) |
-| **Authorization**  | Supported types: **OIDC**, **SAML**, **local text-based database** |
+| **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them (**disabled by default**) |
+| **Authorization**  | Supported types: **OIDC**, **SAML**, **local db (text-based)** |
 
 
-#### Multi-Languages 
+**Multi-Languages (22 languages)** 
 <details>
-  <summary>How to contribute?</summary>
+  <summary>Help us with translations:exclamation:</summary>
   
-  #### Steps
+  #### How to contribute?
+	
+  ##### Steps
   1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) you want to translate
   2. find the _null_  values
   >	"settings.language": null,
@@ -36,7 +38,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 </details>
 
 
-#### Local Recording
+**Local Recording**
 <details>
   <summary>See more</summary>
   
