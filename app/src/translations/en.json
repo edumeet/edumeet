@@ -69,7 +69,8 @@
     "room.recordingConsent": "When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and\/or live broadcasted through web streaming.",
     "room.recordingConsentAccept": "I Accept",
     "room.recordingConsentDeny": "Deny",
-    "me.mutedPTT": "You are muted{br}hold down SPACE-BAR to talk",
+	"room.unexpectedErrorDuringLocalRecording": "Unexpected error ocurred during local recording",
+	"me.mutedPTT": "You are muted{br}hold down SPACE-BAR to talk",
     "roles.gotRole": "You got the role: {role}",
     "roles.lostRole": "You lost the role: {role}",
     "tooltip.login": "Log in",
@@ -111,7 +112,7 @@
     "label.chat": "Chat",
     "label.chatNoMessages": "No messages",
     "label.chatNewMessages": "New messages",
-    "label.participants": "Participants",
+	"label.participants": "Participants",
     "label.shareFile": "Share file",
     "label.shareGalleryFile": "Share image",
     "label.fileSharingUnsupported": "File sharing not supported",
@@ -230,7 +231,5 @@
     "moderator.stopScreenSharing": "Moderator stopped your screen sharing",
     "unsupportedBrowser.titleUnsupportedBrowser": "Detected unsupported browser!",
     "unsupportedBrowser.titlewebrtcUnavailable": "Required functionality not available in your browser!",
-    "unsupportedBrowser.bodyText": "This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser or check your settings. Supported browsers:",
-    "room.unexpectedErrorDuringLocalRecording": "Unexpected error ocurred during local recording",
-    "label.democrat": "Democratic view"
+    "unsupportedBrowser.bodyText": "This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser or check your settings. Supported browsers:"
 }
