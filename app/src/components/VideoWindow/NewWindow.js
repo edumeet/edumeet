@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import classnames from 'classnames';
 import FullScreen from '../FullScreen';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -27,7 +28,16 @@ const styles = (theme) =>
 			flexDirection  : 'row',
 			justifyContent : 'flex-start',
 			alignItems     : 'center',
-			padding        : theme.spacing(1)
+			padding        : theme.spacing(1),
+			'&.hide'       :
+			{
+				transition : 'opacity 0.1s ease-in-out',
+				opacity    : 0
+			},
+			'&.hover' :
+			{
+				opacity : 1
+			}
 		},
 		button :
 		{
@@ -114,7 +124,8 @@ class NewWindow extends React.PureComponent
 
 		this.state = {
 			mounted    : false,
-			fullscreen : false
+			fullscreen : false,
+			hover  	   : false
 		};
 	}
 
@@ -127,9 +138,36 @@ class NewWindow extends React.PureComponent
 		if (!this.state.mounted)
 			return null;
 
+		let touchTimeout = null;
+
 		return ReactDOM.createPortal([
-			<div key='newwindow' className={classes.root}>
-				<div className={classes.controls}>
+			<div key='newwindow' className={classes.root}
+				onMouseOver={() => this.setState({ hover: true })}
+				onMouseOut={() => this.setState({ hover: false })}
+				onTouchStart={() =>
+				{
+					if (touchTimeout)
+						clearTimeout(touchTimeout);
+
+					this.setState({ hover: true });
+				}}
+				onTouchEnd={() =>
+				{
+					if (touchTimeout)
+						clearTimeout(touchTimeout);
+
+					touchTimeout = setTimeout(() =>
+					{
+						this.setState({ hover: false });
+					}, 2000);
+				}}
+			>
+				<div className={classnames(
+					classes.controls,
+					'hide',
+					this.state.hover ? 'hover' : null
+				)}
+				>
 					{ this.fullscreen.fullscreenEnabled &&
 						<div
 							className={classes.button}

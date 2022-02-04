@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useWindowSize } from '@react-hook/window-size';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -39,7 +39,28 @@ const styles = (theme) =>
 			flexDirection  : 'row',
 			justifyContent : 'flex-start',
 			alignItems     : 'center',
-			padding        : theme.spacing(1)
+			padding        : theme.spacing(1),
+			'&.hide'       :
+			{
+				transition : 'opacity 0.1s ease-in-out',
+				opacity    : 0
+			},
+			'&.hover' :
+			{
+				opacity : 1
+			}
+		},
+		buttonControlBarPanel :
+		{
+			'&.hide' :
+			{
+				transition : 'opacity 0.1s ease-in-out',
+				opacity    : 0
+			},
+			'&.hover' :
+			{
+				opacity : 1
+			}
 		},
 		button :
 		{
@@ -125,6 +146,10 @@ const styles = (theme) =>
 
 const FullScreenView = (props) =>
 {
+	const [ hover, setHover ] = useState(false);
+
+	let touchTimeout = null;
+
 	const {
 		roomClient,
 		advancedMode,
@@ -182,8 +207,33 @@ const FullScreenView = (props) =>
 	);
 
 	return (
-		<div className={classes.root} ref={elementRef}>
-			<div className={classes.controls}>
+		<div className={classes.root} ref={elementRef}
+			onMouseOver={() => setHover(true)}
+			onMouseOut={() => setHover(false)}
+			onTouchStart={() =>
+			{
+				if (touchTimeout)
+					clearTimeout(touchTimeout);
+
+				setHover(true);
+			}}
+			onTouchEnd={() =>
+			{
+				if (touchTimeout)
+					clearTimeout(touchTimeout);
+
+				touchTimeout = setTimeout(() =>
+				{
+					setHover(false);
+				}, 2000);
+			}}
+		>
+			<div className={classnames(
+				classes.controls,
+				'hide',
+				hover ? 'hover' : null
+			)}
+			>
 				<div
 					className={classnames(classes.button, {
 						visible : toolbarsVisible || permanentTopBar
@@ -198,6 +248,10 @@ const FullScreenView = (props) =>
 				</div>
 			</div>
 			<div
+				className={classnames(classes.buttonControlBarPanel,
+					'hide',
+					hover ? 'hover' : null
+				)}
 				onMouseEnter={() => handleAutoHide(false)}
 				onMouseLeave={() => handleAutoHide(true)}
 			>
