@@ -231,6 +231,5 @@
     "unsupportedBrowser.bodyText": "Bu toplantı servisi tarayıcınız tarafından desteklenmeyen bir işlev gerektiriyor. Lütfen yeni sürüme geçin veya farklı bir tarayıcıya geçin veya ayarlarınızı kontrol edin. Desteklenen tarayıcılar:",
     "devices.microphoneMute": null,
     "devices.microphoneUnMute": null,
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

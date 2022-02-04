@@ -231,6 +231,5 @@
     "moderator.stopScreenSharing": "A moderátor leállította a képernyőmegosztásod",
     "unsupportedBrowser.titleUnsupportedBrowser": "A böngésző verziód sajnos nem támogatott! :-(",
     "unsupportedBrowser.titlewebrtcUnavailable": "A böngésződ egy szükséges funkciója nem elérhető!",
-    "unsupportedBrowser.bodyText": "Kérlek frissítsd a böngésződ, válts másik böngészőre vagy ellenőrizd a böngésződ beállításait! Támogatott böngészők:",
-    "label.democrat": null
+    "unsupportedBrowser.bodyText": "Kérlek frissítsd a böngésződ, válts másik böngészőre vagy ellenőrizd a böngésződ beállításait! Támogatott böngészők:"
 }

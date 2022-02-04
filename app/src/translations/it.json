@@ -231,6 +231,5 @@
     "unsupportedBrowser.titleUnsupportedBrowser": "Rilevato browser non supportato!",
     "unsupportedBrowser.titlewebrtcUnavailable": "La funzionalità richiesta non è supportata dal tuo browser!",
     "unsupportedBrowser.bodyText": "Questo servizio di meeting richiede una funzionalità non supportata dal tuo browser. Ti invitiamo ad aggiornare il tuo browser utilizzarne un altro oppure controllare le tue impostazioni. I browser supportati sono:",
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

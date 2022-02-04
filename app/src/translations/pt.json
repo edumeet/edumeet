@@ -231,6 +231,5 @@
     "unsupportedBrowser.titleUnsupportedBrowser": "Navegador Não Suportado",
     "unsupportedBrowser.titlewebrtcUnavailable": "WebRTC Indisponível",
     "unsupportedBrowser.bodyText": "Ops, parece que seu navegador não suporta a tenologia necessária ou está desatualizado, segue a lista de navegadores compativeis e suas versões",
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

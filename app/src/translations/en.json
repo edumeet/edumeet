@@ -66,7 +66,7 @@
     "room.localRecordingSecurityError": "Recording the specified source is not allowed due to security restrictions. Check you client settings!",
     "room.leavingTheRoom": "Leaving the room",
     "room.leaveConfirmationMessage": "Do you want to leave the room?",
-    "room.recordingConsent": "When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and\/or live broadcasted through web streaming.",
+    "room.recordingConsent": "When attending this meeting you agree and give your consent that information (audio, video and metadata) about you can be part of that recording or broadcast",
     "room.recordingConsentAccept": "I Accept",
     "room.recordingConsentDeny": "Deny",
 	"room.unexpectedErrorDuringLocalRecording": "Unexpected error ocurred during local recording",

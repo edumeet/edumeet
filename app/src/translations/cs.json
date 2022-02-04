@@ -231,6 +231,5 @@
     "unsupportedBrowser.titleUnsupportedBrowser": "Nepodporovaný prohlížeč detekován!",
     "unsupportedBrowser.titlewebrtcUnavailable": "Požadovaná funkčnost není k dispozici ve Vašem prohlížeči",
     "unsupportedBrowser.bodyText": "Toto videokonferenční řešení vyžaduje funkčnost, která není Vaším prohlížečem podporována. Zkuste novější verzi Vašeho prohlížeče, nebo vyzkoušejte jiný, nebo zkontrolujte Vaše nastavení. Podporované prohlížeče:",
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

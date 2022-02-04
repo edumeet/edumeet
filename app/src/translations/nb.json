@@ -231,6 +231,5 @@
     "unsupportedBrowser.titleUnsupportedBrowser": "Nettleser ikke støttet",
     "unsupportedBrowser.titlewebrtcUnavailable": "Funksjonalitet som kreves er ikke tilgjengelig i denne nettleseren",
     "unsupportedBrowser.bodyText": "Denne møtetjenesten krever funksjonalitet som ikke er støttet i denne nettleseren. Vennligst oppgrader, bytt til en annen nettleser eller sjekk innstillinger. Støttede nettlesere:",
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

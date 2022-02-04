@@ -231,6 +231,5 @@
     "devices.screenSharingDisconnected": null,
     "devices.cameraDisconnected": null,
     "devices.cameraError": null,
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

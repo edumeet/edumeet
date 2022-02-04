@@ -231,6 +231,5 @@
     "unsupportedBrowser.titleUnsupportedBrowser": "Обнаружен неподдерживаемый браузер!",
     "unsupportedBrowser.titlewebrtcUnavailable": "Требуемые функции недоступны в вашем браузере!",
     "unsupportedBrowser.bodyText": "Для этой службы собраний требуется функциональность, не поддерживаемая вашим браузером. Обновите переключитесь на другой браузер или проверьте свои настройки. Поддерживаемые браузеры:",
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

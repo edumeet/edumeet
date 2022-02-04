@@ -231,6 +231,5 @@
     "unsupportedBrowser.titleUnsupportedBrowser": "Wykryto niekompatybilną przeglądarkę!",
     "unsupportedBrowser.titlewebrtcUnavailable": "Twoja przeglądarka nie wspiera wymaganej funkcjonalności!",
     "unsupportedBrowser.bodyText": "Usługa wideokonferencji wymaga funkcjonalności, która nie jest wspierana przez Twoją przeglądarkę. Zaktualizuj przeglądarkę zmień ją lub sprawdź jej ustawienia. Wspierane przeglądarki:",
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

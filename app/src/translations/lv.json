@@ -231,6 +231,5 @@
     "settings.cantSelectAudioOutput": null,
     "devices.microphoneMute": null,
     "devices.microphoneUnMute": null,
-    "settings.recordingsPreferredMimeType": null,
-    "label.democrat": null
+    "settings.recordingsPreferredMimeType": null
 }

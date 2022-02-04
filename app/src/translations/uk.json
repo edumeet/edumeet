@@ -116,7 +116,7 @@
     "label.shareGalleryFile": "Поділитися зображенням",
     "label.fileSharingUnsupported": "Обмін файлами не підтримується",
     "label.unknown": "Невідомо",
-    "label.democrat": "Демократичний вигляд",
+    "label.democratic": "Демократичний вигляд",
     "label.filmstrip": "У вигляді кінострічки",
     "label.low": "Низький",
     "label.medium": "Середній",
@@ -229,7 +229,6 @@
     "unsupportedBrowser.titlewebrtcUnavailable": "Необхідна функціональність недоступна у вашому браузері",
     "unsupportedBrowser.bodyText": "Цей сервіс зустрічей  вимагає функціональності, яка не підтримується вашим браузером. Оновіть або переключіться на інший браузер або перевірте свої налаштування. Браузери що підтримуються: ",
     "room.setDemocraticView": null,
-    "label.democratic": null,
     "devices.microphoneMute": null,
     "devices.microphoneUnMute": null,
     "settings.recordingsPreferredMimeType": null
