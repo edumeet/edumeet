@@ -134,6 +134,8 @@
     "label.version": "Verze",
     "label.username": "Uživatelské jméno",
     "label.password": "Heslo",
+    "label.auth": null,
+    "label.guest": null,
     "label.login": "Přihlásit",
     "label.logout": "Odhlásit",
     "label.join": "Připojit",

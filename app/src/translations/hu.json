@@ -134,6 +134,8 @@
     "label.version": "Verzió",
     "label.username": "Felhasználónév",
     "label.password": "Jelszó",
+    "label.auth": null,
+    "label.guest": null,
     "label.login": "Bejelentkezés",
     "label.logout": "Kijelentkezés",
     "label.join": "Kapcsolódás",

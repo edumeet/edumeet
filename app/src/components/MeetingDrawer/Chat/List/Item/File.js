@@ -203,7 +203,7 @@ const File = (props) =>
 							<Tooltip
 								title={intl.formatMessage({
 									id             : 'filesharing.save',
-									defaultMessage : 'save'
+									defaultMessage : 'Save'
 								})}
 								placement='top'
 								enterDelay='700'

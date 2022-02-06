@@ -131,6 +131,8 @@
     "label.version": null,
     "label.username": null,
     "label.password": null,
+    "label.auth": null,
+    "label.guest": null,
     "label.login": null,
     "label.logout": null,
     "label.join": null,

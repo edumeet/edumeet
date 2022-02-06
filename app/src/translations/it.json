@@ -134,6 +134,8 @@
     "label.version": "Versione",
     "label.username": "Nome utente",
     "label.password": "Password",
+    "label.auth": null,
+    "label.guest": null,
     "label.login": "Accesso",
     "label.logout": "Uscita",
     "label.join": "Entra",

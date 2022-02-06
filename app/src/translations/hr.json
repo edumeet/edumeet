@@ -134,6 +134,8 @@
     "label.version": "Verzija",
     "label.username": "Korisničko ime",
     "label.password": "Zaporka",
+    "label.auth": null,
+    "label.guest": null,
     "label.login": "Prijava",
     "label.logout": "Odjava",
     "label.join": "Priključivanje",

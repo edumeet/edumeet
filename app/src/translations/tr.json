@@ -135,6 +135,8 @@
     "label.recordingInProgress": null,
     "label.username": "Kullanıcı adı",
     "label.password": "Şifre",
+    "label.auth": null,
+    "label.guest": null,
     "label.login": "Giriş",
     "label.logout": "Çıkış",
     "label.join": "Bağlan",

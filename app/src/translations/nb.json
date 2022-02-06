@@ -134,6 +134,8 @@
     "label.version": "Versjon",
     "label.username": "Bruker",
     "label.password": "Passord",
+    "label.auth": null,
+    "label.guest": null,
     "label.login": "Logg på",
     "label.logout": "Logg av",
     "label.join": "Gå inn",

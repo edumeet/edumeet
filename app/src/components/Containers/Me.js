@@ -581,7 +581,7 @@ const Me = (props) =>
 					>
 						<FormattedMessage
 							id='room.me'
-							defaultMessage='ME'
+							defaultMessage='Me'
 						/>
 					</p>
 					{/* /ME TAG */}
@@ -888,7 +888,7 @@ const Me = (props) =>
 							>
 								<FormattedMessage
 									id='room.me'
-									defaultMessage='ME'
+									defaultMessage='Me'
 								/>
 							</p>
 							<div
@@ -1000,7 +1000,7 @@ const Me = (props) =>
 						>
 							<FormattedMessage
 								id='room.me'
-								defaultMessage='ME'
+								defaultMessage='Me'
 							/>
 						</p>
 
