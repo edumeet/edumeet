@@ -26,7 +26,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
   
   ##### How to contribute?
 	
-  1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) you want to translate
+  1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/intl/translations) you want to translate
   2. find the _null_  values
   >	"settings.language": null,
   3. replace them based on the _en.json_ file
