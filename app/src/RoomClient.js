@@ -18,7 +18,7 @@ import * as notificationActions from './store/actions/notificationActions';
 import * as transportActions from './store/actions/transportActions';
 import Spotlights from './Spotlights';
 import { permissions } from './permissions';
-import * as locales from './translations/locales';
+import * as locales from './intl/locales';
 import { createIntl } from 'react-intl';
 import * as recorderActions from './store/actions/recorderActions';
 import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
