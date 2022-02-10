@@ -67,7 +67,7 @@ See [more](https://github.com/edumeet/edumeet-ansible/).
 
 If you want to install it on the Debian & Ubuntu based operating systems.
 
-* Prerequisites: [node v14.x](https://github.com/nodesource/distributions/blob/master/README.md#debinstall) (tested with v14.18.3 version)
+* Prerequisites: [node v16.x](https://github.com/nodesource/distributions/blob/master/README.md#debinstall) (tested with v16.13.2 version)
 
 * Get package [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
 
@@ -123,18 +123,18 @@ Note: Edumeet will start on the default settings (if you don't create your own c
 Important! You must always **rebuild** the edumeet when you change something in the configuration  files. 
 
 #### use template (example)
-Just clone the example files and adjust them
+Just clone the example files and adjust them if required.
 
 ```bash
 cp server/config/config.example.js server/config/config.js
 cp app/public/config/config.example.js app/public/config/config.js
 ```
 
-#### create your own config (yaml or json)
+#### To change default options, create your own server config file (yaml or json)
 
-Example when _config.yaml_:
+Example when usingi _config.yaml_ file
 ```yaml 
-turnAPIKey: "<KEY>"
+turnAPIKey: "<YOUR_API_KEY>"
 turnAPIURI: "https://api.turn.geant.org/turn"
 mediasoup:
   webRtcTransport:
@@ -142,12 +142,18 @@ mediasoup:
     - ip: "<serverip>"
       announcedIp: ""
 ```
-Example when _config.js_
+Example when using _config.json_ file
 ```javascript
-var config =
 {
-	developmentPort : 8443,
-	productionPort  : 3443
+  [
+    {
+      "urls": [
+        "turn:turn.example.com:443?transport=tcp"
+      ],
+      "username": "example",
+      "credential": "example"
+    }
+  ]
 };
 ```
 
@@ -214,7 +220,7 @@ sudo systemctl enable edumeet
 ## Ports and firewall
 | Port | protocol | description |
 | ---- | ----------- | ----------- |
-|3443 | tcp | default https webserver and signaling - adjustable in `server/config.js`) |
+|443 | tcp | default https webserver and signaling - adjustable in `server/config.js`) |
 | 4443 | tcp | default `yarn start` port for developing with live browser reload, not needed in production environments - adjustable in app/package.json) |
 | 40000-49999 | udp, tcp | media ports - adjustable in `server/config.js` |
 
