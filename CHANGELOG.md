@@ -9,17 +9,18 @@
 * Major chat refactoring
   * Added chat badge displaying unread messages
   * Merged file sharing + chat
-  * Save chat
+  * Save chat history (both in leave screen and in chat directly)
+  * Sorting messages
+  * Format messages
+  * Combine messages
 * Local recording (chrome, firefox, edge)
   * This is still default off in config because of bad UX connected to getUserMedias
-* Option to save chat history
 * New app configuration system
 * New server configuration system
-* Add leaving room confirmation Dialog 
+* Add leaving room confirmation dialog
 * New audio config with audio profiles
 * New translations
 * Screen Sharing now supports audio (chrome, edge)
-* Leave screen
 * Add QoS set DSCP bits in IP header according to new option networkPriorities in app config
   Our media traffic should get now higher priority where QoS has been implemented.
   Routers will add higher priority or put media packets to low latency queue.
