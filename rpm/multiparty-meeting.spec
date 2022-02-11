@@ -3,16 +3,16 @@
 
 %global __brp_mangle_shebangs /bin/true
 
-%define commit          effdd3005b9641d1d503d70af064eab0a9c550a8
+%define commit          6af2579b893243ec6328fe4b093daba91d4f79f9
 %define shortcommit     %(c=%{commit}; echo ${c:0:7})
 %define _date           %(date +'%%Y%%m%%dT%%H%%M%%S')
 %define _release        1
 
-Name:                   multiparty-meeting
-Version:                3.2.1
+Name:                   edumeet
+Version:                3.5.0-beta
 License:                MIT
 Summary:                Multiparty web-meetings using mediasoup and WebRTC
-URL:                    https://github.com/havfo/multiparty-meeting
+URL:                    https://github.com/edumeet/edumeet
 %if 0%{?commit:1}
 Release:	        %{_release}.git%{shortcommit}.%{_date}%{?dist}
 Source0:                %{url}/archive/%{commit}.tar.gz
@@ -27,7 +27,7 @@ ExclusiveArch:          %{nodejs_arches} noarch
 
 BuildRequires:		systemd
 BuildRequires:          nodejs-packaging
-BuildRequires:          nodejs >= 10
+BuildRequires:          nodejs >= 14
 BuildRequires:          npm
 BuildRequires:          yarn
 BuildRequires:          python3-devel
@@ -64,13 +64,12 @@ export PYTHON3=%{__python3}
 export NODE_ENV=production
 
 cd app
-npm install
-npm install classnames
-npm run build
+yarn install
+yarn build
 cd -
-mkdir -p server/public
 cd server
-npm install
+yarn install
+yarn build
 cd -
 
 rm -rf server/node_modules/clang-tools-prebuilt
@@ -145,5 +144,6 @@ exit 0
 %{_docdir}/%{name}/munin
 
 %changelog
+* Fri Feb 11 2022 so010 - 3.5.0-beta
 * Mon Apr 20 2020 fuero - 3.2.1-1
 - initial package
