@@ -36,8 +36,7 @@ The bandwidth requirements are quite tunable both on client and server, but serv
 * Typical acceptable good video bandwidth is around (800-1000)Kbps (720p)
 * Possibility to activate Simulcast / SVC to provide different clients with different bandwidths
 ## Scaling
-You can setup more than 1 server with same configuration and load balance with HA-proxy:
-[docs/HAproxy.md]
+You can setup more than 1 server with same configuration and load balance with [HAproxy.md](HAproxy.md)
 This will scale linearly.
 
 ### Limitations / work in progress / ToDo
