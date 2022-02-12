@@ -186,7 +186,7 @@
     "settings.language": "Odabir jezika",
     "settings.hideNoVideoParticipants": "Ne prikazuj sudionika bez videa",
     "settings.myPhotoButton": "Postavi moju sliku",
-    "settings.myPhotoLabel": "Dozv. veličina datoteke: 5MB, jpg, jpeg, png", 
+    "settings.myPhotoLabel": "Dozv. veličina datoteke: 5MB, jpg, jpeg, png",
     "settings.myPhotoSizeError": "Datoteka je prevelika",
     "settings.myPhotoTypeError": "Nedozvoljen tip datoteke",
     "settings.recordingsPreferredMimeType": "Odaberi željeni format videa",
