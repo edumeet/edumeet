@@ -23,7 +23,7 @@
     "room.peerChangedDisplayName": "{oldDisplayName} ora si chiama {displayName}",
     "room.newPeer": "{displayName} è entrato nella stanza",
     "room.newFile": "Nuovo file disponibile",
-    "room.toggleAdvancedMode": "Attivata\/disattivata modalità avanzata",
+    "room.toggleAdvancedMode": "Attivata/disattivata modalità avanzata",
     "room.setDemocraticView": "Aspetto cambiato in vista democratica",
     "room.setFilmStripView": "Aspetto cambiato in vista filmstrip",
     "room.loggedIn": "Hai eseguito il log in",
