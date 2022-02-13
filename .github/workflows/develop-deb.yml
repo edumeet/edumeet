@@ -86,12 +86,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: edumeet-3.5.0-beta1
-        path: "/home/runner/edumeet-*.deb
-
-    - name: Add to release assets 
+        path: "/home/runner/edumeet-*.deb"
+    
+    - name: Add to release assets
       uses: softprops/action-gh-release@v1
       with:
         tag_name: "v3.5.0-beta.1"
         files: "/home/runner/edumeet-*.deb"
-
-
