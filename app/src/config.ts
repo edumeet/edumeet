@@ -38,7 +38,7 @@ const configSchema = convict({
 	{
 		doc     : 'The production server listening port.',
 		format  : 'port',
-		default : 8443
+		default : 443
 	},
 	serverHostname :
 	{
