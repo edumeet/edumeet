@@ -132,29 +132,36 @@ cp app/public/config/config.example.js app/public/config/config.js
 
 #### To change default options, create your own server config file (yaml or json)
 
-Example when usingi _config.yaml_ file
+Example when using _config.yaml_ file format:
 ```yaml 
-turnAPIKey: "<YOUR_API_KEY>"
-turnAPIURI: "https://api.turn.geant.org/turn"
-mediasoup:
-  webRtcTransport:
-    listenIps:
-    - ip: "<serverip>"
-      announcedIp: ""
+    listeningPort: 443
+    listeningHost: host.domain.tld
+
+    fileTracker" : "wss://tracker.openwebtorrent.com"
+
+    tls:
+        key:  /opt/edumeet/server/certs/privkey.pem
+        cert: /opt/edumeet/server/certs/cert.pem
+
+    turnAPIURI: "https://host.domain.tld/turn"
+    turnAPIKey: "Your API key"
 ```
-Example when using _config.json_ file
+Example when using _config.json_ file format:
 ```javascript
-{
-  [
     {
-      "urls": [
-        "turn:turn.example.com:443?transport=tcp"
-      ],
-      "username": "example",
-      "credential": "example"
+        "listeningPort" : "443",
+        "listeningHost" : "host.domain.tld",
+
+        "fileTracker" : "wss://tracker.openwebtorrent.com",
+
+        "tls" : {
+            "cert" : "/opt/edumeet/server/certs/cert.pem",
+            "key"  : "/opt/edumeet/server/certs/privkey.pem"
+        },
+
+        "turnAPIKey" : "Your API key",
+        "turnAPIURI" : "https://host.domain.tld/turn",
     }
-  ]
-};
 ```
 
 Full documentation and list of all settings:
@@ -220,7 +227,7 @@ sudo systemctl enable edumeet
 ## Ports and firewall
 | Port | protocol | description |
 | ---- | ----------- | ----------- |
-|443 | tcp | default https webserver and signaling - adjustable in `server/config.js`) |
+| 3443 | tcp | default https webserver and signaling - adjustable in `server/config.js`) |
 | 4443 | tcp | default `yarn start` port for developing with live browser reload, not needed in production environments - adjustable in app/package.json) |
 | 40000-49999 | udp, tcp | media ports - adjustable in `server/config.js` |
 
