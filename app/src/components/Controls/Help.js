@@ -119,7 +119,7 @@ const Help = ({
 				<Paper className={classes.paper}>m</Paper>
 				<FormattedMessage
 					id='device.muteAudio'
-					defaultMessage='Mute Audio'
+					defaultMessage='Mute audio'
 				/>
 			</div>
 
@@ -127,7 +127,7 @@ const Help = ({
 				<Paper className={classes.paper}>v</Paper>
 				<FormattedMessage
 					id='device.stopVideo'
-					defaultMessage='Mute Video'
+					defaultMessage='Stop video'
 				/>
 			</div>
 
@@ -135,7 +135,7 @@ const Help = ({
 				<Paper className={classes.paper}>1</Paper>
 				<FormattedMessage
 					id='label.democratic'
-					defaultMessage='Democratic View'
+					defaultMessage='Democratic view'
 				/>
 			</div>
 
@@ -143,14 +143,14 @@ const Help = ({
 				<Paper className={classes.paper}>2</Paper>
 				<FormattedMessage
 					id='label.filmstrip'
-					defaultMessage='Filmstrip View'
+					defaultMessage='Filmstrip view'
 				/>
 			</div>
 
 			<div className={classes.shortcuts}>
 				<Paper className={classes.paper}>space</Paper>
 				<FormattedMessage
-					id='me.mutedPTT'
+					id='me.pushToTalk'
 					defaultMessage='Push SPACE to talk'
 				/>
 			</div>
@@ -158,7 +158,7 @@ const Help = ({
 			<div className={classes.shortcuts}>
 				<Paper className={classes.paper}>a</Paper>
 				<FormattedMessage
-					id='label.advanced'
+					id='label.showAdvancedInformation'
 					defaultMessage='Show advanced information'
 				/>
 			</div>
