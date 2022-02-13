@@ -218,7 +218,7 @@
     "settings.webcamFrameRate": "Wybierz liczbę klatek na sekundę kamery internetowej",
     "socket.disconnected": "Rozłączono",
     "socket.reconnected": "Połączono",
-    "socket.reconnectingu": "Próba ponownego połączenia",
+    "socket.reconnecting": "Próba ponownego połączenia",
     "socket.requestError": "Błąd żądania serwera",
     "tooltip.addParticipantToSpotlight": "Zrób uczestnika zawsze widocznym - dla siebie",
     "tooltip.admitFromLobby": "Przejście z poczekalni",
