@@ -2,7 +2,7 @@ name: Debian package
 
 on: 
   push:
-    #branches: [ develop ]
+    branches: [ develop, release-3.5.0 ]
 #  pull_request:
 #    branches: [ develop ]
 
@@ -55,13 +55,13 @@ jobs:
         cat > DEBIAN/control <<EOF
         Package: edumeet-develop
         Version: $VERSION
-        Maintainer: eduMeet team (https://github.com/edumeet)
+        Maintainer: eduMEET team (https://github.com/edumeet)
         Section: admin
         Date : $DATE
         Architecture: amd64
         Priority: important
-        Description: Multiparty web-meetings using mediasoup and WebRTC (develop branch)
-        Depends: nodejs (>= 14), redis
+        Description: Multiparty web-meetings using mediasoup and WebRTC
+        Depends: nodejs (>= 16), redis
         EOF
         #
         cat > DEBIAN/postinst <<EOF
@@ -73,8 +73,8 @@ jobs:
         ln -s /usr/local/src/edumeet/server/public/config/config.js /etc/edumeet/client-config.js || true
         systemctl daemon-reload
         systemctl enable edumeet
-        echo "eduMeet multiparty meeting is installed, but you need the configure the server and client with your ip adresses in configuration files under /etc/meeting/ \n"
-        echo "\n\nPlease visit https://github.com/edumeet/edumeet/tree/develop for configuration details.\n\n"
+        echo "eduMEET multiparty meeting is installed, but you need the configure the server and client with your ip adresses in configuration files under /etc/meeting/ \n"
+        echo "\n\nPlease visit https://github.com/edumeet/edumeet for configuration details.\n\n"
         echo "\n\nAfter the configuration, you can start service with 'sudo systemctl start edumeet' command.\n\n"
         EOF
         #
