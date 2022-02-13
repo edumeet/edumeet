@@ -167,8 +167,8 @@ Example when using _config.json_ file format:
 Full documentation and list of all settings:
 | destination | location | 
 | ---   | ---      |
-| app side | [./app/README.md](https://github.com/edumeet/edumeet/blob/develop/app/README.md) |
-| srv side | [./server/README.md](https://github.com/edumeet/edumeet/blob/develop/server/README.md) | 
+| app side | [./app/README.md](/app/README.md) |
+| srv side | [./server/README.md](/server/README.md) | 
 
 ### Run 
 
