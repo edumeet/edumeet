@@ -133,7 +133,7 @@ cp app/public/config/config.example.js app/public/config/config.js
 
 **eduMEET server** uses two configuration files config.js for authentication models and setting user roles, and second configuration file (json, json5, yml, yaml or toml format supported) for changing default values, like server port, server certificates, STUN/TURN configuration, monitoring, etc...
 
-**Important note:**  only one file format could be udes for second configuration file (yaml file format is recommended)
+**Important note:**  only one file format could be used for second configuration file (yaml file format is recommended)
 
 Copy example template(s) and set/change values (see all available parameters in [./server/README.md](/server/README.md))
 
