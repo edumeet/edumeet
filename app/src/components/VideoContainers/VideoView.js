@@ -664,7 +664,7 @@ VideoView.propTypes =
 	opusConfig                     : PropTypes.string,
 	localRecordingState            : PropTypes.string,
 	recordingConsents              : PropTypes.array,
-	peer                           : PropTypes.string
+	peer                           : PropTypes.object
 
 };
 
