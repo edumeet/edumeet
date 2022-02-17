@@ -11,11 +11,11 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 
 | Feature  | Description |
 | ------------- | ------------- |
-| **A/V streaming** | You can share your microphone and camera + additional video stream  |
-| **Video layouts** | You can choose between **Democratic** and **Filmstrip** views. More in progress. |
-| **Screen sharing** | You can share your screen to make some presentation right from your desktop |
-| **File sharing** | You can share your files with the peers (torrent solution under the hood) |
-| **Chat messages**  | You can make a text conversation with peers |
+| **A/V streaming** | Share your microphone and camera + additional video stream  |
+| **Video layouts** | Choose between **Democratic** and **Filmstrip** views. More in progress. |
+| **Screen sharing** | Share your screen to make some presentation right from your desktop |
+| **File sharing** | Share your files with the peers (torrent solution under the hood) |
+| **Chat messages**  | Text conversation with other participants |
 | **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them (**disabled by default**) |
 | **Authorization**  | Supported types: **OIDC**, **SAML**, **local db (text-based)** |
 
@@ -33,7 +33,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
   > "settings.language": "Select language",
   4. make a Pull Request, or send us a [e-mail](mailto:community@lists.edumeet.org) with file
   
-  Thanks so much in advance!
+  Thank you in advance!
 </details>
 
 
@@ -44,10 +44,10 @@ Try it online at [letsmeet.no](https://letsmeet.no)
   * Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
 Local Recording creates a local IndexedDB with the name of the starting timestamp (unix timestamp format)  And a storage called chunks. All chunks read in an array and created a final blob that you can download. After blobs array concatenation as a big blob, this big blob saved as file, and finally we delete the temporary local IndexedDB.
 
-* Local recording is **disabled** by default. You can enable it by setting localRecordingEnabled to true in  (./app/public/config/config.js)
+* Local recording is **disabled** by default. It could be enabled by setting _localRecordingEnabled_ to true in  (./app/public/config/config.js)
 
-* **WARNINIG**: Take care that You need for local recording extra cpu, memory and disk space.
-  **You need to have good enough free disk space!!**
+* **WARNING**: Take care that local recording will increase cpu, memory and disk space consumption.
+  **Enough free disk space has to be provided!!**
 Keep in mind that Browsers don't allow to use all the disk free capacity!
 See more info about browsers storage limits:
   * <https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria#storage_limits>
@@ -78,7 +78,7 @@ unzip edumeet.zip
 # Install the package
 sudo apt install edumeet/edumeet.deb
 
-# After package installation, don't forget the configure ip address in config file.
+# After package installation, don't forget the configure IP address in config file.
 sudo nano /etc/meeting/server-config.js
 
 # Finally, start the service by (it's enabled by default)
@@ -115,24 +115,35 @@ yarn && yarn build
 cd ../server
 yarn && yarn build
 ```
+## Configuration
+**Note:** eduMEET will start normally with just default settings, it will automatically detect your host IP address and listen on port 443 (https)
 
-### configure
+**Important note:** when eduMEET is running in standalone mode, if configuration parameter is changed, application and server components **has to be rebuild**
+([see build steps](#manual-installation-build)). Rebuild is not necessary for docker or deb version, just container/service restart is required.
 
-Note: Edumeet will start on the default settings (if you don't create your own configuration files)
+There are separate configuration files for client application and eduMEET server:
 
-Important! You must always **rebuild** the edumeet when you change something in the configuration  files. 
+**Client application** configuration file could be used, for example: enabling login, change logo or background, adjust A/V parameters, etc...
 
-#### use template (example)
-Just clone the example files and adjust them if required.
+Copy example template and change values (see all available parameters in [./app/README.md](/app/README.md))
 
 ```bash
-cp server/config/config.example.js server/config/config.js
 cp app/public/config/config.example.js app/public/config/config.js
 ```
 
-#### To change default options, create your own server config file (yaml or json)
+**eduMEET server** uses two configuration files config.js for authentication models and setting user roles, and second configuration file (json, json5, yml, yaml or toml format supported) for changing default values, like server port, server certificates, STUN/TURN configuration, monitoring, etc...
 
-Example when using _config.yaml_ file format:
+**Important note:**  only one file format could be udes for second configuration file (yaml file format is recommended)
+
+Copy example template(s) and set/change values (see all available parameters in [./server/README.md](/server/README.md))
+
+```bash
+cp server/config/config.example.js server/config/config.js
+cp server/config/config.example.yaml server/config/config.yaml
+
+```
+
+**_config.yaml_** file format example:
 ```yaml 
     listeningPort: 443
     listeningHost: host.domain.tld
@@ -146,7 +157,7 @@ Example when using _config.yaml_ file format:
     turnAPIURI: "https://host.domain.tld/turn"
     turnAPIKey: "Your API key"
 ```
-Example when using _config.json_ file format:
+**_config.json_** file format example:
 ```javascript
     {
         "listeningPort" : "443",
@@ -164,13 +175,7 @@ Example when using _config.json_ file format:
     }
 ```
 
-Full documentation and list of all settings:
-| destination | location | 
-| ---   | ---      |
-| app side | [./app/README.md](/app/README.md) |
-| srv side | [./server/README.md](/server/README.md) | 
-
-### Run 
+## Run
 
 #### locally (for development)
 
@@ -227,9 +232,9 @@ sudo systemctl enable edumeet
 ## Ports and firewall
 | Port | protocol | description |
 | ---- | ----------- | ----------- |
-| 3443 | tcp | default https webserver and signaling - adjustable in `server/config.js`) |
+|  443 | tcp | default https webserver and signaling - adjustable in `server/config/config.yaml`) |
 | 4443 | tcp | default `yarn start` port for developing with live browser reload, not needed in production environments - adjustable in app/package.json) |
-| 40000-49999 | udp, tcp | media ports - adjustable in `server/config.js` |
+| 40000-49999 | udp, tcp | media ports - adjustable in `server/config/config.yaml` |
 
 ## Load balanced installation
 
@@ -244,7 +249,7 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 If you are part of the GEANT eduGAIN, you can request your turn api key at [https://turn.geant.org/](https://turn.geant.org/)
 	
 You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! 
-Add your server and credentials to `server/config/config.js`
+Add your server and credentials to `server/config/config.yaml`
 
 ## Community-driven support
 | Type                |                                                |

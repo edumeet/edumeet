@@ -6,31 +6,7 @@ function formatJson(data)
 	return `\`${data.replace(/\n/g, '')}\``;
 }
 
-let data = `# Edumeet Server Configuration
-
-The server configuration file can use one of the following formats:
-
-- config/config.json
-- config/config.json5
-- config/config.yaml
-- config/config.yml
-- config/config.toml
-
-Example \`config.yaml\`:
-
-\`\`\`yaml
-redisOptions:
-  host: redis
-  port: 6379
-
-listeningPort: 3443
-\`\`\`
-
-Additionally, a \`config/config.js\` can be used to override specific properties
-with runtime generated values and to set additional configuration functions and classes.
-Look at the default \`config/config.example.js\` file for documentation.
-
-## Configuration properties
+let data = `# ![edumeet logo](/app/public/images/logo.edumeet.svg) server configuration properties list:
 
 | Name | Description | Format | Default value |
 | :--- | :---------- | :----- | :------------ |
@@ -39,6 +15,17 @@ Look at the default \`config/config.example.js\` file for documentation.
 Object.entries(configDocs).forEach((entry: [string, any]) =>
 {
 	const [ name, value ] = entry;
+
+	// escape dynamically created default values
+	switch (name)
+	{
+		case 'mediasoup.webRtcTransport.listenIps':
+			value.default = '[ { "ip": "0.0.0.0", "announcedIp": null } ]';
+			break;
+		case 'mediasoup.numWorkers':
+			value.default = '4';
+			break;
+	}
 
 	data += `| ${name} | ${value.doc} | ${formatJson(value.format)} | \`${formatJson(value.default)}\` |\n`;
 });
