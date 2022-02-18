@@ -91,9 +91,9 @@ sudo systemctl start edumeet
 Note: We strongly recommend to always use a _yarn_ package manager.
 
 ```bash
-# Install all the required dependencies and NodeJS v14 (Debian/Ubuntu) and Yarn package manager:
+# Install all the required dependencies and NodeJS v16 (Debian/Ubuntu) and Yarn package manager:
 sudo apt update && sudo apt install -y curl git python python3-pip build-essential redis openssl libssl-dev pkg-config
-curl -fsSL https://deb.nodesource.com/setup_14.x | sudo bash -
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -
 curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
 echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt update && sudo apt install -y yarn nodejs
