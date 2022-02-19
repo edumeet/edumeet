@@ -2846,7 +2846,11 @@ export default class RoomClient
 
 					case 'roomBack':
 					{
-						await this._joinRoom({ joinVideo, joinAudio, returning: true });
+						await this._joinRoom({
+							joinVideo : !store.getState().settings.videoMuted,
+							joinAudio : !store.getState().settings.audioMuted,
+							returning : true
+						});
 
 						break;
 					}
