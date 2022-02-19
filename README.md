@@ -1,6 +1,4 @@
-# ![edumeet logo](/app/public/images/logo.edumeet.svg) 
-A WebRTC meeting service using [mediasoup](https://mediasoup.org).
-
+# ![edumeet logo](/app/public/images/logo.edumeet.svg) **WebRTC meeting service using [mediasoup](https://mediasoup.org).**
 Official website: [edumeet.org](https://edumeet.org)
 
 https://user-images.githubusercontent.com/37835902/152279867-639db9bc-bf78-430f-b96f-d17733527474.mp4
@@ -17,37 +15,39 @@ Try it online at [letsmeet.no](https://letsmeet.no)
 | **File sharing** | Share your files with the peers (torrent solution under the hood) |
 | **Chat messages**  | Text conversation with other participants |
 | **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them (**disabled by default**) |
-| **Authorization**  | Supported types: **OIDC**, **SAML**, **local db (text-based)** |
+| **Authentication**  | Supported types: **OIDC**, **SAML**, **local db (text-based)** |
 
 
-**Internationalization (22 languages)** 
+### Internationalization (22 languages) 
 <details>
   <summary>Help us with translations:exclamation:</summary>
   
-  ##### How to contribute?
+  #### How to contribute?
 	
-  1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/intl/translations) you want to translate
+  1. Continue to translate existing [language file](/app/src/intl/translations)
   2. find the _null_  values
   >	"settings.language": null,
   3. replace them based on the _en.json_ file
-  > "settings.language": "Select language",
-  4. make a Pull Request, or send us a [e-mail](mailto:community@lists.edumeet.org) with file
-  
+  >	"settings.language": "Select language",
+  4. If your language is not listed, create a new translation _.json_ file..
+  >	copy en.json to [_"two letter country code"_.json](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) and translate to your languange 
+  5. make a Pull Request, or send us a file by [e-mail](mailto:community@lists.edumeet.org)
+	
   Thank you in advance!
 </details>
 
 
-**Local Recording**
+### Local Recording
 <details>
   <summary>See more</summary>
   
-  * Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
+* Local Recording records the browser window video and audio. From the list of media formats that your  browser supports you can select your preferred media format in the settings menu advanced video menu setting.  MediaRecorder makes small chucks of recording and these recorded blob chunks temporary stored in IndexedDB, if IndexedDB implemented in your browser. Otherwise it stores blobs in memory in an array of blobs.
 Local Recording creates a local IndexedDB with the name of the starting timestamp (unix timestamp format)  And a storage called chunks. All chunks read in an array and created a final blob that you can download. After blobs array concatenation as a big blob, this big blob saved as file, and finally we delete the temporary local IndexedDB.
 
 * Local recording is **disabled** by default. It could be enabled by setting _localRecordingEnabled_ to true in  (./app/public/config/config.js)
 
 * **WARNING**: Take care that local recording will increase cpu, memory and disk space consumption.
-  **Enough free disk space has to be provided!!**
+**Enough free disk space has to be provided!!!**
 Keep in mind that Browsers don't allow to use all the disk free capacity!
 See more info about browsers storage limits:
   * <https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria#storage_limits>
@@ -55,21 +55,15 @@ See more info about browsers storage limits:
 
 </details>
 
-## Docker
+# Installation 
 
-Get docker image [here](https://hub.docker.com/r/edumeet/edumeet/)
+See here for [Docker](https://github.com/edumeet/edumeet-docker/) or [Ansible](https://github.com/edumeet/edumeet-ansible/) (based on Docker) installation procedures
 
-## Ansible (based on Docker)
+## Debian & Ubuntu based operating systems (.deb package)
 
-See [more](https://github.com/edumeet/edumeet-ansible/).
-
-## .deb package (for debian-based systems)
-
-If you want to install it on the Debian & Ubuntu based operating systems.
-
-* Prerequisites: [node v16.x](https://github.com/nodesource/distributions/blob/master/README.md#debinstall) (tested with v16.13.2 version)
-
-* Get package [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
+* Prerequisites: Installed NodeJS (v16.x) as described in [Manual installation](#manual-installation-build) section.
+* See [Configuration](#configuration) section for client and server configuration details.
+* Download from [releases](https://github.com/edumeet/edumeet/releases) assets, or latest job [artifact](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess). 
 
 ```bash
 # Unzip the file
@@ -78,36 +72,50 @@ unzip edumeet.zip
 # Install the package
 sudo apt install edumeet/edumeet.deb
 
-# After package installation, don't forget the configure IP address in config file.
-sudo nano /etc/meeting/server-config.js
+# After package installation, don't forget to edit configuration files.
+sudo nano /etc/educonf/client-config.js
+sudo nano /etc/educonf/server-config.js
+sudo nano /etc/educonf/server-config.yaml
 
 # Finally, start the service by (it's enabled by default)
 sudo systemctl start edumeet
 ```
 
 ## Manual installation (build)
-
-### install
-Note: We strongly recommend to always use a _yarn_ package manager.
-
+Installation example is based on Debian/Ubuntu Linux operating system.
+1. Install [NodeJS (v16.x)](https://github.com/nodesource/distributions) and [Yarn ](https://classic.yarnpkg.com/en/docs/install#debian-stable) package manager 
+- NodeJS (v16.x) [Debian/Ubuntu](https://github.com/nodesource/distributions#deb)
 ```bash
-# Install all the required dependencies and NodeJS v16 (Debian/Ubuntu) and Yarn package manager:
+# Using Ubuntu
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Using Debian, as root
+curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+apt-get install -y nodejs
+```
+- Yarn package manager:
+```bash
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update && sudo apt install yarn
+```
+2. Install all required dependencies
+```bash
 sudo apt update && sudo apt install -y curl git python python3-pip build-essential redis openssl libssl-dev pkg-config
-curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -
-curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
-echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-sudo apt update && sudo apt install -y yarn nodejs
-
-# get version
+```	
+3. Clone eduMEET git repository
+```bash
 git clone https://github.com/edumeet/edumeet.git
-
 cd edumeet
-
-# switch to the "develop" branch to get the latest version for developing
+```
+(switch to the "develop" branch to get the latest features)
+```bash
 git checkout develop 
 ```
+### Build
+**Note:** It is highly recommended to use _yarn_ package manager.
 
-### build
 ```bash
 cd app
 yarn && yarn build
@@ -115,34 +123,31 @@ yarn && yarn build
 cd ../server
 yarn && yarn build
 ```
-## Configuration
-**Note:** eduMEET will start normally with just default settings, it will automatically detect your host IP address and listen on port 443 (https)
+### Configuration
+eduMEET will start and run normally with just default settings. If there is no configuration files,  it will automatically detect your host IP address, and listen on port 443 (https). In order to change default values (e.g. certificates), or activate features (e.g. authentication), appropriate configuration file has to be used (see below for details).  
 
-**Important note:** when eduMEET is running in standalone mode, if configuration parameter is changed, application and server components **has to be rebuild**
-([see build steps](#manual-installation-build)). Rebuild is not necessary for docker or deb version, just container/service restart is required.
-
-There are separate configuration files for client application and eduMEET server:
+**Note:** There are separate configuration files for client application and eduMEET server:
 
 **Client application** configuration file could be used, for example: enabling login, change logo or background, adjust A/V parameters, etc...
 
-Copy example template and change values (see all available parameters in [./app/README.md](/app/README.md))
-
+Copy example template and edit values (see all available parameters in [./app/README.md](/app/README.md))
 ```bash
 cp app/public/config/config.example.js app/public/config/config.js
 ```
 
-**eduMEET server** uses two configuration files config.js for authentication models and setting user roles, and second configuration file (json, json5, yml, yaml or toml format supported) for changing default values, like server port, server certificates, STUN/TURN configuration, monitoring, etc...
+**eduMEET server** uses **two** configuration files:
 
-**Important note:**  only one file format could be used for second configuration file (yaml file format is recommended)
+**config.js** for setting authentication methods and user roles.
 
-Copy example template(s) and set/change values (see all available parameters in [./server/README.md](/server/README.md))
-
+Copy example template and edit values (see additional details in [example](/server/config/config.example.js) file)
 ```bash
 cp server/config/config.example.js server/config/config.js
-cp server/config/config.example.yaml server/config/config.yaml
-
 ```
 
+**second config.(**_json_, _json5_, _yaml/yml_ or _toml_**)** file for changing default values, e.g. server port, server certificates, [STUN/TURN](#turn-configuration) configuration, monitoring, etc... 
+
+Two example template files in [_yaml_](/server/config/config.example.yaml) and [_json_](/server/config/config.example.json) file format are provided.  
+	
 **_config.yaml_** file format example:
 ```yaml 
     listeningPort: 443
@@ -173,32 +178,44 @@ cp server/config/config.example.yaml server/config/config.yaml
         "turnAPIKey" : "Your API key",
         "turnAPIURI" : "https://host.domain.tld/turn",
     }
-```
+``` 
+**Important note::exclamation:**  **only one** file format could be used for second configuration file (yaml file format is highly recommended)
 
-## Run
-
-#### locally (for development)
-
-* The newest build is always in **develop branch** if you want to make a contribution/pull request use it instead of master branch.
-
+Copy **only one** example template file and edit values (see all available parameters in [./server/README.md](/server/README.md))
 ```bash
-# You can run a live build from app folder and running :
-app$ yarn start
-
-# Also you need to start a server in server folder too. 
-server$ yarn start
+cp server/config/config.example.yaml server/config/config.yaml
+  OR!!!
+cp server/config/config.example.json server/config/config.json
 ```
 
-#### locally
+**Important note:** application and server components **has to be rebuild** if configuration parameter is changed ([see build steps](#manual-installation-build)). Rebuild is not necessary for docker or deb version, just container/service restart is required.
+
+### Run
+
+**Run on server** (as root or with sudo) 
 
 ```bash
 # Run the Node.js server application in a terminal:
 cd server
-yarn start
+sudo yarn start
 ```
 
-Note: Do not run the server as root. Instead, do redirects  on the firewall:
+**Run locally** (for development)
+
+* The newest build is always in **develop branch** if you want to make a contribution/pull request use it instead of master branch.
+
 ```bash
+# run a live build from app folder:
+app$ yarn start
+
+# and run server in server folder: 
+server$ yarn start
+```
+
+Note: To avoid running server as root, redirects privileged ports with firewall rules:
+```bash
+#adjust ports to your needs
+
 sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8443
 sudo iptables -t nat -A OUTPUT -p tcp --dport 443 -o lo -j REDIRECT --to-port 8443
 sudo iptables -t nat -A PREROUTING -p tcp --dport 3443 -j REDIRECT --to-ports 8443
@@ -209,10 +226,9 @@ sudo apt install iptables-persistent
 sudo iptables-save > /etc/iptables/rules.v4
 sudo ip6tables-save > /etc/iptables/rules.v6
 ```
-
 * Test your service in a webRTC enabled browser: `https://yourDomainOrIPAdress:3443/roomname`
 
-#### as a service (systemd)
+**Run as a service** (systemd)
 
 ```bash
 # Stop your locally running server. Copy systemd-service file `edumeet.service` to `/etc/systemd/system/` and check location path settings:
