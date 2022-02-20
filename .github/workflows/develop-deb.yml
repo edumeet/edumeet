@@ -61,14 +61,16 @@ jobs:
         #find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum  1>/dev/null 2>/dev/null || true
         #
         cat > DEBIAN/control <<EOF
-        Package: edumeet-develop
+        Package: edumeet
         Version: $VERSION
-        Maintainer: eduMEET team (https://github.com/edumeet)
+        Maintainer: eduMEET team (${{ github.server_url }}/${{ github.repository }})
         Section: admin
         Date : $DATE
         Architecture: amd64
-        Priority: important
-        Description: Multiparty web-meetings using mediasoup and WebRTC
+        Priority: optional
+        Description: eduMMET is multiparty web-meetings based on mediasoup and WebRTC
+          Packet created from ${{ github.ref_name }} branch, commit:${{ github.sha }}
+          Visit ${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }} for details
         Depends: nodejs (>= 16), redis
         EOF
         #
