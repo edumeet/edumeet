@@ -82,9 +82,10 @@ jobs:
         ln -s /usr/local/src/edumeet/server/public/config/config.js /etc/edumeet/client-config.js || true
         systemctl daemon-reload
         systemctl enable edumeet
-        echo "eduMEET multiparty meeting is installed, but you need the configure the server and client with your ip adresses in configuration files under /etc/meeting/ \n"
-        echo "\n\nPlease visit https://github.com/edumeet/edumeet for configuration details.\n\n"
-        echo "\n\nAfter the configuration, you can start service with 'sudo systemctl start edumeet' command.\n\n"
+        echo "eduMEET multiparty meeting is installed.\n"
+        echo "\n\nClient and server configuration files are in /etc/edumeet directory\n"
+        echo "Please visit ${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }} for configuration details.\n\n"
+        echo "\n\nAfter configuration, start service with 'sudo systemctl start edumeet' command.\n\n"
         EOF
         #
         chmod 775 DEBIAN/postinst
