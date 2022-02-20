@@ -25,18 +25,26 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-    - run: |
+        
+    - name: Get eduMEET version
+      id: get-version
+      run: |
+        echo "::set-output name=VERSION::$(cat edumeet/server/package.json | jq -r '.version')"
+        
+    - name: Build Debian package
+      id: build-deb
+      run: |
         cd edumeet
         cp server/config/config.example.js server/config/config.js
+        cp server/config/config.example.yaml server/config/config.yaml
         cp app/public/config/config.example.js app/public/config/config.js
-        touch server/config/config.yaml
         cd app
         yarn install && yarn build
         cd ../server
         yarn install && yarn build
         cat <<< $(jq '.bundleDependencies += .dependencies' package.json) > package.json
         npm pack
-        VERSION=$(cat package.json | jq -r '.version')
+        VERSION=${{ steps.get-version.outputs.VERSION }}
         DATE=$(date)
         mkdir -p /home/runner/package
         cd /home/runner/package
@@ -67,7 +75,6 @@ jobs:
         cat > DEBIAN/postinst <<EOF
         #!/bin/bash
         mkdir -p /etc/edumeet/
-        cp /usr/local/src/edumeet/server/config/config.yaml /usr/local/src/edumeet/server/dist/config/
         ln -s /usr/local/src/edumeet/server/config/config.js /etc/edumeet/server-config.js || true
         ln -s /usr/local/src/edumeet/server/dist/config/config.yaml /etc/edumeet/server-config.yaml || true
         ln -s /usr/local/src/edumeet/server/public/config/config.js /etc/edumeet/client-config.js || true
@@ -81,11 +88,12 @@ jobs:
         chmod 775 DEBIAN/postinst
         cd ../
         dpkg-deb -Zgzip --build package
-        mv /home/runner/package.deb /home/runner/edumeet-3.5.0-beta1.deb
+        mv /home/runner/package.deb /home/runner/edumeet-${{ steps.get-version.outputs.VERSION }}-beta1.deb
+        
     - name : Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: edumeet-3.5.0-beta1
+        name: edumeet-${{ steps.get-version.outputs.VERSION }}-beta1
         path: "/home/runner/edumeet-*.deb"
     
     - name: Add to release assets
