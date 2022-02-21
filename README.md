@@ -113,16 +113,6 @@ cd edumeet
 ```bash
 git checkout develop 
 ```
-### Build
-**Note:** It is highly recommended to use _yarn_ package manager.
-
-```bash
-cd app
-yarn && yarn build
-
-cd ../server
-yarn && yarn build
-```
 ### Configuration
 eduMEET will start and run normally with just default settings. If there is no configuration files,  it will automatically detect your host IP address, and listen on port 443 (https). In order to change default values (e.g. certificates), or activate features (e.g. authentication), appropriate configuration file has to be used (see below for details).  
 
@@ -190,6 +180,16 @@ cp server/config/config.example.json server/config/config.json
 
 **Important note:** application and server components **has to be rebuild** if configuration parameter is changed ([see build steps](#manual-installation-build)). Rebuild is not necessary for docker or deb version, just container/service restart is required.
 
+### Build
+**Note:** It is highly recommended to use _yarn_ package manager.
+
+```bash
+cd app
+yarn && yarn build
+
+cd ../server
+yarn && yarn build
+```
 ### Run
 
 **Run on server** (as root or with sudo) 
