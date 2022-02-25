@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { micConsumerSelector } from '../Selectors';
+import { micConsumerSelector } from '../../store/selectors';
 import PropTypes from 'prop-types';
 import PeerAudio from './PeerAudio';
 
@@ -21,6 +21,7 @@ const AudioPeers = (props) =>
 							key={micConsumer.id}
 							audioTrack={micConsumer.track}
 							audioOutputDevice={audioOutputDevice}
+							audioGain={micConsumer.audioGain}
 						/>
 					);
 				})

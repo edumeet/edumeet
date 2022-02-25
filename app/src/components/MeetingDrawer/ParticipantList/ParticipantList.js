@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {
 	participantListSelector,
 	makePermissionSelector
-} from '../../Selectors';
+} from '../../../store/selectors';
 import { permissions } from '../../../permissions';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';

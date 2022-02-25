@@ -2,27 +2,37 @@
 
 process.title = 'edumeet-server';
 
+import Logger from './lib/logger/Logger';
+const Room = require('./lib/Room');
+const Peer = require('./lib/Peer');
+const userRoles = require('./lib/access/roles');
+const {
+	loginHelper,
+	logoutHelper
+} = require('./lib/helpers/httpHelper');
+const { config, configError } = require('./lib/config/config');
+const interactiveServer = require('./lib/interactive/Server');
+const promExporter = require('./lib/stats/promExporter');
+
 const bcrypt = require('bcrypt');
-const config = require('./config/config');
 const fs = require('fs');
 const http = require('http');
-const spdy = require('spdy');
+const https = require('https');
+
+if (process.versions.node.split('.')[0] < 15)
+{
+	/* eslint-disable no-unused-vars */
+	const spdy = require('spdy');
+}
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
 const AwaitQueue = require('awaitqueue');
-const Logger = require('./lib/Logger');
-const Room = require('./lib/Room');
-const Peer = require('./lib/Peer');
 const base64 = require('base-64');
 const helmet = require('helmet');
-const userRoles = require('./userRoles');
-const {
-	loginHelper,
-	logoutHelper
-} = require('./httpHelper');
 // auth
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
@@ -30,14 +40,20 @@ const imsLti = require('ims-lti');
 const SAMLStrategy = require('passport-saml').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const redis = require('redis');
-const redisClient = redis.createClient(config.redisOptions);
-const { Issuer, Strategy } = require('openid-client');
+const { Issuer, Strategy, custom } = require('openid-client');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
-const interactiveServer = require('./lib/interactiveServer');
-const promExporter = require('./lib/promExporter');
 const { v4: uuidv4 } = require('uuid');
+
+if (configError)
+{
+	/* eslint-disable no-console */
+	console.error(`Invalid config file: ${configError}`);
+	process.exit(-1);
+}
+
+const redisClient = redis.createClient(config.redisOptions);
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -54,9 +70,8 @@ let statusLogger = null;
 if ('StatusLogger' in config)
 	statusLogger = new config.StatusLogger();
 
-// mediasoup Workers.
-// @type {Array<mediasoup.Worker>}
-const mediasoupWorkers = [];
+// mediasoup Workers Map.
+const mediasoupWorkers = new Map();
 
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
@@ -87,7 +102,7 @@ const tls =
 const app = express();
 
 app.use(helmet.hsts());
-const sharedCookieParser=cookieParser();
+const sharedCookieParser = cookieParser();
 
 app.use(sharedCookieParser);
 app.use(bodyParser.json({ limit: '5mb' }));
@@ -137,12 +152,6 @@ async function run()
 		// Open the interactive server.
 		await interactiveServer(rooms, peers);
 
-		// start Prometheus exporter
-		if (config.prometheus)
-		{
-			await promExporter(rooms, peers, config.prometheus);
-		}
-
 		if (typeof (config.auth) === 'undefined')
 		{
 			logger.warn('Auth is not configured properly!');
@@ -157,6 +166,12 @@ async function run()
 
 		// Run HTTPS server.
 		await runHttpsServer();
+
+		// start Prometheus exporter
+		if (config.prometheus.enabled)
+		{
+			await promExporter(mediasoupWorkers, rooms, peers);
+		}
 
 		// Run WebSocketServer.
 		await runWebSocketServer();
@@ -374,6 +389,13 @@ async function setupAuth()
 		typeof (config.auth.oidc.clientOptions) !== 'undefined'
 	)
 	{
+		if (config.auth.oidc.HttpOptions)
+		{
+			// Set http options to allow e.g. http proxy
+			// TODO check with Misi what this is about
+			custom.setHttpOptionsDefaults(config.auth.oidc.HttpOptions);
+		}
+
 		const oidcIssuer = await Issuer.discover(config.auth.oidc.issuerURL);
 
 		// Setup authentication
@@ -416,14 +438,21 @@ async function setupAuth()
 	// loginparams
 	app.get('/auth/login', (req, res, next) =>
 	{
-		const state = {
-			peerId : req.query.peerId,
-			roomId : req.query.roomId
-		};
+		logger.debug('/auth/login');
 
-		if (authStrategy== 'saml' || authStrategy=='local')
+		let state;
+
+		if (req.query.peerId && req.query.roomId)
 		{
-			req.session.authState=state;
+			state = {
+				peerId : req.query.peerId,
+				roomId : req.query.roomId
+			};
+
+			if (authStrategy== 'saml' || authStrategy=='local')
+			{
+				req.session.authState=state;
+			}
 		}
 
 		if (authStrategy === 'local' && !(req.user && req.password))
@@ -444,13 +473,28 @@ async function setupAuth()
 		passport.authenticate('lti', { failureRedirect: '/' }),
 		(req, res) =>
 		{
+			logger.debug('/auth/lti');
 			res.redirect(`/${req.user.room}`);
 		}
 	);
 
+	app.get('/auth/check_login_status', (req, res) =>
+	{
+		let loggedIn = false;
+
+		if (Boolean(req.session.passport) &&
+			Boolean(req.session.passport.user))
+		{
+			loggedIn = true;
+		}
+
+		res.send({ loggedIn: loggedIn });
+	});
+
 	// logout
 	app.get('/auth/logout', (req, res) =>
 	{
+		logger.debug('/auth/logout');
 		const { peerId } = req.session;
 
 		const peer = peers.get(peerId);
@@ -465,11 +509,15 @@ async function setupAuth()
 		}
 
 		req.logout();
+		req.session.passport = undefined;
+		req.session.touch();
+		req.session.save();
 		req.session.destroy(() => res.send(logoutHelper()));
 	});
 	// SAML metadata
 	app.get('/auth/metadata', (req, res) =>
 	{
+		logger.debug('/auth/metadata');
 		if (config.auth && config.auth.saml &&
 			config.auth.saml.decryptionCert &&
 			config.auth.saml.signingCert)
@@ -496,9 +544,10 @@ async function setupAuth()
 	// callback
 	app.all(
 		'/auth/callback',
-		passport.authenticate(authStrategy, { failureRedirect: '/auth/login', failureFlash: true }),
+		passport.authenticate(authStrategy, { failureRedirect: '/auth/login' }),
 		async (req, res, next) =>
 		{
+			logger.debug('/auth/callback');
 			try
 			{
 				let state;
@@ -512,6 +561,13 @@ async function setupAuth()
 					if (req.method === 'POST')
 						state = JSON.parse(base64.decode(req.body.state));
 				}
+
+				if (!state || !state.peerId || !state.roomId)
+				{
+					res.redirect('/auth/login');
+					logger.debug('Empty state or state.peerId or state.roomId in auth/callback');
+				}
+
 				const { peerId, roomId } = state;
 
 				req.session.peerId = peerId;
@@ -555,7 +611,7 @@ async function runHttpsServer()
 {
 	app.use(compression());
 
-	app.use('/.well-known/acme-challenge', express.static('public/.well-known/acme-challenge'));
+	app.use('/.well-known/acme-challenge', express.static('dist/public/.well-known/acme-challenge'));
 
 	app.all('*', async (req, res, next) =>
 	{
@@ -586,20 +642,7 @@ async function runHttpsServer()
 				res.redirect(ltiURL);
 			}
 			else
-			{
-				const specialChars = "<>@!^*()[]{}:;|'\"\\,~`";
-
-				for (let i = 0; i < specialChars.length; i++)
-				{
-					if (req.url.substring(1).indexOf(specialChars[i]) > -1)
-					{
-						req.url = `/${encodeURIComponent(encodeURI(req.url.substring(1)))}`;
-						res.redirect(`${req.url}`);
-					}
-				}
-
 				return next();
-			}
 		}
 		else
 			res.redirect(`https://${req.hostname}${req.url}`);
@@ -607,9 +650,13 @@ async function runHttpsServer()
 	});
 
 	// Serve all files in the public folder as static files.
-	app.use(express.static('public'));
+	app.use(express.static('dist/public', {
+		maxAge : config.staticFilesCachePeriod
+	}));
 
-	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
+	app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`, {
+		maxAge : config.staticFilesCachePeriod
+	}));
 
 	if (config.httpOnly === true)
 	{
@@ -619,15 +666,30 @@ async function runHttpsServer()
 	else
 	{
 		// https
-		mainListener = spdy.createServer(tls, app);
-
-		// http
-		const redirectListener = http.createServer(app);
-
-		if (config.listeningHost)
-			redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
+		// spdy is not working anymore with node.js > 15 and express 5 
+		// is not ready yet for http2
+		// https://github.com/spdy-http2/node-spdy/issues/380
+		if (typeof(spdy) === 'undefined')
+		{
+			logger.info('Found node.js version >= 15 disabling spdy / http2 and using node.js/https module');
+			mainListener = https.createServer(tls, app);
+		}
 		else
-			redirectListener.listen(config.listeningRedirectPort);
+		{
+			/* eslint-disable no-undef */
+			mainListener = spdy.createServer(tls, app);
+		}
+
+		// http -> https redirect server
+		if (config.listeningRedirectPort)
+		{
+			const redirectListener = http.createServer(app);
+
+			if (config.listeningHost)
+				redirectListener.listen(config.listeningRedirectPort, config.listeningHost);
+			else
+				redirectListener.listen(config.listeningRedirectPort);
+		}
 	}
 
 	// https or http
@@ -666,7 +728,7 @@ async function runWebSocketServer()
 	io = require('socket.io')(mainListener, { cookie: false });
 
 	io.use(
-		sharedSession(session, sharedCookieParser, { autoSave: true })
+		sharedSession(session, sharedCookieParser, {})
 	);
 
 	// Handle connections from clients.
@@ -688,9 +750,13 @@ async function runWebSocketServer()
 
 		queue.push(async () =>
 		{
-			const { token } = socket.handshake.session;
-
 			const room = await getOrCreateRoom({ roomId });
+			let token = null;
+
+			if (socket.handshake.session.peerId === peerId)
+			{
+				token = room.getToken(peerId);
+			}
 
 			let peer = peers.get(peerId);
 			let returning = false;
@@ -747,6 +813,10 @@ async function runWebSocketServer()
 
 			room.handlePeer({ peer, returning });
 
+			socket.handshake.session.peerId = peer.id;
+			socket.handshake.session.touch();
+			socket.handshake.session.save();
+
 			statusLog();
 		})
 			.catch((error) =>
@@ -766,18 +836,129 @@ async function runWebSocketServer()
  */
 async function runMediasoupWorkers()
 {
+	mediasoup.observer.on('newworker', (worker) =>
+	{
+		worker.appData.routers = new Map();
+		worker.appData.transports = new Map();
+		worker.appData.producers = new Map();
+		worker.appData.consumers = new Map();
+		worker.appData.dataProducers = new Map();
+		worker.appData.dataConsumers = new Map();
+
+		worker.observer.on('close', () =>
+		{
+			// not needed as we have 'died' listiner below
+			logger.debug('worker closed [worker.pid:%d]', worker.pid);
+		});
+
+		worker.observer.on('newrouter', (router) =>
+		{
+			router.appData.transports = new Map();
+			router.appData.producers = new Map();
+			router.appData.consumers = new Map();
+			router.appData.dataProducers = new Map();
+			router.appData.dataConsumers = new Map();
+			router.appData.worker = worker;
+			worker.appData.routers.set(router.id, router);
+
+			router.observer.on('close', () =>
+			{
+				worker.appData.routers.delete(router.id);
+			});
+
+			router.observer.on('newtransport', (transport) =>
+			{
+				transport.appData.producers = new Map();
+				transport.appData.consumers = new Map();
+				transport.appData.dataProducers = new Map();
+				transport.appData.dataConsumers = new Map();
+				transport.appData.router = router;
+				router.appData.transports.set(transport.id, transport);
+
+				transport.observer.on('close', () =>
+				{
+					router.appData.transports.delete(transport.id);
+				});
+
+				transport.observer.on('newproducer', (producer) =>
+				{
+					producer.appData.transport = transport;
+					transport.appData.producers.set(producer.id, producer);
+					router.appData.producers.set(producer.id, producer);
+					worker.appData.producers.set(producer.id, producer);
+
+					producer.observer.on('close', () =>
+					{
+						transport.appData.producers.delete(producer.id);
+						router.appData.producers.delete(producer.id);
+						worker.appData.producers.delete(producer.id);
+					});
+				});
+
+				transport.observer.on('newconsumer', (consumer) =>
+				{
+					consumer.appData.transport = transport;
+					transport.appData.consumers.set(consumer.id, consumer);
+					router.appData.consumers.set(consumer.id, consumer);
+					worker.appData.consumers.set(consumer.id, consumer);
+
+					consumer.observer.on('close', () =>
+					{
+						transport.appData.consumers.delete(consumer.id);
+						router.appData.consumers.delete(consumer.id);
+						worker.appData.consumers.delete(consumer.id);
+					});
+				});
+
+				transport.observer.on('newdataproducer', (dataProducer) =>
+				{
+					dataProducer.appData.transport = transport;
+					transport.appData.dataProducers.set(dataProducer.id, dataProducer);
+					router.appData.dataProducers.set(dataProducer.id, dataProducer);
+					worker.appData.dataProducers.set(dataProducer.id, dataProducer);
+
+					dataProducer.observer.on('close', () =>
+					{
+						transport.appData.dataProducers.delete(dataProducer.id);
+						router.appData.dataProducers.delete(dataProducer.id);
+						worker.appData.dataProducers.delete(dataProducer.id);
+					});
+				});
+
+				transport.observer.on('newdataconsumer', (dataConsumer) =>
+				{
+					dataConsumer.appData.transport = transport;
+					transport.appData.dataConsumers.set(dataConsumer.id, dataConsumer);
+					router.appData.dataConsumers.set(dataConsumer.id, dataConsumer);
+					worker.appData.dataConsumers.set(dataConsumer.id, dataConsumer);
+
+					dataConsumer.observer.on('close', () =>
+					{
+						transport.appData.dataConsumers.delete(dataConsumer.id);
+						router.appData.dataConsumers.delete(dataConsumer.id);
+						worker.appData.dataConsumers.delete(dataConsumer.id);
+					});
+				});
+			});
+		});
+	});
+
 	const { numWorkers } = config.mediasoup;
 
 	logger.info('running %d mediasoup Workers...', numWorkers);
 
-	for (let i = 0; i < numWorkers; ++i)
+	const { logLevel, logTags, rtcMinPort, rtcMaxPort } = config.mediasoup.worker;
+	const portInterval = Math.floor((rtcMaxPort - rtcMinPort) / numWorkers);
+
+	for (let i = 0; i < numWorkers; i++)
 	{
 		const worker = await mediasoup.createWorker(
 			{
-				logLevel   : config.mediasoup.worker.logLevel,
-				logTags    : config.mediasoup.worker.logTags,
-				rtcMinPort : config.mediasoup.worker.rtcMinPort,
-				rtcMaxPort : config.mediasoup.worker.rtcMaxPort
+				logLevel,
+				logTags,
+				rtcMinPort : rtcMinPort + (i * portInterval),
+				rtcMaxPort : i === numWorkers - 1 ? rtcMaxPort
+					: rtcMinPort + ((i + 1) * portInterval) - 1
 			});
 
 		worker.on('died', () =>
@@ -788,7 +969,7 @@ async function runMediasoupWorkers()
 			setTimeout(() => process.exit(1), 2000);
 		});
 
-		mediasoupWorkers.push(worker);
+		mediasoupWorkers.set(worker.pid, worker);
 	}
 }
 

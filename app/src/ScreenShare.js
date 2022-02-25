@@ -109,11 +109,89 @@ class DisplayMediaScreenShare
 		return true;
 	}
 
+	isAudioEnabled()
+	{
+		return false;
+	}
+
 	_toConstraints(options)
 	{
 		const constraints = {
 			video : {},
 			audio : true
+		};
+
+		if (isFinite(options.width))
+		{
+			constraints.video.width = options.width;
+		}
+		if (isFinite(options.height))
+		{
+			constraints.video.height = options.height;
+		}
+		if (isFinite(options.frameRate))
+		{
+			constraints.video.frameRate = options.frameRate;
+		}
+
+		return constraints;
+	}
+}
+
+class DisplayMediaScreenShareWithAudio
+{
+	constructor()
+	{
+		this._stream = null;
+	}
+
+	start(options = {})
+	{
+		const constraints = this._toConstraints(options);
+
+		return navigator.mediaDevices.getDisplayMedia(constraints)
+			.then((stream) =>
+			{
+				this._stream = stream;
+
+				return Promise.resolve(stream);
+			});
+	}
+
+	stop()
+	{
+		if (this._stream instanceof MediaStream === false)
+		{
+			return;
+		}
+
+		this._stream.getTracks().forEach((track) => track.stop());
+		this._stream = null;
+	}
+
+	isScreenShareAvailable()
+	{
+		return true;
+	}
+
+	isAudioEnabled()
+	{
+		return true;
+	}
+
+	_toConstraints(options)
+	{
+		const constraints = {
+			video : {},
+			audio : {
+				sampleRate       : options.sampleRate,
+				channelCount     : options.channelCount,
+				volume           : options.volume,
+				autoGainControl  : options.autoGainControl,
+				echoCancellation : options.echoCancellation,
+				noiseSuppression : options.noiseSuppression,
+				sampleSize       : options.sampleSize
+			}
 		};
 
 		if (isFinite(options.width))
@@ -169,6 +247,11 @@ class FirefoxScreenShare
 		return true;
 	}
 
+	isAudioEnabled()
+	{
+		return false;
+	}
+
 	_toConstraints(options)
 	{
 		const constraints = {
@@ -214,6 +297,11 @@ class DefaultScreenShare
 	{
 		return false;
 	}
+
+	isAudioEnabled()
+	{
+		return false;
+	}
 }
 
 export default class ScreenShare
@@ -230,24 +318,24 @@ export default class ScreenShare
 			{
 				case 'firefox':
 				{
-					if (device.version < 66.0)
+					if (device.bowser.satisfies({ firefox: '<66' }))
 						return new FirefoxScreenShare();
 					else
 						return new DisplayMediaScreenShare();
 				}
 				case 'safari':
 				{
-					if (device.version >= 13.0)
+					if (device.bowser.satisfies({ safari: '>=13' }))
 						return new DisplayMediaScreenShare();
 					else
 						return new DefaultScreenShare();
 				}
+				case 'opera':
 				case 'chrome':
 				case 'chromium':
-				case 'opera':
 				case 'edge':
 				{
-					return new DisplayMediaScreenShare();
+					return new DisplayMediaScreenShareWithAudio();
 				}
 				default:
 				{

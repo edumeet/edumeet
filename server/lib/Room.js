@@ -1,19 +1,20 @@
+import Logger from './logger/Logger';
+
 const EventEmitter = require('events').EventEmitter;
 const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
-const Logger = require('./Logger');
 const Lobby = require('./Lobby');
-const { SocketTimeoutError } = require('./errors');
+const { SocketTimeoutError, NotFoundInMediasoupError } = require('./helpers/errors');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
-const userRoles = require('../userRoles');
+const userRoles = require('./access/roles');
 
-const {
+import {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
-} = require('../access');
+} from './access/access';
 
-const permissions = require('../permissions'), {
+const permissions = require('./access/perms'), {
 	CHANGE_ROOM_LOCK,
 	PROMOTE_PEER,
 	MODIFY_ROLE,
@@ -25,10 +26,11 @@ const permissions = require('../permissions'), {
 	EXTRA_VIDEO,
 	SHARE_FILE,
 	MODERATE_FILES,
-	MODERATE_ROOM
+	MODERATE_ROOM,
+	LOCAL_RECORD_ROOM
 } = permissions;
 
-const config = require('../config/config');
+const { config } = require('./config/config');
 
 const logger = new Logger('Room');
 
@@ -42,18 +44,19 @@ const roomAccess =
 
 const roomPermissions =
 {
-	[CHANGE_ROOM_LOCK] : [ userRoles.NORMAL ],
-	[PROMOTE_PEER]     : [ userRoles.NORMAL ],
-	[MODIFY_ROLE]      : [ userRoles.MODERATOR ],
-	[SEND_CHAT]        : [ userRoles.NORMAL ],
-	[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
-	[SHARE_AUDIO]      : [ userRoles.NORMAL ],
-	[SHARE_VIDEO]      : [ userRoles.NORMAL ],
-	[SHARE_SCREEN]     : [ userRoles.NORMAL ],
-	[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
-	[SHARE_FILE]       : [ userRoles.NORMAL ],
-	[MODERATE_FILES]   : [ userRoles.MODERATOR ],
-	[MODERATE_ROOM]    : [ userRoles.MODERATOR ],
+	[CHANGE_ROOM_LOCK]  : [ userRoles.NORMAL ],
+	[PROMOTE_PEER]      : [ userRoles.NORMAL ],
+	[MODIFY_ROLE]       : [ userRoles.MODERATOR ],
+	[SEND_CHAT]         : [ userRoles.NORMAL ],
+	[MODERATE_CHAT]     : [ userRoles.MODERATOR ],
+	[SHARE_AUDIO]       : [ userRoles.NORMAL ],
+	[SHARE_VIDEO]       : [ userRoles.NORMAL ],
+	[SHARE_SCREEN]      : [ userRoles.NORMAL ],
+	[EXTRA_VIDEO]       : [ userRoles.NORMAL ],
+	[SHARE_FILE]        : [ userRoles.NORMAL ],
+	[MODERATE_FILES]    : [ userRoles.MODERATOR ],
+	[MODERATE_ROOM]     : [ userRoles.MODERATOR ],
+	[LOCAL_RECORD_ROOM] : [ userRoles.NORMAL ],
 	...config.permissionsFromRoles
 };
 
@@ -64,26 +67,28 @@ const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 class Room extends EventEmitter
 {
 
-	static getLeastLoadedRouter(mediasoupWorkers, peers, mediasoupRouters)
+	static getLeastLoadedRouter(
+		allMediasoupWorkersOnServer,
+		allPeersOnServer,
+		mediasoupRoutersOfRoom)
 	{
-
 		const routerLoads = new Map();
-
 		const workerLoads = new Map();
-
 		const pipedRoutersIds = new Set();
 
-		for (const peer of peers.values())
+		for (const peer of allPeersOnServer.values())
 		{
 			const routerId = peer.routerId;
 
 			if (routerId)
 			{
-				if (mediasoupRouters.has(routerId))
+				// checking which routers of this room are piped
+				if (mediasoupRoutersOfRoom.has(routerId))
 				{
 					pipedRoutersIds.add(routerId);
 				}
 
+				// calculating the routers loads of all routers in use by peers
 				if (routerLoads.has(routerId))
 				{
 					routerLoads.set(routerId, routerLoads.get(routerId) + 1);
@@ -95,20 +100,20 @@ class Room extends EventEmitter
 			}
 		}
 
-		for (const worker of mediasoupWorkers)
+		// calculating the worker loads of all workers based on router loads
+		for (const worker of allMediasoupWorkersOnServer.values())
 		{
-			for (const router of worker._routers)
-			{
-				const routerId = router._internal.routerId;
 
-				if (workerLoads.has(worker._pid))
+			for (const routerId of worker.appData.routers.keys())
+			{
+				if (workerLoads.has(worker.pid))
 				{
-					workerLoads.set(worker._pid, workerLoads.get(worker._pid) +
+					workerLoads.set(worker.pid, workerLoads.get(worker.pid) +
 						(routerLoads.has(routerId)?routerLoads.get(routerId):0));
 				}
 				else
 				{
-					workerLoads.set(worker._pid,
+					workerLoads.set(worker.pid,
 						(routerLoads.has(routerId)?routerLoads.get(routerId):0));
 				}
 			}
@@ -117,25 +122,18 @@ class Room extends EventEmitter
 		const sortedWorkerLoads = new Map([ ...workerLoads.entries() ].sort(
 			(a, b) => a[1] - b[1]));
 
-		// we don't care about if router is piped, just choose the least loaded worker
+		// we don't care if router is piped, just choose the least loaded worker
 		if (pipedRoutersIds.size === 0 ||
-			pipedRoutersIds.size === mediasoupRouters.size)
+			pipedRoutersIds.size === mediasoupRoutersOfRoom.size)
 		{
 			const workerId = sortedWorkerLoads.keys().next().value;
+			const worker = allMediasoupWorkersOnServer.get(workerId);
 
-			for (const worker of mediasoupWorkers)
+			for (const routerId of worker.appData.routers.keys())
 			{
-				if (worker._pid === workerId)
+				if (mediasoupRoutersOfRoom.has(routerId))
 				{
-					for (const router of worker._routers)
-					{
-						const routerId = router._internal.routerId;
-
-						if (mediasoupRouters.has(routerId))
-						{
-							return routerId;
-						}
-					}
+					return routerId;
 				}
 			}
 		}
@@ -144,44 +142,31 @@ class Room extends EventEmitter
 			// find if there is a piped router that is on a worker that is below limit
 			for (const [ workerId, workerLoad ] of sortedWorkerLoads.entries())
 			{
-				for (const worker of mediasoupWorkers)
-				{
-					if (worker._pid === workerId)
-					{
-						for (const router of worker._routers)
-						{
-							const routerId = router._internal.routerId;
+				const worker = allMediasoupWorkersOnServer.get(workerId);
 
-							// on purpose we check if the worker load is below the limit,
-							// as in reality the worker load is imortant,
-							// not the router load
-							if (mediasoupRouters.has(routerId) &&
-								pipedRoutersIds.has(routerId) &&
-								workerLoad < ROUTER_SCALE_SIZE)
-							{
-								return routerId;
-							}
-						}
+				for (const routerId of worker.appData.routers.keys())
+				{
+					// we check if there is a piped router
+					// on a worker with its load below the limit,
+					if (mediasoupRoutersOfRoom.has(routerId) &&
+						pipedRoutersIds.has(routerId) &&
+						workerLoad < ROUTER_SCALE_SIZE)
+					{
+						return routerId;
 					}
 				}
 			}
 
-			// no piped router found, we need to return router from least loaded worker
+			// no piped router found, we need to return the router
+			// from least loaded worker
 			const workerId = sortedWorkerLoads.keys().next().value;
+			const worker = allMediasoupWorkersOnServer.get(workerId);
 
-			for (const worker of mediasoupWorkers)
+			for (const routerId of worker.appData.routers.keys())
 			{
-				if (worker._pid === workerId)
+				if (mediasoupRoutersOfRoom.has(routerId))
 				{
-					for (const router of worker._routers)
-					{
-						const routerId = router._internal.routerId;
-
-						if (mediasoupRouters.has(routerId))
-						{
-							return routerId;
-						}
-					}
+					return routerId;
 				}
 			}
 		}
@@ -192,8 +177,7 @@ class Room extends EventEmitter
 	 *
 	 * @async
 	 *
-	 * @param {mediasoup.Worker} mediasoupWorkers - The mediasoup Worker in which a new
-	 *   mediasoup Router must be created.
+	 * @param {Map [mediasoup.Worker.pid,mediasoup.Worker]} map of mediasoupWorkers.
 	 * @param {String} roomId - Id of the Room instance.
 	 */
 	static async create({ mediasoupWorkers, roomId, peers })
@@ -205,28 +189,29 @@ class Room extends EventEmitter
 
 		const mediasoupRouters = new Map();
 
-		for (const worker of mediasoupWorkers)
+		const audioLevelObservers = new Map();
+
+		for (const worker of mediasoupWorkers.values())
 		{
 			const router = await worker.createRouter({ mediaCodecs });
 
 			mediasoupRouters.set(router.id, router);
+
+			const audioLevelObserver = await router.createAudioLevelObserver(
+				{
+					maxEntries : 1,
+					threshold  : -80,
+					interval   : 800
+				});
+
+			audioLevelObservers.set(router.id,
+				{ audioLevelObserver: audioLevelObserver, peerId: null, volume: -1000 });
 		}
-
-		const firstRouter = mediasoupRouters.get(Room.getLeastLoadedRouter(
-			mediasoupWorkers, peers, mediasoupRouters));
-
-		// Create a mediasoup AudioLevelObserver on first router
-		const audioLevelObserver = await firstRouter.createAudioLevelObserver(
-			{
-				maxEntries : 1,
-				threshold  : -80,
-				interval   : 800
-			});
 
 		return new Room({
 			roomId,
 			mediasoupRouters,
-			audioLevelObserver,
+			audioLevelObservers,
 			mediasoupWorkers,
 			peers
 		});
@@ -235,7 +220,7 @@ class Room extends EventEmitter
 	constructor({
 		roomId,
 		mediasoupRouters,
-		audioLevelObserver,
+		audioLevelObservers,
 		mediasoupWorkers,
 		peers
 	})
@@ -261,7 +246,8 @@ class Room extends EventEmitter
 		this._queue = new AwaitQueue();
 
 		// Locked flag.
-		this._locked = false;
+		this._locked = config.roomsUnlocked.length
+			&& !config.roomsUnlocked.includes(roomId);
 
 		// if true: accessCode is a possibility to open the room
 		this._joinByAccesCode = true;
@@ -282,17 +268,22 @@ class Room extends EventEmitter
 
 		this._selfDestructTimeout = null;
 
-		// Array of mediasoup Router instances.
+		// Mediasoup Router instances map.
 		this._mediasoupRouters = mediasoupRouters;
 
-		// mediasoup AudioLevelObserver.
-		this._audioLevelObserver = audioLevelObserver;
+		// Mediasoup AudioLevelObserver instances map.
+		this._audioLevelObservers = audioLevelObservers;
+
+		this._lastActiveSpeakerUpdateTimestamp = 0;
 
 		// Current active speaker.
 		this._currentActiveSpeaker = null;
 
 		this._handleLobby();
-		this._handleAudioLevelObserver();
+
+		this._handleAudioLevelObservers();
+
+		this._tokens = new Map();
 	}
 
 	isLocked()
@@ -335,6 +326,8 @@ class Room extends EventEmitter
 		// Close the mediasoup Routers.
 		for (const router of this._mediasoupRouters.values())
 		{
+			this._audioLevelObservers.get(router.id).audioLevelObserver.close();
+			this._audioLevelObservers.get(router.id).audioLevelObserver = null;
 			router.close();
 		}
 
@@ -342,12 +335,19 @@ class Room extends EventEmitter
 
 		this._mediasoupWorkers = null;
 
+		this._audioLevelObservers.clear();
+
 		this._mediasoupRouters.clear();
 
-		this._audioLevelObserver = null;
+		this._tokens.clear();
 
 		// Emit 'close' event.
 		this.emit('close');
+	}
+
+	getToken(peerId)
+	{
+		return this._tokens.get(peerId);
 	}
 
 	verifyPeer({ id, token })
@@ -387,7 +387,7 @@ class Room extends EventEmitter
 		else if (this._hasAccess(peer, BYPASS_ROOM_LOCK))
 			this._peerJoining(peer);
 		else if (
-			'maxUsersPerRoom' in config &&
+			config.maxUsersPerRoom &&
 			(
 				Object.keys(this._peers).length +
 				this._lobby.peerList().length
@@ -502,12 +502,29 @@ class Room extends EventEmitter
 		});
 	}
 
-	_handleAudioLevelObserver()
+	_sendActiveSpeakerInfo()
 	{
-		// Set audioLevelObserver events.
-		this._audioLevelObserver.on('volumes', (volumes) =>
+		let peerId = null;
+
+		let maxVolume = -1000;
+
+		this._audioLevelObservers.forEach((audioLevelObject) =>
 		{
-			const { producer, volume } = volumes[0];
+			const tmpPeerId = audioLevelObject.peerId;
+
+			if (tmpPeerId && audioLevelObject.volume > maxVolume)
+			{
+				maxVolume = audioLevelObject.volume;
+				peerId = tmpPeerId;
+			}
+		});
+
+		if (!peerId || Date.now() > (this._lastActiveSpeakerUpdateTimestamp + 1000))
+		{
+			if (peerId)
+			{
+				this._lastActiveSpeakerUpdateTimestamp = Date.now();
+			}
 
 			// Notify all Peers.
 			for (const peer of this.getJoinedPeers())
@@ -516,23 +533,37 @@ class Room extends EventEmitter
 					peer.socket,
 					'activeSpeaker',
 					{
-						peerId : producer.appData.peerId,
-						volume : volume
+						peerId : peerId,
+						volume : maxVolume
 					});
 			}
-		});
+		}
+	}
 
-		this._audioLevelObserver.on('silence', () =>
+	_handleAudioLevelObservers()
+	{
+		this._audioLevelObservers.forEach((audioLevelObject, routerId) =>
 		{
-			// Notify all Peers.
-			for (const peer of this.getJoinedPeers())
+			// Set audioLevelObserver events.
+			audioLevelObject.audioLevelObserver.on('volumes', (volumes) =>
 			{
-				this._notification(
-					peer.socket,
-					'activeSpeaker',
-					{ peerId: null }
-				);
-			}
+				const { producer, volume } = volumes[0];
+
+				const audioLevelObj = this._audioLevelObservers.get(routerId);
+
+				audioLevelObj.peerId = producer.appData.peerId;
+				audioLevelObj.volume = volume;
+				this._sendActiveSpeakerInfo();
+			});
+
+			audioLevelObject.audioLevelObserver.on('silence', () =>
+			{
+				const audioLevelObj = this._audioLevelObservers.get(routerId);
+
+				audioLevelObj.peerId = null;
+				audioLevelObj.volume = -1000;
+				this._sendActiveSpeakerInfo();
+			});
 		});
 	}
 
@@ -574,6 +605,13 @@ class Room extends EventEmitter
 			{
 				logger.info(
 					'Room deserted for some time, closing the room [roomId:"%s"]',
+					this._roomId);
+				this.close();
+			}
+			else if (this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked())
+			{
+				logger.info(
+					'Room deserted for some time, closing the room [roomId:"%s"] and kick peers from the lobby',
 					this._roomId);
 				this.close();
 			}
@@ -621,13 +659,11 @@ class Room extends EventEmitter
 			{
 				const token = jwt.sign({ id: peer.id }, this._uuid, { noTimestamp: true });
 
-				peer.socket.handshake.session.token = token;
-
-				peer.socket.handshake.session.save();
+				this._tokens.set(peer.id, token);
 
 				let turnServers;
 
-				if ('turnAPIURI' in config)
+				if (config.turnAPIURI)
 				{
 					try
 					{
@@ -635,7 +671,9 @@ class Room extends EventEmitter
 							config.turnAPIURI,
 							{
 								timeout : config.turnAPITimeout || 2000,
-								params  : {
+								proxy   : config.turnAPIProxy ? config.turnAPIProxy : null,
+								params  :
+								{
 									...config.turnAPIparams,
 									'api_key' : config.turnAPIKey,
 									'ip'      : peer.socket.request.connection.remoteAddress
@@ -650,13 +688,13 @@ class Room extends EventEmitter
 					}
 					catch (error)
 					{
-						if ('backupTurnServers' in config)
+						if (config.backupTurnServers)
 							turnServers = config.backupTurnServers;
 
 						logger.error('_peerJoining() | error on REST turn [error:"%o"]', error);
 					}
 				}
-				else if ('backupTurnServers' in config)
+				else if (config.backupTurnServers)
 				{
 					turnServers = config.backupTurnServers;
 				}
@@ -761,7 +799,14 @@ class Room extends EventEmitter
 				{
 					logger.error('"request" failed [error:"%o"]', error);
 
-					cb(error);
+					if (error instanceof NotFoundInMediasoupError)
+					{
+						cb({ notFoundInMediasoupError: true });
+					}
+					else
+					{
+						cb(error);
+					}
 				});
 		});
 
@@ -812,6 +857,13 @@ class Room extends EventEmitter
 		// lobby is empty, close the room after a while.
 		if (this.checkEmpty() && this._lobby.checkEmpty())
 			this.selfDestructCountdown();
+		// If this is the last Peer in the room,
+		// lobby is not empty and room is locked, 
+		// close the room after a while.
+		else if (this.checkEmpty() && !this._lobby.checkEmpty() && this.isLocked())
+		{
+			this.selfDestructCountdown();
+		}
 	}
 
 	async _handleSocketRequest(peer, request, cb)
@@ -837,7 +889,8 @@ class Room extends EventEmitter
 				const {
 					displayName,
 					picture,
-					rtpCapabilities
+					rtpCapabilities,
+					returning
 				} = request.data;
 
 				// Store client data into the Peer data object.
@@ -898,7 +951,7 @@ class Room extends EventEmitter
 					this._notification(
 						otherPeer.socket,
 						'newPeer',
-						peer.peerInfo
+						{ ...peer.peerInfo, returning }
 					);
 				}
 
@@ -960,7 +1013,10 @@ class Room extends EventEmitter
 				if (maxIncomingBitrate)
 				{
 					try { await transport.setMaxIncomingBitrate(maxIncomingBitrate); }
-					catch (error) {}
+					catch (error)
+					{
+						logger.error('CreateWebRtcTransport transport.setMaxIncomingBitrate ERROR [roomId:"%s", maxIncomingBitrate:"%s", transportId:"%s", error:"%o"]', this._roomId, maxIncomingBitrate, transport.id, error);
+					}
 				}
 
 				break;
@@ -1045,8 +1101,19 @@ class Room extends EventEmitter
 				// the 'loudest' event of the audioLevelObserver.
 				appData = { ...appData, peerId: peer.id };
 
-				const producer =
-					await transport.produce({ kind, rtpParameters, appData });
+				let producer = null;
+
+				try
+				{
+					producer =
+						await transport.produce({ kind, rtpParameters, appData });
+				}
+				catch (error)
+				{
+					throw new Error(
+						'transport.produce failed: [kind: "%s", rtpParameters: "%o", appData: "%o", error: "%o"]',
+						kind, rtpParameters, appData, error);
+				}
 
 				const pipeRouters = this._getRoutersToPipeTo(peer.routerId);
 
@@ -1093,8 +1160,11 @@ class Room extends EventEmitter
 				// Add into the audioLevelObserver.
 				if (kind === 'audio')
 				{
-					this._audioLevelObserver.addProducer({ producerId: producer.id })
-						.catch(() => {});
+					this._audioLevelObservers.get(peer.routerId).audioLevelObserver.addProducer(
+						{ producerId: producer.id }).catch((error) =>
+					{
+						logger.error('audioLevelObserver addProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
+					});
 				}
 
 				break;
@@ -1111,6 +1181,12 @@ class Room extends EventEmitter
 
 				if (!producer)
 					throw new Error(`producer with id "${producerId}" not found`);
+
+				this._audioLevelObservers.get(peer.routerId).audioLevelObserver.removeProducer(
+					{ producerId: producer.id }).catch((error) =>
+				{
+					logger.error('audioLevelObserver removeProducer ERROR [roomId:"%s", peerId:"%s", routerId:"%s", producerId:"%s", error:"%o"]', this._roomId, peer.id, peer.routerId, producer.id, error);
+				});
 
 				producer.close();
 
@@ -1170,7 +1246,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.pause();
 
@@ -1189,7 +1265,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.resume();
 
@@ -1208,7 +1284,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.setPreferredLayers({ spatialLayer, temporalLayer });
 
@@ -1227,7 +1303,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.setPriority(priority);
 
@@ -1246,7 +1322,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.requestKeyFrame();
 
@@ -1291,7 +1367,7 @@ class Room extends EventEmitter
 				const consumer = peer.getConsumer(consumerId);
 
 				if (!consumer)
-					throw new Error(`consumer with id "${consumerId}" not found`);
+					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				const stats = await consumer.getStats();
 
@@ -1318,7 +1394,7 @@ class Room extends EventEmitter
 				break;
 			}
 
-			/* case 'changePicture':
+			case 'changePicture':
 			{
 				// Ensure the Peer is joined.
 				if (!peer.joined)
@@ -1338,7 +1414,7 @@ class Room extends EventEmitter
 				cb();
 
 				break;
-			} */
+			}
 
 			case 'chatMessage':
 			{
@@ -1424,10 +1500,45 @@ class Room extends EventEmitter
 				if (!this._hasPermission(peer, MODERATE_CHAT))
 					throw new Error('peer not authorized');
 
+				if (!this._hasPermission(peer, MODERATE_FILES))
+					throw new Error('peer not authorized');
+
 				this._chatHistory = [];
+
+				this._fileHistory = [];
 
 				// Spread to others
 				this._notification(peer.socket, 'moderator:clearChat', null, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'setLocalRecording':
+			{
+				if (!this._hasPermission(peer, LOCAL_RECORD_ROOM))
+					throw new Error('peer not authorized');
+
+				const { localRecordingState } = request.data;
+
+				logger.debug('Recoding State changed to state: %O', localRecordingState);
+
+				peer.localRecordingState = localRecordingState;
+
+				try
+				{
+					// Spread to others
+					this._notification(peer.socket, 'setLocalRecording', {
+						peerId : peer.id,
+						localRecordingState
+					}, true);
+				}
+				catch (error)
+				{
+					logger.error('Unable to send setLocalRecording notification %O', error);
+				}
 
 				// Return no error
 				cb();
@@ -1445,6 +1556,22 @@ class Room extends EventEmitter
 				// Spread to others
 				this._notification(peer.socket, 'lockRoom', {
 					peerId : peer.id
+				}, true);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'addConsentForRecording':
+			{
+				const { consent } = request.data;
+				// Spread to others
+
+				this._notification(peer.socket, 'addConsentForRecording', {
+					peerId  : peer.id,
+					consent : consent
 				}, true);
 
 				// Return no error
@@ -1542,31 +1669,17 @@ class Room extends EventEmitter
 				if (!this._hasPermission(peer, SHARE_FILE))
 					throw new Error('peer not authorized');
 
-				const { magnetUri } = request.data;
+				// const { magnetUri, time } = request.data;
+				const file = request.data;
 
-				this._fileHistory.push({ peerId: peer.id, magnetUri: magnetUri });
-
-				// Spread to others
-				this._notification(peer.socket, 'sendFile', {
-					peerId    : peer.id,
-					magnetUri : magnetUri
-				}, true);
-
-				// Return no error
-				cb();
-
-				break;
-			}
-
-			case 'moderator:clearFileSharing':
-			{
-				if (!this._hasPermission(peer, MODERATE_FILES))
-					throw new Error('peer not authorized');
-
-				this._fileHistory = [];
+				this._fileHistory.push({ ...file });
 
 				// Spread to others
-				this._notification(peer.socket, 'moderator:clearFileSharing', null, true);
+				this._notification(
+					peer.socket,
+					'sendFile', { ...file },
+					true
+				);
 
 				// Return no error
 				cb();
@@ -1830,6 +1943,8 @@ class Room extends EventEmitter
 		{
 			// Remove from its map.
 			consumerPeer.removeConsumer(consumer.id);
+
+			this._notification(consumerPeer.socket, 'consumerClosed', { consumerId: consumer.id });
 		});
 
 		consumer.on('producerclose', () =>
@@ -1871,7 +1986,7 @@ class Room extends EventEmitter
 		// Send a request to the remote Peer with Consumer parameters.
 		try
 		{
-			await this._request(
+			this._notification(
 				consumerPeer.socket,
 				'newConsumer',
 				{
@@ -1882,20 +1997,8 @@ class Room extends EventEmitter
 					rtpParameters  : consumer.rtpParameters,
 					type           : consumer.type,
 					appData        : producer.appData,
-					producerPaused : consumer.producerPaused
-				}
-			);
-
-			// Now that we got the positive response from the remote Peer and, if
-			// video, resume the Consumer to ask for an efficient key frame.
-			await consumer.resume();
-
-			this._notification(
-				consumerPeer.socket,
-				'consumerScore',
-				{
-					consumerId : consumer.id,
-					score      : consumer.score
+					producerPaused : consumer.producerPaused,
+					score          : consumer.score
 				}
 			);
 		}
@@ -2075,7 +2178,7 @@ class Room extends EventEmitter
 
 			for (const producerId of peer.producers.keys())
 			{
-				if (router._producers.has(producerId))
+				if (router.appData.producers.has(producerId))
 				{
 					continue;
 				}

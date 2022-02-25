@@ -2,24 +2,27 @@ import Logger from './Logger';
 import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
-import * as requestActions from './actions/requestActions';
-import * as meActions from './actions/meActions';
-import * as intlActions from './actions/intlActions';
-import * as roomActions from './actions/roomActions';
-import * as peerActions from './actions/peerActions';
-import * as peerVolumeActions from './actions/peerVolumeActions';
-import * as settingsActions from './actions/settingsActions';
-import * as chatActions from './actions/chatActions';
-import * as fileActions from './actions/fileActions';
-import * as lobbyPeerActions from './actions/lobbyPeerActions';
-import * as consumerActions from './actions/consumerActions';
-import * as producerActions from './actions/producerActions';
-import * as notificationActions from './actions/notificationActions';
-import * as transportActions from './actions/transportActions';
+import * as requestActions from './store/actions/requestActions';
+import * as meActions from './store/actions/meActions';
+import * as intlActions from './store/actions/intlActions';
+import * as roomActions from './store/actions/roomActions';
+import * as peerActions from './store/actions/peerActions';
+import * as peerVolumeActions from './store/actions/peerVolumeActions';
+import * as settingsActions from './store/actions/settingsActions';
+import * as chatActions from './store/actions/chatActions';
+import * as fileActions from './store/actions/fileActions';
+import * as lobbyPeerActions from './store/actions/lobbyPeerActions';
+import * as consumerActions from './store/actions/consumerActions';
+import * as producerActions from './store/actions/producerActions';
+import * as notificationActions from './store/actions/notificationActions';
+import * as transportActions from './store/actions/transportActions';
 import Spotlights from './Spotlights';
 import { permissions } from './permissions';
-import * as locales from './translations/locales';
+import * as locales from './intl/locales';
 import { createIntl } from 'react-intl';
+import * as recorderActions from './store/actions/recorderActions';
+import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
+import { config } from './config';
 
 let createTorrent;
 
@@ -33,62 +36,83 @@ let io;
 
 let ScreenShare;
 
-let requestTimeout,
-	lastN,
-	mobileLastN,
-	videoAspectRatio;
-
-if (process.env.NODE_ENV !== 'test')
-{
-	({
-		requestTimeout = 20000,
-		lastN = 4,
-		mobileLastN = 1,
-		videoAspectRatio = 1.777 // 16 : 9
-	} = window.config);
-}
-
 const logger = new Logger('RoomClient');
 
 const VIDEO_CONSTRAINS =
 {
 	'low' :
 	{
-		width       : { ideal: 320 },
-		aspectRatio : videoAspectRatio
+		width : 320
 	},
 	'medium' :
 	{
-		width       : { ideal: 640 },
-		aspectRatio : videoAspectRatio
+		width : 640
 	},
 	'high' :
 	{
-		width       : { ideal: 1280 },
-		aspectRatio : videoAspectRatio
+		width : 1280
 	},
 	'veryhigh' :
 	{
-		width       : { ideal: 1920 },
-		aspectRatio : videoAspectRatio
+		width : 1920
 	},
 	'ultra' :
 	{
-		width       : { ideal: 3840 },
-		aspectRatio : videoAspectRatio
+		width : 3840
 	}
 };
+
+const DEFAULT_NETWORK_PRIORITIES =
+{
+	audio            : 'high',
+	mainVideo        : 'high',
+	additionalVideos : 'medium',
+	screenShare      : 'medium'
+};
+
+function getVideoConstrains(resolution, aspectRatio)
+{
+	return {
+		width  : { ideal: VIDEO_CONSTRAINS[resolution].width },
+		height : { ideal: VIDEO_CONSTRAINS[resolution].width / aspectRatio }
+	};
+}
 
 const PC_PROPRIETARY_CONSTRAINTS =
 {
 	optional : [ { googDscp: true } ]
 };
 
-const VIDEO_SIMULCAST_ENCODINGS =
-[
-	{ scaleResolutionDownBy: 4, maxBitRate: 100000 },
-	{ scaleResolutionDownBy: 1, maxBitRate: 1200000 }
-];
+const VIDEO_SIMULCAST_PROFILES =
+{
+	3840 :
+		[
+			{ scaleResolutionDownBy: 12, maxBitRate: 150000 },
+			{ scaleResolutionDownBy: 6, maxBitRate: 500000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 10000000 }
+		],
+	1920 :
+		[
+			{ scaleResolutionDownBy: 6, maxBitRate: 150000 },
+			{ scaleResolutionDownBy: 3, maxBitRate: 500000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 3500000 }
+		],
+	1280 :
+		[
+			{ scaleResolutionDownBy: 4, maxBitRate: 150000 },
+			{ scaleResolutionDownBy: 2, maxBitRate: 500000 },
+			{ scaleResolutionDownBy: 1, maxBitRate: 1200000 }
+		],
+	640 :
+	[
+		{ scaleResolutionDownBy: 2, maxBitRate: 150000 },
+		{ scaleResolutionDownBy: 1, maxBitRate: 500000 }
+	],
+	320 :
+	[
+		{ scaleResolutionDownBy: 1, maxBitRate: 150000 }
+	]
+};
 
 // Used for VP9 webcam video.
 const VIDEO_KSVC_ENCODINGS =
@@ -102,9 +126,72 @@ const VIDEO_SVC_ENCODINGS =
 	{ scalabilityMode: 'S3T3', dtx: true }
 ];
 
+/**
+ * Validates the simulcast `encodings` array extracting the resolution scalings
+ * array.
+ * ref. https://www.w3.org/TR/webrtc/#rtp-media-api
+ * 
+ * @param {*} encodings
+ * @returns the resolution scalings array
+ */
+function getResolutionScalings(encodings)
+{
+	const resolutionScalings = [];
+
+	// SVC encodings
+	if (encodings.length === 1)
+	{
+		const { spatialLayers } =
+			mediasoupClient.parseScalabilityMode(encodings[0].scalabilityMode);
+
+		for (let i=0; i < spatialLayers; i++)
+		{
+			resolutionScalings.push(2 ** (spatialLayers - i - 1));
+		}
+
+		return resolutionScalings;
+	}
+
+	// Simulcast encodings
+	let scaleResolutionDownByDefined = false;
+
+	encodings.forEach((encoding) =>
+	{
+		if (encoding.scaleResolutionDownBy !== undefined)
+		{
+			// at least one scaleResolutionDownBy is defined
+			scaleResolutionDownByDefined = true;
+			// scaleResolutionDownBy must be >= 1.0
+			resolutionScalings.push(Math.max(1.0, encoding.scaleResolutionDownBy));
+		}
+		else
+		{
+			// If encodings contains any encoding whose scaleResolutionDownBy
+			// attribute is defined, set any undefined scaleResolutionDownBy
+			// of the other encodings to 1.0.
+			resolutionScalings.push(1.0);
+		}
+	});
+
+	// If the scaleResolutionDownBy attribues of sendEncodings are
+	// still undefined, initialize each encoding's scaleResolutionDownBy
+	// to 2^(length of sendEncodings - encoding index - 1).
+	if (!scaleResolutionDownByDefined)
+	{
+		encodings.forEach((encoding, index) =>
+		{
+			resolutionScalings[index] = 2 ** (encodings.length - index - 1);
+		});
+	}
+
+	return resolutionScalings;
+}
+
 let store;
 
 let intl;
+
+const insertableStreamsSupported = Boolean(RTCRtpSender.prototype.createEncodedStreams);
 
 export default class RoomClient
 {
@@ -124,6 +211,7 @@ export default class RoomClient
 			accessCode,
 			device,
 			produce,
+			headless,
 			forceTcp,
 			displayName,
 			muted,
@@ -154,8 +242,12 @@ export default class RoomClient
 		this._basePath = basePath;
 
 		// Use displayName
+		this._displayName=null;
 		if (displayName)
+		{
 			store.dispatch(settingsActions.setDisplayName(displayName));
+			this._displayName=displayName;
+		}
 
 		this._tracker = 'wss://tracker.lab.vvc.niif.hu:443';
 
@@ -165,14 +257,10 @@ export default class RoomClient
 		// Whether simulcast should be used.
 		this._useSimulcast = false;
 
-		if ('simulcast' in window.config)
-			this._useSimulcast = window.config.simulcast;
+		this._useSimulcast = config.simulcast;
 
 		// Whether simulcast should be used for sharing
-		this._useSharingSimulcast = false;
-
-		if ('simulcastSharing' in window.config)
-			this._useSharingSimulcast = window.config.simulcastSharing;
+		this._useSharingSimulcast = config.simulcastSharing;
 
 		this._muted = muted;
 
@@ -185,8 +273,19 @@ export default class RoomClient
 		// Access code
 		this._accessCode = accessCode;
 
-		// Alert sound
-		this._soundAlert = new Audio('/sounds/notify.mp3');
+		// Alert sounds
+		this._soundAlerts = { 'default': { audio: new Audio('/sounds/notify.mp3') } };
+		if (config.notificationSounds)
+		{
+			for (const [ k, v ] of Object.entries(config.notificationSounds))
+			{
+				if (v != null && v.play !== undefined)
+					this._soundAlerts[k] = {
+						audio : new Audio(v.play),
+						delay : v.delay ? v.delay: 0
+					};
+			}
+		}
 
 		// Socket.io peer connection
 		this._signalingSocket = null;
@@ -206,15 +305,16 @@ export default class RoomClient
 
 		// Max spotlights
 		if (device.platform === 'desktop')
-			this._maxSpotlights = lastN;
+			this._maxSpotlights = config.lastN;
 		else
-			this._maxSpotlights = mobileLastN;
+			this._maxSpotlights = config.mobileLastN;
 
 		store.dispatch(
 			settingsActions.setLastN(this._maxSpotlights));
 
 		// Manager of spotlight
-		this._spotlights = new Spotlights(this._maxSpotlights, this);
+		this._spotlights = new Spotlights(this._maxSpotlights,
+			store.getState().settings.hideNoVideoParticipants, this);
 
 		// Transport for sending.
 		this._sendTransport = null;
@@ -253,11 +353,39 @@ export default class RoomClient
 
 		this._screenSharingProducer = null;
 
+		this._screenSharingAudioProducer = null;
+
 		this._startKeyListener();
 
 		this._startDevicesListener();
 
 		this.setLocale(store.getState().intl.locale);
+
+		if (store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(store.getState().settings.localPicture));
+		}
+		store.dispatch(
+			settingsActions.setRecorderSupportedMimeTypes(this.getRecorderSupportedMimeTypes())
+		);
+
+		// Receive transport restart ICE object
+		this._recvRestartIce = { timer: null, restarting: false };
+
+		// Send transport restart ICE object
+		this._sendRestartIce = { timer: null, restarting: false };
+
+		if (headless)
+		{
+			const encodedRoomId =
+				encodeURIComponent(decodeURIComponent(window.location.pathname.slice(1)));
+
+			this.join({
+				roomId    : encodedRoomId,
+				joinVideo : false,
+				joinAudio : false
+			});
+		}
 
 	}
 
@@ -294,7 +422,7 @@ export default class RoomClient
 
 			const source = event.target;
 
-			const exclude = [ 'input', 'textarea' ];
+			const exclude = [ 'input', 'textarea', 'div' ];
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
@@ -449,7 +577,7 @@ export default class RoomClient
 
 			const source = event.target;
 
-			const exclude = [ 'input', 'textarea' ];
+			const exclude = [ 'input', 'textarea', 'div' ];
 
 			if (exclude.indexOf(source.tagName.toLowerCase()) === -1)
 			{
@@ -477,7 +605,6 @@ export default class RoomClient
 			}
 			event.preventDefault();
 		}, true);
-
 	}
 
 	_startDevicesListener()
@@ -534,14 +661,42 @@ export default class RoomClient
 		window.open(`/auth/logout?peerId=${this._peerId}&roomId=${roomId}`, 'logoutWindow');
 	}
 
+	setLoggedIn(loggedIn)
+	{
+		logger.debug('setLoggedIn() | [loggedIn: "%s"]', loggedIn);
+
+		store.dispatch(meActions.loggedIn(loggedIn));
+
+	}
+
+	setPicture(picture)
+	{
+		store.dispatch(settingsActions.setLocalPicture(picture));
+		store.dispatch(meActions.setPicture(picture));
+		this.changePicture(picture);
+	}
+
 	receiveLoginChildWindow(data)
 	{
 		logger.debug('receiveFromChildWindow() | [data:"%o"]', data);
 
-		const { displayName, picture } = data;
+		const { picture } = data;
+
+		let displayName;
+
+		if (typeof(data.displayName) === 'undefined' || !data.displayName)
+			displayName = '';
+		else
+			displayName = data.displayName;
 
 		store.dispatch(settingsActions.setDisplayName(displayName));
-		store.dispatch(meActions.setPicture(picture));
+
+		this._displayName=displayName;
+
+		if (!store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(picture));
+		}
 
 		store.dispatch(meActions.loggedIn(true));
 
@@ -558,7 +713,10 @@ export default class RoomClient
 	{
 		logger.debug('receiveLogoutChildWindow()');
 
-		store.dispatch(meActions.setPicture(null));
+		if (!store.getState().settings.localPicture)
+		{
+			store.dispatch(meActions.setPicture(null));
+		}
 
 		store.dispatch(meActions.loggedIn(false));
 
@@ -571,13 +729,24 @@ export default class RoomClient
 			}));
 	}
 
-	_soundNotification()
+	_soundNotification(type = 'default')
 	{
 		const { notificationSounds } = store.getState().settings;
 
 		if (notificationSounds)
 		{
-			const alertPromise = this._soundAlert.play();
+			const soundAlert = this._soundAlerts[type] === undefined
+				? this._soundAlerts['default'] : this._soundAlerts[type];
+
+			const now = Date.now();
+
+			if (soundAlert.last !== undefined && (now - soundAlert.last) < soundAlert.delay)
+			{
+				return;
+			}
+			soundAlert.last = now;
+
+			const alertPromise = soundAlert.audio.play();
 
 			if (alertPromise !== undefined)
 			{
@@ -603,7 +772,7 @@ export default class RoomClient
 				called = true;
 				callback(new SocketTimeoutError('Request timed out'));
 			},
-			requestTimeout
+			config.requestTimeout
 		);
 
 		return (...args) =>
@@ -676,11 +845,7 @@ export default class RoomClient
 	{
 		logger.debug('sendRequest() [method:"%s", data:"%o"]', method, data);
 
-		const {
-			requestRetries = 3
-		} = window.config;
-
-		for (let tries = 0; tries < requestRetries; tries++)
+		for (let tries = 0; tries < config.requestRetries; tries++)
 		{
 			try
 			{
@@ -690,7 +855,7 @@ export default class RoomClient
 			{
 				if (
 					error instanceof SocketTimeoutError &&
-					tries < requestRetries
+					tries < config.requestRetries
 				)
 					logger.warn('sendRequest() | timeout, retrying [attempt:"%s"]', tries);
 				else
@@ -726,6 +891,9 @@ export default class RoomClient
 						displayName
 					})
 				}));
+
+			this._displayName=displayName;
+
 		}
 		catch (error)
 		{
@@ -766,9 +934,22 @@ export default class RoomClient
 		try
 		{
 			store.dispatch(
-				chatActions.addUserMessage(chatMessage.text));
+				chatActions.addMessage(
+					{
+						...chatMessage,
+						// name    : 'Me',
+						sender  : 'client',
+						picture : undefined,
+						isRead  : true
+					}
+				)
+			);
+
+			store.dispatch(
+				chatActions.setIsScrollEnd(true));
 
 			await this.sendRequest('chatMessage', { chatMessage });
+
 		}
 		catch (error)
 		{
@@ -807,6 +988,56 @@ export default class RoomClient
 		});
 	}
 
+	async saveChat()
+	{
+		const html = window.document.getElementsByTagName('html')[0].cloneNode(true);
+
+		const chatEl = html.querySelector('#chatList');
+
+		html.querySelector('body').replaceChildren(chatEl);
+
+		const fileName= 'chat.html';
+
+		// remove unused tags
+		[ 'script', 'link' ].forEach((element) =>
+		{
+			const el = html.getElementsByTagName(element);
+
+			let i = el.length;
+
+			while (i--) el[i].parentNode.removeChild(el[i]);
+		});
+
+		// embed images
+		for await (const img of html.querySelectorAll('img'))
+		{
+			img.src = `${img.src}`;
+
+			await fetch(img.src)
+
+				.then((response) => response.blob())
+				.then((data) =>
+				{
+					const reader = new FileReader();
+
+					reader.readAsDataURL(data);
+
+					reader.onloadend = () => { img.src = reader.result; };
+				});
+		}
+
+		const blob = new Blob([ html.innerHTML ], { type: 'text/html;charset=utf-8' });
+
+		saveAs(blob, fileName);
+	}
+
+	sortChat(order)
+	{
+		store.dispatch(
+			chatActions.sortChat(order)
+		);
+	}
+
 	handleDownload(magnetUri)
 	{
 		store.dispatch(
@@ -840,20 +1071,20 @@ export default class RoomClient
 			return;
 		}
 
-		let lastMove = 0;
+		// let lastMove = 0;
 
 		torrent.on('download', () =>
 		{
-			if (Date.now() - lastMove > 1000)
-			{
-				store.dispatch(
-					fileActions.setFileProgress(
-						torrent.magnetURI,
-						torrent.progress
-					));
+			// if (Date.now() - lastMove > 1000)
+			// {
+			store.dispatch(
+				fileActions.setFileProgress(
+					torrent.magnetURI,
+					torrent.progress
+				));
 
-				lastMove = Date.now();
-			}
+			// lastMove = Date.now();
+			// }
 		});
 
 		torrent.on('done', () =>
@@ -866,7 +1097,7 @@ export default class RoomClient
 		});
 	}
 
-	async shareFiles(files)
+	async shareFiles(data)
 	{
 		store.dispatch(requestActions.notify(
 			{
@@ -876,7 +1107,7 @@ export default class RoomClient
 				})
 			}));
 
-		createTorrent(files, (err, torrent) =>
+		createTorrent(data.attachment, (err, torrent) =>
 		{
 			if (err)
 			{
@@ -904,18 +1135,21 @@ export default class RoomClient
 						})
 					}));
 
-				store.dispatch(fileActions.addFile(
-					this._peerId,
-					existingTorrent.magnetURI
-				));
+				const file = {
+					...data,
+					peerId    : this._peerId,
+					magnetUri : existingTorrent.magnetURI
+				};
 
-				this._sendFile(existingTorrent.magnetURI);
+				store.dispatch(fileActions.addFile(file));
+
+				this._sendFile(file);
 
 				return;
 			}
 
 			this._webTorrent.seed(
-				files,
+				data.attachment,
 				{ announceList: [ [ this._tracker ] ] },
 				(newTorrent) =>
 				{
@@ -927,24 +1161,26 @@ export default class RoomClient
 							})
 						}));
 
-					store.dispatch(fileActions.addFile(
-						this._peerId,
-						newTorrent.magnetURI
-					));
+					const file = {
+						...data,
+						peerId    : this._peerId,
+						magnetUri : newTorrent.magnetURI
+					};
 
-					this._sendFile(newTorrent.magnetURI);
+					store.dispatch(fileActions.addFile(file));
+
+					this._sendFile(file);
 				});
 		});
 	}
 
-	// { file, name, picture }
-	async _sendFile(magnetUri)
+	async _sendFile(file)
 	{
-		logger.debug('sendFile() [magnetUri:"%o"]', magnetUri);
+		logger.debug('sendFile() [magnetUri:"%o"]', file.magnetUri);
 
 		try
 		{
-			await this.sendRequest('sendFile', { magnetUri });
+			await this.sendRequest('sendFile', file);
 		}
 		catch (error)
 		{
@@ -1056,7 +1292,9 @@ export default class RoomClient
 				if (consumer.kind === 'video')
 				{
 					if (spotlights.includes(consumer.appData.peerId))
+					{
 						await this._resumeConsumer(consumer);
+					}
 					else
 					{
 						await this._pauseConsumer(consumer);
@@ -1114,6 +1352,8 @@ export default class RoomClient
 
 		this._hark.on('volume_change', (volume) =>
 		{
+			volume = Math.round(volume);
+
 			// Update only if there is a bigger diff 
 			if (this._micProducer && Math.abs(volume - this._hark.lastVolume) > 0.5)
 			{
@@ -1123,13 +1363,13 @@ export default class RoomClient
 				// at low levels
 				if (volume < this._hark.lastVolume)
 				{
-					volume =
+					volume = Math.round(
 						this._hark.lastVolume -
 						Math.pow(
 							(volume - this._hark.lastVolume) /
 							(100 + this._hark.lastVolume)
 							, 2
-						) * 10;
+						) * 10);
 				}
 
 				this._hark.lastVolume = volume;
@@ -1202,7 +1442,7 @@ export default class RoomClient
 	// https://bugs.chromium.org/p/chromium/issues/detail?id=796964
 	async updateMic({
 		start = false,
-		restart = false || this._device.flag !== 'firefox',
+		restart = true,
 		newDeviceId = null
 	} = {})
 	{
@@ -1237,27 +1477,16 @@ export default class RoomClient
 			const {
 				autoGainControl,
 				echoCancellation,
-				noiseSuppression
+				noiseSuppression,
+				sampleRate,
+				channelCount,
+				sampleSize,
+				opusStereo,
+				opusDtx,
+				opusFec,
+				opusPtime,
+				opusMaxPlaybackRate
 			} = store.getState().settings;
-
-			if (!window.config.centralAudioOptions)
-			{
-				throw new Error(
-					'Missing centralAudioOptions from app config! (See it in example config.)'
-				);
-			}
-
-			const {
-				sampleRate = 96000,
-				channelCount = 1,
-				volume = 1.0,
-				sampleSize = 16,
-				opusStereo = false,
-				opusDtx = true,
-				opusFec = true,
-				opusPtime = 20,
-				opusMaxPlaybackRate = 96000
-			} = window.config.centralAudioOptions;
 
 			if (
 				(restart && this._micProducer) ||
@@ -1266,8 +1495,13 @@ export default class RoomClient
 			{
 				this.disconnectLocalHark();
 
+				let muted = false;
+
 				if (this._micProducer)
+				{
+					muted = this._micProducer.paused;
 					await this.disableMic();
+				}
 
 				const stream = await navigator.mediaDevices.getUserMedia(
 					{
@@ -1275,7 +1509,6 @@ export default class RoomClient
 							deviceId : { ideal: deviceId },
 							sampleRate,
 							channelCount,
-							volume,
 							autoGainControl,
 							echoCancellation,
 							noiseSuppression,
@@ -1290,16 +1523,27 @@ export default class RoomClient
 
 				store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
 
+				const networkPriority =
+					config.networkPriorities?.audio ?
+						config.networkPriorities?.audio :
+						DEFAULT_NETWORK_PRIORITIES.audio;
+
 				this._micProducer = await this._sendTransport.produce(
 					{
 						track,
+						encodings :
+						[
+							{
+								networkPriority
+							}
+						],
 						codecOptions :
 						{
-							opusStereo,
-							opusDtx,
-							opusFec,
-							opusPtime,
-							opusMaxPlaybackRate
+							opusStereo          : opusStereo,
+							opusFec             : opusFec,
+							opusDtx             : opusDtx,
+							opusMaxPlaybackRate : opusMaxPlaybackRate,
+							opusPtime           : opusPtime
 						},
 						appData :
 						{ source: 'mic' }
@@ -1334,9 +1578,9 @@ export default class RoomClient
 					this.disableMic();
 				});
 
-				this._micProducer.volume = 0;
-
 				this.connectLocalHark(track);
+				if (muted) this.muteMic();
+				else this.unmuteMic();
 			}
 			else if (this._micProducer)
 			{
@@ -1346,7 +1590,6 @@ export default class RoomClient
 					{
 						sampleRate,
 						channelCount,
-						volume,
 						autoGainControl,
 						echoCancellation,
 						noiseSuppression,
@@ -1362,7 +1605,6 @@ export default class RoomClient
 						{
 							sampleRate,
 							channelCount,
-							volume,
 							autoGainControl,
 							echoCancellation,
 							noiseSuppression,
@@ -1372,6 +1614,13 @@ export default class RoomClient
 				}
 			}
 
+			// TODO update recorder inputs 
+			/* 
+			if (recorder != null)
+			{
+				recorder.addTrack(new MediaStream([ this._micProducer.track ]));
+			}
+			*/
 			await this._updateAudioDevices();
 		}
 		catch (error)
@@ -1448,6 +1697,7 @@ export default class RoomClient
 
 			const {
 				resolution,
+				aspectRatio,
 				frameRate
 			} = store.getState().settings;
 
@@ -1464,33 +1714,40 @@ export default class RoomClient
 						video :
 						{
 							deviceId : { ideal: deviceId },
-							...VIDEO_CONSTRAINS[resolution],
+							...getVideoConstrains(resolution, aspectRatio),
 							frameRate
 						}
 					});
 
 				([ track ] = stream.getVideoTracks());
 
-				const { deviceId: trackDeviceId } = track.getSettings();
+				const { deviceId: trackDeviceId, width, height } = track.getSettings();
+
+				logger.debug('getUserMedia track settings:', track.getSettings());
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
+				const networkPriority =
+					config.networkPriorities?.mainVideo ?
+						config.networkPriorities?.mainVideo :
+						DEFAULT_NETWORK_PRIORITIES.mainVideo;
+
 				if (this._useSimulcast)
 				{
-					// If VP9 is the only available video codec then use SVC.
-					const firstVideoCodec = this._mediasoupDevice
-						.rtpCapabilities
-						.codecs
-						.find((c) => c.kind === 'video');
+					const encodings = this._getEncodings(width, height);
+					const resolutionScalings = getResolutionScalings(encodings);
 
-					let encodings;
-
-					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-						encodings = VIDEO_KSVC_ENCODINGS;
-					else if ('simulcastEncodings' in window.config)
-						encodings = window.config.simulcastEncodings;
-					else
-						encodings = VIDEO_SIMULCAST_ENCODINGS;
+					/** 
+					 * TODO: 
+					 * I receive DOMException: 
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+					 * Attempted to set an unimplemented parameter of RtpParameters.
+					encodings.forEach((encoding) =>
+					{
+						encoding.networkPriority=networkPriority;
+					});
+					*/
+					encodings[0].networkPriority=networkPriority;
 
 					this._webcamProducer = await this._sendTransport.produce(
 						{
@@ -1502,7 +1759,10 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'webcam'
+								source : 'webcam',
+								width,
+								height,
+								resolutionScalings
 							}
 						});
 				}
@@ -1510,9 +1770,12 @@ export default class RoomClient
 				{
 					this._webcamProducer = await this._sendTransport.produce({
 						track,
-						appData :
+						encodings : [ { networkPriority } ],
+						appData   :
 						{
-							source : 'webcam'
+							source : 'webcam',
+							width,
+							height
 						}
 					});
 				}
@@ -1545,6 +1808,8 @@ export default class RoomClient
 
 					this.disableWebcam();
 				});
+
+				store.dispatch(settingsActions.setVideoMuted(false));
 			}
 			else if (this._webcamProducer)
 			{
@@ -1552,7 +1817,7 @@ export default class RoomClient
 
 				await track.applyConstraints(
 					{
-						...VIDEO_CONSTRAINS[resolution],
+						...getVideoConstrains(resolution, aspectRatio),
 						frameRate
 					}
 				);
@@ -1564,7 +1829,7 @@ export default class RoomClient
 
 					await track.applyConstraints(
 						{
-							...VIDEO_CONSTRAINS[resolution],
+							...getVideoConstrains(resolution, aspectRatio),
 							frameRate
 						}
 					);
@@ -1598,20 +1863,38 @@ export default class RoomClient
 	{
 		logger.debug('addSelectedPeer() [peerId:"%s"]', peerId);
 
-		this._spotlights.addPeerToSpotlight(peerId);
+		this._spotlights.addPeerToSelectedSpotlights(peerId);
 
 		store.dispatch(
 			roomActions.addSelectedPeer(peerId));
+	}
+
+	setSelectedPeer(peerId)
+	{
+		logger.debug('setSelectedPeer() [peerId:"%s"]', peerId);
+
+		this.clearSelectedPeers();
+		this.addSelectedPeer(peerId);
 	}
 
 	removeSelectedPeer(peerId)
 	{
 		logger.debug('removeSelectedPeer() [peerId:"%s"]', peerId);
 
-		this._spotlights.removePeerSpotlight(peerId);
+		this._spotlights.removePeerFromSelectedSpotlights(peerId);
 
 		store.dispatch(
 			roomActions.removeSelectedPeer(peerId));
+	}
+
+	clearSelectedPeers()
+	{
+		logger.debug('clearSelectedPeers()');
+
+		this._spotlights.clearPeersFromSelectedSpotlights();
+
+		store.dispatch(
+			roomActions.clearSelectedPeers());
 	}
 
 	async promoteAllLobbyPeers()
@@ -1666,6 +1949,8 @@ export default class RoomClient
 			await this.sendRequest('moderator:clearChat');
 
 			store.dispatch(chatActions.clearChat());
+
+			store.dispatch(fileActions.clearFiles());
 		}
 		catch (error)
 		{
@@ -1676,6 +1961,7 @@ export default class RoomClient
 			roomActions.setClearChatInProgress(false));
 	}
 
+	/*
 	async clearFileSharing()
 	{
 		logger.debug('clearFileSharing()');
@@ -1697,6 +1983,7 @@ export default class RoomClient
 		store.dispatch(
 			roomActions.setClearFileSharingInProgress(false));
 	}
+	*/
 
 	async givePeerRole(peerId, roleId)
 	{
@@ -1947,6 +2234,38 @@ export default class RoomClient
 				peerActions.setPeerScreenInProgress(peerId, false));
 	}
 
+	async setAudioGain(micConsumer, peerId, audioGain)
+	{
+		logger.debug(
+			'setAudioGain() [micConsumer:"%o", peerId:"%s", type:"%s"]',
+			micConsumer,
+			peerId,
+			audioGain
+		);
+
+		if (!micConsumer)
+		{
+			return;
+		}
+
+		micConsumer.audioGain = audioGain;
+
+		try
+		{
+			for (const consumer of this._consumers.values())
+			{
+				if (consumer.appData.peerId === peerId)
+				{
+					store.dispatch(consumerActions.setConsumerAudioGain(consumer.id, audioGain));
+				}
+			}
+		}
+		catch (error)
+		{
+			logger.error('setAudioGain() [error:"%o"]', error);
+		}
+	}
+
 	async _pauseConsumer(consumer)
 	{
 		logger.debug('_pauseConsumer() [consumer:"%o"]', consumer);
@@ -1965,30 +2284,41 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('_pauseConsumer() [error:"%o"]', error);
+			logger.error('_pauseConsumer() [consumerId: %s; error:"%o"]', consumer.id, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumer.id);
+			}
 		}
 	}
 
-	async _resumeConsumer(consumer)
+	async _resumeConsumer(consumer, { initial = false } = {})
 	{
 		logger.debug('_resumeConsumer() [consumer:"%o"]', consumer);
 
-		if (!consumer.paused || consumer.closed)
+		if ((!initial && !consumer.paused) || consumer.closed)
 			return;
 
 		try
 		{
-			await this.sendRequest('resumeConsumer', { consumerId: consumer.id });
-
 			consumer.resume();
-
+			await this.sendRequest('resumeConsumer', { consumerId: consumer.id });
 			store.dispatch(
 				consumerActions.setConsumerResumed(consumer.id, 'local'));
 		}
 		catch (error)
 		{
-			logger.error('_resumeConsumer() [error:"%o"]', error);
+			logger.error('_resumeConsumer() [consumerId: %s; error:"%o"]', consumer.id, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumer.id);
+			}
 		}
+	}
+
+	async _startConsumer(consumer)
+	{
+		return this._resumeConsumer(consumer, { initial: true });
 	}
 
 	async lowerPeerHand(peerId)
@@ -2070,8 +2400,154 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPreferredLayers() [error:"%o"]', error);
+			logger.error('setConsumerPreferredLayers() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
+	}
+
+	async restartIce(transport, ice, delay)
+	{
+		logger.debug('restartIce() [transport:%o ice:%o delay:%d]', transport, ice, delay);
+
+		if (!transport)
+		{
+			logger.error('restartIce(): missing valid transport object');
+
+			return;
+		}
+
+		if (!ice)
+		{
+			logger.error('restartIce(): missing valid ice object');
+
+			return;
+		}
+
+		clearTimeout(ice.timer);
+		ice.timer = setTimeout(async () =>
+		{
+			try
+			{
+				if (ice.restarting)
+				{
+					return;
+				}
+				ice.restarting = true;
+
+				const iceParameters = await this.sendRequest(
+					'restartIce',
+					{ transportId: transport.id });
+
+				await transport.restartIce({ iceParameters });
+				ice.restarting = false;
+				logger.debug('ICE restarted');
+			}
+			catch (error)
+			{
+				logger.error('restartIce() [failed:%o]', error);
+
+				ice.restarting = false;
+				ice.timer = setTimeout(() =>
+				{
+					this.restartIce(transport, ice, delay * 2);
+				}, delay);
+			}
+		}, delay);
+	}
+
+	setConsumerPreferredLayersMax(consumer)
+	{
+		if (consumer.type === 'simple')
+		{
+			return;
+		}
+
+		logger.debug(
+			'setConsumerPreferredLayersMax() [consumerId:"%s"]', consumer.id);
+
+		if (consumer.preferredSpatialLayer !== consumer.spatialLayers -1 ||
+			consumer.preferredTemporalLayer !== consumer.temporalLayers -1)
+		{
+			return this.setConsumerPreferredLayers(consumer.id,
+				consumer.spatialLayers - 1, consumer.temporalLayers - 1);
+		}
+	}
+
+	adaptConsumerPreferredLayers(consumer, viewportWidth, viewportHeight)
+	{
+		if (consumer.type === 'simple')
+		{
+			return;
+		}
+
+		if (!viewportWidth || !viewportHeight)
+		{
+			return;
+		}
+
+		const {
+			id,
+			preferredSpatialLayer,
+			preferredTemporalLayer,
+			width,
+			height,
+			resolutionScalings
+		} = consumer;
+		const adaptiveScalingFactor = Math.min(Math.max(
+			config.adaptiveScalingFactor || 0.75, 0.5), 1.0);
+
+		logger.debug(
+			'adaptConsumerPreferredLayers() [consumerId:"%s", width:"%d", height:"%d" resolutionScalings:[%s] viewportWidth:"%d", viewportHeight:"%d"]',
+			consumer.id, width, height, resolutionScalings.join(', '),
+			viewportWidth, viewportHeight);
+
+		let newPreferredSpatialLayer = 0;
+
+		for (let i = 0; i < resolutionScalings.length; i++)
+		{
+			const levelWidth = adaptiveScalingFactor * width / resolutionScalings[i];
+			const levelHeight = adaptiveScalingFactor * height / resolutionScalings[i];
+
+			if (viewportWidth >= levelWidth || viewportHeight >= levelHeight)
+			{
+				newPreferredSpatialLayer = i;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		let newPreferredTemporalLayer = consumer.temporalLayers - 1;
+
+		if (newPreferredSpatialLayer === 0 && newPreferredTemporalLayer > 0)
+		{
+			const lowestLevelWidth = width / resolutionScalings[0];
+			const lowestLevelHeight = height / resolutionScalings[0];
+
+			if (viewportWidth < lowestLevelWidth * 0.5
+				&& viewportHeight < lowestLevelHeight * 0.5)
+			{
+				newPreferredTemporalLayer -= 1;
+			}
+			if (newPreferredTemporalLayer > 0
+				&& viewportWidth < lowestLevelWidth * 0.25
+				&& viewportHeight < lowestLevelHeight * 0.25)
+			{
+				newPreferredTemporalLayer -= 1;
+			}
+		}
+
+		if (preferredSpatialLayer !== newPreferredSpatialLayer ||
+			preferredTemporalLayer !== newPreferredTemporalLayer)
+		{
+			return this.setConsumerPreferredLayers(id,
+				newPreferredSpatialLayer, newPreferredTemporalLayer);
+		}
+
 	}
 
 	async setConsumerPriority(consumerId, priority)
@@ -2088,7 +2564,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('setConsumerPriority() [error:"%o"]', error);
+			logger.error('setConsumerPriority() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
 	}
 
@@ -2102,7 +2582,11 @@ export default class RoomClient
 		}
 		catch (error)
 		{
-			logger.error('requestConsumerKeyFrame() [error:"%o"]', error);
+			logger.error('requestConsumerKeyFrame() [consumerId: %s; error:"%o"]', consumerId, error);
+			if (error.notFoundInMediasoupError)
+			{
+				this._closeConsumer(consumerId);
+			}
 		}
 	}
 
@@ -2220,6 +2704,15 @@ export default class RoomClient
 				this._webcamProducer = null;
 			}
 
+			for (const producer of this._extraVideoProducers.values())
+			{
+				producer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(producer.id));
+			}
+			this._extraVideoProducers.clear();
+
 			if (this._micProducer)
 			{
 				this._micProducer.close();
@@ -2290,93 +2783,6 @@ export default class RoomClient
 
 			switch (request.method)
 			{
-				case 'newConsumer':
-				{
-					const {
-						peerId,
-						producerId,
-						id,
-						kind,
-						rtpParameters,
-						type,
-						appData,
-						producerPaused
-					} = request.data;
-
-					const consumer = await this._recvTransport.consume(
-						{
-							id,
-							producerId,
-							kind,
-							rtpParameters,
-							appData : { ...appData, peerId } // Trick.
-						});
-
-					// Store in the map.
-					this._consumers.set(consumer.id, consumer);
-
-					consumer.on('transportclose', () =>
-					{
-						this._consumers.delete(consumer.id);
-					});
-
-					const { spatialLayers, temporalLayers } =
-						mediasoupClient.parseScalabilityMode(
-							consumer.rtpParameters.encodings[0].scalabilityMode);
-
-					store.dispatch(consumerActions.addConsumer(
-						{
-							id                     : consumer.id,
-							peerId                 : peerId,
-							kind                   : kind,
-							type                   : type,
-							locallyPaused          : false,
-							remotelyPaused         : producerPaused,
-							rtpParameters          : consumer.rtpParameters,
-							source                 : consumer.appData.source,
-							spatialLayers          : spatialLayers,
-							temporalLayers         : temporalLayers,
-							preferredSpatialLayer  : spatialLayers - 1,
-							preferredTemporalLayer : temporalLayers - 1,
-							priority               : 1,
-							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
-							track                  : consumer.track
-						},
-						peerId));
-
-					// We are ready. Answer the request so the server will
-					// resume this Consumer (which was paused for now).
-					cb(null);
-
-					if (kind === 'audio')
-					{
-						consumer.volume = 0;
-
-						const stream = new MediaStream();
-
-						stream.addTrack(consumer.track);
-
-						if (!stream.getAudioTracks()[0])
-							throw new Error('request.newConsumer | given stream has no audio track');
-
-						consumer.hark = hark(stream, { play: false });
-
-						consumer.hark.on('volume_change', (volume) =>
-						{
-							volume = Math.round(volume);
-
-							if (consumer && volume !== consumer.volume)
-							{
-								consumer.volume = volume;
-
-								store.dispatch(peerVolumeActions.setPeerVolume(peerId, volume));
-							}
-						});
-					}
-
-					break;
-				}
-
 				default:
 				{
 					logger.error('unknown request.method "%s"', request.method);
@@ -2411,6 +2817,7 @@ export default class RoomClient
 
 					case 'signInRequired':
 					{
+						store.dispatch(meActions.loggedIn(false));
 						store.dispatch(roomActions.setSignInRequired(true));
 
 						break;
@@ -2439,7 +2846,7 @@ export default class RoomClient
 
 					case 'roomBack':
 					{
-						await this._joinRoom({ joinVideo, joinAudio });
+						await this._joinRoom({ joinVideo, joinAudio, returning: true });
 
 						break;
 					}
@@ -2485,7 +2892,7 @@ export default class RoomClient
 						store.dispatch(
 							roomActions.setToolbarsVisible(true));
 
-						this._soundNotification();
+						this._soundNotification(notification.method);
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2527,7 +2934,7 @@ export default class RoomClient
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
 
-							this._soundNotification();
+							this._soundNotification(notification.method);
 
 							store.dispatch(requestActions.notify(
 								{
@@ -2585,6 +2992,9 @@ export default class RoomClient
 									displayName
 								})
 							}));
+
+						if (peerId === this._peerId)
+							this._displayName=displayName;
 
 						break;
 					}
@@ -2687,6 +3097,9 @@ export default class RoomClient
 								})
 							}));
 
+						if (peerId === this._peerId)
+							this._displayName=displayName;
+
 						break;
 					}
 
@@ -2746,7 +3159,7 @@ export default class RoomClient
 								}));
 						}
 
-						this._soundNotification();
+						this._soundNotification(notification.method);
 
 						break;
 					}
@@ -2756,7 +3169,7 @@ export default class RoomClient
 						const { peerId, chatMessage } = notification.data;
 
 						store.dispatch(
-							chatActions.addResponseMessage({ ...chatMessage, peerId }));
+							chatActions.addMessage({ ...chatMessage, peerId, isRead: false }));
 
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
@@ -2766,7 +3179,7 @@ export default class RoomClient
 						{
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
-							this._soundNotification();
+							this._soundNotification(notification.method);
 						}
 
 						break;
@@ -2775,6 +3188,8 @@ export default class RoomClient
 					case 'moderator:clearChat':
 					{
 						store.dispatch(chatActions.clearChat());
+
+						store.dispatch(fileActions.clearFiles());
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2789,9 +3204,9 @@ export default class RoomClient
 
 					case 'sendFile':
 					{
-						const { peerId, magnetUri } = notification.data;
+						const file = notification.data;
 
-						store.dispatch(fileActions.addFile(peerId, magnetUri));
+						store.dispatch(fileActions.addFile({ ...file }));
 
 						store.dispatch(requestActions.notify(
 							{
@@ -2804,17 +3219,18 @@ export default class RoomClient
 						if (
 							!store.getState().toolarea.toolAreaOpen ||
 							(store.getState().toolarea.toolAreaOpen &&
-							store.getState().toolarea.currentToolTab !== 'files')
+							store.getState().toolarea.currentToolTab !== 'chat')
 						) // Make sound
 						{
 							store.dispatch(
 								roomActions.setToolbarsVisible(true));
-							this._soundNotification();
+							this._soundNotification(notification.method);
 						}
 
 						break;
 					}
 
+					/*
 					case 'moderator:clearFileSharing':
 					{
 						store.dispatch(fileActions.clearFiles());
@@ -2829,6 +3245,7 @@ export default class RoomClient
 
 						break;
 					}
+					*/
 
 					case 'producerScore':
 					{
@@ -2842,24 +3259,33 @@ export default class RoomClient
 
 					case 'newPeer':
 					{
-						const { id, displayName, picture, roles } = notification.data;
+						const {
+							id,
+							displayName,
+							picture,
+							roles,
+							returning
+						} = notification.data;
 
 						store.dispatch(peerActions.addPeer(
 							{ id, displayName, picture, roles, consumers: [] }));
 
 						this._spotlights.newPeer(id);
 
-						this._soundNotification();
+						if (!returning)
+						{
+							this._soundNotification(notification.method);
 
-						store.dispatch(requestActions.notify(
-							{
-								text : intl.formatMessage({
-									id             : 'room.newPeer',
-									defaultMessage : '{displayName} joined the room'
-								}, {
-									displayName
-								})
-							}));
+							store.dispatch(requestActions.notify(
+								{
+									text : intl.formatMessage({
+										id             : 'room.newPeer',
+										defaultMessage : '{displayName} joined the room'
+									}, {
+										displayName
+									})
+								}));
+						}
 
 						break;
 					}
@@ -2867,6 +3293,14 @@ export default class RoomClient
 					case 'peerClosed':
 					{
 						const { peerId } = notification.data;
+
+						for (const consumer of this._consumers.values())
+						{
+							if (peerId === consumer.appData.peerId)
+							{
+								this._closeConsumer(consumer.id);
+							}
+						}
 
 						this._spotlights.closePeer(peerId);
 
@@ -2876,25 +3310,115 @@ export default class RoomClient
 						break;
 					}
 
+					case 'newConsumer':
+					{
+						const {
+							peerId,
+							producerId,
+							id,
+							kind,
+							rtpParameters,
+							type,
+							appData,
+							producerPaused,
+							score
+						} = notification.data;
+
+						const consumer = await this._recvTransport.consume(
+							{
+								id,
+								producerId,
+								kind,
+								rtpParameters,
+								appData : { ...appData, peerId } // Trick.
+							});
+
+						if (this._recvTransport.appData.encodedInsertableStreams)
+						{
+							const { enableOpusDetails } = store.getState().settings;
+
+							if (kind === 'audio' && enableOpusDetails)
+								opusReceiverTransform(consumer.rtpReceiver, consumer.id);
+							else
+								directReceiverTransform(consumer.rtpReceiver);
+						}
+
+						// Store in the map.
+						this._consumers.set(consumer.id, consumer);
+
+						consumer.on('transportclose', () =>
+						{
+							this._consumers.delete(consumer.id);
+						});
+
+						const { spatialLayers, temporalLayers } =
+							mediasoupClient.parseScalabilityMode(
+								consumer.rtpParameters.encodings[0].scalabilityMode);
+
+						const consumerStoreObject = {
+							id                     : consumer.id,
+							peerId                 : peerId,
+							kind                   : kind,
+							type                   : type,
+							locallyPaused          : false,
+							remotelyPaused         : producerPaused,
+							rtpParameters          : consumer.rtpParameters,
+							source                 : consumer.appData.source,
+							width                  : consumer.appData.width,
+							height                 : consumer.appData.height,
+							resolutionScalings     : consumer.appData.resolutionScalings,
+							spatialLayers          : spatialLayers,
+							temporalLayers         : temporalLayers,
+							preferredSpatialLayer  : 0,
+							preferredTemporalLayer : 0,
+							priority               : 1,
+							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
+							track                  : consumer.track,
+							score                  : score,
+							audioGain              : undefined,
+							opusConfig             : null
+						};
+
+						this._spotlights.addVideoConsumer(consumerStoreObject);
+
+						store.dispatch(consumerActions.addConsumer(consumerStoreObject, peerId));
+
+						await this._startConsumer(consumer);
+
+						if (kind === 'audio')
+						{
+							consumer.volume = 0;
+
+							const stream = new MediaStream();
+
+							stream.addTrack(consumer.track);
+
+							if (!stream.getAudioTracks()[0])
+								throw new Error('request.newConsumer | given stream has no audio track');
+
+							consumer.hark = hark(stream, { play: false, interval: 100 });
+
+							consumer.hark.on('volume_change', (volume) =>
+							{
+								volume = Math.round(volume);
+
+								if (consumer && volume !== consumer.volume)
+								{
+									consumer.volume = volume;
+
+									store.dispatch(peerVolumeActions.setPeerVolume(peerId, volume));
+								}
+							});
+						}
+
+						break;
+					}
+
 					case 'consumerClosed':
 					{
 						const { consumerId } = notification.data;
-						const consumer = this._consumers.get(consumerId);
 
-						if (!consumer)
-							break;
-
-						consumer.close();
-
-						if (consumer.hark != null)
-							consumer.hark.stop();
-
-						this._consumers.delete(consumerId);
-
-						const { peerId } = consumer.appData;
-
-						store.dispatch(
-							consumerActions.removeConsumer(consumerId, peerId));
+						this._closeConsumer(consumerId);
 
 						break;
 					}
@@ -2910,6 +3434,8 @@ export default class RoomClient
 						store.dispatch(
 							consumerActions.setConsumerPaused(consumerId, 'remote'));
 
+						this._spotlights.pauseVideoConsumer(consumerId);
+
 						break;
 					}
 
@@ -2923,6 +3449,8 @@ export default class RoomClient
 
 						store.dispatch(
 							consumerActions.setConsumerResumed(consumerId, 'remote'));
+
+						this._spotlights.resumeVideoConsumer(consumerId);
 
 						break;
 					}
@@ -3065,6 +3593,89 @@ export default class RoomClient
 
 						break;
 					}
+					case 'addConsentForRecording':
+					{
+						// eslint-disable-next-line no-unused-vars
+						const { peerId, consent } = notification.data;
+
+						store.dispatch(
+							peerActions.setPeerLocalRecordingConsent(peerId, consent));
+
+						break;
+					}
+					case 'setLocalRecording':
+					{
+						const { peerId, localRecordingState } = notification.data;
+						const { me, peers } = store.getState();
+
+						let displayNameOfRecorder;
+
+						if (peerId === me.id)
+						{
+							displayNameOfRecorder = store.getState().settings.displayName;
+						}
+						else if (peers[peerId])
+							displayNameOfRecorder = store.getState().peers[peerId].displayName;
+						else
+							return;
+
+						// Save state to peer
+						store.dispatch(
+							peerActions.setPeerLocalRecordingState(peerId, localRecordingState));
+
+						switch (localRecordingState)
+						{
+							case 'start':
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingStarted',
+											defaultMessage : '{displayName} started local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							case 'resume':
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingResumed',
+											defaultMessage : '{displayName} resumed local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							case 'pause':
+							{
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingPaused',
+											defaultMessage : '{displayName} paused local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							}
+							case 'stop':
+								store.dispatch(requestActions.notify(
+									{
+										text : intl.formatMessage({
+											id             : 'room.localRecordingStopped',
+											defaultMessage : '{displayName} stopped local recording'
+										}, {
+											displayName : displayNameOfRecorder
+										})
+									}));
+								break;
+							default:
+								break;
+						}
+						break;
+					}
 
 					default:
 					{
@@ -3090,11 +3701,11 @@ export default class RoomClient
 		});
 	}
 
-	async _joinRoom({ joinVideo, joinAudio })
+	async _joinRoom({ joinVideo, joinAudio, returning })
 	{
 		logger.debug('_joinRoom()');
 
-		const { displayName } = store.getState().settings;
+		const { displayName, enableOpusDetails } = store.getState().settings;
 		const { picture } = store.getState().me;
 
 		try
@@ -3176,6 +3787,22 @@ export default class RoomClient
 					});
 
 				this._sendTransport.on(
+					'connectionstatechange', (connectState) =>
+					{
+						switch (connectState)
+						{
+							case 'disconnected':
+							case 'failed':
+								this.restartIce(this._sendTransport, this._sendRestartIce, 2000);
+								break;
+
+							default:
+								clearTimeout(this._sendRestartIce.timer);
+								break;
+						}
+					});
+
+				this._sendTransport.on(
 					'produce', async ({ kind, rtpParameters, appData }, callback, errback) =>
 					{
 						try
@@ -3222,7 +3849,13 @@ export default class RoomClient
 					dtlsParameters,
 					iceServers         : this._turnServers,
 					// TODO: Fix for issue #72
-					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined
+					iceTransportPolicy : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined,
+					additionalSettings : {
+						encodedInsertableStreams : insertableStreamsSupported && enableOpusDetails
+					},
+					appData : {
+						encodedInsertableStreams : insertableStreamsSupported && enableOpusDetails
+					}
 				});
 
 			this._recvTransport.on(
@@ -3236,6 +3869,22 @@ export default class RoomClient
 						})
 						.then(callback)
 						.catch(errback);
+				});
+
+			this._recvTransport.on(
+				'connectionstatechange', (connectState) =>
+				{
+					switch (connectState)
+					{
+						case 'disconnected':
+						case 'failed':
+							this.restartIce(this._recvTransport, this._recvRestartIce, 2000);
+							break;
+
+						default:
+							clearTimeout(this._recvRestartIce.timer);
+							break;
+					}
 				});
 
 			// Set our media capabilities.
@@ -3267,7 +3916,8 @@ export default class RoomClient
 				{
 					displayName     : displayName,
 					picture         : picture,
-					rtpCapabilities : this._mediasoupDevice.rtpCapabilities
+					rtpCapabilities : this._mediasoupDevice.rtpCapabilities,
+					returning       : returning
 				});
 
 			logger.debug(
@@ -3360,14 +4010,12 @@ export default class RoomClient
 					if (!this._muted)
 					{
 						await this.updateMic({ start: true });
-						let autoMuteThreshold = 4;
+						const autoMuteThreshold = config.autoMuteThreshold;
 
-						if ('autoMuteThreshold' in window.config)
+						if (autoMuteThreshold >= 0 && peers.length >= autoMuteThreshold)
 						{
-							autoMuteThreshold = window.config.autoMuteThreshold;
-						}
-						if (autoMuteThreshold && peers.length >= autoMuteThreshold)
 							this.muteMic();
+						}
 					}
 			}
 
@@ -3423,6 +4071,48 @@ export default class RoomClient
 
 			this.close();
 		}
+	}
+
+	getRecorderSupportedMimeTypes()
+	{
+		const mimeTypes = [];
+
+		const mimeTypeCapability = [
+
+			/* audio codecs
+			[ 'audio/wav', [] ],
+			[ 'audio/pcm', [] ],
+			[ 'audio/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'audio/ogg', [ 'Firefox' ] ],
+			[ 'audio/opus', [] ],
+			*/
+			[ 'video/webm', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs="vp8, opus"', [ 'Chrome', 'Firefox', 'Safari' ] ],
+			[ 'video/webm;codecs="vp9, opus"', [ 'Chrome' ] ],
+			[ 'video/webm;codecs="h264, opus"', [ 'Chrome' ] ],
+			[ 'video/mp4', [] ],
+			[ 'video/mpeg', [] ],
+			[ 'video/x-matroska;codecs=avc1', [ 'Chrome' ] ]
+		];
+
+		if (typeof MediaRecorder === 'undefined')
+		{
+			window.MediaRecorder = {
+				isTypeSupported : function()
+				{
+					return false;
+				}
+			};
+		}
+		mimeTypeCapability.forEach((item) =>
+		{
+			if (MediaRecorder.isTypeSupported(item[0]) && !mimeTypes.includes(item[0]))
+			{
+				mimeTypes.push(item[0]);
+			}
+		});
+
+		return mimeTypes;
 	}
 
 	async lockRoom()
@@ -3490,6 +4180,23 @@ export default class RoomClient
 				}));
 
 			logger.error('unlockRoom() [error:"%o"]', error);
+		}
+	}
+
+	async addConsentForRecording(consent)
+	{
+		logger.debug('addConsentForRecording()');
+
+		try
+		{
+			store.dispatch(
+				recorderActions.setLocalRecordingConsent(consent));
+			await this.sendRequest('addConsentForRecording', { consent });
+		}
+		catch (error)
+		{
+
+			logger.error('addConsentForRecording() [error:"%o"]', error);
 		}
 	}
 
@@ -3572,7 +4279,7 @@ export default class RoomClient
 		try
 		{
 			const device = this._webcams[videoDeviceId];
-			const resolution = store.getState().settings.resolution;
+			const { resolution, aspectRatio } = store.getState().settings;
 
 			if (!device)
 				throw new Error('no webcam devices');
@@ -3582,11 +4289,15 @@ export default class RoomClient
 					video :
 					{
 						deviceId : { ideal: videoDeviceId },
-						...VIDEO_CONSTRAINS[resolution]
+						...getVideoConstrains(resolution, aspectRatio)
 					}
 				});
 
 			([ track ] = stream.getVideoTracks());
+
+			const { width, height } = track.getSettings();
+
+			logger.debug('extra video track settings:', track.getSettings());
 
 			let exists = false;
 
@@ -3603,22 +4314,27 @@ export default class RoomClient
 
 				let producer;
 
+				const networkPriority =
+					config.networkPriorities?.extraVideo ?
+						config.networkPriorities?.extraVideo :
+						DEFAULT_NETWORK_PRIORITIES.extraVideo;
+
 				if (this._useSimulcast)
 				{
-					// If VP9 is the only available video codec then use SVC.
-					const firstVideoCodec = this._mediasoupDevice
-						.rtpCapabilities
-						.codecs
-						.find((c) => c.kind === 'video');
+					const encodings = this._getEncodings(width, height);
+					const resolutionScalings = getResolutionScalings(encodings);
 
-					let encodings;
-
-					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-						encodings = VIDEO_KSVC_ENCODINGS;
-					else if ('simulcastEncodings' in window.config)
-						encodings = window.config.simulcastEncodings;
-					else
-						encodings = VIDEO_SIMULCAST_ENCODINGS;
+					/** 
+					 * TODO: 
+					 * I receive DOMException: 
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+					 * Attempted to set an unimplemented parameter of RtpParameters.
+					encodings.forEach((encoding) =>
+					{
+						encoding.networkPriority=networkPriority;
+					});
+					*/
+					encodings[0].networkPriority=networkPriority;
 
 					producer = await this._sendTransport.produce(
 						{
@@ -3630,7 +4346,10 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'extravideo'
+								source : 'extravideo',
+								width,
+								height,
+								resolutionScalings
 							}
 						});
 				}
@@ -3638,9 +4357,12 @@ export default class RoomClient
 				{
 					producer = await this._sendTransport.produce({
 						track,
-						appData :
+						encodings : [ { networkPriority } ],
+						appData   :
 						{
-							source : 'extravideo'
+							source : 'extravideo',
+							width,
+							height
 						}
 					});
 				}
@@ -3749,6 +4471,14 @@ export default class RoomClient
 
 		store.dispatch(meActions.setAudioInProgress(false));
 	}
+	async updateRecorderPreferredMimeType({ recorderPreferredMimeType = null } = {})
+	{
+		logger.debug('updateRecorderPreferredMimeType [mime-type: "%s"]',
+			recorderPreferredMimeType
+		);
+		store.dispatch(
+			settingsActions.setRecorderPreferredMimeType(recorderPreferredMimeType));
+	}
 
 	async updateScreenSharing({
 		start = false,
@@ -3763,6 +4493,8 @@ export default class RoomClient
 		try
 		{
 			const available = this._screenSharing.isScreenShareAvailable();
+
+			const isAudioEnabled = this._screenSharing.isAudioEnabled();
 
 			if (!available)
 				throw new Error('screen sharing not available');
@@ -3780,42 +4512,88 @@ export default class RoomClient
 
 			const {
 				screenSharingResolution,
-				screenSharingFrameRate
+				autoGainControl,
+				echoCancellation,
+				noiseSuppression,
+				aspectRatio,
+				screenSharingFrameRate,
+				sampleRate,
+				channelCount,
+				sampleSize,
+				opusStereo,
+				opusDtx,
+				opusFec,
+				opusPtime,
+				opusMaxPlaybackRate
 			} = store.getState().settings;
 
 			if (start)
 			{
-				const stream = await this._screenSharing.start({
-					...VIDEO_CONSTRAINS[screenSharingResolution],
-					frameRate : screenSharingFrameRate
-				});
+				let stream;
+
+				if (isAudioEnabled)
+				{
+					stream = await this._screenSharing.start({
+						...getVideoConstrains(screenSharingResolution, aspectRatio),
+						frameRate : screenSharingFrameRate,
+						sampleRate,
+						channelCount,
+						autoGainControl,
+						echoCancellation,
+						noiseSuppression,
+						sampleSize
+					});
+
+				}
+				else
+				{
+					stream = await this._screenSharing.start({
+						...getVideoConstrains(screenSharingResolution, aspectRatio),
+						frameRate : screenSharingFrameRate
+					});
+
+				}
 
 				([ track ] = stream.getVideoTracks());
 
+				const { width, height } = track.getSettings();
+
+				logger.debug('screenSharing track settings:', track.getSettings());
+
+				const networkPriority =
+					config.networkPriorities?.screenShare ?
+						config.networkPriorities?.screenShare :
+						DEFAULT_NETWORK_PRIORITIES.screenShare;
+
 				if (this._useSharingSimulcast)
 				{
+					let encodings = this._getEncodings(width, height, true);
+
 					// If VP9 is the only available video codec then use SVC.
 					const firstVideoCodec = this._mediasoupDevice
 						.rtpCapabilities
 						.codecs
 						.find((c) => c.kind === 'video');
 
-					let encodings;
+					if (firstVideoCodec.mimeType.toLowerCase() !== 'video/vp9')
+					{
+						encodings = encodings
+							.map((encoding) => ({ ...encoding, dtx: true }));
+					}
 
-					if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+					const resolutionScalings = getResolutionScalings(encodings);
+
+					/** 
+					 * TODO: 
+					 * I receive DOMException: 
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+					 * Attempted to set an unimplemented parameter of RtpParameters.
+					encodings.forEach((encoding) =>
 					{
-						encodings = VIDEO_SVC_ENCODINGS;
-					}
-					else if ('simulcastEncodings' in window.config)
-					{
-						encodings = window.config.simulcastEncodings
-							.map((encoding) => ({ ...encoding, dtx: true }));
-					}
-					else
-					{
-						encodings = VIDEO_SIMULCAST_ENCODINGS
-							.map((encoding) => ({ ...encoding, dtx: true }));
-					}
+						encoding.networkPriority=networkPriority;
+					});
+					*/
+					encodings[0].networkPriority=networkPriority;
 
 					this._screenSharingProducer = await this._sendTransport.produce(
 						{
@@ -3827,7 +4605,10 @@ export default class RoomClient
 							},
 							appData :
 							{
-								source : 'screen'
+								source : 'screen',
+								width,
+								height,
+								resolutionScalings
 							}
 						});
 				}
@@ -3835,9 +4616,12 @@ export default class RoomClient
 				{
 					this._screenSharingProducer = await this._sendTransport.produce({
 						track,
-						appData :
+						encodings : [ { networkPriority } ],
+						appData   :
 						{
-							source : 'screen'
+							source : 'screen',
+							width,
+							height
 						}
 					});
 				}
@@ -3871,17 +4655,88 @@ export default class RoomClient
 
 					this.disableScreenSharing();
 				});
-			}
-			else if (this._screenSharingProducer)
-			{
-				({ track } = this._screenSharingProducer);
 
-				await track.applyConstraints(
+				([ track ] = stream.getAudioTracks());
+
+				if (isAudioEnabled && track)
+				{
+
+					this._screenSharingAudioProducer = await this._sendTransport.produce(
+						{
+							track,
+							codecOptions :
+							{
+								opusStereo          : opusStereo,
+								opusFec             : opusFec,
+								opusDtx             : opusDtx,
+								opusMaxPlaybackRate : opusMaxPlaybackRate,
+								opusPtime           : opusPtime
+							},
+							appData :
+							{ source: 'mic' }
+						});
+
+					store.dispatch(producerActions.addProducer(
+						{
+							id            : this._screenSharingAudioProducer.id,
+							source        : 'mic',
+							paused        : this._screenSharingAudioProducer.paused,
+							track         : this._screenSharingAudioProducer.track,
+							rtpParameters : this._screenSharingAudioProducer.rtpParameters,
+							codec         : this._screenSharingAudioProducer.rtpParameters.codecs[0].mimeType.split('/')[1]
+						}));
+
+					this._screenSharingAudioProducer.on('transportclose', () =>
 					{
-						...VIDEO_CONSTRAINS[screenSharingResolution],
-						frameRate : screenSharingFrameRate
-					}
-				);
+						this._screenSharingAudioProducer = null;
+					});
+
+					this._screenSharingAudioProducer.on('trackended', () =>
+					{
+						store.dispatch(requestActions.notify(
+							{
+								type : 'error',
+								text : intl.formatMessage({
+									id             : 'devices.screenSharingDisconnected',
+									defaultMessage : 'Screen sharing disconnected'
+								})
+							}));
+
+						// this.disableScreenSharing();
+					});
+
+					this._screenSharingAudioProducer.volume = 0;
+				}
+
+			}
+			else
+			{
+				if (this._screenSharingProducer)
+				{
+					({ track } = this._screenSharingProducer);
+
+					await track.applyConstraints(
+						{
+							...getVideoConstrains(screenSharingResolution, aspectRatio),
+							frameRate : screenSharingFrameRate
+						}
+					);
+				}
+				if (this._screenSharingAudioProducer)
+				{
+					({ track } = this._screenSharingAudioProducer);
+
+					await track.applyConstraints(
+						{
+							sampleRate,
+							channelCount,
+							autoGainControl,
+							echoCancellation,
+							noiseSuppression,
+							sampleSize
+						}
+					);
+				}
 			}
 		}
 		catch (error)
@@ -3915,6 +4770,14 @@ export default class RoomClient
 
 		this._screenSharingProducer.close();
 
+		if (this._screenSharingAudioProducer)
+		{
+			this._screenSharingAudioProducer.close();
+
+			store.dispatch(
+				producerActions.removeProducer(this._screenSharingAudioProducer.id));
+		}
+
 		store.dispatch(
 			producerActions.removeProducer(this._screenSharingProducer.id));
 
@@ -3922,6 +4785,12 @@ export default class RoomClient
 		{
 			await this.sendRequest(
 				'closeProducer', { producerId: this._screenSharingProducer.id });
+
+			if (this._screenSharingAudioProducer)
+			{
+				await this.sendRequest(
+					'closeProducer', { producerId: this._screenSharingAudioProducer.id });
+			}
 		}
 		catch (error)
 		{
@@ -3929,6 +4798,7 @@ export default class RoomClient
 		}
 
 		this._screenSharingProducer = null;
+		this._screenSharingAudioProducer = null;
 
 		this._screenSharing.stop();
 
@@ -3999,7 +4869,7 @@ export default class RoomClient
 	{
 		logger.debug('_setNoiseThreshold() [threshold:"%s"]', threshold);
 
-		this._hark.setThreshold(threshold);
+		this._hark?.setThreshold(threshold);
 
 		store.dispatch(
 			settingsActions.setNoiseThreshold(threshold));
@@ -4189,5 +5059,85 @@ export default class RoomClient
 			return true;
 
 		return false;
+	}
+
+	_closeConsumer(consumerId)
+	{
+		const consumer = this._consumers.get(consumerId);
+
+		this._spotlights.removeVideoConsumer(consumerId);
+
+		if (!consumer)
+			return;
+
+		consumer.close();
+
+		if (consumer.hark != null)
+			consumer.hark.stop();
+
+		this._consumers.delete(consumerId);
+
+		const { peerId } = consumer.appData;
+
+		store.dispatch(
+			consumerActions.removeConsumer(consumerId, peerId));
+	}
+
+	_chooseEncodings(simulcastProfiles, size)
+	{
+		let encodings;
+
+		const sortedMap = new Map([ ...Object.entries(simulcastProfiles) ]
+			.sort((a, b) => parseInt(b[0]) - parseInt(a[0])));
+
+		for (const [ key, value ] of sortedMap)
+		{
+			if (key < size)
+			{
+				if (encodings === null)
+				{
+					encodings = value;
+				}
+
+				break;
+			}
+
+			encodings = value;
+		}
+
+		// hack as there is a bug in mediasoup
+		if (encodings.length === 1)
+		{
+			encodings.push({ ...encodings[0] });
+		}
+
+		return encodings;
+	}
+
+	_getEncodings(width, height, screenSharing = false)
+	{
+		// If VP9 is the only available video codec then use SVC.
+		const firstVideoCodec = this._mediasoupDevice
+			.rtpCapabilities
+			.codecs
+			.find((c) => c.kind === 'video');
+
+		let encodings;
+
+		const size = (width > height ? width : height);
+
+		if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
+			encodings = screenSharing ? VIDEO_SVC_ENCODINGS : VIDEO_KSVC_ENCODINGS;
+		else if (config.simulcastProfiles)
+			encodings = this._chooseEncodings(config.simulcastProfiles, size);
+		else
+			encodings = this._chooseEncodings(VIDEO_SIMULCAST_PROFILES, size);
+
+		return encodings;
+	}
+
+	setHideNoVideoParticipants(hideNoVideoParticipants)
+	{
+		this._spotlights.hideNoVideoParticipants = hideNoVideoParticipants;
 	}
 }

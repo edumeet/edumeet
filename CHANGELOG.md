@@ -1,5 +1,59 @@
 # Changelog
 
+## 3.5.0
+
+### Added
+
+* Update build steps
+* Update documentations
+* Major chat refactoring
+  * Added chat badge displaying unread messages
+  * Merged file sharing + chat
+  * Save chat history (both in leave screen and in chat directly)
+  * Sorting messages
+  * Format messages
+  * Combine messages
+* Local recording (chrome, firefox, edge)
+  * This is still default off in config because of bad UX connected to getUserMedias
+* New app configuration system
+* New server configuration system
+* Add leaving room confirmation dialog
+* New audio config with audio profiles
+* New translations
+* Screen Sharing now supports audio (chrome, edge)
+* Add QoS set DSCP bits in IP header according to new option networkPriorities in app config
+  Our media traffic should get now higher priority where QoS has been implemented.
+  Routers will add higher priority or put media packets to low latency queue.
+  If QoS implemented in L2 too, then switches also set the L2 CoS bits according DSCP.
+  WIFI AP-s that implements QoS, also based on it could activate the multimedia extension MMS.
+  Hopefully it will help and add little bit more priority lower latency in congested networks.
+  At the time of this writing it is only implemented in Chrome.
+
+### Improved
+* Scalability and performance: 
+  * Improvements for handling simulcast and video container size
+  * Improved performance for encryption of media (+25% capacity)
+  * Improved balancing of peers to workers
+* CSS for mobile
+* UI improvements (bugs fixes) #922
+* Improved button layout
+* Improved login dialog
+* Added bcrypt for local auth strategy
+ 
+
+### Fixed 
+* Fix auto unmute buttons on separate bar
+* Fix browser version comparison
+* Safari Screen Share Bug Fix
+* Fix session overwrites
+* Fix loosing the current language after leaving the room)
+* Extra video duplication fix
+* Fix loosing the current language after leaving the room)
+* Fix notifications (they were displayed always in English)
+* Translation updates
+* A lot of bugs in auth
+* Sanitizations for room names
+
 ## 3.4.0
 
 ### Added

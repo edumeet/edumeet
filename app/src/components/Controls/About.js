@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../RoomContext';
-import * as roomActions from '../../actions/roomActions';
+import * as roomActions from '../../store/actions/roomActions';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
@@ -14,6 +14,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -105,22 +106,22 @@ const About = ({
 				</DialogContentText>
 				<Divider variant='middle' light className={classes.divider}/>
 				{
-					window.config.supportUrl
+					config.supportUrl
 					&&
 					<DialogContentText align='center' paragraph>
 						<span>Visit for more info: </span>
-						<Link href={window.config.supportUrl} target='_blank' rel='noreferrer' color='secondary'>
-							{ window.config.supportUrl }
+						<Link href={config.supportUrl} target='_blank' rel='noreferrer' color='secondary'>
+							{ config.supportUrl }
 						</Link>
 					</DialogContentText>
 				}
-				<Link href={window.config.privacyUrl ? window.config.privacyUrl : 'privacy/privacy.html'} target='_blank' rel='noreferrer' color='secondary' className={classes.link}>
+				<Link href={config.privacyUrl ? config.privacyUrl : 'privacy/privacy.html'} target='_blank' rel='noreferrer' color='secondary' className={classes.link}>
 					Data protection and Privacy Policy
 				</Link>
 
 			</DialogContent>
 			<DialogActions>
-				{ window.config.logo && <img alt='Logo' className={classes.logo} src={window.config.logo} /> }
+				{ config.logo && <img alt='Logo' className={classes.logo} src={config.logo} /> }
 				<Button onClick={() => { handleCloseAbout(false); }} color='primary'>
 					<FormattedMessage
 						id='label.close'

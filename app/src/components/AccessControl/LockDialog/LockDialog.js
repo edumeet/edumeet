@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import {
 	lobbyPeersKeySelector,
 	makePermissionSelector
-} from '../../Selectors';
+} from '../../../store/selectors';
 import { permissions } from '../../../permissions';
 import * as appPropTypes from '../../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../RoomContext';
-import * as roomActions from '../../../actions/roomActions';
+import * as roomActions from '../../../store/actions/roomActions';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';

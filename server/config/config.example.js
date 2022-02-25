@@ -1,12 +1,13 @@
-const os = require('os');
+// const os = require('os');
 // const fs = require('fs');
+// const tunnel = require('tunnel');
 
-const userRoles = require('../userRoles');
+const userRoles = require('../lib/access/roles');
 
 const {
 	BYPASS_ROOM_LOCK,
 	BYPASS_LOBBY
-} = require('../access');
+} = require('../lib/access/access');
 
 const {
 	CHANGE_ROOM_LOCK,
@@ -20,15 +21,15 @@ const {
 	EXTRA_VIDEO,
 	SHARE_FILE,
 	MODERATE_FILES,
-	MODERATE_ROOM
-} = require('../permissions');
+	MODERATE_ROOM,
+	LOCAL_RECORD_ROOM
+} = require('../lib/access/perms');
 
 // const AwaitQueue = require('awaitqueue');
 // const axios = require('axios');
 
 module.exports =
 {
-
 	// Auth conf
 	/*
 	auth :
@@ -63,8 +64,22 @@ module.exports =
 				scope       		: 'openid email profile',
 				// where client.example.com is your edumeet server
 				redirect_uri  : 'https://client.example.com/auth/callback'
+			},
+			/*
+			HttpOptions   :
+			{
+  				timeout: 5000,
+				agent: 
+				{
+                	https:tunnel.httpsOverHttp({
+                           proxy: {
+                                host: 'proxy',
+                               port: 3128
+                           }
+                 	})
+  				}
 			}
-
+			*//*
 		},
 		saml :
 		{
@@ -89,14 +104,16 @@ module.exports =
 					username     : 'alice',
 					passwordHash : '$2b$10$PAXXw.6cL3zJLd7ZX.AnL.sFg2nxjQPDmMmGSOQYIJSa0TrZ9azG6',
 					displayName  : 'Alice',
-					emails       : [ { value: 'alice@atlanta.com' } ]
+					emails       : [ { value: 'alice@atlanta.com' } ],
+					meetRoles   : [ ]
 				},
 				{
 					id           : 2,
 					username     : 'bob',
 					passwordHash : '$2b$10$BzAkXcZ54JxhHTqCQcFn8.H6klY/G48t4jDBeTE2d2lZJk/.tvv0G',
 					displayName  : 'Bob',
-					emails       : [ { value: 'bob@biloxi.com' } ]
+					emails       : [ { value: 'bob@biloxi.com' } ],
+					meetRoles   : [ ]
 				}
 			]
 		}
@@ -193,28 +210,28 @@ module.exports =
 	// See examples below.
 	// Examples:
 	/*
-	// All authenicated users will be MODERATOR and AUTHENTICATED
+	// All authenticated users will be MODERATOR and AUTHENTICATED
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		peer.addRole(userRoles.MODERATOR);
 		peer.addRole(userRoles.AUTHENTICATED);
 	},
-	// All authenicated users will be AUTHENTICATED,
+	// All authenticated users will be AUTHENTICATED,
 	// and those with the moderator role set in the userinfo
 	// will also be MODERATOR
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (
-			Array.isArray(userinfo.meet_roles) &&
-			userinfo.meet_roles.includes('moderator')
+			Array.isArray(userinfo.meetRoles) &&
+			userinfo.meetRoles.includes('moderator')
 		)
 		{
 			peer.addRole(userRoles.MODERATOR);
 		}
 
 		if (
-			Array.isArray(userinfo.meet_roles) &&
-			userinfo.meet_roles.includes('meetingadmin')
+			Array.isArray(userinfo.meetRoles) &&
+			userinfo.meetRoles.includes('meetingadmin')
 		)
 		{
 			peer.addRole(userRoles.ADMIN);
@@ -239,19 +256,7 @@ module.exports =
 			}
 		}
 	},
-	// All authenicated users will be AUTHENTICATED,
-	// and those with email ending with @example.com
-	// will also be MODERATOR
-	userMapping : async ({ peer, room, roomId, userinfo }) =>
-	{
-		if (userinfo.email && userinfo.email.endsWith('@example.com'))
-		{
-			peer.addRole(userRoles.MODERATOR);
-		}
-
-		peer.addRole(userRoles.AUTHENTICATED);
-	},
-	// All authenicated users will be AUTHENTICATED,
+	// All authenticated users will be AUTHENTICATED,
 	// and those with email ending with @example.com
 	// will also be MODERATOR
 	userMapping : async ({ peer, room, roomId, userinfo }) =>
@@ -265,7 +270,7 @@ module.exports =
 	},
 	*/
 	// eslint-disable-next-line no-unused-vars
-	userMapping           : async ({ peer, room, roomId, userinfo }) =>
+	userMapping : async ({ peer, room, roomId, userinfo }) =>
 	{
 		if (userinfo.picture != null)
 		{
@@ -327,153 +332,36 @@ module.exports =
 	},
 	permissionsFromRoles : {
 		// The role(s) have permission to lock/unlock a room
-		[CHANGE_ROOM_LOCK] : [ userRoles.MODERATOR ],
+		[CHANGE_ROOM_LOCK]  : [ userRoles.MODERATOR ],
 		// The role(s) have permission to promote a peer from the lobby
-		[PROMOTE_PEER]     : [ userRoles.NORMAL ],
+		[PROMOTE_PEER]      : [ userRoles.NORMAL ],
 		// The role(s) have permission to give/remove other peers roles
-		[MODIFY_ROLE]      : [ userRoles.NORMAL ],
+		[MODIFY_ROLE]       : [ userRoles.NORMAL ],
 		// The role(s) have permission to send chat messages
-		[SEND_CHAT]        : [ userRoles.NORMAL ],
+		[SEND_CHAT]         : [ userRoles.NORMAL ],
 		// The role(s) have permission to moderate chat
-		[MODERATE_CHAT]    : [ userRoles.MODERATOR ],
+		[MODERATE_CHAT]     : [ userRoles.MODERATOR ],
 		// The role(s) have permission to share audio
-		[SHARE_AUDIO]      : [ userRoles.NORMAL ],
+		[SHARE_AUDIO]       : [ userRoles.NORMAL ],
 		// The role(s) have permission to share video
-		[SHARE_VIDEO]      : [ userRoles.NORMAL ],
+		[SHARE_VIDEO]       : [ userRoles.NORMAL ],
 		// The role(s) have permission to share screen
-		[SHARE_SCREEN]     : [ userRoles.NORMAL ],
+		[SHARE_SCREEN]      : [ userRoles.NORMAL ],
 		// The role(s) have permission to produce extra video
-		[EXTRA_VIDEO]      : [ userRoles.NORMAL ],
+		[EXTRA_VIDEO]       : [ userRoles.NORMAL ],
 		// The role(s) have permission to share files
-		[SHARE_FILE]       : [ userRoles.NORMAL ],
+		[SHARE_FILE]        : [ userRoles.NORMAL ],
 		// The role(s) have permission to moderate files
-		[MODERATE_FILES]   : [ userRoles.MODERATOR ],
+		[MODERATE_FILES]    : [ userRoles.MODERATOR ],
 		// The role(s) have permission to moderate room (e.g. kick user)
-		[MODERATE_ROOM]    : [ userRoles.MODERATOR ]
+		[MODERATE_ROOM]     : [ userRoles.MODERATOR ],
+		// The role(s) have permission to local record room
+		[LOCAL_RECORD_ROOM] : [ userRoles.NORMAL ]
 	},
 	// Array of permissions. If no peer with the permission in question
 	// is in the room, all peers are permitted to do the action. The peers
 	// that are allowed because of this rule will not be able to do this 
 	// action as soon as a peer with the permission joins. In this example
 	// everyone will be able to lock/unlock room until a MODERATOR joins.
-	allowWhenRoleMissing : [ CHANGE_ROOM_LOCK ],
-	// When truthy, the room will be open to all users when as long as there
-	// are allready users in the room
-	activateOnHostJoin   : true,
-	// When set, maxUsersPerRoom defines how many users can join
-	// a single room. If not set, there is no limit.
-	// maxUsersPerRoom    : 20,
-	// Room size before spreading to new router
-	routerScaleSize      : 40,
-	// Socket timout value
-	requestTimeout       : 20000,
-	// Socket retries when timeout
-	requestRetries       : 3,
-	// Mediasoup settings
-	mediasoup            :
-	{
-		numWorkers : Object.keys(os.cpus()).length,
-		// mediasoup Worker settings.
-		worker     :
-		{
-			logLevel : 'warn',
-			logTags  :
-			[
-				'info',
-				'ice',
-				'dtls',
-				'rtp',
-				'srtp',
-				'rtcp'
-			],
-			rtcMinPort : 40000,
-			rtcMaxPort : 49999
-		},
-		// mediasoup Router settings.
-		router :
-		{
-			// Router media codecs.
-			mediaCodecs :
-			[
-				{
-					kind      : 'audio',
-					mimeType  : 'audio/opus',
-					clockRate : 48000,
-					channels  : 2
-				},
-				{
-					kind       : 'video',
-					mimeType   : 'video/VP8',
-					clockRate  : 90000,
-					parameters :
-					{
-						'x-google-start-bitrate' : 1000
-					}
-				},
-				{
-					kind       : 'video',
-					mimeType   : 'video/VP9',
-					clockRate  : 90000,
-					parameters :
-					{
-						'profile-id'             : 2,
-						'x-google-start-bitrate' : 1000
-					}
-				},
-				{
-					kind       : 'video',
-					mimeType   : 'video/h264',
-					clockRate  : 90000,
-					parameters :
-					{
-						'packetization-mode'      : 1,
-						'profile-level-id'        : '4d0032',
-						'level-asymmetry-allowed' : 1,
-						'x-google-start-bitrate'  : 1000
-					}
-				},
-				{
-					kind       : 'video',
-					mimeType   : 'video/h264',
-					clockRate  : 90000,
-					parameters :
-					{
-						'packetization-mode'      : 1,
-						'profile-level-id'        : '42e01f',
-						'level-asymmetry-allowed' : 1,
-						'x-google-start-bitrate'  : 1000
-					}
-				}
-			]
-		},
-		// mediasoup WebRtcTransport settings.
-		webRtcTransport :
-		{
-			listenIps :
-			[
-				// change 192.0.2.1 IPv4 to your server's IPv4 address!!
-				{ ip: '192.0.2.1', announcedIp: null }
-
-				// Can have multiple listening interfaces
-				// change 2001:DB8::1 IPv6 to your server's IPv6 address!!
-				// { ip: '2001:DB8::1', announcedIp: null }
-			],
-			initialAvailableOutgoingBitrate : 1000000,
-			minimumAvailableOutgoingBitrate : 600000,
-			// Additional options that are not part of WebRtcTransportOptions.
-			maxIncomingBitrate              : 1500000
-		}
-	}
-
-	/*
-	,
-	// Prometheus exporter
-	prometheus : {
-		deidentify : false, // deidentify IP addresses
-		// listen     : 'localhost', // exporter listens on this address
-		numeric    : false, // show numeric IP addresses
-		port       : 8889, // allocated port
-		quiet      : false // include fewer labels
-	}
-	*/
+	allowWhenRoleMissing : [ CHANGE_ROOM_LOCK ]
 };

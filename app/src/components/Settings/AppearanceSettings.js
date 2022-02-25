@@ -2,8 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as appPropTypes from '../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../actions/roomActions';
-import * as settingsActions from '../../actions/settingsActions';
+import * as roomActions from '../../store/actions/roomActions';
+import * as settingsActions from '../../store/actions/settingsActions';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
@@ -14,6 +14,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 import { withRoomContext } from '../../RoomContext';
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -48,6 +49,7 @@ const AppearanceSettings = (props) =>
 		onToggleShowNotifications,
 		onToggleDrawerOverlayed,
 		onToggleMirrorOwnVideo,
+		onToggleHideNoVideoParticipants,
 		handleChangeMode,
 		handleChangeAspectRatio,
 		classes,
@@ -71,14 +73,6 @@ const AppearanceSettings = (props) =>
 		})
 	} ];
 
-	const aspectRatios = window.config.aspectRatios || [ {
-		value : 1.333,
-		label : '4 : 3'
-	}, {
-		value : 1.777,
-		label : '16 : 9'
-	} ];
-
 	return (
 		<React.Fragment>
 
@@ -93,7 +87,7 @@ const AppearanceSettings = (props) =>
 					}
 					name={intl.formatMessage({
 						id             : 'settings.language',
-						defaultMessage : 'Language'
+						defaultMessage : 'Select language'
 					})}
 					autoWidth
 					className={classes.selectEmpty}
@@ -153,7 +147,10 @@ const AppearanceSettings = (props) =>
 					onChange={(event) =>
 					{
 						if (event.target.value)
+						{
 							handleChangeAspectRatio(event.target.value);
+							roomClient.updateWebcam({ restart: true });
+						}
 					}}
 					name={intl.formatMessage({
 						id             : 'settings.aspectRatio',
@@ -162,7 +159,7 @@ const AppearanceSettings = (props) =>
 					autoWidth
 					className={classes.selectEmpty}
 				>
-					{ aspectRatios.map((aspectRatio, index) =>
+					{ config.aspectRatios.map((aspectRatio, index) =>
 					{
 						return (
 							<MenuItem key={index} value={aspectRatio.value}>
@@ -186,6 +183,24 @@ const AppearanceSettings = (props) =>
 				label={intl.formatMessage({
 					id             : 'settings.mirrorOwnVideo',
 					defaultMessage : 'Mirror view of own video'
+				})}
+			/>
+			<FormControlLabel
+				className={classnames(classes.setting, classes.switchLabel)}
+				control={
+					<Switch
+						checked={settings.hideNoVideoParticipants}
+						onChange={() =>
+						{
+							roomClient.setHideNoVideoParticipants(!settings.hideNoVideoParticipants);
+							onToggleHideNoVideoParticipants();
+						}}
+						value='hideNoVideoParticipants'
+					/>}
+				labelPlacement='start'
+				label={intl.formatMessage({
+					id             : 'settings.hideNoVideoParticipants',
+					defaultMessage : 'Hide participants with no video'
 				})}
 			/>
 			<FormControlLabel
@@ -242,22 +257,23 @@ const AppearanceSettings = (props) =>
 
 AppearanceSettings.propTypes =
 {
-	roomClient          				  : PropTypes.any.isRequired,
-	isMobile                  : PropTypes.bool.isRequired,
-	room                      : appPropTypes.Room.isRequired,
-	settings                  : PropTypes.object.isRequired,
-	onTogglePermanentTopBar   : PropTypes.func.isRequired,
-	onToggleHiddenControls    : PropTypes.func.isRequired,
-	onToggleButtonControlBar  : PropTypes.func.isRequired,
-	onToggleShowNotifications : PropTypes.func.isRequired,
-	onToggleDrawerOverlayed   : PropTypes.func.isRequired,
-	onToggleMirrorOwnVideo    : PropTypes.func.isRequired,
-	handleChangeMode          : PropTypes.func.isRequired,
-	handleChangeAspectRatio   : PropTypes.func.isRequired,
-	classes                   : PropTypes.object.isRequired,
-	intl                      : PropTypes.object.isRequired,
-	locale                    : PropTypes.object.isRequired,
-	localesList               : PropTypes.object.isRequired
+	roomClient                      : PropTypes.any.isRequired,
+	isMobile                        : PropTypes.bool.isRequired,
+	room                            : appPropTypes.Room.isRequired,
+	settings                        : PropTypes.object.isRequired,
+	onTogglePermanentTopBar         : PropTypes.func.isRequired,
+	onToggleHiddenControls          : PropTypes.func.isRequired,
+	onToggleButtonControlBar        : PropTypes.func.isRequired,
+	onToggleShowNotifications       : PropTypes.func.isRequired,
+	onToggleDrawerOverlayed         : PropTypes.func.isRequired,
+	onToggleMirrorOwnVideo          : PropTypes.func.isRequired,
+	onToggleHideNoVideoParticipants : PropTypes.func.isRequired,
+	handleChangeMode                : PropTypes.func.isRequired,
+	handleChangeAspectRatio         : PropTypes.func.isRequired,
+	classes                         : PropTypes.object.isRequired,
+	intl                            : PropTypes.object,
+	locale                          : PropTypes.string.isRequired,
+	localesList                     : PropTypes.array.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -270,14 +286,15 @@ const mapStateToProps = (state) =>
 	});
 
 const mapDispatchToProps = {
-	onTogglePermanentTopBar   : settingsActions.togglePermanentTopBar,
-	onToggleHiddenControls    : settingsActions.toggleHiddenControls,
-	onToggleShowNotifications : settingsActions.toggleShowNotifications,
-	onToggleButtonControlBar  : settingsActions.toggleButtonControlBar,
-	onToggleDrawerOverlayed   : settingsActions.toggleDrawerOverlayed,
-	onToggleMirrorOwnVideo    : settingsActions.toggleMirrorOwnVideo,
-	handleChangeMode          : roomActions.setDisplayMode,
-	handleChangeAspectRatio   : settingsActions.setAspectRatio
+	onTogglePermanentTopBar         : settingsActions.togglePermanentTopBar,
+	onToggleHiddenControls          : settingsActions.toggleHiddenControls,
+	onToggleShowNotifications       : settingsActions.toggleShowNotifications,
+	onToggleButtonControlBar        : settingsActions.toggleButtonControlBar,
+	onToggleDrawerOverlayed         : settingsActions.toggleDrawerOverlayed,
+	onToggleMirrorOwnVideo          : settingsActions.toggleMirrorOwnVideo,
+	onToggleHideNoVideoParticipants : settingsActions.toggleHideNoVideoParticipants,
+	handleChangeMode                : roomActions.setDisplayMode,
+	handleChangeAspectRatio         : settingsActions.setAspectRatio
 };
 
 export default withRoomContext(connect(

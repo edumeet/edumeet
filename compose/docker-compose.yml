@@ -1,0 +1,107 @@
+version: '2.2'
+
+networks:
+  edumeet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.22.0.0/24
+
+services:
+
+  edumeet:
+    build: ./edumeet
+    container_name: edumeet
+    restart: unless-stopped
+    user: "${CURRENT_USER}"
+    volumes:
+    - ${PWD}/..:/edumeet
+    - ${PWD}/config/edumeet-server-config.js:/edumeet/server/config/config.js:ro
+    - ${PWD}/config/edumeet-server-config.yaml:/edumeet/server/config/config.yaml:ro
+    - ${PWD}/config/edumeet-app-config.js:/edumeet/app/public/config/config.js:ro
+    #- ${PWD}/../app/public/config/config.example.js:/edumeet/app/public/config/config.js:ro
+    network_mode: "host"
+    extra_hosts:
+      redis: 172.22.0.2
+    depends_on:
+    - redis
+
+  redis:
+    image: redis
+    container_name: edumeet_redis
+    restart: unless-stopped
+    networks:
+      edumeet:
+        ipv4_address: 172.22.0.2
+
+  nginx:
+    image: nginx
+    container_name: edumeet_nginx
+    restart: unless-stopped
+    ports:
+    - 8443:443
+    volumes:
+    - ${PWD}/../server/certs/mediasoup-demo.localhost.cert.pem:/etc/nginx/cert.pem:ro
+    - ${PWD}/../server/certs/mediasoup-demo.localhost.key.pem:/etc/nginx/key.pem:ro
+    - ${PWD}/config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    extra_hosts:
+      edumeet: 172.22.0.1
+    depends_on:
+    - edumeet
+
+  prometheus:
+    image: prom/prometheus:v2.26.0
+    user: root
+    container_name: edumeet_prometheus
+    restart: unless-stopped
+    volumes:
+    - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    - ./data/prometheus:/prometheus
+    command:
+    - '--config.file=/etc/prometheus/prometheus.yml'
+    - '--storage.tsdb.path=/prometheus'
+    ports:
+    - 9090:9090
+    links:
+    #- cadvisor:cadvisor
+    - node-exporter:node-exporter
+    - edumeet:edumeet
+    extra_hosts:
+      edumeet: 172.22.0.1
+
+  node-exporter:
+    image: prom/node-exporter:v1.1.2
+    container_name: edumeet_node_exporter
+    restart: unless-stopped
+
+  #cadvisor:
+  #  image: google/cadvisor:latest
+  #  container_name: edumeet_cadvisor
+  #  restart: unless-stopped
+  #  volumes:
+  #  - /:/rootfs:ro
+  #  - /var/run:/var/run:rw
+  #  - /sys:/sys:ro
+  #  - /var/lib/docker/:/var/lib/docker:ro
+  #  expose:
+  #  - 8080
+
+  grafana:
+    image: grafana/grafana:7.5.3
+    user: root
+    container_name: edumeet_grafana
+    restart: unless-stopped
+    links:
+    - prometheus:prometheus
+    ports:
+    - 9091:3000
+    volumes:
+    - ./config/grafana-prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus.yml
+    - ./config/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/all.yml
+    - ./config/grafana-dashboards:/var/lib/grafana/dashboards
+    - ./data/grafana:/var/lib/grafana
+    environment:
+    - GF_SECURITY_ADMIN_USER=admin
+    - GF_SECURITY_ADMIN_PASSWORD=admin
+    - GF_USERS_ALLOW_SIGN_UP=false

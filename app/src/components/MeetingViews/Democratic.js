@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {
 	spotlightPeersSelector,
 	videoBoxesSelector
-} from '../Selectors';
+} from '../../store/selectors';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -116,8 +116,8 @@ class Democratic extends React.PureComponent
 		)
 		{
 			this.setState({
-				peerWidth  : FILL_RATE * x,
-				peerHeight : FILL_RATE * y
+				peerWidth  : Math.ceil(FILL_RATE * x),
+				peerHeight : Math.ceil(FILL_RATE * y)
 			});
 		}
 	};
@@ -192,6 +192,7 @@ class Democratic extends React.PureComponent
 							id={peer}
 							spacing={6}
 							style={style}
+							enableLayersSwitch
 						/>
 					);
 				})}

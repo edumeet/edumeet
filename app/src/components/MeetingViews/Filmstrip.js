@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import {
 	videoBoxesSelector
-} from '../Selectors';
+} from '../../store/selectors';
 import { withRoomContext } from '../../RoomContext';
 import Me from '../Containers/Me';
 import Peer from '../Containers/Peer';
@@ -78,11 +78,36 @@ class Filmstrip extends React.PureComponent
 		this.activePeerContainer = React.createRef();
 
 		this.filmStripContainer = React.createRef();
+
+		const selectedPeerId = this.getSelectedPeerId();
+
+		if (selectedPeerId)
+		{
+			props.roomClient.setSelectedPeer(selectedPeerId);
+		}
 	}
 
 	state = {
 		lastSpeaker : null
 	};
+
+	getSelectedPeerId = () =>
+	{
+		const {
+			selectedPeers,
+			peers
+		} = this.props;
+
+		let selectedPeerId;
+
+		if (selectedPeers && selectedPeers.length > 0 &&
+			peers[selectedPeers[selectedPeers.length - 1]])
+		{
+			selectedPeerId = selectedPeers[selectedPeers.length - 1];
+		}
+
+		return selectedPeerId;
+	}
 
 	// Find the name of the peer which is currently speaking. This is either
 	// the latest active speaker, or the manually selected peer, or, if no
@@ -90,15 +115,16 @@ class Filmstrip extends React.PureComponent
 	getActivePeerId = () =>
 	{
 		const {
-			selectedPeerId,
 			peers
 		} = this.props;
 
 		const { lastSpeaker } = this.state;
 
+		const selectedPeerId = this.getSelectedPeerId();
+
 		if (selectedPeerId && peers[selectedPeerId])
 		{
-			return this.props.selectedPeerId;
+			return selectedPeerId;
 		}
 
 		if (lastSpeaker && peers[lastSpeaker])
@@ -236,7 +262,7 @@ class Filmstrip extends React.PureComponent
 	render()
 	{
 		const {
-			// roomClient,
+			/* roomClient, */
 			peers,
 			myId,
 			advancedMode,
@@ -259,6 +285,7 @@ class Filmstrip extends React.PureComponent
 		{
 			width  : this.state.filmStripWidth,
 			height : this.state.filmStripHeight
+
 		};
 
 		return (
@@ -292,7 +319,6 @@ class Filmstrip extends React.PureComponent
 								<Me
 									advancedMode={advancedMode}
 									style={peerStyle}
-									smallContainer
 								/>
 								}
 							</div>
@@ -306,9 +332,8 @@ class Filmstrip extends React.PureComponent
 									<Grid key={peerId} item>
 										<div
 											key={peerId}
-											// onClick={() => roomClient.setSelectedPeer(peerId)}
 											className={classnames(classes.filmItem, {
-												selected : this.props.selectedPeerId === peerId,
+												selected : this.getSelectedPeerId() === peerId,
 												active   : peerId === activePeerId
 											})}
 										>
@@ -316,7 +341,7 @@ class Filmstrip extends React.PureComponent
 												advancedMode={advancedMode}
 												id={peerId}
 												style={peerStyle}
-												smallContainer
+												enableLayersSwitch={activePeerId !== peerId}
 											/>
 										</div>
 									</Grid>
@@ -335,13 +360,13 @@ class Filmstrip extends React.PureComponent
 }
 
 Filmstrip.propTypes = {
-	// roomClient      : PropTypes.any.isRequired,
+	roomClient      : PropTypes.any.isRequired,
 	activeSpeakerId : PropTypes.string,
 	advancedMode    : PropTypes.bool,
 	peers           : PropTypes.object.isRequired,
 	consumers       : PropTypes.object.isRequired,
 	myId            : PropTypes.string.isRequired,
-	selectedPeerId  : PropTypes.string,
+	selectedPeers   : PropTypes.array,
 	spotlights      : PropTypes.array.isRequired,
 	boxes           : PropTypes.number,
 	toolbarsVisible : PropTypes.bool.isRequired,
@@ -356,7 +381,7 @@ const mapStateToProps = (state) =>
 {
 	return {
 		activeSpeakerId : state.room.activeSpeakerId,
-		selectedPeerId  : state.room.selectedPeerId,
+		selectedPeers   : state.room.selectedPeers,
 		peers           : state.peers,
 		consumers       : state.consumers,
 		myId            : state.me.id,
@@ -379,7 +404,7 @@ export default withRoomContext(connect(
 		{
 			return (
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
-				prev.room.selectedPeerId === next.room.selectedPeerId &&
+				prev.room.selectedPeers === next.room.selectedPeers &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
 				prev.room.hideSelfView === next.room.hideSelfView &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&

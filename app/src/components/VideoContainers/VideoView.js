@@ -10,6 +10,7 @@ import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';
 import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
+import { AudioAnalyzer } from './AudioAnalyzer';
 
 const logger = new Logger('VideoView');
 
@@ -31,7 +32,7 @@ const styles = (theme) =>
 			flex               : '100 100 auto',
 			height             : '100%',
 			width              : '100%',
-			objectFit          : 'cover',
+			objectFit          : 'contain',
 			userSelect         : 'none',
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
@@ -70,7 +71,8 @@ const styles = (theme) =>
 		{
 			display            : 'flex',
 			transitionProperty : 'opacity',
-			transitionDuration : '.15s'
+			transitionDuration : '.15s',
+			alignItems         : 'flex-start'
 		},
 		box :
 		{
@@ -89,9 +91,10 @@ const styles = (theme) =>
 
 					// eslint-disable-next-line
 					gridTemplateAreas : '\
-				"AcodL		Acod	Acod	Acod	Acod" \
+					"AcodL		Acod	Acod	Acod	Acod" \
 					"VcodL		Vcod	Vcod	Vcod	Vcod" \
 					"ResL		Res		Res		Res		Res" \
+					"VPortL		VPort VPort VPort VPort" \
 					"RecvL		RecvBps RecvBps RecvSum RecvSum" \
 					"SendL		SendBps SendBps SendSum SendSum" \
 					"IPlocL		IPloc	IPloc	IPloc	IPloc" \
@@ -105,6 +108,8 @@ const styles = (theme) =>
 					'& .Vcod'     : { gridArea: 'Vcod' },
 					'& .ResL'     : { gridArea: 'ResL' },
 					'& .Res'      : { gridArea: 'Res' },
+					'& .VPortL'   : { gridArea: 'VPortL' },
+					'& .VPort'    : { gridArea: 'VPort' },
 					'& .RecvL'    : { gridArea: 'RecvL' },
 					'& .RecvBps'  : { gridArea: 'RecvBps', justifySelf: 'flex-end' },
 					'& .RecvSum'  : { gridArea: 'RecvSum', justifySelf: 'flex-end' },
@@ -128,8 +133,16 @@ const styles = (theme) =>
 			},
 			'&.hidden' :
 			{
-				opacity            : 0,
-				transitionDuration : '0s'
+				display : 'none'
+			},
+			'&.audioAnalyzer' :
+			{
+				width           : '30%',
+				height          : '30%',
+				minWidth        : '180px',
+				minHeight       : '120px',
+				marginLeft      : theme.spacing(0.5),
+				backgroundColor : 'rgba(0, 0, 0, 0.25)'
 			}
 		},
 		peer :
@@ -143,16 +156,19 @@ const styles = (theme) =>
 			color           : 'rgba(255, 255, 255, 0.85)',
 			border          : 'none',
 			borderBottom    : '1px solid #aeff00',
-			backgroundColor : 'transparent'
+			backgroundColor : 'rgba(0, 0, 0, 0.25)',
+			padding         : theme.spacing(0.6)
 		},
 		displayNameStatic :
 		{
-			userSelect : 'none',
-			cursor     : 'text',
-			fontSize   : 14,
-			fontWeight : 400,
-			color      : 'rgba(255, 255, 255, 0.85)',
-			'&:hover'  :
+			userSelect      : 'none',
+			cursor          : 'text',
+			fontSize        : 14,
+			fontWeight      : 400,
+			color           : 'rgba(255, 255, 255, 0.85)',
+			backgroundColor : 'rgba(0, 0, 0, 0.25)',
+			padding         : theme.spacing(0.6),
+			'&:hover'       :
 			{
 				backgroundColor : 'rgb(174, 255, 0, 0.25)'
 			}
@@ -175,8 +191,15 @@ class VideoView extends React.PureComponent
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
 
+		// Latest received audio track.
+		// @type {MediaStreamTrack}
+		this._audioTrack = null;
+
 		// Periodic timer for showing video resolution.
 		this._videoResolutionTimer = null;
+
+		// Audio Analyzer
+		this.audioAnalyzerContainer = React.createRef();
 	}
 
 	render()
@@ -187,6 +210,7 @@ class VideoView extends React.PureComponent
 			isScreen,
 			isExtraVideo,
 			showQuality,
+			showAudioAnalyzer,
 			displayName,
 			showPeerInfo,
 			videoContain,
@@ -204,7 +228,13 @@ class VideoView extends React.PureComponent
 			onChangeDisplayName,
 			children,
 			classes,
-			netInfo
+			netInfo,
+			width,
+			height,
+			opusConfig,
+			localRecordingState,
+			recordingConsents,
+			peer
 		} = this.props;
 
 		const {
@@ -277,12 +307,13 @@ class VideoView extends React.PureComponent
 			<div className={classes.root}>
 				<div className={classes.info}>
 					<div className={classes.media}>
+						{(audioCodec || videoCodec) &&
 						<div className={classnames(classes.box, 'left', { hidden: !advancedMode })}>
 							{ audioCodec &&
 								<React.Fragment>
 									<span className={'AcodL'}>Acod: </span>
 									<span className={'Acod'}>
-										{audioCodec}
+										{audioCodec} {opusConfig}
 									</span>
 								</React.Fragment>
 							}
@@ -301,6 +332,15 @@ class VideoView extends React.PureComponent
 									<span className={'ResL'}>Res: </span>
 									<span className={'Res'}>
 										{videoWidth}x{videoHeight}
+									</span>
+								</React.Fragment>
+							}
+
+							{ (videoVisible && width && height) &&
+								<React.Fragment>
+									<span className={'VPortL'}>VPort: </span>
+									<span className={'VPort'}>
+										{Math.round(width)}x{Math.round(height)}
 									</span>
 								</React.Fragment>
 							}
@@ -347,6 +387,15 @@ class VideoView extends React.PureComponent
 							}
 
 						</div>
+						}
+
+						{showAudioAnalyzer && advancedMode &&
+						<div
+							className={classnames(classes.box, 'audioAnalyzer')}
+							ref={this.audioAnalyzerContainer}
+						/>
+						}
+
 						{ showQuality &&
 							<div className={classnames(classes.box, 'right')}>
 								{
@@ -354,6 +403,7 @@ class VideoView extends React.PureComponent
 								}
 							</div>
 						}
+
 					</div>
 
 					{ showPeerInfo &&
@@ -380,7 +430,17 @@ class VideoView extends React.PureComponent
 									</React.Fragment>
 									:
 									<span className={classes.displayNameStatic}>
-										{displayName}
+										{
+											(
+												(
+													localRecordingState==='start' ||
+													localRecordingState==='resume'
+												)&&
+												(
+													!recordingConsents.includes(peer.id)
+												)
+											) ? '':displayName
+										}
 									</span>
 								}
 							</div>
@@ -391,7 +451,18 @@ class VideoView extends React.PureComponent
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
-						hidden       : !videoVisible,
+						hidden : (!videoVisible ||
+							(
+								!isMe &&
+								(
+									localRecordingState==='start' ||
+									localRecordingState==='resume'
+								)&&
+								(
+									!recordingConsents.includes(peer.id)
+								)
+							)
+						),
 						'isMirrored' : isMirrored,
 						contain      : videoContain
 					})}
@@ -408,9 +479,20 @@ class VideoView extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { videoTrack } = this.props;
+		const { videoTrack, audioTrack, showAudioAnalyzer } = this.props;
 
 		this._setTracks(videoTrack);
+
+		// Audio analyzer
+		if (showAudioAnalyzer && this.props.advancedMode)
+		{
+			this._setAudioMonitorTrack(audioTrack);
+		}
+		else if (this.audioAnalyzer)
+		{
+			this.audioAnalyzer.delete();
+			this.audioAnalyzer = null;
+		}
 	}
 
 	componentWillUnmount()
@@ -425,15 +507,31 @@ class VideoView extends React.PureComponent
 			videoElement.onplay = null;
 			videoElement.onpause = null;
 		}
+
+		if (this.audioAnalyzer)
+		{
+			this.audioAnalyzer.delete();
+			this.audioAnalyzer = null;
+		}
 	}
 
 	componentDidUpdate(prevProps)
 	{
 		if (prevProps !== this.props)
 		{
-			const { videoTrack } = this.props;
+			const { videoTrack, audioTrack, showAudioAnalyzer } = this.props;
 
 			this._setTracks(videoTrack);
+
+			if (showAudioAnalyzer && this.props.advancedMode)
+			{
+				this._setAudioMonitorTrack(audioTrack);
+			}
+			else if (this.audioAnalyzer)
+			{
+				this.audioAnalyzer.delete();
+				this.audioAnalyzer = null;
+			}
 		}
 	}
 
@@ -470,6 +568,25 @@ class VideoView extends React.PureComponent
 		}
 	}
 
+	_setAudioMonitorTrack(track)
+	{
+		if (!this.audioAnalyzer)
+		{
+			logger.debug('_setAudioMonitorTrack creating audioAnalyzer with dom:', this.audioAnalyzerContainer.current);
+			this.audioAnalyzer = new AudioAnalyzer(this.audioAnalyzerContainer.current);
+		}
+
+		if (track)
+		{
+			this.audioAnalyzer.addTrack(track);
+		}
+		else
+		{
+			// disconnects all the tracks
+			this.audioAnalyzer.removeTracks();
+		}
+	}
+
 	_showVideoResolution()
 	{
 		this._videoResolutionTimer = setInterval(() =>
@@ -496,6 +613,20 @@ class VideoView extends React.PureComponent
 	{
 		this.setState({ videoWidth: null, videoHeight: null });
 	}
+
+	handleMenuClick(event)
+	{
+		logger.debug('handleMenuClick', event.currentTarget);
+
+		this.menuAnchorElement = event.currentTarget;
+	}
+
+	handleMenuClose(event)
+	{
+		logger.debug('handleMenuClose', event.currentTarget);
+
+		this.menuAnchorElement = null;
+	}
 }
 
 VideoView.propTypes =
@@ -505,12 +636,14 @@ VideoView.propTypes =
 	isScreen                       : PropTypes.bool,
 	isExtraVideo   	               : PropTypes.bool,
 	showQuality                    : PropTypes.bool,
+	showAudioAnalyzer              : PropTypes.bool,
 	displayName                    : PropTypes.string,
 	showPeerInfo                   : PropTypes.bool,
 	videoContain                   : PropTypes.bool,
 	advancedMode                   : PropTypes.bool,
 	videoTrack                     : PropTypes.any,
 	videoVisible                   : PropTypes.bool.isRequired,
+	audioTrack                     : PropTypes.any,
 	consumerSpatialLayers          : PropTypes.number,
 	consumerTemporalLayers         : PropTypes.number,
 	consumerCurrentSpatialLayer    : PropTypes.number,
@@ -525,7 +658,14 @@ VideoView.propTypes =
 	onChangeDisplayName            : PropTypes.func,
 	children                       : PropTypes.object,
 	classes                        : PropTypes.object.isRequired,
-	netInfo                        : PropTypes.object
+	netInfo                        : PropTypes.object,
+	width                          : PropTypes.number,
+	height                         : PropTypes.number,
+	opusConfig                     : PropTypes.string,
+	localRecordingState            : PropTypes.string,
+	recordingConsents              : PropTypes.array,
+	peer                           : PropTypes.string
+
 };
 
 export default withStyles(styles)(VideoView);

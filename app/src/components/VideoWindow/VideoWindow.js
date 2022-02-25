@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import NewWindow from './NewWindow';
 import PropTypes from 'prop-types';
 import * as appPropTypes from '../appPropTypes';
-import * as roomActions from '../../actions/roomActions';
+import * as roomActions from '../../store/actions/roomActions';
 import FullView from '../VideoContainers/FullView';
 
 const VideoWindow = (props) =>

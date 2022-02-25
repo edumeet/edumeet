@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { makePeerConsumerSelector } from '../Selectors';
+import { makePeerConsumerSelector, recordingConsentsPeersSelector } from '../../store/selectors';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from '../appPropTypes';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import * as roomActions from '../../actions/roomActions';
+import * as roomActions from '../../store/actions/roomActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
 import Tooltip from '@material-ui/core/Tooltip';
 import Fab from '@material-ui/core/Fab';
-import IconButton from '@material-ui/core/IconButton';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import NewWindowIcon from '@material-ui/icons/OpenInNew';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
+import RemoveFromQueueIcon from '@material-ui/icons/RemoveFromQueue';
+import AddToQueueIcon from '@material-ui/icons/AddToQueue';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import Volume from './Volume';
 
 const styles = (theme) =>
@@ -40,6 +43,7 @@ const styles = (theme) =>
 			{
 				// transition  : 'filter .2s',
 				// filter      : 'grayscale(0)',
+				boxShadow   : 'var(--active-speaker-shadow)',
 				borderColor : 'var(--active-speaker-border-color)'
 			},
 			'&:not(.active-speaker):not(.screen)' :
@@ -56,23 +60,6 @@ const styles = (theme) =>
 				order : 3
 			}
 		},
-		fab :
-		{
-			margin : theme.spacing(1)
-		},
-		smallContainer :
-		{
-			backgroundColor : 'rgba(255, 255, 255, 0.9)',
-			margin          : '0.5vmin',
-			padding         : '0.5vmin',
-			boxShadow       : '0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12)',
-			pointerEvents   : 'auto',
-			transition      : 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-			'&:hover'       :
-			{
-				backgroundColor : 'rgba(213, 213, 213, 1)'
-			}
-		},
 		viewContainer :
 		{
 			position : 'relative',
@@ -86,18 +73,29 @@ const styles = (theme) =>
 			height          : '100%',
 			backgroundColor : 'rgba(0, 0, 0, 0.3)',
 			display         : 'flex',
-			flexDirection   : 'column',
 			justifyContent  : 'center',
 			alignItems      : 'flex-end',
 			padding         : theme.spacing(1),
 			zIndex          : 21,
-			opacity         : 0,
+			opacity         : 1,
 			transition      : 'opacity 0.3s',
 			touchAction     : 'none',
 			'&.hover'       :
 			{
 				opacity : 1
+			},
+			'& .fab' :
+			{
+				margin       : theme.spacing(1),
+				'&.smallest' : {
+					width     : 30,
+					height    : 30,
+					minHeight : 'auto',
+					margin    : theme.spacing(0.5)
+				}
+
 			}
+
 		},
 		videoInfo :
 		{
@@ -110,13 +108,21 @@ const styles = (theme) =>
 			alignItems      : 'center',
 			padding         : theme.spacing(1),
 			zIndex          : 20,
-			'& p'           :
+			'&.hide'        :
+			{
+				transition : 'opacity 0.1s ease-in-out',
+				opacity    : 0
+			},
+			'&.hover' :
+			{
+				opacity : 1
+			},
+			'& p' :
 			{
 				padding       : '6px 12px',
 				borderRadius  : 6,
 				userSelect    : 'none',
 				pointerEvents : 'none',
-				fontSize      : 20,
 				color         : 'rgba(255, 255, 255, 0.55)'
 			}
 		}
@@ -144,10 +150,15 @@ const Peer = (props) =>
 		toggleConsumerWindow,
 		spacing,
 		style,
-		smallContainer,
 		windowConsumer,
+		fullScreenConsumer,
 		classes,
-		theme
+		enableLayersSwitch,
+		isSelected,
+		mode,
+		theme,
+		localRecordingState,
+		recordingConsents
 	} = props;
 
 	const micEnabled = (
@@ -168,17 +179,221 @@ const Peer = (props) =>
 		!screenConsumer.remotelyPaused
 	);
 
-	const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
 	const rootStyle =
 	{
 		'margin' : spacing,
 		...style
 	};
 
+	const width = style.width;
+
+	const height = style.height;
+
+	const [ controls, setControls ] = useState(
+		{
+			root : {
+				style : {}
+			},
+			item : {
+				style : {},
+				size  : ''
+			}
+		}
+	);
+
+	const [ videoInfo, setVideoInfo ] = useState(
+		{
+			root : {
+				style : {}
+			}
+		}
+	);
+
+	// Extend styles/props values
+	useEffect(() =>
+	{
+		if (height > 0)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'row',
+						alignItems    : 'flex-start'
+					}
+				},
+				item : {
+					style : {
+						width     : 30,
+						height    : 30,
+						minHeight : 'auto',
+						margin    : theme.spacing(0.5)
+					},
+					size : 'small'
+				}
+			});
+
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '0em'
+					}
+				}
+			});
+		}
+
+		if (height > 120)
+		{
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '1em'
+					}
+				}
+			});
+		}
+
+		if (height > 170)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'row',
+						alignItems    : 'flex-start'
+					}
+				},
+				item : {
+					style : {},
+					size  : 'small'
+				}
+			});
+
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '1.5em'
+					}
+				}
+			});
+		}
+
+		if (height > 190)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
+				},
+				item : {
+					style : {},
+					size  : 'small'
+				}
+			});
+		}
+
+		if (height > 320)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
+				},
+				item : {
+					style : {},
+					size  : 'medium'
+				}
+			});
+
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '2.3em'
+					}
+				}
+			});
+		}
+
+		if (height > 400)
+		{
+			setControls({
+				root : {
+					style : {
+						flexDirection : 'column'
+					}
+				},
+				item : {
+					style : {},
+					size  : 'large'
+				}
+			});
+
+			setVideoInfo({
+				root : {
+					style : {
+						fontSize : '3.0em'
+					}
+				}
+			});
+		}
+
+	}, [ height, theme ]);
+
+	if (peer.picture)
+	{
+		rootStyle.backgroundImage = `url(${peer.picture})`;
+		rootStyle.backgroundSize = 'auto 100%';
+	}
+
+	useEffect(() =>
+	{
+		const handler = setTimeout(() =>
+		{
+			const consumer = webcamConsumer || screenConsumer;
+
+			if (!consumer)
+				return;
+
+			if (windowConsumer === consumer.id)
+			{
+				// if playing in external window, set the maximum quality levels
+				roomClient.setConsumerPreferredLayersMax(consumer);
+			}
+			else if (enableLayersSwitch && consumer?.type !== 'simple'
+				&& fullScreenConsumer !== consumer.id)
+			{
+				roomClient.adaptConsumerPreferredLayers(consumer, width, height);
+			}
+		}, 1000);
+
+		return () => { clearTimeout(handler); };
+	}, [
+		enableLayersSwitch,
+		webcamConsumer,
+		screenConsumer,
+		windowConsumer,
+		fullScreenConsumer,
+		roomClient, width, height
+	]);
+
+	// menu
+	const [ menuAnchorElement, setMenuAnchorElement ] = React.useState(null);
+	const [ showAudioAnalyzer, setShowAudioAnalyzer ] = React.useState(null);
+
+	const handleMenuOpen = (event) =>
+	{
+		setMenuAnchorElement(event.currentTarget);
+	};
+
+	const handleMenuClose = () =>
+	{
+		setMenuAnchorElement(null);
+	};
+
 	return (
 		<React.Fragment>
 			<div
+				style={rootStyle}
 				className={
 					classnames(
 						classes.root,
@@ -206,11 +421,17 @@ const Peer = (props) =>
 						setHover(false);
 					}, 2000);
 				}}
-				style={rootStyle}
 			>
 				<div className={classnames(classes.viewContainer)}>
 					{ !videoVisible &&
-						<div className={classes.videoInfo}>
+						<div
+							style={{ ...videoInfo.root.style }}
+							className={classnames(
+								classes.videoInfo,
+								'hide',
+								hover ? 'hover' : null
+							)}
+						>
 							<p>
 								<FormattedMessage
 									id='room.videoPaused'
@@ -221,7 +442,12 @@ const Peer = (props) =>
 					}
 
 					<div
-						className={classnames(classes.controls, hover ? 'hover' : null)}
+
+						className={classnames(
+							classes.controls, hover ? 'hover' : null,
+							height <= 170 ? 'smallest': null
+						)}
+						style={{ ...controls.root.style }}
 						onMouseOver={() => setHover(true)}
 						onMouseOut={() => setHover(false)}
 						onTouchStart={() =>
@@ -242,46 +468,26 @@ const Peer = (props) =>
 							}, 2000);
 						}}
 					>
+
+						{micConsumer &&
 						<Tooltip
 							title={intl.formatMessage({
 								id             : 'device.muteAudio',
 								defaultMessage : 'Mute audio'
 							})}
-							placement={smallScreen ? 'top' : 'left'}
+							placement={height <= 190 ? 'bottom' : 'left'}
 						>
-							{ smallContainer ?
-								<IconButton
-									aria-label={intl.formatMessage({
-										id             : 'device.muteAudio',
-										defaultMessage : 'Mute audio'
-									})}
-									className={classes.smallContainer}
-									disabled={!micConsumer}
-									color='primary'
-									size='small'
-									onClick={() =>
-									{
-										micEnabled ?
-											roomClient.modifyPeerConsumer(peer.id, 'mic', true) :
-											roomClient.modifyPeerConsumer(peer.id, 'mic', false);
-									}}
-								>
-									{ micEnabled ?
-										<VolumeUpIcon />
-										:
-										<VolumeOffIcon />
-									}
-								</IconButton>
-								:
+							<div>
 								<Fab
 									aria-label={intl.formatMessage({
 										id             : 'device.muteAudio',
 										defaultMessage : 'Mute audio'
 									})}
-									className={classes.fab}
-									disabled={!micConsumer}
+									// className={classes.fab}
+									style={{ ...controls.item.style }}
+									className={classnames('fab')}
 									color={micEnabled ? 'default' : 'secondary'}
-									size='large'
+									size={controls.item.size}
 									onClick={() =>
 									{
 										micEnabled ?
@@ -295,49 +501,28 @@ const Peer = (props) =>
 										<VolumeOffIcon />
 									}
 								</Fab>
-							}
+							</div>
 						</Tooltip>
+						}
 
 						{ browser.platform !== 'mobile' &&
+							videoVisible && windowConsumer !== webcamConsumer.id &&
 							<Tooltip
 								title={intl.formatMessage({
 									id             : 'label.newWindow',
 									defaultMessage : 'New window'
 								})}
-								placement={smallScreen ? 'top' : 'left'}
+								placement={height <= 190 ? 'bottom' : 'left'}
 							>
-								{ smallContainer ?
-									<IconButton
-										aria-label={intl.formatMessage({
-											id             : 'label.newWindow',
-											defaultMessage : 'New window'
-										})}
-										className={classes.smallContainer}
-										disabled={
-											!videoVisible ||
-											(windowConsumer === webcamConsumer.id)
-										}
-										size='small'
-										color='primary'
-										onClick={() =>
-										{
-											toggleConsumerWindow(webcamConsumer);
-										}}
-									>
-										<NewWindowIcon />
-									</IconButton>
-									:
+								<div>
 									<Fab
 										aria-label={intl.formatMessage({
 											id             : 'label.newWindow',
 											defaultMessage : 'New window'
 										})}
-										className={classes.fab}
-										disabled={
-											!videoVisible ||
-											(windowConsumer === webcamConsumer.id)
-										}
-										size='large'
+										style={{ ...controls.item.style }}
+										className={classnames('fab')}
+										size={controls.item.size}
 										onClick={() =>
 										{
 											toggleConsumerWindow(webcamConsumer);
@@ -345,55 +530,139 @@ const Peer = (props) =>
 									>
 										<NewWindowIcon />
 									</Fab>
-								}
+								</div>
 							</Tooltip>
 						}
 
-						<Tooltip
-							title={intl.formatMessage({
-								id             : 'label.fullscreen',
-								defaultMessage : 'Fullscreen'
-							})}
-							placement={smallScreen ? 'top' : 'left'}
-						>
-							{ smallContainer ?
-								<IconButton
-									aria-label={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
-									})}
-									className={classes.smallContainer}
-									disabled={!videoVisible}
-									size='small'
-									color='primary'
+						{ videoVisible &&
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'label.fullscreen',
+									defaultMessage : 'Fullscreen'
+								})}
+								placement={height <= 190 ? 'bottom' : 'left'}
+							>
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										// className={classes.fab}
+										style={{ ...controls.item.style }}
+										className={classnames('fab')}
+										disabled={!videoVisible}
+										size={controls.item.size}
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(webcamConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</Fab>
+								</div>
+							</Tooltip>
+						}
+
+						{ mode === 'filmstrip' &&
+							<Tooltip
+								title={isSelected ?
+									intl.formatMessage({
+										id             : 'tooltip.removeParticipantFromSpotlight',
+										defaultMessage : 'Remove from spotlight'
+									})
+									:
+									intl.formatMessage({
+										id             : 'tooltip.addParticipantToSpotlight',
+										defaultMessage : 'Add to spotlight'
+									})
+								}
+								placement={height <= 190 ? 'bottom' : 'left'}
+							>
+								<div>
+									<Fab
+										aria-label={isSelected ?
+											intl.formatMessage({
+												id             : 'tooltip.removeParticipantFromSpotlight',
+												defaultMessage : 'Remove from spotlight'
+											})
+											:
+											intl.formatMessage({
+												id             : 'tooltip.addParticipantToSpotlight',
+												defaultMessage : 'Add to spotlight'
+											})
+										}
+										// className={classes.fab}
+										style={{ ...controls.item.style }}
+										className={classnames('fab')}
+										size={controls.item.size}
+										onClick={() =>
+										{
+											isSelected ?
+												roomClient.removeSelectedPeer(peer.id) :
+												mode === 'filmstrip' ?
+													roomClient.setSelectedPeer(peer.id) :
+													roomClient.addSelectedPeer(peer.id);
+										}}
+									>
+										{ isSelected ?
+											<RemoveFromQueueIcon />
+											:
+											<AddToQueueIcon />
+										}
+									</Fab>
+								</div>
+							</Tooltip>
+						}
+
+						{advancedMode &&
+						<React.Fragment>
+							<Tooltip
+								title={intl.formatMessage({
+									id             : 'device.options',
+									defaultMessage : 'Options'
+								})}
+								placement={height <= 190 ? 'bottom' : 'left'}
+							>
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'device.options',
+											defaultMessage : 'Options'
+										})}
+										style={{ ...controls.item.style }}
+										className={classnames('fab')}
+										size={controls.item.size}
+										onClick={handleMenuOpen}
+									>
+										<MoreHorizIcon />
+									</Fab>
+								</div>
+							</Tooltip>
+							<Menu
+								anchorEl={menuAnchorElement}
+								keepMounted
+								open={Boolean(menuAnchorElement)}
+								onClose={handleMenuClose}
+							>
+								<MenuItem
 									onClick={() =>
 									{
-										toggleConsumerFullscreen(webcamConsumer);
+										setShowAudioAnalyzer(!showAudioAnalyzer);
+										handleMenuClose();
 									}}
 								>
-									<FullScreenIcon />
-								</IconButton>
-								:
-								<Fab
-									aria-label={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
-									})}
-									className={classes.fab}
-									disabled={!videoVisible}
-									size='large'
-									onClick={() =>
-									{
-										toggleConsumerFullscreen(webcamConsumer);
-									}}
-								>
-									<FullScreenIcon />
-								</Fab>
-							}
-						</Tooltip>
+									{ showAudioAnalyzer ? 'Disable' : 'Enable' } audio analyzer
+								</MenuItem>
+							</Menu>
+						</React.Fragment>
+						}
+
 					</div>
 
 					<VideoView
+						localRecordingState={localRecordingState}
+						recordingConsents={recordingConsents}
 						showQuality
 						advancedMode={advancedMode}
 						peer={peer}
@@ -421,6 +690,10 @@ const Peer = (props) =>
 						videoCodec={webcamConsumer && webcamConsumer.codec}
 						audioScore={micConsumer ? micConsumer.score : null}
 						videoScore={webcamConsumer ? webcamConsumer.score : null}
+						width={width}
+						height={height}
+						opusConfig={micConsumer && micConsumer.opusConfig}
+						showAudioAnalyzer={showAudioAnalyzer}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -431,6 +704,7 @@ const Peer = (props) =>
 			{
 				return (
 					<div key={consumer.id}
+						style={rootStyle}
 						className={
 							classnames(
 								classes.root,
@@ -458,11 +732,13 @@ const Peer = (props) =>
 								setHover(false);
 							}, 2000);
 						}}
-						style={rootStyle}
 					>
 						<div className={classnames(classes.viewContainer)}>
 							{ !videoVisible &&
-								<div className={classes.videoInfo}>
+								<div
+									style={{ ...videoInfo.root.style }}
+									className={classes.videoInfo}
+								>
 									<p>
 										<FormattedMessage
 											id='room.videoPaused'
@@ -473,7 +749,11 @@ const Peer = (props) =>
 							}
 
 							<div
-								className={classnames(classes.controls, hover ? 'hover' : null)}
+								className={classnames(
+									classes.controls,
+									hover ? 'hover' : null
+								)}
+								style={{ ...controls.root.style }}
 								onMouseOver={() => setHover(true)}
 								onMouseOut={() => setHover(false)}
 								onTouchStart={() =>
@@ -500,40 +780,22 @@ const Peer = (props) =>
 											id             : 'label.newWindow',
 											defaultMessage : 'New window'
 										})}
-										placement={smallScreen ? 'top' : 'left'}
+										placement={height <= 190 ? 'bottom' : 'left'}
 									>
-										{ smallContainer ?
-											<IconButton
-												aria-label={intl.formatMessage({
-													id             : 'label.newWindow',
-													defaultMessage : 'New window'
-												})}
-												className={classes.smallContainer}
-												disabled={
-													!videoVisible ||
-													(windowConsumer === consumer.id)
-												}
-												size='small'
-												color='primary'
-												onClick={() =>
-												{
-													toggleConsumerWindow(consumer);
-												}}
-											>
-												<NewWindowIcon />
-											</IconButton>
-											:
+										<div>
 											<Fab
 												aria-label={intl.formatMessage({
 													id             : 'label.newWindow',
 													defaultMessage : 'New window'
 												})}
-												className={classes.fab}
+												// className={classes.fab}
+												style={{ ...controls.item.style }}
+												className={classnames('fab')}
 												disabled={
 													!videoVisible ||
 													(windowConsumer === consumer.id)
 												}
-												size='large'
+												size={controls.item.size}
 												onClick={() =>
 												{
 													toggleConsumerWindow(consumer);
@@ -541,7 +803,7 @@ const Peer = (props) =>
 											>
 												<NewWindowIcon />
 											</Fab>
-										}
+										</div>
 									</Tooltip>
 								}
 
@@ -550,34 +812,19 @@ const Peer = (props) =>
 										id             : 'label.fullscreen',
 										defaultMessage : 'Fullscreen'
 									})}
-									placement={smallScreen ? 'top' : 'left'}
+									placement={height <= 190 ? 'bottom' : 'left'}
 								>
-									{ smallContainer ?
-										<IconButton
-											aria-label={intl.formatMessage({
-												id             : 'label.fullscreen',
-												defaultMessage : 'Fullscreen'
-											})}
-											className={classes.smallContainer}
-											disabled={!videoVisible}
-											size='small'
-											color='primary'
-											onClick={() =>
-											{
-												toggleConsumerFullscreen(consumer);
-											}}
-										>
-											<FullScreenIcon />
-										</IconButton>
-										:
+									<div>
 										<Fab
 											aria-label={intl.formatMessage({
 												id             : 'label.fullscreen',
 												defaultMessage : 'Fullscreen'
 											})}
-											className={classes.fab}
+											// className={classes.fab}
+											style={{ ...controls.item.style }}
+											className={classnames('fab')}
 											disabled={!videoVisible}
-											size='large'
+											size={controls.item.size}
 											onClick={() =>
 											{
 												toggleConsumerFullscreen(consumer);
@@ -585,11 +832,13 @@ const Peer = (props) =>
 										>
 											<FullScreenIcon />
 										</Fab>
-									}
+									</div>
 								</Tooltip>
 							</div>
 
 							<VideoView
+								localRecordingState={localRecordingState}
+								recordingConsents={recordingConsents}
 								showQuality
 								advancedMode={advancedMode}
 								peer={peer}
@@ -614,6 +863,8 @@ const Peer = (props) =>
 								videoVisible={videoVisible}
 								videoCodec={consumer && consumer.codec}
 								videoScore={consumer ? consumer.score : null}
+								width={width}
+								height={height}
 							/>
 						</div>
 					</div>
@@ -622,7 +873,11 @@ const Peer = (props) =>
 
 			{ screenConsumer &&
 				<div
-					className={classnames(classes.root, 'screen', hover ? 'hover' : null)}
+					style={{ ...rootStyle, ...controls.root.style }}
+					className={classnames(
+						classes.root, 'screen',
+						hover ? 'hover' : null
+					)}
 					onMouseOver={() => setHover(true)}
 					onMouseOut={() => setHover(false)}
 					onTouchStart={() =>
@@ -642,11 +897,13 @@ const Peer = (props) =>
 							setHover(false);
 						}, 2000);
 					}}
-					style={rootStyle}
 				>
 					<div className={classnames(classes.viewContainer)}>
 						{ !screenVisible &&
-							<div className={classes.videoInfo}>
+							<div
+								style={{ ...videoInfo.root.style }}
+								className={classes.videoInfo}
+							>
 								<p>
 									<FormattedMessage
 										id='room.videoPaused'
@@ -684,26 +941,31 @@ const Peer = (props) =>
 										id             : 'label.newWindow',
 										defaultMessage : 'New window'
 									})}
-									placement={smallScreen ? 'top' : 'left'}
+									placement={height <= 190 ? 'bottom' : 'left'}
 								>
-									<Fab
-										aria-label={intl.formatMessage({
-											id             : 'label.newWindow',
-											defaultMessage : 'New window'
-										})}
-										className={classes.fab}
-										disabled={
-											!screenVisible ||
+
+									<div>
+										<Fab
+											aria-label={intl.formatMessage({
+												id             : 'label.newWindow',
+												defaultMessage : 'New window'
+											})}
+											style={{ ...controls.item.style }}
+											className={classnames('fab')}
+											disabled={
+												!screenVisible ||
 											(windowConsumer === screenConsumer.id)
-										}
-										size={smallContainer ? 'small' : 'large'}
-										onClick={() =>
-										{
-											toggleConsumerWindow(screenConsumer);
-										}}
-									>
-										<NewWindowIcon />
-									</Fab>
+											}
+											size={controls.item.size}
+											onClick={() =>
+											{
+												toggleConsumerWindow(screenConsumer);
+											}}
+										>
+											<NewWindowIcon />
+										</Fab>
+
+									</div>
 								</Tooltip>
 							}
 
@@ -712,26 +974,35 @@ const Peer = (props) =>
 									id             : 'label.fullscreen',
 									defaultMessage : 'Fullscreen'
 								})}
-								placement={smallScreen ? 'top' : 'left'}
+								placement={height <= 190 ? 'bottom' : 'left'}
 							>
-								<Fab
-									aria-label={intl.formatMessage({
-										id             : 'label.fullscreen',
-										defaultMessage : 'Fullscreen'
-									})}
-									className={classes.fab}
-									disabled={!screenVisible}
-									size={smallContainer ? 'small' : 'large'}
-									onClick={() =>
-									{
-										toggleConsumerFullscreen(screenConsumer);
-									}}
-								>
-									<FullScreenIcon />
-								</Fab>
+
+								<div>
+									<Fab
+										aria-label={intl.formatMessage({
+											id             : 'label.fullscreen',
+											defaultMessage : 'Fullscreen'
+										})}
+										// className={classes.fab}
+										className={classnames(
+											'fab',
+											height <= 170 ? 'smallest': null
+										)}
+										disabled={!screenVisible}
+										size={controls.item.size}
+										onClick={() =>
+										{
+											toggleConsumerFullscreen(screenConsumer);
+										}}
+									>
+										<FullScreenIcon />
+									</Fab>
+								</div>
 							</Tooltip>
 						</div>
 						<VideoView
+							localRecordingState={localRecordingState}
+							recordingConsents={recordingConsents}
 							showQuality
 							advancedMode={advancedMode}
 							videoContain
@@ -758,6 +1029,8 @@ const Peer = (props) =>
 							videoVisible={screenVisible}
 							videoCodec={screenConsumer && screenConsumer.codec}
 							videoScore={screenConsumer ? screenConsumer.score : null}
+							width={width}
+							height={height}
 						/>
 					</div>
 				</div>
@@ -776,15 +1049,20 @@ Peer.propTypes =
 	screenConsumer           : appPropTypes.Consumer,
 	extraVideoConsumers      : PropTypes.arrayOf(appPropTypes.Consumer),
 	windowConsumer           : PropTypes.string,
+	fullScreenConsumer       : PropTypes.string,
 	activeSpeaker            : PropTypes.bool,
 	browser                  : PropTypes.object.isRequired,
 	spacing                  : PropTypes.number,
 	style                    : PropTypes.object,
-	smallContainer           : PropTypes.bool,
 	toggleConsumerFullscreen : PropTypes.func.isRequired,
 	toggleConsumerWindow     : PropTypes.func.isRequired,
 	classes                  : PropTypes.object.isRequired,
-	theme                    : PropTypes.object.isRequired
+	theme                    : PropTypes.object.isRequired,
+	enableLayersSwitch       : PropTypes.bool,
+	isSelected               : PropTypes.bool,
+	mode                     : PropTypes.string.isRequired,
+	localRecordingState      : PropTypes.string,
+	recordingConsents        : PropTypes.array
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -794,11 +1072,16 @@ const makeMapStateToProps = (initialState, { id }) =>
 	const mapStateToProps = (state) =>
 	{
 		return {
-			peer           : state.peers[id],
+			peer                : state.peers[id],
 			...getPeerConsumers(state, id),
-			windowConsumer : state.room.windowConsumer,
-			activeSpeaker  : id === state.room.activeSpeakerId,
-			browser        : state.me.browser
+			windowConsumer      : state.room.windowConsumer,
+			fullScreenConsumer  : state.room.fullScreenConsumer,
+			activeSpeaker       : id === state.room.activeSpeakerId,
+			browser             : state.me.browser,
+			isSelected          : state.room.selectedPeers.includes(id),
+			mode                : state.room.mode,
+			localRecordingState : state.recorder.localRecordingState.status,
+			recordingConsents   : recordingConsentsPeersSelector(state)
 		};
 	};
 
@@ -833,7 +1116,14 @@ export default withRoomContext(connect(
 				prev.consumers === next.consumers &&
 				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
 				prev.room.windowConsumer === next.room.windowConsumer &&
-				prev.me.browser === next.me.browser
+				prev.room.fullScreenConsumer === next.room.fullScreenConsumer &&
+				prev.room.mode === next.room.mode &&
+				prev.room.selectedPeers === next.room.selectedPeers &&
+				prev.me.browser === next.me.browser &&
+				prev.enableLayersSwitch === next.enableLayersSwitch &&
+				prev.recorder.localRecordingState.status ===
+				next.recorder.localRecordingState.status &&
+				recordingConsentsPeersSelector(prev)===recordingConsentsPeersSelector(next)
 			);
 		}
 	}

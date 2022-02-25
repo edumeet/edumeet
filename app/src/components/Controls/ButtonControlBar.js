@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { meProducersSelector } from '../Selectors';
+import {
+	meProducersSelector,
+	makePermissionSelector
+} from '../../store/selectors';
+import { permissions } from '../../permissions';
 import { withStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import classnames from 'classnames';
@@ -14,6 +18,7 @@ import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
+import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
 
 const styles = (theme) =>
@@ -64,19 +69,19 @@ const styles = (theme) =>
 			alignItems                     : 'center',
 			[theme.breakpoints.down('lg')] :
 			{
-				left : '40vw'
+				left : '30vw'
 			},
 			[theme.breakpoints.down('md')] :
 			{
-				left : '50vw'
+				left : '40vw'
 			},
 			[theme.breakpoints.down('sm')] :
 			{
-				left : '70vw'
+				left : '60vw'
 			},
 			[theme.breakpoints.down('xs')] :
 			{
-				left : '90vw'
+				left : '80vw'
 			}
 		}
 	});
@@ -88,13 +93,16 @@ const ButtonControlBar = (props) =>
 	const {
 		roomClient,
 		toolbarsVisible,
-		hiddenControls,
-		drawerOverlayed,
+		settings,
 		toolAreaOpen,
 		me,
 		micProducer,
 		webcamProducer,
 		screenProducer,
+		hasAudioPermission,
+		hasVideoPermission,
+		hasScreenPermission,
+		noiseVolume,
 		classes,
 		theme
 	} = props;
@@ -103,7 +111,7 @@ const ButtonControlBar = (props) =>
 
 	let micTip;
 
-	if (!me.canSendMic)
+	if (!me.canSendMic || !hasAudioPermission)
 	{
 		micState = 'unsupported';
 		micTip = intl.formatMessage({
@@ -119,7 +127,9 @@ const ButtonControlBar = (props) =>
 			defaultMessage : 'Activate audio'
 		});
 	}
-	else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
+	else if (!micProducer.locallyPaused &&
+		!micProducer.remotelyPaused &&
+		!settings.audioMuted)
 	{
 		micState = 'on';
 		micTip = intl.formatMessage({
@@ -201,11 +211,11 @@ const ButtonControlBar = (props) =>
 			className={
 				classnames(
 					classes.root,
-					hiddenControls ?
+					settings.hiddenControls ?
 						(toolbarsVisible ? classes.show : classes.hide) :
 						classes.show,
 					toolAreaOpen &&
-						(me.browser.platform !== 'mobile' && !drawerOverlayed) ?
+						(me.browser.platform !== 'mobile' && !settings.drawerOverlayed) ?
 						classes.move : null
 				)
 			}
@@ -217,8 +227,17 @@ const ButtonControlBar = (props) =>
 						defaultMessage : 'Mute audio'
 					})}
 					className={classes.fab}
-					disabled={!me.canSendMic || me.audioInProgress}
-					color={micState === 'on' ? 'primary' : 'secondary'}
+					disabled={
+						!me.canSendMic ||
+						!hasAudioPermission ||
+						me.audioInProgress
+					}
+					color={micState === 'on' ?
+						settings.voiceActivatedUnmute ?
+							me.isAutoMuted ? 'secondary' : 'primary'
+							: 'default'
+						: 'secondary'
+					}
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
 					{
@@ -230,10 +249,34 @@ const ButtonControlBar = (props) =>
 							roomClient.unmuteMic();
 					}}
 				>
-					{ micState === 'on' ?
-						<MicIcon />
-						:
-						<MicOffIcon />
+					{ settings.voiceActivatedUnmute ?
+						micState === 'on' ?
+							<React.Fragment>
+								<svg className='MuiSvgIcon-root' focusable='false' aria-hidden='true'style={{ 'position': 'absolute' }}>
+									<defs>
+										<clipPath id='cut-off-indicator'>
+											<rect x='0' y='0' width='24' height={24-2.4*noiseVolume}/>
+										</clipPath>
+									</defs>
+								</svg>
+								<SettingsVoiceIcon style={{ 'position': 'absolute' }}
+									color={'default'}
+								/>
+								<SettingsVoiceIcon
+									clipPath='url(#cut-off-indicator)'
+									style={{
+										'position' : 'absolute',
+										'opacity'  : '0.6'
+									}}
+									color={me.isAutoMuted ?
+										'primary' : 'default'}
+								/>
+							</React.Fragment>
+							: <MicOffIcon />
+						: micState === 'on' ?
+							<MicIcon />
+							:
+							<MicOffIcon />
 					}
 				</Fab>
 			</Tooltip>
@@ -244,8 +287,12 @@ const ButtonControlBar = (props) =>
 						defaultMessage : 'Start video'
 					})}
 					className={classes.fab}
-					disabled={!me.canSendWebcam || me.webcamInProgress}
-					color={webcamState === 'on' ? 'primary' : 'secondary'}
+					disabled={
+						!me.canSendWebcam ||
+						!hasVideoPermission ||
+						me.webcamInProgress
+					}
+					color={webcamState === 'on' ? 'defaut' : 'secondary'}
 					size={smallScreen ? 'large' : 'medium'}
 					onClick={() =>
 					{
@@ -269,8 +316,12 @@ const ButtonControlBar = (props) =>
 							defaultMessage : 'Start screen sharing'
 						})}
 						className={classes.fab}
-						disabled={!me.canShareScreen || me.screenShareInProgress}
-						color={screenState === 'on' ? 'primary' : 'secondary'}
+						disabled={
+							!hasScreenPermission ||
+							!me.canShareScreen ||
+							me.screenShareInProgress
+						}
+						color={screenState === 'on' ? 'default' : 'secondary'}
 						size={smallScreen ? 'large' : 'medium'}
 						onClick={() =>
 						{
@@ -290,31 +341,63 @@ const ButtonControlBar = (props) =>
 
 ButtonControlBar.propTypes =
 {
-	roomClient      : PropTypes.any.isRequired,
-	toolbarsVisible : PropTypes.bool.isRequired,
-	hiddenControls  : PropTypes.bool.isRequired,
-	drawerOverlayed : PropTypes.bool.isRequired,
-	toolAreaOpen    : PropTypes.bool.isRequired,
-	me              : appPropTypes.Me.isRequired,
-	micProducer     : appPropTypes.Producer,
-	webcamProducer  : appPropTypes.Producer,
-	screenProducer  : appPropTypes.Producer,
-	classes         : PropTypes.object.isRequired,
-	theme           : PropTypes.object.isRequired
+	roomClient          : PropTypes.any.isRequired,
+	toolbarsVisible     : PropTypes.bool.isRequired,
+	settings            : PropTypes.object.isRequired,
+	toolAreaOpen        : PropTypes.bool.isRequired,
+	me                  : appPropTypes.Me.isRequired,
+	micProducer         : appPropTypes.Producer,
+	webcamProducer      : appPropTypes.Producer,
+	screenProducer      : appPropTypes.Producer,
+	hasAudioPermission  : PropTypes.bool.isRequired,
+	hasVideoPermission  : PropTypes.bool.isRequired,
+	hasScreenPermission : PropTypes.bool.isRequired,
+	noiseVolume         : PropTypes.number,
+	classes             : PropTypes.object.isRequired,
+	theme               : PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) =>
-	({
-		toolbarsVisible : state.room.toolbarsVisible,
-		hiddenControls  : state.settings.hiddenControls,
-		drawerOverlayed : state.settings.drawerOverlayed,
-		toolAreaOpen    : state.toolarea.toolAreaOpen,
-		...meProducersSelector(state),
-		me              : state.me
-	});
+const makeMapStateToProps = () =>
+{
+	const canShareAudio =
+		makePermissionSelector(permissions.SHARE_AUDIO);
+	const canShareVideo =
+		makePermissionSelector(permissions.SHARE_VIDEO);
+	const canShareScreen =
+		makePermissionSelector(permissions.SHARE_SCREEN);
+
+	const mapStateToProps = (state) =>
+	{
+		let noise;
+
+		// noise = volume under threshold
+		if (state.peerVolumes[state.me.id] < state.settings.noiseThreshold)
+		{
+			// noise mapped to range 0 ... 10
+			noise = Math.round((100 + state.peerVolumes[state.me.id]) /
+				(100 + state.settings.noiseThreshold)*10);
+		}
+		// noiseVolume over threshold: no noise but voice
+		else { noise = 10; }
+
+		return {
+			toolbarsVisible     : state.room.toolbarsVisible,
+			settings            : state.settings,
+			noiseVolume         : noise,
+			hasAudioPermission  : canShareAudio(state),
+			hasVideoPermission  : canShareVideo(state),
+			hasScreenPermission : canShareScreen(state),
+			toolAreaOpen        : state.toolarea.toolAreaOpen,
+			...meProducersSelector(state),
+			me                  : state.me
+		};
+	};
+
+	return mapStateToProps;
+};
 
 export default withRoomContext(connect(
-	mapStateToProps,
+	makeMapStateToProps,
 	null,
 	null,
 	{
@@ -324,8 +407,7 @@ export default withRoomContext(connect(
 				Math.round(prev.peerVolumes[prev.me.id]) ===
 				Math.round(next.peerVolumes[prev.me.id]) &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
-				prev.settings.hiddenControls === next.settings.hiddenControls &&
-				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
+				prev.settings === next.settings &&
 				prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
 				prev.producers === next.producers &&
 				prev.me === next.me

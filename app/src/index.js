@@ -14,26 +14,32 @@ import debug from 'debug';
 import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
-import * as meActions from './actions/meActions';
+import * as meActions from './store/actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
+import ConfigDocumentation from './components/ConfigDocumentation';
+import ConfigError from './components/ConfigError';
 import JoinDialog from './components/JoinDialog';
-import LoginDialog from './components/LoginDialog';
-import LoadingView from './components/LoadingView';
+import LoginDialog from './components/AccessControl/LoginDialog';
+import LoadingView from './components/Loader/LoadingView';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
-import { persistor, store } from './store';
+import { persistor, store } from './store/store';
 import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
-import { ReactLazyPreload } from './components/ReactLazyPreload';
+import { LazyPreload } from './components/Loader/LazyPreload';
 import { detectDevice } from 'mediasoup-client';
+import { recorder } from './BrowserRecorder';
 
 import './index.css';
 
-const App = ReactLazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
+import { config, configError } from './config';
+
+const App = LazyPreload(() => import(/* webpackChunkName: "app" */ './components/App'));
 
 // const cache = createIntlCache();
 
-const supportedBrowsers={
+const supportedBrowsers =
+{
 	'windows' : {
 		'internet explorer' : '>12',
 		'microsoft edge'    : '>18'
@@ -46,7 +52,9 @@ const supportedBrowsers={
 	'samsung internet for android' : '>=11.1.1.52'
 };
 
-const intl = createIntl();
+const intl = createIntl({ locale: 'en', defaultLocale: 'en' });
+
+recorder.intl = intl;
 
 if (process.env.REACT_APP_DEBUG === '*' || process.env.NODE_ENV !== 'production')
 {
@@ -59,7 +67,7 @@ let roomClient;
 
 RoomClient.init({ store });
 
-const theme = createMuiTheme(window.config.theme);
+const theme = createMuiTheme(config.theme);
 
 let Router;
 
@@ -88,6 +96,8 @@ function run()
 	const forceTcp = parameters.get('forceTcp') === 'true';
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
+	const headless = parameters.get('headless');
+	const showConfigDocumentationPath = parameters.get('config') === 'true';
 
 	const { pathname } = window.location;
 
@@ -121,7 +131,7 @@ function run()
 	}
 	else if (
 		!device.bowser.satisfies(
-			window.config.supportedBrowsers || supportedBrowsers
+			config.supportedBrowsers || supportedBrowsers
 		)
 	)
 	{
@@ -140,14 +150,48 @@ function run()
 	if (unsupportedBrowser || webrtcUnavailable)
 	{
 		render(
-			<MuiThemeProvider theme={theme}>
-				<IntlProvider value={intl}>
-					<UnsupportedBrowser
-						webrtcUnavailable={webrtcUnavailable}
-						platform={device.platform}
-					/>
-				</IntlProvider>
-			</MuiThemeProvider>,
+			<Provider store={store}>
+				<MuiThemeProvider theme={theme}>
+					<IntlProvider value={intl}>
+						<UnsupportedBrowser
+							webrtcUnavailable={webrtcUnavailable}
+							platform={device.platform}
+						/>
+					</IntlProvider>
+				</MuiThemeProvider>
+			</Provider>,
+			document.getElementById('edumeet')
+		);
+
+		return;
+	}
+
+	if (showConfigDocumentationPath)
+	{
+		render(
+			<Provider store={store}>
+				<MuiThemeProvider theme={theme}>
+					<IntlProvider value={intl}>
+						<ConfigDocumentation />
+					</IntlProvider>
+				</MuiThemeProvider>
+			</Provider>,
+			document.getElementById('edumeet')
+		);
+
+		return;
+	}
+
+	if (configError)
+	{
+		render(
+			<Provider store={store}>
+				<MuiThemeProvider theme={theme}>
+					<IntlProvider value={intl}>
+						<ConfigError configError={configError} />
+					</IntlProvider>
+				</MuiThemeProvider>
+			</Provider>,
 			document.getElementById('edumeet')
 		);
 
@@ -157,7 +201,7 @@ function run()
 	store.dispatch(
 		meActions.setMe({
 			peerId,
-			loginEnabled : window.config.loginEnabled
+			loginEnabled : config.loginEnabled
 		})
 	);
 
@@ -167,6 +211,7 @@ function run()
 			accessCode,
 			device,
 			produce,
+			headless,
 			forceTcp,
 			displayName,
 			muted,

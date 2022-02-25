@@ -40,6 +40,8 @@ export const Consumer = PropTypes.shape(
 		source         : PropTypes.oneOf([ 'mic', 'webcam', 'screen', 'extravideo' ]).isRequired,
 		locallyPaused  : PropTypes.bool.isRequired,
 		remotelyPaused : PropTypes.bool.isRequired,
+		width          : PropTypes.number,
+		height         : PropTypes.number,
 		profile        : PropTypes.oneOf([ 'none', 'default', 'low', 'medium', 'high' ]),
 		track          : PropTypes.any,
 		codec          : PropTypes.string

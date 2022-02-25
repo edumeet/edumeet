@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../RoomContext';
-import * as settingsActions from '../../actions/settingsActions';
+import * as settingsActions from '../../store/actions/settingsActions';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { useIntl, FormattedMessage } from 'react-intl';
@@ -12,6 +12,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
+import { config } from '../../config';
 
 const styles = (theme) =>
 	({
@@ -62,7 +63,7 @@ const AdvancedSettings = ({
 					defaultMessage : 'Notification sounds'
 				})}
 			/>
-			{ !window.config.lockLastN &&
+			{ !config.lockLastN &&
 				<form className={classes.setting} autoComplete='off'>
 					<FormControl className={classes.formControl}>
 						<Select
@@ -77,7 +78,7 @@ const AdvancedSettings = ({
 							className={classes.selectEmpty}
 						>
 							{ Array.from(
-								{ length: window.config.maxLastN || 10 },
+								{ length: config.maxLastN || 10 },
 								(_, i) => i + 1
 							).map((lastN) =>
 							{
