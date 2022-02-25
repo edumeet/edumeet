@@ -114,71 +114,65 @@ cd edumeet
 git checkout develop 
 ```
 ### Configuration
-eduMEET will start and run normally with just default settings. If there is no configuration files,  it will automatically detect your host IP address, and listen on port 443 (https). In order to change default values (e.g. certificates), or activate features (e.g. authentication), appropriate configuration file has to be used (see below for details).  
+**eduMEET** will start and run normally with just default settings. If there is no configuration files,  it will automatically detect your host IP address, and listen on port 443 (https). In order to change default values (e.g. certificates), or activate features (e.g. authentication), use appropriate configuration file (see below for details).  
 
-**Note:** There are separate configuration files for client application and eduMEET server:
+**:warning: Note:** There are separate configuration files for eduMEET application and eduMEET server:
 
-**Client application** configuration file could be used, for example: enabling login, change logo or background, adjust A/V parameters, etc...
+**eduMEET application (app)** for: enabling login, change logo or background, adjust A/V parameters, etc...
 
-Copy example template and edit values (see all available parameters in [./app/README.md](/app/README.md))
+Copy [example](/app/public/config/config.example.js) template and edit values (see all available parameters in [./app/public/config/README.md](/app/public/config/README.md))
 ```bash
 cp app/public/config/config.example.js app/public/config/config.js
 ```
 
-**eduMEET server** uses **two** configuration files:
+**eduMEET server** require **:warning:two** configuration files: **config.js**, and **config.{_json_, _yaml_ or _toml_}** (multiple format supported)
 
-**config.js** for setting authentication methods and user roles.
+**1. config.js** for setting authentication methods and user roles.
 
 Copy example template and edit values (see additional details in [example](/server/config/config.example.js) file)
 ```bash
 cp server/config/config.example.js server/config/config.js
 ```
 
-**second config.(**_json_, _json5_, _yaml/yml_ or _toml_**)** file for changing default values, e.g. server port, server certificates, [STUN/TURN](#turn-configuration) configuration, monitoring, etc... 
+**2. config.{_json_, _yaml_ or _toml_}** for configuring: server port, server certificates, [STUN/TURN](#turn-configuration) configuration, monitoring, etc...  (See below examples of different configuration styles). 
 
-Two example template files in [_yaml_](/server/config/config.example.yaml) and [_json_](/server/config/config.example.json) file format are provided.  
-	
-**_config.yaml_** file format example:
+[**:point_right: _config.yaml_**](/server/config/config.example.yaml) example:
 ```yaml 
     listeningPort: 443
-    listeningHost: host.domain.tld
-
-    fileTracker" : "wss://tracker.openwebtorrent.com"
-
     tls:
         key:  /opt/edumeet/server/certs/privkey.pem
         cert: /opt/edumeet/server/certs/cert.pem
-
-    turnAPIURI: "https://host.domain.tld/turn"
-    turnAPIKey: "Your API key"
 ```
-**_config.json_** file format example:
+[**:point_right: _config.json_**](/server/config/config.example.json) example:
 ```javascript
     {
         "listeningPort" : "443",
-        "listeningHost" : "host.domain.tld",
-
-        "fileTracker" : "wss://tracker.openwebtorrent.com",
-
         "tls" : {
             "cert" : "/opt/edumeet/server/certs/cert.pem",
             "key"  : "/opt/edumeet/server/certs/privkey.pem"
-        },
-
-        "turnAPIKey" : "Your API key",
-        "turnAPIURI" : "https://host.domain.tld/turn",
+        }
     }
-``` 
-**Important note::exclamation:**  **only one** file format could be used for second configuration file (yaml file format is highly recommended)
+```
+[**:point_right: _config.toml_**](/server/config/config.example.toml) example:
+```toml
+    listeningPort = "443"
 
-Copy **only one** example template file and edit values (see all available parameters in [./server/README.md](/server/README.md))
+    [tls]
+    cert = "/opt/edumeet/server/certs/cert.pem"
+    key = "/opt/edumeet/server/certs/privkey.pem"
+```
+**:red_circle: IMPORTANT:**  Use **only one** type for second configuration file (`yaml` file format is highly recommended)
+
+Copy **only one** example template file and edit values (see all available parameters in [./server/config/README.md](/server/config/README.md))
 ```bash
 cp server/config/config.example.yaml server/config/config.yaml
   OR!!!
 cp server/config/config.example.json server/config/config.json
+  OR!!!
+cp server/config/config.example.toml server/config/config.toml
 ```
 
-**Important note:** application and server components **has to be rebuild** if configuration parameter is changed ([see build steps](#manual-installation-build)). Rebuild is not necessary for docker or deb version, just container/service restart is required.
+**:warning: NOTE:** application and server components **has to be rebuild** if configuration parameter is changed ([see build steps](#manual-installation-build)). Rebuild is not necessary for Docker or Debian (.deb) version, just restart container/service.
 
 ### Build
 **Note:** It is highly recommended to use _yarn_ package manager.
@@ -294,3 +288,4 @@ MIT License (see `LICENSE.md`)
 Contributions to this work were made on behalf of the GÉANT project, a project that has received funding from the European Union’s Horizon 2020 research and innovation programme under Grant Agreement No. 731122 (GN4-2). On behalf of GÉANT project, GÉANT Association is the sole owner of the copyright in all material which was developed by a member of the GÉANT project.
 
 GÉANT Vereniging (Association) is registered with the Chamber of Commerce in Amsterdam with registration number 40535155 and operates in the UK as a branch of GÉANT Vereniging. Registered office: Hoekenrode 3, 1102BR Amsterdam, The Netherlands. UK branch address: City House, 126-130 Hills Road, Cambridge CB2 1PQ, UK.
+

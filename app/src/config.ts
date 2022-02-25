@@ -731,7 +731,7 @@ if (typeof window === 'undefined')
 {
 	import('fs').then((fs) =>
 	{
-		fs.writeFileSync('README.md', dumpDocsMarkdown());
+		fs.writeFileSync('public/config/README.md', dumpDocsMarkdown());
 		fs.writeFileSync('public/config/config.example.js', dumpExampleConfigJs());
 	});
 }
