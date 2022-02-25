@@ -33,8 +33,12 @@
 
   "mediasoup" : {
       "webRtcTransport" : {
-        "listenIps" : [ "ip": "PUBLIC_IP_ADDRESS"],
-        "announcedIp" : ""
+        "listenIps" : [
+          {
+            "ip": "PUBLIC_IP_ADDRESS",
+            "announcedIp" : ""
+          }
+        ]
       }
   }
 }
