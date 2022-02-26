@@ -5,8 +5,8 @@
   "fileTracker" : "wss://tracker.openwebtorrent.com",
 
   "tls" : {
-    "cert" : "/opt/edumeet/server/certs/cert.pem",
-    "key"  : "/opt/edumeet/server/certs/privkey.pem"
+    "cert" : "./certs/mediasoup-demo.localhost.cert.pem",
+    "key"  : "./certs/mediasoup-demo.localhost.key.pem"
   },
 
   "turnAPIKey" : "Your API key",
