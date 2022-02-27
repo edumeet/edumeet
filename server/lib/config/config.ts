@@ -184,12 +184,12 @@ const configSchema = convict({
 		cert : {
 			doc     : 'SSL certificate path.',
 			format  : String,
-			default : './certs/mediasoup-demo.localhost.cert.pem'
+			default : './certs/edumeet-demo-cert.pem'
 		},
 		key : {
 			doc     : 'SSL key path.',
 			format  : String,
-			default : './certs/mediasoup-demo.localhost.key.pem'
+			default : './certs/edumeet-demo-key.pem'
 		}
 	},
 	listeningHost : {
