@@ -5,8 +5,8 @@ turnAPIKey = "Your API key"
 turnAPIURI = "https://host.domain.tld/turn"
 
 [tls]
-cert = "/opt/edumeet/server/certs/cert.pem"
-key = "/opt/edumeet/server/certs/privkey.pem"
+cert = "./certs/edumeet-demo-cert.pem"
+key = "./certs/edumeet-demo-key.pem"
 
 [backupTurnServers]
 urls = [ "turn:host.domain.tld:443?transport=tcp" ]

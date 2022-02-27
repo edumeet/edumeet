@@ -1,11 +1,11 @@
 listeningPort: 443
 listeningHost: host.domain.tld
 
-fileTracker" : "wss://tracker.openwebtorrent.com"
+fileTracker: "wss://tracker.openwebtorrent.com"
 
 tls:
-  key:  /opt/edumeet/server/certs/privkey.pem
-  cert: /opt/edumeet/server/certs/cert.pem
+  cert: ./certs/edumeet-demo-cert.pem
+  key:  ./certs/edumeet-demo-key.pem
 
 turnAPIURI: "https://host.domain.tld/turn"
 turnAPIKey: "Your API key"
@@ -32,4 +32,3 @@ mediasoup:
     listenIps:
     - ip: "PUBLIC_IP_ADDRESS"
       announcedIp: ""
-
