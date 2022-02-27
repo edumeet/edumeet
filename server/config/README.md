@@ -16,8 +16,8 @@
 | redisOptions.password | Redis server password. | `"string"` | ``""`` |
 | cookieSecret | Session cookie secret. | `"string"` | ``"T0P-S3cR3t_cook!e"`` |
 | cookieName | Session cookie name. | `"string"` | ``"edumeet.sid"`` |
-| tls.cert | SSL certificate path. | `"string"` | ``"./certs/mediasoup-demo.localhost.cert.pem"`` |
-| tls.key | SSL key path. | `"string"` | ``"./certs/mediasoup-demo.localhost.key.pem"`` |
+| tls.cert | SSL certificate path. | `"string"` | ``"./certs/edumeet-demo-cert.pem"`` |
+| tls.key | SSL key path. | `"string"` | ``"./certs/edumeet-demo-key.pem"`` |
 | listeningHost | The listening Host or IP address. | `"string"` | ``"0.0.0.0"`` |
 | listeningPort | The HTTPS listening port. | `"port"` | ``443`` |
 | listeningRedirectPort | The HTTP server listening port used for redirecting any HTTP request to HTTPS. If 0, the redirect server is disabled. | `"port"` | ``8080`` |
