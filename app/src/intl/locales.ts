@@ -146,13 +146,13 @@ export const loadOne = (locale: string): ILocale =>
 			(item) => item.locale.includes(locale)
 		)[0];
 
-		res.messages = require(`./${res.file}`);
+		res.messages = require(`./translations/${res.file}`);
 	}
 	catch
 	{
 		res = list.filter((item) => item.locale.includes('en'))[0];
 
-		res.messages = require(`./${res.file}`);
+		res.messages = require(`./translations/${res.file}`);
 	}
 
 	return res;

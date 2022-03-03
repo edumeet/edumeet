@@ -87,7 +87,7 @@ const AppearanceSettings = (props) =>
 					}
 					name={intl.formatMessage({
 						id             : 'settings.language',
-						defaultMessage : 'Language'
+						defaultMessage : 'Select language'
 					})}
 					autoWidth
 					className={classes.selectEmpty}

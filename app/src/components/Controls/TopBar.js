@@ -382,7 +382,7 @@ const TopBar = (props) =>
 		:
 		intl.formatMessage({
 			id             : 'tooltip.pauseLocalRecording',
-			defaultMessage : 'Pause local recording.'
+			defaultMessage : 'Pause local recording'
 		});
 
 	const fullscreenTooltip = fullscreen ?

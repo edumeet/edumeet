@@ -26,12 +26,12 @@ Try it online at [letsmeet.no](https://letsmeet.no)
   
   ##### How to contribute?
 	
-  1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/translations) you want to translate
+  1. take a certain [language file](https://github.com/edumeet/edumeet/tree/develop/app/src/intl/translations) you want to translate
   2. find the _null_  values
   >	"settings.language": null,
   3. replace them based on the _en.json_ file
   > "settings.language": "Select language",
-  4. make a Pull Request, or send us a [e-mail](mailto:roman@drozd.it) with file
+  4. make a Pull Request, or send us a [e-mail](mailto:community@lists.edumeet.org) with file
   
   Thanks so much in advance!
 </details>
@@ -63,13 +63,11 @@ Get docker image [here](https://hub.docker.com/r/edumeet/edumeet/)
 
 See [more](https://github.com/edumeet/edumeet-ansible/).
 
-[![asciicast](https://asciinema.org/a/311365.svg)](https://asciinema.org/a/311365)
-
 ## .deb package (for debian-based systems)
 
 If you want to install it on the Debian & Ubuntu based operating systems.
 
-* Prerequisites: [node v14.x](https://github.com/nodesource/distributions/blob/master/README.md#debinstall) (tested with v14.18.3 version)
+* Prerequisites: [node v16.x](https://github.com/nodesource/distributions/blob/master/README.md#debinstall) (tested with v16.13.2 version)
 
 * Get package [here](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess) (job artifact)
 
@@ -125,18 +123,18 @@ Note: Edumeet will start on the default settings (if you don't create your own c
 Important! You must always **rebuild** the edumeet when you change something in the configuration  files. 
 
 #### use template (example)
-Just clone the example files and adjust them
+Just clone the example files and adjust them if required.
 
 ```bash
 cp server/config/config.example.js server/config/config.js
 cp app/public/config/config.example.js app/public/config/config.js
 ```
 
-#### create your own config (yaml or json)
+#### To change default options, create your own server config file (yaml or json)
 
-Example when _config.yaml_:
+Example when usingi _config.yaml_ file
 ```yaml 
-turnAPIKey: "<KEY>"
+turnAPIKey: "<YOUR_API_KEY>"
 turnAPIURI: "https://api.turn.geant.org/turn"
 mediasoup:
   webRtcTransport:
@@ -144,12 +142,18 @@ mediasoup:
     - ip: "<serverip>"
       announcedIp: ""
 ```
-Example when _config.js_
+Example when using _config.json_ file
 ```javascript
-var config =
 {
-	developmentPort : 8443,
-	productionPort  : 3443
+  [
+    {
+      "urls": [
+        "turn:turn.example.com:443?transport=tcp"
+      ],
+      "username": "example",
+      "credential": "example"
+    }
+  ]
 };
 ```
 
@@ -216,7 +220,7 @@ sudo systemctl enable edumeet
 ## Ports and firewall
 | Port | protocol | description |
 | ---- | ----------- | ----------- |
-|3443 | tcp | default https webserver and signaling - adjustable in `server/config.js`) |
+|443 | tcp | default https webserver and signaling - adjustable in `server/config.js`) |
 | 4443 | tcp | default `yarn start` port for developing with live browser reload, not needed in production environments - adjustable in app/package.json) |
 | 40000-49999 | udp, tcp | media ports - adjustable in `server/config.js` |
 
@@ -230,6 +234,8 @@ To integrate with an LMS (e.g. Moodle), have a look at [LTI](LTI/LTI.md).
 
 ## TURN configuration
 
+If you are part of the GEANT eduGAIN, you can request your turn api key at [https://turn.geant.org/](https://turn.geant.org/)
+	
 You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! 
 Add your server and credentials to `server/config/config.js`
 

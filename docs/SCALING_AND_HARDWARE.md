@@ -5,7 +5,7 @@
 * Disk space is not so important - 10GB is a good start - but logs can get huge :) 
 * 1GB/s network adapter better with 2 or more ports + bonding
 * If you have more than 1 network interface + public IPs TURN server can run on same machine but we recommend extra TURN server or use a distributed TURN service
-* 1 TURN server / 4 Multiparty Meeting servers (TURN server can have fewer CPUs / cores)
+* 1 TURN server / 4 eduMEET servers (TURN server can have fewer CPUs / cores)
 
 ## Network
 The bandwidth requirements are quite tunable both on client and server, but server downstream to clients bandwidth will be one of the largest constraints on the system. If you have 1Gbit on your nodes, the number of users should not exceed ~600 per server node, and this can be run without a problem on a modern 8 core server. If you have higher bandwidth per node, the numbers can be scaled up linearly (2Gbit/16core/1200 users). Note that this is concurrent users, so if you anticipate ~10000 concurrent users, scale it according to these numbers. Real number of concurrent users depends on typical size of rooms(bigger is better), lastN config (lower is better), maxIncomingBitrate config (lower is better), use of simulcast. 
@@ -37,12 +37,12 @@ The bandwidth requirements are quite tunable both on client and server, but serv
 * Possibility to activate Simulcast / SVC to provide different clients with different bandwidths
 ## Scaling
 You can setup more than 1 server with same configuration and load balance with HA-proxy:
-https://github.com/havfo/multiparty-meeting/blob/master/HAproxy.md
+[docs/HAproxy.md]
 This will scale linearly.
 
 ### Limitations / work in progress / ToDo
 You can fine tune max number of active streams in same room by setting lastN parameter in server/config/config.js - this is then globally for whole server installation. Clients can override this in advanced settings locally.
 
-There is heavy development for separating signal/control part from media part (branch **[feat-media-node](https://github.com/havfo/multiparty-meeting/tree/feat-media-node)** ) when this is ready you can fire up several media nodes completely separated from signal/control. For multi-tenant you can install one server node (or more for redundancy) per tenant with separate configurations/domains and share all media nodes across tenants. One room can then spread over several media nodes so max number of participants is limited only by size of your infrastructure.
+There is heavy development for separating signal/control part from media part (branch **[feat-media-node](https://github.com/edumeet/edumeet/tree/feat-media-node)** ) when this is ready you can fire up several media nodes completely separated from signal/control. For multi-tenant you can install one server node (or more for redundancy) per tenant with separate configurations/domains and share all media nodes across tenants. One room can then spread over several media nodes so max number of participants is limited only by size of your infrastructure.
 
 Right now simulcast is supported and we are working on using bandwidth more effectively. Small video windows don't need high quality video streams so we should switch to lower quality streams according to video container sizes on screen. This could enable for much higher number of lastN.

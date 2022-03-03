@@ -16,7 +16,7 @@ var config = {
 	developmentPort : 3443,
 
 	// The production server listening port.
-	productionPort : 8443,
+	productionPort : 443,
 
 	// If the server component runs on a different host than the app you can specify the host name.
 	serverHostname : '',

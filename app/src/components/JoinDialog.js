@@ -500,7 +500,7 @@ const JoinDialog = ({
 									<WorkOutlineIcon/>&nbsp;
 
 									<FormattedMessage
-										id='room.joinRoomm'
+										id='label.guest'
 										defaultMessage='Guest'
 									/>
 								</ToggleButton>
@@ -509,7 +509,7 @@ const JoinDialog = ({
 									<VpnKeyIcon/>&nbsp;
 
 									<FormattedMessage
-										id='room.joinRoomm'
+										id='label.auth'
 										defaultMessage='Auth'
 									/>
 								</ToggleButton>

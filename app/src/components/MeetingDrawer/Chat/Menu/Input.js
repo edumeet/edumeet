@@ -418,7 +418,7 @@ const ChatInput = (props) =>
 									disabled={!canShareFiles || !canShare || chatItemsLength === 0}
 									aria-label={intl.formatMessage({
 										id             : 'label.saveChat',
-										defaultMessage : 'Save chat'
+										defaultMessage : 'Save Chat'
 									})}
 
 									component='span'
