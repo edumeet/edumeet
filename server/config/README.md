@@ -1,28 +1,4 @@
-# Edumeet Server Configuration
-
-The server configuration file can use one of the following formats:
-
-- config/config.json
-- config/config.json5
-- config/config.yaml
-- config/config.yml
-- config/config.toml
-
-Example `config.yaml`:
-
-```yaml
-redisOptions:
-  host: redis
-  port: 6379
-
-listeningPort: 443
-```
-
-Additionally, a `config/config.js` can be used to override specific properties
-with runtime generated values and to set additional configuration functions and classes.
-Look at the default `config/config.example.js` file for documentation.
-
-## Configuration properties
+# ![edumeet logo](/app/public/images/logo.edumeet.svg) server configuration properties list:
 
 | Name | Description | Format | Default value |
 | :--- | :---------- | :----- | :------------ |
@@ -40,8 +16,8 @@ Look at the default `config/config.example.js` file for documentation.
 | redisOptions.password | Redis server password. | `"string"` | ``""`` |
 | cookieSecret | Session cookie secret. | `"string"` | ``"T0P-S3cR3t_cook!e"`` |
 | cookieName | Session cookie name. | `"string"` | ``"edumeet.sid"`` |
-| tls.cert | SSL certificate path. | `"string"` | ``"./certs/mediasoup-demo.localhost.cert.pem"`` |
-| tls.key | SSL key path. | `"string"` | ``"./certs/mediasoup-demo.localhost.key.pem"`` |
+| tls.cert | SSL certificate path. | `"string"` | ``"./certs/edumeet-demo-cert.pem"`` |
+| tls.key | SSL key path. | `"string"` | ``"./certs/edumeet-demo-key.pem"`` |
 | listeningHost | The listening Host or IP address. | `"string"` | ``"0.0.0.0"`` |
 | listeningPort | The HTTPS listening port. | `"port"` | ``443`` |
 | listeningRedirectPort | The HTTP server listening port used for redirecting any HTTP request to HTTPS. If 0, the redirect server is disabled. | `"port"` | ``8080`` |
@@ -54,15 +30,15 @@ Look at the default `config/config.example.js` file for documentation.
 | routerScaleSize | Room size before spreading to a new router. | `"nat"` | ``40`` |
 | requestTimeout | Socket timeout value (ms). | `"nat"` | ``20000`` |
 | requestRetries | Socket retries when a timeout occurs. | `"nat"` | ``3`` |
-| mediasoup.numWorkers | The number of Mediasoup workers to spawn. Defaults to the available CPUs count. | `"nat"` | ``6`` |
+| mediasoup.numWorkers | The number of Mediasoup workers to spawn. Defaults to the available CPUs count. | `"nat"` | ``4`` |
 | mediasoup.worker.logLevel | The Mediasoup log level. | `"string"` | ``"warn"`` |
 | mediasoup.worker.logTags | The Mediasoup log tags. | `"array"` | ``[  "info",  "ice",  "dtls",  "rtp",  "srtp",  "rtcp"]`` |
 | mediasoup.worker.rtcMinPort | The Mediasoup start listening port number. | `"port"` | ``40000`` |
 | mediasoup.worker.rtcMaxPort | The Mediasoup end listening port number. | `"port"` | ``49999`` |
 | mediasoup.router.mediaCodecs | The Mediasoup codecs settings. [supportedRtpCapabilities](https://github.com/versatica/mediasoup/blob/v3/src/supportedRtpCapabilities.ts) | `"*"` | ``[  {    "kind": "audio",    "mimeType": "audio/opus",    "clockRate": 48000,    "channels": 2  },  {    "kind": "video",    "mimeType": "video/VP8",    "clockRate": 90000,    "parameters": {      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/VP9",    "clockRate": 90000,    "parameters": {      "profile-id": 2,      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/h264",    "clockRate": 90000,    "parameters": {      "packetization-mode": 1,      "profile-level-id": "4d0032",      "level-asymmetry-allowed": 1,      "x-google-start-bitrate": 1000    }  },  {    "kind": "video",    "mimeType": "video/h264",    "clockRate": 90000,    "parameters": {      "packetization-mode": 1,      "profile-level-id": "42e01f",      "level-asymmetry-allowed": 1,      "x-google-start-bitrate": 1000    }  }]`` |
-| mediasoup.webRtcTransport.listenIps | The Mediasoup listen IPs. [TransportListenIp](https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp) | `"array"` | ``[  {    "ip": "10.0.0.1",    "announcedIp": null  },  {    "ip": "db19:25c4:5f01:9683:cc5a:bcac:fd6e:b38d",    "announcedIp": null  }]`` |
+| mediasoup.webRtcTransport.listenIps | The Mediasoup listen IPs. [TransportListenIp](https://mediasoup.org/documentation/v3/mediasoup/api/#TransportListenIp) | `"array"` | ``[ { "ip": "0.0.0.0", "announcedIp": null } ]`` |
 | mediasoup.webRtcTransport.initialAvailableOutgoingBitrate | The Mediasoup initial available outgoing bitrate (in bps). [WebRtcTransportOptions](https://mediasoup.org/documentation/v3/mediasoup/api/#WebRtcTransportOptions) | `"nat"` | ``1000000`` |
-| mediasoup.webRtcTransport.maxIncomingBitrate | The Mediasoup maximum incoming bitrate for each transport. (in bps). [setMaxIncomingBitrate](https://mediasoup.org/documentation/v3/mediasoup/api/#transport-setMaxIncomingBitrate) | `"nat"` | ``1500000`` |
+| mediasoup.webRtcTransport.maxIncomingBitrate | The Mediasoup maximum incoming bitrate for each transport. (in bps). [setMaxIncomingBitrate](https://mediasoup.org/documentation/v3/mediasoup/api/#transport-setMaxIncomingBitrate) | `"nat"` | ``15000000`` |
 | prometheus.enabled | Enables the Prometheus metrics exporter. | `"boolean"` | ``false`` |
 | prometheus.listen | Prometheus metrics exporter listening address. | `"string"` | ``"localhost"`` |
 | prometheus.port | The Prometheus metrics exporter listening port. | `"port"` | ``8889`` |
