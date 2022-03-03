@@ -2,7 +2,7 @@ name: Debian package
 
 on: 
   push:
-    branches: [ develop, release-3.5.0 ]
+    branches: [ master, develop ]
 #  pull_request:
 #    branches: [ develop ]
 
@@ -91,16 +91,16 @@ jobs:
         chmod 775 DEBIAN/postinst
         cd ../
         dpkg-deb -Zgzip --build package
-        mv /home/runner/package.deb /home/runner/edumeet-$VERSION-beta1.deb
+        mv /home/runner/package.deb /home/runner/edumeet-$VERSION.deb
         
     - name : Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: edumeet-${{ steps.get-version.outputs.VERSION }}-beta1
+        name: edumeet-${{ steps.get-version.outputs.VERSION }}
         path: "/home/runner/edumeet-*.deb"
     
     - name: Add to release assets
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: "v3.5.0-beta.1"
+        tag_name: ${{ steps.get-version.outputs.VERSION }}
         files: "/home/runner/edumeet-*.deb"
