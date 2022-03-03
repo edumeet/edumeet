@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.5.1
+* Updated Documentation
+
 ## 3.5.0
 
 ### Added
