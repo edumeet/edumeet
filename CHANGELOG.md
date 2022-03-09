@@ -1,5 +1,7 @@
 # Changelog
 
+## 3.5.2
+  Security update for dependencies
 ## 3.5.1
 * Updated Documentation
 
