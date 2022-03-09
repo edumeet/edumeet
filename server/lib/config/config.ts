@@ -184,12 +184,12 @@ const configSchema = convict({
 		cert : {
 			doc     : 'SSL certificate path.',
 			format  : String,
-			default : './certs/mediasoup-demo.localhost.cert.pem'
+			default : './certs/edumeet-demo-cert.pem'
 		},
 		key : {
 			doc     : 'SSL key path.',
 			format  : String,
-			default : './certs/mediasoup-demo.localhost.key.pem'
+			default : './certs/edumeet-demo-key.pem'
 		}
 	},
 	listeningHost : {
@@ -200,7 +200,7 @@ const configSchema = convict({
 	listeningPort : {
 		doc     : 'The HTTPS listening port.',
 		format  : 'port',
-		default : 8443
+		default : 443
 	},
 	listeningRedirectPort : {
 		doc     : 'The HTTP server listening port used for redirecting any HTTP request to HTTPS. If 0, the redirect server is disabled.',

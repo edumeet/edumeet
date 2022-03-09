@@ -119,6 +119,59 @@ module.exports =
 		}
 	},
 	*/
+	// URI and key for requesting geoip-based TURN server closest to the client
+	turnAPIKey    : 'examplekey',
+	turnAPIURI    : 'https://example.com/api/turn',
+	turnAPIparams : {
+		'uri_schema' 	: 'turn',
+		'transport' 		: 'tcp',
+		'ip_ver'    		: 'ipv4',
+		'servercount'	: '2'
+	},
+	turnAPITimeout    : 2 * 1000,
+	// Backup turnservers if REST fails or is not configured
+	backupTurnServers : [
+		{
+			urls : [
+				'turn:turn.example.com:443?transport=tcp'
+			],
+			username   : 'example',
+			credential : 'example'
+		}
+	],
+	// bittorrent tracker: please replace this if you want a more private file sharing service inside eduMEET
+	// have a look at https://github.com/webtorrent/bittorrent-tracker for setup your own tracker
+	fileTracker : 'wss://tracker.openwebtorrent.com',  
+	// redis server options
+	redisOptions : {},
+	// session cookie secret
+	cookieSecret : 'T0P-S3cR3t_cook!e',
+	cookieName   : 'edumeet.sid',
+	// if you use encrypted private key the set the passphrase
+	tls          :
+	{
+		cert : `${__dirname}/../certs/mediasoup-demo.localhost.cert.pem`,
+		// passphrase: 'key_password'
+		key  : `${__dirname}/../certs/mediasoup-demo.localhost.key.pem`
+	},
+	// listening Host or IP 
+	// If omitted listens on every IP. ("0.0.0.0" and "::")
+	// listeningHost: 'localhost',
+	// Listening port for https server.
+	listeningPort         : 443,
+	// Any http request is redirected to https.
+	// Listening port for http server.
+	listeningRedirectPort : 80,
+	// Listens only on http, only on listeningPort
+	// listeningRedirectPort disabled
+	// use case: loadbalancer backend
+	httpOnly              : false,
+	// WebServer/Express trust proxy config for httpOnly mode
+	// You can find more info:
+	//  - https://expressjs.com/en/guide/behind-proxies.html
+	//  - https://www.npmjs.com/package/proxy-addr
+	// use case: loadbalancer backend
+	trustProxy            : '',
 	// This logger class will have the log function
 	// called every time there is a room created or destroyed,
 	// or peer created or destroyed. This would then be able

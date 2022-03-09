@@ -5,7 +5,8 @@ node_modules/
 /app/public/images/logo.*
 !/app/public/images/logo.edumeet.svg
 /server/config/
-!/server/config/config.example.js
+!/server/config/config.example.*
+!/server/config/README.md
 /server/public/
 /server/certs/
 /server/dist/

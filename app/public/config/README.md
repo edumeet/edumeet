@@ -1,21 +1,4 @@
-# Edumeet App Configuration
-
-The app configuration file should be a valid javascript file defining a single
-`config` object containing the properties that you need to modify.
-
-Example `public/config/config.example.js`:
-```javascript
-var config =
-{
-	developmentPort : 3443,
-	productionPort  : 443
-};
-```
-The actual app-config of a running edumeet instance can you get on https://yourinstance:yourport/?config=true
-An example configuration file with all properties set to default values
-can be found here: [config.example.js](public/config/config.example.js).
-
-## Configuration properties
+# ![edumeet logo](/app/public/images/logo.edumeet.svg) App Configuration properties list:
 
 | Name | Description | Format | Default value |
 | :--- | :---------- | :----- | :------------ |

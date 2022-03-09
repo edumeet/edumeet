@@ -14,23 +14,6 @@ import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
-const shortcuts=[
-	{ key: 'h', label: 'room.help', defaultMessage: 'Help' },
-	{ key: 'm', label: 'device.muteAudio', defaultMessage: 'Mute Audio' },
-	{ key: 'v', label: 'device.stopVideo', defaultMessage: 'Mute Video' },
-	{ key: '1', label: 'label.democratic', defaultMessage: 'Democratic View' },
-	{ key: '2', label: 'label.filmstrip', defaultMessage: 'Filmstrip View' },
-	{ key: 'space', label: 'me.mutedPTT', defaultMessage: 'Push SPACE to talk' },
-	{ key: 'a', label: 'label.advanced', defaultMessage: 'Show advanced information' }
-
-	/*
-	{
-		key: `${String.fromCharCode(8592)} ${String.fromCharCode(8594)}`,
-		label: 'room.browsePeersSpotlight',
-		defaultMessage: 'Browse participants into Spotlight'
-	}
-	*/
-];
 const styles = (theme) =>
 	({
 		dialogPaper :
@@ -116,20 +99,70 @@ const Help = ({
 					}
 				/>
 			</Tabs>
-			{shortcuts.map((value, index) =>
+
+			{/*
 			{
-				return (
-					<div key={index} className={classes.shortcuts}>
-						<Paper className={classes.paper}>
-							{value.key}
-						</Paper>
-						<FormattedMessage
-							id={value.label}
-							defaultMessage={value.defaultMessage}
-						/>
-					</div>
-				);
-			})}
+				key: `${String.fromCharCode(8592)} ${String.fromCharCode(8594)}`,
+				label: 'room.browsePeersSpotlight',
+				defaultMessage: 'Browse participants into Spotlight'
+			}
+			*/}
+			<div className={classes.shortcuts}>
+				<Paper className={classes.paper}>h</Paper>
+				<FormattedMessage
+					id='room.help'
+					defaultMessage='Help'
+				/>
+			</div>
+
+			<div className={classes.shortcuts}>
+				<Paper className={classes.paper}>m</Paper>
+				<FormattedMessage
+					id='device.muteAudio'
+					defaultMessage='Mute audio'
+				/>
+			</div>
+
+			<div className={classes.shortcuts}>
+				<Paper className={classes.paper}>v</Paper>
+				<FormattedMessage
+					id='device.stopVideo'
+					defaultMessage='Stop video'
+				/>
+			</div>
+
+			<div className={classes.shortcuts}>
+				<Paper className={classes.paper}>1</Paper>
+				<FormattedMessage
+					id='label.democratic'
+					defaultMessage='Democratic view'
+				/>
+			</div>
+
+			<div className={classes.shortcuts}>
+				<Paper className={classes.paper}>2</Paper>
+				<FormattedMessage
+					id='label.filmstrip'
+					defaultMessage='Filmstrip view'
+				/>
+			</div>
+
+			<div className={classes.shortcuts}>
+				<Paper className={classes.paper}>space</Paper>
+				<FormattedMessage
+					id='me.pushToTalk'
+					defaultMessage='Push SPACE to talk'
+				/>
+			</div>
+
+			<div className={classes.shortcuts}>
+				<Paper className={classes.paper}>a</Paper>
+				<FormattedMessage
+					id='label.showAdvancedInformation'
+					defaultMessage='Show advanced information'
+				/>
+			</div>
+
 			<DialogActions>
 				<Button onClick={() => { handleCloseHelp(false); }} color='primary'>
 					<FormattedMessage

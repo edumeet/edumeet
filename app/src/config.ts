@@ -38,7 +38,7 @@ const configSchema = convict({
 	{
 		doc     : 'The production server listening port.',
 		format  : 'port',
-		default : 8443
+		default : 443
 	},
 	serverHostname :
 	{
@@ -668,24 +668,7 @@ function formatJson(data: string)
 
 function dumpDocsMarkdown()
 {
-	let data = `# Edumeet App Configuration
-
-The app configuration file should be a valid javascript file defining a single
-\`config\` object containing the properties that you need to modify.
-
-Example \`public/config.js\`:
-\`\`\`javascript
-var config =
-{
-	developmentPort : 8443,
-	productionPort  : 3443
-};
-\`\`\`
-
-An example configuration file with all properties set to default values
-can be found here: [config.example.js](public/config/config.example.js).
-
-## Configuration properties
+	let data = `# ![edumeet logo](/app/public/images/logo.edumeet.svg) App Configuration properties list:
 
 | Name | Description | Format | Default value |
 | :--- | :---------- | :----- | :------------ |
@@ -748,7 +731,7 @@ if (typeof window === 'undefined')
 {
 	import('fs').then((fs) =>
 	{
-		fs.writeFileSync('README.md', dumpDocsMarkdown());
+		fs.writeFileSync('public/config/README.md', dumpDocsMarkdown());
 		fs.writeFileSync('public/config/config.example.js', dumpExampleConfigJs());
 	});
 }
