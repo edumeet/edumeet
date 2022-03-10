@@ -1,5 +1,7 @@
 # Changelog
 
+## 3.5.3
+  Hotfix configuration issue
 ## 3.5.2
   Security update for dependencies
 ## 3.5.1
