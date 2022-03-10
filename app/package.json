@@ -1,6 +1,6 @@
 {
 	"name": "edumeet",
-	"version": "3.5.2",
+	"version": "3.5.3",
 	"private": true,
 	"description": "edumeet meeting service",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
