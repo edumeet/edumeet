@@ -1,11 +1,11 @@
 [Unit]
-Description=edumeet is a audio / video meeting service running in the browser and powered by webRTC
+Description=FaceToFace is a audio / video meeting service running in the browser and powered by webRTC
 After=network.target
 
 [Service]
 # modify the paths accordingly with your installation
-ExecStart=/usr/local/src/edumeet/server/dist/server.js
-WorkingDirectory=/usr/local/src/edumeet/server
+ExecStart=/usr/local/src/FaceToFace/server/dist/server.js
+WorkingDirectory=/usr/local/src/FaceToFace/server
 Restart=always
 RestartSec=1
 User=nobody
