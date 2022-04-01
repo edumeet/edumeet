@@ -437,6 +437,7 @@ class VideoView extends React.PureComponent
 													localRecordingState==='resume'
 												)&&
 												(
+													recordingConsents!==undefined &&
 													!recordingConsents.includes(peer.id)
 												)
 											) ? '':displayName
@@ -459,6 +460,7 @@ class VideoView extends React.PureComponent
 									localRecordingState==='resume'
 								)&&
 								(
+									recordingConsents!==undefined &&
 									!recordingConsents.includes(peer.id)
 								)
 							)
