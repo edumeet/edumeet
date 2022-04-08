@@ -1,5 +1,6 @@
 import Logger from './logger/Logger';
 
+const utils = require('util');
 const EventEmitter = require('events').EventEmitter;
 const AwaitQueue = require('awaitqueue');
 const axios = require('axios');
@@ -1111,8 +1112,9 @@ class Room extends EventEmitter
 				catch (error)
 				{
 					throw new Error(
-						'transport.produce failed: [kind: "%s", rtpParameters: "%o", appData: "%o", error: "%o"]',
-						kind, rtpParameters, appData, error);
+						utils.format('transport.produce failed: [kind: "%s", rtpParameters: "%o", appData: "%o", error: "%o"]',
+							kind, rtpParameters, appData, error)
+						);
 				}
 
 				const pipeRouters = this._getRoutersToPipeTo(peer.routerId);
