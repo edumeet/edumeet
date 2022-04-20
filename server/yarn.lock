@@ -830,10 +830,10 @@ convict-format-with-validator@^6.0.1:
   dependencies:
     validator "^13.6.0"
 
-convict@^6.1.0:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/convict/-/convict-6.2.1.tgz#9c7f1442d8d0421b2ac72062e7b52c444b2827eb"
-  integrity sha512-Mn4AJiYkR3TAZH1Xm/RU7gFS/0kM5TBSAQDry8y40Aez0ASY+3boUhv+3QE5XbOXiXM2JjdhkKve3IsBvWCibQ==
+convict@^6.2.2:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/convict/-/convict-6.2.2.tgz#8168abe41d45b4f5ecd6e249c02553c0612a31af"
+  integrity sha512-3MsROJiEFN3BAzeFit1t87t7EUFzd44MNd13MLSikV2dsnDl7znwKgtYPPONtnDzxiDW0nBAsxVhSRNrjUrTTg==
   dependencies:
     lodash.clonedeep "^4.5.0"
     yargs-parser "^20.2.7"
