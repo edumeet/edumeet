@@ -26,7 +26,7 @@
 		"bowser": "^2.7.0",
 		"chroma-js": "^2.1.1",
 		"classnames": "^2.2.6",
-		"convict": "^6.0.1",
+		"convict": "^6.2.2",
 		"convict-format-with-validator": "^6.0.1",
 		"create-torrent": "^4.4.1",
 		"deep-object-diff": "^1.1.0",
