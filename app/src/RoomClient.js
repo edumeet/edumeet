@@ -4283,7 +4283,7 @@ export default class RoomClient
 		try
 		{
 			const device = this._webcams[videoDeviceId];
-			const { resolution, aspectRatio } = store.getState().settings;
+			const { resolution, aspectRatio, frameRate } = store.getState().settings;
 
 			if (!device)
 				throw new Error('no webcam devices');
@@ -4293,7 +4293,8 @@ export default class RoomClient
 					video :
 					{
 						deviceId : { ideal: videoDeviceId },
-						...getVideoConstrains(resolution, aspectRatio)
+						...getVideoConstrains(resolution, aspectRatio),
+						frameRate
 					}
 				});
 
