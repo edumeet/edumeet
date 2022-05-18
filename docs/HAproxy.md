@@ -95,7 +95,7 @@ sudo systemctl enable haproxy
 
   ``` plaintext
 
-global
+  global
         # mult thread setup
         nbproc 1
         nbthread 4
@@ -125,7 +125,7 @@ global
         tune.ssl.default-dh-param 2048
         maxconn 20000
 
-defaults
+  defaults
         log     global
         mode    http
         option  httplog
@@ -143,7 +143,7 @@ defaults
         errorfile 504 /etc/haproxy/errors/504.http
         maxconn 8192
 
-backend letsmeet-room-backend
+  backend letsmeet-room-backend
     fullconn 4000
     balance url_param roomId
     hash-type consistent
@@ -156,7 +156,7 @@ backend letsmeet-room-backend
     server edumeet2 192.0.2.2:80 check maxconn 1000 verify none
     server edumeet3 192.0.2.3:80 check maxconn 1000 verify none
 
-backend letsmeet-backend
+  backend letsmeet-backend
     fullconn 4000
     balance leastconn
     stick-table type ip size 200k expire 30m
@@ -167,7 +167,7 @@ backend letsmeet-backend
     server edumeet2 192.0.2.2:80 check maxconn 1000 verify none
     server edumeet3 192.0.2.3:80 check maxconn 1000 verify none
 
-frontend letsmeet
+  frontend letsmeet
     bind *:80
     bind*:443 ssl crt /etc/ssl/edumeet.example.com/edumeet.example.com.pem alpn h2,http/1.1
     http-request redirect scheme https if !{ ssl_fc }
