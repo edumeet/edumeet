@@ -1,10 +1,3 @@
-# ![edumeet logo](/app/public/images/logo.edumeet.svg) **WebRTC meeting service using [mediasoup](https://mediasoup.org).**
-Official website: [edumeet.org](https://edumeet.org)
-
-https://user-images.githubusercontent.com/37835902/152279867-639db9bc-bf78-430f-b96f-d17733527474.mp4
-
-Try it online at [letsmeet.no](https://letsmeet.no)
-
 ## Main features
 
 | Feature  | Description |
@@ -31,7 +24,7 @@ Try it online at [letsmeet.no](https://letsmeet.no)
   >	"settings.language": "Select language",
   4. If your language is not listed, create a new translation _.json_ file..
   >	copy en.json to [_"two letter country code"_.json](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) and translate to your languange 
-  5. make a Pull Request, or send us a file by [e-mail](mailto:community@lists.edumeet.org)
+  5. make a Pull Request, or send us a file by
 	
   Thank you in advance!
 </details>
@@ -55,22 +48,12 @@ See more info about browsers storage limits:
 
 </details>
 
-# Installation 
-
-See here for [Docker](https://github.com/edumeet/edumeet-docker/) or [Ansible](https://github.com/edumeet/edumeet-ansible/) (based on Docker) installation procedures
-
-## Debian & Ubuntu based operating systems (.deb package)
-
-* Prerequisites: Installed NodeJS (v16.x) as described in [Manual installation](#manual-installation-build) section.
-* See [Configuration](#configuration) section for client and server configuration details.
-* Download from [releases](https://github.com/edumeet/edumeet/releases) assets, or latest job [artifact](https://github.com/edumeet/edumeet/actions?query=workflow%3ADeployer+branch%3Amaster+is%3Asuccess). 
-
 ```bash
 # Unzip the file
-unzip edumeet.zip
+unzip FaceToFace.zip
 
 # Install the package
-sudo apt install edumeet/edumeet.deb
+sudo apt install FaceToFace/FaceToFace.deb
 
 # After package installation, don't forget to edit configuration files.
 sudo nano /etc/educonf/client-config.js
@@ -78,7 +61,7 @@ sudo nano /etc/educonf/server-config.js
 sudo nano /etc/educonf/server-config.yaml
 
 # Finally, start the service by (it's enabled by default)
-sudo systemctl start edumeet
+sudo systemctl start FaceToFace
 ```
 
 ## Manual installation (build)
@@ -104,28 +87,28 @@ sudo apt update && sudo apt install yarn
 ```bash
 sudo apt update && sudo apt install -y curl git python python3-pip build-essential redis openssl libssl-dev pkg-config
 ```	
-3. Clone eduMEET git repository
+3. Clone FaceToFace git repository
 ```bash
-git clone https://github.com/edumeet/edumeet.git
-cd edumeet
+git clone https://github.com/buraksumer/FaceToFace.git
+cd FaceToFace
 ```
 (switch to the "develop" branch to get the latest features)
 ```bash
 git checkout develop 
 ```
 ### Configuration
-**eduMEET** will start and run normally with just default settings. If there is no configuration files,  it will automatically detect your host IP address, and listen on port 443 (https). In order to change default values (e.g. certificates), or activate features (e.g. authentication), use appropriate configuration file (see below for details).  
+**FaceToFace** will start and run normally with just default settings. If there is no configuration files,  it will automatically detect your host IP address, and listen on port 443 (https). In order to change default values (e.g. certificates), or activate features (e.g. authentication), use appropriate configuration file (see below for details).  
 
-**:warning: Note:** There are separate configuration files for eduMEET application and eduMEET server:
+**:warning: Note:** There are separate configuration files for FaceToFace application and FaceToFace server:
 
-**eduMEET application (app)** for: enabling login, change logo or background, adjust A/V parameters, etc...
+**FaceToFace application (app)** for: enabling login, change logo or background, adjust A/V parameters, etc...
 
 Copy [example](/app/public/config/config.example.js) template and edit values (see all available parameters in [./app/public/config/README.md](/app/public/config/README.md))
 ```bash
 cp app/public/config/config.example.js app/public/config/config.js
 ```
 
-**eduMEET server** require **:warning:two** configuration files: **config.js**, and **config.{_json_, _yaml_ or _toml_}** (multiple format supported)
+**FaceToFace server** require **:warning:two** configuration files: **config.js**, and **config.{_json_, _yaml_ or _toml_}** (multiple format supported)
 
 **1. config.js** for setting authentication methods and user roles.
 
@@ -140,16 +123,16 @@ cp server/config/config.example.js server/config/config.js
 ```yaml 
     listeningPort: 443
     tls:
-        key:  /opt/edumeet/server/certs/privkey.pem
-        cert: /opt/edumeet/server/certs/cert.pem
+        key:  /opt/FaceToFace/server/certs/privkey.pem
+        cert: /opt/FaceToFace/server/certs/cert.pem
 ```
 [**:point_right: _config.json_**](/server/config/config.example.json) example:
 ```javascript
     {
         "listeningPort" : "443",
         "tls" : {
-            "cert" : "/opt/edumeet/server/certs/cert.pem",
-            "key"  : "/opt/edumeet/server/certs/privkey.pem"
+            "cert" : "/opt/FaceToFace/server/certs/cert.pem",
+            "key"  : "/opt/FaceToFace/server/certs/privkey.pem"
         }
     }
 ```
@@ -158,8 +141,8 @@ cp server/config/config.example.js server/config/config.js
     listeningPort = "443"
 
     [tls]
-    cert = "/opt/edumeet/server/certs/cert.pem"
-    key = "/opt/edumeet/server/certs/privkey.pem"
+    cert = "/opt/FaceToFace/server/certs/cert.pem"
+    key = "/opt/FaceToFace/server/certs/privkey.pem"
 ```
 **:red_circle: IMPORTANT:**  Use **only one** type for second configuration file (`yaml` file format is highly recommended)
 
@@ -225,18 +208,18 @@ sudo ip6tables-save > /etc/iptables/rules.v6
 **Run as a service** (systemd)
 
 ```bash
-# Stop your locally running server. Copy systemd-service file `edumeet.service` to `/etc/systemd/system/` and check location path settings:
-cp edumeet.service /etc/systemd/system/
+# Stop your locally running server. Copy systemd-service file `FaceToFace.service` to `/etc/systemd/system/` and check location path settings:
+cp FaceToFace.service /etc/systemd/system/
 
 # modify the install paths, if required
-sudo edit /etc/systemd/system/edumeet.service
+sudo edit /etc/systemd/system/FaceToFace.service
 
 # Reload systemd configuration and start service:
 sudo systemctl daemon-reload
-sudo systemctl start edumeet
+sudo systemctl start FaceToFace
 
-# If you want to start edumeet at boot time:
-sudo systemctl enable edumeet
+# If you want to start FaceToFace at boot time:
+sudo systemctl enable FaceToFace
 ```
 
 ## Ports and firewall
@@ -260,32 +243,3 @@ If you are part of the GEANT eduGAIN, you can request your turn api key at [http
 	
 You need an additional [TURN](https://github.com/coturn/coturn)-server for clients located behind restrictive firewalls! 
 Add your server and credentials to `server/config/config.yaml`
-
-## Community-driven support
-| Type                |                                                |
-| -----------         | -----------                                    |
-| Open mailing list   | community@lists.edumeet.org                    |
-| Subscribe           | lists.edumeet.org/sympa/subscribe/community/   |
-| Open archive        | lists.edumeet.org/sympa/arc/community/         |
-
-## Authors
-
-* Håvar Aambø Fosstveit
-* Stefan Otto
-* Mészáros Mihály
-* Roman Drozd
-* Rémai Gábor László
-* Piotr Pawałowski
-
-This started as a fork of the [work](https://github.com/versatica/mediasoup-demo) done by:
-
-* Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
-
-## License
-
-MIT License (see `LICENSE.md`)
-
-Contributions to this work were made on behalf of the GÉANT project, a project that has received funding from the European Union’s Horizon 2020 research and innovation programme under Grant Agreement No. 731122 (GN4-2). On behalf of GÉANT project, GÉANT Association is the sole owner of the copyright in all material which was developed by a member of the GÉANT project.
-
-GÉANT Vereniging (Association) is registered with the Chamber of Commerce in Amsterdam with registration number 40535155 and operates in the UK as a branch of GÉANT Vereniging. Registered office: Hoekenrode 3, 1102BR Amsterdam, The Netherlands. UK branch address: City House, 126-130 Hills Road, Cambridge CB2 1PQ, UK.
-
