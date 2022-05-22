@@ -62,8 +62,8 @@ function getListenIps()
 			ifaces[ifname].forEach(function(iface)
 			{
 				if (
-					(iface.family !== 'IPv4' &&
-						(iface.family !== 'IPv6' || iface.scopeid !== 0)) ||
+					(iface.family !== 4 &&
+						(iface.family !== 6 || iface.scopeid !== 0)) ||
 					iface.internal !== false
 				)
 				{
