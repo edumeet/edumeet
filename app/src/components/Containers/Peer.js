@@ -349,21 +349,32 @@ const Peer = (props) =>
 	{
 		const handler = setTimeout(() =>
 		{
-			const consumer = webcamConsumer || screenConsumer;
+			const consumers = [];
 
-			if (!consumer)
-				return;
+			if (webcamConsumer)
+				consumers.push(webcamConsumer);
 
-			if (windowConsumer === consumer.id)
+			if (screenConsumer)
+				consumers.push(screenConsumer);
+
+			extraVideoConsumers.map((consumer) =>
 			{
-				// if playing in external window, set the maximum quality levels
-				roomClient.setConsumerPreferredLayersMax(consumer);
-			}
-			else if (enableLayersSwitch && consumer?.type !== 'simple'
-				&& fullScreenConsumer !== consumer.id)
+				consumers.push(consumer);
+			});
+
+			consumers.forEach((consumer) =>
 			{
-				roomClient.adaptConsumerPreferredLayers(consumer, width, height);
-			}
+				if (windowConsumer === consumer.id)
+				{
+					// if playing in external window, set the maximum quality levels
+					roomClient.setConsumerPreferredLayersMax(consumer);
+				}
+				else if (enableLayersSwitch && consumer?.type !== 'simple'
+					&& fullScreenConsumer !== consumer.id)
+				{
+					roomClient.adaptConsumerPreferredLayers(consumer, width, height);
+				}
+			});
 		}, 1000);
 
 		return () => { clearTimeout(handler); };
@@ -371,6 +382,7 @@ const Peer = (props) =>
 		enableLayersSwitch,
 		webcamConsumer,
 		screenConsumer,
+		extraVideoConsumers,
 		windowConsumer,
 		fullScreenConsumer,
 		roomClient, width, height
