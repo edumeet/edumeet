@@ -158,7 +158,8 @@ const Peer = (props) =>
 		mode,
 		theme,
 		localRecordingState,
-		recordingConsents
+		recordingConsents,
+		inDrawingMode
 	} = props;
 
 	const micEnabled = (
@@ -706,6 +707,14 @@ const Peer = (props) =>
 						height={height}
 						opusConfig={micConsumer && micConsumer.opusConfig}
 						showAudioAnalyzer={showAudioAnalyzer}
+						producerId={webcamConsumer && webcamConsumer.producerId}
+						pathsToDraw={webcamConsumer && webcamConsumer.pathsToDraw}
+						onDrawPathOnVideo={(path, srcWidth, destPeerId, producerId) =>
+						{
+							roomClient.drawPathOnVideo(path,
+								srcWidth, destPeerId, producerId);
+						}}
+						isDrawingEnabled={inDrawingMode}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -877,6 +886,14 @@ const Peer = (props) =>
 								videoScore={consumer ? consumer.score : null}
 								width={width}
 								height={height}
+								producerId={consumer && consumer.producerId}
+								pathsToDraw={consumer && consumer.pathsToDraw}
+								onDrawPathOnVideo={(path, srcWidth, destPeerId, producerId) =>
+								{
+									roomClient.drawPathOnVideo(path,
+										srcWidth, destPeerId, producerId);
+								}}
+								isDrawingEnabled={inDrawingMode}
 							/>
 						</div>
 					</div>
@@ -1043,6 +1060,14 @@ const Peer = (props) =>
 							videoScore={screenConsumer ? screenConsumer.score : null}
 							width={width}
 							height={height}
+							producerId={screenConsumer && screenConsumer.producerId}
+							pathsToDraw={screenConsumer && screenConsumer.pathsToDraw}
+							onDrawPathOnVideo={(path, srcWidth, destPeerId, producerId) =>
+							{
+								roomClient.drawPathOnVideo(path,
+									srcWidth, destPeerId, producerId);
+							}}
+							isDrawingEnabled={room.inDrawingMode}
 						/>
 					</div>
 				</div>
@@ -1074,7 +1099,8 @@ Peer.propTypes =
 	isSelected               : PropTypes.bool,
 	mode                     : PropTypes.string.isRequired,
 	localRecordingState      : PropTypes.string,
-	recordingConsents        : PropTypes.array
+	recordingConsents        : PropTypes.array,
+	inDrawingMode            : PropTypes.bool
 };
 
 const makeMapStateToProps = (initialState, { id }) =>
@@ -1093,7 +1119,8 @@ const makeMapStateToProps = (initialState, { id }) =>
 			isSelected          : state.room.selectedPeers.includes(id),
 			mode                : state.room.mode,
 			localRecordingState : state.recorder.localRecordingState.status,
-			recordingConsents   : recordingConsentsPeersSelector(state)
+			recordingConsents   : recordingConsentsPeersSelector(state),
+			inDrawingMode       : state.room.inDrawingMode
 		};
 	};
 
@@ -1131,6 +1158,7 @@ export default withRoomContext(connect(
 				prev.room.fullScreenConsumer === next.room.fullScreenConsumer &&
 				prev.room.mode === next.room.mode &&
 				prev.room.selectedPeers === next.room.selectedPeers &&
+				prev.room.inDrawingMode === next.room.inDrawingMode &&
 				prev.me.browser === next.me.browser &&
 				prev.enableLayersSwitch === next.enableLayersSwitch &&
 				prev.recorder.localRecordingState.status ===

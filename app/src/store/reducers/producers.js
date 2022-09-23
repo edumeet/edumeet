@@ -71,6 +71,52 @@ const producers = (state = initialState, action) =>
 			return { ...state, [producerId]: newProducer };
 		}
 
+		case 'ADD_PATH_TO_DRAW_PRODUCER':
+		{
+			const { producerId, path, srcWidth } = action.payload;
+
+			const producer = state[producerId];
+
+			if (!producer)
+				return { ...state };
+
+			let newPathsToDraw = producer.pathsToDraw;
+
+			if (!newPathsToDraw)
+			{
+				newPathsToDraw = [];
+			}
+
+			newPathsToDraw.push({ path: path, srcWidth: srcWidth });
+
+			const newProducer = { ...producer, pathsToDraw: newPathsToDraw };
+
+			return { ...state, [producerId]: newProducer };
+		}
+
+		case 'REMOVE_DRAWINGS_PRODUCER':
+		{
+			const { producerId } = action.payload;
+
+			if (!producerId)
+			{
+				Object.values(state).forEach((producer) =>
+				{
+					if (producer.pathsToDraw)
+						producer.pathsToDraw.length = 0;
+				});
+			}
+			else
+			{
+				const producer = state[producerId];
+
+				if (producer)
+					state[producerId].pathsToDraw.length = 0;
+			}
+
+			return { ...state };
+		}
+
 		default:
 			return state;
 	}

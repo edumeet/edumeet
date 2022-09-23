@@ -240,3 +240,9 @@ export const setHideSelfView = (hideSelfView) =>
 		type    : 'SET_HIDE_SELF_VIEW',
 		payload : { hideSelfView }
 	});
+
+export const toggleDrawingMode = (started) =>
+	({
+		type    : 'TOGGLE_DRAWING_MODE',
+		payload : { started }
+	});

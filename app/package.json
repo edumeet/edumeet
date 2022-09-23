@@ -37,6 +37,7 @@
 		"draft-js-plugins-editor": "^3.0.0",
 		"draft-js-single-line-plugin": "^2.0.5",
 		"end-of-stream": "1.4.1",
+		"fabric": "^4.6.0",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",
 		"idb": "^6.0.0",

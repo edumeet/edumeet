@@ -11,6 +11,7 @@ import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
 import { AudioAnalyzer } from './AudioAnalyzer';
+import { fabric } from 'fabric';
 
 const logger = new Logger('VideoView');
 
@@ -73,6 +74,20 @@ const styles = (theme) =>
 			transitionProperty : 'opacity',
 			transitionDuration : '.15s',
 			alignItems         : 'flex-start'
+		},
+		canvasForDrawing :
+		{
+			zIndex          : -1,
+			backgroundColor : 'rgba(255, 0, 0, 0)'
+		},
+		canvasForShowing :
+		{
+			zIndex          : 9,
+			backgroundColor : 'rgba(0, 0, 255, 0)',
+			'&.isMirrored'  :
+			{
+				transform : 'scaleX(-1)'
+			}
 		},
 		box :
 		{
@@ -187,6 +202,11 @@ class VideoView extends React.PureComponent
 			videoHeight : null
 		};
 
+		this._canvasForDrawing = null;
+		this._canvasForShowing = null;
+		this._producerId = null;
+		this._peerId = null;
+
 		// Latest received video track.
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
@@ -234,7 +254,11 @@ class VideoView extends React.PureComponent
 			opusConfig,
 			localRecordingState,
 			recordingConsents,
-			peer
+			peer,
+			producerId,
+			pathsToDraw,
+			onDrawPathOnVideo,
+			isDrawingEnabled
 		} = this.props;
 
 		const {
@@ -449,6 +473,22 @@ class VideoView extends React.PureComponent
 					}
 				</div>
 
+				<canvas
+					ref='canvasForDrawingRef'
+					width={width}
+					height={height}
+					className={classes.canvasForDrawing}
+				/>
+
+				<canvas
+					ref='canvasForShowingRef'
+					width={width}
+					height={height}
+					className={classnames(classes.canvasForShowing, {
+						'isMirrored' : isMirrored
+					})}
+				/>
+
 				<video
 					ref='videoElement'
 					className={classnames(classes.video, {
@@ -481,7 +521,15 @@ class VideoView extends React.PureComponent
 
 	componentDidMount()
 	{
-		const { videoTrack, audioTrack, showAudioAnalyzer } = this.props;
+		const {
+			videoTrack,
+			audioTrack,
+			showAudioAnalyzer,
+			width,
+			height,
+			peer,
+			producerId
+		} = this.props;
 
 		this._setTracks(videoTrack);
 
@@ -494,6 +542,26 @@ class VideoView extends React.PureComponent
 		{
 			this.audioAnalyzer.delete();
 			this.audioAnalyzer = null;
+		}
+
+		this._producerId = producerId;
+
+		if (peer)
+		{
+			this._peerId = peer.id;
+		}
+
+		if (canvasForShowingRef)
+		{
+			this._canvasForShowing = new fabric.Canvas(canvasForShowingRef,
+				{ width: width, height: height });
+
+			this._drawPaths();
+		}
+
+		if (canvasForDrawingRef)
+		{
+			this._createDrawingCanvas();
 		}
 	}
 
@@ -515,13 +583,31 @@ class VideoView extends React.PureComponent
 			this.audioAnalyzer.delete();
 			this.audioAnalyzer = null;
 		}
+
+		if (this._canvasForShowing)
+			this._canvasForShowing.dispose();
+
+		if (this._canvasForDrawing)
+			this._canvasForDrawing.dispose();
 	}
 
 	componentDidUpdate(prevProps)
 	{
 		if (prevProps !== this.props)
 		{
-			const { videoTrack, audioTrack, showAudioAnalyzer } = this.props;
+			const {
+				videoTrack,
+				audioTrack,
+				showAudioAnalyzer,
+				width,
+				height,
+				peer,
+				producerId,
+				pathsToDraw,
+				isDrawingEnabled,
+				isMe,
+				isMirrored
+			} = this.props;
 
 			this._setTracks(videoTrack);
 
@@ -534,6 +620,225 @@ class VideoView extends React.PureComponent
 				this.audioAnalyzer.delete();
 				this.audioAnalyzer = null;
 			}
+
+			let doRecreateCanvases = false;
+
+			if (prevProps.peer.id !== peer.id)
+			{
+				this._peerId = peer.id;
+				doRecreateCanvases = true;
+			}
+
+			if (prevProps.producerId !== producerId)
+			{
+				this._producerId = producerId;
+				doRecreateCanvases = true;
+			}
+
+			if (prevProps.isMirrored !== isMirrored)
+			{
+				if (this._canvasForDrawing)
+				{
+					this._canvasForDrawing.remove(...this._canvasForDrawing.getObjects());
+					this._canvasForDrawing.dispose();
+					this._canvasForDrawing = null;
+				}
+				if (this._producerId)
+					this._createDrawingCanvas();
+			}
+
+			if (prevProps.isDrawingEnabled !== isDrawingEnabled)
+			{
+				if (this._canvasForDrawing)
+				{
+					this._canvasForDrawing.remove(...this._canvasForDrawing.getObjects());
+					this._canvasForDrawing.dispose();
+					this._canvasForDrawing = null;
+				}
+				if (this._producerId)
+					this._createDrawingCanvas();
+			}
+
+			if (doRecreateCanvases)
+			{
+				this._canvasForShowing.remove(...this._canvasForShowing.getObjects());
+
+				if (this._canvasForDrawing)
+				{
+					this._canvasForDrawing.remove(...this._canvasForDrawing.getObjects());
+					this._canvasForDrawing.dispose();
+					this._canvasForDrawing = null;
+				}
+				if (this._producerId)
+					this._createDrawingCanvas();
+			}
+
+			if (prevProps.width !== width || prevProps.height !== height)
+			{
+				if (this._canvasForDrawing)
+					this._rescaleCanvas(this._canvasForDrawing,
+						width, height);
+
+				if (this._canvasForShowing)
+					this._rescaleCanvas(this._canvasForShowing,
+						width, height);
+			}
+
+			this._drawPaths();
+		}
+	}
+
+	_getBrushWidth(canvasWidth)
+	{
+		let brushWidth = 4 * canvasWidth / 1920;
+
+		if (brushWidth < 1)
+			brushWidth = 1;
+
+		return brushWidth;
+	}
+
+	_drawPaths()
+	{
+		const {
+			pathsToDraw
+		} = this.props;
+
+		if (this._canvasForShowing && pathsToDraw)
+		{
+			const newLength = pathsToDraw.length;
+
+			let prevLength = this._canvasForShowing.getObjects().length;
+
+			if (newLength < prevLength)
+			{
+				this._canvasForShowing.remove(...this._canvasForShowing.getObjects());
+				prevLength = 0;
+			}
+
+			if (newLength > prevLength)
+			{
+				const newPaths = pathsToDraw.slice(prevLength);
+
+				newPaths.forEach((pathEntry) =>
+				{
+					const factor = this._canvasForShowing.width / pathEntry.srcWidth;
+
+					fabric.util.enlivenObjects([ pathEntry.path ], (paths) =>
+					{
+						paths.forEach((pathObject) =>
+						{
+							pathObject.scaleX = pathObject.scaleX * factor;
+							pathObject.scaleY = pathObject.scaleY * factor;
+							pathObject.left = pathObject.left * factor;
+							pathObject.top = pathObject.top * factor;
+							pathObject.setCoords();
+							pathObject.selectable = false;
+
+							this._canvasForShowing.add(pathObject);
+						});
+					});
+				});
+			}
+		}
+	}
+
+	_createDrawingCanvas()
+	{
+		const {
+			width,
+			height,
+			isDrawingEnabled,
+			onDrawPathOnVideo,
+			isMirrored
+		} = this.props;
+
+		const { canvasForDrawingRef } = this.refs;
+
+		if (canvasForDrawingRef)
+		{
+			if (isDrawingEnabled)
+			{
+				canvasForDrawingRef.style.zIndex = '51';
+			}
+			else
+			{
+				canvasForDrawingRef.style.zIndex = '-1';
+			}
+
+			this._canvasForDrawing = new fabric.Canvas(canvasForDrawingRef,
+				{ width: width, height: height });
+
+			this._canvasForDrawing.isDrawingMode = true;
+			this._canvasForDrawing.freeDrawingBrush = new fabric.PencilBrush(
+				this._canvasForDrawing);
+			this._canvasForDrawing.freeDrawingBrush.decimate = 10;
+			this._canvasForDrawing.freeDrawingBrush.color = '#00ff00';
+			this._canvasForDrawing.freeDrawingBrush.width = this._getBrushWidth(width);
+
+			this._canvasForDrawing.on('path:created', (opt) =>
+			{
+				if (this._peerId && this._producerId)
+				{
+					const pathToSend = opt.path.toJSON();
+
+					if (isMirrored)
+					{
+						pathToSend.left = this._canvasForDrawing.width -
+							pathToSend.left - pathToSend.width - pathToSend.strokeWidth;
+
+						for (const pathEntry of pathToSend.path)
+						{
+							pathEntry[1] = this._canvasForDrawing.width - pathEntry[1];
+							if (pathEntry[0] === 'Q')
+								pathEntry[3] = this._canvasForDrawing.width - pathEntry[3];
+						}
+					}
+
+					onDrawPathOnVideo(pathToSend,
+						this._canvasForDrawing.width, this._peerId, this._producerId);
+
+					setTimeout(() =>
+					{
+						if (this._canvasForDrawing)
+						{
+							this._canvasForDrawing.remove(opt.path);
+						}
+					}, 1000);
+				}
+				else
+				{
+					this._canvasForDrawing.remove(opt.path);
+				}
+			});
+		}
+	}
+
+	_rescaleCanvas(canvas, width, height)
+	{
+		const prevWidth = canvas.getWidth();
+
+		canvas.setDimensions({ width: width, height: height });
+
+		if (prevWidth && prevWidth > 0 && !isNaN(width / prevWidth))
+		{
+			const factor = width / prevWidth;
+
+			canvas.getObjects().forEach((canvasObject) =>
+			{
+				canvasObject.scaleX = canvasObject.scaleX * factor;
+				canvasObject.scaleY = canvasObject.scaleY * factor;
+				canvasObject.left = canvasObject.left * factor;
+				canvasObject.top = canvasObject.top * factor;
+				canvasObject.setCoords();
+			});
+			canvas.renderAll();
+			canvas.calcOffset();
+		}
+
+		if (canvas.isDrawingMode && canvas.freeDrawingBrush)
+		{
+			canvas.freeDrawingBrush.width = this._getBrushWidth(width);
 		}
 	}
 
@@ -666,7 +971,11 @@ VideoView.propTypes =
 	opusConfig                     : PropTypes.string,
 	localRecordingState            : PropTypes.string,
 	recordingConsents              : PropTypes.array,
-	peer                           : PropTypes.object
+	peer                           : PropTypes.object,
+	producerId                     : PropTypes.string,
+	pathsToDraw                    : PropTypes.arrayOf(PropTypes.object),
+	onDrawPathOnVideo              : PropTypes.func,
+	isDrawingEnabled               : PropTypes.bool
 
 };
 

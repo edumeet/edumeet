@@ -1099,7 +1099,7 @@ class Room extends EventEmitter
 
 				// Add peerId into appData to later get the associated Peer during
 				// the 'loudest' event of the audioLevelObserver.
-				appData = { ...appData, peerId: peer.id };
+				appData = { ...appData, peerId: peer.id, pathsToDraw: [] };
 
 				let producer = null;
 
@@ -1852,6 +1852,95 @@ class Room extends EventEmitter
 
 				this._notification(lowerPeer.socket, 'moderator:lowerHand');
 
+				cb();
+
+				break;
+			}
+
+			case 'drawPathOnVideo':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.joined)
+					throw new Error('Peer not yet joined');
+
+				const { path, srcWidth, destPeerId, producerId, srcPeerId } = request.data;
+
+				if (!path)
+					throw new Error('drawPathOnVideo - path must be set');
+
+				if (isNaN(srcWidth) || srcWidth <= 0)
+					throw new Error(`drawPathOnVideo - srcWidth not > 0, srcWidth="${srcWidth}"`);
+
+				const destPeer = this._peers[destPeerId];
+
+				if (!destPeer)
+					throw new Error(`drawPathOnVideo - peer with id "${destPeerId}" not found`);
+
+				if (!destPeer.producers.has(producerId))
+					throw new Error(`drawPathOnVideo - producer with id "${producerId}" not found for peer with id "${destPeerId}"`);
+
+				const producer = destPeer.producers.get(producerId);
+
+				producer.appData.pathsToDraw.push({ path: path, srcWidth: srcWidth });
+
+				this._notification(
+					destPeer.socket,
+					'drawPathOnVideo',
+					{ peerId: destPeer.id, path: path, srcWidth: srcWidth, producerId: producerId },
+					true,
+					true
+				);
+
+				// Return no error
+				cb();
+
+				break;
+			}
+
+			case 'removeDrawings':
+			{
+				// Ensure the Peer is joined.
+				if (!peer.joined)
+					throw new Error('Peer not yet joined');
+
+				const { peerId, producerId } = request.data;
+
+				if (!peerId)
+				{
+					Object.values(this._peers).forEach((peer) =>
+					{
+						peer.producers.forEach((producer) =>
+						{
+							if (producer.appData.pathsToDraw)
+								producer.appData.pathsToDraw.length = 0;
+						});
+					});
+				}
+				else
+				{
+					const destPeer = this._peers[peerId];
+
+					// Ensure the Peer is joined.
+					if (!destPeer || !destPeer.joined)
+						throw new Error('removeDrawings - destPeer not joined');
+
+					const producer = destPeer.producers.get(producerId);
+
+					if (!producer)
+						throw new Error('removeDrawings - Producer not found');
+
+					if (producer.appData.pathsToDraw)
+						producer.appData.pathsToDraw.length = 0;
+				}
+
+				this._notification(
+					peer.socket,
+					'removeDrawings',
+					{ peerId, producerId },
+					true
+				);
+
+				// Return no error
 				cb();
 
 				break;

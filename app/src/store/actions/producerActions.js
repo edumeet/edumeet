@@ -33,3 +33,15 @@ export const setProducerScore = (producerId, score) =>
 		type    : 'SET_PRODUCER_SCORE',
 		payload : { producerId, score }
 	});
+
+export const addPathToDraw = (producerId, path, srcWidth) =>
+	({
+		type    : 'ADD_PATH_TO_DRAW_PRODUCER',
+		payload : { producerId, path, srcWidth }
+	});
+
+export const removeDrawings = (producerId) =>
+	({
+		type    : 'REMOVE_DRAWINGS_PRODUCER',
+		payload : { producerId }
+	});

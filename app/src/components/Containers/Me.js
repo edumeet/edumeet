@@ -838,6 +838,16 @@ const Me = (props) =>
 							roomClient.changeDisplayName(displayName);
 						}}
 						showAudioAnalyzer={showAudioAnalyzer}
+						producerId={webcamProducer && webcamProducer.id}
+						pathsToDraw={webcamProducer && webcamProducer.pathsToDraw}
+						width={width}
+						height={height}
+						onDrawPathOnVideo={(path, srcWidth, destPeerId, producerId) =>
+						{
+							roomClient.drawPathOnVideo(path,
+								srcWidth, destPeerId, producerId);
+						}}
+						isDrawingEnabled={room.inDrawingMode}
 					>
 						{ micState === 'muted' ? null : <Volume id={me.id} /> }
 					</VideoView>
@@ -959,6 +969,16 @@ const Me = (props) =>
 								{
 									roomClient.changeDisplayName(displayName);
 								}}
+								producerId={producer && producer.id}
+								pathsToDraw={producer && producer.pathsToDraw}
+								width={width}
+								height={height}
+								onDrawPathOnVideo={(path, srcWidth, destPeerId, producerId) =>
+								{
+									roomClient.drawPathOnVideo(path,
+										srcWidth, destPeerId, producerId);
+								}}
+								isDrawingEnabled={room.inDrawingMode}
 							/>
 						</div>
 					</div>
@@ -1014,6 +1034,16 @@ const Me = (props) =>
 							videoTrack={screenProducer && screenProducer.track}
 							videoVisible={screenVisible}
 							videoCodec={screenProducer && screenProducer.codec}
+							producerId={screenProducer && screenProducer.id}
+							pathsToDraw={screenProducer && screenProducer.pathsToDraw}
+							width={width}
+							height={height}
+							onDrawPathOnVideo={(path, srcWidth, destPeerId, producerId) =>
+							{
+								roomClient.drawPathOnVideo(path,
+									srcWidth, destPeerId, producerId);
+							}}
+							isDrawingEnabled={isDrawingEnabled}
 						/>
 					</div>
 				</div>

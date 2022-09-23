@@ -137,6 +137,72 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
+		case 'ADD_PATH_TO_DRAW_CONSUMER':
+		{
+			const { producerId, path, srcWidth } = action.payload;
+
+			let consumer;
+
+			for (const tmpConsumer of Object.values(state))
+			{
+				if (producerId === tmpConsumer.producerId)
+				{
+					consumer = tmpConsumer;
+
+					break;
+				}
+			}
+
+			if (!consumer)
+				return { ...state };
+
+			let newPathsToDraw = consumer.pathsToDraw;
+
+			if (!newPathsToDraw)
+			{
+				newPathsToDraw = [];
+			}
+
+			newPathsToDraw.push({ path: path, srcWidth: srcWidth });
+
+			const newConsumer = { ...consumer, pathsToDraw: newPathsToDraw };
+
+			return { ...state, [consumer.id]: newConsumer };
+		}
+
+		case 'REMOVE_DRAWINGS_CONSUMER':
+		{
+			const { producerId } = action.payload;
+
+			if (!producerId)
+			{
+				Object.values(state).forEach((consumer) =>
+				{
+					if (consumer.pathsToDraw)
+						consumer.pathsToDraw.length = 0;
+				});
+			}
+			else
+			{
+				let consumer;
+
+				for (const tmpConsumer of Object.values(state))
+				{
+					if (producerId === tmpConsumer.producerId)
+					{
+						consumer = tmpConsumer;
+
+						break;
+					}
+				}
+
+				if (consumer)
+					consumer.pathsToDraw.length = 0;
+			}
+
+			return { ...state };
+		}
+
 		default:
 			return state;
 	}

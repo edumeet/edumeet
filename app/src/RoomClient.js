@@ -3168,6 +3168,47 @@ export default class RoomClient
 						break;
 					}
 
+					case 'drawPathOnVideo':
+					{
+						const { peerId, path, srcWidth, producerId } = notification.data;
+
+						if (peerId === this._peerId)
+						{
+							store.dispatch(producerActions.addPathToDraw(producerId, path, srcWidth));
+						}
+						else
+						{
+							store.dispatch(consumerActions.addPathToDraw(producerId, path, srcWidth));
+						}
+
+						break;
+					}
+
+					case 'removeDrawings':
+					{
+						const { peerId, producerId } = notification.data;
+
+						if (!peerId)
+						{
+							store.dispatch(producerActions.removeDrawings(null));
+							store.dispatch(consumerActions.removeDrawings(null));
+						}
+						else if (peerId === this._peerId)
+							store.dispatch(producerActions.removeDrawings(producerId));
+						else
+							store.dispatch(consumerActions.removeDrawings(producerId));
+
+						store.dispatch(requestActions.notify(
+							{
+								text : intl.formatMessage({
+									id             : 'room.drawingsRemoved',
+									defaultMessage : 'The drawings have been removed'
+								})
+							}));
+
+						break;
+					}
+
 					case 'chatMessage':
 					{
 						const { peerId, chatMessage } = notification.data;
@@ -3380,7 +3421,8 @@ export default class RoomClient
 							track                  : consumer.track,
 							score                  : score,
 							audioGain              : undefined,
-							opusConfig             : null
+							opusConfig             : null,
+							pathsToDraw            : consumer.appData.pathsToDraw
 						};
 
 						this._spotlights.addVideoConsumer(consumerStoreObject);
@@ -5144,5 +5186,87 @@ export default class RoomClient
 	setHideNoVideoParticipants(hideNoVideoParticipants)
 	{
 		this._spotlights.hideNoVideoParticipants = hideNoVideoParticipants;
+	}
+
+	async drawPathOnVideo(path, srcWidth, destPeerId, producerId)
+	{
+		try
+		{
+			await this.sendRequest('drawPathOnVideo', {
+				path       : path,
+				srcWidth   : srcWidth,
+				destPeerId : destPeerId,
+				producerId : producerId,
+				srcPeerId  : this._peerId
+			});
+		}
+		catch (error)
+		{
+			logger.error('drawPathOnVideo() [error:"%o"]', error);
+		}
+	}
+
+	async removeDrawings(peerId, producerId)
+	{
+		try
+		{
+			await this.sendRequest('removeDrawings', { peerId, producerId });
+
+			if (!peerId)
+			{
+				store.dispatch(producerActions.removeDrawings(null));
+				store.dispatch(consumerActions.removeDrawings(null));
+			}
+			else if (peerId === this._peerId)
+				store.dispatch(producerActions.removeDrawings(producerId));
+			else
+				store.dispatch(consumerActions.removeDrawings(producerId));
+
+			store.dispatch(requestActions.notify(
+				{
+					text : intl.formatMessage({
+						id             : 'room.drawingsRemoved',
+						defaultMessage : 'The drawings have been removed'
+					})
+				}));
+
+		}
+		catch (error)
+		{
+			logger.error('removeDrawings() [error:"%o"]', error);
+		}
+	}
+
+	toggleDrawingMode(start)
+	{
+		try
+		{
+			store.dispatch(roomActions.toggleDrawingMode(start));
+
+			if (start)
+			{
+				store.dispatch(requestActions.notify(
+					{
+						text : intl.formatMessage({
+							id             : 'room.startDrawingMode',
+							defaultMessage : 'The drawing mode has been started'
+						})
+					}));
+			}
+			else
+			{
+				store.dispatch(requestActions.notify(
+					{
+						text : intl.formatMessage({
+							id             : 'room.stopDrawingMode',
+							defaultMessage : 'The drawing mode has been stopped'
+						})
+					}));
+			}
+		}
+		catch (error)
+		{
+			logger.error('startDrawingMode() [error:"%o"]', error);
+		}
 	}
 }

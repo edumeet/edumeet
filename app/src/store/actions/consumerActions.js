@@ -68,3 +68,15 @@ export const setConsumerOpusConfig = (consumerId, opusConfig) =>
 		type    : 'SET_CONSUMER_OPUS_CONFIG',
 		payload : { consumerId, opusConfig }
 	});
+
+export const addPathToDraw = (producerId, path, srcWidth) =>
+	({
+		type    : 'ADD_PATH_TO_DRAW_CONSUMER',
+		payload : { producerId, path, srcWidth }
+	});
+
+export const removeDrawings = (producerId) =>
+	({
+		type    : 'REMOVE_DRAWINGS_CONSUMER',
+		payload : { producerId }
+	});

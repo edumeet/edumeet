@@ -80,7 +80,8 @@ const SpeakerPeer = (props) =>
 		fullScreenConsumer,
 		spacing,
 		style,
-		classes
+		classes,
+		inDrawingMode
 	} = props;
 
 	const width = style.width;
@@ -186,6 +187,14 @@ const SpeakerPeer = (props) =>
 						width={width}
 						height={height}
 						opusConfig={micConsumer && micConsumer.opusConfig}
+						producerId={webcamConsumer && webcamConsumer.producerId}
+						pathsToDraw={webcamConsumer && webcamConsumer.pathsToDraw}
+						onDrawPathOnVideo={(path, srcWidth, destPeerId, producerId) =>
+						{
+							roomClient.drawPathOnVideo(path,
+								srcWidth, destPeerId, producerId);
+						}}
+						isDrawingEnabled={inDrawingMode}
 					>
 						<Volume id={peer.id} />
 					</VideoView>
@@ -235,6 +244,16 @@ const SpeakerPeer = (props) =>
 								videoVisible={screenVisible}
 								videoCodec={screenConsumer && screenConsumer.codec}
 								videoScore={screenConsumer ? screenConsumer.score : null}
+								width={width}
+								height={height}
+								producerId={screenConsumer && screenConsumer.producerId}
+								pathsToDraw={screenConsumer && screenConsumer.pathsToDraw}
+								onDrawPathOnVideo={(path, srcWidth, destPeerId, producerId) =>
+								{
+									roomClient.drawPathOnVideo(path,
+										srcWidth, destPeerId, producerId);
+								}}
+								isDrawingEnabled={inDrawingMode}
 							/>
 						</div>
 					}
@@ -256,7 +275,8 @@ SpeakerPeer.propTypes =
 	fullScreenConsumer : PropTypes.string,
 	spacing            : PropTypes.number,
 	style              : PropTypes.object,
-	classes            : PropTypes.object.isRequired
+	classes            : PropTypes.object.isRequired,
+	inDrawingMode      : PropTypes.bool
 };
 
 const mapStateToProps = (state, { id }) =>
@@ -267,7 +287,8 @@ const mapStateToProps = (state, { id }) =>
 		peer               : state.peers[id],
 		...getPeerConsumers(state, id),
 		windowConsumer     : state.room.windowConsumer,
-		fullScreenConsumer : state.room.fullScreenConsumer
+		fullScreenConsumer : state.room.fullScreenConsumer,
+		inDrawingMode      : state.room.inDrawingMode
 	};
 };
 
@@ -281,7 +302,8 @@ export default withRoomContext(connect(
 			return (
 				prev.peers === next.peers &&
 				prev.consumers === next.consumers &&
-				prev.room.activeSpeakerId === next.room.activeSpeakerId
+				prev.room.activeSpeakerId === next.room.activeSpeakerId &&
+				prev.room.inDrawingMode === next.room.inDrawingMode
 			);
 		}
 	}
