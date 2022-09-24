@@ -49,6 +49,8 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
+import DrawingIcon from '@material-ui/icons/Edit';
+import RemoveDrawingIcon from '@material-ui/icons/Backspace';
 import randomString from 'random-string';
 import { recorder } from './../../BrowserRecorder';
 
@@ -406,6 +408,33 @@ const TopBar = (props) =>
 			id             : 'tooltip.login',
 			defaultMessage : 'Log in'
 		});
+
+	let drawingTip;
+
+	if (room.inDrawingMode)
+	{
+		drawingTip = intl.formatMessage({
+			id             : 'room.stopDrawing',
+			defaultMessage : 'Stop drawing'
+		});
+	}
+	else
+	{
+		drawingTip = intl.formatMessage({
+			id             : 'room.startDrawing',
+			defaultMessage : 'Start drawing'
+		});
+	}
+
+	const removeDrawingsTip = intl.formatMessage({
+		id             : 'room.removeDrawings',
+		defaultMessage : 'Remove drawings for all'
+	});
+
+	const hasDrawings = Object.values(consumers).some((consumer) =>
+		consumer.pathsToDraw && consumer.pathsToDraw.length > 0) ||
+		Object.values(producers).some((producer) =>
+			producer.pathsToDraw && producer.pathsToDraw.length > 0);
 
 	return (
 		<React.Fragment>
@@ -823,6 +852,43 @@ const TopBar = (props) =>
 
 						</MenuItem>
 						}
+						<MenuItem
+							onClick={() =>
+							{
+								handleMenuClose();
+								inDrawingMode ?
+									roomClient.toggleDrawingMode(false) :
+									roomClient.toggleDrawingMode(true);
+							}}
+						>
+							{ inDrawingMode ?
+								<DrawingIcon
+									aria-label={drawingTip}
+								/>
+								:
+								<DrawingIcon
+									aria-label={drawingTip}
+								/>
+							}
+							<p className={classes.moreAction}>
+								{drawingTip}
+							</p>
+						</MenuItem>
+						<MenuItem
+							disabled={!hasDrawings}
+							onClick={() =>
+							{
+								handleMenuClose();
+								roomClient.removeDrawings(null, null);
+							}}
+						>
+							<RemoveDrawingIcon
+								aria-label={removeDrawingsTip}
+							/>
+							<p className={classes.moreAction}>
+								{removeDrawingsTip}
+							</p>
+						</MenuItem>
 						<MenuItem
 							disabled={!canProduceExtraVideo}
 							onClick={() =>
