@@ -71,7 +71,7 @@ const styles = (theme) =>
 			position        : 'absolute',
 			width           : '100%',
 			height          : '100%',
-			backgroundColor : 'rgba(0, 0, 0, 0.3)',
+			backgroundColor : 'rgba(0, 0, 0, 0)',
 			display         : 'flex',
 			justifyContent  : 'center',
 			alignItems      : 'flex-end',
@@ -1067,7 +1067,7 @@ const Peer = (props) =>
 								roomClient.drawPathOnVideo(path,
 									srcWidth, destPeerId, producerId);
 							}}
-							isDrawingEnabled={room.inDrawingMode}
+							isDrawingEnabled={inDrawingMode}
 						/>
 					</div>
 				</div>

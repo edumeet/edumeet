@@ -3403,6 +3403,7 @@ export default class RoomClient
 						const consumerStoreObject = {
 							id                     : consumer.id,
 							peerId                 : peerId,
+							producerId             : producerId,
 							kind                   : kind,
 							type                   : type,
 							locallyPaused          : false,

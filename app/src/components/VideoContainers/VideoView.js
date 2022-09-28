@@ -20,7 +20,7 @@ const styles = (theme) =>
 		root :
 		{
 			position      : 'relative',
-			flex          : '100 100 auto',
+			flex          : '0 0 auto',
 			height        : '100%',
 			width         : '100%',
 			display       : 'flex',
@@ -30,7 +30,7 @@ const styles = (theme) =>
 
 		video :
 		{
-			flex               : '100 100 auto',
+			flex               : '0 0 auto',
 			height             : '100%',
 			width              : '100%',
 			objectFit          : 'contain',
@@ -528,8 +528,11 @@ class VideoView extends React.PureComponent
 			width,
 			height,
 			peer,
-			producerId
+			producerId,
+			pathsToDraw
 		} = this.props;
+
+		const { canvasForShowingRef, canvasForDrawingRef } = this.refs;
 
 		this._setTracks(videoTrack);
 
@@ -547,9 +550,7 @@ class VideoView extends React.PureComponent
 		this._producerId = producerId;
 
 		if (peer)
-		{
 			this._peerId = peer.id;
-		}
 
 		if (canvasForShowingRef)
 		{
@@ -716,7 +717,7 @@ class VideoView extends React.PureComponent
 				prevLength = 0;
 			}
 
-			if (newLength > prevLength)
+			if (newLength > prevLength && this._canvasForShowing.width > 0)
 			{
 				const newPaths = pathsToDraw.slice(prevLength);
 

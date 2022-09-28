@@ -856,12 +856,12 @@ const TopBar = (props) =>
 							onClick={() =>
 							{
 								handleMenuClose();
-								inDrawingMode ?
+								room.inDrawingMode ?
 									roomClient.toggleDrawingMode(false) :
 									roomClient.toggleDrawingMode(true);
 							}}
 						>
-							{ inDrawingMode ?
+							{ room.inDrawingMode ?
 								<DrawingIcon
 									aria-label={drawingTip}
 								/>
@@ -1205,6 +1205,43 @@ const TopBar = (props) =>
 						</p>
 					</MenuItem>
 				}
+				<MenuItem
+					onClick={() =>
+					{
+						handleMenuClose();
+						room.inDrawingMode ?
+							roomClient.toggleDrawingMode(false) :
+							roomClient.toggleDrawingMode(true);
+					}}
+				>
+					{ room.inDrawingMode ?
+						<DrawingIcon
+							aria-label={drawingTip}
+						/>
+						:
+						<DrawingIcon
+							aria-label={drawingTip}
+						/>
+					}
+					<p className={classes.moreAction}>
+						{drawingTip}
+					</p>
+				</MenuItem>
+				<MenuItem
+					disabled={!hasDrawings}
+					onClick={() =>
+					{
+						handleMenuClose();
+						roomClient.removeDrawings(null, null);
+					}}
+				>
+					<RemoveDrawingIcon
+						aria-label={removeDrawingsTip}
+					/>
+					<p className={classes.moreAction}>
+						{removeDrawingsTip}
+					</p>
+				</MenuItem>
 				<MenuItem
 					disabled={!canProduceExtraVideo}
 					onClick={() =>

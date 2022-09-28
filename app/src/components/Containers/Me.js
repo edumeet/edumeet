@@ -155,6 +155,7 @@ const Me = (props) =>
 	const {
 		roomClient,
 		me,
+		room,
 		settings,
 		activeSpeaker,
 		spacing,
@@ -175,7 +176,7 @@ const Me = (props) =>
 		localRecordingState
 	} = props;
 
-	// const width = style.width;
+	const width = style.width;
 
 	const height = style.height;
 
@@ -1043,7 +1044,7 @@ const Me = (props) =>
 								roomClient.drawPathOnVideo(path,
 									srcWidth, destPeerId, producerId);
 							}}
-							isDrawingEnabled={isDrawingEnabled}
+							isDrawingEnabled={room.inDrawingMode}
 						/>
 					</div>
 				</div>
@@ -1057,6 +1058,7 @@ Me.propTypes =
 	roomClient          : PropTypes.any.isRequired,
 	advancedMode        : PropTypes.bool,
 	me                  : appPropTypes.Me.isRequired,
+	room                : appPropTypes.Room.isRequired,
 	settings            : PropTypes.object,
 	activeSpeaker       : PropTypes.bool,
 	micProducer         : appPropTypes.Producer,
@@ -1101,6 +1103,7 @@ const makeMapStateToProps = () =>
 
 		return {
 			me                  : state.me,
+			room                : state.room,
 			...meProducersSelector(state),
 			settings            : state.settings,
 			activeSpeaker       : state.me.id === state.room.activeSpeakerId,
