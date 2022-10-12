@@ -2562,10 +2562,10 @@ passport-lti@0.0.7:
   dependencies:
     passport-strategy "1.0.x"
 
-passport-saml@^3.1.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/passport-saml/-/passport-saml-3.2.1.tgz#c489a61a4c2dd93ddec1d53952a595b9f33e15e8"
-  integrity sha512-Y8aD94B6MTLht57BlBrDauEgvtWjuSeINKk7NadXlpT/OBmsoGGYPpb0FJeBtdyGX4GEbZARAkxvBEqsL8E7XQ==
+passport-saml@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/passport-saml/-/passport-saml-3.2.2.tgz#0ebd5aa26898f79d0c821e5e098ee0464ea43f7b"
+  integrity sha512-69lhv2HVuXlMcywSeZ91o91L5BW1tSK3xX3TJh8QfRUv8M65B5Jm0cgm2PV63IM3qn4Cq4jDkq934vcBEBcRNw==
   dependencies:
     "@xmldom/xmldom" "^0.7.5"
     debug "^4.3.2"

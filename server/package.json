@@ -48,7 +48,7 @@
 		"passport": "^0.4.0",
 		"passport-local": "^1.0.0",
 		"passport-lti": "0.0.7",
-		"passport-saml": "^3.1.0",
+		"passport-saml": "^3.2.2",
 		"pidusage": "^2.0.21",
 		"prom-client": "^13.1.0",
 		"redis": "v3",
