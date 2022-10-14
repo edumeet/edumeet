@@ -39,6 +39,7 @@ const initialState =
 	closeMeetingInProgress        : false,
 	clearChatInProgress           : false,
 	clearFileSharingInProgress    : false,
+	inDrawingMode                 : false,
 	roomPermissions               : null,
 	userRoles                     : null,
 	allowWhenRoleMissing          : null
@@ -183,6 +184,13 @@ const room = (state = initialState, action) =>
 			const { supported } = action.payload;
 
 			return { ...state, torrentSupport: supported };
+		}
+
+		case 'TOGGLE_DRAWING_MODE':
+		{
+			const { started } = action.payload;
+
+			return { ...state, inDrawingMode: (started ? true : false) };
 		}
 
 		case 'TOGGLE_JOINED':
