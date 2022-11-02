@@ -1,6 +1,6 @@
 FROM node:14-buster-slim
 RUN apt-get update && \
-    apt-get install -y git build-essential python pkg-config libssl-dev && \
+    apt-get install -y git build-essential python pkg-config libssl-dev python3-pip && \
     apt-get clean
 WORKDIR /edumeet
 ENV DEBUG=edumeet*,mediasoup*

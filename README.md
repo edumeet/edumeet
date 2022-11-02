@@ -248,7 +248,7 @@ sudo systemctl enable edumeet
 
 ## Load balanced installation
 
-To deploy this as a load balanced cluster, have a look at [HAproxy](HAproxy.md).
+To deploy this as a load balanced cluster, have a look at [HAproxy](/docs/HAproxy.md).
 
 ## Learning management integration
 
