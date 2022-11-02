@@ -41,7 +41,7 @@
 		"hark": "^1.2.3",
 		"idb": "^6.0.0",
 		"is-electron": "^2.2.0",
-		"marked": "^0.8.0",
+		"marked": "^4.0.10",
 		"material-ui-popup-state": "^1.8.0",
 		"mediasoup-client": "^3.6.55",
 		"notistack": "^0.9.5",
