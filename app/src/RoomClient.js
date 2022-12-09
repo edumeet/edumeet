@@ -4849,8 +4849,10 @@ export default class RoomClient
 			return;
 
 		store.dispatch(meActions.setWebcamInProgress(true));
-
-		this._webcamProducer.close();
+		/**
+		* If the camera is disabled after being enabled, the camera cannot be enabled again. Therefore, you are advised to log out
+		*/ 
+		// this._webcamProducer.close();
 
 		store.dispatch(
 			producerActions.removeProducer(this._webcamProducer.id));
