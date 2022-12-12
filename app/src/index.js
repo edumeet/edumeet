@@ -99,7 +99,7 @@ function run()
 	const muted = parameters.get('muted') === 'true';
 	const headless = parameters.get('headless');
 	const hideNoVideoParticipants = parameters.get('hideNoVideoParticipants');
-	const filmstripmode = parameters.get('filmstrip_mode'); // filmstrip
+	const filmstripmode = parameters.get('filmstrip'); // filmstrip mode by default
 	const acceptCookie = parameters.get('acceptCookie'); // auto accept cookie popup
 
 	if (filmstripmode === 'true')
