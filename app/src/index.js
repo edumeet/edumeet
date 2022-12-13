@@ -6,7 +6,7 @@ import isElectron from 'is-electron';
 
 import { createIntl } from 'react-intl';
 import { IntlProvider } from 'react-intl-redux';
-
+import Cookies from 'universal-cookie';
 import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
 import randomString from 'random-string';
 import Logger from './Logger';
@@ -15,6 +15,7 @@ import RoomClient from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
 import * as meActions from './store/actions/meActions';
+import * as roomActions from './store/actions/roomActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
 import ConfigDocumentation from './components/ConfigDocumentation';
 import ConfigError from './components/ConfigError';
@@ -97,6 +98,24 @@ function run()
 	const displayName = parameters.get('displayName');
 	const muted = parameters.get('muted') === 'true';
 	const headless = parameters.get('headless');
+	const hideNoVideoParticipants = parameters.get('hideNoVideoParticipants');
+	const filmstripmode = parameters.get('filmstrip'); // filmstrip mode by default
+	const acceptCookie = parameters.get('acceptCookie'); // auto accept cookie popup
+
+	if (filmstripmode === 'true')
+	{
+		store.dispatch(
+			roomActions.setDisplayMode('filmstrip')
+		);
+	}
+
+	if (acceptCookie === 'true')
+	{
+		const cookies = new Cookies();
+
+		cookies.set('CookieConsent', 'true', { path: '/' });
+	}
+
 	const showConfigDocumentationPath = parameters.get('config') === 'true';
 
 	const { pathname } = window.location;
@@ -217,6 +236,11 @@ function run()
 			muted,
 			basePath
 		});
+
+	if (hideNoVideoParticipants === 'true')
+	{
+		roomClient.setHideNoVideoParticipants(true);
+	}
 
 	global.CLIENT = roomClient;
 
