@@ -101,6 +101,7 @@ function run()
 	const hideNoVideoParticipants = parameters.get('hideNoVideoParticipants');
 	const filmstripmode = parameters.get('filmstrip'); // filmstrip mode by default
 	const acceptCookie = parameters.get('acceptCookie'); // auto accept cookie popup
+	const hideSelfView = parameters.get('hideSelfView');
 
 	if (filmstripmode === 'true')
 	{
@@ -240,6 +241,11 @@ function run()
 	if (hideNoVideoParticipants === 'true')
 	{
 		roomClient.setHideNoVideoParticipants(true);
+	}
+
+	if (hideSelfView === 'true')
+	{
+		store.dispatch(roomActions.setHideSelfView(hideSelfView));
 	}
 
 	global.CLIENT = roomClient;
