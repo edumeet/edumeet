@@ -498,6 +498,24 @@ Setting 'play' to null disables the sound notification.
 		format  : 'String',
 		default : 'edumeet'
 	},
+	infoTooltipText :
+	{
+		doc     : 'Informative text on the join page. If empty hidden.',
+		format  : 'String',
+		default : ''
+	},
+	infoTooltipLink :
+	{
+		doc     : 'Informative text link site on the join page. If empty hidden.',
+		format  : 'String',
+		default : ''
+	},
+	infoTooltipDesc :
+	{
+		doc     : 'Informative text description on the join page. If empty hidden.',
+		format  : 'String',
+		default : ''
+	},
 	supportUrl :
 	{
 		doc      : 'The service & Support URL; if `null`, it will be not displayed on the about dialogs.',

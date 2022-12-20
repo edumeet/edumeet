@@ -39,6 +39,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import { config } from '../config';
+import InfoIcon from '@material-ui/icons/Info';
 
 const styles = (theme) =>
 	({
@@ -186,7 +187,6 @@ const JoinDialog = ({
 
 }) =>
 {
-
 	const location = useLocation();
 
 	const history = useHistory();
@@ -671,6 +671,51 @@ const JoinDialog = ({
 								</Button>
 
 							</Grid>
+							{ config.infoTooltipText!=='' &&
+
+								<div className={classes.infoToolTip}
+									style={{
+										'padding-top' : '20px',
+										'overflowX'   : 'auto',
+										'width'       : '100%',
+										'display'     : 'flex',
+										'align-items' : 'center'
+									}}
+								>
+									<InfoIcon />
+									{ config.infoTooltipLink!=='' &&
+									<a
+										style={{
+											'text-decoration' : 'none',
+											'padding-left'    : '5px'
+										}}
+										href={config.infoTooltipLink}
+									>{config.infoTooltipText}</a>
+									}
+
+									{ config.infoTooltipLink==='' &&
+										<p style={{
+											'text-decoration' : 'none',
+											'padding-left'    : '5px'
+										}}
+										>{config.infoTooltipText}</p>
+									}
+								</div>
+							}
+							{ config.infoTooltipDesc!=='' &&
+							<div
+								className={classes.infoToolTip}
+								style={{
+									'padding-top' : '15px',
+									'overflowX'   : 'auto',
+									'width'       : '100%',
+									'display'     : 'flex',
+									'align-items' : 'center'
+								}}
+							>
+								{config.infoTooltipDesc}
+							</div>
+							}
 							{/*
 							{authType === 'auth' && !loggedIn &&
 							<Grid item>
