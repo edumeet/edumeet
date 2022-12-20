@@ -1,6 +1,6 @@
 {
 	"name": "edumeet",
-	"version": "3.5.4",
+	"version": "3.5.5",
 	"private": true,
 	"description": "edumeet meeting service",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
@@ -45,6 +45,7 @@
 		"material-ui-popup-state": "^1.8.0",
 		"mediasoup-client": "^3.6.55",
 		"notistack": "^0.9.5",
+		"universal-cookie": "4.0.4",
 		"prop-types": "^15.7.2",
 		"random-string": "^0.2.0",
 		"react": "^16.10.2",

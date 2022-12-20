@@ -32,7 +32,7 @@ import {
 const logger = new Logger('config');
 
 // add network interfaces list
-const ifaceWhiteListRegex = '^(eth.*)|(ens.*)|(br.*)|(wl.*)|(ww.*)';
+const ifaceWhiteListRegex = '^(eth.*)|(enp.*)|(ens.*)|(br.*)|(wl.*)|(ww.*)';
 
 // add parsers
 convict.addParser([
