@@ -502,7 +502,7 @@ Setting 'play' to null disables the sound notification.
 	{
 		doc     : 'Informative text on the join page. If empty hidden.',
 		format  : 'String',
-		default : 'asd'
+		default : ''
 	},
 	infoTooltipLink :
 	{
