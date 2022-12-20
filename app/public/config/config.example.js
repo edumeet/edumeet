@@ -304,6 +304,15 @@ var config = {
 	// The title to show if the logo is not specified.
 	title : 'edumeet',
 
+	// Informative text on the join page. If empty hidden.
+	infoTooltipText : '',
+
+	// Informative text link site on the join page. If empty hidden.
+	infoTooltipLink : '',
+
+	// Informative text description on the join page. If empty hidden.
+	infoTooltipDesc : '',
+
 	// The service & Support URL; if `null`, it will be not displayed on the about dialogs.
 	supportUrl : 'https://support.example.com',
 
