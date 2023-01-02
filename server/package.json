@@ -41,7 +41,7 @@
 		"fast-stats": "^0.0.6",
 		"helmet": "^3.21.2",
 		"ims-lti": "^3.0.2",
-		"json5": "^2.2.0",
+		"json5": "^2.2.2",
 		"jsonwebtoken": "^8.5.1",
 		"mediasoup": "3.10.5",
 		"openid-client": "^3.7.3",
