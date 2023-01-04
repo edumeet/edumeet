@@ -168,7 +168,7 @@ export default connect(
 			return (
 				prev.toolarea.currentToolTab === next.toolarea.currentToolTab &&
 				prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
-				prev.toolarea.drawerOverlayed === next.toolarea.drawerOverlayed &&
+				prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
 				prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
 				prev.peers === next.peers &&
 				prev.me.browser === next.me.browser
