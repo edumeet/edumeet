@@ -567,6 +567,55 @@ class Room extends EventEmitter
 		});
 	}
 
+	_calcProducerPreferredLayer(peer, producer, reason)
+	{
+		let producerPaused = true;
+		let producerPreferredLayer = 0;
+
+		logger.debug(
+			'_calcProducerPreferredLayer as %s[room:"%s", peer:"%s", producer:"%s" paused:"%s", layer: %d]',
+			reason, this._roomId, peer.id,
+			producer.id, producer.appData.paused,
+			producer.appData.preferredLayer);
+
+		for (const consumerId of producer.appData.consumersPauseState.keys())
+		{
+			const paused = producer.appData.consumersPauseState.get(consumerId);
+			const preferredLayer = producer.appData.consumersPreferredLayer.get(consumerId);
+
+			logger.debug('consumer" %s paused:%s preferredLayer: %d',
+				consumerId, paused, preferredLayer);
+
+			if (!paused)
+				producerPaused = false;
+			if (preferredLayer > producerPreferredLayer)
+				producerPreferredLayer = preferredLayer;
+		}
+
+		if (producerPaused !== producer.appData.paused)
+		{
+			logger.debug('producer pause: %s', producerPaused);
+			if (producerPaused)
+			{
+				this._notification(peer.socket, 'producerPauseReq');
+			}
+			else
+			{
+				this._notification(peer.socket, 'producerResumeReq');
+			}
+			producer.appData.paused = producerPaused;
+		}
+
+		if (producerPreferredLayer !== producer.appData.preferredLayer)
+		{
+			logger.debug('producer preferLayer: %d', producerPreferredLayer);
+			this._notification(peer.socket, 'maxSendingSpatialLayer', {
+				peerId       : peer.id,
+				spatialLayer : producerPreferredLayer });
+			producer.appData.preferredLayer = producerPreferredLayer;
+		}
+	}
+
 	logStatus()
 	{
 		logger.info(
@@ -1101,6 +1150,20 @@ class Room extends EventEmitter
 				// the 'loudest' event of the audioLevelObserver.
 				appData = { ...appData, peerId: peer.id };
 
+				if (kind === 'video' && rtpParameters.encodings.length > 1)
+				{
+					const consumersPauseState = new Map();
+					const consumersPreferredLayer = new Map();
+
+					appData = {
+						...appData,
+						consumersPauseState     : consumersPauseState,
+						consumersPreferredLayer : consumersPreferredLayer,
+						paused                  : true,
+						preferredLayer          : rtpParameters.encodings.length - 1
+					};
+				}
+
 				let producer = null;
 
 				try
@@ -1250,6 +1313,15 @@ class Room extends EventEmitter
 
 				await consumer.pause();
 
+				if (consumer.kind === 'video' && consumer.type !== 'simple')
+				{
+					const producerPeer = this._peers[consumer.appData.producerPeerId];
+					const producer = producerPeer.getProducer(consumer.producerId);
+
+					producer.appData.consumersPauseState.set(consumer.id, true);
+					this._calcProducerPreferredLayer(producerPeer, producer, 'consumer paused');
+				}
+
 				cb();
 
 				break;
@@ -1269,6 +1341,15 @@ class Room extends EventEmitter
 
 				await consumer.resume();
 
+				if (consumer.kind === 'video' && consumer.type !== 'simple')
+				{
+					const producerPeer = this._peers[consumer.appData.producerPeerId];
+					const producer = producerPeer.getProducer(consumer.producerId);
+
+					producer.appData.consumersPauseState.set(consumer.id, false);
+					this._calcProducerPreferredLayer(producerPeer, producer, 'consumer resumed');
+				}
+
 				cb();
 
 				break;
@@ -1287,6 +1368,15 @@ class Room extends EventEmitter
 					throw new NotFoundInMediasoupError(`consumer with id "${consumerId}" not found`);
 
 				await consumer.setPreferredLayers({ spatialLayer, temporalLayer });
+
+				if (consumer.kind === 'video')
+				{
+					const producerPeer = this._peers[consumer.appData.producerPeerId];
+					const producer = producerPeer.getProducer(consumer.producerId);
+
+					producer.appData.consumersPreferredLayer.set(consumer.id, spatialLayer);
+					this._calcProducerPreferredLayer(producerPeer, producer, `consumer prefer layer changed ${spatialLayer}`);
+				}
 
 				cb();
 
@@ -1922,11 +2012,20 @@ class Room extends EventEmitter
 				{
 					producerId      : producer.id,
 					rtpCapabilities : consumerPeer.rtpCapabilities,
-					paused          : producer.kind === 'video'
+					paused          : producer.kind === 'video',
+					appData         : { producerPeerId: producerPeer.id }
 				});
 
 			if (producer.kind === 'audio')
 				await consumer.setPriority(255);
+
+			if (producer.kind === 'video' && producer.type !== 'simple')
+			{
+				producer.appData.consumersPauseState.set(consumer.id, true);
+				producer.appData.consumersPreferredLayer.set(consumer.id,
+					consumer.preferredLayers.spatialLayer);
+				this._calcProducerPreferredLayer(producerPeer, producer, 'new consumer');
+			}
 		}
 		catch (error)
 		{
@@ -1943,6 +2042,16 @@ class Room extends EventEmitter
 		{
 			// Remove from its map.
 			consumerPeer.removeConsumer(consumer.id);
+
+			if (consumer.kind === 'video' && consumer.type !== 'simple')
+			{
+				// const producerPeer = this._peers[consumer.appData.producerPeerId];
+				// const producer = producerPeer.getProducer(consumer.producerId);
+
+				producer.appData.consumersPauseState.delete(consumer.id);
+				producer.appData.consumersPreferredLayer.delete(consumer.id);
+				this._calcProducerPreferredLayer(producerPeer, producer, 'consumer removed');
+			}
 
 			this._notification(consumerPeer.socket, 'consumerClosed', { consumerId: consumer.id });
 		});
