@@ -33,7 +33,7 @@
     "devices.screenSharingError": "访问屏幕时发生错误",
     "filesharing.download": "下载共享文件",
     "filesharing.error": "文件共享发生错误",
-    "filesharing.missingSeeds": "如果此过程需要很长时间，则可能没有人播下该种子。请尝试让某人重新上传您想要的文件。",
+    "filesharing.missingSeeds": "如果此过程需要很长时间，则可能没有人进行做种。请尝试使上传者重新上传您想要的文件。",
     "filesharing.save": "保存共享文件",
     "filesharing.saveFileError": "无法保存文件",
     "filesharing.startingFileShare": "正在尝试共享文件",
@@ -50,7 +50,7 @@
     "label.chatNewMessages": "新消息",
     "label.chatNoMessages": "暂无消息",
     "label.close": "关闭",
-    "label.democratic": "民主视图",
+    "label.democratic": "主持人视图",
     "label.fileSharingUnsupported": "不支持文件共享",
     "label.filmstrip": "幻灯片视图",
     "label.fullscreen": "全屏",
@@ -253,3 +253,4 @@
     "unsupportedBrowser.titleUnsupportedBrowser": "检测到不支持的浏览器！",
     "unsupportedBrowser.titlewebrtcUnavailable": "所需功能在您的浏览器中不可用！"
 }
+
