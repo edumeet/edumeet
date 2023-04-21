@@ -1,6 +1,6 @@
 {
 	"name": "edumeet-server",
-	"version": "3.5.5",
+	"version": "3.5.6",
 	"private": true,
 	"description": "edumeet server",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
