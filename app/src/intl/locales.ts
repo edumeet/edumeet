@@ -15,12 +15,12 @@ const list = [
 	{
 		name   : 'Chinese (Simplified)',
 		file   : 'cn',
-		locale : [ 'zn', 'zn-zn', 'zn-cn' ]
+		locale : [ 'zh', 'zh-zh', 'zh-cn' ]
 	}, // hans
 	{
 		name   : 'Chinese (Traditional)',
 		file   : 'tw',
-		locale : [ 'zn-tw', 'zn-hk', 'zn-sg' ]
+		locale : [ 'zh-tw', 'zh-hk', 'zh-sg' ]
 	}, // hant
 	{
 		name   : 'Croatian',
