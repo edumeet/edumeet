@@ -27,7 +27,7 @@
 		"chroma-js": "^2.1.1",
 		"classnames": "^2.2.6",
 		"convict": "6.1.0",
-		"convict-format-with-validator": "6.1.0",
+		"convict-format-with-validator": "6.0.1",
 		"create-torrent": "^4.4.1",
 		"deep-object-diff": "^1.1.0",
 		"dompurify": "^2.0.7",
