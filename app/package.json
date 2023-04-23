@@ -26,8 +26,8 @@
 		"bowser": "^2.7.0",
 		"chroma-js": "^2.1.1",
 		"classnames": "^2.2.6",
-		"convict": "^6.0.1",
-		"convict-format-with-validator": "^6.0.1",
+		"convict": "6.1.0",
+		"convict-format-with-validator": "6.1.0",
 		"create-torrent": "^4.4.1",
 		"deep-object-diff": "^1.1.0",
 		"dompurify": "^2.0.7",
@@ -72,7 +72,8 @@
 		"typescript": "^4.2.4",
 		"universal-cookie": "4.0.4",
 		"web-streams-polyfill": "^3.0.2",
-		"webtorrent": "^0.108.1"
+		"webtorrent": "^0.108.1",
+		"yargs-parser": "20.2.2"
 	},
 	"scripts": {
 		"analyze": "source-map-explorer build/static/js/*",
