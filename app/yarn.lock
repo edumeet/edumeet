@@ -4088,7 +4088,7 @@ convert-source-map@^1.4.0, convert-source-map@^1.6.0, convert-source-map@^1.7.0:
   resolved "https://registry.yarnpkg.com/convert-source-map/-/convert-source-map-1.9.0.tgz#7faae62353fb4213366d0ca98358d22e8368b05f"
   integrity sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==
 
-convict-format-with-validator@6.1.0:
+convict-format-with-validator@6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/convict-format-with-validator/-/convict-format-with-validator-6.0.1.tgz#a0ff08b663c40beac480d1a0d39b40382b9e39a3"
   integrity sha512-6/O0W9/0MESdL+0fY7glQlWHs+wnP9xXlB1tjY/Wb9ujCCEBqMP8VCjtLvRlBdfwgONrpb+DTPSHQRhUO5aTlQ==
