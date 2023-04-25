@@ -56,7 +56,7 @@
 		"spdy": "^4.0.2",
 		"toml": "^3.0.0",
 		"uuid": "^7.0.2",
-		"yaml": "^1.10.2"
+		"yaml": "^2.2.2"
 	},
 	"devDependencies": {
 		"@types/base-64": "^0.1.3",
