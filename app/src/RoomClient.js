@@ -4545,7 +4545,7 @@ export default class RoomClient
 				{
 					stream = await this._screenSharing.start({
 						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate : screenSharingFrameRate,
+						frameRate          : screenSharingFrameRate,
 						sampleRate,
 						channelCount,
 						autoGainControl,
@@ -4560,7 +4560,7 @@ export default class RoomClient
 				{
 					stream = await this._screenSharing.start({
 						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate : screenSharingFrameRate,
+						frameRate          : screenSharingFrameRate,
 						selfBrowserSurface : 'include'
 					});
 
