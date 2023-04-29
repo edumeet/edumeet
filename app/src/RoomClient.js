@@ -4551,7 +4551,8 @@ export default class RoomClient
 						autoGainControl,
 						echoCancellation,
 						noiseSuppression,
-						sampleSize
+						sampleSize,
+						selfBrowserSurface : 'include'
 					});
 
 				}
@@ -4559,7 +4560,8 @@ export default class RoomClient
 				{
 					stream = await this._screenSharing.start({
 						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate : screenSharingFrameRate
+						frameRate : screenSharingFrameRate,
+						selfBrowserSurface : 'include'
 					});
 
 				}
