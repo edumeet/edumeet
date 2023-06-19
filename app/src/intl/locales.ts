@@ -129,10 +129,10 @@ export const detect = () =>
 export const getList = () => list;
 
 export interface ILocale {
-  name: string;
-  file: string;
-  locale: string[];
-  messages: any;
+	name: string;
+	file: string;
+	locale: string[];
+	messages: any;
 }
 
 export const loadOne = (locale: string): ILocale =>
