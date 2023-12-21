@@ -142,6 +142,23 @@ export const addSelectedPeer = (peerId) =>
 		payload : { peerId }
 	});
 
+export const openIframe = (iframeUrl) =>
+	({
+		type    : 'OPEN_IFRAME',
+		payload : { iframeUrl }
+	});
+
+export const setToggleIframeInProgress = (flag) =>
+	({
+		type    : 'SET_TOGGLE_IFRAME_IN_PROGRESS',
+		payload : { flag }
+	});
+
+export const closeIframe = () =>
+	({
+		type : 'CLOSE_IFRAME'
+	});
+
 export const removeSelectedPeer = (peerId) =>
 	({
 		type    : 'REMOVE_SELECTED_PEER',

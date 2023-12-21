@@ -20,6 +20,8 @@ const peersKeySelector = createSelector(
 	(peers) => Object.keys(peers)
 );
 
+export const showIframeSelect = (state) => state.room.iframeUrl;
+
 export const peersValueSelector = createSelector(
 	peersSelector,
 	(peers) => Object.values(peers)
@@ -186,6 +188,7 @@ export const raisedHandsSelector = createSelector(
 
 export const videoBoxesSelector = createSelector(
 	isHiddenSelect,
+	showIframeSelect,
 	spotlightsLengthSelector,
 	screenProducersSelector,
 	spotlightScreenConsumerSelector,
@@ -193,6 +196,7 @@ export const videoBoxesSelector = createSelector(
 	spotlightExtraVideoConsumerSelector,
 	(
 		isHidden,
+		iframeUrl,
 		spotlightsLength,
 		screenProducers,
 		screenConsumers,
@@ -202,7 +206,8 @@ export const videoBoxesSelector = createSelector(
 	{
 		return spotlightsLength + (isHidden ? 0 : 1) +
 			(isHidden ? 0 : screenProducers.length) + screenConsumers.length +
-			(isHidden ? 0 : extraVideoProducers.length) + extraVideoConsumers.length;
+			(isHidden ? 0 : extraVideoProducers.length) + extraVideoConsumers.length +
+			(isHidden ? 0 : (iframeUrl ? 1 : 0));
 	}
 );
 

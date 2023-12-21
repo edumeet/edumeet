@@ -262,6 +262,8 @@ class Room extends EventEmitter
 
 		this._fileHistory = [];
 
+		this._iframeHistory = null;
+
 		this._lastN = [];
 
 		this._peers = {};
@@ -309,6 +311,8 @@ class Room extends EventEmitter
 		this._chatHistory = null;
 
 		this._fileHistory = null;
+
+		this._iframeHistory = null;
 
 		this._lobby.close();
 
@@ -923,6 +927,7 @@ class Room extends EventEmitter
 					chatHistory          : this._chatHistory,
 					fileHistory          : this._fileHistory,
 					lastNHistory         : this._lastN,
+					iframeHistory        : this._iframeHistory,
 					locked               : this._locked,
 					lobbyPeers           : lobbyPeers,
 					accessCode           : this._accessCode
@@ -1765,6 +1770,57 @@ class Room extends EventEmitter
 				// Spread to others
 				this._notification(peer.socket, 'moderator:stopVideo', null, true);
 
+				cb();
+
+				break;
+			}
+
+			case 'toggleIframe':
+			{
+				if (!peer.joined)
+					throw new Error('Peer not yet joined');
+
+				if (!this._hasPermission(peer, SHARE_SCREEN))
+					throw new Error('Peer not authorized to toggle external app');
+
+				const { iframeUrl } = request.data;
+
+				if (iframeUrl && this._iframeHistory)
+					throw new Error('External app already opened');
+
+				if (!iframeUrl)
+				{
+					this._iframeHistory = null;
+
+					// Spread to others and self
+					this._notification(peer.socket, 'closeIframe', null, true, true);
+				}
+				else
+				{
+
+					const pattern = new RegExp(
+						'^(https?:\\/\\/)?' +
+						'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+						'((\\d{1,3}\\.){3}\\d{1,3}))' +
+						'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+						'(\\?[;&a-z\\d%_.~+=-]*)?' +
+						'(\\#[-a-z\\d_]*)?$',
+						'i'
+					);
+
+					if (!pattern.test(iframeUrl))
+						throw new Error('Not a valid url for external app');
+	
+					if (!iframeUrl.toLowerCase().startsWith('https://'))
+						throw new Error('Only https allowed for external apps');
+
+					this._iframeHistory = iframeUrl;
+
+					// Spread to others and self
+					this._notification(peer.socket, 'showIframe',
+						{ iframeUrl }, true, true);
+				}
+				// Return no error
 				cb();
 
 				break;

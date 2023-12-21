@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import {
 	meProducersSelector,
 	makePermissionSelector,
-	recordingConsentsPeersSelector
+	recordingConsentsPeersSelector,
+	showIframeSelect
 } from '../../store/selectors';
 import { permissions } from '../../permissions';
 import { withRoomContext } from '../../RoomContext';
@@ -60,6 +61,10 @@ const styles = (theme) =>
 			'&.screen' :
 			{
 				order : 2
+			},
+			'&.iframe' :
+			{
+				order : 3
 			}
 		},
 		viewContainer :
@@ -156,6 +161,7 @@ const Me = (props) =>
 		roomClient,
 		me,
 		settings,
+		iframeUrl,
 		activeSpeaker,
 		spacing,
 		style,
@@ -175,7 +181,7 @@ const Me = (props) =>
 		localRecordingState
 	} = props;
 
-	// const width = style.width;
+	const width = style.width;
 
 	const height = style.height;
 
@@ -1018,6 +1024,19 @@ const Me = (props) =>
 					</div>
 				</div>
 			}
+			{iframeUrl &&
+			<div className={classnames(classes.root, 'iframe')} style={spacingStyle}>
+				<div className={classes.viewContainer} style={style}>
+					<VideoView
+						isMe
+						isIframe
+						iframeUrl={`${iframeUrl }`}
+						videoVisible
+					/>
+				</div>
+			</div>
+
+			}
 		</React.Fragment>
 	);
 };
@@ -1028,6 +1047,7 @@ Me.propTypes =
 	advancedMode        : PropTypes.bool,
 	me                  : appPropTypes.Me.isRequired,
 	settings            : PropTypes.object,
+	iframeUrl           : PropTypes.string.isRequired,
 	activeSpeaker       : PropTypes.bool,
 	micProducer         : appPropTypes.Producer,
 	webcamProducer      : appPropTypes.Producer,
@@ -1073,6 +1093,7 @@ const makeMapStateToProps = () =>
 			me                  : state.me,
 			...meProducersSelector(state),
 			settings            : state.settings,
+			iframeUrl           : showIframeSelect(state),
 			activeSpeaker       : state.me.id === state.room.activeSpeakerId,
 			hasAudioPermission  : canShareAudio(state),
 			hasVideoPermission  : canShareVideo(state),

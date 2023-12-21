@@ -26,6 +26,8 @@ const initialState =
 	settingsOpen                  : false,
 	extraVideoOpen                : false,
 	hideSelfView                  : false,
+	iframeUrl                     : null,
+	toggleIframeInProgress        : false,
 	rolesManagerOpen              : false,
 	helpOpen                      : false,
 	aboutOpen                     : false,
@@ -308,6 +310,23 @@ const room = (state = initialState, action) =>
 
 			return { ...state, hideSelfView };
 		}
+
+		case 'OPEN_IFRAME':
+		{
+			const { iframeUrl } = action.payload;
+
+			return { ...state, iframeUrl };
+		}
+
+		case 'CLOSE_IFRAME':
+		{
+			const iframeUrl = null;
+
+			return { ...state, iframeUrl };
+		}
+
+		case 'SET_TOGGLE_IFRAME_IN_PROGRESS':
+			return { ...state, toggleIframeInProgress: action.payload.flag };
 
 		default:
 			return state;

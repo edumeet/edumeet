@@ -243,6 +243,7 @@ export default connect(
 				prev.room.spotlights === next.room.spotlights &&
 				prev.room.toolbarsVisible === next.room.toolbarsVisible &&
 				prev.room.hideSelfView === next.room.hideSelfView &&
+				prev.room.iframeUrl === next.room.iframeUrl &&
 				prev.settings.permanentTopBar === next.settings.permanentTopBar &&
 				prev.settings.buttonControlBar === next.settings.buttonControlBar &&
 				prev.settings.aspectRatio === next.settings.aspectRatio &&

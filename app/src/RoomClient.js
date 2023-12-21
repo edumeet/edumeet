@@ -2110,6 +2110,24 @@ export default class RoomClient
 			peerActions.setStopPeerScreenSharingInProgress(peerId, false));
 	}
 
+	async toggleIframe(iframeUrl)
+	{
+		store.dispatch(
+			roomActions.setToggleIframeInProgress(true));
+
+		try
+		{
+			await this.sendRequest('toggleIframe', { iframeUrl });
+		}
+		catch (error)
+		{
+			logger.error('toggleIframe() [error:"%o"]', error);
+		}
+
+		store.dispatch(
+			roomActions.setToggleIframeInProgress(false));
+	}
+
 	async muteAllPeers()
 	{
 		logger.debug('muteAllPeers()');
@@ -3194,6 +3212,24 @@ export default class RoomClient
 						break;
 					}
 
+					case 'showIframe':
+					{
+						const { iframeUrl } = notification.data;
+
+						store.dispatch(
+							roomActions.openIframe(iframeUrl));
+
+						break;
+					}
+
+					case 'closeIframe':
+					{
+						store.dispatch(
+							roomActions.closeIframe());
+
+						break;
+					}
+
 					case 'moderator:clearChat':
 					{
 						store.dispatch(chatActions.clearChat());
@@ -3917,6 +3953,7 @@ export default class RoomClient
 				chatHistory,
 				fileHistory,
 				lastNHistory,
+				iframeHistory,
 				locked,
 				lobbyPeers,
 				accessCode
@@ -3983,6 +4020,9 @@ export default class RoomClient
 
 			(fileHistory.length > 0) && store.dispatch(
 				fileActions.addFileHistory(fileHistory));
+
+			(iframeHistory) && store.dispatch(
+				roomActions.openIframe(iframeHistory));
 
 			locked ?
 				store.dispatch(roomActions.setRoomLocked()) :
