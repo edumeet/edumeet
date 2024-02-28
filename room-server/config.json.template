@@ -1,0 +1,34 @@
+{
+	"listenPort": "8443",
+	"listenHost": "0.0.0.0",
+	"defaultRoomSettings": {
+		"defaultRole": {
+			"name": "Default",
+			"description": "Default role",
+			"permissions": [
+				{ "name": "CHANGE_ROOM_LOCK" },
+				{ "name": "PROMOTE_PEER" },
+				{ "name": "SEND_CHAT" },
+				{ "name": "MODERATE_CHAT" },
+				{ "name": "SHARE_AUDIO" },
+				{ "name": "SHARE_VIDEO" },
+				{ "name": "SHARE_SCREEN" },
+				{ "name": "SHARE_EXTRA_VIDEO" },
+				{ "name": "SHARE_FILE" },
+				{ "name": "MODERATE_FILES" },
+				{ "name": "MODERATE_ROOM" },
+				{ "name": "LOCAL_RECORD_ROOM" },
+				{ "name": "CREATE_ROOM" },
+				{ "name": "CHANGE_ROOM" }
+			]
+		}
+	},
+	"mediaNodes": [{
+		"hostname": "${LISTEN_IP}",
+		"port": 3000,
+		"secret": "${MEDIA_SECRET}",
+		"latitude": 63.430481,
+		"longitude": 10.394964,
+		"turnHostname": "${MEDIA_DOMAIN}"
+	}]
+}

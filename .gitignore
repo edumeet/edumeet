@@ -1,0 +1,3 @@
+.env
+certbot/
+room-server/config.json

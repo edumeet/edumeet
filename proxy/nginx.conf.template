@@ -1,0 +1,87 @@
+events {
+	worker_connections 1024;
+}
+
+http {
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+
+	sendfile on;
+
+	keepalive_timeout 65;
+
+	server {
+		listen 80;
+		server_name _;
+		server_tokens off;
+
+		location /.well-known/acme-challenge/ {
+			root /var/www/certbot;
+		}
+
+		location / {
+			return 301 https://$host$request_uri/;
+		}
+	}
+
+	server {
+		listen 4443 ssl proxy_protocol;
+		server_name ${MAIN_DOMAIN};
+		server_tokens off;
+
+		ssl_certificate /etc/letsencrypt/live/${MAIN_DOMAIN}/fullchain.pem;
+		ssl_certificate_key /etc/letsencrypt/live/${MAIN_DOMAIN}/privkey.pem;
+		include /etc/letsencrypt/options-ssl-nginx.conf;
+		ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+		set_real_ip_from				proxy;
+		real_ip_header					proxy_protocol;
+
+		location / {
+			proxy_pass					http://edumeet-client:80/;
+		}
+
+		location /socket.io/ {
+			proxy_pass					http://edumeet-room-server:8443/socket.io/;
+			proxy_http_version			1.1;
+
+			proxy_set_header			X-Forwarded-For $proxy_protocol_addr;
+			proxy_set_header			Upgrade $http_upgrade;
+			proxy_set_header			Connection "upgrade";
+		}
+	}
+}
+
+stream {
+	map $ssl_preread_server_name $name {
+		${MAIN_DOMAIN} http_backend;
+		${MEDIA_DOMAIN} turn_server;
+	}
+
+	upstream http_backend {
+		server proxy:4443;
+	}
+
+	upstream turn_server {
+		server proxy:3479;
+	}
+
+	server {
+		listen 443;
+		ssl_preread on;
+		proxy_pass $name;
+		proxy_buffer_size 10m;
+		proxy_protocol on;
+	}
+
+	server {
+		listen 3479 ssl;
+
+		ssl_certificate /etc/letsencrypt/live/${MAIN_DOMAIN}/fullchain.pem;
+		ssl_certificate_key /etc/letsencrypt/live/${MAIN_DOMAIN}/privkey.pem;
+		ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+		proxy_ssl	off;
+		proxy_pass	${LISTEN_IP}:3478;
+	}
+}

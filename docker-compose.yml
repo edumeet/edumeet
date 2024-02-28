@@ -1,0 +1,80 @@
+services:
+  proxy:
+    image: nginx
+    restart: unless-stopped
+    volumes:
+     - ./proxy:/etc/nginx/templates
+     - ./certbot/conf:/etc/letsencrypt
+     - ./certbot/www:/var/www/certbot
+    ports:
+     - "80:80"
+     - "443:443"
+    links:
+     - edumeet-room-server
+     - edumeet-client
+    environment:
+     - MAIN_DOMAIN=${MAIN_DOMAIN}
+     - MEDIA_DOMAIN=${MEDIA_DOMAIN}
+     - LISTEN_IP=${LISTEN_IP}
+    command: "/bin/sh -c 'envsubst \"\\$${MAIN_DOMAIN},\\$${LISTEN_IP},\\$${MEDIA_DOMAIN}\" < /etc/nginx/templates/nginx.conf.template > /etc/nginx/nginx.conf && while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+     - ./certbot/conf:/etc/letsencrypt
+     - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  turn:
+    image: coturn/coturn
+    restart: unless-stopped
+    network_mode: host
+    environment:
+     - EXTERNAL_IP=${EXTERNAL_IP}
+     - LISTEN_IP=${LISTEN_IP}
+     - MEDIA_SECRET=${MEDIA_SECRET}
+    command: >
+      -n
+      --min-port=50000
+      --max-port=60000
+      --realm=${MEDIA_DOMAIN}
+      --external-ip=${EXTERNAL_IP}
+      --listening-ip=${LISTEN_IP}
+      --fingerprint
+      --use-auth-secret
+      --static-auth-secret=${MEDIA_SECRET}
+      --no-tls
+      --no-dtls
+      --no-udp
+      --no-multicast-peers
+      --no-cli
+  edumeet-client:
+    image: edumeet/edumeet-client
+    restart: unless-stopped
+    volumes:
+     - ./client:/app/config
+    ports:
+     - "8080:80"
+  edumeet-room-server:
+    image: edumeet/edumeet-room-server
+    restart: unless-stopped
+    volumes:
+     - ./room-server:/usr/src/app/config
+    environment:
+     - TEMPLATE_REPLACE=true
+     - LISTEN_IP=${LISTEN_IP}
+     - MEDIA_SECRET=${MEDIA_SECRET}
+     - MEDIA_DOMAIN=${MEDIA_DOMAIN}
+    ports:
+     - "8443:8443"
+  edumeet-media-node:
+    image: edumeet/edumeet-media-node
+    restart: unless-stopped
+    environment:
+     - MEDIA_SECRET=${MEDIA_SECRET}
+     - EXTERNAL_IP=${EXTERNAL_IP}
+     - LISTEN_IP=${LISTEN_IP}
+    network_mode: host
+    command: >
+      --ip ${LISTEN_IP}
+      --announcedIp ${EXTERNAL_IP}
+      --secret ${MEDIA_SECRET}
