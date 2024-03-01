@@ -14,8 +14,21 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
-## [4.0-202402x-stable] - 2024-02-x (next release changes)
+## [4.0-20240301-stable] - 2024-03-01 
 Generic bug fixes
+ 
+### Added
+
+### Changed
+- Extended metric for media node
+### Fixed
+- Management Client had hardcoded path
+- Management Client was running in development mode 
+- Packages are now updated again
+
+
+## [4.0-20240229-stable] - 2024-02-29
+Generic bug fixes + major config change
  
 ### Added
 - Improved background blur 
@@ -29,8 +42,6 @@ Generic bug fixes
 ### Fixed
 - Issue, code was not building in production mode because of a bad variable check
 - Media node was leaking memory because of mediasoup version bug
-- Management Client had hardcoded path
-- Management Client was running in development mode 
 - Packages are now updated again
 
 ## [4.0-20240202-stable] - 2024-02-02
