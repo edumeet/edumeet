@@ -75,7 +75,7 @@ stream {
 	}
 
 	server {
-		listen 3479 ssl;
+		listen 3479 ssl proxy_protocol;
 
 		ssl_certificate /etc/letsencrypt/live/${MAIN_DOMAIN}/fullchain.pem;
 		ssl_certificate_key /etc/letsencrypt/live/${MAIN_DOMAIN}/privkey.pem;
