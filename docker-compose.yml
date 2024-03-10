@@ -8,8 +8,9 @@ services:
      - ./certbot/conf:/etc/letsencrypt
      - ./certbot/www:/var/www/certbot
     ports:
-     - "80:80"
-     - "443:443"
+     - "80:80/tcp"
+     - "443:443/tcp"
+     - "443:443/udp"
     links:
      - edumeet-room-server
      - edumeet-client
@@ -45,7 +46,6 @@ services:
       --static-auth-secret=${MEDIA_SECRET}
       --no-tls
       --no-dtls
-      --no-udp
       --no-multicast-peers
       --no-cli
   edumeet-client:

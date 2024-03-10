@@ -75,6 +75,12 @@ stream {
 	}
 
 	server {
+		listen 443 udp;
+		proxy_pass ${LISTEN_IP}:3478;
+		proxy_buffer_size 10m;
+	}
+
+	server {
 		listen 3479 ssl proxy_protocol;
 
 		ssl_certificate /etc/letsencrypt/live/${MAIN_DOMAIN}/fullchain.pem;
