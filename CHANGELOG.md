@@ -20,6 +20,7 @@ Generic bug fixes
  
 ### Added
 - Spotlight logic
+- microphone volume feedback is shown when media is not sent
 ### Changed
 - Layout of screenshare
 ### Fixed
