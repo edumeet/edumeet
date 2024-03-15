@@ -14,6 +14,32 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
+
+## [4.0-20240315-stable] - 2024-03-15
+Generic bug fixes
+ 
+### Added
+- Spotlight logic
+### Changed
+- Layout of screenshare
+### Fixed
+- P2P mode (codec is not hardcoded, if 2 participants are talking edumeet will use p2p)
+- Packages are now updated again
+
+
+## [4.0-20240308-stable] - 2024-03-08
+Generic bug fixes
+ 
+### Added
+- P2P mode
+### Changed
+- Made participant list a bit more compact
+- room layout small UI changes 
+### Fixed
+- media-node communication logic
+- Packages are now updated again
+
+
 ## [4.0-20240301-stable] - 2024-03-01 
 Generic bug fixes + minify size of images
  
