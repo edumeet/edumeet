@@ -20,7 +20,7 @@ http {
 		}
 
 		location / {
-			return 301 https://$host$request_uri/;
+			return 301 https://$host$request_uri;
 		}
 	}
 
@@ -38,7 +38,7 @@ http {
 		real_ip_header					proxy_protocol;
 
 		location / {
-			proxy_pass					http://edumeet-client:80/;
+			proxy_pass					http://edumeet-client:80;
 		}
 
 		location /socket.io/ {
