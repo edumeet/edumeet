@@ -15,6 +15,17 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
 
+
+## [4.0-202403x-stable] - 2024-03-x
+Next release 
+ 
+### Added
+### Changed
+### Fixed
+- Fixed the problem of consumers stuck in a loading state.
+- Fixed recording after it got slightly broken with the P2P work. Also added support for Firefox and Safari while I was at it.
+- Packages are now updated again
+
 ## [4.0-20240315-stable] - 2024-03-15
 Generic bug fixes
  
