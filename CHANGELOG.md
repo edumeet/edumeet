@@ -16,12 +16,14 @@ The stable tag  is teseted by the development team and used by default for [edum
 
 
 
-## [4.0-202403x-stable] - 2024-03-x
-Next release 
+## [4.0-20240531-stable] - 2024-05-31
+Generic bug fixes
  
 ### Added
 ### Changed
 ### Fixed
+- Edumeet hardcoded text is no longer there.
+- When management service is configured logo and background is now loading as expected.
 - Fixed the problem of consumers stuck in a loading state.
 - Fixed recording after it got slightly broken with the P2P work. Also added support for Firefox and Safari while I was at it.
 - Packages are now updated again
