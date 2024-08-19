@@ -29,6 +29,17 @@
 		"secret": "${MEDIA_SECRET}",
 		"latitude": 63.430481,
 		"longitude": 10.394964,
-		"turnHostname": "${MEDIA_DOMAIN}"
-	}]
+		"turnHostname": "${MEDIA_DOMAIN}",
+		"turnports" :  [
+				{
+					"protocol":"turn",
+					"port": 80,
+					"transport": "udp"
+				},
+				{
+					"protocol":"turns",
+					"port": 443,
+					"transport": "tcp"
+				}
+		]
 }
