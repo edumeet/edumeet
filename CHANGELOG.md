@@ -15,6 +15,16 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
 
+## [4.0-20240819-stable] - 2024-08-19
+Generic bug fixes
+ 
+### Added
+- QR code is now displayed on the room dialog
+### Changed
+- TURN ports and protocols are now configurable in the room-server config
+### Fixed
+- translations are updated
+
 ## [4.0-20240730-stable] - 2024-07-30
 Generic bug fixes
  
