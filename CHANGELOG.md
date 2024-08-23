@@ -14,6 +14,13 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
+## [4.0-20240823-stable] - 2024-08-23
+Generic bug fixes
+ 
+### Added
+### Changed
+### Fixed
+- Management server callback is now fixed
 
 ## [4.0-20240819-stable] - 2024-08-19
 Generic bug fixes
