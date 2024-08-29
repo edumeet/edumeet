@@ -24,13 +24,13 @@
 		}
 	},
 	"mediaNodes": [{
-		"hostname": "${LISTEN_IP}",
-		"port": 3000,
-		"secret": "${MEDIA_SECRET}",
-		"latitude": 63.430481,
-		"longitude": 10.394964,
-		"turnHostname": "${MEDIA_DOMAIN}",
-		"turnports" :  [
+			"hostname": "${LISTEN_IP}",
+			"port": 3000,
+			"secret": "${MEDIA_SECRET}",
+			"latitude": 63.430481,
+			"longitude": 10.394964,
+			"turnHostname": "${MEDIA_DOMAIN}",
+			"turnports" :  [
 				{
 					"protocol":"turn",
 					"port": 80,
@@ -41,5 +41,7 @@
 					"port": 443,
 					"transport": "tcp"
 				}
-		]
+			]
+	}]
 }
+
