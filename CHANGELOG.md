@@ -14,6 +14,25 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
+
+## [4.0-20241016-stable] - 2024-10-16
+Generic bug fixes
+ 
+### Added
+- Impressum url can be added (in app config impressumUrl :  path/url) 
+- p2p can be disabled (in app config p2penabled : true/false )
+### Changed
+### Fixed
+
+
+## [4.0-20240919-stable] - 2024-09-19
+Generic bug fixes
+ 
+### Added
+### Changed
+### Fixed
+- packages are upgraded
+
 ## [4.0-20240823-stable] - 2024-08-23
 Generic bug fixes
  
