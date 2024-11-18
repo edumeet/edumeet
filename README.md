@@ -42,7 +42,9 @@ docker-compose up -d
 This will start all the services. And you are done. You can now access the service at the main domain you provided.
 
 ### Configuration
-The configuration for the client is in the `client` folder. You may change it as needed, but no changes are necessary for the service to work. The configuration for the room-server is in the `room-server` folder. You may change it as needed, but no changes are necessary for the service to work.
+The configuration for the client is in the `client` folder. You may change it as needed, but no changes are necessary for the service to work.
+An example for this configuration file can be found in the [edumeet-client](https://github.com/edumeet/edumeet-client?tab=readme-ov-file#configuration-properties) repository. The configuration for the room-server is in the `room-server` folder. You may change it as needed, but no changes are necessary for the service to work.
+An example for this configuration file can be found in the [edumeet-room-server](https://github.com/edumeet/edumeet-room-server?tab=readme-ov-file#configuration-properties) repository.
 
 ## Community-driven support
 | Type                |                                                |

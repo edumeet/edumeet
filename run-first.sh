@@ -35,6 +35,40 @@ EXTERNAL_IP=$EXTERNAL_IP
 MEDIA_SECRET=$MEDIA_SECRET
 EOF
 
+# Configure edumeet-client
+if [[ "$(cat client/config.js)" == "var config = {};" ]]; then
+    while true; do
+        read -p "Do you want to configure edumeet-client now? You can do it later in client/config.js (y/n): " do_client_config
+        case "$do_client_config" in
+            [yY])
+                [ -z "$TITLE" ] && read -p "Enter name of your edumeet: " TITLE
+                echo "If you don't want to show links to your imprint or privacy notes, please skip the following questions."
+                [ -z "$IMPRINT_URL" ] && read -p "Enter URL of your imprint: " IMPRINT_URL
+                [ -z "$PRIVACY_URL" ] && read -p "Enter URL of your privacy notes " PRIVACY_URL
+
+                cat <<EOF > client/config.js
+var config = {
+        title: "$TITLE",
+        imprintUrl: "$IMPRINT_URL",
+        privacyUrl: "$PRIVACY_URL",
+};
+EOF
+
+                break
+                ;;
+            [nN])
+                echo "Skipping configuration of edumeet-client."
+                break
+                ;;
+            *)
+                echo "Invalid input. Please type 'y' or 'n'."
+                ;;
+        esac
+    done
+else
+    echo "Found existing configuration for edumeet-client. Skipping its config."
+fi
+
 # Define other variables
 domains=($MAIN_DOMAIN $MEDIA_DOMAIN)
 rsa_key_size=4096
