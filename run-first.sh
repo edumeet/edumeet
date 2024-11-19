@@ -18,7 +18,7 @@ fi
 
 # Ask for input only if variables are not already set
 [ -z "$MAIN_DOMAIN" ] && read -p "Enter Main FQDN: " MAIN_DOMAIN
-[ -z "$MEDIA_DOMAIN" ] && read -p "Enter Media FQDN: " MEDIA_DOMAIN
+[ -z "$MEDIA_DOMAIN" ] && read -p "Enter Media FQDN (MUST be different from Main Domain): " MEDIA_DOMAIN
 [ -z "$EMAIL" ] && read -p "Enter Email: " EMAIL
 [ -z "$LISTEN_IP" ] && read -p "Enter Listen IP: " LISTEN_IP
 [ -z "$EXTERNAL_IP" ] && read -p "Enter Public IP: " EXTERNAL_IP
