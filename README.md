@@ -26,6 +26,82 @@ Join our discord server [here](https://discord.gg/DkD4nj6D)
  * Ports 80/tcp, 443/tcp need to be open on the public IP address
  * Ports 40000-40249/udp and 40000-40249/tcp are not strictly necessary, but are recommended for better connectivity
 
+### Architecture
+Edumeet simple setup
+```mermaid
+graph TD;
+    Proxy-->eduMEET-room-server;
+    Proxy-->eduMEET-client;
+    Proxy-->Media-service;
+    Media-service-->TURN;
+    Media-service-->eduMEET-media-node;
+```
+Edumeet setup with authentication
+```mermaid
+graph TD;
+    Proxy-->eduMEET-room-server;
+    Proxy-->eduMEET-client;
+    Proxy-->Management-service;
+    Management-service-->eduMEET-management-server;
+    eduMEET-management-server-->Tenant-A;
+    eduMEET-management-server-->Tenant-B;
+    eduMEET-management-server-->Tenant-C;
+    Tenant-A-->OIDC-provider-A;
+    Tenant-B-->OIDC-provider-B;
+    Tenant-C-->OIDC-provider-federation;
+    eduMEET-management-server-->DB;
+    Proxy-->Media-service;
+    Media-service-->TURN-server;
+    Media-service-->eduMEET-media-node;
+    
+    
+```
+Edumeet setup with multiple nodes
+```mermaid
+graph TD;
+    Proxy-->eduMEET-room-servers;
+    eduMEET-room-servers-->eduMEET-room-server-1;
+    eduMEET-room-servers-->eduMEET-room-server-2;
+    eduMEET-room-servers-->eduMEET-room-server-N;
+    Proxy-->eduMEET-clients;
+    eduMEET-clients-->eduMEET-clients-1;
+    eduMEET-clients-->eduMEET-clients-2;
+    eduMEET-clients-->eduMEET-clients-N;
+    Proxy-->Management-service;
+    Management-service-->eduMEET-management-server;
+    eduMEET-management-server-->Tenant-A;
+    eduMEET-management-server-->Tenant-B;
+    eduMEET-management-server-->Tenant-C;
+    Tenant-A-->OIDC-provider-A;
+    Tenant-B-->OIDC-provider-B;
+    Tenant-C-->OIDC-provider-federation;
+    eduMEET-management-server-->DB;
+    Proxy-->Media-service;
+    Media-service-->TURN-servers;
+    TURN-servers-->TURN-server-1;
+    TURN-servers-->TURN-server-2;
+    TURN-servers-->TURN-server-N;
+    Media-service-->eduMEET-media-nodes;
+    eduMEET-media-nodes-->eduMEET-media-node-1;
+    eduMEET-media-nodes-->eduMEET-media-node-2;
+    eduMEET-media-nodes-->eduMEET-media-node-N;
+```
+
+Edumeet setup - Communication
+```mermaid
+graph TD;
+    Client-->Proxy;
+    Proxy-. Socket .->eduMEET-room-server;
+    Proxy-. HTTP/HTTPS .->eduMEET-client;
+    Proxy-->Management-service;
+    Management-service-. JWT+API .->eduMEET-management-server;
+    eduMEET-management-server-->Tenant-A;
+    Tenant-A-->OIDC-provider-A;
+    eduMEET-management-server-->DB;
+    Proxy-->Media-service;
+    Media-service-. TURN .->TURN-server;
+    Media-service-. MediaSoup+Socket .->eduMEET-media-node;
+```
 ### Installation steps
 1. Run the installation script
 ```bash
