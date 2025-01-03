@@ -59,32 +59,54 @@ graph TD;
 Edumeet setup with multiple nodes
 ```mermaid
 graph TD;
-    Proxy-->eduMEET-room-servers;
-    eduMEET-room-servers-->eduMEET-room-server-1;
-    eduMEET-room-servers-->eduMEET-room-server-2;
-    eduMEET-room-servers-->eduMEET-room-server-N;
-    Proxy-->eduMEET-clients;
-    eduMEET-clients-->eduMEET-clients-1;
-    eduMEET-clients-->eduMEET-clients-2;
-    eduMEET-clients-->eduMEET-clients-N;
-    Proxy-->Management-service;
-    Management-service-->eduMEET-management-server;
-    eduMEET-management-server-->Tenant-A;
-    eduMEET-management-server-->Tenant-B;
-    eduMEET-management-server-->Tenant-C;
-    Tenant-A-->OIDC-provider-A;
-    Tenant-B-->OIDC-provider-B;
-    Tenant-C-->OIDC-provider-federation;
-    eduMEET-management-server-->DB;
-    Proxy-->Media-service;
-    Media-service-->TURN-servers;
-    TURN-servers-->TURN-server-1;
-    TURN-servers-->TURN-server-2;
-    TURN-servers-->TURN-server-N;
-    Media-service-->eduMEET-media-nodes;
-    eduMEET-media-nodes-->eduMEET-media-node-1;
-    eduMEET-media-nodes-->eduMEET-media-node-2;
-    eduMEET-media-nodes-->eduMEET-media-node-N;
+    subgraph "Frontend"
+        Proxy
+        eduMEET-client
+
+    end
+
+    subgraph "Media-service"
+        eduMEET-media-node
+        TURN-server
+    end
+
+    subgraph "eduMEET Backend"
+        eduMEET-room-server
+        eduMEET-management-server
+    end
+
+    subgraph "Management Services"
+        Management-service
+        DB
+    end
+
+    subgraph "Tenants"
+        Tenant-A
+        Tenant-B
+        Tenant-C
+    end
+
+    subgraph "External Services"
+        OIDC-provider-A
+        OIDC-provider-B
+        OIDC-provider-federation
+    end
+
+    Proxy --> eduMEET-room-server
+    Proxy --> eduMEET-client
+    Proxy --> Media-service
+    Proxy --> Management-service
+
+    Management-service --> eduMEET-management-server
+    eduMEET-management-server --> Tenant-A
+    eduMEET-management-server --> Tenant-B
+    eduMEET-management-server --> Tenant-C
+    eduMEET-management-server --> DB
+
+    Tenant-A --> OIDC-provider-A
+    Tenant-B --> OIDC-provider-B
+    Tenant-C --> OIDC-provider-federation
+
 ```
 
 Edumeet setup - Communication
