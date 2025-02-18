@@ -15,6 +15,23 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
 
+## [4.1-20250218-stable] - 2025-02-18
+The mangemenet client has been integrated into the edumeet-client.
+### Added
+- Audio feedback on join dialog
+- Countdown timer is feature is now added, but disabled by default
+- Management interface is now part of the client
+- Tooltip text option with (text,description and link parameters)
+- ObserveRTC stats
+### Changed
+- Removed mgmt-client.
+- QR code is now disabled by default but can be enabled
+### Fixed
+- Media node can now listen on 2 interfaces 
+- Fixed blur bug with multiple camera devices
+- Fix management UI - hide parameters that cannot be assigned (at creation).
+- Fix management backend bugs (rooms are now only shown to the owners, groups and roles can be created by normal users too).
+
 ## [4.0-20241016-stable] - 2024-10-16
 Generic bug fixes
  
