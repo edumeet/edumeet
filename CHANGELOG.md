@@ -15,6 +15,24 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
 
+## [4.1-202505xx-stable] - 2025-05-xx - (next release)
+
+### Added
+- Drag and drop functionality for breakout rooms
+- Users can upload room backgrounds for local usage (TODO update it to work with video background)
+- Added option to add rules to mgmt service (user creation can be blocked by conditions, user can gain permissions (Tenant admin/owner, group membership))
+- Added name parameter for mgmt-service (Previously it was not stored. Depending on the Oauth source it can differ: name, nickname, displayName ... fallback is email)
+- Added session end url for mgmt-service (Previously it was not stored. Currently not in use, but can be used to log out from the OIDC provider session, and not just logout from edumeet)
+- Added new translations for new and old components in the edumeet-client
+### Changed
+- edumeet-docker got an update for certificate re-generation
+### Fixed
+- Fix management UI - minor bug fixes (in some cases id parameter was used instead of tenantId ).
+- Fix management backend bugs.
+- Some labels were mixed up
+
+
+
 ## [4.1-20250218-stable] - 2025-02-18
 The mangemenet client has been integrated into the edumeet-client.
 ### Added
