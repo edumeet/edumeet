@@ -15,7 +15,7 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
 
-## [4.1-202505xx-stable] - 2025-05-xx - (next release)
+## [4.1-20250513-stable] - 2025-05-13
 
 ### Added
 - Drag and drop functionality for breakout rooms
