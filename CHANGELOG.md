@@ -14,6 +14,15 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
+## [4.1-2025xxxx-stable] - 2025-xx-xx
+
+### Added
+### Changed
+
+### Fixed
+- Fix management UI - query limit was set to 10 so userquery for admins did not work correctly
+- Fix login button on the room chooser UI (message listener was not started)
+
 
 ## [4.1-20250513-stable] - 2025-05-13
 
