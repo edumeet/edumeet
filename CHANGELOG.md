@@ -14,13 +14,13 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
-## [4.1-2025xxxx-stable] - 2025-xx-xx
+## [4.1-20250718-stable] - 2025-07-18
 
 ### Added
 - Draw on meet feature (Whiteboard)
 - Video background from local image feature
 ### Changed
-
+- database can now be configured with mysql for mgmt service backend
 ### Fixed
 - Fix management UI - query limit was set to 10 so userquery for admins did not work correctly
 - Fix login button on the room chooser UI (message listener was not started)
