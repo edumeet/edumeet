@@ -17,11 +17,14 @@ The stable tag  is teseted by the development team and used by default for [edum
 ## [4.1-2025xxxx-stable] - 2025-xx-xx
 
 ### Added
+- Draw on meet feature (Whiteboard)
+- Video background from local image feature
 ### Changed
 
 ### Fixed
 - Fix management UI - query limit was set to 10 so userquery for admins did not work correctly
 - Fix login button on the room chooser UI (message listener was not started)
+- Fix for edumeet client drag and drop bug in the volume slider (edumeet-client issue  255)
 
 
 ## [4.1-20250513-stable] - 2025-05-13
