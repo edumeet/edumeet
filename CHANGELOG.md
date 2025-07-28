@@ -14,6 +14,20 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
+## [4.1-20250728-stable] - 2025-07-28
+
+### Added
+- add file sharing limit large files  (default 100MB) for file sharing
+### Changed
+- type fix for webtorrent, and reworked status handling 
+### Fixed
+- webtorrent tracker was not configurable (for now it can be a part of the default config (-> should be part of the mgmt service later) )
+- management UI fixes (role permissions were broken, owner was not listing properly)
+- client UI Lobby peers were duplicated if the owner joined later
+- fix avatar image empty state
+- fix push to talk
+- raise hand mobile view
+  
 ## [4.1-20250718-stable] - 2025-07-18
 
 ### Added
