@@ -17,7 +17,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 
 ### Added
 ### Changed
-- Shared files (webtorrents) can now be removed by the user(who uploded), and stopped/removed on remote peers (after/while downloading).
+- Shared files (webtorrents) can now be removed by the user(who uploaded), and stopped/removed on remote peers (after/while downloading).
 ### Fixed
 - after removing torrent seeding was not stopped correctly. (on moderator actions)
   
@@ -222,4 +222,5 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
