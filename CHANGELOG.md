@@ -13,6 +13,15 @@ We are using a rolling release versioning:
 4.0-20240131-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+
+## [4.1-20250811-stable] - 2025-08-11
+
+### Added
+### Changed
+- google font link is no longer included in the index html file
+### Fixed
+- Bug fixed with multiple camera device change, caused by browser parameter change.
+  
 ## [4.1-20250805-stable] - 2025-08-05
 
 ### Added
@@ -222,5 +231,6 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
 
