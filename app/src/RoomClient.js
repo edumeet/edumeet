@@ -1506,7 +1506,7 @@ export default class RoomClient
 				const stream = await navigator.mediaDevices.getUserMedia(
 					{
 						audio : {
-							deviceId : { exact: deviceId },
+							deviceId : deviceId,
 							sampleRate,
 							channelCount,
 							autoGainControl,
@@ -1713,7 +1713,7 @@ export default class RoomClient
 					{
 						video :
 						{
-							deviceId : { exact: deviceId },
+							deviceId : deviceId,
 							...getVideoConstrains(resolution, aspectRatio),
 							frameRate
 						}
@@ -4292,7 +4292,7 @@ export default class RoomClient
 				{
 					video :
 					{
-						deviceId : { exact: videoDeviceId },
+						deviceId : videoDeviceId,
 						...getVideoConstrains(resolution, aspectRatio),
 						frameRate
 					}
