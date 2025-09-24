@@ -339,7 +339,7 @@ const Peer = (props) =>
 
 	}, [ height, theme ]);
 
-	if (peer.picture)
+	if (peer && peer.picture)
 	{
 		rootStyle.backgroundImage = `url(${peer.picture})`;
 		rootStyle.backgroundSize = 'auto 100%';
