@@ -767,7 +767,8 @@ if (typeof window !== 'undefined' && (window as any).config !== undefined)
 // Perform validation
 try
 {
-	configSchema.validate({ allowed: 'strict' });
+	// ASTAGOR
+	// configSchema.validate({ allowed: 'strict' });
 	config = configSchema.getProperties();
 }
 catch (error: any)

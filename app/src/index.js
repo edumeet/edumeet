@@ -1,6 +1,6 @@
 import domready from 'domready';
 import React, { Suspense } from 'react';
-import { render } from 'react-dom';
+import * as ReactDOMClient from 'react-dom/client';
 import { Provider } from 'react-redux';
 import isElectron from 'is-electron';
 
@@ -22,7 +22,7 @@ import ConfigError from './components/ConfigError';
 import JoinDialog from './components/JoinDialog';
 import LoginDialog from './components/AccessControl/LoginDialog';
 import LoadingView from './components/Loader/LoadingView';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistor, store } from './store/store';
 import { SnackbarProvider } from 'notistack';
@@ -68,7 +68,7 @@ let roomClient;
 
 RoomClient.init({ store });
 
-const theme = createMuiTheme(config.theme);
+const theme = createTheme(config.theme);
 
 let Router;
 
@@ -87,6 +87,9 @@ domready(() =>
 function run()
 {
 	logger.debug('run() [environment:%s]', process.env.NODE_ENV);
+
+	const rootElement = document.getElementById('edumeet');
+	const client = ReactDOMClient.createRoot(rootElement);
 
 	const peerId = randomString({ length: 8 }).toLowerCase();
 	const urlParser = new URL(window.location);
@@ -169,7 +172,7 @@ function run()
 
 	if (unsupportedBrowser || webrtcUnavailable)
 	{
-		render(
+		client.render(
 			<Provider store={store}>
 				<MuiThemeProvider theme={theme}>
 					<IntlProvider value={intl}>
@@ -179,8 +182,7 @@ function run()
 						/>
 					</IntlProvider>
 				</MuiThemeProvider>
-			</Provider>,
-			document.getElementById('edumeet')
+			</Provider>
 		);
 
 		return;
@@ -188,15 +190,14 @@ function run()
 
 	if (showConfigDocumentationPath)
 	{
-		render(
+		client.render(
 			<Provider store={store}>
 				<MuiThemeProvider theme={theme}>
 					<IntlProvider value={intl}>
 						<ConfigDocumentation />
 					</IntlProvider>
 				</MuiThemeProvider>
-			</Provider>,
-			document.getElementById('edumeet')
+			</Provider>
 		);
 
 		return;
@@ -204,15 +205,14 @@ function run()
 
 	if (configError)
 	{
-		render(
+		client.render(
 			<Provider store={store}>
 				<MuiThemeProvider theme={theme}>
 					<IntlProvider value={intl}>
 						<ConfigError configError={configError} />
 					</IntlProvider>
 				</MuiThemeProvider>
-			</Provider>,
-			document.getElementById('edumeet')
+			</Provider>
 		);
 
 		return;
@@ -250,7 +250,7 @@ function run()
 
 	global.CLIENT = roomClient;
 
-	render(
+	client.render(
 		<Provider store={store}>
 			<MuiThemeProvider theme={theme}>
 				<IntlProvider value={intl}>
@@ -273,8 +273,7 @@ function run()
 					</PersistGate>
 				</IntlProvider>
 			</MuiThemeProvider>
-		</Provider>,
-		document.getElementById('edumeet')
+		</Provider>
 	);
 }
 
