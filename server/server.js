@@ -30,19 +30,19 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const mediasoup = require('mediasoup');
-const AwaitQueue = require('awaitqueue');
+const { AwaitQueue } = require('awaitqueue');
 const base64 = require('base-64');
 const helmet = require('helmet');
 // auth
 const passport = require('passport');
-const LTIStrategy = require('passport-lti');
-const imsLti = require('ims-lti');
-const SAMLStrategy = require('passport-saml').Strategy;
+// const LTIStrategy = require('passport-lti');
+// const imsLti = require('ims-lti');
+const SAMLStrategy = require('@node-saml/passport-saml').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
-const redis = require('redis');
+const { createClient: redisCreateClient } = require('redis');
 const { Issuer, Strategy, custom } = require('openid-client');
 const expressSession = require('express-session');
-const RedisStore = require('connect-redis')(expressSession);
+const {RedisStore} = require("connect-redis")
 const sharedSession = require('express-socket.io-session');
 const { v4: uuidv4 } = require('uuid');
 
@@ -53,7 +53,10 @@ if (configError)
 	process.exit(-1);
 }
 
-const redisClient = redis.createClient(config.redisOptions);
+const redisClient = redisCreateClient(config.redisOptions);
+redisClient.connect().catch(console.error);
+
+const redisStore = new RedisStore({ client: redisClient });
 
 /* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
@@ -113,7 +116,7 @@ const session = expressSession({
 	name              : config.cookieName,
 	resave            : true,
 	saveUninitialized : true,
-	store             : new RedisStore({ client: redisClient }),
+	store             : redisStore,
 	cookie            : {
 		secure   : true,
 		httpOnly : true,
@@ -371,7 +374,12 @@ async function setupAuth()
 		typeof (config.auth.lti) !== 'undefined' &&
 		typeof (config.auth.lti.consumerKey) !== 'undefined' &&
 		typeof (config.auth.lti.consumerSecret) !== 'undefined'
-	) setupLTI(config.auth.lti);
+	)
+	{
+		// setupLTI(config.auth.lti);
+		logger.error('LTI is not supported anymore');
+	}
+
 
 	// OIDC
 	if (
@@ -725,7 +733,7 @@ function isPathAlreadyTaken(actualUrl)
  */
 async function runWebSocketServer()
 {
-	io = require('socket.io')(mainListener, { cookie: false });
+	io = require('socket.io')(mainListener, { cookie: false, maxHttpBufferSize: 1e8 });
 
 	io.use(
 		sharedSession(session, sharedCookieParser, {})

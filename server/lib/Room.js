@@ -1,7 +1,7 @@
 import Logger from './logger/Logger';
 
 const EventEmitter = require('events').EventEmitter;
-const AwaitQueue = require('awaitqueue');
+const { AwaitQueue } = require('awaitqueue');
 const axios = require('axios');
 const Lobby = require('./Lobby');
 const { SocketTimeoutError, NotFoundInMediasoupError } = require('./helpers/errors');
@@ -315,10 +315,10 @@ class Room extends EventEmitter
 		this._lobby = null;
 
 		// Close the peers.
-		for (const peer in this._peers)
+		for (const peer of Object.values(this._peers))
 		{
-			if (!this._peers[peer].closed)
-				this._peers[peer].close();
+			if (!peer.closed)
+				peer.close();
 		}
 
 		this._peers = null;
