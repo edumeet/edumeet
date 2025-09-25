@@ -179,7 +179,7 @@ class Democratic extends React.PureComponent
 				{ !hideSelfView &&
 				<Me
 					advancedMode={advancedMode}
-					spacing={6}
+					spacing={3}
 					style={style}
 				/>
 				}
@@ -190,7 +190,7 @@ class Democratic extends React.PureComponent
 							key={peer}
 							advancedMode={advancedMode}
 							id={peer}
-							spacing={6}
+							spacing={3}
 							style={style}
 							enableLayersSwitch
 						/>

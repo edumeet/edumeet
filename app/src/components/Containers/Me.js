@@ -175,7 +175,7 @@ const Me = (props) =>
 		localRecordingState
 	} = props;
 
-	// const width = style.width;
+	const width = style.width;
 
 	const height = style.height;
 

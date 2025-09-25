@@ -101,7 +101,7 @@ const UnsupportedBrowser = ({
 						Please upgrade, switch to a different browser, or
 						check your settings. Supported browsers:'
 				/>
-				<Grid container spacing={2} justify='center' alignItems='center'>
+				<Grid container spacing={2} justifyContent='center' alignItems='center'>
 					<Grid item xs={12} md={7}>
 
 						<div className={classes.list}>

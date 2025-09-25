@@ -16,7 +16,7 @@ const PADDING_V = 64;
 const FILMSTRING_PADDING_V = 0;
 const FILMSTRING_PADDING_H = 10;
 
-const FILL_RATE = 0.95;
+const FILL_RATE = 0.90;
 
 const styles = () =>
 	({
@@ -308,7 +308,7 @@ class Filmstrip extends React.PureComponent
 				</div>
 
 				<div className={classes.filmStrip} ref={this.filmStripContainer}>
-					<Grid container justify='center' spacing={0}>
+					<Grid container justifyContent='center' spacing={0}>
 						<Grid item>
 							<div
 								className={classnames(classes.filmItem, {
@@ -324,24 +324,26 @@ class Filmstrip extends React.PureComponent
 							</div>
 						</Grid>
 
-						{ Object.keys(peers).map((peerId) =>
+						{ spotlights.map((peerId) =>
 						{
-							if (spotlights.find((spotlightsElement) => spotlightsElement === peerId))
+							const peer = peers[peerId];
+
+							if (peer)
 							{
 								return (
-									<Grid key={peerId} item>
+									<Grid key={peer.id} item>
 										<div
-											key={peerId}
+											key={peer.id}
 											className={classnames(classes.filmItem, {
-												selected : this.getSelectedPeerId() === peerId,
-												active   : peerId === activePeerId
+												selected : this.getSelectedPeerId() === peer.id,
+												active   : peer.id === activePeerId
 											})}
 										>
 											<Peer
 												advancedMode={advancedMode}
-												id={peerId}
+												id={peer.id}
 												style={peerStyle}
-												enableLayersSwitch={activePeerId !== peerId}
+												enableLayersSwitch={activePeerId !== peer.id}
 											/>
 										</div>
 									</Grid>
@@ -351,7 +353,8 @@ class Filmstrip extends React.PureComponent
 							{
 								return ('');
 							}
-						})}
+						})
+						}
 					</Grid>
 				</div>
 			</div>

@@ -71,13 +71,13 @@ const styles = (theme) =>
 			position        : 'absolute',
 			width           : '100%',
 			height          : '100%',
-			backgroundColor : 'rgba(0, 0, 0, 0.3)',
+			backgroundColor : 'rgba(0, 0, 0, 0)',
 			display         : 'flex',
 			justifyContent  : 'center',
 			alignItems      : 'flex-end',
 			padding         : theme.spacing(1),
 			zIndex          : 21,
-			opacity         : 1,
+			opacity         : 0,
 			transition      : 'opacity 0.3s',
 			touchAction     : 'none',
 			'&.hover'       :
@@ -160,24 +160,6 @@ const Peer = (props) =>
 		localRecordingState,
 		recordingConsents
 	} = props;
-
-	const micEnabled = (
-		Boolean(micConsumer) &&
-		!micConsumer.locallyPaused &&
-		!micConsumer.remotelyPaused
-	);
-
-	const videoVisible = (
-		Boolean(webcamConsumer) &&
-		!webcamConsumer.locallyPaused &&
-		!webcamConsumer.remotelyPaused
-	);
-
-	const screenVisible = (
-		Boolean(screenConsumer) &&
-		!screenConsumer.locallyPaused &&
-		!screenConsumer.remotelyPaused
-	);
 
 	const rootStyle =
 	{
@@ -339,12 +321,6 @@ const Peer = (props) =>
 
 	}, [ height, theme ]);
 
-	if (peer && peer.picture)
-	{
-		rootStyle.backgroundImage = `url(${peer.picture})`;
-		rootStyle.backgroundSize = 'auto 100%';
-	}
-
 	useEffect(() =>
 	{
 		const handler = setTimeout(() =>
@@ -401,6 +377,33 @@ const Peer = (props) =>
 	{
 		setMenuAnchorElement(null);
 	};
+
+	const micEnabled = (
+		Boolean(micConsumer) &&
+		!micConsumer.locallyPaused &&
+		!micConsumer.remotelyPaused
+	);
+
+	const videoVisible = (
+		Boolean(webcamConsumer) &&
+		!webcamConsumer.locallyPaused &&
+		!webcamConsumer.remotelyPaused
+	);
+
+	const screenVisible = (
+		Boolean(screenConsumer) &&
+		!screenConsumer.locallyPaused &&
+		!screenConsumer.remotelyPaused
+	);
+
+	if (!peer)
+		return (null);
+
+	if (peer.picture)
+	{
+		rootStyle.backgroundImage = `url(${peer.picture})`;
+		rootStyle.backgroundSize = 'auto 100%';
+	}
 
 	return (
 		<React.Fragment>

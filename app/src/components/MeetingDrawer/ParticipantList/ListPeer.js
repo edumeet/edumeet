@@ -169,6 +169,9 @@ const ListPeer = (props) =>
 		!screenConsumer.remotelyPaused
 	);
 
+	if (!peer)
+		return (null);
+
 	const picture = peer.picture || EmptyAvatar;
 
 	const isMenuOpen = Boolean(anchorEl);

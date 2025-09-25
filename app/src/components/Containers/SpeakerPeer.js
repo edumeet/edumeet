@@ -134,6 +134,9 @@ const SpeakerPeer = (props) =>
 		roomClient, width, height
 	]);
 
+	if (!peer)
+		return (null);
+
 	return (
 		<React.Fragment>
 			<div
