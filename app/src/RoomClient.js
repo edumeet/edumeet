@@ -78,6 +78,14 @@ function getVideoConstrains(resolution, aspectRatio)
 	};
 }
 
+function getDeviceIdConstrains(deviceId)
+{
+	if (!deviceId || deviceId === '')
+		return null;
+	else
+		return { exact: deviceId };
+}
+
 const PC_PROPRIETARY_CONSTRAINTS =
 {
 	optional : [ { googDscp: true } ]
@@ -117,13 +125,13 @@ const VIDEO_SIMULCAST_PROFILES =
 // Used for VP9 webcam video.
 const VIDEO_KSVC_ENCODINGS =
 [
-	{ scalabilityMode: 'S3T3_KEY' }
+	{ scalabilityMode: 'L3T3_KEY' }
 ];
 
 // Used for VP9 desktop sharing.
 const VIDEO_SVC_ENCODINGS =
 [
-	{ scalabilityMode: 'S3T3', dtx: true }
+	{ scalabilityMode: 'L3T3', dtx: true }
 ];
 
 /**
@@ -386,6 +394,8 @@ export default class RoomClient
 				joinAudio : false
 			});
 		}
+
+		this._consumerQueue = {};
 
 	}
 
@@ -689,7 +699,10 @@ export default class RoomClient
 		else
 			displayName = data.displayName;
 
+		if (typeof(displayName) !== 'undefined' && typeof(displayName) !== 'boolean')
+		{
 		store.dispatch(settingsActions.setDisplayName(displayName));
+		}
 
 		this._displayName=displayName;
 
@@ -1422,11 +1435,14 @@ export default class RoomClient
 			const device = this._audioOutputDevices[deviceId];
 
 			if (!device)
-				throw new Error('Selected audio output device no longer available');
-
-			store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
-
-			await this._updateAudioOutputDevices();
+			{
+				logger.error('Selected audio output device no longer available');
+				await this._updateAudioOutputDevices();
+			}
+			else
+			{
+				store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
+			}
 		}
 		catch (error)
 		{
@@ -1488,6 +1504,8 @@ export default class RoomClient
 				opusMaxPlaybackRate
 			} = store.getState().settings;
 
+			const deviceIdConstrains = getDeviceIdConstrains(deviceId);
+
 			if (
 				(restart && this._micProducer) ||
 				start
@@ -1506,7 +1524,7 @@ export default class RoomClient
 				const stream = await navigator.mediaDevices.getUserMedia(
 					{
 						audio : {
-							deviceId : deviceId,
+							deviceId : deviceIdConstrains,
 							sampleRate,
 							channelCount,
 							autoGainControl,
@@ -1638,6 +1656,9 @@ export default class RoomClient
 
 			if (track)
 				track.stop();
+
+			// even on error try getting the device list
+			await this._updateAudioDevices();
 		}
 
 		store.dispatch(meActions.setAudioInProgress(false));
@@ -1663,6 +1684,11 @@ export default class RoomClient
 
 		let track;
 
+		let {
+			resolution,
+			frameRate
+		} = store.getState().settings;
+
 		try
 		{
 			if (!this._mediasoupDevice.canProduce('video'))
@@ -1675,12 +1701,18 @@ export default class RoomClient
 				store.dispatch(settingsActions.setSelectedWebcamDevice(newDeviceId));
 
 			if (newResolution)
+			{
 				store.dispatch(settingsActions.setVideoResolution(newResolution));
+				resolution = newResolution;
+			}
 
 			if (newFrameRate)
+			{
 				store.dispatch(settingsActions.setVideoFrameRate(newFrameRate));
+				frameRate = newFrameRate;
+			}
 
-			const { videoMuted } = store.getState().settings;
+			const { videoMuted, aspectRatio } = store.getState().settings;
 
 			if (init && videoMuted)
 				return;
@@ -1695,12 +1727,6 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no webcam devices');
 
-			const {
-				resolution,
-				aspectRatio,
-				frameRate
-			} = store.getState().settings;
-
 			if (
 				(restart && this._webcamProducer) ||
 				start
@@ -1709,11 +1735,12 @@ export default class RoomClient
 				if (this._webcamProducer)
 					await this.disableWebcam();
 
+				const deviceIdConstrains = getDeviceIdConstrains(deviceId);
 				const stream = await navigator.mediaDevices.getUserMedia(
 					{
 						video :
 						{
-							deviceId : deviceId,
+							deviceId : deviceIdConstrains,
 							...getVideoConstrains(resolution, aspectRatio),
 							frameRate
 						}
@@ -1721,9 +1748,12 @@ export default class RoomClient
 
 				([ track ] = stream.getVideoTracks());
 
-				const { deviceId: trackDeviceId, width, height } = track.getSettings();
+				const trackSettings = track.getSettings();
+				const trackDeviceId = trackSettings.deviceId;
 
-				logger.debug('getUserMedia track settings:', track.getSettings());
+				logger.debug('getUserMedia webcam using track settings:', trackSettings);
+
+				const { width, height } = trackSettings;
 
 				store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
@@ -1853,6 +1883,9 @@ export default class RoomClient
 
 			if (track)
 				track.stop();
+
+			// even on error try getting the device list
+			await this._updateWebcams();
 		}
 
 		store.dispatch(
@@ -2183,7 +2216,9 @@ export default class RoomClient
 
 		store.dispatch(
 			roomActions.setCloseMeetingInProgress(false));
-	}
+
+		this.close();
+			}
 
 	// type: mic/webcam/screen
 	// mute: true/false
@@ -2637,6 +2672,8 @@ export default class RoomClient
 
 	async join({ roomId, joinVideo, joinAudio })
 	{
+		store.dispatch(meActions.setJoinInProgress(true));
+
 		await this._loadDynamicImports();
 
 		this._roomId = roomId;
@@ -2674,6 +2711,10 @@ export default class RoomClient
 					}));
 
 				this.close();
+
+				// if socket was closed by server then do not reconnect
+
+				return;
 			}
 
 			store.dispatch(requestActions.notify(
@@ -2722,6 +2763,15 @@ export default class RoomClient
 
 				this._micProducer = null;
 			}
+
+			for (const producer of this._extraVideoProducers.values())
+			{
+				producer.close();
+
+				store.dispatch(
+					producerActions.removeProducer(producer.id));
+			}
+			this._extraVideoProducers.clear();
 
 			if (this._sendTransport)
 			{
@@ -3276,6 +3326,16 @@ export default class RoomClient
 
 						this._spotlights.newPeer(id);
 
+						if (id in this._consumerQueue)
+						{
+							while (this._consumerQueue[id].length > 0)
+							{
+								const consumerData = this._consumerQueue[id].shift();
+
+								await this._createConsumer(consumerData);
+							}
+						}
+
 						if (!returning)
 						{
 							this._soundNotification(notification.method);
@@ -3328,92 +3388,34 @@ export default class RoomClient
 							score
 						} = notification.data;
 
-						const consumer = await this._recvTransport.consume(
-							{
+						const consumerData = {
+							peerId,
+							producerId,
 								id,
-								producerId,
 								kind,
 								rtpParameters,
-								appData : { ...appData, peerId } // Trick.
-							});
-
-						if (this._recvTransport.appData.encodedInsertableStreams)
-						{
-							const { enableOpusDetails } = store.getState().settings;
-
-							if (kind === 'audio' && enableOpusDetails)
-								opusReceiverTransform(consumer.rtpReceiver, consumer.id);
-							else
-								directReceiverTransform(consumer.rtpReceiver);
-						}
-
-						// Store in the map.
-						this._consumers.set(consumer.id, consumer);
-
-						consumer.on('transportclose', () =>
-						{
-							this._consumers.delete(consumer.id);
-						});
-
-						const { spatialLayers, temporalLayers } =
-							mediasoupClient.parseScalabilityMode(
-								consumer.rtpParameters.encodings[0].scalabilityMode);
-
-						const consumerStoreObject = {
-							id                     : consumer.id,
-							peerId                 : peerId,
-							kind                   : kind,
-							type                   : type,
-							locallyPaused          : false,
-							remotelyPaused         : producerPaused,
-							rtpParameters          : consumer.rtpParameters,
-							source                 : consumer.appData.source,
-							width                  : consumer.appData.width,
-							height                 : consumer.appData.height,
-							resolutionScalings     : consumer.appData.resolutionScalings,
-							spatialLayers          : spatialLayers,
-							temporalLayers         : temporalLayers,
-							preferredSpatialLayer  : 0,
-							preferredTemporalLayer : 0,
-							priority               : 1,
-							codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
-							track                  : consumer.track,
-							score                  : score,
-							audioGain              : undefined,
-							opusConfig             : null
+							type,
+							appData,
+							producerPaused,
+							score
 						};
 
-						this._spotlights.addVideoConsumer(consumerStoreObject);
+						const storePeers = store.getState().peers;
 
-						store.dispatch(consumerActions.addConsumer(consumerStoreObject, peerId));
-
-						await this._startConsumer(consumer);
-
-						if (kind === 'audio')
+						if (!storePeers[peerId])
 						{
-							consumer.volume = 0;
+							if (!(peerId in this._consumerQueue))
+								this._consumerQueue[peerId] = [];
 
-							const stream = new MediaStream();
+							this._consumerQueue[peerId].push(consumerData);
 
-							stream.addTrack(consumer.track);
-
-							if (!stream.getAudioTracks()[0])
-								throw new Error('request.newConsumer | given stream has no audio track');
-
-							consumer.hark = hark(stream, { play: false, interval: 100 });
-
-							consumer.hark.on('volume_change', (volume) =>
-							{
-								volume = Math.round(volume);
-
-								if (consumer && volume !== consumer.volume)
-								{
-									consumer.volume = volume;
-
-									store.dispatch(peerVolumeActions.setPeerVolume(peerId, volume));
-								}
-							});
+							logger.debug('newConsumer - peerId %s not yet in store, adding to _consumerQueue',
+								peerId);
 						}
+						else
+							{
+							await this._createConsumer(consumerData);
+								}
 
 						break;
 					}
@@ -3703,6 +3705,8 @@ export default class RoomClient
 			}
 
 		});
+
+		store.dispatch(meActions.setJoinInProgress(false));
 	}
 
 	async _joinRoom({ joinVideo, joinAudio, returning })
@@ -3772,8 +3776,9 @@ export default class RoomClient
 						iceCandidates,
 						dtlsParameters,
 						iceServers             : this._turnServers,
-						// TODO: Fix for issue #72
-						iceTransportPolicy     : this._device.flag === 'firefox' && this._turnServers ? 'relay' : undefined,
+						// TODO: Fix for issue #72 - fixed in new media soup
+						// iceTransportPolicy     : this._device.flag === 'firefox'
+						// && this._turnServers ? 'relay' : undefined,
 						proprietaryConstraints : PC_PROPRIETARY_CONSTRAINTS
 					});
 
@@ -3971,7 +3976,19 @@ export default class RoomClient
 			{
 				store.dispatch(
 					peerActions.addPeer({ ...peer, consumers: [] }));
+
+				if (peer.id in this._consumerQueue)
+				{
+					while (this._consumerQueue[peer.id].length > 0)
+					{
+						const consumerData = this._consumerQueue[peer.id].shift();
+
+						await this._createConsumer(consumerData);
+					}
+				}
 			}
+
+			await this._updateAudioOutputDevices();
 
 			(chatHistory.length > 0) && store.dispatch(
 				chatActions.addChatHistory(chatHistory));
@@ -4014,26 +4031,18 @@ export default class RoomClient
 					if (!this._muted)
 					{
 						await this.updateMic({ start: true });
-						const autoMuteThreshold = config.autoMuteThreshold;
+						let autoMuteThreshold = config.autoMuteThreshold;
+
+						if (config.autoMuteThresholds[this._roomId])
+						{
+							autoMuteThreshold = config.autoMuteThresholds[this._roomId];
+						}
 
 						if (autoMuteThreshold >= 0 && peers.length >= autoMuteThreshold)
 						{
 							this.muteMic();
 						}
 					}
-			}
-
-			await this._updateAudioOutputDevices();
-
-			const { selectedAudioOutputDevice } = store.getState().settings;
-
-			if (!selectedAudioOutputDevice && this._audioOutputDevices !== {})
-			{
-				store.dispatch(
-					settingsActions.setSelectedAudioOutputDevice(
-						Object.keys(this._audioOutputDevices)[0]
-					)
-				);
 			}
 
 			store.dispatch(roomActions.setRoomState('connected'));
@@ -4288,11 +4297,13 @@ export default class RoomClient
 			if (!device)
 				throw new Error('no webcam devices');
 
+			const deviceIdConstrains = getDeviceIdConstrains(videoDeviceId);
+
 			const stream = await navigator.mediaDevices.getUserMedia(
 				{
 					video :
 					{
-						deviceId : videoDeviceId,
+						deviceId : deviceIdConstrains,
 						...getVideoConstrains(resolution, aspectRatio),
 						frameRate
 					}
@@ -4306,12 +4317,10 @@ export default class RoomClient
 
 			let exists = false;
 
-			this._extraVideoProducers.forEach(function(value)
+			this._extraVideoProducers.forEach((extraVideoProducer) =>
 			{
-				if (value._track.label===track.label)
-				{
+				if (extraVideoProducer.appData.deviceId === videoDeviceId)
 					exists=true;
-				}
 			});
 
 			if (!exists)
@@ -4546,7 +4555,8 @@ export default class RoomClient
 						autoGainControl,
 						echoCancellation,
 						noiseSuppression,
-						sampleSize
+						sampleSize,
+						selfBrowserSurface : 'include'
 					});
 
 				}
@@ -4554,7 +4564,8 @@ export default class RoomClient
 				{
 					stream = await this._screenSharing.start({
 						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate : screenSharingFrameRate
+						frameRate          : screenSharingFrameRate,
+						selfBrowserSurface : 'include'
 					});
 
 				}
@@ -4946,7 +4957,7 @@ export default class RoomClient
 
 		try
 		{
-			logger.debug('_getAudioDeviceId() | calling _updateAudioDeviceId()');
+			logger.debug('_getAudioDeviceId() | calling _updateAudioDevices');
 
 			await this._updateAudioDevices();
 
@@ -4994,6 +5005,33 @@ export default class RoomClient
 		}
 	}
 
+	_initSelectedAudioOutputDevice()
+	{
+		logger.debug('_initSelectedAudioOutputDevice()');
+
+		if (Object.keys(this._audioOutputDevices).length > 0)
+		{
+			const { selectedAudioOutputDevice } = store.getState().settings;
+
+			if (!selectedAudioOutputDevice ||
+				!(selectedAudioOutputDevice in this._audioOutputDevices))
+			{
+				logger.debug('_initSelectedAudioOutputDevice() - setting default. Non selected or not present | deviceId = %s',
+					selectedAudioOutputDevice);
+
+				store.dispatch(
+					settingsActions.setSelectedAudioOutputDevice(
+						Object.keys(this._audioOutputDevices)[0]
+					)
+				);
+			}
+		}
+		else
+		{
+			logger.debug('_initSelectedAudioOutputDevice() - no audio out devices present');
+		}
+	}
+
 	async _updateAudioOutputDevices()
 	{
 		logger.debug('_updateAudioOutputDevices()');
@@ -5017,6 +5055,8 @@ export default class RoomClient
 
 			store.dispatch(
 				meActions.setAudioOutputDevices(this._audioOutputDevices));
+
+			this._initSelectedAudioOutputDevice();
 		}
 		catch (error)
 		{
@@ -5145,4 +5185,115 @@ export default class RoomClient
 	{
 		this._spotlights.hideNoVideoParticipants = hideNoVideoParticipants;
 	}
-}
+
+	async _createConsumer(consumerData)
+	{
+		const {
+			peerId,
+			producerId,
+			id,
+			kind,
+			rtpParameters,
+			type,
+			appData,
+			producerPaused,
+			score
+		} = consumerData;
+
+		logger.debug('_createConsumer() - Creating new consumer %o', consumerData);
+
+		const consumer = await this._recvTransport.consume(
+			{
+				id,
+				producerId,
+				kind,
+				rtpParameters,
+				appData : { ...appData, peerId } // Trick.
+			});
+
+		if (this._recvTransport.appData.encodedInsertableStreams)
+		{
+			const { enableOpusDetails } = store.getState().settings;
+
+			if (kind === 'audio' && enableOpusDetails)
+				opusReceiverTransform(consumer.rtpReceiver, consumer.id);
+			else
+				directReceiverTransform(consumer.rtpReceiver);
+		}
+
+		// Store in the map.
+		this._consumers.set(consumer.id, consumer);
+
+		consumer.on('transportclose', () =>
+		{
+			this._consumers.delete(consumer.id);
+		});
+
+		const { spatialLayers, temporalLayers } =
+			mediasoupClient.parseScalabilityMode(
+				consumer.rtpParameters.encodings[0].scalabilityMode);
+
+		const consumerStoreObject = {
+			id                     : consumer.id,
+			peerId                 : peerId,
+			kind                   : kind,
+			type                   : type,
+			locallyPaused          : false,
+			remotelyPaused         : producerPaused,
+			rtpParameters          : consumer.rtpParameters,
+			source                 : consumer.appData.source,
+			width                  : consumer.appData.width,
+			height                 : consumer.appData.height,
+			resolutionScalings     : consumer.appData.resolutionScalings,
+			spatialLayers          : spatialLayers,
+			temporalLayers         : temporalLayers,
+			preferredSpatialLayer  : 0,
+			preferredTemporalLayer : 0,
+			priority               : 1,
+			codec                  : consumer.rtpParameters.codecs[0].mimeType.split('/')[1],
+			track                  : consumer.track,
+			score                  : score,
+			audioGain              : undefined,
+			opusConfig             : null
+		};
+
+		this._spotlights.addVideoConsumer(consumerStoreObject);
+
+		store.dispatch(consumerActions.addConsumer(consumerStoreObject, peerId));
+
+		await this._startConsumer(consumer);
+
+		if (kind === 'audio')
+		{
+			consumer.volume = 0;
+
+			const stream = new MediaStream();
+
+			stream.addTrack(consumer.track);
+
+			if (!stream.getAudioTracks()[0])
+				throw new Error('request.newConsumer | given stream has no audio track');
+
+			consumer.hark = hark(stream, { play: false, interval: 100 });
+
+			consumer.hark.on('volume_change', (volume) =>
+			{
+				volume = Math.round(volume);
+
+				if (consumer && volume !== consumer.volume)
+				{
+					consumer.volume = volume;
+
+					store.dispatch(peerVolumeActions.setPeerVolume(peerId, volume));
+				}
+			});
+		}
+	}
+
+	_onBeforeUnload(event)
+	{
+		event.preventDefault();
+		event.returnValue = '';
+	}
+
+	}

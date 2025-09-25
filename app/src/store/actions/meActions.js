@@ -99,6 +99,12 @@ export const setRaisedHandInProgress = (flag) =>
 		payload : { flag }
 	});
 
+export const setJoinInProgress = (flag) =>
+	({
+		type    : 'SET_JOIN_IN_PROGRESS',
+		payload : { flag }
+	});
+
 export const setDisplayNameInProgress = (flag) =>
 	({
 		type    : 'SET_DISPLAY_NAME_IN_PROGRESS',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { micConsumerSelector } from '../../store/selectors';
+import { withRoomContext } from '../../RoomContext';
 import PropTypes from 'prop-types';
 import PeerAudio from './PeerAudio';
 
@@ -8,8 +9,25 @@ const AudioPeers = (props) =>
 {
 	const {
 		micConsumers,
-		audioOutputDevice
+		selectedAudioOutputDevice,
+		audioOutputDevices
 	} = props;
+
+	let audioOutputDeviceId;
+
+	if (audioOutputDevices)
+	{
+		if (selectedAudioOutputDevice &&
+			audioOutputDevices[selectedAudioOutputDevice])
+		{
+			audioOutputDeviceId = selectedAudioOutputDevice;
+		}
+		else
+		{
+			audioOutputDeviceId =
+				audioOutputDevices[0] ? audioOutputDevices[0].deviceId : null;
+		}
+	}
 
 	return (
 		<div data-component='AudioPeers'>
@@ -20,7 +38,7 @@ const AudioPeers = (props) =>
 						<PeerAudio
 							key={micConsumer.id}
 							audioTrack={micConsumer.track}
-							audioOutputDevice={audioOutputDevice}
+							audioOutputDevice={audioOutputDeviceId}
 							audioGain={micConsumer.audioGain}
 						/>
 					);
@@ -32,17 +50,19 @@ const AudioPeers = (props) =>
 
 AudioPeers.propTypes =
 {
-	micConsumers      : PropTypes.array,
-	audioOutputDevice : PropTypes.string
+	selectedAudioOutputDevice : PropTypes.string,
+	audioOutputDevices        : PropTypes.object,
+	micConsumers              : PropTypes.array
 };
 
 const mapStateToProps = (state) =>
 	({
-		micConsumers      : micConsumerSelector(state),
-		audioOutputDevice : state.settings.selectedAudioOutputDevice
+		selectedAudioOutputDevice : state.settings.selectedAudioOutputDevice,
+		audioOutputDevices        : state.me.audioOutputDevices,
+		micConsumers              : micConsumerSelector(state)
 	});
 
-const AudioPeersContainer = connect(
+export default withRoomContext(connect(
 	mapStateToProps,
 	null,
 	null,
@@ -52,11 +72,10 @@ const AudioPeersContainer = connect(
 			return (
 				prev.consumers === next.consumers &&
 				prev.room.spotlights === next.room.spotlights &&
+				prev.me.audioOutputDevices === next.me.audioOutputDevices &&
 				prev.settings.selectedAudioOutputDevice ===
 				next.settings.selectedAudioOutputDevice
 			);
 		}
 	}
-)(AudioPeers);
-
-export default AudioPeersContainer;
+)(AudioPeers));

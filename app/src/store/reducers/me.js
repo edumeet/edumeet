@@ -10,6 +10,7 @@ const initialState =
 	canShareFiles         : false,
 	audioDevices          : null,
 	webcamDevices         : null,
+	audioOutputDevices    : null,
 	webcamInProgress      : false,
 	audioInProgress       : false,
 	screenShareInProgress : false,
@@ -17,6 +18,7 @@ const initialState =
 	loginEnabled          : false,
 	raisedHand            : false,
 	raisedHandInProgress  : false,
+	joinInProgress        : false,
 	loggedIn              : false,
 	isSpeaking            : false,
 	isAutoMuted           : true
@@ -144,6 +146,13 @@ const me = (state = initialState, action) =>
 			const { flag } = action.payload;
 
 			return { ...state, raisedHandInProgress: flag };
+		}
+
+		case 'SET_JOIN_IN_PROGRESS':
+		{
+			const { flag } = action.payload;
+
+			return { ...state, joinInProgress: flag };
 		}
 
 		case 'SET_DISPLAY_NAME_IN_PROGRESS':
