@@ -13,6 +13,22 @@ We are using a rolling release versioning:
 4.0-20240131-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [4.2-2025xxxx-stable] - 2025-xx-xx
+
+### Added
+- tenant defaults 
+### Changed
+### Fixed
+
+
+## [4.1-20250926-stable] - 2025-09-26
+Package updates (mainly mediasoup)
+
+### Added
+### Changed
+### Fixed
+- device change bug
+
 
 ## [4.1-20250811-stable] - 2025-08-11
 
@@ -231,6 +247,7 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
 
 
