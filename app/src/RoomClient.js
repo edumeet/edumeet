@@ -701,7 +701,7 @@ export default class RoomClient
 
 		if (typeof(displayName) !== 'undefined' && typeof(displayName) !== 'boolean')
 		{
-		store.dispatch(settingsActions.setDisplayName(displayName));
+			store.dispatch(settingsActions.setDisplayName(displayName));
 		}
 
 		this._displayName=displayName;
@@ -2218,7 +2218,7 @@ export default class RoomClient
 			roomActions.setCloseMeetingInProgress(false));
 
 		this.close();
-			}
+	}
 
 	// type: mic/webcam/screen
 	// mute: true/false
@@ -3391,9 +3391,9 @@ export default class RoomClient
 						const consumerData = {
 							peerId,
 							producerId,
-								id,
-								kind,
-								rtpParameters,
+							id,
+							kind,
+							rtpParameters,
 							type,
 							appData,
 							producerPaused,
@@ -3413,9 +3413,9 @@ export default class RoomClient
 								peerId);
 						}
 						else
-							{
+						{
 							await this._createConsumer(consumerData);
-								}
+						}
 
 						break;
 					}
@@ -4033,7 +4033,7 @@ export default class RoomClient
 						await this.updateMic({ start: true });
 						let autoMuteThreshold = config.autoMuteThreshold;
 
-						if (config.autoMuteThresholds[this._roomId])
+						if (config.autoMuteThresholds && config.autoMuteThresholds[this._roomId])
 						{
 							autoMuteThreshold = config.autoMuteThresholds[this._roomId];
 						}
@@ -4549,7 +4549,7 @@ export default class RoomClient
 				{
 					stream = await this._screenSharing.start({
 						...getVideoConstrains(screenSharingResolution, aspectRatio),
-						frameRate : screenSharingFrameRate,
+						frameRate          : screenSharingFrameRate,
 						sampleRate,
 						channelCount,
 						autoGainControl,
@@ -5296,4 +5296,4 @@ export default class RoomClient
 		event.returnValue = '';
 	}
 
-	}
+}
