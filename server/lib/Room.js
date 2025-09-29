@@ -296,9 +296,12 @@ class Room extends EventEmitter
 		logger.debug('close()');
 
 		this._closed = true;
-
-		this._queue.close();
-
+		if (this._queue && (typeof this._queue.close === 'function')) {
+			this._queue.close();
+		}
+		if (this._queue && (typeof this._queue.stop === 'function')) {
+			this._queue.stop();
+		}
 		this._queue = null;
 
 		if (this._selfDestructTimeout)
