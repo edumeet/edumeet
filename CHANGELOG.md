@@ -19,7 +19,14 @@ The stable tag  is teseted by the development team and used by default for [edum
 - tenant defaults 
 ### Changed
 ### Fixed
+- html title did not update from config
 
+## [4.1-20250930-stable] - 2025-09-30
+
+### Added
+### Changed
+### Fixed
+- edumeet-management-server is now running with yarn start
 
 ## [4.1-20250926-stable] - 2025-09-26
 Package updates (mainly mediasoup)
@@ -247,6 +254,7 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
 
 
