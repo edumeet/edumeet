@@ -19,7 +19,15 @@ The stable tag  is teseted by the development team and used by default for [edum
 - tenant defaults 
 ### Changed
 ### Fixed
-- html title did not update from config
+
+## [4.1-20251007-stable] - 2025-xx-xx
+
+### Added
+### Changed
+### Fixed
+- HTML title did not update from app config.
+- if mic is muted the feedback will turn to grey color.
+- mgmt-server dynamic tenant handling fix!
 
 ## [4.1-20250930-stable] - 2025-09-30
 
@@ -254,6 +262,7 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
 
 
