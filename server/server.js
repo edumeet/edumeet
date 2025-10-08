@@ -504,7 +504,7 @@ async function setupAuth()
 	{
 		logger.debug('/auth/logout');
 
-		const peerId = req.session.peerId || req.query.peerId;
+		const peerId = req.query.peerId;
 		const roomId = req.query.roomId;
 
 		let peer = peers.get(peerId);
