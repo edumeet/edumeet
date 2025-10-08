@@ -500,12 +500,20 @@ async function setupAuth()
 	});
 
 	// logout
-	app.get('/auth/logout', (req, res) =>
+	app.get('/auth/logout', (req, res, next) =>
 	{
 		logger.debug('/auth/logout');
-		const { peerId } = req.session;
 
-		const peer = peers.get(peerId);
+		const peerId = req.session.peerId || req.query.peerId;
+		const roomId = req.query.roomId;
+
+		let peer = peers.get(peerId);
+
+		if (!peer) // User has no socket session yet, make temporary
+			peer = new Peer({ id: peerId, roomId });
+
+		if (peer && peer.roomId !== roomId) // The peer is mischievous
+			throw new Error('peer authenticated with wrong room');
 
 		if (peer)
 		{
@@ -516,12 +524,18 @@ async function setupAuth()
 			}
 		}
 
-		req.logout();
-		req.session.passport = undefined;
-		req.session.touch();
-		req.session.save();
-		req.session.destroy(() => res.send(logoutHelper()));
+		req.logout((err) =>
+		{
+			if (err)
+				return next(err);
+
+			req.session.passport = undefined;
+			req.session.touch();
+			req.session.save();
+			req.session.destroy(() => res.send(logoutHelper()));
+		});
 	});
+
 	// SAML metadata
 	app.get('/auth/metadata', (req, res) =>
 	{
