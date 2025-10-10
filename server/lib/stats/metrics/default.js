@@ -156,11 +156,15 @@ module.exports = async function(workers, rooms, peers, registry, config)
 				}
 				const iceSelectedTuple = transportJson.iceSelectedTuple;
 
+				let proto = '';
+				let localAddr = ''
+				let remoteAddr = '';
+
 				if (iceSelectedTuple){
-					const proto = iceSelectedTuple.protocol;
-					const localAddr = await addr(iceSelectedTuple.localIp,
+					proto = iceSelectedTuple.protocol;
+					localAddr = await addr(iceSelectedTuple.localIp,
 						iceSelectedTuple.localPort);
-					const remoteAddr = await addr(iceSelectedTuple.remoteIp,
+					remoteAddr = await addr(iceSelectedTuple.remoteIp,
 						iceSelectedTuple.remotePort);
 				}
 
@@ -181,9 +185,9 @@ module.exports = async function(workers, rooms, peers, registry, config)
 							'display_name' : displayName,
 							'user_agent'   : userAgent,
 							'transport_id' : quiet(transportId),
-							'proto'        : proto || '',
-							'local_addr'   : localAddr || '',
-							'remote_addr'  : remoteAddr || '',
+							'proto'        : proto,
+							'local_addr'   : localAddr,
+							'remote_addr'  : remoteAddr,
 							'id'           : quiet(producerId),
 							'kind'         : kind,
 							'codec'        : codec,
@@ -218,9 +222,9 @@ module.exports = async function(workers, rooms, peers, registry, config)
 							'display_name' : displayName,
 							'user_agent'   : userAgent,
 							'transport_id' : quiet(transportId),
-							'proto'        : proto || '',
-							'local_addr'   : localAddr || '',
-							'remote_addr'  : remoteAddr || '',
+							'proto'        : proto,
+							'local_addr'   : localAddr,
+							'remote_addr'  : remoteAddr,
 							'id'           : quiet(consumerId),
 							'kind'         : kind,
 							'codec'        : codec,
