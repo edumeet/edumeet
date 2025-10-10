@@ -155,11 +155,14 @@ module.exports = async function(workers, rooms, peers, registry, config)
 					continue;
 				}
 				const iceSelectedTuple = transportJson.iceSelectedTuple;
-				const proto = iceSelectedTuple.protocol;
-				const localAddr = await addr(iceSelectedTuple.localIp,
-					iceSelectedTuple.localPort);
-				const remoteAddr = await addr(iceSelectedTuple.remoteIp,
-					iceSelectedTuple.remotePort);
+
+				if (iceSelectedTuple){
+					const proto = iceSelectedTuple.protocol;
+					const localAddr = await addr(iceSelectedTuple.localIp,
+						iceSelectedTuple.localPort);
+					const remoteAddr = await addr(iceSelectedTuple.remoteIp,
+						iceSelectedTuple.remotePort);
+				}
 
 				for (const [ producerId, producer ] of transport.appData.producers)
 				{
@@ -178,9 +181,9 @@ module.exports = async function(workers, rooms, peers, registry, config)
 							'display_name' : displayName,
 							'user_agent'   : userAgent,
 							'transport_id' : quiet(transportId),
-							'proto'        : proto,
-							'local_addr'   : localAddr,
-							'remote_addr'  : remoteAddr,
+							'proto'        : proto || '',
+							'local_addr'   : localAddr || '',
+							'remote_addr'  : remoteAddr || '',
 							'id'           : quiet(producerId),
 							'kind'         : kind,
 							'codec'        : codec,
@@ -215,9 +218,9 @@ module.exports = async function(workers, rooms, peers, registry, config)
 							'display_name' : displayName,
 							'user_agent'   : userAgent,
 							'transport_id' : quiet(transportId),
-							'proto'        : proto,
-							'local_addr'   : localAddr,
-							'remote_addr'  : remoteAddr,
+							'proto'        : proto || '',
+							'local_addr'   : localAddr || '',
+							'remote_addr'  : remoteAddr || '',
 							'id'           : quiet(consumerId),
 							'kind'         : kind,
 							'codec'        : codec,
