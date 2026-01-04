@@ -10,17 +10,90 @@ We are using a rolling release versioning:
 ```
 <version>-<date of release>-<tag>
 
-4.0-20240131-stable
+4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
-## [4.2-2025xxxx-stable] - 2025-xx-xx
 
-### Added
-- tenant defaults 
-### Changed
-### Fixed
+## [4.2-20260109-stable] - 2026-01-09
 
-## [4.1-20251007-stable] - 2025-xx-xx
+### edumeet-client
+
+#### Added
+- New UI theming options under `config.theme`, including:
+	- `backgroundImage`
+	- App bar color controls: `appBarTextColor`, `appBarIconColor`
+	- Pre-call UI color controls: `precallTitleColor`, `precallTitleTextColor`, `precallTitleIconColor`
+- Support for overriding Material UI theme parameters via `config.theme`
+  (e.g. `palette.primary.main`)
+- New configuration option `keepRoomNameOnLeave` to retain the room name in the URL after leaving
+- Additional UI and behavior configuration flags (QR code, countdown timer, info tooltip, reactions)
+
+#### Changed
+- Configuration structure clarified:
+	- UI/branding options are consistently grouped under `config.theme`
+	- Audio presets are clearly separated from global audio defaults
+- Screen sharing configuration key renamed:
+	- `screenResolution` → `screenSharingResolution`
+- Default webcam framerate increased to 30 FPS
+- Expanded and fully commented example configuration (`config.example.js`)
+
+#### Fixed
+- Inconsistent defaults between runtime config and documentation
+- Missing documentation for `audioPresets` sub-fields
+- Incorrect placement of theme-related configuration options in documentation
+
+
+### edumeet-management-server
+
+#### Added
+- Tenant defaults support.
+- New database migrations to support reactions and tenant defaults handling.
+- Logout helpers for OAuth-based authentication flows.
+- Additional request validation hooks (tenant/role ownership, non-empty names).
+
+#### Changed
+- Simplified defaults schema by removing managed (`*Managed`) fields.
+- Defaults service now supports safe preview (`get` / `find`) access.
+- Authorization and tenant isolation hardening across services and hooks.
+- ESLint modernization and dependency/toolchain updates.
+
+#### Fixed
+- Dynamic tenant handling edge cases.
+- Schema inconsistencies related to defaults and permissions.
+
+
+### edumeet-room-server
+
+#### Changed
+- Improved integration with management service defaults:
+	- Room-server now falls back to tenant defaults when no room record exists.
+	- Default room feature flags and branding are applied consistently.
+- Docker base image upgraded to Node.js 24.
+- Dependency updates (including `mediasoup` and `edumeet-common`).
+
+#### Fixed
+- Minor TypeScript and linting issues.
+- Improved robustness when resolving room defaults.
+
+
+### edumeet-media-node
+
+#### Changed
+- Docker base image upgraded to Node.js 24.
+- Dependency upgrades:
+	- `mediasoup` 3.19.x
+	- `edumeet-common` 0.6.4
+	- `socket.io` 4.8.x
+- Improved structured error logging for media production paths.
+
+#### Fixed
+- Better diagnostics when producer or data producer creation fails.
+- General stability improvements following dependency upgrades.
+
+
+
+
+## [4.1-20251007-stable] - 2025-10-07
 
 ### Added
 ### Changed
@@ -262,9 +335,3 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
-
-
-
-
-
-
