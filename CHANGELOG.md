@@ -13,6 +13,38 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [4.2-20260130-stable] - 2026-01-30 
+### edumeet-media-node
+#### Fixed
+- Upgraded dependencies
+- Draining timeout should not exit process (#51)
+
+### edumeet-management-server
+#### Fixed
+- Mariadb-operator returned roles as string instead of object (added checks to handle it)
+- Upgraded dependencies
+
+### edumeet-room-server
+#### Added
+- Initaial prometheus exporter with basic data (all room count, all peer count and detailed room data (roomId+medianodeusage/peercount))
+- Added live config reload for prometheus config
+- #120 Astagor fix breakout rooms
+#### Fixed
+- Updated dependencies 
+- Fix unmanaged room permissions (#121)
+
+### edumeet-client
+#### Fixed
+- Updated dependencies
+- #276 Change default value for max active videos from 0 to 12 when creating new rooms via mgmt interface
+- Fix video size in new window
+- Added chooser to apply effects for extra video
+- Fix locale bug (after exiting a meeting)
+- Fix extra video rendered black on change
+
+### edumeet-docker
+#### Fixed
+- Since the version 4.2 contianers run as edumeet user there were permission bugs with volume mounts (owned by root)
 
 ## [4.2-20260109-stable] - 2026-01-09
 
@@ -335,3 +367,4 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
