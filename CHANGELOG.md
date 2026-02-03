@@ -13,6 +13,27 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [4.2-20260203-stable] - 2026-02-03
+### edumeet-room-server
+#### Fixed
+- mediasoup upgrade (logs flooding our nodes)
+### edumeet-media-node
+#### Fixed
+- mediasoup upgrade (logs flooding our nodes)
+
+### edumeet-docker
+#### Added
+- Added a bittorrent tracker to edumeet dockerhub for file shareing
+
+## [4.2-20260202-stable] - 2026-02-02 
+### edumeet-client
+#### Fixed
+- package upgrades (fabric.js, feather.js, MUI)
+### edumeet-managment-server
+#### Fixed
+- issue with permission types when using mariadb cluster is now fixed
+- package upgrades
+
 ## [4.2-20260130-stable] - 2026-01-30 
 ### edumeet-media-node
 #### Fixed
@@ -367,4 +388,5 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
