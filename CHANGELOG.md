@@ -13,6 +13,14 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [4.2-20260213-stable] - 2026-02-13
+### general
+- Package upgrade
+### edumeet-client
+- Fix mgmt bug with sql cluster (rolePermissions have different id(s) in a cluster)
+### edumeet-room-server
+- Added new metrics for media-nodes in prometheus
+
 ## [4.2-20260203-stable] - 2026-02-03
 ### edumeet-room-server
 #### Fixed
@@ -388,5 +396,6 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
 
