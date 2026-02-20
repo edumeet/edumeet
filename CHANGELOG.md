@@ -13,6 +13,10 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [4.2-20260220-stable] - 2026-02-20
+### edumeet-docker
+- Added new logging variable to room server entrypoint, and .env file. (SERVER_DEBUG_LEVEL)
+
 ## [4.2-20260213-stable] - 2026-02-13
 ### general
 - Package upgrade
@@ -396,6 +400,7 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
 
 
