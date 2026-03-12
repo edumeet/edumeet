@@ -13,6 +13,16 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+
+## [4.2-20260312-stable] - 2026-03-12
+### edumeet-client
+- added client reconnect feature
+### edumeet-client
+- added client reconnect feature
+
+## [4.2-20260227-stable] - 2026-02-27
+### edumeet-room-server
+- Fixed type validation for mgmt server output(in case of mariadb backend)
 ## [4.2-20260220-stable] - 2026-02-20
 ### edumeet-docker
 - Added new logging variable to room server entrypoint, and .env file. (SERVER_DEBUG_LEVEL)
@@ -400,6 +410,7 @@ EduMEET is now written in TypeScrip and uses Node 18.x
 ### Fixed
 Every package is now updated to the latest available.
  
+
 
 
 
