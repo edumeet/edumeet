@@ -14,6 +14,15 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
+## [4.2-20260320-stable] - 2026-03-20
+### general
+- package upgrade on components
+### edumeet-client
+#### Fixed
+- race condition fixed for #292 [BUG] Leaving a room logs the user out
+#### Added
+- #295 Merge my rooms from Florian
+
 ## [4.2-20260312-stable] - 2026-03-12
 ### edumeet-client
 - added client reconnect feature
