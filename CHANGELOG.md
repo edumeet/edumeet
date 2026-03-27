@@ -14,6 +14,11 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
+## [4.2-20260327-stable] - 2026-03-27
+### general
+- Updated translations
+- Updated mediasoup to version 3.19.19
+
 ## [4.2-20260320-stable] - 2026-03-20
 ### general
 - package upgrade on components
