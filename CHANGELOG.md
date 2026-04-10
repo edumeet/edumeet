@@ -13,6 +13,28 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [4.2-20260410-stable] - 2026-04-10
+### general for all components
+- package manager for building is now yarn 4
+### edumeet-client
+- Remove unused dependencies
+- Update react material table to use locales
+- Supported browsers update
+- Added temporary fix for mediasoup bug
+
+### edumeet-management-server
+- Added field for hiding user details for non admin users, can be anbled or disable on each tenant
+### edumeet-room-server
+- Fixed router bug (listeners were giving out warnings)
+- Fixed memory leak on sessionIdChange listener
+- minor fixes
+
+### edumeet-media-node
+- improve stats
+- improve layer handling 
+
+### edumeet-common
+- moved p2p repo into edumeet project repo
 
 ## [4.2-20260327-stable] - 2026-03-27
 ### general
@@ -31,7 +53,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 ## [4.2-20260312-stable] - 2026-03-12
 ### edumeet-client
 - added client reconnect feature
-### edumeet-client
+### edumeet-server
 - added client reconnect feature
 
 ## [4.2-20260227-stable] - 2026-02-27
