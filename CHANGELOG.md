@@ -13,6 +13,17 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+
+## [4.2-20260417-stable] - 2026-04-17
+
+### edumeet-management-server
+- updated dompurify dependency
+
+### edumeet-client
+- updated dompurify dependency
+- updated translations
+- mediasoup fix
+
 ## [4.2-20260413-stable] - 2026-04-13
 ### edumeet-management-server
 - Fixed type issue with MariaDB backend
