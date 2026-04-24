@@ -22,7 +22,11 @@ The stable tag  is teseted by the development team and used by default for [edum
 ### edumeet-client
 - updated translations
 - added fix for mgmt-admin typechecking (role permission assigment)
+- added feature to give and take permissions on the fly
 
+### edumeet-room-server
+- added feature to give and take permissions on the fly
+ 
 ## [4.2-20260417-stable] - 2026-04-17
 
 ### edumeet-management-server
