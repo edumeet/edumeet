@@ -15,6 +15,22 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
 
+## [4.2-20260518-stable] - 2026-05-18
+### general
+- package upgrades
+### edumeet-client
+- Nginx upgraded to version 1.31.0
+- Add lang selector to admin
+### edumeet-room-server
+- Mediasoup update
+- #73 Add planned meetings and calendar invites.
+- Guard against flapping media nodes
+- Per-tenant media-node region binding
+### edumeet-media-node 
+- Fix vulns by removing unsed observerrtc
+### edumeet-management-server
+- Add password rate limiting for protecting against brute force attacks
+
 ## [4.2-20260423-stable] - 2026-04-23
 ### general
 - package upgrades
