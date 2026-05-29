@@ -15,6 +15,14 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
 
+## [4.2-20260529-stable] - 2026-05-29
+### general
+- package upgrades
+
+### edumeet-room-server
+- fix for mgmt reconnection logic in (ilde)
+- Fix unhandled promise rejection in Router.pipeToRouter
+
 ## [4.2-20260518-stable] - 2026-05-18
 ### general
 - package upgrades
