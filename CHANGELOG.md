@@ -13,8 +13,14 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
-
-
+## [4.2-20260605-stable] - 2026-06-05
+### general
+- package upgrades (mainly react-router and axios )
+  - React Router vulnerable to DoS via unbounded path expansion in __manifest endpoint 
+  - React Router's vendored turbo-stream v2 allows arbitrary constructor invocation via TYPE_ERROR deserialization leading to Unauth RCE #95
+  - CVE-2026-40175: Axios has Unrestricted Cloud Metadata Exfiltration via Header Injection Chain
+  - CVE-2025-62718: Axios has a NO_PROXY Hostname Normalization Bypass Leads to SSRF
+  - CVE-2026-29792: Feathers has an OAuth Callback Account Takeover issue
 ## [4.2-20260529-stable] - 2026-05-29
 ### general
 - package upgrades
