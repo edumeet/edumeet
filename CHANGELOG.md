@@ -13,35 +13,18 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
-## Federated webinars for eduMEET (NLnet NGI Zero Core — project 2024-10-244)
-
-The webinar capability — large-scale, presenter-led events on the distributed multi-media-node
-infrastructure — was delivered across the 4.2 release series. See [WEBINAR.md](WEBINAR.md) for the full
-technical description. The project's release milestones are marked inline in the entries below:
-
-- **Webinars — ALPHA**: `4.2-20260109-stable` (2026-01-09) — webinar foundation
-- **Webinars — BETA**: `4.2-20260423-stable` (2026-04-23) — feature-complete (live presenter promotion)
-- **Webinars — RELEASE 1.0**: `4.2-20260619-stable` (2026-06-19) — validated and released
-
-This work was funded by NLnet via the NGI0 Core Fund (EC Next Generation Internet programme, grant No 101092990).
-
-## [4.2-20260619-stable] - 2026-06-19 — 🎓 Federated webinars: RELEASE 1.0
+## [4.2-20260619-stable] - 2026-06-19
 This is the current stable release.
 
-### Federated webinars (NLnet 2024-10-244)
-- **Release 1.0.** Implementation and validation of the federated webinar capability are complete. Any room
-  can be operated as a full webinar: distributed multi-media-node scaling, a view-only audience default
-  role, assignable Presenter roles, and live promotion/demotion of speakers during the event. Validated by
-  a geographically-distributed load test — 512 participants across 6 media nodes (Poland ×2, Finland,
-  Portugal, Germany, Denmark); full results in [WEBINAR-LOADTEST.md](WEBINAR-LOADTEST.md). Architecture and
-  per-milestone detail in [WEBINAR.md](WEBINAR.md).
+### general
+- Federated webinars: 1.0 final release (validated at scale; see WEBINAR.md)
 
 ### edumeet-client
 - Fixed the MeetingsDialog date display
 - Fixed a too-short room-server request timeout that caused duplicate join attempts
 
 ### edumeet-room-server
-- Fixed duplicate producers for the same stream when a client retries (join-handshake idempotency)
+- Fixed duplicate producers for the same stream when a client retries
 - Fixed pipe-transport promise creation/cleanup (pipe-transport leak)
 
 ## [4.2-20260605-stable] - 2026-06-05
@@ -74,23 +57,18 @@ This is the current stable release.
 ### edumeet-management-server
 - Add password rate limiting for protecting against brute force attacks
 
-## [4.2-20260423-stable] - 2026-04-23 — 🎓 Federated webinars: BETA
+## [4.2-20260423-stable] - 2026-04-23
 ### general
 - package upgrades
-
-### Federated webinars (NLnet 2024-10-244)
-- **Beta.** Live presenter management completed: a host can promote an audience member to presenter — or
-  demote them — on the fly during a running event, via the dynamic permission controls. This was the final
-  webinar-critical feature; combined with the view-only default role and the distributed media-node scaling,
-  any room can be operated as a full webinar. Feature-complete ahead of final validation. See [WEBINAR.md](WEBINAR.md).
+- Federated webinars: beta (live presenter promotion / on-the-fly permissions)
 
 ### edumeet-client
 - updated translations
 - added fix for mgmt-admin typechecking (role permission assigment)
-- added feature to give and take permissions on the fly (live promote/demote of presenters — webinar)
+- added feature to give and take permissions on the fly
 
 ### edumeet-room-server
-- added feature to give and take permissions on the fly (live promote/demote of presenters — webinar)
+- added feature to give and take permissions on the fly
  
 ## [4.2-20260417-stable] - 2026-04-17
 
@@ -150,7 +128,7 @@ This is the current stable release.
 
 ## [4.2-20260312-stable] - 2026-03-12
 ### edumeet-client
-- added client reconnect feature (resilience for large, long-running webinar sessions — NLnet 2024-10-244)
+- added client reconnect feature
 ### edumeet-server
 - added client reconnect feature
 
@@ -223,14 +201,10 @@ This is the current stable release.
 #### Fixed
 - Since the version 4.2 contianers run as edumeet user there were permission bugs with volume mounts (owned by root)
 
-## [4.2-20260109-stable] - 2026-01-09 — 🎓 Federated webinars: ALPHA
+## [4.2-20260109-stable] - 2026-01-09
 
-### Federated webinars (NLnet 2024-10-244)
-- **Alpha.** First 4.2 release consolidating the full webinar foundation: rooms served by the distributed
-  multi-media-node infrastructure (geographic/load routing plus inter-node media bridging), role-based
-  permissions with a per-room **default role** so an audience can be made view-only, and tenant/room
-  defaults to configure it. This is what makes any room configurable as a webinar (organizer = room
-  owner, presenters via assigned role, audience via the view-only default role). See [WEBINAR.md](WEBINAR.md).
+### general
+- Federated webinars: alpha (distributed multi-node foundation + roles / view-only default role)
 
 ### edumeet-client
 
