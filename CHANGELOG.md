@@ -14,18 +14,81 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 
+## Federated webinars for eduMEET (NLnet NGI Zero Core — project 2024-10-244)
 
-## [4.2-20260423-stable] - 2026-04-23
+The webinar capability — large-scale, presenter-led events on the distributed multi-media-node
+infrastructure — was delivered across the 4.2 release series. See [WEBINAR.md](WEBINAR.md) for the full
+technical description. The project's release milestones are marked inline in the entries below:
+
+- **Webinars — ALPHA**: `4.2-20260109-stable` (2026-01-09) — webinar foundation
+- **Webinars — BETA**: `4.2-20260423-stable` (2026-04-23) — feature-complete (live presenter promotion)
+- **Webinars — RELEASE 1.0**: `4.2-20260619-stable` (2026-06-19) — validated and released
+
+This work was funded by NLnet via the NGI0 Core Fund (EC Next Generation Internet programme, grant No 101092990).
+
+## [4.2-20260619-stable] - 2026-06-19 — 🎓 Federated webinars: RELEASE 1.0
+This is the current stable release.
+
+### Federated webinars (NLnet 2024-10-244)
+- **Release 1.0.** Implementation and validation of the federated webinar capability are complete. Any room
+  can be operated as a full webinar: distributed multi-media-node scaling, a view-only audience default
+  role, assignable Presenter roles, and live promotion/demotion of speakers during the event. Validated by
+  a geographically-distributed load test — 512 participants across 6 media nodes (Poland ×2, Finland,
+  Portugal, Germany, Denmark); full results in [WEBINAR-LOADTEST.md](WEBINAR-LOADTEST.md). Architecture and
+  per-milestone detail in [WEBINAR.md](WEBINAR.md).
+
+### edumeet-client
+- Added planned meetings and calendar invites (#308), with locale-correct calendar/date formatting and a fix for the MeetingsDialog date display
+- Hide the Meetings view when invites are disabled; warn when invite sending is not configured
+- Per-tenant media-node region binding (#311)
+- Added a language selector to the management admin
+- OIDC: send `id_token_hint` on logout (including super admin); fixed default OIDC values and an OIDC translation
+- Dynamic screen-share aspect ratio (#310)
+- Send `tenantId` when creating a group from the management dialog
+- Fixed microphone handling on device change
+- Fixed super-admin defaults creation (disable fields on add)
+- Reduced the room-server request waiting time; node-datachannel build fix; dependency updates
+
+### edumeet-room-server
+- Per-tenant media-node region binding for privacy (#137), including countries belonging to multiple regions
+- Added room-server ↔ management-server re-authentication on auth failure
+- Guard against flapping media nodes
+- Hardened crash handling: global `unhandledRejection`/`uncaughtException` handling; fixed unhandled rejection in `Router.pipeToRouter` and pipe-transport promise creation/cleanup (pipe-transport leak)
+- Fixed duplicate producers for the same stream when a client retries (join-handshake idempotency)
+- mediasoup 3.19.22; vulnerability fixes; dependency upgrades
+
+### edumeet-management-server
+- Added planned meetings and calendar invites (#48), with Outlook-compatible invite text and date formatting
+- Per-tenant media-node region binding (#49)
+- Added per-IP password rate limiting (brute-force protection), including proxy-IP handling; login throttle now counts only 401s
+- Fixed tenant scoping in roles, groups and defaults; allow tenant admins to patch their own tenant
+- OIDC: send `id_token_hint` on logout; fixed login failing after an `ssoId` change
+- Warn when invite sending is not configured; fixed super-admin defaults creation
+- Dependency upgrades
+
+### edumeet-media-node
+- mediasoup 3.19.22
+- Removed the unused observertc dependency (vulnerability fixes)
+- Hardened crash handling (global `unhandledRejection`/`uncaughtException`)
+- Dependency upgrades
+
+## [4.2-20260423-stable] - 2026-04-23 — 🎓 Federated webinars: BETA
 ### general
 - package upgrades
+
+### Federated webinars (NLnet 2024-10-244)
+- **Beta.** Live presenter management completed: a host can promote an audience member to presenter — or
+  demote them — on the fly during a running event, via the dynamic permission controls. This was the final
+  webinar-critical feature; combined with the view-only default role and the distributed media-node scaling,
+  any room can be operated as a full webinar. Feature-complete ahead of final validation. See [WEBINAR.md](WEBINAR.md).
 
 ### edumeet-client
 - updated translations
 - added fix for mgmt-admin typechecking (role permission assigment)
-- added feature to give and take permissions on the fly
+- added feature to give and take permissions on the fly (live promote/demote of presenters — webinar)
 
 ### edumeet-room-server
-- added feature to give and take permissions on the fly
+- added feature to give and take permissions on the fly (live promote/demote of presenters — webinar)
  
 ## [4.2-20260417-stable] - 2026-04-17
 
@@ -85,7 +148,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 
 ## [4.2-20260312-stable] - 2026-03-12
 ### edumeet-client
-- added client reconnect feature
+- added client reconnect feature (resilience for large, long-running webinar sessions — NLnet 2024-10-244)
 ### edumeet-server
 - added client reconnect feature
 
@@ -158,7 +221,14 @@ The stable tag  is teseted by the development team and used by default for [edum
 #### Fixed
 - Since the version 4.2 contianers run as edumeet user there were permission bugs with volume mounts (owned by root)
 
-## [4.2-20260109-stable] - 2026-01-09
+## [4.2-20260109-stable] - 2026-01-09 — 🎓 Federated webinars: ALPHA
+
+### Federated webinars (NLnet 2024-10-244)
+- **Alpha.** First 4.2 release consolidating the full webinar foundation: rooms served by the distributed
+  multi-media-node infrastructure (geographic/load routing plus inter-node media bridging), role-based
+  permissions with a per-room **default role** so an audience can be made view-only, and tenant/room
+  defaults to configure it. This is what makes any room configurable as a webinar (organizer = room
+  owner, presenters via assigned role, audience via the view-only default role). See [WEBINAR.md](WEBINAR.md).
 
 ### edumeet-client
 
