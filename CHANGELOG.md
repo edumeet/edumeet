@@ -13,7 +13,6 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
-
 ## Federated webinars for eduMEET (NLnet NGI Zero Core — project 2024-10-244)
 
 The webinar capability — large-scale, presenter-led events on the distributed multi-media-node
@@ -38,39 +37,42 @@ This is the current stable release.
   per-milestone detail in [WEBINAR.md](WEBINAR.md).
 
 ### edumeet-client
-- Added planned meetings and calendar invites (#308), with locale-correct calendar/date formatting and a fix for the MeetingsDialog date display
-- Hide the Meetings view when invites are disabled; warn when invite sending is not configured
-- Per-tenant media-node region binding (#311)
-- Added a language selector to the management admin
-- OIDC: send `id_token_hint` on logout (including super admin); fixed default OIDC values and an OIDC translation
-- Dynamic screen-share aspect ratio (#310)
-- Send `tenantId` when creating a group from the management dialog
-- Fixed microphone handling on device change
-- Fixed super-admin defaults creation (disable fields on add)
-- Reduced the room-server request waiting time; node-datachannel build fix; dependency updates
+- Fixed the MeetingsDialog date display
+- Fixed a too-short room-server request timeout that caused duplicate join attempts
 
 ### edumeet-room-server
-- Per-tenant media-node region binding for privacy (#137), including countries belonging to multiple regions
-- Added room-server ↔ management-server re-authentication on auth failure
-- Guard against flapping media nodes
-- Hardened crash handling: global `unhandledRejection`/`uncaughtException` handling; fixed unhandled rejection in `Router.pipeToRouter` and pipe-transport promise creation/cleanup (pipe-transport leak)
 - Fixed duplicate producers for the same stream when a client retries (join-handshake idempotency)
-- mediasoup 3.19.22; vulnerability fixes; dependency upgrades
+- Fixed pipe-transport promise creation/cleanup (pipe-transport leak)
 
+## [4.2-20260605-stable] - 2026-06-05
+### general
+- package upgrades (mainly react-router and axios )
+  - React Router vulnerable to DoS via unbounded path expansion in __manifest endpoint 
+  - React Router's vendored turbo-stream v2 allows arbitrary constructor invocation via TYPE_ERROR deserialization leading to Unauth RCE #95
+  - CVE-2026-40175: Axios has Unrestricted Cloud Metadata Exfiltration via Header Injection Chain
+  - CVE-2025-62718: Axios has a NO_PROXY Hostname Normalization Bypass Leads to SSRF
+  - CVE-2026-29792: Feathers has an OAuth Callback Account Takeover issue
+## [4.2-20260529-stable] - 2026-05-29
+### general
+- package upgrades
+### edumeet-room-server
+- fix for mgmt reconnection logic in (ilde)
+- Fix unhandled promise rejection in Router.pipeToRouter
+## [4.2-20260518-stable] - 2026-05-18
+### general
+- package upgrades
+### edumeet-client
+- Nginx upgraded to version 1.31.0
+- Add lang selector to admin
+### edumeet-room-server
+- Mediasoup update
+- #73 Add planned meetings and calendar invites.
+- Guard against flapping media nodes
+- Per-tenant media-node region binding
+### edumeet-media-node 
+- Fix vulns by removing unsed observerrtc
 ### edumeet-management-server
-- Added planned meetings and calendar invites (#48), with Outlook-compatible invite text and date formatting
-- Per-tenant media-node region binding (#49)
-- Added per-IP password rate limiting (brute-force protection), including proxy-IP handling; login throttle now counts only 401s
-- Fixed tenant scoping in roles, groups and defaults; allow tenant admins to patch their own tenant
-- OIDC: send `id_token_hint` on logout; fixed login failing after an `ssoId` change
-- Warn when invite sending is not configured; fixed super-admin defaults creation
-- Dependency upgrades
-
-### edumeet-media-node
-- mediasoup 3.19.22
-- Removed the unused observertc dependency (vulnerability fixes)
-- Hardened crash handling (global `unhandledRejection`/`uncaughtException`)
-- Dependency upgrades
+- Add password rate limiting for protecting against brute force attacks
 
 ## [4.2-20260423-stable] - 2026-04-23 — 🎓 Federated webinars: BETA
 ### general
