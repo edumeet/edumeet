@@ -1,7 +1,7 @@
-# eduMEET webinar — load & scaling test results
+# eduMEET webinar - load & scaling test results
 
 > Validation artifact for NLnet project **2024-10-244 "Federated webinars for eduMEET"**, milestone
-> *3a — Federated webinar scenarios tested*. See [WEBINAR.md](WEBINAR.md) for the architecture this
+> *3a - Federated webinar scenarios tested*. See [WEBINAR.md](WEBINAR.md) for the architecture this
 > validates.
 
 ## 1. Test setup
@@ -11,9 +11,9 @@
 | Test date | **2 June 2026** (released in `4.2-20260619-stable`) |
 | Concurrent clients | **512 headless browsers** |
 | Active senders | **10**: 1 presenter (screen share) + 9 panelists (webcam + microphone) |
-| View-only audience | **~502** (no webcam/mic/screen permission — view-only default role) |
+| View-only audience | **~502** (no webcam/mic/screen permission - view-only default role) |
 | Media nodes | **6, geographically distributed**: Poland ×2, Finland, Portugal, Germany, Denmark |
-| Routing | Standard geo + load routing — each client served by its nearest/least-loaded node |
+| Routing | Standard geo + load routing - each client served by its nearest/least-loaded node |
 | Video codec | **VP8 simulcast** (client default profiles) |
 
 This is the canonical webinar traffic shape: **a handful of senders, a large view-only audience.** The
@@ -32,7 +32,7 @@ audio preset `conference`):
 | --- | --- | --- |
 | Panelist webcam | `medium` = 640 | 320@150 kbps + 640@500 kbps |
 | Presenter screen | `veryhigh` = 1920 @5 fps | 320@150 + 640@500 + 1920@3500 kbps |
-| Audio (Opus, `conference`) | 48 kHz mono, FEC | — |
+| Audio (Opus, `conference`) | 48 kHz mono, FEC | - |
 
 ## 3. Results
 
@@ -85,17 +85,17 @@ Inter-node bridging is bounded by panel size, not audience size.
 The 6-node / 512-client geographically-distributed run exercised the full webinar media path end-to-end:
 all **512 clients joined successfully** (median join time **2.7 s**, median end-to-end latency **328 ms**),
 distributed by geo/load routing, with presenter and panel media bridged between nodes via pipe transports
-and consumed locally on each node. The dominant load — audience egress — was divided across the node pool,
+and consumed locally on each node. The dominant load - audience egress - was divided across the node pool,
 peaking at **294 Mbps per node**, while total upstream ingest stayed at **8.274 Mbps** and total inter-node
-mesh traffic at **41 Mbps** — both bounded by the small panel and independent of audience size. Per-node
-resource use stayed low — **8.71%** CPU (normalized to 8 cores) and **1.7 GB** memory, versus **54%** CPU
+mesh traffic at **41 Mbps** - both bounded by the small panel and independent of audience size. Per-node
+resource use stayed low - **8.71%** CPU (normalized to 8 cores) and **1.7 GB** memory, versus **54%** CPU
 and **3.8 GB** to serve the same event from a single node. This confirms the horizontal-scaling design:
-audience size is absorbed by adding media nodes, with per-node load staying low — leaving substantial
+audience size is absorbed by adding media nodes, with per-node load staying low - leaving substantial
 headroom to scale well beyond 512 concurrent participants.
 
 ---
 
-## Appendix — Dimensioning model (expected magnitudes from the encoding profiles)
+## Appendix - Dimensioning model (expected magnitudes from the encoding profiles)
 
 This appendix derives the expected order of magnitude for each metric above from the shipped client
 encoding profiles, as a reference for what the measured numbers in §3 should look like. These are
@@ -106,16 +106,16 @@ analytical values from the profiles, not measurements.
 | Stream | Aggregate |
 | --- | --- |
 | Panelist webcam (640: 150 + 500) | 650 kbps |
-| Presenter screen (1920 cap: 150 + 500 + 3500) | 4 150 kbps cap (≈1.0–1.5 Mbps typical at 5 fps) |
+| Presenter screen (1920 cap: 150 + 500 + 3500) | 4 150 kbps cap (≈1.0-1.5 Mbps typical at 5 fps) |
 | Audio (Opus conference) | ~40 kbps |
 
-**Upstream ingest** — `presenter (4150+40) + 9×(650+40)` ≈ **10.4 Mbps** worst case (only the panel uploads).
+**Upstream ingest** - `presenter (4150+40) + 9×(650+40)` ≈ **10.4 Mbps** worst case (only the panel uploads).
 
-**Downstream per viewer** — presenter screen (1 layer) + 9 panel thumbnails (low layer 150 kbps) + panel
+**Downstream per viewer** - presenter screen (1 layer) + 9 panel thumbnails (low layer 150 kbps) + panel
 audio: `1500 + 9×150 + 10×40` ≈ **3.25 Mbps** (worst case, mid layers ≈ 8.4 Mbps).
 
-**Aggregate egress** — `~502 × 3.25 Mbps` ≈ **1.6 Gbps**, across 6 nodes ≈ **270 Mbps/node** (worst case
+**Aggregate egress** - `~502 × 3.25 Mbps` ≈ **1.6 Gbps**, across 6 nodes ≈ **270 Mbps/node** (worst case
 ≈ 700 Mbps/node).
 
-**Inter-node bridging** — each panel stream piped once per remote node: `~10.4 Mbps/node`, total mesh
-`~52 Mbps` — independent of audience size.
+**Inter-node bridging** - each panel stream piped once per remote node: `~10.4 Mbps/node`, total mesh
+`~52 Mbps` - independent of audience size.
