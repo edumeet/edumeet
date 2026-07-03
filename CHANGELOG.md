@@ -13,6 +13,13 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [4.2-20260703-stable] - 2026-07-03
+
+### general
+- mediasoup update 3.20.1
+### edumeet-client
+- fix for Performance Issue: All Participant Videos Consumed Regardless of Visibility #314
+
 ## [4.2-20260619-stable] - 2026-06-19
 This is the current stable release.
 
