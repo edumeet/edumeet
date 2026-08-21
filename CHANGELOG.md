@@ -13,6 +13,35 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [4.2-20260821-stable] - 2026-08-21
+
+### general
+- mediasoup update 3.23.2
+
+### edumeet-client
+- Fixed a burst of console errors when joining with a role that is not allowed to share audio or video
+- The client no longer tries to start media that the current role cannot send
+- Screen audio is no longer captured when the role can share the screen but not audio
+- Failed signaling requests now report the actual cause instead of an unrelated error
+- Package upgrades: MUI 9, MUI date pickers 9, Vite 8, react-intl 10, marked 18 and webtorrent 3
+- Fixed layouts broken by the MUI 9 upgrade: the audio gain slider, drawing menu pickers and permissions dialog stacked in the wrong direction
+- Fixed chat message headers rendering at the wrong text size
+- Fixed drawing toolbar and management sidebar icons showing the wrong symbol
+- Fixed inline formatting being lost inside markdown links in chat messages
+- Fixed file sharing not finding a shared file after a media server change
+- Fixed the tenant rules editor not preselecting the saved group, and listing groups from other tenants
+- Fixed the negate column in the rules list always appearing empty
+- The rule parameter field now offers the attributes a login actually carries
+- The tenant is now preselected when adding a rule and can no longer be left empty
+
+### edumeet-management-server
+- Group membership is no longer granted across tenant boundaries
+- A group or role grant that fails is now reported in the log instead of being silently dropped, and no longer affects the login that triggered it
+- Fixed a rule with a misspelled parameter blocking every login for the tenant when negated
+- Fixed the selected tenant being ignored when a super admin creates a rule
+- Rules that can never match are now reported in the log
+- A login refused by a rule now reports a permission error instead of a server error
+
 ## [4.2-20260703-stable] - 2026-07-03
 
 ### general
