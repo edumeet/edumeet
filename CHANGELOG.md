@@ -34,9 +34,10 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The rule parameter field now offers the attributes a login actually carries
 - The tenant is now preselected when adding a rule and can no longer be left empty
 - Rules now separate what a rule does from what it matches: an access rule is a Block or an Allow, chosen directly, instead of a negate checkbox that inverted the condition
-- The negate checkbox and the "does not ..." comparisons are gone. A Block rule and an Allow rule express the same intent correctly, where two negated conditions used to cancel each other out. Rules that already use one keep working and still read correctly
+- The negate checkbox is gone and negated conditions are no longer offered; a block rule and an allow rule express the same intent correctly. Rules that already use one keep working and still read correctly
 - The rules list shows the rule type and its condition as readable phrases
 - Added an info button to the rule dialog explaining how access and grant rules work
+- Added the "matches anyone" comparison, which is how a tenant states its default as a visible rule instead of it being implied
 
 ### edumeet-management-server
 - Group membership is no longer granted across tenant boundaries
@@ -47,10 +48,12 @@ The stable tag  is teseted by the development team and used by default for [edum
 - A login refused by a rule now reports a permission error instead of a server error
 - Access rules are now applied at every sign in, not only when the account is first created, so access can be withdrawn without deleting the user
 - Allow rules now combine as expected: listing two domains admits both, where previously a second allow rule blocked everyone
-- Block rules and allow rules are now separate types, so a block is never defeated by an unrelated allow
+- Block rules and allow rules are separate types that compose correctly, where a single type with a negate flag did not: two allow-list rules used to cancel out and refuse everybody
 - An allow rule that cannot be evaluated no longer locks out the tenant
 - Existing rules are converted automatically on upgrade; see the Rules section of the management server readme for what changes
 - Administrators are never refused by an access rule: the super admin and the admins and owners of a tenant can always sign in, so a rule cannot lock them out of the settings that define it
+- A tenant states its default as a visible rule rather than having it implied: a tenant is open unless it holds a block rule with the "matches anyone" comparison. Existing allow lists gain that rule automatically on upgrade, so they keep restricting exactly as before
+- The most specific matching rule decides, with block winning a tie, so a block rule can have exceptions: blocking a whole provider while admitting one named address from it now works
 
 ## [4.2-20260703-stable] - 2026-07-03
 
