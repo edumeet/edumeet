@@ -20,7 +20,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - package upgrades across all components to clear reported security advisories, including a denial of service in the signaling transport reachable without authentication
 
 ### edumeet-client
-- mediasoup-client update 3.22.0, keeping the media timing information the server uses for audio and video synchronisation
+- mediasoup-client update 3.22.0
 - The permissions panel can now load a tenant role into the checkboxes, so a set of peers can be given a role's permissions in one step
 - The permissions panel now marks the permissions a moderator cannot grant, and leaves them out of the pending changes list
 - Fixed a burst of console errors when joining with a role that is not allowed to share audio or video
