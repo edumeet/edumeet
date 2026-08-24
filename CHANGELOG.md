@@ -16,9 +16,11 @@ The stable tag  is teseted by the development team and used by default for [edum
 ## [Upcoming release]
 
 ### general
-- mediasoup update 3.23.2
+- mediasoup update 3.26.0
+- package upgrades across all components to clear reported security advisories, including a denial of service in the signaling transport reachable without authentication
 
 ### edumeet-client
+- mediasoup-client update 3.22.0, keeping the media timing information the server uses for audio and video synchronisation
 - The permissions panel can now load a tenant role into the checkboxes, so a set of peers can be given a role's permissions in one step
 - The permissions panel now marks the permissions a moderator cannot grant, and leaves them out of the pending changes list
 - Fixed a burst of console errors when joining with a role that is not allowed to share audio or video
@@ -40,6 +42,9 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The rules list shows the rule type and its condition as readable phrases
 - Added an info button to the rule dialog explaining how access and grant rules work
 - Added the "matches anyone" comparison, which is how a tenant states its default as a visible rule instead of it being implied
+
+### edumeet-media-node
+- Fixed the unit test suite, which could not load three of its test files and so skipped the worker startup and router selection tests
 
 ### edumeet-management-server
 - Group membership is no longer granted across tenant boundaries
