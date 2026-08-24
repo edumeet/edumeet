@@ -13,7 +13,7 @@ We are using a rolling release versioning:
 4.2-20260109-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
-## [4.2-20260821-stable] - 2026-08-21
+## [Upcoming release]
 
 ### general
 - mediasoup update 3.23.2
@@ -54,16 +54,19 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Administrators are never refused by an access rule: the super admin and the admins and owners of a tenant can always sign in, so a rule cannot lock them out of the settings that define it
 - A tenant states its default as a visible rule rather than having it implied: a tenant is open unless it holds a block rule with the "matches anyone" comparison. Existing allow lists gain that rule automatically on upgrade, so they keep restricting exactly as before
 - The most specific matching rule decides, with block winning a tie, so a block rule can have exceptions: blocking a whole provider while admitting one named address from it now works
+- Fixed the user groups and group roles lists showing entries from other tenants
+- Role permissions and room owners are no longer readable across tenant boundaries
 
 ## [4.2-20260703-stable] - 2026-07-03
+This is the current stable release.
 
 ### general
 - mediasoup update 3.20.1
+
 ### edumeet-client
 - fix for Performance Issue: All Participant Videos Consumed Regardless of Visibility #314
 
 ## [4.2-20260619-stable] - 2026-06-19
-This is the current stable release.
 
 ### general
 - Federated webinars: 1.0 final release (validated at scale; see WEBINAR.md)
