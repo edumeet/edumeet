@@ -19,6 +19,8 @@ The stable tag  is teseted by the development team and used by default for [edum
 - mediasoup update 3.23.2
 
 ### edumeet-client
+- The permissions panel can now load a tenant role into the checkboxes, so a set of peers can be given a role's permissions in one step
+- The permissions panel now marks the permissions a moderator cannot grant, and leaves them out of the pending changes list
 - Fixed a burst of console errors when joining with a role that is not allowed to share audio or video
 - The client no longer tries to start media that the current role cannot send
 - Screen audio is no longer captured when the role can share the screen but not audio
