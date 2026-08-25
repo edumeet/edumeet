@@ -42,6 +42,11 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The rules list shows the rule type and its condition as readable phrases
 - Added an info button to the rule dialog explaining how access and grant rules work
 - Added the "matches anyone" comparison, which is how a tenant states its default as a visible rule instead of it being implied
+- Added a control in the participant list to stop receiving the other participants' cameras, which saves bandwidth on a slow connection. Screen shares and audio keep arriving, the choice affects only your own client and lasts until you leave the meeting
+- A top bar icon appears while camera reception is off, and starts it again when clicked
+- The moderator actions that apply to everyone in the room now ask for confirmation before they run
+- Stop all video now also stops a participant's extra video, which previously could not be stopped by a moderator at all
+- Fixed the moderator buttons disabling one another while any one of them was running
 
 ### edumeet-media-node
 - Fixed the unit test suite, which could not load three of its test files and so skipped the worker startup and router selection tests
