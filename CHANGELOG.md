@@ -47,6 +47,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The moderator actions that apply to everyone in the room now ask for confirmation before they run
 - Stop all video now also stops a participant's extra video, which previously could not be stopped by a moderator at all
 - Fixed the moderator buttons disabling one another while any one of them was running
+- The screen is now kept awake during a meeting, so a device left idle no longer locks itself and interrupts audio and video
 
 ### edumeet-media-node
 - Fixed the unit test suite, which could not load three of its test files and so skipped the worker startup and router selection tests
