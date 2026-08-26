@@ -48,6 +48,23 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Stop all video now also stops a participant's extra video, which previously could not be stopped by a moderator at all
 - Fixed the moderator buttons disabling one another while any one of them was running
 - The screen is now kept awake during a meeting, so a device left idle no longer locks itself and interrupts audio and video
+- Local recordings are now saved in the most compatible format the browser can produce, and the file name extension always matches what was actually recorded
+- Added a setting to choose the recording format manually, offering only the formats the browser supports
+- Recording files are now named after the room and the time the recording started
+- Recordings are now repackaged while they are saved, so players show the correct length and seeking through the video works; previously neither did
+- Recording no longer holds the whole file in memory on Firefox and Safari, and is written to disk while it runs
+- Fixed the last seconds of a recording being discarded when it was stopped
+- A recording interrupted by a crash or a closed tab can now be saved the next time the client is opened, from the room or the landing page
+- Recording continues into a second file when the browser runs low on storage, instead of stopping
+- Recording problems are now reported instead of failing silently
+- While a recording is being written to disk, the top bar shows that it is saving and how far it has got
+- Starting a recording is refused while an earlier recording is still waiting to be saved, so it cannot be lost
+- A second tab no longer offers to save a recording that is still running in another tab
+- The recording format settings are locked while a recording is running
+- Recording is no longer offered on mobile browsers, which cannot capture a screen
+- Fixed a recording becoming unplayable when the window was resized while it ran
+- Fixed cancelling the leave confirmation stopping the recording
+- The recording bitrate had no effect and is now applied
 
 ### edumeet-media-node
 - Fixed the unit test suite, which could not load three of its test files and so skipped the worker startup and router selection tests
