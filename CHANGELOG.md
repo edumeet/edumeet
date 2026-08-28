@@ -65,6 +65,17 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Fixed a recording becoming unplayable when the window was resized while it ran
 - Fixed cancelling the leave confirmation stopping the recording
 - The recording bitrate had no effect and is now applied
+- Participants can now send private messages to each other. A private conversation is started from the participant list and opens as its own thread in the chat panel, next to the room chat
+- Closing a private conversation hides it and keeps its messages, so reopening it, or receiving a new message in it, shows the conversation as it was
+- The chat button now also counts unread private messages, and the participant list marks who is waiting for a reply
+- A chat message that cannot be sent is now reported, and the text stays in the input instead of being discarded
+- Display names and chat messages are limited in length in the input fields
+
+### edumeet-room-server
+- Private messages between participants are delivered to the recipient only, are never stored on the server, and reach a participant who has moved to a breakout room
+- Private messages follow the room chat: they need the same permission and are unavailable when chat is turned off for the room
+- Chat messages and display names are now checked and limited in length. A malformed value sent by a modified client could previously break the display for everyone in the room
+- A participant who joins without a usable name is now shown as a guest instead of appearing nameless
 
 ### edumeet-media-node
 - Fixed the unit test suite, which could not load three of its test files and so skipped the worker startup and router selection tests
