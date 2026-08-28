@@ -67,9 +67,13 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The recording bitrate had no effect and is now applied
 - Participants can now send private messages to each other. A private conversation is started from the participant list and opens as its own thread in the chat panel, next to the room chat
 - Closing a private conversation hides it and keeps its messages, so reopening it, or receiving a new message in it, shows the conversation as it was
-- The chat button now also counts unread private messages, and the participant list marks who is waiting for a reply
+- The chat button now also counts unread private messages
+- A private conversation can also be started from someone's message in the room chat, for as long as they are still in the meeting
+- Receiving a private message plays the same notification sound as a message in the room chat
+- The chat panel names the conversation you are reading, and shows the breakout room's name while you are in one
 - A chat message that cannot be sent is now reported, and the text stays in the input instead of being discarded
 - Display names and chat messages are limited in length in the input fields
+- The chat input no longer takes part in the browser's form autofill, which could cover the conversation with unrelated suggestions and stored typed messages in the browser's own history
 
 ### edumeet-room-server
 - Private messages between participants are delivered to the recipient only, are never stored on the server, and reach a participant who has moved to a breakout room
