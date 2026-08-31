@@ -10,14 +10,21 @@ We are using a rolling release versioning:
 ```
 <version>-<date of release>-<tag>
 
-4.2-20260109-stable
+4.2-20260828-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
 
+### edumeet-client
+- mediasoup-client update 3.23.1
+
+## [4.2-20260828-stable] - 2026-08-28
+This is the current stable release.
+
 ### general
 - mediasoup update 3.26.0
 - package upgrades across all components to clear reported security advisories, including a denial of service in the signaling transport reachable without authentication
+- Optional end to end encryption of media, off by default and enabled per tenant or per room. Media nodes no longer handle decoded audio and video while it is on. This is a proof of concept and has not been independently audited
 
 ### edumeet-client
 - mediasoup-client update 3.22.0
@@ -74,12 +81,18 @@ The stable tag  is teseted by the development team and used by default for [edum
 - A chat message that cannot be sent is now reported, and the text stays in the input instead of being discarded
 - Display names and chat messages are limited in length in the input fields
 - The chat input no longer takes part in the browser's form autofill, which could cover the conversation with unrelated suggestions and stored typed messages in the browser's own history
+- Media is encrypted in the browser before it reaches the network when end to end encryption is on, using the WebRTC encoded transform with AES-GCM in a worker
+- A room that requires end to end encryption refuses a browser that cannot support it, and removes a browser that accepts the transform but does not encrypt, rather than letting it send unprotected media
+- A shield in the top bar shows whether encryption has been confirmed for the room, and the participant list flags a peer whose identity key changes during a call
+- End to end encryption can be set as a tenant default, with an optional lock, and per room from the management views
 
 ### edumeet-room-server
 - Private messages between participants are delivered to the recipient only, are never stored on the server, and reach a participant who has moved to a breakout room
 - Private messages follow the room chat: they need the same permission and are unavailable when chat is turned off for the room
 - Chat messages and display names are now checked and limited in length. A malformed value sent by a modified client could previously break the display for everyone in the room
 - A participant who joins without a usable name is now shown as a guest instead of appearing nameless
+- Rooms carry an end to end encryption setting, resolved from the room, the tenant default and the server configuration, and reported to clients on join and while they wait in the lobby
+- Relays the end to end encryption key exchange between peers without being able to read it
 
 ### edumeet-media-node
 - Fixed the unit test suite, which could not load three of its test files and so skipped the worker startup and router selection tests
@@ -101,9 +114,9 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The most specific matching rule decides, with block winning a tie, so a block rule can have exceptions: blocking a whole provider while admitting one named address from it now works
 - Fixed the user groups and group roles lists showing entries from other tenants
 - Role permissions and room owners are no longer readable across tenant boundaries
+- Tenants carry an end to end encryption default with an optional lock, and a room can override it unless the tenant lock is set
 
 ## [4.2-20260703-stable] - 2026-07-03
-This is the current stable release.
 
 ### general
 - mediasoup update 3.20.1
