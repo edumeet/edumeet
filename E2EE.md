@@ -267,7 +267,7 @@ over when asked. Identity keys survive a reconnect, so no change of identity is 
 ### The alternatives at lecture scale
 
 Pairwise distribution is what keeps a departure with many senders expensive, and there are two known
-ways past it. Both change the key model rather than the rotation, and neither is built here.
+ways past it. Both change the key model rather than the rotation.
 
 **A leader with a room key.** One participant, named by the room server, generates a single room key
 and hands it to each participant pairwise. Each sender's frame key is derived from it, so the frame
@@ -275,17 +275,188 @@ format and the worker stay as they are. A departure is then one participant send
 rather than every sender doing so, and a single security code read aloud verifies the whole meeting.
 The price is that one key protects the whole room, so one compromise exposes everyone rather than one
 sender, that everyone stalls for a round trip when the leader leaves, and that the room server has to
-name the leader.
+name the leader. It is not built, and would be a dead end if MLS is the destination.
 
 **MLS (RFC 9420).** A group secret held in a ratchet tree, where a membership change is a single
-commit of logarithmic size rather than every member re keying every other member. There is an IETF
-draft binding SFrame keys to MLS exporters, so the two are designed to fit together. The cryptography
-is available in a browser without WebAssembly. What it needs is an ordered delivery service for
-commits, which the room server is not today, and a substantial amount of group state and recovery
-machinery. It is the answer if this is ever wanted at lecture scale with everyone sending.
+commit of logarithmic size rather than every member re keying every other member. This is the
+planned next step, and the next section is the plan.
 
-For a feature that is off by default, opt in per room, and built to keep media nodes out at meeting
-scale, pairwise keys with the rules above are the smaller and more reviewable mechanism.
+## Next step: MLS
+
+This is a plan, not a commitment, and nothing in it is built. It describes what replacing the pairwise
+key exchange above with MLS (RFC 9420) would involve, what it would buy, what it would cost, and in
+what order to find out whether it holds up.
+
+### Why
+
+The departure cost is the last structural limit in the current design. Every other cost was removed
+by a rule: arrivals are free, only senders replace, departures are batched, recovery is on demand.
+Nothing of the kind is left for a room where many participants send, and that room is more common
+than it sounds, because key distribution ignores lastN. The SFU forwards a dozen videos to each
+receiver, so media scales with lastN, but every sender must key every receiver whether anyone is
+watching them or not. A hundred cameras the SFU handles comfortably still cost ten thousand key
+messages per departure.
+
+MLS changes the key model. A room holds a single group secret in a ratchet tree. A membership change
+is one commit, broadcast once, of logarithmic size, and every member derives the new epoch's secret
+from it. Per-sender frame keys are derived locally from that secret, so nothing per sender is ever
+distributed. Per departure, in messages:
+
+| Room                                | Now      | MLS                       |
+| ----------------------------------- | -------- | ------------------------- |
+| Meeting, 20 people, all sending     | ~400     | 20 deliveries of a commit |
+| Seminar, 50 people, all sending     | ~2,500   | 50                        |
+| Lecture, 200 people, 3 sending      | ~600     | 200                       |
+| Conference, 200 people, all sending | ~40,000  | 200                       |
+
+It also brings forward secrecy, post-compromise security and one security code per meeting, which the
+pairwise design cannot reach at any price. What it does not change is keyframes: an epoch change still
+needs one from each sender, so the visible cost of a departure is the same under either design, and
+grace period activation is the fix for both. Arrivals cost a commit where they cost nothing today,
+which is a small price for the rest.
+
+What it does not change either: the room server remains trusted for membership, exactly as it is today
+for key exchange. MLS keeps the server from reading keys; it does not stop the server from admitting a
+member it should not. Only signed credentials do that, and they are a later phase.
+
+### What exists to build on
+
+**Library.** `ts-mls` ([npm](https://www.npmjs.com/package/ts-mls),
+[GitHub](https://github.com/LukaJCB/ts-mls)) is a TypeScript implementation of RFC 9420, version
+1.6.4 as of August 2026, MIT licensed, about 690 KB unpacked, with one dependency, `@hpke/core`,
+which runs entirely on the Web Cryptography API with no WebAssembly. It exports what this plan needs:
+group creation and joining, `createCommit` and `processMessage`, external joins from a published
+`GroupInfo` (`joinGroupExternal`, `createGroupInfoWithExternalPubAndRatchetTree`), the MLS exporter
+(`mlsExporter`), external proposals, re-initialisation, pre-shared keys, basic and X.509
+credentials, and an `AuthenticationService` hook for validating credentials. It states plainly that it
+has not had a formal security audit. It is the only serious option in this language; the alternative
+is a WebAssembly build of OpenMLS, which this project has so far avoided.
+
+**Binding.** RFC 9605, the SFrame RFC, specifies how SFrame keys come from MLS: a per-epoch base key
+from `MLS-Exporter("SFrame 1.0 Base Key", "", Nk)`, per-sender keys derived from it by the sender's
+leaf index, and a key identifier that packs a context, the sender index and the low bits of the
+epoch, with the rule that a receiver drops an old epoch when a new one arrives with the same low
+bits. That is close to what the worker already does with its namespace and epoch byte.
+
+**Our own code.** The key provider is an interface with one implementation, written so a second one
+could replace it without touching the worker, the media pipeline or the interface. The worker keys
+its store by sender namespace and epoch and derives nothing itself except the one way advance, which
+MLS would make unnecessary. The room server relays two opaque message types and stamps the sender.
+
+### Design
+
+**Group per session.** One MLS group per room session. Breakout rooms are separate sessions today and
+would be separate groups; moving to a breakout is a leave and a join. A recording participant is an
+ordinary member.
+
+**Joining.** The joiner publishes a KeyPackage on arrival, as it publishes its identity today. A
+present member could add it with a commit and a Welcome, but that needs some member to act, which is
+the leader problem in a new form. Instead the joiner commits itself in with an **external commit**,
+using the group's published `GroupInfo`: no existing member has to do anything, the room server hands
+the joiner the current `GroupInfo` and relays the joiner's commit to everyone. This is what makes
+arrivals independent of who else is online, and the reason the room server has to hold `GroupInfo`.
+Either way the newcomer receives the new epoch's secret and nothing from before it, so the backward
+secrecy that advancing provides today comes for free.
+
+**Leaving.** A member cannot remove itself; some remaining member must commit a Remove. The plan makes
+that deterministic: the remaining member with the lowest leaf index commits within a short window, the
+next one takes over if it has not after a timeout, and the room server, which orders commits, accepts
+the first valid one and rejects the rest, which then re-synchronise from it. Departures inside the
+same window go into one commit, which is the batching the current design does by hand. No key is
+distributed pairwise: one commit of logarithmic size reaches everyone.
+
+**Frame keys.** Per epoch, each member derives the SFrame base key from the exporter, and from it a
+key per sender index. The worker's key identifier becomes context, sender index and epoch bits,
+following RFC 9605. The worker itself changes only in how keys arrive: the provider derives every
+sender's key locally and pushes them, rather than the worker deriving advances from frames. The clear
+byte handling, the fail closed checks and the drop rules are untouched.
+
+**Forward secrecy and post-compromise security.** Every commit advances the epoch, and an Update
+proposal from a member replaces its leaf key. Issuing one periodically, for example every few minutes
+from whichever member is the current committer, gives the group both forward secrecy and recovery from
+a compromised member key, which the current design has neither of for its pairwise KEK.
+
+**Identity.** Phase one keeps trust on first use: basic credentials carrying the participant id,
+pinned as today. Phase two has the management server sign credentials for authenticated users, so a
+member's leaf carries an identity the others can verify against something they already trust, and the
+room server can no longer insert a member unnoticed for those users. Guests would remain trust on
+first use. A single group secret also makes one security code per meeting possible, derived from the
+epoch's authenticated group state, which the pairwise design could not offer.
+
+**The room server as delivery service.** Today the room server relays two message types and keeps no
+state. MLS needs it to order commits per group and reject one built on a stale epoch, to store the
+current `GroupInfo` refreshed by each committer so joiners can commit themselves in, to relay
+proposals, commits and Welcomes without being able to read any of them, and to keep the KeyPackage of
+each present participant for the Add path and for re-joins. None of this lets the server read media.
+All of it is new code with its own tests, and it turns the relay from stateless into stateful, which
+is the largest single piece of work in the plan.
+
+**Reconnects and recovery.** A short reconnect changes nothing, as now. A long one is a Remove by the
+others and an external commit by the returning member, which is also what recovery becomes: a member
+that has fallen out of sync, for any reason, re-joins externally from the current `GroupInfo` rather
+than asking a peer for a key. The current recovery request disappears.
+
+### What it would cost to build
+
+For a proof of concept of the same standard as the current one:
+
+| Phase | Work | Estimate |
+| ----- | ---- | -------- |
+| 0. Spike | Node script with ts-mls: 200-member group, adds, removes, external join, exporter, timings and message sizes; confirm the WebCrypto-only ciphersuite; run the RFC 9420 test vectors and an interop exchange against OpenMLS for those operations | one week |
+| 1. Delivery service | Room server: group state per session, ordered commits with epoch check, `GroupInfo` store, KeyPackage store, relay of the MLS message types, tests | one to two weeks |
+| 2. Client provider | `MlsKeyProvider` behind the existing interface, middleware routing for MLS messages, committer election, frame key derivation into the worker, unit tests | two to three weeks |
+| 3. Browser matrix | The same matrix as the current design: three browsers, arrivals, departures, reconnects, recording member, breakouts | one week |
+| 4. Credentials | Management server signs credentials for authenticated users, `AuthenticationService` validates them, a security code per meeting | later, separate |
+
+Six to eight weeks of focused work to reach phase three, without phase four.
+
+### Risks
+
+- **Library assurance.** ts-mls is actively maintained, with recent releases, RFC test vectors and an
+  interop directory in the repository, so maintenance is not the concern. Three things are. It has not
+  been audited, and neither has our own implementation, so that alone is not a point against it; the
+  difference is that ours is fifteen hundred lines we wrote, can read in full and have reviewed and
+  tested ourselves, making a modest claim with a one-sender blast radius, while this would be a large
+  protocol implementation we did not write, adopted to make the stronger claims that need an audit to
+  be believable, with a single group secret whose compromise exposes the whole room. MLS is also a
+  protocol where a subtle mistake in tree handling is invisible in normal use and only matters against
+  an adversary, which no amount of browser testing finds. The paths this plan leans on hardest,
+  external commits into a large group, rejected concurrent commits and re-synchronisation, are the
+  ones fewest deployments have exercised yet. And a small maintainer team is a dependency risk if they
+  stop, because an MLS implementation is not something to pick up casually. Mitigation: the spike runs
+  the official RFC 9420 test vectors and an interop exchange against OpenMLS for exactly the
+  operations planned, at the scale planned. Phase four is where an audit would have to precede any
+  claim to protect against the operator.
+- **Stateful server.** Ordering commits and holding `GroupInfo` is straightforward in one process and
+  harder across the horizontally scaled room server. The current design deliberately avoided this.
+- **Committer availability.** Removes depend on a remaining member acting. The deterministic election
+  with a timeout handles a slow or gone committer, but it adds a delay to every departure, during
+  which the leaver can still read.
+- **Bundle size.** About 700 KB of library against an implementation that currently adds none.
+- **Debuggability.** Group state is opaque and shared. The diagnostics that made the current design
+  debuggable in a week of browser logs will need an equivalent for epochs and commits.
+
+### Decision
+
+Proceed, in a way that keeps the risk where it can be seen:
+
+1. **Spike first, one week, as the go or no-go.** It answers, cheaply, the questions that would
+   otherwise surface in week five with the delivery service already built around them: whether
+   external commits behave in a 200-leaf tree and under concurrent joins, how large `GroupInfo` is
+   for a joiner to download, whether the WebCrypto-only ciphersuite is enough, and what commits and
+   exporter derivations cost in a browser. The RFC 9420 test vectors and an interop exchange with
+   OpenMLS are the substitute for the audit we do not have, and the script becomes the fixture
+   generator for the provider's tests.
+2. **Build the MLS provider beside the pairwise one, not instead of it.** Both sit behind the existing
+   provider interface; a room or tenant selects one, and MLS is off by default. The pairwise design
+   stays as the fallback and the comparison, and a flaw in the new one never reaches a room that did
+   not opt in.
+3. **Make the delivery service additive.** The room server gains ordered commits, a `GroupInfo` store
+   and a KeyPackage store as new methods; the existing relay stays for the pairwise provider.
+4. **Reuse the acceptance bar.** The unit suites and the browser matrix that verified the current
+   design are the bar for this one.
+5. **Audit before any stronger claim.** Until then the feature claims what it claims today, keeping
+   federated media nodes out, and the MLS provider is the road to the rest.
 
 ## Making sure it is actually encrypting
 
