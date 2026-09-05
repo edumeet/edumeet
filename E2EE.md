@@ -283,9 +283,9 @@ planned next step, and the next section is the plan.
 
 ## Next step: MLS
 
-This is a plan, not a commitment, and nothing in it is built. It describes what replacing the pairwise
-key exchange above with MLS (RFC 9420) would involve, what it would buy, what it would cost, and in
-what order to find out whether it holds up.
+This is a plan, not a commitment, and nothing in it is built; only the spike at the end has run. It
+describes what replacing the pairwise key exchange above with MLS (RFC 9420) would involve, what it
+would buy, what it would cost, and in what order to find out whether it holds up.
 
 ### Why
 
@@ -323,8 +323,11 @@ member it should not. Only signed credentials do that, and they are a later phas
 
 **Library.** `ts-mls` ([npm](https://www.npmjs.com/package/ts-mls),
 [GitHub](https://github.com/LukaJCB/ts-mls)) is a TypeScript implementation of RFC 9420, version
-1.6.4 as of August 2026, MIT licensed, about 690 KB unpacked, with one dependency, `@hpke/core`,
-which runs entirely on the Web Cryptography API with no WebAssembly. It exports what this plan needs:
+1.6.4 as of August 2026 and 2.0.0-rc.16 on `main` in September 2026, which is the version to build
+on (see the spike results), MIT licensed, about 690 KB unpacked, with one dependency, `@hpke/core`, plus
+`@noble` peer packages that must be installed alongside it. Together they run HPKE, AEAD, key
+derivation and hashing on the Web Cryptography API and signatures in pure JavaScript through
+`@noble/curves`, with no WebAssembly either way. It exports what this plan needs:
 group creation and joining, `createCommit` and `processMessage`, external joins from a published
 `GroupInfo` (`joinGroupExternal`, `createGroupInfoWithExternalPubAndRatchetTree`), the MLS exporter
 (`mlsExporter`), external proposals, re-initialisation, pre-shared keys, basic and X.509
@@ -402,13 +405,15 @@ For a proof of concept of the same standard as the current one:
 
 | Phase | Work | Estimate |
 | ----- | ---- | -------- |
-| 0. Spike | Node script with ts-mls: 200-member group, adds, removes, external join, exporter, timings and message sizes; confirm the WebCrypto-only ciphersuite; run the RFC 9420 test vectors and an interop exchange against OpenMLS for those operations | one week |
+| 0. Spike | Node script with ts-mls: 200-member group, adds, removes, external join, exporter, timings and message sizes; confirm a ciphersuite every browser can run; run the RFC 9420 test vectors and an interop exchange against OpenMLS for those operations | one week |
+| 0b. Move to 2.0 | Port the plan's API assumptions to ts-mls 2.0 (parameter objects, an authentication service in every call), pin the X25519 suite, follow the release candidate to its release; all from the spike, see the results below | a few days |
 | 1. Delivery service | Room server: group state per session, ordered commits with epoch check, `GroupInfo` store, KeyPackage store, relay of the MLS message types, tests | one to two weeks |
 | 2. Client provider | `MlsKeyProvider` behind the existing interface, middleware routing for MLS messages, committer election, frame key derivation into the worker, unit tests | two to three weeks |
 | 3. Browser matrix | The same matrix as the current design: three browsers, arrivals, departures, reconnects, recording member, breakouts | one week |
 | 4. Credentials | Management server signs credentials for authenticated users, `AuthenticationService` validates them, a security code per meeting | later, separate |
 
-Six to eight weeks of focused work to reach phase three, without phase four.
+Six to eight weeks of focused work to reach phase three, without phase four; the spike week is
+spent.
 
 ### Risks
 
@@ -446,7 +451,8 @@ Proceed, in a way that keeps the risk where it can be seen:
    for a joiner to download, whether the WebCrypto-only ciphersuite is enough, and what commits and
    exporter derivations cost in a browser. The RFC 9420 test vectors and an interop exchange with
    OpenMLS are the substitute for the audit we do not have, and the script becomes the fixture
-   generator for the provider's tests.
+   generator for the provider's tests. Done; the results are in the next section, and they add
+   the preconditions listed there.
 2. **Build the MLS provider beside the pairwise one, not instead of it.** Both sit behind the existing
    provider interface; a room or tenant selects one, and MLS is off by default. The pairwise design
    stays as the fallback and the comparison, and a flaw in the new one never reaches a room that did
@@ -457,6 +463,137 @@ Proceed, in a way that keeps the risk where it can be seen:
    design are the bar for this one.
 5. **Audit before any stronger claim.** Until then the feature claims what it claims today, keeping
    federated media nodes out, and the MLS provider is the road to the rest.
+
+### Spike results (2026-09-05)
+
+The spike in phase 0 was run twice: first against the published ts-mls 1.6.4, then, after that run
+turned up three library problems, against upstream `main` at 2.0.0-rc.16, which is the version phase
+one would build on. Each run built groups of 25, 50, 100 and 200 members in Node and exercised every
+operation the design relies on, timed the same operations inside headless Chromium and Firefox, ran
+the RFC 9420 test vectors shipped with the library, and exchanged messages with OpenMLS 0.9 running
+in Docker. The scripts live in `tmp/mls-spike` and become the fixture generators for the provider's
+tests later. Ciphersuite `MLS_128_DHKEMP256_AES128GCM_SHA256_P256` unless stated.
+
+**Everything the design needs works, in both versions.** Adds with a Welcome that carries the
+ratchet tree, external joins from a published `GroupInfo`, Removes that leave the leaver unable to
+derive the next epoch, Update commits, rejection of a commit built on a stale epoch (`Cannot
+process commit or proposal from former epoch`), recovery by applying the winning commit to the kept
+state, and recovery by an external resync commit that replaces the old leaf rather than adding one.
+After every step all members hold the same exporter secret, at every size tried.
+
+**Sizes are fine and the same in both versions.** A key package is 0.4 KB. `GroupInfo` with the
+tree, which a joiner downloads, is 54 KB at 200 members and 0.3 KB without it. A commit is 23 KB at
+200 members, a Welcome for a batch of 25 newcomers 34 to 56 KB. A member's serialised state at 200
+members is 458 KB on 1.6.4 and 286 KB on `main`. The exporter plus RFC 9605 frame keys and salts for
+200 senders take 14 to 20 ms.
+
+**The RFC 9420 test vectors pass.** The library's own suite against the vectors published with the
+RFC, 14 files and 785 cases covering tree math, key schedule, secret tree, message protection,
+transcript hashes, Welcome, tree operations and validation, TreeKEM, and the passive client
+scenarios in which a client processes Welcomes and commits produced by other implementations, passes
+on this machine for all seven ciphersuites, on 1.6.4 (113 s) and on `main` (40 s).
+
+**What 1.6.4 got wrong, and what `main` has already fixed.** Three problems, found in this order:
+
+- The `external_pub` extension of a `GroupInfo` was written as the bare HPKE key where RFC 9420
+  section 12.4.3.2 defines a length-prefixed vector. OpenMLS follows the RFC, so neither library
+  could external-join the other's group; the first interop run failed there with `Invalid public
+  key for the ciphersuite`. `main` encodes and decodes the vector correctly.
+- An external resync with a key package whose signature key matched no leaf looped forever in 1.6.4
+  instead of throwing. `main` matches the old leaf by signature key and then by credential identity,
+  so a returning member with a fresh key pair resyncs cleanly, and a real mismatch throws.
+- On every commit 1.6.4 derived the whole secret tree for the new epoch eagerly, two HKDF
+  expansions per node for 2N-1 nodes plus two ratchet roots each, every one an asynchronous
+  WebCrypto call. Measured in isolation that was 83 ms at 256 leaves and most of the per-commit
+  cost, growing linearly with the room. `main` derives the secret tree on demand and caches the tree
+  hash, which is what makes the difference in the numbers below.
+
+Two things are true of both versions. Signatures are not WebCrypto: the default provider uses
+`@noble/curves` for ECDSA and Ed25519 in pure JavaScript (no WebAssembly either way), and the
+`@noble` packages are peer dependencies that must be installed explicitly. And a join validates the
+signature of every leaf, so joining costs about a millisecond or two times the room size in Node, and
+adding members costs each member the verification of every added key package.
+
+**Time, per member, for processing one commit** (Node 24 on a laptop, p95 unless stated):
+
+| Members | Remove or update commit, 1.6.4 | Remove or update commit, main | Join from Welcome (avg), 1.6.4 / main | External join, joiner side (avg), 1.6.4 / main |
+| ------- | ------------------------------ | ----------------------------- | ------------------------------------- | ---------------------------------------------- |
+| 25      | 36 to 61 ms                    | 13 to 14 ms                   | 74 / 56 ms                            | 172 / 102 ms                                   |
+| 50      | 63 to 65 ms                    | 15 to 18 ms                   | 179 / 116 ms                          | 368 / 203 ms                                   |
+| 100     | 110 to 124 ms                  | 14 ms                         | 298 / 187 ms                          | 841 / 374 ms                                   |
+| 200     | 190 to 228 ms                  | 15 to 16 ms                   | 426 / 337 ms                          | 1,840 / 988 ms                                 |
+
+On `main` the per-commit cost no longer depends on the size of the room: a departure costs every
+remaining member about 15 ms of asynchronous WebCrypto work whether the room has 25 or 200 people.
+What still grows is the joiner's own work, because a joiner validates every leaf of the tree it
+receives, and the cost of an Add commit to everyone else, because each added key package is verified.
+Against the thresholds in the plan, on `main` in Node: `GroupInfo` under 100 KB passes, derivation
+under 50 ms passes, commit processing under 50 ms per member passes for Removes, Updates and
+external commits at every size and fails only for Add commits of 25 at once (a batch of 5 should
+pass), and the join under 1 s passes on average at 200 members for both the Welcome and the
+external path but not at the slowest (1.4 s and 1.2 s). The browser numbers below are the ones
+that count, and there it passes.
+
+**In a browser, on `main`, it is fast.** The same operations from a page in headless Chromium 153 and
+Firefox 155 through Playwright, per member and p95 unless stated:
+
+| Members, browser, suite | Remove or update commit | External commit | Add commit of 25 | Join from Welcome (avg) | External join, joiner side | Whole scenario |
+| ----------------------- | ----------------------- | --------------- | ---------------- | ----------------------- | -------------------------- | -------------- |
+| 50, Chromium, P-256     | 4 ms                    | 4 ms            | 40 ms            | 31 ms                   | 52 ms                      | 3 s            |
+| 50, Chromium, X25519    | 3 ms                    | 3 ms            | 8 ms             | 6 ms                    | 23 ms                      | 1 s            |
+| 50, Firefox, X25519     | 17 to 20 ms             | 13 ms           | 42 ms            | 39 ms                   | 83 ms                      | 5 s            |
+| 200, Chromium, P-256    | 5 ms                    | 5 ms            | 70 ms            | 129 ms                  | 189 ms                     | 69 s           |
+| 200, Chromium, X25519   | 4 ms                    | 3 ms            | 9 ms             | 12 ms                   | 61 ms                      | 9 s            |
+| 200, Firefox, X25519    | 13 to 15 ms             | 10 ms           | 38 ms            | 59 ms                   | 244 ms                     | 38 s           |
+
+For comparison, the same page on 1.6.4 at 200 members cost a Chromium member 49 to 82 ms per commit
+and a Firefox member 265 to 278 ms; `main` is ten to twenty times cheaper. A 200-member departure now
+costs each Chromium member about 4 ms and each Firefox member about 14 ms, and a newcomer waits
+between 60 and 250 ms before it can read anything. Every threshold in the plan passes in the browser
+on `main`, except that an Add commit of 25 people at once costs each Chromium member 70 ms on P-256;
+smaller batches or the other suite bring it under. All members agree on the exporter in every run.
+
+The X25519 suite is not only the one Firefox can run, it is also the faster one everywhere, by two to
+ten times on joins and adds, because Ed25519 verification in pure JavaScript is much cheaper than
+P-256 ECDSA. That settles the suite question in favour of `MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519`
+unless something else forces P-256.
+
+Firefox could not run the P-256 suite in either version. Every attempt to join a group fails while
+decrypting the Welcome, and the probe that pins it down is small: a P-256 private key that
+`@hpke/core` derives from a secret cannot be exported by Firefox's Web Cryptography implementation
+(`exportKey` fails with `OperationError`), while a generated key exports fine. ts-mls derives its init
+and path keys from secrets and stores them exported, so every P-256 group operation breaks in Firefox
+at the first join. The library's own browser tests run in Chromium only, which is why nobody noticed.
+
+**It interoperates with OpenMLS.** A file exchange between OpenMLS 0.9 (Rust, in Docker) and ts-mls
+on the P-256 suite ran five rounds: a ts-mls client joining from an OpenMLS Welcome, a ts-mls client
+committing itself into the OpenMLS group externally, a ts-mls Remove sent as an encrypted private
+message and applied by OpenMLS, an OpenMLS update commit applied by ts-mls, and an OpenMLS Add with a
+ts-mls member already present. On 1.6.4 the external join failed on the encoding bug above and the
+other four rounds passed; on `main`, unpatched, all five pass and every party agrees on the exporter
+secret afterwards. The `main` branch also carries a gRPC client for the official MLS interop test
+runner, which is how the maintainers now exercise the library against OpenMLS themselves.
+
+**Preconditions this adds to the decision.** Two, both contained:
+
+1. Build on ts-mls 2.0, not 1.6.4. It is a release candidate today (2.0.0-rc.16) with a different,
+   parameter-object API and a mandatory authentication service in every call, which suits phase four.
+   Nothing in the plan should be built on 1.6.4, whose external joins do not interoperate and whose
+   commits cost every member time proportional to the room.
+2. Pin the X25519 suite (`MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519`) for the room. A group has one
+   suite for all its members; P-256 cannot be joined from Firefox in either version, and X25519 is
+   faster in every browser besides. If `@hpke/core` fixes the Firefox derivation, P-256 becomes an
+   option again, but nothing here needs it.
+
+**What it means for the decision.** The protocol does what the plan claims, the library on `main`
+is correct at 200 members and interoperates with OpenMLS, and the one structural cost that worried
+the first run, commit processing growing with the room, is gone in the version we would use. What
+remains is a joiner's tree validation, between 60 and 250 ms at 200 members in a browser, and the
+per-member cost of large Add batches, both of which are policy (trust the tree hash of a `GroupInfo`
+signed by a member we already trust; add in smaller batches) rather than protocol. The
+decision to proceed stands, on 2.0, with the suite question settled first. The upstream issues worth
+filing are the Firefox P-256 derivation failure against `@hpke/core`, and a note to ts-mls that the
+1.6.x `external_pub` encoding is not interoperable, so that 1.6 users know to move.
 
 ## Making sure it is actually encrypting
 
