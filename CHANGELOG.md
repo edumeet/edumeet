@@ -15,8 +15,21 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
 
+### general
+- Rooms can be set to admit scheduled meetings only. Every meeting has a meeting token, the invitation link carries it, and anyone arriving without it, the room owner included, is asked for it on the join screen. The first participant binds the room to their meeting until the room empties again
+
 ### edumeet-client
 - mediasoup-client update 3.23.1
+- Added a "Meetings only" setting to the room settings dialog and to the rooms table in the management UI; the meetings table shows each meeting's token
+- The join screen reads the meeting token from the room link and, after a refusal, shows a field to type it in
+- The upcoming meetings dialog opens a meetings-only room with its token
+
+### edumeet-room-server
+- Managed rooms marked meetings only admit only participants who present a token of one of the room's meetings. The check runs before the lobby and before owner permissions, and switching the setting takes effect for newcomers immediately without affecting participants already in the room
+
+### edumeet-management-server
+- New meetingsOnly room setting and a mandatory, unique meetingToken on every meeting, generated on creation and added to existing meetings by migration
+- Invitations for meetings in a meetings-only room carry the token in the join link and the calendar location. Switching the room setting re-sends the invitation with the updated link to attendees of meetings that are not over yet
 
 ## [4.2-20260828-stable] - 2026-08-28
 This is the current stable release.
