@@ -19,7 +19,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Rooms can be set to admit scheduled meetings only. Every meeting has a meeting token, the invitation link carries it, and anyone arriving without it, the room owner included, is asked for it on the join screen. The first participant binds the room to their meeting until the room empties again
 
 ### edumeet-client
-- mediasoup-client update 3.23.1
+- mediasoup-client update 3.23.2
 - Added a "Meetings only" setting to the room settings dialog and to the rooms table in the management UI; the meetings table shows each meeting's token
 - The join screen reads the meeting token from the room link and, after a refusal, shows a field to type it in
 - The upcoming meetings dialog opens a meetings-only room with its token
