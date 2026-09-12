@@ -17,15 +17,21 @@ The stable tag  is teseted by the development team and used by default for [edum
 
 ### general
 - Rooms can be set to admit scheduled meetings only. Every meeting has a meeting token, the invitation link carries it, and anyone arriving without it, the room owner included, is asked for it on the join screen. The first participant binds the room to their meeting until the room empties again
+- End to end encryption now agrees keys with MLS (RFC 9420), one group per room, breakout rooms included. A membership change costs one commit to the room instead of one key per pair of participants, so large rooms with many senders no longer pay the square of their size at every departure. Verified across Chrome, Edge, Firefox and Safari; the room server must be upgraded before or together with the client
 
 ### edumeet-client
 - mediasoup-client update 3.23.2
 - Added a "Meetings only" setting to the room settings dialog and to the rooms table in the management UI; the meetings table shows each meeting's token
 - The join screen reads the meeting token from the room link and, after a refusal, shows a field to type it in
 - The upcoming meetings dialog opens a meetings-only room with its token
+- Encrypted rooms join an MLS group on arrival, commit departures from within the group, and derive every sender's frame key locally following RFC 9605; a sender delays its own new key briefly so that receivers never miss frames at an epoch change
+- The participant list flags a peer whose signature key changes during a call, and a participant that cannot join or catch up with the group leaves the room with an explanation rather than staying unable to decrypt anyone
+- The lobby list a participant sees after being admitted is the current one; peers let in together no longer see each other as still waiting
 
 ### edumeet-room-server
 - Managed rooms marked meetings only admit only participants who present a token of one of the room's meetings. The check runs before the lobby and before owner permissions, and switching the setting takes effect for newcomers immediately without affecting participants already in the room
+- Serves the MLS group of each encrypted room: admits joiners one at a time, orders commits by epoch, holds the group information newcomers join from, and relays it all without being able to read a key
+- The list of peers waiting in the lobby is sent only to participants in the room, so a peer admitted from the lobby never carries a stale list in with it
 
 ### edumeet-management-server
 - New meetingsOnly room setting and a mandatory, unique meetingToken on every meeting, generated on creation and added to existing meetings by migration
