@@ -37,6 +37,10 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Serves the MLS group of each encrypted room: admits joiners one at a time, orders commits by epoch, holds the group information newcomers join from, and relays it all without being able to read a key
 - The list of peers waiting in the lobby is sent only to participants in the room, so a peer admitted from the lobby never carries a stale list in with it
 
+### edumeet-media-node
+- Optional storage of client monitoring samples: with `--samplesStorePath` the node writes one JSONL file per client, and with `--samplesUploadUri` it uploads them to S3 compatible or HTTP storage when the client leaves, together with a summary per call and a sample per router. A node started without these flags behaves as before
+- Sample ids sent by a client are checked before they become file names or storage keys, so a crafted id cannot write outside the store; a node that stores nothing no longer processes incoming samples at all; files left behind by a crash or restart are uploaded at the next start
+
 ### edumeet-management-server
 - New meetingsOnly room setting and a mandatory, unique meetingToken on every meeting, generated on creation and added to existing meetings by migration
 - Invitations for meetings in a meetings-only room carry the token in the join link and the calendar location. Switching the room setting re-sends the invitation with the updated link to attendees of meetings that are not over yet
