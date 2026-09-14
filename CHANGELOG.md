@@ -29,7 +29,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The lobby list a participant sees after being admitted is the current one; peers let in together no longer see each other as still waiting
 - The quality window (Q key) shows the client monitor's score per track and for the client as a whole, with the reasons behind it; quality badges moved from the video tiles to the top bar and the participant list
 - A connection check dialog, opened from the participant list or from a top bar indicator when media is not getting through, walks the steps of connecting and names the first one that fails
-- The client monitor config key is `clientMonitor` (the misspelled `clientMontitor` still works); sending samples to the media node is off unless `samplingPeriodInMs` is set, and `obfuscateDisplayName` masks names in the samples
+- The client monitor config key is now spelled `clientMonitor`; a config still using the old `clientMontitor` spelling is ignored and the defaults apply. Sending samples to the media node is off unless `samplingPeriodInMs` is set, and `obfuscateDisplayName` masks names in the samples
 
 ### edumeet-room-server
 - Managed rooms marked meetings only admit only participants who present a token of one of the room's meetings. The check runs before the lobby and before owner permissions, and switching the setting takes effect for newcomers immediately without affecting participants already in the room
