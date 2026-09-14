@@ -27,9 +27,13 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Encrypted rooms join an MLS group on arrival, commit departures from within the group, and derive every sender's frame key locally following RFC 9605; a sender delays its own new key briefly so that receivers never miss frames at an epoch change
 - The participant list flags a peer whose signature key changes during a call, and a participant that cannot join or catch up with the group leaves the room with an explanation rather than staying unable to decrypt anyone
 - The lobby list a participant sees after being admitted is the current one; peers let in together no longer see each other as still waiting
+- The quality window (Q key) shows the client monitor's score per track and for the client as a whole, with the reasons behind it; quality badges moved from the video tiles to the top bar and the participant list
+- A connection check dialog, opened from the participant list or from a top bar indicator when media is not getting through, walks the steps of connecting and names the first one that fails
+- The client monitor config key is `clientMonitor` (the misspelled `clientMontitor` still works); sending samples to the media node is off unless `samplingPeriodInMs` is set, and `obfuscateDisplayName` masks names in the samples
 
 ### edumeet-room-server
 - Managed rooms marked meetings only admit only participants who present a token of one of the room's meetings. The check runs before the lobby and before owner permissions, and switching the setting takes effect for newcomers immediately without affecting participants already in the room
+- Client monitoring samples are no longer handed to participants who join after the sender; the data channel only goes to the media node
 - Serves the MLS group of each encrypted room: admits joiners one at a time, orders commits by epoch, holds the group information newcomers join from, and relays it all without being able to read a key
 - The list of peers waiting in the lobby is sent only to participants in the room, so a peer admitted from the lobby never carries a stale list in with it
 
