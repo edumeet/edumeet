@@ -21,7 +21,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 
 ### edumeet-client
 - mediasoup-client update 3.23.2
-- client-monitor-js update 4.9.1-rc.553, which keeps monitoring live tracks through a missing stats round and quiets its detectors once a track has ended
+- client-monitor-js update 4.9.1, which keeps monitoring live tracks through a missing stats round and quiets its detectors once a track has ended
 - Added a "Meetings only" setting to the room settings dialog and to the rooms table in the management UI; the meetings table shows each meeting's token
 - The join screen reads the meeting token from the room link and, after a refusal, shows a field to type it in
 - The upcoming meetings dialog opens a meetings-only room with its token
