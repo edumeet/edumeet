@@ -20,7 +20,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - End to end encryption now agrees keys with MLS (RFC 9420), one group per room, breakout rooms included. A membership change costs one commit to the room instead of one key per pair of participants, so large rooms with many senders no longer pay the square of their size at every departure. Verified across Chrome, Edge, Firefox and Safari; the room server must be upgraded before or together with the client
 - Signing in through a tenant's identity provider now hands the token only to the site that started the sign in, and the tokens no longer appear in the sign in URLs. The client and the management server must be upgraded together
 - Access rules are applied again at every token refresh of an SSO user, so a blocked user who stays signed in is signed out within one token lifetime, and a session lasts about `authSessionMaxDays` (30 by default) before a new sign in. Sessions from before the upgrade end at their next refresh
-- The docker proxy template no longer writes sign out requests to its access log
+- The docker proxy template no longer writes sign out requests to its access log, and carries a commented HSTS header to enable for production deployments with valid certificates
 
 ### edumeet-client
 - mediasoup-client update 3.23.2
