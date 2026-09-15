@@ -25,6 +25,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 ### edumeet-client
 - mediasoup-client update 3.23.2
 - client-monitor-js update 4.9.1, which keeps monitoring live tracks through a missing stats round and quiets its detectors once a track has ended
+- Client monitoring samples carry the host name the client joined on, so stored samples can be filed per tenant
 - Added a "Meetings only" setting to the room settings dialog and to the rooms table in the management UI; the meetings table shows each meeting's token
 - The join screen reads the meeting token from the room link and, after a refusal, shows a field to type it in
 - The upcoming meetings dialog opens a meetings-only room with its token
@@ -46,6 +47,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 ### edumeet-media-node
 - Optional storage of client monitoring samples: with `--samplesStorePath` the node writes one JSONL file per client, and with `--samplesUploadUri` it uploads them to S3 compatible or HTTP storage when the client leaves, together with a summary per call and a sample per router. A node started without these flags behaves as before
 - Sample ids sent by a client are checked before they become file names or storage keys, so a crafted id cannot write outside the store; a node that stores nothing no longer processes incoming samples at all; files left behind by a crash or restart are uploaded at the next start
+- Stored samples are filed under `<tenantFqdn>/<roomId>/<callId>/`, one folder per tenant; samples naming a call other than the one the sender's router serves are dropped; each media node writes its own call summary, so a call spread over several nodes no longer keeps only the last one; a rejoining client no longer overwrites its earlier sample file; the summary carries the observer's issues and scores
 
 ### edumeet-management-server
 - New meetingsOnly room setting and a mandatory, unique meetingToken on every meeting, generated on creation and added to existing meetings by migration
