@@ -18,6 +18,9 @@ The stable tag  is teseted by the development team and used by default for [edum
 ### general
 - Rooms can be set to admit scheduled meetings only. Every meeting has a meeting token, the invitation link carries it, and anyone arriving without it, the room owner included, is asked for it on the join screen. The first participant binds the room to their meeting until the room empties again
 - End to end encryption now agrees keys with MLS (RFC 9420), one group per room, breakout rooms included. A membership change costs one commit to the room instead of one key per pair of participants, so large rooms with many senders no longer pay the square of their size at every departure. Verified across Chrome, Edge, Firefox and Safari; the room server must be upgraded before or together with the client
+- Signing in through a tenant's identity provider now hands the token only to the site that started the sign in, and the tokens no longer appear in the sign in URLs. The client and the management server must be upgraded together
+- Access rules are applied again at every token refresh of an SSO user, so a blocked user who stays signed in is signed out within one token lifetime, and a session lasts about `authSessionMaxDays` (30 by default) before a new sign in. Sessions from before the upgrade end at their next refresh
+- The docker proxy template no longer writes sign out requests to its access log
 
 ### edumeet-client
 - mediasoup-client update 3.23.2
@@ -30,6 +33,8 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The lobby list a participant sees after being admitted is the current one; peers let in together no longer see each other as still waiting
 - The quality window (Q key) shows the client monitor's score per track and for the client as a whole, with the reasons behind it. Outside it the client stays quiet: the top bar only marks problems on the user's own side that they can act on, such as a saturated upload or a device out of processing power, and the participant list only marks a peer from whom no audio or video is arriving. Other people's degraded media is never shown as a warning
 - A connection check dialog, opened from the participant list or from a top bar indicator when media is not getting through, walks the steps of connecting and names the first one that fails
+- The sign in tab opens as soon as Login is clicked, before the tenant is looked up, so a slow lookup no longer gets the tab blocked, and the user is told when the browser blocks it anyway
+- A token refresh the server refuses signs the user out with a notice. In a call or in the lobby they keep the permissions they joined with until they leave the room. A refresh that fails for network reasons is retried before the token expires, and a refresh answer that arrives after the user signed in or out again is ignored
 - The client monitor config key is now spelled `clientMonitor`; a config still using the old `clientMontitor` spelling is ignored and the defaults apply. Sending samples to the media node is off unless `samplingPeriodInMs` is set, and `obfuscateDisplayName` masks names in the samples
 
 ### edumeet-room-server
@@ -45,6 +50,8 @@ The stable tag  is teseted by the development team and used by default for [edum
 ### edumeet-management-server
 - New meetingsOnly room setting and a mandatory, unique meetingToken on every meeting, generated on creation and added to existing meetings by migration
 - Invitations for meetings in a meetings-only room carry the token in the join link and the calendar location. Switching the room setting re-sends the invitation with the updated link to attendees of meetings that are not over yet
+- The sign in callback delivers the token only to a site registered as one of the tenant's domains, and redirects with a single use code instead of the tokens. A sign in started without a valid origin is stopped before the identity provider
+- Token refresh checks the tenant's Block and Allow rules against the stored user for SSO users, as at sign in, and refuses a session older than `authSessionMaxDays` for everyone. Tokens record the time of the original sign in, so a token issued by an earlier release is refused at its next refresh
 
 ## [4.2-20260828-stable] - 2026-08-28
 This is the current stable release.
