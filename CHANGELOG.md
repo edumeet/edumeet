@@ -16,6 +16,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 ## [Upcoming release]
 
 ### general
+- mediasoup update 3.27.0, which switches to a lower quality SVC layer when a higher one stops arriving and measures packet arrival times more precisely for jitter, round trip time and bandwidth estimation
 - Rooms can be set to admit scheduled meetings only. Every meeting has a meeting token, the invitation link carries it, and anyone arriving without it, the room owner included, is asked for it on the join screen. The first participant binds the room to their meeting until the room empties again
 - End to end encryption now agrees keys with MLS (RFC 9420), one group per room, breakout rooms included. A membership change costs one commit to the room instead of one key per pair of participants, so large rooms with many senders no longer pay the square of their size at every departure. Verified across Chrome, Edge, Firefox and Safari; the room server must be upgraded before or together with the client
 - Signing in through a tenant's identity provider now hands the token only to the site that started the sign in, and the tokens no longer appear in the sign in URLs. The client and the management server must be upgraded together
