@@ -215,6 +215,71 @@ Chrome additionally requires the peer connection to be created with encoded inse
 enabled, which is why that flag is set only when encryption is on. Setting it unconditionally breaks
 media in rooms that are not encrypted.
 
+## Data protection
+
+This section is meant to help a deployment assess encryption against the GDPR or similar rules, for
+example in a data protection impact assessment or a transfer assessment. It describes what each part
+of the system processes in an encrypted room. It is a technical description, not legal advice.
+
+### What each component sees in an encrypted room
+
+| Component | Processes | Cannot read |
+| --- | --- | --- |
+| Participant's browser | Everything the participant sees and hears, and the keys | |
+| Room server | Display names, user ids of signed in users, IP addresses, room names, membership, chat, files, and the MLS messages it relays | Audio, video, transcripts, keys |
+| Management server | Accounts, tenants, rooms, meetings and invitations | Anything from a call |
+| Media node | Participant IP addresses and ports; a random id per room session; when connections open and close and when streams pause or resume; who is speaking when; packet sizes and timing; the clear leading bytes of each frame | Audio, video, transcripts, names, accounts, room names, chat |
+| Other media nodes of the same room | The encrypted streams of participants connected elsewhere, with their timing and speaking activity, under random ids and without their addresses | The same as a media node |
+| TURN server, when used | Participant IP addresses and relayed ciphertext | The same as a media node |
+
+A few of these deserve a note:
+
+- **Room identity.** A media node is asked for a router by a random id created for each room
+  session, never by the room name.
+- **Speaking activity.** The audio level header of each packet is not encrypted, and the media node
+  uses it to detect the active speaker. Silence and speech can be told apart, as the limitations
+  below also say.
+- **Nothing identifying travels with the media.** Producers, consumers and transports carry
+  generated ids. Client monitoring samples, which can carry display names, are not sent from an
+  encrypted room, and transcripts are encrypted.
+
+### Points for an assessment
+
+**Encryption does not make the media node anonymous.** A media node needs participant IP addresses
+to deliver media, and an IP address is personal data. The organisation running a node therefore
+still processes personal data for the deployment, whichever country it is in. What encryption
+removes is the content: voices, faces, screens and transcripts.
+
+**Participants on other nodes appear only under random ids.** When a room spans several media nodes,
+each node receives the streams of participants connected to the others, but not their addresses.
+Whether that counts as personal data for the node's operator depends on whether it has any
+reasonable means of linking those ids to people, which in turn depends on who can access the room
+server and its logs.
+
+**Region limits are per tenant.** The room server can restrict a tenant's rooms to media nodes in
+chosen regions (see Media Node Region Binding in the room server README). The restriction applies to
+every participant of the room alike, whatever their own location, and a room keeps using the nodes
+it already has when further participants join.
+
+**Identities stay on the room and management servers.** Names, accounts, chat and files never reach
+a media node, so where those two servers run is what decides where identifying data is processed.
+The room server's debug logs contain IP addresses and display names.
+
+**Encryption is per room.** In a room without it, media nodes handle decoded audio and video, and
+client monitoring samples, when enabled, reach the node with display names unless
+`obfuscateDisplayName` is set. An assessment that relies on encryption applies to encrypted rooms
+only, so a tenant that depends on it should lock its default.
+
+**Some browser features involve third parties.** Transcription uses the browser's own speech
+recognition, which sends the speaker's audio to the browser vendor's service and is outside the
+encryption. It is off unless enabled in the client configuration. Local recording stays in the
+browser.
+
+**The guarantees are bounded.** The room server is trusted for membership, identity is trusted on
+first use, and neither the library nor this implementation has been audited. A privacy notice that
+describes encryption should say that media nodes cannot read meeting content, rather than that
+nobody operating the service can.
+
 ## Limitations
 
 **Identity is trusted on first use.** A room server that inserted its own member when a group was
