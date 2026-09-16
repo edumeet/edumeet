@@ -252,8 +252,15 @@ vectors and the exchange with OpenMLS are the substitute for the audit neither h
 has to precede any stronger claim than keeping federated media nodes out.
 
 **Local recording and transcription see plaintext.** Both run in the browser on decoded media and
-are unaffected by encryption. Browser speech recognition sends audio to a third party service, which
-is worth considering in a room chosen for its privacy.
+are unaffected by encryption. A transcript is sent to the other participants over a data channel,
+encrypted under the sender's key for the epoch as its frames are, so the media node forwards it
+without being able to read it. The text itself comes from the browser's speech recognition, which
+sends the speaker's audio to the browser vendor's service; encryption does not reach that step,
+which is worth considering in a room chosen for its privacy.
+
+**Client monitoring is off.** The client normally sends connection statistics to the media node over
+a data channel, and the node reads them. In an end-to-end encrypted room the client does not open
+that channel and the room server refuses it if asked.
 
 **Silence is observable.** Frames with no content are passed through unencrypted, so an observer can
 distinguish speech from silence. Frame sizes already revealed this before encryption, so it is not a
