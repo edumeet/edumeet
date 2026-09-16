@@ -16,7 +16,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 ## [Upcoming release]
 
 ### general
-- mediasoup update 3.27.0, which switches to a lower quality SVC layer when a higher one stops arriving and measures packet arrival times more precisely for jitter, round trip time and bandwidth estimation
+- mediasoup update 3.27.1, which switches to a lower quality SVC layer when a higher one stops arriving, measures packet arrival times more precisely for jitter, round trip time and bandwidth estimation, and fixes unbounded memory growth on data channels while a stream reset is pending
 - Rooms can be set to admit scheduled meetings only. Every meeting has a meeting token, the invitation link carries it, and anyone arriving without it, the room owner included, is asked for it on the join screen. The first participant binds the room to their meeting until the room empties again
 - End to end encryption of audio and video for rooms that opt in, per tenant or per room. Keys are agreed with MLS (RFC 9420), one group per room, breakout rooms included, so a membership change costs one commit to the room rather than one key per pair of participants. Media nodes forward frames they cannot read. Verified across Chrome, Edge, Firefox and Safari; the room server must be upgraded before or together with the client
 - In an encrypted room, transcripts sent to the other participants are encrypted under the same keys, and client monitoring samples are not sent to the media node. See E2EE.md for what is and is not covered
