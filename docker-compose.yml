@@ -45,9 +45,7 @@ services:
       --use-auth-secret
       --static-auth-secret=${MEDIA_SECRET}
       --no-tls
-      --no-dtls
       --no-multicast-peers
-      --no-cli
   edumeet-client:
     image: edumeet/edumeet-client
     restart: unless-stopped

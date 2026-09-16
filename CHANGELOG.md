@@ -23,6 +23,8 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Signing in through a tenant's identity provider now hands the token only to the site that started the sign in, and the tokens no longer appear in the sign in URLs. The client and the management server must be upgraded together
 - Access rules are applied again at every token refresh of an SSO user, so a blocked user who stays signed in is signed out within one token lifetime, and a session lasts about `authSessionMaxDays` (30 by default) before a new sign in. Sessions from before the upgrade end at their next refresh
 - The docker proxy template no longer writes sign out requests to its access log, and carries a commented HSTS header to enable for production deployments with valid certificates
+- coturn update 4.18.0. The `--no-dtls` and `--no-cli` flags were removed from the compose files, as coturn 4.18 rejects them and does not start; DTLS and the CLI have been off by default since coturn 4.17, so nothing changes in behaviour
+- TURN relay to a media node on the same host works. coturn mapped its `--external-ip` to the `0.0.0.0` listening address and refused every peer on that address with a 403, so participants who could only reach the media node through TURN got no audio or video. The media node compose now passes the external address together with the local interface address (new `LOCAL_IP` in `.env`, filled in by the install and update scripts). The media node install scripts and the fleet update also check that coturn is still running after a restart and stop the rollout if it is not
 
 ### edumeet-client
 - mediasoup-client update 3.23.2
