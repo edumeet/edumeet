@@ -30,6 +30,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - To avoid it when coturn listens on `0.0.0.0`, pass the external address twice: `--external-ip=<public ip>/<interface ip>` maps the public address to the host's own interface address, so a peer on that address is reached directly, and the plain `--external-ip=<public ip>` keeps the public address in the relay candidates given to clients. The interface address is the address of the interface with the default route, which is the public address itself on a host without NAT and the private one behind NAT. Installs whose `LISTEN_IP` is the real interface address, as set by `run-me-first.sh` in edumeet-docker, are not affected
 
 ### edumeet-client
+- The "Visible participants" slider accepts any value, follows a room limit that changes while the settings are open, and says that the number includes you; before, the room default landed between two marks and the first touch changed it
 - mediasoup-client update 3.23.2
 - client-monitor-js update 4.9.1, which keeps monitoring live tracks through a missing stats round and quiets its detectors once a track has ended
 - Client monitoring samples carry the host name the client joined on, so stored samples can be filed per tenant
