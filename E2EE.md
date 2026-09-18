@@ -228,7 +228,7 @@ of the system processes in an encrypted room. It is a technical description, not
 | Participant's browser | Everything the participant sees and hears, and the keys | |
 | Room server | Display names, user ids of signed in users, IP addresses, room names, membership, chat, files, and the MLS messages it relays | Audio, video, transcripts, keys |
 | Management server | Accounts, tenants, rooms, meetings and invitations | Anything from a call |
-| Media node | Participant IP addresses and ports; a random id per room session; when connections open and close and when streams pause or resume; who is speaking when; packet sizes and timing; the clear leading bytes of each frame | Audio, video, transcripts, names, accounts, room names, chat |
+| Media node | Participant IP addresses and ports; a random id per room session; when connections open and close and when streams pause or resume; who is speaking when; packet sizes and timing; the clear leading bytes of each frame; client monitoring samples, when configured (see below) | Audio, video, transcripts, accounts, chat; names and room names unless monitoring samples carry them |
 | Other media nodes of the same room | The encrypted streams of participants connected elsewhere, with their timing and speaking activity, under random ids and without their addresses | The same as a media node |
 | TURN server, when used | Participant IP addresses and relayed ciphertext | The same as a media node |
 
@@ -240,8 +240,12 @@ A few of these deserve a note:
   uses it to detect the active speaker. Silence and speech can be told apart, as the limitations
   below also say.
 - **Nothing identifying travels with the media.** Producers, consumers and transports carry
-  generated ids. Client monitoring samples, which can carry display names, are not sent from an
-  encrypted room, and transcripts are encrypted.
+  generated ids, and transcripts are encrypted.
+- **Client monitoring is the exception.** When the operator configures sampling, every client sends
+  connection statistics to its media node over a data channel, encrypted rooms included, because the
+  node is their consumer. They name the room and the participant unless the client settings
+  `obfuscateRoomName` (the room's session id instead of its name) and `obfuscateDisplayName` (the
+  name masked) are set. A deployment that wants a node to learn nothing user chosen sets both.
 
 ### Points for an assessment
 
@@ -265,10 +269,9 @@ it already has when further participants join.
 a media node, so where those two servers run is what decides where identifying data is processed.
 The room server's debug logs contain IP addresses and display names.
 
-**Encryption is per room.** In a room without it, media nodes handle decoded audio and video, and
-client monitoring samples, when enabled, reach the node with display names unless
-`obfuscateDisplayName` is set. An assessment that relies on encryption applies to encrypted rooms
-only, so a tenant that depends on it should lock its default.
+**Encryption is per room.** In a room without it, media nodes handle decoded audio and video. An
+assessment that relies on encryption applies to encrypted rooms only, so a tenant that depends on it
+should lock its default.
 
 **Some browser features involve third parties.** Transcription uses the browser's own speech
 recognition, which sends the speaker's audio to the browser vendor's service and is outside the
@@ -323,9 +326,10 @@ without being able to read it. The text itself comes from the browser's speech r
 sends the speaker's audio to the browser vendor's service; encryption does not reach that step,
 which is worth considering in a room chosen for its privacy.
 
-**Client monitoring is off.** The client normally sends connection statistics to the media node over
-a data channel, and the node reads them. In an end-to-end encrypted room the client does not open
-that channel and the room server refuses it if asked.
+**Client monitoring is not covered.** The client sends connection statistics to the media node over
+a data channel when the operator configures sampling, and the node reads them, in an encrypted room
+as in any other. They carry no media, but they name the room and the participant unless the client
+settings `obfuscateRoomName` and `obfuscateDisplayName` are set; see Data protection above.
 
 **Silence is observable.** Frames with no content are passed through unencrypted, so an observer can
 distinguish speech from silence. Frame sizes already revealed this before encryption, so it is not a
