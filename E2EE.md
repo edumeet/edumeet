@@ -235,7 +235,8 @@ of the system processes in an encrypted room. It is a technical description, not
 A few of these deserve a note:
 
 - **Room identity.** A media node is asked for a router by a random id created for each room
-  session, never by the room name.
+  session. It learns the room name only when the operator turns on room information for client
+  monitoring, described below.
 - **Speaking activity.** The audio level header of each packet is not encrypted, and the media node
   uses it to detect the active speaker. Silence and speech can be told apart, as the limitations
   below also say.
@@ -243,9 +244,11 @@ A few of these deserve a note:
   generated ids, and transcripts are encrypted.
 - **Client monitoring is the exception.** When the operator configures sampling, every client sends
   connection statistics to its media node over a data channel, encrypted rooms included, because the
-  node is their consumer. They name the room and the participant unless the client settings
-  `obfuscateRoomName` (the room's session id instead of its name) and `obfuscateDisplayName` (the
-  name masked) are set. A deployment that wants a node to learn nothing user chosen sets both.
+  node is their consumer. The samples carry the participant's display name, masked when the client
+  setting `obfuscateDisplayName` is on. The tenant and room to file them under come from the room
+  server, and only when its `clientMonitoring.roomInfo` setting is on; with
+  `clientMonitoring.obfuscateRoomName` it names the room by its session id instead of its name.
+  With `roomInfo` off, the default, a node knows a room only by that id.
 
 ### Points for an assessment
 
@@ -265,9 +268,10 @@ chosen regions (see Media Node Region Binding in the room server README). The re
 every participant of the room alike, whatever their own location, and a room keeps using the nodes
 it already has when further participants join.
 
-**Identities stay on the room and management servers.** Names, accounts, chat and files never reach
-a media node, so where those two servers run is what decides where identifying data is processed.
-The room server's debug logs contain IP addresses and display names.
+**Identities stay on the room and management servers.** Apart from client monitoring, described
+above, names, accounts, chat and files never reach a media node, so where those two servers run is
+what decides where identifying data is processed. The room server's debug logs contain IP addresses
+and display names.
 
 **Encryption is per room.** In a room without it, media nodes handle decoded audio and video. An
 assessment that relies on encryption applies to encrypted rooms only, so a tenant that depends on it
@@ -328,8 +332,9 @@ which is worth considering in a room chosen for its privacy.
 
 **Client monitoring is not covered.** The client sends connection statistics to the media node over
 a data channel when the operator configures sampling, and the node reads them, in an encrypted room
-as in any other. They carry no media, but they name the room and the participant unless the client
-settings `obfuscateRoomName` and `obfuscateDisplayName` are set; see Data protection above.
+as in any other. They carry no media. What they say about the participant is set by the client's
+`obfuscateDisplayName`, and what the node learns about the room by the room server's
+`clientMonitoring` settings; see Data protection above.
 
 **Silence is observable.** Frames with no content are passed through unencrypted, so an observer can
 distinguish speech from silence. Frame sizes already revealed this before encryption, so it is not a
