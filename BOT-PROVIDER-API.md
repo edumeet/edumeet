@@ -119,8 +119,10 @@ from its address as soon as it has read it.
 
 The page joins the meeting on its own. It shows the meeting and nothing else: no dialogs, buttons,
 notifications or sounds. It sends no audio or video, and it is hidden from the participant list and
-the participant count. Participants see that it is there from an icon in the top bar, and moderators
-can see and stop the job from the bot menu.
+the participant count. Where the deployment collects client monitoring statistics, the page sends
+its own, marked as a bot's, so the operator can see what the recorder received. Participants see
+that it is there from an icon in the top bar, and moderators can see and stop the job from the bot
+menu.
 
 ### Reporting how the job is doing
 
