@@ -67,7 +67,9 @@ Content-Type: application/json
     "roomId": "lecture1",
     "sessionId": "8f0c…",
     "sessionName": "Group A"
-  }
+  },
+  "recipients": [ { "email": "teacher@example.org" } ],
+  "locale": "pl"
 }
 ```
 
@@ -80,6 +82,13 @@ Content-Type: application/json
 - **`room.host`**, **`room.roomId`** and **`room.sessionId`** identify the meeting, so that a
   provider can apply its own per-tenant or per-room configuration. `sessionId` is the main room
   unless the job runs in a breakout room, in which case **`room.sessionName`** is that room's name.
+- **`recipients`**, when present, are the people to tell once the recording is ready: the owners
+  of the room and the moderator who started the job, each once. edumeet resolves them from its
+  own accounts, so they are real addresses of signed-in people. Absent when nobody could be
+  resolved; the job still runs.
+- **`locale`**, when present, is the language the tenant writes to its people in, as a language
+  code such as `pl` or `de`. Use it for the notification; fall back to English when it is absent
+  or you have no template for it.
 
 Any 2xx means the job is accepted. The body of the answer is ignored, so an empty `202` is enough.
 Anything else, a timeout, or a certificate that does not validate, means the job failed: edumeet
@@ -105,6 +114,18 @@ already gone.
 
 It is not sent while an edumeet server restarts. See **Surviving a restart**.
 
+### Telling people about the recording
+
+edumeet does not send mail about recordings and never sees the file, so the notification is
+yours to send, to the `recipients` of the job, once the recording is available. Send it from an
+address of the institution rather than your own: the tenant gives you a sending domain for that,
+so the mail looks like it comes from where the meeting was held, and it lands. Say where the
+recording is, and until when. Send nothing to anyone who is not in `recipients`; whether others
+get it is the owners' decision, not the provider's.
+
+Only a signed-in moderator can start a job, so the `recipients` list is never empty for a reason
+other than a lookup failure on edumeet's side.
+
 ## The browser side
 
 The provider opens `room.url` in a browser it controls, with the bot access token appended to the
@@ -119,8 +140,12 @@ from its address as soon as it has read it.
 
 The page joins the meeting on its own. It shows the meeting and nothing else: no dialogs, buttons,
 notifications or sounds. It sends no audio or video, and it is hidden from the participant list and
-the participant count. Where the deployment collects client monitoring statistics, the page sends
-its own, marked as a bot's, so the operator can see what the recorder received. Participants see
+the participant count. A transcriber page receives audio only: it declares no video capability, so
+the media node never sends it video, which keeps such a browser light enough to run many of them.
+A meeting with a bot in it always goes through a media node, however few people are in it, so what
+the bot receives does not change as people arrive and leave. Where the deployment collects client
+monitoring statistics, the page sends its own, marked as a bot's, so the operator can see what
+the recorder received. Participants see
 that it is there from an icon in the top bar, and moderators can see and stop the job from the bot
 menu.
 
@@ -210,6 +235,8 @@ meeting is told so explicitly and has to confirm.
 - Watch `data-edumeet-reason` and finish cleanly when it appears.
 - Treat `DELETE` as a request to finish properly rather than to kill the process, and answer it even
   for a job it no longer knows.
+- Tell the `recipients`, and only them, where the recording is once it is ready, from an address
+  of the institution.
 - Tell the people in the meeting nothing edumeet has not: the bot is disclosed by edumeet itself.
 
 ## Recording people
