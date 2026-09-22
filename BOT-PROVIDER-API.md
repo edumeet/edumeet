@@ -66,6 +66,7 @@ Content-Type: application/json
     "host": "meet.example.org",
     "roomId": "lecture1",
     "sessionId": "8f0c…",
+    "mainSessionId": "2b71…",
     "sessionName": "Group A"
   },
   "recipients": [ { "email": "teacher@example.org" } ],
@@ -79,9 +80,13 @@ Content-Type: application/json
   from.
 - **`room.url`** is the page to open, ready to use. It is built by edumeet; the provider appends the
   bot access token to it, see below.
-- **`room.host`**, **`room.roomId`** and **`room.sessionId`** identify the meeting, so that a
-  provider can apply its own per-tenant or per-room configuration. `sessionId` is the main room
+- **`room.host`**, **`room.roomId`** and **`room.sessionId`** identify the session the job runs
+  in, so that a provider can apply its own per-tenant or per-room configuration. `sessionId` is the main room
   unless the job runs in a breakout room, in which case **`room.sessionName`** is that room's name.
+- **`room.mainSessionId`** is the main room's session, the same for every job of one meeting,
+  breakout rooms included; it equals `sessionId` for a job in the main room. `roomId` is the name
+  of the room and stays the same when the room is used again another day, so this is the field
+  to group the jobs of one meeting by.
 - **`recipients`**, when present, are the people to tell once the recording is ready: the owners
   of the room and the moderator who started the job, each once. edumeet resolves them from its
   own accounts, so they are real addresses of signed-in people. Absent when nobody could be
@@ -125,6 +130,16 @@ get it is the owners' decision, not the provider's.
 
 Only a signed-in moderator can start a job, so the `recipients` list is never empty for a reason
 other than a lookup failure on edumeet's side.
+
+A meeting with breakout rooms can have a job in the main room and one in each breakout room, each
+started separately and possibly by different moderators. Group them by `room.mainSessionId` and
+send one notice for the meeting, with a link per recording named after its `sessionName` (the main
+room's has none), to the
+union of the `recipients` of those jobs: the owners of the room are in every list, and a moderator
+who started one of the recordings is told about the others of the same meeting. The natural moment
+to send is when the main room's job ends, with a short grace period for a breakout job that is still
+being finished; a meeting can also have breakout recordings only, in which case send when the last
+of them has been quiet for that long.
 
 ## The browser side
 
@@ -214,9 +229,13 @@ seconds for 30 seconds, because after a restart it may well be back before the f
 Once somebody is in the room, it is let in and its job is picked up again, with no second `POST`.
 Providers therefore need do nothing here, beyond leaving the browser open.
 
-Two limits are worth knowing. A browser gives up reconnecting after about 95 seconds, so an outage
-longer than that ends the job. And a restarted server recognises a job from the bot access token it
-was started with, so a job cannot be picked up after its provider row has been deleted.
+Three limits are worth knowing. A browser gives up reconnecting after about 95 seconds, so an outage
+longer than that ends the job. A restarted server recognises a job from the bot access token it
+was started with, so a job cannot be picked up after its provider row has been deleted. And the
+meeting goes on under a new session: a job started after the restart carries a different
+`room.mainSessionId` from those started before it, which are never sent again. A provider that
+wants one notice across a restart has to bridge the two itself, by the same `host` and `roomId`
+close together in time.
 
 ## End-to-end encrypted meetings
 
@@ -236,7 +255,8 @@ meeting is told so explicitly and has to confirm.
 - Treat `DELETE` as a request to finish properly rather than to kill the process, and answer it even
   for a job it no longer knows.
 - Tell the `recipients`, and only them, where the recording is once it is ready, from an address
-  of the institution.
+  of the institution; one notice per meeting, grouped by `room.mainSessionId`, when it had
+  breakout rooms.
 - Tell the people in the meeting nothing edumeet has not: the bot is disclosed by edumeet itself.
 
 ## Recording people
