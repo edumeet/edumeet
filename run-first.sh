@@ -20,8 +20,9 @@ fi
 [ -z "$MAIN_DOMAIN" ] && read -p "Enter Main FQDN: " MAIN_DOMAIN
 [ -z "$MEDIA_DOMAIN" ] && read -p "Enter Media FQDN (MUST be different from Main Domain): " MEDIA_DOMAIN
 [ -z "$EMAIL" ] && read -p "Enter Email: " EMAIL
-[ -z "$LISTEN_IP" ] && read -p "Enter Listen IP: " LISTEN_IP
 [ -z "$EXTERNAL_IP" ] && read -p "Enter Public IP: " EXTERNAL_IP
+[ -z "$LISTEN_IP" ] && read -p "Enter Listen IP (MUST NOT be 0.0.0.0 or MEDIA won't work. Defaults to $EXTERNAL_IP): " LISTEN_IP
+[ -z "$LISTEN_IP" ] && LISTEN_IP=$EXTERNAL_IP
 # Always generate a new Media Secret
 MEDIA_SECRET=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)
 
