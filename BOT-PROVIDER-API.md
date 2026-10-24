@@ -183,66 +183,12 @@ fragment:
 <room.url>#botToken=<bot access token>
 ```
 
-The fragment is not sent to any server, so the token appears in no access log. The page removes it
-from its address as soon as it has read it.
-
-The page joins the meeting on its own. It shows the meeting and nothing else: no dialogs, buttons,
-notifications or sounds. It sends no audio or video, and it is hidden from the participant list and
-the participant count. It receives audio and video, since a bot may be asked to record at any time;
-only the bot of a provider that offers transcription and nothing else is sent with
-`botType=transcriber`, declares no video capability, and receives audio alone, which keeps such a
-browser light enough to run many of them. A meeting with a bot in it always goes through a media
-node, however few people are in it, so what the bot receives does not change as people arrive and
-leave. Where the deployment collects client monitoring statistics, the page sends its own, marked
-as a bot's, so the operator can see what the recorder received. Participants see that it is there
-from an icon in the top bar, and moderators can see and stop each job from the bot menu.
-
-### Reporting how the jobs are doing
-
-The page provides one function for the provider to call:
-
-```js
-window.edumeetBot.status('running');                           // the bot's heartbeat
-window.edumeetBot.status('finished', undefined, 'streamer');   // this job is done
-window.edumeetBot.status('failed', 'ingest down', 'streamer'); // this job gave up
-window.edumeetBot.status('finished');                          // every job is done, about to leave
-window.edumeetBot.status('failed', 'disk full');               // the bot gave up altogether
-```
-
-It returns `true` when the status was sent, and exists only on a page carrying a `botId`.
-
-**`running` is a heartbeat for the whole bot and it is required.** Send it once the capture is
-actually running, and then every 30 seconds for as long as the bot stays healthy. It should be tied
-to the health of the work itself, for example to the encoder still producing output, because this is
-what lets edumeet notice a recorder that has hung behind a page that is still connected.
-
-`finished` and `failed` take a third argument, the kind of job they are about. With it, only that
-job ends, and the bot goes on with the others; a `finished` job is not sent a delete, a `failed` one
-is. Without it, they are about the whole bot and every job it runs. A kind the bot is not running is
-ignored, and a third argument that is not a kind of job sends nothing at all, so a typo cannot end
-every job by accident.
-
-The reason given with `failed` is shown to the moderators and written to the edumeet server log, so
-it should be short and say something useful. It is cut off after 200 characters. A bot that fails
-as a whole tells the moderators once, not once per job.
-
-### Watching the page
-
-The page writes its state on the `<html>` element, and the provider should watch it rather than only
-its own process:
-
-| Attribute | Meaning |
-| --- | --- |
-| `data-edumeet-state` | `new`, `lobby`, `joined` or `left` |
-| `data-edumeet-connection` | `connecting`, `connected`, `reconnecting` or `disconnected` |
-| `data-edumeet-reason` | why it left, once it has |
-
-**When `data-edumeet-reason` appears, the bot is over**, whatever the cause, and no delete will
-arrive for its jobs. Finish the work and close the browser. The reasons a bot page can see are
-`kicked` (a moderator removed it, or edumeet ended a bot that did not leave), `meetingEnded`,
-`connectionClosed`, `sessionClosed` (its breakout room was closed), `jobNotActive` (the bot has no
-jobs left, or belongs to another browser), and the refusals `roomNotOpen`, `botsNotAllowed` and
-`botTokenRejected`.
+The page does the rest: it joins the meeting, shows it and nothing else, sends no media of its own,
+and reports itself as running every 20 seconds while it is in the meeting. A browser that only opens
+the page and records therefore needs no code for edumeet: its jobs run, and they end through the
+API. **[BOTS.md](BOTS.md) describes the browser side in full**: what the page does, how the browser
+should be set up, the `window.edumeetBot.status` function that lets a bot take the heartbeat over or
+end a single job, and the status attributes that tell it why the bot is over.
 
 ## The life of a bot
 
@@ -253,6 +199,9 @@ jobs left, or belongs to another browser), and the refusals `roomNotOpen`, `bots
 | the next `running` | 90 s | its jobs fail |
 | the browser to leave after its last job ended | 30 s | edumeet removes it from the meeting |
 | the browser to come back after a disconnect | 60 s | its jobs fail |
+
+The page sends `running` by itself, so the two heartbeat limits matter only to a provider that has
+taken the heartbeat over.
 
 Every job of a bot shows the bot's state. A job started on a bot that is already running shows as
 running at once, so switch the new kind of work on promptly.
@@ -301,9 +250,11 @@ meeting is told so explicitly and has to confirm.
   were registered for it.
 - Run one browser per `botId`: open it for a `botId` it does not know, and switch a kind of work on
   or off in the running one for a `botId` it does.
-- Send `running` at least every 30 seconds while a bot is healthy, tied to the work rather than to a
-  timer alone, and report the end or failure of a single kind with its type.
-- Watch `data-edumeet-reason` and finish cleanly when it appears.
+- Either leave the heartbeat to the page and close the browser when the recording dies, or take it
+  over with `running` at least every 30 seconds, tied to the work; report the end or failure of a
+  single kind with its type where it can.
+- Put an upper limit on how long a bot may run, and preferably watch `data-edumeet-reason` to finish
+  sooner than the delete would make it, see [BOTS.md](BOTS.md).
 - Treat `DELETE` as a request to finish that job properly rather than to kill the process, keep the
   bot for its other jobs, and answer it even for a job it no longer knows.
 - Answer `GET /v1/bots/<botId>` with the jobs a bot runs, and only for the host and room it was
