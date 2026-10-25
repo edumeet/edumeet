@@ -127,8 +127,15 @@ needs no special handling.
 
 edumeet sends this when a moderator stops the job, for every job of a bot the moderator removes from
 the meeting, when the meeting ends or its room empties, when the breakout room the job runs in is
-closed, and whenever a job fails. It may arrive more than once for the same job, and it may arrive
-for a job whose browser has already gone.
+closed or emptied, and whenever a job fails. It may arrive more than once for the same job, and it
+may arrive for a job whose browser has already gone.
+
+A delete that cannot be delivered (no connection, a certificate that does not validate, a redirect,
+or no answer within 10 seconds) or is answered with a 5xx other than 501 and 505, a 408 or a 429 is
+sent again, up to six times, waiting 10 seconds, then 30 seconds, 1, 2, 5 and 10 minutes between
+tries, about 19 minutes in all. Any other answer is taken as final. While more than a thousand
+deletes are waiting to be sent again, a new one that fails is not. These repeats are not kept across a
+restart of the edumeet server, so keep a limit of your own on how long a job may run.
 
 It is not sent while an edumeet server restarts. See **Surviving a restart**.
 
@@ -144,14 +151,19 @@ GET <api url>/v1/bots/7d3e5a10-0000-4000-8000-7d3e5a100001?host=meet.example.org
 
 edumeet asks this once, when a bot arrives that it does not know, which happens after an edumeet
 server was restarted under running jobs. The answer lists the jobs the bot is doing, so edumeet can
-show them in the room again. `host` and `roomId` are the room the bot arrived in: **list the bot's
-jobs only when you started that bot for that host and room**, and answer `404` otherwise, as for a
-bot you do not know. edumeet ends the jobs it picks up here, and stops them at your API, so a bot
-that arrived in the wrong room must not bring the jobs of another room with it. Answer `200` with
-the list. Only
-this answer is read, and only its first 64 KB; entries without a UUID `jobId` or with an unknown
-`type` are skipped. A bot you do not know, an empty list, an error or a timeout all mean edumeet
-refuses the bot, and its page sees `jobNotActive`.
+show them in the room again. `host` and `roomId` are the room the bot arrived in, `host` being the
+host of the bot's `room.url`: **list the bot's jobs only when you started that bot for that host and
+room**, and answer `404` otherwise, as for a bot you do not know. edumeet ends the jobs it picks up
+here, and stops them at your API, so a bot that arrived in the wrong room must not bring the jobs of
+another room with it. Answer `200` with the list. Only this answer is read, and one over 64 KB is
+refused like an error; entries without a UUID `jobId` or with an unknown `type` are skipped, and a
+`jobId` listed twice counts once. A bot you do not know, an empty list, an error or a timeout all
+mean edumeet refuses the bot, and its page sees `jobNotActive`.
+
+A listed job that edumeet does not take back gets a delete: one of a kind the row no longer offers
+(a bot of a row with a single kind that is no longer offered is refused with `botTokenRejected`
+before it is asked about), of a kind the session already runs, also by another job in the same
+list, past the room's limit of jobs, or of a room or breakout room that closed meanwhile.
 
 ### Telling people about the recording
 
@@ -194,8 +206,8 @@ end a single job, and the status attributes that tell it why the bot is over.
 
 | edumeet is waiting for | For how long | Otherwise |
 | --- | --- | --- |
-| the browser to join | 60 s | its jobs fail |
-| the first `running` after it joined | 60 s | its jobs fail |
+| the browser to join | 60 s from the start of the bot's first job, the `POST` included; after a restart, from the listing answer | its jobs fail |
+| the first `running` after it joined, or after a reload of a running bot | 60 s | its jobs fail |
 | the next `running` | 90 s | its jobs fail |
 | the browser to leave after its last job ended | 30 s | edumeet removes it from the meeting |
 | the browser to come back after a disconnect | 60 s | its jobs fail |
@@ -235,6 +247,19 @@ cannot answer the listing call loses the bot. And the meeting goes on under a ne
 started after the restart carries a different `room.mainSessionId` from those started before it,
 which are never sent again. A provider that wants one notice across a restart has to bridge the two
 itself, by the same `host` and `roomId` close together in time.
+
+Breakout rooms do not survive a restart. A bot of one is refused with `sessionNotOpen`, and edumeet
+makes the listing call for it and sends a delete for every job it lists. A bot refused before its
+jobs were listed gets no delete, since edumeet no longer knows them: one whose room nobody comes
+back to in time (`roomNotOpen`), one whose token is no longer valid (`botsNotAllowed`,
+`botTokenRejected`), and one whose listing call failed (`jobNotActive`, or `sessionNotOpen` for a
+breakout bot). End those jobs when the page says so (see [BOTS.md](BOTS.md)), or by your own
+limit.
+
+A room reads its providers once, when it opens. After the API key of a row is changed, accept the
+old key as well until the rooms opened before have ended, and about 20 minutes more for the deletes
+sent again, or their deletes are refused and their jobs run on; a job started in such a room, and
+its listing call, use the old key too.
 
 ## End-to-end encrypted meetings
 

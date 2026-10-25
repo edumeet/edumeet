@@ -128,7 +128,7 @@ For a provider's bot, the least is:
 2. Record, stream or transcribe what it shows and plays.
 3. Finish properly when edumeet sends a delete for the bot's last job, and close the browser.
 4. Close the browser when the recording dies, so that the page leaves the meeting. edumeet notices
-   within a minute and ends the jobs.
+   in about a minute and ends the jobs.
 5. Not run longer than a limit of its own, in case the edumeet server stops and never comes back.
 
 Everything else is optional: it lets a bot say more, or finish sooner.
@@ -179,10 +179,14 @@ The attributes only ever hold the codes listed here, never names, ids or tokens,
 read them from outside the page, for example with the DevTools protocol, without reading anything
 of the meeting.
 
-**When `data-edumeet-reason` appears, the bot is over**, whatever the reason: the page will not
-rejoin. A provider's bot does not have to watch for it, because edumeet sends a delete for every
-end it decides on, at most a minute later; watching it only lets the bot finish sooner. A bot
-started by hand has no delete coming, so for it this is the way to know it is over.
+**When `data-edumeet-reason` appears, the page is over**, whatever the reason: it will not rejoin.
+So is the bot, except for a `jobNotActive` given because another browser already runs this `botId`,
+where only this browser is. While edumeet knows the bot's jobs, it sends a delete for every end it
+decides on, first sent at most a minute or so later, and watching the reason only lets the bot
+finish sooner. It does not know them for a bot refused after a restart of the edumeet server before
+its provider listed its jobs (`roomNotOpen`, `botsNotAllowed`, `botTokenRejected`, or `jobNotActive`
+and `sessionNotOpen` when the listing call failed), nor for one started by hand: for those, this is
+the way to know it is over.
 
 | Reason | What happened |
 | --- | --- |
