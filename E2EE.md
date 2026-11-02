@@ -35,7 +35,8 @@ Both the tenant default and the per-room setting are edited from the management 
 also lock its default, in which case rooms cannot override it.
 
 A browser that cannot support the WebRTC Encoded Transform API is refused entry to a room that
-requires encryption, at the lobby rather than after admission.
+requires encryption, at the lobby rather than after admission. A bot, which skips the lobby, stops
+when the room tells it that it is encrypted, before it joins (see [BOTS.md](BOTS.md)).
 
 The client needs a room server that carries the MLS delivery service, so when upgrading, deploy the
 room server before the client or together with it.
@@ -205,7 +206,9 @@ reconnects, and a whole room losing the server and founding a new group.
 
 ## Browser support
 
-Verified working, including between different browsers: Chrome, Edge, Firefox and Safari. Edge and
+Verified working, including between different browsers: Chrome, Edge, Firefox and Safari, in the
+versions that have `RTCRtpScriptTransform`: Chrome and Edge 141 or later, Firefox 117 or later,
+Safari 15.4 or later. Chrome shipped it in 141; an older Chrome, such as 139, is refused. Edge and
 Chrome share the Chromium engine with Opera, Brave, Vivaldi and the other Chromium browsers, which
 therefore work the same way, though they were not tested one by one. Any browser implementing
 `RTCRtpScriptTransform` is allowed to try, and one that accepts the transform without using it is

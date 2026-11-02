@@ -214,7 +214,11 @@ the way to know it is over.
   profile shared with a person's browsing would change their layout; opening any page with
   `headless=0` in that profile puts the layout back.
 - **Use a browser edumeet supports for its meetings**, a current Chromium being the usual choice.
-  An end-to-end encrypted meeting also needs a browser that supports encoded transforms.
+  An end-to-end encrypted meeting also needs `RTCRtpScriptTransform` (WebRTC Encoded Transform):
+  Chrome and Chromium 141 or later, Firefox 117 or later, Safari 15.4 or later. An older browser,
+  Chrome 139 for one, does not join such a meeting: the page stops before it joins, with the reason
+  `e2eeUnsupported`, and edumeet, which sees only that the bot did not arrive, fails its jobs with
+  `joinTimeout` a minute later. Check the browser version before recording encrypted meetings.
 - **One browser per `botId`.** A second browser for a bot that already has a live one is refused
   with `jobNotActive`.
 
