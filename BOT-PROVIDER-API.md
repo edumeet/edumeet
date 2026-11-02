@@ -6,8 +6,10 @@ document is the contract that service implements. It is written for whoever buil
 edumeet calls such a service a **provider**, and each piece of work it does for a meeting a **job**:
 a recording, a live stream or a transcription. For every session of a meeting that has jobs, the
 provider runs one **bot**, a browser it controls that is in the meeting and does all of that
-provider's jobs there at once. A moderator starts and stops jobs from the room; the provider switches
-each kind of work on or off in its bot, and the bot leaves when its last job ends.
+provider's jobs there at once. A signed-in moderator starts and stops jobs from the room. Jobs start
+only in a room claimed in edumeet's management: in an unclaimed room the first person in is a
+moderator, and nobody owns what is recorded. The provider switches each kind of work on or off in
+its bot, and the bot leaves when its last job ends.
 
 edumeet has no idea what recording or streaming involves. It never sees a file, a stream key or a
 transcript, and it has nowhere to put a destination or a language beyond what is described here:
@@ -174,8 +176,8 @@ so the mail looks like it comes from where the meeting was held, and it lands. S
 recording is, and until when. Send nothing to anyone who is not in `recipients`; whether others
 get it is the owners' decision, not the provider's.
 
-Only a signed-in moderator can start a job, so the `recipients` list is never empty for a reason
-other than a lookup failure on edumeet's side.
+Only a signed-in moderator of a claimed room can start a job, so the `recipients` list is never
+empty for a reason other than a lookup failure on edumeet's side.
 
 A meeting with breakout rooms can have a bot in the main room and one in each breakout room, each
 with its own jobs, started separately and possibly by different moderators. Group them by
