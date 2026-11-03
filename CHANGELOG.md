@@ -14,6 +14,8 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+### general
+- The example client config no longer enables transcription, which was already off by default in the code. The client README now lists its default as off and says where the speech goes: the browser's speech recognition sends the speaker's audio to the browser vendor (Google, Microsoft or Apple), outside end-to-end encryption, so it should be enabled only where the privacy notice covers that
 
 ## [4.2-20261026-stable] - 2026-10-26
 ### general
