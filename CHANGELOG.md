@@ -15,6 +15,9 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
 ### general
+- Moderators can stop a server recording, live stream or transcription from the More menu too: while one runs in their session, its entry there offers to stop it, as Stop in the bot menu does
+- Media keeps flowing after a media node drops in the middle of a meeting. A connection that closed before it was ready, or that a stale request timed out, left requests for a router waiting for ever, and new streams were offered to the participants one at a time, so one stuck participant held up the rest. A connection now closes only itself and fails what waits on it at once, leaving or reconnecting ends a wait for a router, and new streams go to all participants at the same time
+- The documentation now states the browsers end-to-end encryption needs, those with `RTCRtpScriptTransform`: Chrome and Edge 141 or later, Firefox 117 or later, Safari 15.4 or later. An older browser is refused in an encrypted room
 - The example client config no longer enables transcription, which was already off by default in the code. The client README now lists its default as off and says where the speech goes: the browser's speech recognition sends the speaker's audio to the browser vendor (Google, Microsoft or Apple), outside end-to-end encryption, so it should be enabled only where the privacy notice covers that
 
 ## [4.2-20261026-stable] - 2026-10-26
