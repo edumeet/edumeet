@@ -186,7 +186,10 @@ with its own jobs, started separately and possibly by different moderators. Grou
 of the room are in every list, and a moderator who started one of the recordings is told about the
 others of the same meeting. The natural moment to send is when the main room's last job ends, with a
 short grace period for a breakout job that is still being finished; a meeting can also have breakout
-recordings only, in which case send when the last of them has been quiet for that long.
+recordings only, in which case send when the last of them has been quiet for that long. A meeting
+can record again after its notice went out, as long as the room stays open: tell the same people
+again once those jobs end, and lead them to the same place, which by then has every recording of
+the meeting.
 
 ## The browser side
 
