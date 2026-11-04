@@ -5,21 +5,22 @@ meeting. This document is the contract that the service implements. It is for th
 that service.
 
 edumeet calls such a service a **provider**. Each piece of work that the provider does for a
-meeting is a **job**. A job is a recording, a live stream or a transcription. For each session of a
-meeting that has jobs, the provider runs one **bot**. A bot is a browser that the provider controls.
-The bot is in the meeting and does all the jobs of that provider in that session at the same time.
+meeting is a **job**. A job is a recording, a live stream or a transcription. A **session** is the
+main room or one breakout room of a room, from the time it opens until it closes. For each session
+that has jobs, the provider runs one **bot**. A bot is a browser that the provider controls. The bot
+is in the meeting and does all the jobs of that provider in that session at the same time.
 
 A signed-in moderator starts and stops jobs from the room. Jobs start only in a room that is claimed
 in the edumeet management. The reason: in an unclaimed room, the first person in the room is a
-moderator, and nobody owns the recorded content. The provider starts and stops each type of work in
+moderator, and nobody owns the recorded content. The provider starts and stops each job type in
 its bot. The bot leaves when its last job ends.
 
 edumeet does not know what recording or streaming involves. edumeet never sees a file, a stream key
 or a transcript. edumeet has no place for a destination or a language, other than the data that
-this document describes. The provider configures all data of that type on its side. edumeet tells
-the provider which meeting, which bot and which type of work.
+this document describes. The provider configures all such data on its side. edumeet tells the
+provider which meeting, which bot and which job type.
 
-## The two keys
+## The two credentials
 
 There are two different credentials. Keep them separate from the start.
 
@@ -29,8 +30,8 @@ There are two different credentials. Keep them separate from the start.
 | **Bot access token** | edumeet | the provider | the browser of the provider joins rooms |
 
 The provider gives the API key to the tenant administrator. The administrator pastes it into
-edumeet. The bot access token goes in the opposite direction. edumeet generates the token and shows
-it one time. Then the administrator sends it to the provider. edumeet keeps the API key in encrypted
+edumeet. The bot access token goes in the opposite direction. edumeet generates the bot access token and
+shows it one time. Then the administrator sends it to the provider. edumeet keeps the API key in encrypted
 form. edumeet keeps only a hash of the bot access token.
 
 ## Set up a provider
@@ -41,28 +42,29 @@ form. edumeet keeps only a hash of the bot access token.
    - the IP addresses that its browsers connect from
    - the job types that it does.
 2. The administrator opens the tenant in the edumeet management interface.
-3. The administrator sets the bot policy to admit bots with an access token.
+3. The administrator sets the bot policy to "Only bots with an access token". The policy "All bots"
+   also admits the bot.
 4. The administrator adds a row under **Bot providers** with these items: a label, a generated bot
    access token, the allowed addresses, the ticked job types, the API address and the API key.
-5. The administrator sends the bot access token to the provider. The provider keeps the token for
-   that tenant.
+5. The administrator sends the bot access token to the provider. The provider keeps the bot access
+   token for that tenant.
 
 Participants see the label as the name of the bot in the meeting. A moderator sees the label in the
 menu. Thus, use the name of the service as the label.
 
-One row is one provider with one token, for all the job types that the provider offers. edumeet
+One row is one provider with one bot access token, for all the job types that the provider offers. edumeet
 sends one bot of a row to a session. That bot does all the job types of the row in that session.
 
 Some providers run each job type as a separate system, with its own browser. Such a provider
-registers one row for each job type. Each row then gets its own token and its own bot in the
-session.
+registers one row for each job type. Each row then gets its own bot access token and its own bot in
+the session.
 
 A row with no job types, no API address and no API key is for a bot that the provider starts
 manually, as before. Such a row gets no button in the room.
 
 ## The API
 
-The API has three calls. All calls use the API key as a bearer token for authentication:
+The API has three calls. All calls send the API key in the `Authorization` header:
 
 ```
 Authorization: Bearer <api key>
@@ -101,11 +103,14 @@ Content-Type: application/json
   on the row.
 - **`botId`** identifies the bot that does the job. It is a UUID that edumeet selects, one for each
   session and provider. **The first job with a `botId` that you do not know means: open `room.url`
-  in a new browser. A job with a `botId` that you already run means: start this type of work in
-  that browser.** That browser is already in the meeting. A session runs a maximum of one job of
-  each type. Thus, edumeet never asks a bot for a job type that the bot already does.
+  in a new browser. A job with a `botId` that you already run means: start this job type in that
+  browser.** That browser is already in the meeting. A session runs a maximum of one job of each
+  job type. Thus, edumeet never asks a bot for a job type that the bot already does.
 - **`room.url`** is the page to open. It is ready to use, and it is the same for all the jobs of a
-  bot. edumeet builds this URL. The provider adds the bot access token to it (see below).
+  bot. edumeet builds this URL. The provider adds the bot access token to it (see below). The URL
+  contains `botType` only when the row offers exactly one job type. With `botType=transcriber`, the
+  page receives only audio. If the row has job types, and the browser comes with a `botType` that
+  the row does not offer, edumeet refuses the browser with `botTokenRejected`.
 - **`room.host`**, **`room.roomId`** and **`room.sessionId`** identify the session that the job
   runs in. With these fields, a provider can apply its own configuration for each tenant or for
   each room. `sessionId` is the main room, except when the job runs in a breakout room. In that
@@ -118,7 +123,8 @@ Content-Type: application/json
 - **`recipients`**, if present, are the people to tell when the recording is ready. They are the
   owners of the room and the moderator who started the job. Each person is in the list one time.
   edumeet finds these people in its own accounts. Thus, they are real addresses of signed-in
-  people. If edumeet cannot find any of these people, the field is absent. The job runs also in that case.
+  people. If edumeet finds no address for any of these people, the field is absent. The job runs
+  also in that case.
 - **`locale`**, if present, is the language that the tenant uses when it writes to its people. It
   is a language code, for example `pl` or `de`. Use it for the notification. Use English if the
   field is absent, or if you do not have a template for that language.
@@ -129,8 +135,8 @@ empty `202` is sufficient.
 The job failed if one of these conditions occurs:
 
 - The answer is not a 2xx.
-- The call has a timeout.
-- edumeet cannot validate the certificate.
+- edumeet cannot deliver the call: there is no connection, edumeet cannot validate the
+  certificate, there is a redirect, or there is no answer in 10 seconds.
 
 In that case, edumeet tells the moderators. edumeet also sends a delete for the same `jobId`,
 because it is possible that the provider started the job. The failure has no effect on the other
@@ -145,7 +151,7 @@ separate step.
 DELETE <api url>/v1/jobs/4be1c0de-0000-4000-8000-4be1c0de0001
 ```
 
-Finish the job correctly: stop that type of work, and close its file or its stream. **The bot stays
+Finish the job correctly: stop that job type, and close its file or its stream. **The bot stays
 in the meeting while it has other jobs. The bot leaves after its last job.** If the delete is for
 the last job of a bot, finish all the work. Then let the browser leave the meeting.
 
@@ -156,8 +162,8 @@ edumeet sends this request each time that one of these events occurs:
 
 - A moderator stops the job.
 - A moderator removes a bot from the meeting. edumeet sends the request for each job of that bot.
-- The meeting ends, or its room becomes empty.
-- The breakout room that the job runs in closes or becomes empty.
+- The meeting ends, or the last participant leaves the room.
+- The breakout room that the job runs in closes, or a moderator empties it.
 - A job fails.
 
 The request can arrive more than one time for the same job. It can also arrive for a job whose
@@ -214,14 +220,15 @@ In these conditions, edumeet refuses the bot, and the page of the bot gets `jobN
 edumeet sends a delete for each listed job that it does not take back. edumeet does not take back a
 listed job in these conditions:
 
-- The job has a type that the row does not offer any more.
-- The job has a type that the session already runs. This includes the type of a different job in the
-  same list.
+- The job has a job type that the row does not offer any more.
+- The job has a job type that the session already runs. This includes the job type of a different
+  job in the same list.
 - The job is more than the job limit of the room.
 - The job is for a room or a breakout room that closed in the meantime.
 
-A special case: a row can have a single job type that the row does not offer any more. edumeet
-refuses a bot of such a row with `botTokenRejected`, before edumeet asks about the bot.
+A special case: the `room.url` of a bot contains `botType` when its row offered exactly one job
+type. If the row does not offer that job type any more when the bot comes back, edumeet refuses the
+bot with `botTokenRejected`. This occurs before edumeet makes the listing call.
 
 ### Tell people about the recording
 
@@ -235,8 +242,9 @@ the meeting occurred, and the email arrives. Tell the recipients where the recor
 when it is there. Do not send anything to a person who is not in `recipients`. The owners decide if
 other people get the notification, not the provider.
 
-Only a signed-in moderator of a claimed room can start a job. Thus, the `recipients` list is empty
-only when edumeet cannot find the people (a lookup failure on the edumeet side).
+Only a signed-in moderator of a claimed room can start a job. Thus, the `recipients` field is
+absent only when edumeet finds no address: a lookup failure on the edumeet side, or accounts without
+an email address.
 
 A meeting with breakout rooms can have a bot in the main room and a bot in each breakout room. Each
 bot has its own jobs. Moderators start these jobs separately, and different moderators can start
@@ -267,6 +275,12 @@ to the fragment:
 ```
 <room.url>#botToken=<bot access token>
 ```
+
+With a valid bot access token, the bot is verified. A verified bot does not need a meeting token,
+also in a meetings-only room, and it does not go to the lobby of a locked room. A meeting token is
+a different token: it proves that a participant was invited to a scheduled meeting. The bot can
+only join a room that is open. In a meetings-only room, an invited participant with a valid meeting
+token must be there first.
 
 The page does the remaining steps:
 
@@ -300,7 +314,7 @@ The page sends `running` automatically. Thus, the two heartbeat limits are impor
 provider that has taken control of the heartbeat.
 
 Each job of a bot shows the state of the bot. If edumeet starts a job on a bot that already runs,
-the job shows as running immediately. Thus, start the new type of work quickly.
+the job shows as running immediately. Thus, start the new job type quickly.
 
 If a browser loses its connection, its jobs do not end. The icons in the room change to show that
 the jobs are interrupted. If the same browser comes back with the same `botId` in 60 seconds, the
@@ -311,7 +325,7 @@ with `jobNotActive`.
 If a job starts while its bot leaves (after the last job ended), the job gets a new bot with a new
 `botId`.
 
-A session runs a maximum of **one job of each type**. A room runs a maximum of **10 jobs** at the
+A session runs a maximum of **one job of each job type**. A room runs a maximum of **10 jobs** at the
 same time. This limit is for all providers, job types and sessions together.
 
 ## Survive a restart
@@ -337,10 +351,12 @@ Know these four limits:
 - A browser stops its tries to connect again after approximately 95 seconds. Thus, an outage that is
   longer than that ends the jobs.
 - A restarted server identifies a bot from the bot access token that the bot started with. Thus,
-  edumeet cannot take back a bot if the provider row of the bot was deleted.
+  edumeet cannot take back a bot if the provider row of the bot was deleted. The same is true when
+  the row has no job types, no https API address or no API key that edumeet can send. Then the
+  bot comes in as a bot without jobs: edumeet does not list its jobs and sends no delete for them.
 - If a provider cannot answer the listing call, the provider loses the bot.
-- The meeting continues with a new session. A job that starts after the restart has a different
-  `room.mainSessionId` from the jobs that started before the restart. edumeet never sends those
+- After the restart, the main room has a new session. A job that starts after the restart has a
+  different `room.mainSessionId` from the jobs that started before the restart. edumeet never sends those
   earlier jobs again. If a provider wants one notice across a restart, the provider must connect
   the two sessions itself: by the same `host` and `roomId`, close together in time.
 
@@ -352,7 +368,8 @@ If edumeet refuses a bot before it has the list of the jobs of the bot, the bot 
 reason is that edumeet does not know these jobs any more. These bots get no delete:
 
 - a bot whose room nobody comes back to in time (`roomNotOpen`)
-- a bot whose token is not valid any more (`botsNotAllowed`, `botTokenRejected`)
+- a bot that the bot policy or the check of its bot access token refuses (`botsNotAllowed`,
+  `botTokenRejected`)
 - a bot whose listing call failed (`jobNotActive`, or `sessionNotOpen` for a breakout bot).
 
 End those jobs when the page tells you (see [BOTS.md](BOTS.md)), or at your own limit.
@@ -368,22 +385,23 @@ uses the old key.
 
 A job can run in an end-to-end encrypted meeting. The bot takes part in the encryption like all
 other participants. This means that the provider can read the meeting. Thus, when a moderator starts
-a job in such a meeting, the moderator gets an explicit message about this and must confirm.
+a job in such a meeting, the confirmation dialog tells the moderator about this, and the moderator
+must confirm.
 
 ## What a provider is expected to do
 
 - Serve the API over https with a certificate that validates. Answer `POST /v1/jobs` quickly.
 - Keep the API key secret. Do not accept a request without the API key.
 - Keep the bot access token for the tenant that it was issued for. Connect from the addresses that
-  are registered for that token.
+  are registered for that bot access token.
 - Run one browser for each `botId`. For a `botId` that you do not know, open a browser. For a
-  `botId` that you know, start or stop a type of work in the browser that runs.
+  `botId` that you know, start or stop a job type in the browser that runs.
 - Select one of these two methods for the heartbeat:
   - Let the page send the heartbeat, and close the browser when the recording stops working.
   - Take control of the heartbeat, and send `running` at least every 30 seconds. Make the heartbeat
     depend on the work.
 
-  Where you can, report the end or the failure of a single type of work, with its type.
+  Where you can, report the end or the failure of a single job, with its job type.
 - Set a maximum time for a bot to run. We recommend that you also monitor `data-edumeet-reason`, so
   that the bot finishes before the delete makes it finish (see [BOTS.md](BOTS.md)).
 - Treat `DELETE` as a request to finish that job correctly, not to kill the process. Keep the bot
