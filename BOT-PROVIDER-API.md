@@ -142,6 +142,10 @@ In that case, edumeet tells the moderators. edumeet also sends a delete for the 
 because it is possible that the provider started the job. The failure has no effect on the other
 jobs of the same bot.
 
+If you cannot start more jobs at this time, answer `429`. Then edumeet tells the moderators that
+the provider is busy and that they can try again later. For all other refusals, the moderators see
+only that the job stopped. edumeet does not start the job again by itself.
+
 Answer quickly. You can start the browser after you answer. edumeet waits for the bot to arrive as a
 separate step.
 
@@ -325,8 +329,17 @@ with `jobNotActive`.
 If a job starts while its bot leaves (after the last job ended), the job gets a new bot with a new
 `botId`.
 
-A session runs a maximum of **one job of each job type**. A room runs a maximum of **10 jobs** at the
-same time. This limit is for all providers, job types and sessions together.
+A session runs a maximum of **one job of each job type**. By default, a room runs a maximum of
+**10 jobs** at the same time. This limit is for all providers, job types and sessions together. The
+operator of the room server sets this limit with `maxBotJobsPerRoom`, from 1 to 100. A tenant
+administrator can set a lower limit for the rooms of the tenant in the tenant editor, but not a
+higher limit. When a room runs as many jobs as it can, edumeet does not call the provider for a new
+job, and tells the moderator the limit. The
+limit is for new jobs only. After a restart, edumeet takes back the jobs that run, also when the
+limit is now lower. edumeet takes back a maximum of 100 jobs for each room.
+
+This limit is for one room. edumeet does not limit the jobs of all rooms together. If you can run
+only a limited number of jobs, set your own limit, and answer `429` when you reach it.
 
 ## Survive a restart
 
