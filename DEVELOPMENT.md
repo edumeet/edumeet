@@ -12,10 +12,10 @@ Last checked against the `main` branches of November 2026 (management-server `8f
 
 ```
                   https://localhost:4443                 wss://localhost:8443
-  Browser ──────────────────────────────► client  ┌──────────────────────────► room-server
+  Browser ──────────────────────────────► client   ┌──────────────────────────► room-server
      │   (page + JS, Vite dev server)              │  (signaling, socket.io)        │
      │                                             │                                │ wss://localhost:3000
-     │ ── http://localhost:3030 ──► management-server ◄── REST (JWT, admin login) ─┤ (secret auth)
+     │ ── http://localhost:3030 ──► management-server ◄── REST (JWT, admin login)  ─┤ (secret auth)
      │      (login, rooms, admin UI API)      │                                     ▼
      │                                        └──► PostgreSQL :5432           media-node
      └──────────── audio/video: UDP/TCP 40000–40249 ─────────────────────────► (mediasoup SFU)
