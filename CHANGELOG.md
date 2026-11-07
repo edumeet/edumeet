@@ -22,6 +22,10 @@ The stable tag  is teseted by the development team and used by default for [edum
 - How many server recordings, live streams and transcriptions a room may run at the same time, breakout rooms included, is now a setting: the room-server's `maxBotJobsPerRoom` (1 to 100, default 10 as before), which a tenant can lower for its own rooms in the tenant editor but not raise. A moderator who starts one more job than the room may run is told the limit instead of a plain failure, and a provider that answers a new job with `429` is reported to the moderators as busy. The management server must be upgraded first, as the client's tenant editor sends the new setting, and the client together with the room-server, as an older client shows nothing when the limit is reached. New migration; runs on Postgres and MySQL
 - The example client config no longer enables transcription, which was already off by default in the code. The client README now lists its default as off and says where the speech goes: the browser's speech recognition sends the speaker's audio to the browser vendor (Google, Microsoft or Apple), outside end-to-end encryption, so it should be enabled only where the privacy notice covers that
 - Keycloak update 26.8.2, which fixes CVE-2026-117691 (SAML identity broker signature bypass). The image is now pinned to an exact version, as the community `26.4` tag no longer receives fixes
+- mediasoup update 3.32.2. Bandwidth estimation is now mediasoup's own instead of the one from libwebrtc: when a participant's connection gets worse and then better again, the estimate is back within seconds instead of climbing slowly for more than a minute. Also fixes a worker crash on an oversized incoming packet, RTP timestamp jumps when simulcast switches layers, and SRTP errors on bandwidth probing packets. Media nodes on 3.30 and 3.32 send media to each other, so they can be upgraded one at a time
+
+### edumeet-client
+- mediasoup-client update 3.26.0
 
 ## [4.2-20261026-stable] - 2026-10-26
 ### general
