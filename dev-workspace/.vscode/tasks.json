@@ -1,0 +1,261 @@
+{
+	// Local edumeet dev stack. Run "edumeet: start all" (Ctrl+Shift+B).
+	// All Node commands go through dev/with-node.sh, which picks Node from .nvmrc (24)
+	// without touching your nvm default.
+	//
+	//   client             https://localhost:4443   (Vite, hot reload)
+	//   room-server        wss://localhost:8443      (tsc build + node; restart task after changes)
+	//   media-node         https://localhost:3000    RTC udp/tcp 40000-40249
+	//   management-server  http://localhost:3030     (nodemon + ts-node, auto restart)
+	//   postgres           127.0.0.1:5432            (docker, dev/docker-compose.yml)
+	//
+	// Configs (gitignored in each repo):
+	//   edumeet-client/public/config/config.js
+	//   edumeet-room-server/config/config.json
+	//   edumeet-management-server/config/local.json
+	"version": "2.0.0",
+	"options": {
+		"env": {
+			// pino level for room-server and media-node (trace|debug|info|warn|error)
+			"LOG_LEVEL": "info"
+		}
+	},
+	"inputs": [
+		{
+			"id": "mediaIp",
+			"type": "promptString",
+			"description": "IP the media node listens on and announces in ICE candidates (your LAN IP, so other devices can reach it)",
+			"default": "192.168.1.10"
+		}
+	],
+	"tasks": [
+		// ───────────────────────────── stack ─────────────────────────────
+		{
+			"label": "edumeet: start all",
+			"dependsOn": ["management-server", "media-node", "room-server", "client"],
+			"dependsOrder": "parallel",
+			"group": { "kind": "build", "isDefault": true },
+			"problemMatcher": []
+		},
+
+		// ───────────────────────────── infra ─────────────────────────────
+		{
+			"label": "db: up",
+			"type": "shell",
+			"command": "docker compose -f dev/docker-compose.yml up -d --wait",
+			"presentation": { "reveal": "silent", "panel": "shared" },
+			"problemMatcher": []
+		},
+		{
+			"label": "db: down",
+			"type": "shell",
+			"command": "docker compose -f dev/docker-compose.yml down",
+			"problemMatcher": []
+		},
+		{
+			"label": "db: reset (DELETES ALL DATA)",
+			"type": "shell",
+			"command": "docker compose -f dev/docker-compose.yml down -v && docker compose -f dev/docker-compose.yml up -d --wait",
+			"problemMatcher": []
+		},
+		{
+			"label": "db: psql",
+			"type": "shell",
+			"command": "docker exec -it edumeet-dev-db psql -U postgres -d edumeet",
+			"problemMatcher": []
+		},
+
+		// ──────────────────────── management-server ───────────────────────
+		{
+			"label": "management-server: migrate",
+			"type": "shell",
+			"dependsOn": "db: up",
+			"command": "../dev/with-node.sh yarn migrate",
+			"options": { "cwd": "${workspaceFolder}/edumeet-management-server" },
+			"presentation": { "reveal": "silent", "panel": "shared" },
+			"problemMatcher": []
+		},
+		{
+			"label": "management-server",
+			"type": "shell",
+			"dependsOn": "management-server: migrate",
+			"command": "../dev/with-node.sh yarn dev",
+			"options": {
+				"cwd": "${workspaceFolder}/edumeet-management-server",
+				"env": { "TRUST_PROXY": "false" }
+			},
+			"isBackground": true,
+			"presentation": { "group": "edumeet", "panel": "dedicated", "reveal": "always" },
+			"problemMatcher": {
+				"owner": "edumeet-mgmt",
+				"pattern": { "regexp": "^__never__(.*):(\\d+):(.*)$", "file": 1, "line": 2, "message": 3 },
+				"background": {
+					"activeBegin": true,
+					"beginsPattern": "starting `ts-node",
+					"endsPattern": "Feathers app listening"
+				}
+			}
+		},
+
+		// ─────────────────────────── media-node ───────────────────────────
+		{
+			"label": "media-node",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn start --ip 127.0.0.1 --secret devsecret --numberOfWorkers 2",
+			"options": { "cwd": "${workspaceFolder}/edumeet-media-node" },
+			"isBackground": true,
+			"presentation": { "group": "edumeet", "panel": "dedicated", "reveal": "always" },
+			"problemMatcher": {
+				"base": "$tsc",
+				"owner": "edumeet-media-node",
+				"background": {
+					"activeBegin": true,
+					"beginsPattern": ".",
+					"endsPattern": "httpsServer\\.listen|error TS"
+				}
+			}
+		},
+		{
+			"label": "media-node (LAN IP)",
+			"detail": "Use instead of media-node to test from a phone or another machine on your network",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn start --ip ${input:mediaIp} --secret devsecret --numberOfWorkers 2",
+			"options": { "cwd": "${workspaceFolder}/edumeet-media-node" },
+			"isBackground": true,
+			"presentation": { "group": "edumeet", "panel": "dedicated", "reveal": "always" },
+			"problemMatcher": {
+				"base": "$tsc",
+				"owner": "edumeet-media-node",
+				"background": {
+					"activeBegin": true,
+					"beginsPattern": ".",
+					"endsPattern": "httpsServer\\.listen|error TS"
+				}
+			}
+		},
+
+		// ─────────────────────────── room-server ──────────────────────────
+		{
+			"label": "room-server",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn start",
+			"options": {
+				"cwd": "${workspaceFolder}/edumeet-room-server",
+				"env": {
+					// media-node and management-server use self-signed/dev certs
+					"NODE_TLS_REJECT_UNAUTHORIZED": "0",
+					// super-admin seeded by the management-server initial migration
+					"MANAGEMENT_USERNAME": "edumeet-admin@localhost",
+					"MANAGEMENT_PASSWORD": "supersecret"
+				}
+			},
+			"isBackground": true,
+			"presentation": { "group": "edumeet", "panel": "dedicated", "reveal": "always" },
+			"problemMatcher": {
+				"base": "$tsc",
+				"owner": "edumeet-room-server",
+				"background": {
+					"activeBegin": true,
+					"beginsPattern": ".",
+					"endsPattern": "Config live reload|error TS"
+				}
+			}
+		},
+
+		// ───────────────────────────── client ─────────────────────────────
+		{
+			"label": "client",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn start",
+			"options": { "cwd": "${workspaceFolder}/edumeet-client" },
+			"isBackground": true,
+			"presentation": { "group": "edumeet", "panel": "dedicated", "reveal": "always" },
+			"problemMatcher": {
+				"owner": "edumeet-client",
+				"pattern": { "regexp": "^__never__(.*):(\\d+):(.*)$", "file": 1, "line": 2, "message": 3 },
+				"background": {
+					"activeBegin": true,
+					"beginsPattern": "VITE v",
+					"endsPattern": "ready in"
+				}
+			}
+		},
+
+		// ─────────────────────────── utilities ────────────────────────────
+		{
+			"label": "install all",
+			"type": "shell",
+			"command": "for r in edumeet-common edumeet-client edumeet-room-server edumeet-media-node edumeet-management-server; do echo \"== $r\"; (cd $r && ../dev/with-node.sh yarn install --immutable) || exit 1; done",
+			"problemMatcher": []
+		},
+		{
+			"label": "pull all",
+			"type": "shell",
+			"command": "for r in edumeet-common edumeet-client edumeet-room-server edumeet-media-node edumeet-management-server; do echo \"== $r ($(git -C $r branch --show-current))\"; git -C $r pull --ff-only; done",
+			"problemMatcher": []
+		},
+		{
+			"label": "lint all",
+			"type": "shell",
+			"command": "rc=0; for r in edumeet-client edumeet-room-server edumeet-media-node edumeet-management-server; do echo \"== $r\"; (cd $r && ../dev/with-node.sh yarn lint) || rc=1; done; exit $rc",
+			"problemMatcher": ["$eslint-stylish"]
+		},
+		// Used as preLaunchTask by .vscode/launch.json
+		{
+			"label": "room-server: build",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn build",
+			"options": { "cwd": "${workspaceFolder}/edumeet-room-server" },
+			"presentation": { "reveal": "silent", "panel": "shared" },
+			"problemMatcher": ["$tsc"]
+		},
+		{
+			"label": "media-node: build",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn build",
+			"options": { "cwd": "${workspaceFolder}/edumeet-media-node" },
+			"presentation": { "reveal": "silent", "panel": "shared" },
+			"problemMatcher": ["$tsc"]
+		},
+		{
+			"label": "common: build",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn build",
+			"options": { "cwd": "${workspaceFolder}/edumeet-common" },
+			"problemMatcher": ["$tsc"]
+		},
+		{
+			"label": "room-server: unit tests",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn test:unit",
+			"options": { "cwd": "${workspaceFolder}/edumeet-room-server" },
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "media-node: unit tests",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn test:unit",
+			"options": { "cwd": "${workspaceFolder}/edumeet-media-node" },
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "client: tests",
+			"type": "shell",
+			"command": "../dev/with-node.sh yarn test",
+			"options": { "cwd": "${workspaceFolder}/edumeet-client" },
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "management-server: tests",
+			"detail": "Uses a separate edumeet_test database (config/test.json), dev data is untouched",
+			"type": "shell",
+			"dependsOn": "db: up",
+			"command": "dev/mgmt-test.sh",
+			"group": "test",
+			"problemMatcher": []
+		}
+	]
+}

@@ -1,0 +1,26 @@
+{
+	// ESLint setup from the components' CONTRIBUTING.md, applied to all repos in the workspace.
+	// Needs the ESLint extension (dbaeumer.vscode-eslint).
+	"eslint.validate": [
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"typescriptreact"
+	],
+	"eslint.workingDirectories": [
+		{ "mode": "auto" }
+	],
+	"eslint.format.enable": true,
+	"editor.defaultFormatter": "dbaeumer.vscode-eslint",
+	"editor.formatOnSave": true,
+	"editor.formatOnSaveMode": "modifications",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	}
+}
