@@ -54,6 +54,34 @@ The configuration for the client is in the `client` folder. You may change it as
 An example for this configuration file can be found in the [edumeet-client](https://github.com/edumeet/edumeet-client?tab=readme-ov-file#configuration-properties) repository. The configuration for the room-server is in the `room-server` folder. You may change it as needed, but no changes are necessary for the service to work.
 An example for this configuration file can be found in the [edumeet-room-server](https://github.com/edumeet/edumeet-room-server?tab=readme-ov-file#configuration-properties) repository.
 
+For a full deployment with the management server and login (OIDC, Keycloak), see [edumeet-docker](https://github.com/edumeet/edumeet-docker).
+
+## Documentation
+
+| Document | Topic |
+|---|---|
+| [E2EE.md](E2EE.md) | End-to-end encryption |
+| [WEBINAR.md](WEBINAR.md) | Webinars |
+| [WEBINAR-LOADTEST.md](WEBINAR-LOADTEST.md) | Webinar load and scaling test results |
+| [BOTS.md](BOTS.md) | Writing a bot for eduMEET |
+| [BOT-PROVIDER-API.md](BOT-PROVIDER-API.md) | Bot provider API |
+| [DEVELOPMENT.md](DEVELOPMENT.md) | Developer setup: run the whole stack from source |
+| [DEVELOPMENT-VSCODE.md](DEVELOPMENT-VSCODE.md) | Developer setup with VS Code: tasks, debugging, shortcuts |
+| [CHANGELOG.md](CHANGELOG.md) | Changes per release |
+
+## Development
+
+eduMEET consists of four services, each in its own repository: [edumeet-client](https://github.com/edumeet/edumeet-client), [edumeet-room-server](https://github.com/edumeet/edumeet-room-server), [edumeet-media-node](https://github.com/edumeet/edumeet-media-node) and [edumeet-management-server](https://github.com/edumeet/edumeet-management-server), plus the shared library [edumeet-common](https://github.com/edumeet/edumeet-common).
+
+To run them all from source on your machine:
+```bash
+mkdir -p ~/src/edumeet && cd ~/src/edumeet
+git clone https://github.com/edumeet/edumeet.git
+cp -a edumeet/dev-workspace/. .
+./bootstrap.sh
+```
+Then follow [DEVELOPMENT.md](DEVELOPMENT.md), or [DEVELOPMENT-VSCODE.md](DEVELOPMENT-VSCODE.md) if you use VS Code. Contributions go through pull requests against `main` of the respective repository; see its `CONTRIBUTING.md`.
+
 ## Community-driven support
 | Type                |                                                |
 | -----------         | -----------                                    |

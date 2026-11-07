@@ -1,0 +1,25 @@
+# Local dev infrastructure for edumeet. Only Postgres for now; the four
+# edumeet components run natively via VS Code tasks (.vscode/tasks.json).
+name: edumeet-dev
+
+services:
+  edumeet-db:
+    image: postgres:18.4-alpine
+    container_name: edumeet-dev-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: edumeet
+      POSTGRES_DB: edumeet
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - edumeet-dev-db:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d edumeet"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  edumeet-dev-db:

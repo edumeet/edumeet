@@ -1,0 +1,127 @@
+{
+	// Debug configs for the local edumeet stack (see tasks.json for the plain run tasks).
+	//
+	// "Debug: full stack" launches room-server, media-node and management-server under the
+	// debugger and opens the client in a debug Chrome. Stop the "edumeet: start all" task
+	// first, or the ports (3000/3030/8443) are already taken.
+	//
+	// To debug just one server, stop its task and launch its config here; the others can
+	// keep running as tasks. "Attach to running Node process" attaches to any task-started
+	// process without restarting it.
+	//
+	// Breakpoints in edumeet-common: it's consumed as a compiled package from node_modules,
+	// so set breakpoints in node_modules/edumeet-common/lib/*.js of the server you debug.
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "room-server",
+			"type": "node",
+			"request": "launch",
+			"runtimeVersion": "24",
+			"cwd": "${workspaceFolder}/edumeet-room-server",
+			"program": "${workspaceFolder}/edumeet-room-server/dist/server.js",
+			"preLaunchTask": "room-server: build",
+			"outFiles": ["${workspaceFolder}/edumeet-room-server/dist/**/*.js"],
+			"env": {
+				"LOG_LEVEL": "debug",
+				"NODE_TLS_REJECT_UNAUTHORIZED": "0",
+				"MANAGEMENT_USERNAME": "edumeet-admin@localhost",
+				"MANAGEMENT_PASSWORD": "supersecret"
+			},
+			"console": "integratedTerminal",
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "media-node",
+			"type": "node",
+			"request": "launch",
+			"runtimeVersion": "24",
+			"cwd": "${workspaceFolder}/edumeet-media-node",
+			"program": "${workspaceFolder}/edumeet-media-node/dist/server.js",
+			"args": ["--ip", "127.0.0.1", "--secret", "devsecret", "--numberOfWorkers", "2"],
+			"preLaunchTask": "media-node: build",
+			"outFiles": ["${workspaceFolder}/edumeet-media-node/dist/**/*.js"],
+			"env": { "LOG_LEVEL": "debug" },
+			"console": "integratedTerminal",
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "management-server",
+			"type": "node",
+			"request": "launch",
+			"runtimeVersion": "24",
+			"cwd": "${workspaceFolder}/edumeet-management-server",
+			"runtimeArgs": ["-r", "ts-node/register"],
+			"program": "${workspaceFolder}/edumeet-management-server/src/index.ts",
+			"preLaunchTask": "management-server: migrate",
+			"env": { "TRUST_PROXY": "false" },
+			"console": "integratedTerminal",
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "client (Chrome)",
+			"type": "chrome",
+			"request": "launch",
+			"url": "https://localhost:4443/devroom",
+			"webRoot": "${workspaceFolder}/edumeet-client",
+			"preLaunchTask": "client",
+			// Debug profile only: accepts the self-signed certs of :4443 and :8443.
+			"runtimeArgs": ["--ignore-certificate-errors"]
+		},
+		{
+			"name": "client: 2nd peer (fake media)",
+			"type": "chrome",
+			"request": "launch",
+			"url": "https://localhost:4443/devroom",
+			"webRoot": "${workspaceFolder}/edumeet-client",
+			// Separate profile so it can run next to "client (Chrome)".
+			"userDataDir": "${env:HOME}/.cache/edumeet-debug-chrome-peer2",
+			"runtimeArgs": [
+				"--ignore-certificate-errors",
+				"--use-fake-device-for-media-stream",
+				"--use-fake-ui-for-media-stream"
+			]
+		},
+		{
+			"name": "Attach to running Node process",
+			"type": "node",
+			"request": "attach",
+			"processId": "${command:PickProcess}",
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "room-server: unit tests (current file)",
+			"type": "node",
+			"request": "launch",
+			"runtimeVersion": "24",
+			"cwd": "${workspaceFolder}/edumeet-room-server",
+			"program": "${workspaceFolder}/edumeet-room-server/node_modules/jest/bin/jest.js",
+			"args": ["--runInBand", "${file}"],
+			"console": "integratedTerminal",
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "media-node: unit tests (current file)",
+			"type": "node",
+			"request": "launch",
+			"runtimeVersion": "24",
+			"cwd": "${workspaceFolder}/edumeet-media-node",
+			"program": "${workspaceFolder}/edumeet-media-node/node_modules/jest/bin/jest.js",
+			"args": ["--runInBand", "${file}"],
+			"console": "integratedTerminal",
+			"skipFiles": ["<node_internals>/**"]
+		}
+	],
+	"compounds": [
+		{
+			"name": "Debug: full stack",
+			"configurations": ["management-server", "media-node", "room-server", "client (Chrome)"],
+			"stopAll": true
+		},
+		{
+			"name": "Debug: servers only",
+			"configurations": ["management-server", "media-node", "room-server"],
+			"stopAll": true
+		}
+	]
+}
