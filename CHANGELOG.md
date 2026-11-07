@@ -23,6 +23,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The example client config no longer enables transcription, which was already off by default in the code. The client README now lists its default as off and says where the speech goes: the browser's speech recognition sends the speaker's audio to the browser vendor (Google, Microsoft or Apple), outside end-to-end encryption, so it should be enabled only where the privacy notice covers that
 - Keycloak update 26.8.2, which fixes CVE-2026-117691 (SAML identity broker signature bypass). The image is now pinned to an exact version, as the community `26.4` tag no longer receives fixes
 - mediasoup update 3.32.2. Bandwidth estimation is now mediasoup's own instead of the one from libwebrtc: when a participant's connection gets worse and then better again, the estimate is back within seconds instead of climbing slowly for more than a minute. Also fixes a worker crash on an oversized incoming packet, RTP timestamp jumps when simulcast switches layers, and SRTP errors on bandwidth probing packets. Media nodes on 3.30 and 3.32 send media to each other, so they can be upgraded one at a time
+- Package upgrades in the client, room-server, management server and media node to clear reported security advisories, including a denial of service in the signaling transport (Engine.IO) reachable without authentication
 
 ### edumeet-client
 - mediasoup-client update 3.26.0
