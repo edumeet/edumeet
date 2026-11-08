@@ -117,14 +117,12 @@ The client connects to `wss://<page hostname>:<developmentPort>` in development 
 	},
 	"mediaNodes": [{
 		"hostname": "localhost", "port": 3000, "secret": "devsecret",
-		"latitude": 63.43, "longitude": 10.39, "country": "NO",
-		"turnHostname": "",                            // required by the schema, "" = no TURN
-		"turnports": []
+		"latitude": 63.43, "longitude": 10.39, "country": "NO"
 	}]
 }
 ```
 - **Keep `tls`.** Without it the room server speaks plain `ws://`, and the client page is served over `https://`.
-- **`turnHostname` must be present.** The config schema (`src/common/schema.ts`) requires it, and the server exits at startup with a `ZodError` without it. Leave it empty to disable TURN; `Peer.ts` skips TURN when it's empty. Don't use an empty `turnports` list with a non-empty `turnHostname`: that produces an ICE server entry with no URLs, which browsers reject.
+- **TURN is optional.** Without `turnHostname` and `turnports` the room server sends clients no TURN server, which is fine on one machine or a LAN.
 - To work without the management server, remove `managementService` entirely.
 
 **`edumeet-management-server/config/local.json`**
@@ -247,8 +245,8 @@ For login through an identity provider, TURN, NAT and many participants, run [ed
 ### Login through Keycloak (or any OIDC provider)
 1. In Keycloak, create a realm and a **confidential** client. `configs/kc/dev.json` is an importable example: mount it at `/opt/keycloak/data/import/` and start Keycloak with `start --import-realm`. **That example's client secret and test-user password are public in the repo**, so change both before exposing the host. Also turn on brute-force protection and turn off "direct access grants".
 2. In the management server (admin UI or REST), create a **tenant**, a **tenant FQDN** (the host name users open) and a **tenant OAuth** entry. The OAuth entry needs `key`, `secret`, `authorize_url`, `access_url`, `profile_url` and `end_session_endpoint`, plus:
-   - **`redirect_uri`: set it explicitly** to `https://<MAIN_DOMAIN>/mgmt/oauth/tenant/callback`. If it's empty, the management server builds a callback URL from its own listen address (`http://0.0.0.0:3030/oauth/tenant/callback`), and the identity provider rejects it. The login then stops at the provider without a login form.
-3. **The first login after the OAuth config is created, and after every management-server restart, fails with HTTP 500** ("Reloading configuration try again!", `src/hooks/dynamicOAuth.ts`). The server rebuilds its OAuth setup on that request, and the second attempt works. Changing an existing OAuth entry only takes effect after a restart, because the config is cached in memory.
+   - **`redirect_uri`**: `https://<MAIN_DOMAIN>/mgmt/oauth/tenant/callback`, which must also be a valid redirect URI of the client at the identity provider. The admin UI fills it in; when it's empty, the management server builds the same address from `MGMT_URL`, which edumeet-docker sets to `https://<MAIN_DOMAIN>/mgmt`.
+3. Changes to a tenant OAuth entry apply at once; the management server doesn't need a restart.
 4. Sign-in also checks that the page's origin is a registered tenant FQDN (`src/auth/allowedOrigin.ts`). A host name that's missing from the tenant's FQDNs fails with "Sign in was started from a site that does not belong to this tenant".
 
 ### nginx (`configs/proxy/nginx.conf.template`)
@@ -297,21 +295,14 @@ Notes for writing such tests against the current client:
 | Problem | Cause / fix |
 |---|---|
 | Join hangs, no error | The room-server certificate hasn't been accepted. Open https://localhost:8443 once |
-| Room server exits at start with `ZodError … mediaNodes … turnHostname` | Add `"turnHostname": ""` (section 4.3) |
 | `EADDRINUSE` on 3000, 3030, 4443 or 8443 | An old process is still running: `fuser -k 3000/tcp 3030/tcp 4443/tcp 8443/tcp` |
 | Management server: unsupported engine, or syntax errors | Wrong Node version; use 24 |
 | `yarn` is 1.x | `corepack enable` (once for each Node version) |
-| Room server ignores `CONFIG_FILE=…` | Known quirk: `getConfig()` in `src/Config.ts` always reads `./config/config.json` (listen port, TLS, media nodes). `CONFIG_FILE` only changes the file that's validated and live-reloaded |
 | No logs despite `DEBUG=edumeet:*` | Use `LOG_LEVEL=debug` |
 | Other devices connect but get no media | The media node was started with `--ip 127.0.0.1` (section 7) |
 | Management tests changed your dev data | Add `config/test.json` (section 4.3) |
-| OIDC login: HTTP 500 on first try | Expected after OAuth config changes or a restart; try again (section 8) |
-| OIDC login stops at the provider, which reports an invalid redirect URI | Set `redirect_uri` on the tenant OAuth entry (section 8) |
+| OIDC login stops at the provider, which reports an invalid redirect URI | Register `https://<MAIN_DOMAIN>/mgmt/oauth/tenant/callback` at the provider, and check that the tenant's `redirect_uri`, or `MGMT_URL` when it's empty, is the management server's public address (section 8) |
 | `/kc/admin` says "This page isn't working" (redirect loop) | nginx `proxy_pass` with a path inside a sub-location (section 8) |
 
 ## 11. Known upstream issues found during setup
-- management-server: the first OAuth request after a config change or restart always returns 500 (`dynamicOAuth.ts` throws on purpose to reload).
-- management-server: `redirect_uri` falls back to an address built from `host`/`port` (`http://0.0.0.0:3030/…`), which no provider can reach.
-- room-server: `CONFIG_FILE` is honored by `ConfigLoader` but not by `getConfig()`, which supplies the listen port, TLS and media nodes.
-- room-server: `turnHostname` is required by the schema even when no TURN is used.
 - edumeet-docker: `run-me-first.sh` is interactive only and needs `jq` and `ack`; Keycloak 26 warns that `KEYCLOAK_ADMIN*` is deprecated (`KC_BOOTSTRAP_ADMIN_*`).

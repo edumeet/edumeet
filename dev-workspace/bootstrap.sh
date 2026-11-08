@@ -85,8 +85,6 @@ c.managementService.host = 'http://localhost:3030'; // example public key matche
 c.mediaNodes = [{
 	hostname: 'localhost', port: 3000, secret: 'devsecret',
 	latitude: 63.430481, longitude: 10.394964, country: 'NO',
-	// turnHostname is required by the config schema; '' means "no TURN servers".
-	turnHostname: '', turnports: [],
 }];
 fs.writeFileSync(out, JSON.stringify(c, null, '\t') + '\n');
 EOF
