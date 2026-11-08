@@ -26,6 +26,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Package upgrades in the client, room-server, management server and media node to clear reported security advisories, including a denial of service in the signaling transport (Engine.IO) reachable without authentication
 
 ### edumeet-client
+- Three dividers can be dragged to share out the room screen: between the videos and the side panels, between the screen shares (also extra videos and the drawing board) and the participant videos, and between the participant list and the chat when both are open. Double-click or Enter puts a divider back to the default, the arrow keys move it (Shift for larger steps), Home and End jump to the limits, and each one is a labelled separator for screen readers. The sizes are kept in the browser's saved settings; until a divider is moved, the layout is as before. Screen shares and participant videos now go side by side or stacked by whichever shows the videos biggest (screen shares count double, with a margin so the layout does not flip near the break-even point), instead of side by side only when the video area was wider than the aspect ratio: on a wide screen with the participant list open, a screen share next to two cameras is now almost twice as big. The headless view has no dividers but follows the new rule, so a recording of a screen share with cameras shows them side by side
 - mediasoup-client update 3.26.0
 
 ## [4.2-20261026-stable] - 2026-10-26
