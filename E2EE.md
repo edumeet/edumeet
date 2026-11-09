@@ -163,10 +163,12 @@ not arrive before the receivers can read them. In testing, epoch changes cost no
 delay was added.
 
 **Identity.** A member's leaf carries its participant id, and the room server stamps the sender on
-every relayed message, so a commit claiming another member's id is refused. Trust is on first use:
-the first signature key seen under a participant id is pinned for the session, and a later leaf
-carrying a different key under a known id is flagged in the participant list with a warning. A
-reconnect keeps the id and the key pair, so it is not a change of identity.
+every relayed message. The id in a leaf is written by the member's own client, so the group does not
+take it on trust: a leaf whose id is no participant the room lists, or an id two leaves claim, is
+removed together with the next departure. Trust is on first use: the first signature key seen under
+a participant id is pinned for the session, and a later leaf carrying a different key under a known
+id is flagged in the participant list with a warning. A reconnect keeps the id and the key pair, so
+it is not a change of identity.
 
 **Reconnects.** A short reconnect, with the socket back before the room server gives the peer up,
 changes nothing. A long one, after which the room server has closed the peer, is a departure for the
