@@ -31,8 +31,9 @@ It is off unless enabled. The effective value for a room is resolved as: the per
 the tenant default, then the room server configuration, then off. Only an unset value falls through,
 so an explicit "off" at any level stops the chain rather than deferring to the next one.
 
-Both the tenant default and the per-room setting are edited from the management views. A tenant can
-also lock its default, in which case rooms cannot override it.
+Both the tenant default and the per-room setting are edited from the management views. A super
+administrator can also lock a tenant's default, in which case neither the tenant's admins nor its
+rooms can change it.
 
 A browser that cannot support the WebRTC Encoded Transform API is refused entry to a room that
 requires encryption, at the lobby rather than after admission. A bot, which skips the lobby, stops
@@ -279,8 +280,8 @@ what decides where identifying data is processed. The room server's debug logs c
 and display names.
 
 **Encryption is per room.** In a room without it, media nodes handle decoded audio and video. An
-assessment that relies on encryption applies to encrypted rooms only, so a tenant that depends on it
-should lock its default.
+assessment that relies on encryption applies to encrypted rooms only, so for a tenant that depends
+on it a super administrator should lock its default.
 
 **Some browser features involve third parties.** Transcription uses the browser's own speech
 recognition, which sends the speaker's audio to the browser vendor's service and is outside the
