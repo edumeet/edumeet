@@ -138,15 +138,13 @@
 		{
 			"label": "room-server",
 			"type": "shell",
-			"command": "../dev/with-node.sh yarn start",
+			// MANAGEMENT_USERNAME and MANAGEMENT_PASSWORD: the super-admin, from bootstrap.sh
+			"command": "set -a && . ../.dev-secrets/room-server.env && set +a && ../dev/with-node.sh yarn start",
 			"options": {
 				"cwd": "${workspaceFolder}/edumeet-room-server",
 				"env": {
 					// media-node and management-server use self-signed/dev certs
-					"NODE_TLS_REJECT_UNAUTHORIZED": "0",
-					// super-admin seeded by the management-server initial migration
-					"MANAGEMENT_USERNAME": "edumeet-admin@localhost",
-					"MANAGEMENT_PASSWORD": "supersecret"
+					"NODE_TLS_REJECT_UNAUTHORIZED": "0"
 				}
 			},
 			"isBackground": true,

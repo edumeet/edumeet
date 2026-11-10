@@ -11,7 +11,7 @@ cp -a edumeet/dev-workspace/. .
 
 | File | Purpose |
 |---|---|
-| `bootstrap.sh` | Node 24 (nvm) and Yarn 4 (Corepack), clone the component repos, `yarn install`, write the local gitignored config files, start PostgreSQL, run migrations |
+| `bootstrap.sh` | Node 24 (nvm) and Yarn 4 (Corepack), clone the component repos, `yarn install`, make the workspace's token key pair and super-admin password in `.dev-secrets/`, write the local gitignored config files, start PostgreSQL, run migrations, set the super-admin password |
 | `.nvmrc` | Node version used by the scripts, tasks and debug configs |
 | `dev/with-node.sh` | runs a command with the Node version from `.nvmrc` |
 | `dev/docker-compose.yml` | PostgreSQL for the management server |

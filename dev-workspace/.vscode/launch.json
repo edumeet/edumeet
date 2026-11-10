@@ -22,11 +22,11 @@
 			"program": "${workspaceFolder}/edumeet-room-server/dist/server.js",
 			"preLaunchTask": "room-server: build",
 			"outFiles": ["${workspaceFolder}/edumeet-room-server/dist/**/*.js"],
+			// MANAGEMENT_USERNAME and MANAGEMENT_PASSWORD: the super-admin, from bootstrap.sh
+			"envFile": "${workspaceFolder}/.dev-secrets/room-server.env",
 			"env": {
 				"LOG_LEVEL": "debug",
-				"NODE_TLS_REJECT_UNAUTHORIZED": "0",
-				"MANAGEMENT_USERNAME": "edumeet-admin@localhost",
-				"MANAGEMENT_PASSWORD": "supersecret"
+				"NODE_TLS_REJECT_UNAUTHORIZED": "0"
 			},
 			"console": "integratedTerminal",
 			"skipFiles": ["<node_internals>/**"]

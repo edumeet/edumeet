@@ -64,8 +64,11 @@ The script:
 1. Installs and selects Node 24 from `.nvmrc` and enables Corepack.
 2. Clones the five repos (it skips any that already exist).
 3. Runs `yarn install --immutable` in each.
-4. Writes the four local config files described in section 4. It never overwrites existing ones, and all four are gitignored in their repos.
-5. Starts PostgreSQL (`dev/docker-compose.yml`) and runs the management-server migrations.
+4. Makes the workspace's own token key pair and super-admin password in `.dev-secrets/` (readable by you only). The management server refuses the ones published with eduMeet.
+5. Writes the four local config files described in section 4. It never overwrites existing ones, and all four are gitignored in their repos.
+6. Starts PostgreSQL (`dev/docker-compose.yml`), runs the management-server migrations and sets the super-admin password.
+
+The admin login is `edumeet-admin@localhost` with the password in `.dev-secrets/room-server.env`.
 
 Then continue with [section 5, Run the stack](#5-run-the-stack).
 
@@ -91,7 +94,10 @@ docker run -d --name edumeet-dev-db -p 127.0.0.1:5432:5432 \
 cd edumeet-management-server && yarn migrate
 ```
 
-The first migration creates the super-admin **`edumeet-admin@localhost` / `supersecret`**. The management server uses it, and so does the room server to log in to it.
+The first migration creates the super-admin **`edumeet-admin@localhost`** with the published password `supersecret`, which the management server refuses. Set your own (at least 12 characters). The room server logs in with it as well:
+```bash
+cd edumeet-management-server && yarn compile && yarn set-password edumeet-admin@localhost
+```
 
 ### 4.3 Config files
 
@@ -113,7 +119,7 @@ The client connects to `wss://<page hostname>:<developmentPort>` in development 
 	"tls": { … keep as in the example … },          // keep it, see below
 	"managementService": {
 		"host": "http://localhost:3030",
-		"jwtPublicKeys": [ … keep as in the example … ] // matches the management server's dev key
+		"jwtPublicKeys": [ "<your public key>" ]         // see the management server's local.json below
 	},
 	"mediaNodes": [{
 		"hostname": "localhost", "port": 3000, "secret": "devsecret",
@@ -127,9 +133,17 @@ The client connects to `wss://<page hostname>:<developmentPort>` in development 
 
 **`edumeet-management-server/config/local.json`**
 ```json
-{ "origins": ["http://localhost:3030", "https://localhost:4443"] }
+{
+	"origins": ["http://localhost:3030", "https://localhost:4443"],
+	"authentication": { "secret": "<your private key>" }
+}
 ```
-`origins` is the socket.io CORS list. `default.json` only allows `http://localhost:3030`, so without this file the client on :4443 can't open the management server's socket.
+- `origins` is the socket.io CORS list. `default.json` only allows `http://localhost:3030`, so without this file the client on :4443 can't open the management server's socket.
+- `authentication.secret` is the private key the management server signs tokens with. The key pair in `default.json` is public, so the management server refuses to start with it. Make your own pair. This prints both keys as JSON strings, ready to paste: the private key goes here, the public key into the room server's `jwtPublicKeys`.
+  ```bash
+  node -e "const k = require('crypto').generateKeyPairSync('rsa', { modulusLength: 2048 }); console.log(JSON.stringify({ private: k.privateKey.export({ type: 'pkcs8', format: 'pem' }), public: k.publicKey.export({ type: 'spki', format: 'pem' }) }, null, 1))"
+  ```
+- With a local identity provider on `http://localhost`, also add `"oauthPrivateHosts": ["localhost"]`. Otherwise the management server only accepts https URLs on public addresses for a tenant's sign-in.
 
 **`edumeet-management-server/config/test.json`**
 ```json
@@ -153,9 +167,10 @@ cd edumeet-management-server && TRUST_PROXY=false yarn dev
 # 2. media node
 cd edumeet-media-node && LOG_LEVEL=info yarn start --ip 127.0.0.1 --secret devsecret --numberOfWorkers 2
 
-# 3. room server (logs in to the management server with these credentials)
+# 3. room server (logs in to the management server as the super-admin;
+#    with bootstrap.sh: set -a && . ../.dev-secrets/room-server.env && set +a)
 cd edumeet-room-server && NODE_TLS_REJECT_UNAUTHORIZED=0 \
-  MANAGEMENT_USERNAME=edumeet-admin@localhost MANAGEMENT_PASSWORD=supersecret \
+  MANAGEMENT_USERNAME=edumeet-admin@localhost MANAGEMENT_PASSWORD='<your password>' \
   LOG_LEVEL=info yarn start
 
 # 4. client (hot reload)
@@ -182,8 +197,8 @@ The commands use these options:
 ### Check that it works
 - [ ] Two participants see and hear each other.
 - [ ] Two video elements play in each window (`chrome://webrtc-internals` shows inbound and outbound RTP).
-- [ ] https://localhost:4443/mgmt-admin lets you log in as `edumeet-admin@localhost` / `supersecret`.
-- [ ] The management server answers: `curl -s localhost:3030/authentication -H 'Content-Type: application/json' -d '{"strategy":"local","email":"edumeet-admin@localhost","password":"supersecret"}'` returns an `accessToken`.
+- [ ] https://localhost:4443/mgmt-admin lets you log in as `edumeet-admin@localhost` with your password.
+- [ ] The management server answers: `curl -s localhost:3030/authentication -H 'Content-Type: application/json' -d '{"strategy":"local","email":"edumeet-admin@localhost","password":"<your password>"}'` returns an `accessToken`.
 
 ---
 
@@ -239,12 +254,14 @@ For login through an identity provider, TURN, NAT and many participants, run [ed
 ### Configuration (`utils/run-me-first.sh` is interactive and needs `jq` and `ack`)
 - `MGMT_PUB` in `.env` is substituted into the room server's `config.json` with `envsubst`, so it must keep **literal `\n`** sequences. Single quotes in `.env` (`MGMT_PUB='-----BEGIN…\n…'`) do that.
 - `MEDIA_SECRET` must be identical for the media node and the `mediaNodes` entry in `configs/server/config.json.template`.
-- The coturn relay range is 50000–60000 by default. Narrow it, e.g. `--min-port=50000 --max-port=50249`, if you have to forward it through a NAT router.
-- When the host is behind NAT, set `LISTEN_IP` to the LAN address and `EXTERNAL_IP` to the public one. The media node announces `EXTERNAL_IP`; coturn needs `--external-ip=PUBLIC/LAN`.
+- The coturn relay range is 50000–60000 by default. Narrow it if you have to forward it through a NAT router: `command: --min-port=50000 --max-port=50249` for the `turn` service in `docker-compose.override.yml`. Options there are added after the defaults; leave out `-n` and `--static-auth-secret`.
+- When the host is behind NAT, set `LISTEN_IP` to the LAN address (or `0.0.0.0`), `EXTERNAL_IP` to the public one and `LOCAL_IP` to the host's LAN address. The media node announces `EXTERNAL_IP`; coturn maps it to `LOCAL_IP` and allows only these two of the private addresses as relay peers. `LOCAL_IP` must never be `0.0.0.0`.
+- `.env` holds the deployment's secrets: keep it readable by its owner only (`chmod 600 .env`), and run `docker compose` as that user.
 
 ### Login through Keycloak (or any OIDC provider)
 1. In Keycloak, create a realm and a **confidential** client. `configs/kc/dev.json` is an importable example: mount it at `/opt/keycloak/data/import/` and start Keycloak with `start --import-realm`. **That example's client secret and test-user password are public in the repo**, so change both before exposing the host. Also turn on brute-force protection and turn off "direct access grants".
 2. In the management server (admin UI or REST), create a **tenant**, a **tenant FQDN** (the host name users open) and a **tenant OAuth** entry. The OAuth entry needs `key`, `secret`, `authorize_url`, `access_url`, `profile_url` and `end_session_endpoint`, plus:
+   - The three URLs must use `https` and must not point to a private or local address. For an identity provider on an internal network, list its host name in `oauthPrivateHosts` in the management server's config.
    - **`redirect_uri`**: `https://<MAIN_DOMAIN>/mgmt/oauth/tenant/callback`, which must also be a valid redirect URI of the client at the identity provider. The admin UI fills it in; when it's empty, the management server builds the same address from `MGMT_URL`, which edumeet-docker sets to `https://<MAIN_DOMAIN>/mgmt`.
 3. Changes to a tenant OAuth entry apply at once; the management server doesn't need a restart.
 4. Sign-in also checks that the page's origin is a registered tenant FQDN (`src/auth/allowedOrigin.ts`). A host name that's missing from the tenant's FQDNs fails with "Sign in was started from a site that does not belong to this tenant".
