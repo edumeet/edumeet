@@ -33,6 +33,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Chinese and Danish use their real language codes (`zh`, `zh-tw` and `da` instead of `zn`, `zn-tw` and `dk`): browsers set to these languages now start in them, dates and times are formatted for them, and the management tables show Chinese texts. A Chinese or Danish choice saved in the browser before goes back to English once and can be chosen again. The page also states its language (`lang`) for screen readers
 - A browser set to a regional variant now starts in that language instead of English, for example cs-CZ in Czech, el-GR in Greek, uk-UA in Ukrainian or pt-BR in Portuguese, as long as no language is saved in the browser yet. The join screen and the lobby have a language selector, so a guest can switch before entering
 - In end-to-end encrypted rooms, a participant who leaves or is removed always loses the meeting's keys, whatever identity their client used in the encryption group, and a sender never reuses an encryption nonce under the same key
+- Stopping browser transcription now also closes its data channel on the room-server. Before, every start and stop left one open until the participant left the meeting. After a reconnect to the room-server or a lost media server, browser transcription is now switched off and can be started again; before, it looked switched on but sent nothing.
 - mediasoup-client update 3.26.0
 
 ### edumeet-room-server
