@@ -22,6 +22,12 @@ fi
 [ -z "$EMAIL" ] && read -p "Enter Email: " EMAIL
 [ -z "$LISTEN_IP" ] && read -p "Enter Listen IP: " LISTEN_IP
 [ -z "$EXTERNAL_IP" ] && read -p "Enter Public IP: " EXTERNAL_IP
+# This host's own address, the private one behind NAT: coturn maps EXTERNAL_IP to it, so the media
+# node on this host stays reachable. 0.0.0.0 would let coturn relay to every peer.
+if [ -z "$LOCAL_IP" ] || [ "$LOCAL_IP" = "0.0.0.0" ]; then
+  LOCAL_IP=$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i < NF; i++) if ($i == "src") print $(i + 1)}')
+  [ -z "$LOCAL_IP" ] && LOCAL_IP=$(hostname -I | awk '{print $1}')
+fi
 # Always generate a new Media Secret
 MEDIA_SECRET=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)
 
@@ -33,6 +39,7 @@ MEDIA_DOMAIN=$MEDIA_DOMAIN
 EMAIL=$EMAIL
 LISTEN_IP=$LISTEN_IP
 EXTERNAL_IP=$EXTERNAL_IP
+LOCAL_IP=$LOCAL_IP
 MEDIA_SECRET=$MEDIA_SECRET
 EOF
 )

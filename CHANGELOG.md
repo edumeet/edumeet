@@ -16,6 +16,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 ## [Upcoming release]
 ### general
 - `run-first.sh` writes `.env` readable by its owner only, also when it already exists
+- `run-first.sh` sets `LOCAL_IP`, this host's own address (the private one behind NAT), which the TURN server maps `EXTERNAL_IP` to so that a media node on the same host stays reachable. A `LOCAL_IP` already in `.env` is kept when the script rewrites the file, unless it is `0.0.0.0`. edumeet-docker's `utils/run-me-first.sh` now also replaces a `LOCAL_IP` of `0.0.0.0`, with which the TURN server would relay to every peer
 - The room-server mounts only `room-server/config.json.template` and builds its `config.json` inside the container, so the built file with the media secret no longer lands in the `room-server` folder; `run-first.sh` removes one left there by an earlier version
 
 ### edumeet-media-node
