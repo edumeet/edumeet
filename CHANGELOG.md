@@ -24,7 +24,15 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Package upgrades to clear reported security advisories
 - The media node reads the room servers' secret from the `MEDIA_SECRET` environment variable when `--secret` is not given, so the secret can stay off the command line
 
+## [4.2-20261111.2-stable] - 2026-11-11
+### general
+- **Security release**, the third today: the compose setup now makes its own TLS key and certificate for the media node and the room-server pins that certificate, so the media secret and the media signalling go only to this media node. Before, the room-server accepted any certificate, and the media node used the demo key published with eduMeet, so someone on the network path between room-server and media node, or able to redirect the media node's address, could read the secret and steer the participants' media (see [GHSA-whxx-hmc3-j8q4](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-whxx-hmc3-j8q4)). The room-server image is new; the client, management server and media node are those of 4.2-20261111.1-stable
+- Upgrading a compose setup: pull this checkout, run `./media-node-cert.sh` (`run-first.sh` also runs it), then `docker compose up -d`. The script writes `certs/media-node/` with a certificate for `LISTEN_IP` and keeps it on later runs; run it again after changing `LISTEN_IP`. If `docker compose up` ran before the script, docker has created `certs/media-node` as root: remove that folder and run the script
+- A media node on another host keeps working as before, with a warning at start. Give it its own certificate and set it as that node's `ca` in `mediaNodes`; the room-server README has the command. A later release will refuse unvalidated media nodes
+
 ### edumeet-room-server
+- A media node whose `ca` file cannot be read no longer stops the room-server at start. The node is not used, and the room-server does not fall back to an unvalidated connection
+- The connection to the media node uses WebSocket only, so the secret is no longer sent in the URL of each long-polling request
 - Clearing a shared file needs an entry of one's own for it, unless one is a moderator; before, any participant could clear the file of a sharer who had left (edumeet/edumeet-room-server#147)
 
 ## [4.2-20261111.1-stable] - 2026-11-11

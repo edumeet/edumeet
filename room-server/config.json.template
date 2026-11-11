@@ -20,6 +20,7 @@
 			"hostname": "${LISTEN_IP}",
 			"port": 3000,
 			"secret": "${MEDIA_SECRET}",
+			"ca": "/certs/media-node/cert.pem",
 			"latitude": 63.430481,
 			"longitude": 10.394964,
 			"turnHostname": "${MEDIA_DOMAIN}",

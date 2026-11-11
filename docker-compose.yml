@@ -77,6 +77,8 @@ services:
     volumes:
      # Only the template: the config.json built from it holds MEDIA_SECRET and stays in the container.
      - ./room-server/config.json.template:/usr/src/app/config/config.json.template:ro
+     # The media node's certificate, pinned as its "ca" in the template (media-node-cert.sh).
+     - ./certs/media-node:/certs/media-node:ro
     environment:
      - TEMPLATE_REPLACE=true
      - LISTEN_IP=${LISTEN_IP}
@@ -92,7 +94,12 @@ services:
      - EXTERNAL_IP=${EXTERNAL_IP}
      - LISTEN_IP=${LISTEN_IP}
     network_mode: host
+    volumes:
+     # Key and certificate made for this install by media-node-cert.sh, not the published demo ones.
+     - ./certs/media-node:/certs/media-node:ro
     command: >
+      --cert /certs/media-node/cert.pem
+      --key /certs/media-node/key.pem
       --ip ${LISTEN_IP}
       --announcedIp ${EXTERNAL_IP}
       --secret ${MEDIA_SECRET}

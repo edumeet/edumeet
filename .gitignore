@@ -1,3 +1,4 @@
 .env
 certbot/
+certs/
 room-server/config.json
