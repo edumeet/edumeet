@@ -14,6 +14,10 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+### general
+- `run-first.sh` writes `.env` readable by its owner only, also when it already exists
+- The room-server mounts only `room-server/config.json.template` and builds its `config.json` inside the container, so the built file with the media secret no longer lands in the `room-server` folder; `run-first.sh` removes one left there by an earlier version
+
 ### edumeet-media-node
 - mediasoup update 3.32.2. Bandwidth estimation is now mediasoup's own instead of the one from libwebrtc: when a participant's connection gets worse and then better again, the estimate is back within seconds instead of climbing slowly for more than a minute. Also fixes a worker crash on an oversized incoming packet, RTP timestamp jumps when simulcast switches layers, and SRTP errors on bandwidth probing packets. Media nodes on 3.30 and 3.32 send media to each other, so they can be upgraded one at a time
 - Package upgrades to clear reported security advisories

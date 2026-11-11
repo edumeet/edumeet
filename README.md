@@ -51,7 +51,7 @@ This will start all the services. And you are done. You can now access the servi
 
 ### Configuration
 The configuration for the client is in the `client` folder. You may change it as needed, but no changes are necessary for the service to work.
-An example for this configuration file can be found in the [edumeet-client](https://github.com/edumeet/edumeet-client?tab=readme-ov-file#configuration-properties) repository. The configuration for the room-server is in the `room-server` folder. You may change it as needed, but no changes are necessary for the service to work.
+An example for this configuration file can be found in the [edumeet-client](https://github.com/edumeet/edumeet-client?tab=readme-ov-file#configuration-properties) repository. The configuration for the room-server is `room-server/config.json.template`; the room-server builds its configuration from it at every start. You may change it as needed, but no changes are necessary for the service to work.
 An example for this configuration file can be found in the [edumeet-room-server](https://github.com/edumeet/edumeet-room-server?tab=readme-ov-file#configuration-properties) repository.
 
 For a full deployment with the management server and login (OIDC, Keycloak), see [edumeet-docker](https://github.com/edumeet/edumeet-docker).

@@ -75,7 +75,8 @@ services:
     image: edumeet/edumeet-room-server
     restart: unless-stopped
     volumes:
-     - ./room-server:/usr/src/app/config
+     # Only the template: the config.json built from it holds MEDIA_SECRET and stays in the container.
+     - ./room-server/config.json.template:/usr/src/app/config/config.json.template:ro
     environment:
      - TEMPLATE_REPLACE=true
      - LISTEN_IP=${LISTEN_IP}

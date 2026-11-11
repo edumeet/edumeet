@@ -25,8 +25,9 @@ fi
 # Always generate a new Media Secret
 MEDIA_SECRET=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)
 
-# Save the environment variables
-cat <<EOF > .env
+# Save the environment variables. .env holds MEDIA_SECRET, so only its owner may read it,
+# also when it already exists.
+(umask 077; cat <<EOF > .env
 MAIN_DOMAIN=$MAIN_DOMAIN
 MEDIA_DOMAIN=$MEDIA_DOMAIN
 EMAIL=$EMAIL
@@ -34,6 +35,11 @@ LISTEN_IP=$LISTEN_IP
 EXTERNAL_IP=$EXTERNAL_IP
 MEDIA_SECRET=$MEDIA_SECRET
 EOF
+)
+chmod 600 .env
+
+# Earlier versions built the room-server config, which holds MEDIA_SECRET, in this folder.
+rm -f room-server/config.json
 
 # Configure edumeet-client
 if [[ "$(cat client/config.js)" == "var config = {};" ]]; then
