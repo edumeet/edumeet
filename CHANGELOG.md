@@ -24,6 +24,23 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Package upgrades to clear reported security advisories
 - The media node reads the room servers' secret from the `MEDIA_SECRET` environment variable when `--secret` is not given, so the secret can stay off the command line
 
+### edumeet-room-server
+- Clearing a shared file needs an entry of one's own for it, unless one is a moderator; before, any participant could clear the file of a sharer who had left (edumeet/edumeet-room-server#147)
+
+## [4.2-20261111.1-stable] - 2026-11-11
+### general
+- **Security release**, a follow-up to 4.2-20261111-stable: it fixes two more high-severity advisories in the room-server, found by a scan of the released code. Every installation should upgrade. Only the room-server image is new; the client and management server are those of 4.2-20261111-stable, and the media node is that of 4.2-20261026-stable. No configuration changes are needed beyond those of 4.2-20261111-stable
+- Security (high): Participant can join a room twice under one peer ID as a hidden twin ([GHSA-gp29-w6qr-xcpv](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-gp29-w6qr-xcpv))
+- Security (high): Malformed reaction crashes other participants' clients ([GHSA-5j89-579x-4frx](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-5j89-579x-4frx))
+
+### edumeet-room-server
+- A peer that only claims to be a bot (headless) no longer passes the room lock; only verified bots do (edumeet/edumeet-room-server#146)
+- The reconnect permission cache checks the peer kind, holds one entry per peer and is dropped when the room's permissions change, so a kick also ends the cached rights
+- One router assignment per peer; routers of a replaced assignment stay owned until released
+- Shared files are cleared by info-hash, and the file of a participant who left no longer blocks
+- Whiteboard objects are checked against an allow-list per object type
+- A closed connection's socket.io recovery session is dropped, so a reconnect does not replay room state
+
 ## [4.2-20261111-stable] - 2026-11-11
 ### general
 - **Security release.** It fixes 19 security advisories in the management server, the room-server and the compose setups, five of them critical; every installation should upgrade. The management server, room-server and client images are new; the media node image is that of 4.2-20261026-stable
