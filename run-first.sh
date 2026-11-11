@@ -45,6 +45,9 @@ EOF
 )
 chmod 600 .env
 
+# The media node's own TLS key and certificate, which the room-server pins
+./media-node-cert.sh || exit 1
+
 # Earlier versions built the room-server config, which holds MEDIA_SECRET, in this folder.
 rm -f room-server/config.json
 
