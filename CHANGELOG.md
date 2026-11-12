@@ -24,6 +24,25 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Package upgrades to clear reported security advisories
 - The media node reads the room servers' secret from the `MEDIA_SECRET` environment variable when `--secret` is not given, so the secret can stay off the command line
 
+## [4.2-20261112-stable] - 2026-11-12
+### general
+- **Security release**: it fixes a high-severity advisory in the room-server and one in the management server. Every installation should upgrade. The room-server, management server and client images are new; the media node is that of 4.2-20261111.2-stable
+- Security (high): Reconnecting in a loop exhausts the room server's memory ([GHSA-jp8j-rw69-r9cp](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-jp8j-rw69-r9cp))
+- Security (high): A long list of ids in a meeting query ties up the database for every tenant ([GHSA-pj9h-q4pg-wmqf](https://github.com/edumeet/edumeet-management-server/security/advisories/GHSA-pj9h-q4pg-wmqf))
+- The compose setup publishes the client (8080) and room-server (8443) ports on 127.0.0.1 only. The proxy reaches both over the compose network; on all interfaces, clients could bypass it and send the room-server their own `X-Forwarded-For` (edumeet/edumeet#1121)
+
+### edumeet-management-server
+- A request on meeting attendees or invitation replies may name at most 5000 ids, and the room check looks up only distinct ids, in one query per table (GHSA-pj9h-q4pg-wmqf)
+- Password sign-in works when several accounts share an e-mail address, for example a local account and an account a tenant's identity provider created with the same address: only accounts with a password take part, and the oldest one that accepts the password is signed in. Before, an arbitrary account with the address was picked, so a passwordless account could lock the super admin or the room-server's service account out of password sign-in. An e-mail that is not text is refused (edumeet/edumeet-management-server#54)
+- Invitations are sent at most four at a time per SMTP mailbox, and a message is built only when its turn comes, so a large meeting no longer fills the management server's memory, and a mailbox that cannot be reached delays only the tenants that send through it. A meeting has at most `invites.maxAttendeesPerMeeting` attendees (default 300), also when the client adds them all at once; attendee e-mail addresses may have 254 characters and names 200 (edumeet/edumeet-management-server#54)
+
+### edumeet-client
+- The eraser stores in each drawing it touches only the part of the stroke near that drawing, instead of the whole stroke. Erasing across handwriting sends about a tenth of the data it did and keeps the whiteboard much smaller; it looks the same, and undo and redo are unchanged. The room-server's whiteboard limits in this release rely on it: update client and room-server together, and a browser tab still running the old client that erases a lot is refused until it reloads
+- Links in chat messages open in a new tab without access to the meeting tab (`rel="noopener noreferrer"`), also links written as raw HTML (edumeet/edumeet-client#330)
+- The meeting page and the management view take a sign-in token only from the sign-in tab they opened themselves (edumeet/edumeet-client#330)
+- Reactions from other participants are accepted only when they are one of the known reactions; an unknown one shows nothing (edumeet/edumeet-client#329)
+- The client monitor clears the issues of a peer connection once it is closed
+
 ## [4.2-20261111.2-stable] - 2026-11-11
 ### general
 - **Security release**, the third today: the compose setup now makes its own TLS key and certificate for the media node and the room-server pins that certificate, so the media secret and the media signalling go only to this media node. Before, the room-server accepted any certificate, and the media node used the demo key published with eduMeet, so someone on the network path between room-server and media node, or able to redirect the media node's address, could read the secret and steer the participants' media (see [GHSA-whxx-hmc3-j8q4](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-whxx-hmc3-j8q4)). The room-server image is new; the client, management server and media node are those of 4.2-20261111.1-stable
