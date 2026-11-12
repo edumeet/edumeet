@@ -69,8 +69,9 @@ services:
     restart: unless-stopped
     volumes:
      - ./client:/app/config
+    # Reached by the proxy over the compose network; published on the host's loopback only.
     ports:
-     - "8080:80"
+     - "127.0.0.1:8080:80"
   edumeet-room-server:
     image: edumeet/edumeet-room-server
     restart: unless-stopped
@@ -84,8 +85,10 @@ services:
      - LISTEN_IP=${LISTEN_IP}
      - MEDIA_SECRET=${MEDIA_SECRET}
      - MEDIA_DOMAIN=${MEDIA_DOMAIN}
+    # Only through the proxy, which sets X-Forwarded-For: published on the host's loopback only,
+    # so no client can reach the room server directly and choose its own address.
     ports:
-     - "8443:8443"
+     - "127.0.0.1:8443:8443"
   edumeet-media-node:
     image: edumeet/edumeet-media-node
     restart: unless-stopped
