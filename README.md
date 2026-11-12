@@ -3,7 +3,7 @@ Official website: [edumeet.org](https://edumeet.org)
 
 Try it online at [usually.in](https://usually.in)
 
-Join our discord server [here](https://discord.gg/DkD4nj6D)
+Join our discord server [here](https://discord.gg/jxhQNq956)
 
 Releases are docker images with the 'stable' tag ending:
 | Component    | Docker images |
