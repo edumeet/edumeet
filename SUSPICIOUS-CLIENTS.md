@@ -16,6 +16,8 @@ The proxy of this compose setup and of edumeet-docker meets these points. You do
 
 ## Turn it on
 
+Do these steps in the folder of this compose setup.
+
 1. Add to `room-server/config.json.template`:
 
    ```json
@@ -24,13 +26,31 @@ The proxy of this compose setup and of edumeet-docker meets these points. You do
    }
    ```
 
-2. Mount a folder of the host for the file. In `docker-compose.yml`, add to the volumes of `edumeet-room-server`:
+2. Make the folder and an empty file. In its container, the room-server runs as the user `edumeet` with the uid 1001, so this user must own them:
+
+   ```bash
+   mkdir -p data/suspicious
+   touch data/suspicious/suspicious-ips.log
+   sudo chown -R 1001:1001 data/suspicious
+   ```
+
+   If the folder does not exist when the container starts, Docker makes it for root, and the room-server cannot write the file. fail2ban (see below) does not start when the file of a jail does not exist, so make the empty file now. `docker compose exec edumeet-room-server id -u` shows the uid of the room-server.
+
+3. Mount the folder. In `docker-compose.yml`, add to the volumes of `edumeet-room-server`:
 
    ```yaml
    - ./data/suspicious:/usr/src/app/suspicious
    ```
 
-3. Run `docker compose up -d`.
+4. Run `docker compose up -d`.
+
+5. Make sure that the room-server can write to the folder:
+
+   ```bash
+   docker compose exec edumeet-room-server sh -c 'touch /usr/src/app/suspicious/.test && rm /usr/src/app/suspicious/.test && echo WRITABLE'
+   ```
+
+   The command shows `WRITABLE`. The file stays empty until the room-server writes the first address. If the room-server cannot write it, its log shows `cannot write the suspicious clients file`.
 
 You can change these settings:
 
@@ -50,7 +70,23 @@ The room-server writes at most one line for each address in each window. Each li
 2026-11-12T11:05:00.000Z 203.0.113.7 short_connections=57 limit_hits=3 window=300s
 ```
 
-The file only grows. Rotate it on the host, for example with logrotate.
+### Rotate the file
+
+The file only grows. Rotate it on the host with logrotate. Make the file `/etc/logrotate.d/edumeet-suspicious`:
+
+```
+/path/to/edumeet/data/suspicious/suspicious-ips.log {
+	weekly
+	rotate 8
+	compress
+	delaycompress
+	missingok
+	notifempty
+	copytruncate
+}
+```
+
+With `copytruncate`, the file stays in its place, and fail2ban (see below) continues to read it. `sudo logrotate -d /etc/logrotate.d/edumeet-suspicious` shows what logrotate will do, and changes nothing.
 
 ## Act on the file
 
@@ -59,21 +95,102 @@ One address can be many people: a university network, or a mobile network that p
 - Look at the file for one or two weeks before a tool acts on it. Then you know what is normal for your service.
 - Keep the settings high and the bans short.
 
-An example for fail2ban, which bans a written address for 15 minutes on the web ports:
+### fail2ban
 
-```ini
-# /etc/fail2ban/filter.d/edumeet-suspicious.conf
-[Definition]
-failregex = <HOST> short_connections=
-```
+This example bans a written address for 15 minutes. The commands are for Debian and Ubuntu.
 
-```ini
-# /etc/fail2ban/jail.d/edumeet-suspicious.conf
-[edumeet-suspicious]
-enabled  = true
-filter   = edumeet-suspicious
-logpath  = /path/to/edumeet/data/suspicious/suspicious-ips.log
-maxretry = 1
-bantime  = 900
-port     = http,https
+1. Install fail2ban:
+
+   ```bash
+   sudo apt-get install fail2ban
+   ```
+
+2. Make the filter `/etc/fail2ban/filter.d/edumeet-suspicious.conf`:
+
+   ```ini
+   [Definition]
+   failregex = <HOST> short_connections=
+   ignoreregex =
+   ```
+
+3. Make the jail `/etc/fail2ban/jail.d/edumeet-suspicious.conf`. Use the version for the place where your reverse proxy runs.
+
+   The reverse proxy runs in Docker, as in this compose setup and in edumeet-docker:
+
+   ```ini
+   [edumeet-suspicious]
+   enabled   = true
+   filter    = edumeet-suspicious
+   logpath   = /path/to/edumeet/data/suspicious/suspicious-ips.log
+   backend   = polling
+   maxretry  = 1
+   findtime  = 300
+   bantime   = 900
+   banaction = iptables-allports
+   chain     = DOCKER-USER
+   protocol  = all
+   ignoreip  = 127.0.0.1/8 ::1
+   ```
+
+   Docker sends the traffic to the published ports of containers through the `FORWARD` chain, not through `INPUT`. Thus the default ban of fail2ban, in `INPUT`, does not stop it. For your own rules, Docker has the `DOCKER-USER` chain. This jail blocks all traffic from the address to your containers. The host itself, for example SSH, stays available.
+
+   The reverse proxy runs on the host:
+
+   ```ini
+   [edumeet-suspicious]
+   enabled   = true
+   filter    = edumeet-suspicious
+   logpath   = /path/to/edumeet/data/suspicious/suspicious-ips.log
+   backend   = polling
+   maxretry  = 1
+   findtime  = 300
+   bantime   = 900
+   banaction = iptables-multiport
+   chain     = INPUT
+   port      = http,https
+   protocol  = tcp
+   ignoreip  = 127.0.0.1/8 ::1
+   ```
+
+   This jail blocks the web ports of the host for the address.
+
+   For both versions:
+
+   - `backend = polling` is necessary. Debian and Ubuntu set `backend = systemd` for all jails. With it, the jail reads the journal and not the file.
+   - `maxretry = 1`: the room-server writes an address only when the address went above a limit, so each line is a reason for a ban.
+   - Add your own addresses to `ignoreip`, for example the addresses of your office and of your monitoring. Separate them with spaces.
+
+4. Only when the reverse proxy runs in Docker: start fail2ban after Docker. The `DOCKER-USER` chain exists only when Docker runs. Make the file `/etc/systemd/system/fail2ban.service.d/after-docker.conf`:
+
+   ```ini
+   [Unit]
+   After=docker.service
+   ```
+
+5. Start fail2ban with the new jail:
+
+   ```bash
+   sudo fail2ban-client -t
+   sudo systemctl daemon-reload
+   sudo systemctl restart fail2ban
+   sudo fail2ban-client status edumeet-suspicious
+   ```
+
+   The first command shows `OK: configuration test is successful`. The last command shows the jail and the file. fail2ban adds its rule to the chain when it bans for the first time. When the file has lines, `sudo fail2ban-regex /path/to/edumeet/data/suspicious/suspicious-ips.log /etc/fail2ban/filter.d/edumeet-suspicious.conf` shows that the filter finds them.
+
+6. Test the ban with `203.0.113.7`, an address for documentation that no real client has:
+
+   ```bash
+   sudo fail2ban-client set edumeet-suspicious banip 203.0.113.7
+   sudo iptables -S f2b-edumeet-suspicious
+   sudo fail2ban-client set edumeet-suspicious unbanip 203.0.113.7
+   sudo iptables -S f2b-edumeet-suspicious
+   ```
+
+   The first `iptables` command shows a `REJECT` rule for `203.0.113.7`. The second shows the chain without it.
+
+To remove a ban before its time ends:
+
+```bash
+sudo fail2ban-client set edumeet-suspicious unbanip <address>
 ```
