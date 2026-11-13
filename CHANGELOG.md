@@ -27,10 +27,16 @@ The stable tag  is teseted by the development team and used by default for [edum
 ### edumeet-room-server
 - Closing the whiteboard keeps its drawings. They go with Erase all, or with the meeting's other content when the last participant leaves
 - `suspiciousClients`: new defaults `shortConnectionSeconds` 10 and `maxShortConnections` 200, so that a large class behind one address whose network drops shortly after it joined is not written to the file
+- The room-server accepts WebSocket connections only, no long-polling. A reverse proxy in front of it must pass WebSocket upgrades, as the proxy configurations of this setup and of edumeet-docker do
+- A client whose connection dropped gets back what it missed only once, only from shortly before the drop, and only as much as a connection may have waiting; otherwise it rejoins the room as on any reconnect
+- Whiteboard changes are passed on to the other participants with only the fields that the room-server checked
+- A connection closed because more data waits for its client than allowed is no longer written to the suspicious clients file; a client that took nothing at all for a while still is
 
 ### edumeet-client
 - The whiteboard opens with the pencil, and its toolbar shows the pencil, text, eraser and then the move tool. On mobile and in the headless view, where the toolbar is hidden, the board keeps the move tool
 - When the whiteboard is opened again, it shows its drawings as they were when it closed; update client and room-server together
+- The client connects to the room-server over WebSocket only
+- Closing or reloading the page leaves the meeting at once, as the leave button does. Before, the room-server kept the participant for its reconnect window
 
 ## [4.2-20261112-stable] - 2026-11-12
 ### general
