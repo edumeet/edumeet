@@ -13,8 +13,9 @@ We are using a rolling release versioning:
 4.2-20260828-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
-## [Upcoming release]
+## [4.2-20261113-stable] - 2026-11-13
 ### general
+- The room-server, management server and media node images use Node.js 24.22.3
 - `run-first.sh` writes `.env` readable by its owner only, also when it already exists
 - `run-first.sh` sets `LOCAL_IP`, this host's own address (the private one behind NAT), which the TURN server maps `EXTERNAL_IP` to so that a media node on the same host stays reachable. A `LOCAL_IP` already in `.env` is kept when the script rewrites the file, unless it is `0.0.0.0`. edumeet-docker's `utils/run-me-first.sh` now also replaces a `LOCAL_IP` of `0.0.0.0`, with which the TURN server would relay to every peer
 - The room-server mounts only `room-server/config.json.template` and builds its `config.json` inside the container, so the built file with the media secret no longer lands in the `room-server` folder; `run-first.sh` removes one left there by an earlier version
@@ -23,6 +24,12 @@ The stable tag  is teseted by the development team and used by default for [edum
 - mediasoup update 3.32.2. Bandwidth estimation is now mediasoup's own instead of the one from libwebrtc: when a participant's connection gets worse and then better again, the estimate is back within seconds instead of climbing slowly for more than a minute. Also fixes a worker crash on an oversized incoming packet, RTP timestamp jumps when simulcast switches layers, and SRTP errors on bandwidth probing packets. Media nodes on 3.30 and 3.32 send media to each other, so they can be upgraded one at a time
 - Package upgrades to clear reported security advisories
 - The media node reads the room servers' secret from the `MEDIA_SECRET` environment variable when `--secret` is not given, so the secret can stay off the command line
+
+### edumeet-management-server
+- Updated the Mocha test dependency and its transitive dependencies
+
+### edumeet-common
+- Updated test dependencies; this does not change the common package version used by the server images
 
 ### edumeet-room-server
 - Closing the whiteboard keeps its drawings. They go with Erase all, or with the meeting's other content when the last participant leaves
