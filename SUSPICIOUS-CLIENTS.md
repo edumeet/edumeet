@@ -67,7 +67,7 @@ You can change these settings:
 The room-server writes at most one line for each address in each window. Each line starts with the time (UTC, ISO 8601) and the address. The counts follow:
 
 ```
-2026-11-12T11:05:00.000Z 203.0.113.7 short_connections=57 limit_hits=3 window=300s
+2026-11-12T11:05:00.000Z 203.0.113.7 short_connections=201 limit_hits=0 window=300s
 ```
 
 ### Rotate the file
