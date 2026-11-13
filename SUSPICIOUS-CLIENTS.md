@@ -58,8 +58,8 @@ You can change these settings:
 | :--- | :--- | :--- |
 | `file` | | The file that the lines are appended to. Without it, the function is off. |
 | `windowSeconds` | `300` | The length of the time window in which events are counted. |
-| `shortConnectionSeconds` | `30` | A connection that received the state of a room and lasted less than this counts as short. |
-| `maxShortConnections` | `50` | Short connections of one address in one window before it is written. |
+| `shortConnectionSeconds` | `10` | A connection that received the state of a room and lasted less than this counts as short. |
+| `maxShortConnections` | `200` | Short connections of one address in one window before it is written. |
 | `maxLimitHits` | `10` | Refused requests, and connections closed because the client did not read, of one address in one window before it is written. |
 
 ## The file
