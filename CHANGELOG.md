@@ -26,6 +26,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 
 ### edumeet-room-server
 - Closing the whiteboard keeps its drawings. They go with Erase all, or with the meeting's other content when the last participant leaves
+- `suspiciousClients`: new defaults `shortConnectionSeconds` 10 and `maxShortConnections` 200, so that a large class behind one address whose network drops shortly after it joined is not written to the file
 
 ### edumeet-client
 - The whiteboard opens with the pencil, and its toolbar shows the pencil, text, eraser and then the move tool. On mobile and in the headless view, where the toolbar is hidden, the board keeps the move tool
