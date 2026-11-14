@@ -10,10 +10,15 @@ We are using a rolling release versioning:
 ```
 <version>-<date of release>-<tag>
 
-4.2-20260828-stable
+4.2-20261113-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
+## [Upcoming release]
+### edumeet-client
+- Stable `data-edumeet-*` attributes on the join dialog, the control bar, the reactions menu, the leave dialog and the chat, for room connectors and other programs that control the page (AUTOMATION.md)
+
 ## [4.2-20261113-stable] - 2026-11-13
+This is the current stable release.
 ### general
 - The room-server, management server and media node images use Node.js 24.22.3
 - `run-first.sh` writes `.env` readable by its owner only, also when it already exists
@@ -243,7 +248,6 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Token refresh checks the tenant's Block and Allow rules against the stored user for SSO users, as at sign in, and refuses a session older than `authSessionMaxDays` for everyone. Tokens record the time of the original sign in, so a token issued by an earlier release is refused at its next refresh
 
 ## [4.2-20260828-stable] - 2026-08-28
-This is the current stable release.
 
 ### general
 - mediasoup update 3.26.0

@@ -65,6 +65,7 @@ For a full deployment with the management server and login (OIDC, Keycloak), see
 | [WEBINAR-LOADTEST.md](WEBINAR-LOADTEST.md) | Webinar load and scaling test results |
 | [BOTS.md](BOTS.md) | Writing a bot for eduMEET |
 | [BOT-PROVIDER-API.md](BOT-PROVIDER-API.md) | Bot provider API |
+| [AUTOMATION.md](AUTOMATION.md) | Attributes for programs that control the eduMEET page, such as room connectors |
 | [SUSPICIOUS-CLIENTS.md](SUSPICIOUS-CLIENTS.md) | Writing the addresses of clients that behave unusually to a file, for a firewall ban |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Developer setup: run the whole stack from source |
 | [DEVELOPMENT-VSCODE.md](DEVELOPMENT-VSCODE.md) | Developer setup with VS Code: tasks, debugging, shortcuts |
