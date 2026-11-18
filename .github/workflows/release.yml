@@ -1,0 +1,73 @@
+# Publish a GitHub Release for each rolling stable release.
+#
+# A release is documented by its "## [<version>-stable] - <date>" section in
+# CHANGELOG.md. When that section reaches main, this workflow tags the commit
+# with the version and creates the GitHub Release from the section, so the
+# repository page shows the current rolling release as "Latest".
+#
+# It can also be started by hand (Actions > Release > Run workflow) for one
+# version, e.g. to recreate notes. A release that already exists is skipped.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - CHANGELOG.md
+      - .github/workflows/release.yml
+      - .github/scripts/release-notes.sh
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Changelog version to release, e.g. 4.2-20261118-stable (empty = newest)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          script=.github/scripts/release-notes.sh
+          newest="$(bash "$script" --latest-version)"
+          version="${INPUT_VERSION:-$newest}"
+
+          if [ -z "$version" ]; then
+            echo "No *-stable release in CHANGELOG.md"
+            exit 1
+          fi
+          case "$version" in
+            *-stable) ;;
+            *) echo "Only *-stable versions are released: $version"; exit 1 ;;
+          esac
+
+          if gh release view "$version" >/dev/null 2>&1; then
+            echo "Release $version already exists, nothing to do"
+            exit 0
+          fi
+
+          bash "$script" "$version" > "$RUNNER_TEMP/notes.md"
+
+          latest=false
+          [ "$version" = "$newest" ] && latest=true
+
+          gh release create "$version" \
+            --target "$GITHUB_SHA" \
+            --title "$version" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            --latest="$latest"
+          echo "Published $version (latest: $latest)"
