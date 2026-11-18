@@ -1,7 +1,7 @@
 # ![edumeet logo](https://github.com/edumeet/edumeet-client/blob/main/public/images/logo.edumeet.svg) **WebRTC meeting service**
 Official website: [edumeet.org](https://edumeet.org)
 
-Try it online at [usually.in](https://usually.in)
+Try it online at [letsmeet.no](https://letsmeet.no)
 
 Join our discord server [here](https://discord.gg/jxhQNq956)
 
