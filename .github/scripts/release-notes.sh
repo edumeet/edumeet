@@ -10,7 +10,12 @@ set -euo pipefail
 
 if [ "${1:-}" = "--latest-version" ]; then
 	changelog="${2:-CHANGELOG.md}"
-	sed -n 's/^## \[\([0-9][^]]*-stable\)\].*/\1/p' "$changelog" | head -n 1
+	# One awk pass that stops at the first match: no pipe, so pipefail cannot
+	# trip over a SIGPIPE.
+	awk 'match($0, /^## \[[0-9][^]]*-stable\]/) {
+		print substr($0, 5, RLENGTH - 5)
+		exit
+	}' "$changelog"
 	exit 0
 fi
 
