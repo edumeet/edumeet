@@ -10,15 +10,27 @@ We are using a rolling release versioning:
 ```
 <version>-<date of release>-<tag>
 
-4.2-20261113-stable
+4.2-20261118-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+
+## [4.2-20261118-stable] - 2026-11-18
+This is the current stable release.
+### general
+- **Security release**: it fixes a high-severity advisory in the room-server and mitigates Java4Shell in the bundled Keycloak. Every installation should upgrade. The room-server and client images are new; the management server and media node are those of 4.2-20261113-stable
+- Security (high): Session recovery replay can be requested again and again, stalling the room server ([GHSA-3q2c-6p9p-wmm6](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-3q2c-6p9p-wmm6))
+- edumeet-docker: Keycloak runs with `-XX:-UseBASE64Intrinsics` against Java4Shell (CVE-2026-114938), a heap overflow in the Base64 code of the Red Hat OpenJDK in every Keycloak image up to 26.8.2, on CPUs with AVX-512 VBMI. A `JAVA_OPTS_APPEND` set in `.env` is kept. The flag goes again once a Keycloak image ships a fixed JDK (edumeet/edumeet-docker#91)
+- edumeet-docker: Keycloak keeps its database in the `keycloak-data` volume, so its realms and users survive when the container is recreated. **Before the first `docker compose up -d` of this release, copy the database over** as described in edumeet-docker's README ("Upgrading from 4.2-20261113-stable or older"), otherwise Keycloak starts empty (edumeet/edumeet-docker#91)
+- edumeet-docker: the client container has a restart policy, so it comes back after a reboot of the host. Before, the proxy kept failing until it was started by hand (edumeet/edumeet-docker#90)
+
+### edumeet-room-server
+- A session recovered after a dropped connection is handed each stored message at most once, at most as often per minute as a participant may reconnect, and within a budget of replayed bytes per client address. A recovered connection that names another participant than the one its session belongs to is cut. Refused session recoveries count as limit hits for `suspiciousClients` (GHSA-3q2c-6p9p-wmm6)
+
 ### edumeet-client
 - Stable `data-edumeet-*` attributes on the join dialog, the control bar, the reactions menu, the leave dialog and the chat, for room connectors and other programs that control the page (AUTOMATION.md)
 
 ## [4.2-20261113-stable] - 2026-11-13
-This is the current stable release.
 ### general
 - The room-server, management server and media node images use Node.js 24.22.3
 - `run-first.sh` writes `.env` readable by its owner only, also when it already exists
