@@ -27,7 +27,7 @@
 			"turnports" :  [
 				{
 					"protocol":"turn",
-					"port": 80,
+					"port": 443,
 					"transport": "udp"
 				},
 				{
@@ -38,4 +38,3 @@
 			]
 	}]
 }
-
