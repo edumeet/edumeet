@@ -86,7 +86,7 @@ else
 fi
 
 # Define other variables
-domains=($MAIN_DOMAIN $MEDIA_DOMAIN)
+domains=("$MAIN_DOMAIN" "$MEDIA_DOMAIN")
 rsa_key_size=4096
 data_path="./certbot"
 staging=0 # Set to 1 if you're testing your setup to avoid hitting request limits
@@ -131,29 +131,30 @@ echo
 
 
 echo "### Requesting Let's Encrypt certificate for $domains ..."
-#Join $domains to -d args
-domain_args=""
+# Build one -d argument pair per domain
+domain_args=()
 for domain in "${domains[@]}"; do
-  domain_args="$domain_args -d $domain"
+  domain_args+=(-d "$domain")
 done
 
 # Select appropriate email arg
-case "$email" in
-  "") email_arg="--register-unsafely-without-email" ;;
-  *) email_arg="--email $email" ;;
+case "$EMAIL" in
+  "") email_args=(--register-unsafely-without-email) ;;
+  *) email_args=(--email "$EMAIL") ;;
 esac
 
 # Enable staging mode if needed
-if [ $staging != "0" ]; then staging_arg="--staging"; fi
+staging_args=()
+if [ "$staging" != "0" ]; then staging_args+=(--staging); fi
 
-docker-compose run --rm --entrypoint "\
-  certbot certonly --webroot -w /var/www/certbot \
-    $staging_arg \
-    $email_arg \
-    $domain_args \
-    --rsa-key-size $rsa_key_size \
+docker-compose run --rm --entrypoint certbot certbot \
+  certonly --webroot -w /var/www/certbot \
+    "${staging_args[@]}" \
+    "${email_args[@]}" \
+    "${domain_args[@]}" \
+    --rsa-key-size "$rsa_key_size" \
     --agree-tos \
-    --force-renewal" certbot
+    --force-renewal
 echo
 
 echo "### Reloading proxy ..."
