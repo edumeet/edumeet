@@ -13,6 +13,10 @@ Releases are docker images with the 'stable' tag ending:
 | edumeet-media-node    | ![Docker Image for room-server (latest)](https://img.shields.io/docker/v/edumeet/edumeet-media-node)    |
 | edumeet-management-server    | ![Docker Image for room-server (latest)](https://img.shields.io/docker/v/edumeet/edumeet-management-server)    |
 
+`docker-compose.yml` pins the edumeet images to the current stable release, and the `latest` tag on Docker Hub points at the same release.
+
+To publish a release: push the images with the version tag, then merge the pull request that adds the `## [<version>-stable]` section to `CHANGELOG.md` and sets that version in `docker-compose.yml`. The [release workflow](.github/workflows/release.yml) then creates the GitHub Release and moves `latest` to the new version.
+
 ## Main features
 
 | Feature  | Description |

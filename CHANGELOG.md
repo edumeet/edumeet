@@ -14,6 +14,9 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+### general
+- `docker-compose.yml` pins the edumeet images to the stable release instead of using `latest`, so a checkout of a release tag runs the images of that release
+- The release workflow moves the `latest` tag of the edumeet images on Docker Hub to each new stable release. Before, `latest` was last moved in April 2026
 
 ## [4.2-20261118-stable] - 2026-11-18
 This is the current stable release.
