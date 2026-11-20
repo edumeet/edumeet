@@ -18,7 +18,15 @@ services:
      - MAIN_DOMAIN=${MAIN_DOMAIN}
      - MEDIA_DOMAIN=${MEDIA_DOMAIN}
      - LISTEN_IP=${LISTEN_IP}
-    command: "/bin/sh -c 'envsubst \"\\$${MAIN_DOMAIN},\\$${LISTEN_IP},\\$${MEDIA_DOMAIN}\" < /etc/nginx/templates/nginx.conf.template > /etc/nginx/nginx.conf && while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    command: >
+      /bin/sh -c 'envsubst "\$${MAIN_DOMAIN},\$${LISTEN_IP},\$${MEDIA_DOMAIN}"
+      < /etc/nginx/templates/nginx.conf.template > /etc/nginx/nginx.conf
+      && live=/etc/letsencrypt/live/$${MAIN_DOMAIN}
+      && old=$$(md5sum "$$live/fullchain.pem" "$$live/privkey.pem" 2>/dev/null || true)
+      && { while :; do sleep 6h & wait $${!};
+      new=$$(md5sum "$$live/fullchain.pem" "$$live/privkey.pem" 2>/dev/null || true);
+      if [ "$$new" != "$$old" ]; then old=$$new; nginx -s reload; fi; done & }
+      && exec nginx -g "daemon off;"'
   certbot:
     image: certbot/certbot
     restart: unless-stopped
