@@ -119,16 +119,31 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set up Docker Buildx
+        if: steps.version.outputs.latest == 'true'
+        uses: docker/setup-buildx-action@v3
+
       - name: Move the latest tag on Docker Hub
         if: steps.version.outputs.latest == 'true'
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          # Copies the manifest (list) on the registry: nothing is rebuilt and
-          # every platform of the version keeps its digest.
+          digest() {
+            docker buildx imagetools inspect "$1" --format '{{json .Manifest}}' | jq -r .digest
+          }
+          # Copies the manifest on the registry: nothing is rebuilt. With
+          # --prefer-index=false a single-platform image is copied as it is
+          # instead of being wrapped in a new index, so "latest" has the same
+          # digest as the version tag.
           for image in $IMAGES; do
-            docker buildx imagetools create \
+            docker buildx imagetools create --prefer-index=false \
               --tag "edumeet/$image:latest" "edumeet/$image:$VERSION"
-            echo "edumeet/$image:latest -> $VERSION"
+            want="$(digest "edumeet/$image:$VERSION")"
+            got="$(digest "edumeet/$image:latest")"
+            if [ "$want" != "$got" ]; then
+              echo "edumeet/$image:latest is $got, expected $want"
+              exit 1
+            fi
+            echo "edumeet/$image:latest -> $VERSION ($got)"
           done
