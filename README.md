@@ -31,8 +31,7 @@ Releases are docker images with the 'stable' tag ending:
  * Curl
  * If you want to access the service from the internet, you need a public IP address
  * 2 fqdns (one for the main service and one for the turn server) that point to the public IP address
- * Ports 80/tcp, 443/tcp and 443/udp need to be open on the public IP address (443/udp is for TURN over UDP; TURN over TLS uses 443/tcp)
- * Ports 50000-60000/udp need to be open for TURN relay traffic
+ * Ports 80/tcp, 443/tcp need to be open on the public IP address (443/tcp also carries TURN over TLS)
  * Ports 40000-40249/udp and 40000-40249/tcp are not strictly necessary, but are recommended for better connectivity
 
 ### Installation steps

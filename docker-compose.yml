@@ -10,7 +10,6 @@ services:
     ports:
      - "80:80/tcp"
      - "443:443/tcp"
-     - "443:443/udp"
     links:
      - edumeet-room-server
      - edumeet-client

@@ -26,11 +26,6 @@
 			"turnHostname": "${MEDIA_DOMAIN}",
 			"turnports" :  [
 				{
-					"protocol":"turn",
-					"port": 443,
-					"transport": "udp"
-				},
-				{
 					"protocol":"turns",
 					"port": 443,
 					"transport": "tcp"
