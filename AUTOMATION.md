@@ -90,6 +90,22 @@ The page writes its state on the `<html>` element: `data-edumeet-state`, `data-e
 and `data-edumeet-reason`. [BOTS.md](BOTS.md) describes them. Use `data-edumeet-state` to know when
 the page is in the meeting (`joined`) and when it has left (`left`).
 
+## Language
+
+At the start, the page uses the language that was chosen before in this browser (in its language
+menu or with the event below), else the language of the browser, else English. To change the
+language, send the `edumeet:set-locale` event to the document. The page then changes its language as with its language menu. This works in the join
+dialog, in the lobby and in the meeting:
+
+```js
+document.dispatchEvent(new CustomEvent('edumeet:set-locale', { detail: { locale: 'pl' } }));
+```
+
+`locale` is a language tag, for example `pl`, `de` or `uk-UA`. The page ignores a language that it
+does not have. When you send more events quickly, the page loads one language at a time and uses
+the language of the last event. When the page has loaded a language, the `lang` attribute of the
+`<html>` element shows it.
+
 ## Text inputs
 
 To enter text in `name`, `meeting-token` or `chat-input`, set the value as a user does. Use the

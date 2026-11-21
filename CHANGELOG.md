@@ -22,6 +22,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 
 ### edumeet-client
 - The join dialog tells a participant with a valid meeting token when the meeting starts, or that it is over, instead of asking for the token again. For automation, the text is the control `meeting-closed`, and a headless page leaves with `meetingTokenEarly` or `meetingTokenOver`
+- Automation can change the language of the page with the `edumeet:set-locale` event, as the language menu does; a language the page does not have is ignored (AUTOMATION.md)
 
 ## [4.2-20261118-stable] - 2026-11-18
 This is the current stable release.
