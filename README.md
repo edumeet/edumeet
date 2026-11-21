@@ -31,7 +31,7 @@ Releases are docker images with the 'stable' tag ending:
  * Curl
  * If you want to access the service from the internet, you need a public IP address
  * 2 fqdns (one for the main service and one for the turn server) that point to the public IP address
- * Ports 80/tcp, 443/tcp need to be open on the public IP address
+ * Ports 80/tcp, 443/tcp need to be open on the public IP address (443/tcp also carries TURN over TLS)
  * Ports 40000-40249/udp and 40000-40249/tcp are not strictly necessary, but are recommended for better connectivity
 
 ### Installation steps
@@ -53,6 +53,7 @@ This will start all the services. And you are done. You can now access the servi
 The configuration for the client is in the `client` folder. You may change it as needed, but no changes are necessary for the service to work.
 An example for this configuration file can be found in the [edumeet-client](https://github.com/edumeet/edumeet-client?tab=readme-ov-file#configuration-properties) repository. The configuration for the room-server is `room-server/config.json.template`; the room-server builds its configuration from it at every start. You may change it as needed, but no changes are necessary for the service to work.
 An example for this configuration file can be found in the [edumeet-room-server](https://github.com/edumeet/edumeet-room-server?tab=readme-ov-file#configuration-properties) repository.
+After updating the room-server template in an existing deployment, recreate the room-server container with `docker compose up -d --force-recreate edumeet-room-server` to refresh its generated configuration.
 
 For a full deployment with the management server and login (OIDC, Keycloak), see [edumeet-docker](https://github.com/edumeet/edumeet-docker).
 
@@ -107,5 +108,4 @@ MIT License
 Contributions to this work were made on behalf of the GÉANT project, a project that has received funding from the European Union’s Horizon 2020 research and innovation programme under Grant Agreement No. 731122 (GN4-2). On behalf of GÉANT project, GÉANT Association is the sole owner of the copyright in all material which was developed by a member of the GÉANT project.
 
 GÉANT Vereniging (Association) is registered with the Chamber of Commerce in Amsterdam with registration number 40535155 and operates in the UK as a branch of GÉANT Vereniging. Registered office: Hoekenrode 3, 1102BR Amsterdam, The Netherlands. UK branch address: City House, 126-130 Hills Road, Cambridge CB2 1PQ, UK.
-
 
