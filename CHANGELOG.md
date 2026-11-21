@@ -14,6 +14,14 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+### edumeet-management-server
+- A meeting token opens its meetings-only room from an hour before the meeting (or each occurrence of a series) until an hour after it ends. The hour starts when the room empties, so a meeting that runs over keeps its token, and whoever enters during that hour starts it again. A migration adds the column `lastActiveAt` to `meetings`
+
+### edumeet-room-server
+- In a meetings-only room, a valid meeting token is refused too early or too late, with the times of the meeting. A room bound to a meeting reports to the management server while it is in use and when it empties. Switching the setting off and on again no longer releases the room from its meeting; the room keeps it until it empties
+
+### edumeet-client
+- The join dialog tells a participant with a valid meeting token when the meeting starts, or that it is over, instead of asking for the token again. For automation, the text is the control `meeting-closed`, and a headless page leaves with `meetingTokenEarly` or `meetingTokenOver`
 
 ## [4.2-20261118-stable] - 2026-11-18
 This is the current stable release.

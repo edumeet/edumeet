@@ -258,6 +258,7 @@ For these bots, the reason is the way to know that the bot has ended.
 | `botTokenRejected` | The bot access token, the state of the bot access token or the address of the bot did not pass the checks. Or `botType` is a job type that the provider row of the bot access token does not offer. |
 | `sessionNotOpen` | The breakout room in `session` does not exist. |
 | `meetingTokenRequired`, `meetingTokenInvalid` | The room is a meetings-only room, the bot is not verified, and it has no valid `meetingToken`. |
+| `meetingTokenEarly`, `meetingTokenOver` | The room is a meetings-only room, the bot is not verified, and its `meetingToken` is correct. But the meeting is not open yet, or it is over. [AUTOMATION.md](AUTOMATION.md) tells when a meeting is open. |
 | `e2eeUnsupported`, `e2eeFailed` | The browser cannot take part in the end-to-end encryption of the meeting, or the encryption failed. |
 | `joinErrorPending` | This tab still stores an earlier join error, so the page did not join. Open the page in a new tab. |
 | `left` | The page left the meeting for no other reason. An internal error of the page also gives this reason. After such an error, the page reloads after 5 seconds and joins again. |

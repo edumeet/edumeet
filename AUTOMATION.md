@@ -16,6 +16,7 @@ The page marks each control that a program can use with a `data-edumeet-control`
 | --- | --- | --- |
 | `name` | Text input for the display name | Join dialog |
 | `meeting-token` | Text input for the meeting token | Join dialog, when the room requires a meeting token |
+| `meeting-closed` | Text that tells when the meeting starts, or that the meeting is over | Join dialog, when the meeting token is correct but the meeting is not open |
 | `join` | Join button | Join dialog |
 | `mic` | Microphone button | Join dialog and control bar |
 | `webcam` | Camera button | Join dialog and control bar |
@@ -33,6 +34,18 @@ The page marks each control that a program can use with a `data-edumeet-control`
 A control can be on the page more than once, or not at all. For example, `chat` is not there when
 the chat is disabled in the room. `meeting-token` is there only when the room asks for a token.
 Always check that the control exists before you use it.
+
+A meeting is open from one hour before its start until one hour after its end. If the meeting
+continues after its scheduled end, the hour starts when the room becomes empty. When the meeting
+token is correct but the meeting is not open, the join dialog shows `meeting-closed` and no
+`meeting-token`. `meeting-closed` has these attributes:
+
+- `data-edumeet-reason`: `early` when the meeting is not open yet, `over` when it is over.
+- `data-edumeet-starts-at` and `data-edumeet-ends-at`: the start and the end of the meeting, in
+  milliseconds since 1 January 1970 UTC. For a meeting that is over, the end is the time when the
+  room became empty, if that time is later than the scheduled end. For a series, the times are
+  those of one occurrence: the next occurrence when the meeting is not open yet, and the last
+  occurrence when it is over.
 
 The join dialog and the control bar use the same values: `mic` is the microphone button before and
 after the join.
