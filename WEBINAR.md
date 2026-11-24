@@ -16,12 +16,14 @@ More at [nlnet.nl/project/eduMEET-webinars](https://nlnet.nl/project/) and [nlne
 
 eduMEET is a free/open-source (MIT-licensed) WebRTC conferencing platform built for the research and
 education community, designed to run on-premises with strong privacy and sovereignty guarantees. This
-document describes the **webinar** capability of eduMEET: support for large-scale, presenter-led online
-events delivered on the same infrastructure as ordinary meetings.
+document describes how eduMEET can be configured for presenter-led online
+events. Its multi-node design can distribute a large audience, but actual
+capacity depends on the deployment and workload.
 
 **What a "webinar" means here.** A webinar is a session with a **small number of speakers and a large,
 mostly view-only audience** - a lecture, a town-hall, a public broadcast. The technical requirements that
-follow from this are: (1) the media infrastructure must scale a single event to a very large audience;
+follow from this are: (1) the design goal is to distribute a single event across enough media nodes for
+a very large audience;
 (2) the audience must be view-only by default while designated people may present; (3) hosts must be able
 to promote/demote speakers, including live during the event; and (4) organizers must be able to create,
 schedule and operate such events.
@@ -30,30 +32,30 @@ schedule and operate such events.
 server" or a one-way streaming product, eduMEET delivers webinars as a **configuration of the existing,
 well-tested meeting platform**. A webinar is an ordinary room running on the standard multi-media-node
 infrastructure, where the audience is given a view-only default role and only organizers/presenters may
-speak and present. This means **any room can be a webinar room**, there is one codebase to maintain, and
-every capability described below is already part of the shipping product.
+speak and present. This means **any managed room can be configured as a webinar**, there is one codebase
+to maintain, and every capability described below is already part of the shipping product.
 
 **What was delivered.** The four requirements above map directly onto eduMEET components:
 
 | Webinar requirement | How eduMEET delivers it | See |
 | --- | --- | --- |
-| Scale one event to thousands | Distributed media-node pool with geo/load routing and inter-node media bridging | §1 |
+| Distribute one event across media nodes | Distributed media-node pool with geo/load routing and inter-node media bridging | §1 |
 | View-only audience, designated presenters | Role/permission model + a view-only default role | §2, §3 |
 | Promote/demote speakers, incl. live | Pre-assigned roles + on-the-fly permission changes + lobby admission | §4 |
 | Speaker-focused experience | Active-speaker spotlight & presentation layout | §5 |
 | Create / schedule / operate webinars | Management server: rooms, roles, scheduled meetings, calendar invites | §6 |
 
-**Validation.** The webinar scenario has been **load-tested with 512 headless browser clients distributed
-across a pool of 6 media nodes**, exercising exactly the few-senders/many-receivers traffic shape that a
-webinar produces (see §7). This validates the horizontal-scaling design in §1 at the multi-node, multi-
-hundred-client scale.
+**Reported test.** The project documents a run with **512 headless browser clients across 6 media
+nodes**, using a few-senders/many-receivers scenario (see §7). The repository does not include raw
+measurements or a reproducible procedure for that run; see the limitations in
+[WEBINAR-LOADTEST.md](WEBINAR-LOADTEST.md).
 
 This document maps each proposed element to its concrete implementation. File links point to the public
 repositories under [github.com/edumeet](https://github.com/edumeet) on branch `main`.
 
 ---
 
-## 1. Architecture - multi-node media for thousands of users
+## 1. Architecture - multi-node media for large audiences
 
 ### 1.1 Topology
 
@@ -62,7 +64,7 @@ A deployment is composed of:
 | Component | Role |
 | --- | --- |
 | **edumeet-room-server** | Session orchestrator. Owns room state, peers, roles/permissions, and decides which media node serves each participant. One room-server runs a whole deployment. |
-| **edumeet-media-node** (pool) | The SFU workers (mediasoup). Each node runs multiple workers/routers and does the actual RTP forwarding. Capacity is increased simply by adding nodes to the pool. |
+| **edumeet-media-node** (pool) | The SFU workers (mediasoup). Each node runs multiple workers/routers and does the actual RTP forwarding. The pool can be expanded with additional configured nodes, subject to deployment and workload limits. |
 | **edumeet-client** | Browser app (React/Redux). Produces/consumes media and renders the speaker-oriented layout. |
 | **edumeet-management-server** | Admin/REST layer for tenants, rooms, roles, permissions, scheduled meetings and invites. |
 
@@ -78,7 +80,8 @@ When a peer needs media, the room-server selects a media node from the pool:
 - **Sticky**: prefer a node the room already uses, if it is within load/geo limits.
 - **Geographic**: nearest node by great-circle distance using a KD-tree nearest-neighbour search
   (with a same-country preference and a distance breakpoint), so users connect to a close node.
-- **Load-aware**: nodes above a load threshold are skipped, spreading participants across the pool.
+- **Load-aware**: healthy nodes below the load threshold are preferred; healthy, non-draining nodes
+  at or above it remain as last-resort candidates if the preferred candidates do not work.
 - **Region policy**: per-tenant region restrictions can constrain which nodes are eligible.
 
 Implementation:
@@ -97,22 +100,21 @@ Implementation:
 lazy creation + caching of pipes in
 [`consuming.ts` - `checkPipe`/`createConsumers`](https://github.com/edumeet/edumeet-room-server/blob/main/src/common/consuming.ts).
 
-### 1.4 Why this scales a webinar to thousands
+### 1.4 Why multi-node routing helps large webinars
 
 A webinar has the ideal traffic shape for this design: **few senders, many receivers**.
 
 - A presenter publishes **one** upstream. The room-server pipes it once per media node (not once per
   viewer). Each node then serves its **local** viewers independently.
-- Viewer capacity therefore grows **horizontally**: add media nodes and the same event serves more
+- This architecture can increase viewer capacity **horizontally**: add media nodes and the same event serves more
   viewers, because inter-node traffic stays proportional to the (small) number of presenters and nodes,
   not to the audience size.
-- Because participants are auto-distributed by geography and load (§1.2), a large audience is spread over
-  the whole pool instead of overloading a single server.
+- Geographic preference and load limits can distribute a large audience across the pool instead of
+  sending everyone to one server.
 
-This is what makes an eduMEET webinar able to support thousands of concurrent viewers: the audience is
-partitioned across the media-node pool, and presenter media is bridged node-to-node a small, bounded
-number of times. This behaviour has been validated under load with **512 headless browser clients spread
-across 6 media nodes** (see §7).
+This design is intended to support large audiences by partitioning viewers across the media-node pool
+and bridging presenter media between nodes. The project reports a run with **512 headless browser
+clients across 6 media nodes** (see §7), but deployment capacity must be tested separately.
 
 ### 1.5 Operating considerations
 
@@ -134,7 +136,7 @@ Permissions are defined once on the server and mirrored on the client. There are
 | `BYPASS_ROOM_LOCK` | Enter the room even when it is locked (skip the lobby). |
 | `CHANGE_ROOM_LOCK` | Lock/unlock the room. |
 | `PROMOTE_PEER` | Admit a peer waiting in the lobby. |
-| `MODIFY_ROLE` | Give/remove roles to/from other peers. |
+| `MODIFY_ROLE` | Declared but not enforced; assigning it does not let a peer give or remove roles. Do not rely on it. |
 | `SEND_CHAT` | Send chat messages. |
 | `MODERATE_CHAT` | Clear/moderate chat. |
 | `SHARE_AUDIO` | Publish microphone (and screen-audio). |
@@ -196,8 +198,8 @@ three roles in the management UI and assigning them. Create these once per tenan
 #### a) Webinar Organizer - *modelled as the room owner*
 
 Do **not** create a role for this; the organizer is the **room Owner**. Owners automatically get every
-permission (§2.3), including `MODERATE_ROOM`, `PROMOTE_PEER`, `MODIFY_ROLE`, `CHANGE_ROOM_LOCK` and all
-`SHARE_*`. Assign organizers as owners of the room in
+permission (§2.3), including `MODERATE_ROOM`, `PROMOTE_PEER`, `CHANGE_ROOM_LOCK` and all `SHARE_*`.
+The declared `MODIFY_ROLE` permission is not enforced (§2.1). Assign organizers as owners of the room in
 **Management → Rooms → Owners**
 ([room owners model](https://github.com/edumeet/edumeet-room-server/blob/main/src/common/types.ts);
 owner ⇒ all permissions in `updatePeerPermissions`).
@@ -234,10 +236,10 @@ features (toggles), not permissions, so the audience can still raise a hand to a
 
 ---
 
-## 3. Making any room a webinar room (the "flexible webinar" model)
+## 3. Making any managed room a webinar (the "flexible webinar" model)
 
 There is intentionally **no separate "webinar mode" button**. The capability is implemented as a flexible
-configuration so that **any room on the multi-media-node deployment can act as a webinar room**. The
+configuration so that **any managed room on a multi-media-node deployment can act as a webinar**. The
 organizer turns a room into a webinar by setting its **default role to "Webinar Participant"**:
 
 1. In **Management → Rooms**, edit the room and set **Default role = Webinar Participant**
@@ -257,9 +259,9 @@ organizer turns a room into a webinar by setting its **default role to "Webinar 
 Because role resolution is the union of user role + group roles + default role (§2.3), the same room serves
 all three audiences correctly at once: owners moderate, presenters speak, everyone else watches.
 
-This design is strictly more flexible than a fixed "webinar/meeting" switch: the same room can be a normal
-meeting (no view-only default role) or a webinar (Webinar Participant default role) just by changing the
-default role, with no separate room type, schema, or server.
+This design is strictly more flexible than a fixed "webinar/meeting" switch: the same managed room can be
+a normal meeting (no view-only default role) or a webinar (Webinar Participant default role) just by
+changing the default role, with no separate room type, schema, or server.
 
 ---
 
@@ -361,15 +363,14 @@ The management server provides the create/operate surface for webinar rooms:
 
 ## 7. Testing, documentation and releases
 
-- **Load / scale test (webinar scenario).** The webinar traffic shape was exercised end-to-end with
+- **Reported load / scale test (webinar scenario).** The documented webinar scenario describes a run with
   **512 headless browser clients across 6 geographically-distributed media nodes** (Poland ×2, Finland,
   Portugal, Germany, Denmark), with a 10-person panel (1 presenter + 9 panelists) and a ~502 view-only
   audience. Clients were spread by geo/load routing (§1.2), presenter/panel media was bridged between
   nodes via pipe transports (§1.3), and the audience consumed it locally on each node. The full media-load
   calculation - per-stream bitrates from the VP8 simulcast profiles, ingest, per-node egress and
-  inter-node bridging - is reported in **[WEBINAR-LOADTEST.md](WEBINAR-LOADTEST.md)**. The run confirms
-  the few-senders/many-receivers design: audience egress divides across the node pool while inter-node
-  bridging stays bounded by the (small) panel size, independent of audience size.
+  inter-node bridging - is reported in **[WEBINAR-LOADTEST.md](WEBINAR-LOADTEST.md)**. Raw measurements
+  and a reproducible procedure are not included in this repository.
 - **Automated tests** (Jest) cover the distributed media path that webinars rely on - media-node selection
   and load balancing, node connection/retry/failover, and the authorization middlewares:
   [room-server `__tests__`](https://github.com/edumeet/edumeet-room-server/tree/main/__tests__)
@@ -382,17 +383,17 @@ The management server provides the create/operate surface for webinar rooms:
   [`authorization.test.ts`](https://github.com/edumeet/edumeet-room-server/blob/main/__tests__/unit-tests/common/authorization.test.ts),
   [`moderatorMiddleware.test.ts`](https://github.com/edumeet/edumeet-room-server/blob/main/__tests__/unit-tests/middlewares/moderatorMiddleware.test.ts).
 - **Operator & developer documentation**:
-  [deployment guide (edumeet-docker)](https://github.com/edumeet/edumeet-docker/blob/main/README.md),
-  [room-server config](https://github.com/edumeet/edumeet-room-server/blob/main/README.md),
-  [media-node](https://github.com/edumeet/edumeet-media-node/blob/main/README.md),
-  [client config](https://github.com/edumeet/edumeet-client/blob/main/README.md).
+  [deployment guide (edumeet-docker)](https://github.com/edumeet/edumeet-docker/blob/main/docs/installation.md),
+  [room-server config](https://github.com/edumeet/edumeet-room-server/blob/main/docs/configuration.md),
+  [media-node guide](https://github.com/edumeet/edumeet-media-node/blob/main/docs/media-node-guide.md),
+  [client config](https://github.com/edumeet/edumeet-client/blob/main/docs/configuration.md).
 - **Releases** are published as Docker images (rolling `stable` tag) and tracked in the
   [CHANGELOG](https://github.com/edumeet/edumeet/blob/main/CHANGELOG.md);
   images at [hub.docker.com/u/edumeet](https://hub.docker.com/u/edumeet). The webinar capability shipped
   across the 4.2 series with these milestone releases:
   - **Alpha** - `4.2-20260109-stable` (multi-node + role-based view-only default role: the webinar foundation)
   - **Beta** - `4.2-20260423-stable` (feature-complete: live presenter promotion / on-the-fly permissions)
-  - **Release 1.0** - `4.2-20260619-stable` (validation complete; the 6-node / 512-client load test)
+  - **Release 1.0** - `4.2-20260619-stable` (the reported 6-node / 512-client load test)
 - **Public channels** for dissemination: [edumeet.eu](https://edumeet.eu/) / [edumeet.org](https://edumeet.org),
   the [GitHub organisation](https://github.com/edumeet/), Discord, and the community mailing list.
 

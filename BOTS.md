@@ -128,11 +128,13 @@ provider a separate job for each session, with its own `room.url`.
 
 - The page joins automatically. There is no join dialog, no device preview and no lobby dialog. The
   page never asks the browser for a camera or a microphone.
-- The page shows the meeting and nothing else. The top bar keeps the logo and the timers. The page
-  removes the buttons, the control bar, dialogs, pop-up notifications and notification sounds. Thus
+- The page shows the meeting and nothing else. The top bar keeps the logo and meeting timer; the
+  countdown timer appears only when enabled. It removes the buttons, the control bar, dialogs,
+  pop-up notifications and notification sounds. Thus
   the recording does not include them. The names stay on the tiles.
-- The page sets the meeting layout for a recording. There is no self view, and nothing is hidden.
-  Each participant has a tile, also a participant without video.
+- The page uses a recording-oriented layout: no self view, separate tiles for participants without
+  video, and no notification sounds. The room's `maxActiveVideos` setting still limits how many
+  participant tiles appear at once, so a large room may not show every participant in the capture.
 - The page sends no audio or video. The participant list and the participant count do not show the
   bot. The bot cannot chat, share, draw, raise a hand or vote.
 - The page receives the audio and video of all participants. A page opened with
@@ -224,7 +226,7 @@ Each edumeet page writes its state on the `<html>` element:
 | --- | --- |
 | `data-edumeet-state` | `new`, `lobby`, `joined` or `left` |
 | `data-edumeet-connection` | `new`, `connecting`, `connected`, `reconnecting` or `disconnected` |
-| `data-edumeet-reason` | Not present until the page stops. Then it gives the reason why the page stopped. |
+| `data-edumeet-reason` | Not present until a reason is recorded; then it gives the first reason for leaving or a failed join. |
 
 The attributes contain only the codes in this section. They never contain names, ids or tokens.
 Thus a bot can read them from outside the page, for example with the DevTools protocol. The bot then
@@ -258,7 +260,7 @@ For these bots, the reason is the way to know that the bot has ended.
 | `botTokenRejected` | The bot access token, the state of the bot access token or the address of the bot did not pass the checks. Or `botType` is a job type that the provider row of the bot access token does not offer. |
 | `sessionNotOpen` | The breakout room in `session` does not exist. |
 | `meetingTokenRequired`, `meetingTokenInvalid` | The room is a meetings-only room, the bot is not verified, and it has no valid `meetingToken`. |
-| `meetingTokenEarly`, `meetingTokenOver` | The room is a meetings-only room, the bot is not verified, and its `meetingToken` is correct. But the meeting is not open yet, or it is over. [AUTOMATION.md](AUTOMATION.md) tells when a meeting is open. |
+| `meetingTokenEarly`, `meetingTokenOver` | The room is a meetings-only room, the bot is not verified, and its valid meeting token is not yet usable or its meeting is over. These reasons are in the upcoming release. |
 | `e2eeUnsupported`, `e2eeFailed` | The browser cannot take part in the end-to-end encryption of the meeting, or the encryption failed. |
 | `joinErrorPending` | This tab still stores an earlier join error, so the page did not join. Open the page in a new tab. |
 | `left` | The page left the meeting for no other reason. An internal error of the page also gives this reason. After such an error, the page reloads after 5 seconds and joins again. |

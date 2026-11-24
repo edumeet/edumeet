@@ -4,7 +4,8 @@ This guide gets the whole eduMEET 4.x stack running on your machine from source:
 
 How to propose changes (issues first, forks, pull requests to `main`) is described in each component's `CONTRIBUTING.md`, for example [edumeet-room-server/CONTRIBUTING.md](https://github.com/edumeet/edumeet-room-server/blob/main/CONTRIBUTING.md).
 
-Last checked against the `main` branches of November 2026 (management-server `8fb1bbe`, room-server `6b0a786`, media-node `3254b3f`, client `4d1faf7`, common `87be894`).
+These instructions describe the current workspace template and component
+configurations; check the versions you are using.
 
 ---
 
@@ -53,12 +54,19 @@ The management server is optional. Without it, the room server runs unmanaged ro
 
 [dev-workspace/](dev-workspace/) in this repo holds a bootstrap script plus the shared files for the workspace folder. The workspace is a plain folder that holds all repos side by side.
 
+Use a **new, empty workspace directory**. Copying the template into an existing
+directory can overwrite its `.vscode/`, `dev/`, `.nvmrc`, `bootstrap.sh` and
+other files. The template also uses the fixed Docker container name
+`edumeet-dev-db` and host port 5432; check for conflicts before starting it.
+
 ```bash
-mkdir -p ~/src/edumeet && cd ~/src/edumeet
-git clone https://github.com/edumeet/edumeet.git
-cp -a edumeet/dev-workspace/. .              # bootstrap.sh, .nvmrc, dev/, .vscode/
-./bootstrap.sh                               # or: GIT_BASE=git@github.com:edumeet ./bootstrap.sh
+mkdir -p ~/src && mkdir ~/src/edumeet-workspace && cd ~/src/edumeet-workspace &&
+  git clone https://github.com/edumeet/edumeet.git &&
+  cp -a edumeet/dev-workspace/. . && ./bootstrap.sh
 ```
+
+For SSH clones of the component repositories, replace the last command with
+`GIT_BASE=git@github.com:edumeet ./bootstrap.sh`.
 
 The script:
 1. Installs and selects Node 24 from `.nvmrc` and enables Corepack.
@@ -66,10 +74,19 @@ The script:
 3. Runs `yarn install --immutable` in each.
 4. Makes the workspace's own token key pair and super-admin password in `.dev-secrets/` (readable by you only). The management server refuses the ones published with eduMeet.
 5. Writes the four local config files described in section 4. It never overwrites existing ones, and all four are gitignored in their repos.
-6. Starts PostgreSQL (`dev/docker-compose.yml`), runs the management-server migrations and sets the super-admin password.
+6. Starts PostgreSQL (`dev/docker-compose.yml`), attempts the management-server
+   migrations and sets the super-admin password.
 
 The admin login is `edumeet-admin@localhost` with the password in `.dev-secrets/room-server.env`.
+The bootstrap script can hide migration errors, so verify migrations separately:
 
+```bash
+(cd edumeet-management-server && ../dev/with-node.sh yarn migrate)
+```
+
+Do not rerun bootstrap casually on an existing workspace: it preserves existing
+config files but resets the database super-admin password to the value in
+`.dev-secrets/room-server.env`. Inspect the script and back up any data first.
 Then continue with [section 5, Run the stack](#5-run-the-stack).
 
 ---
@@ -79,7 +96,7 @@ Then continue with [section 5, Run the stack](#5-run-the-stack).
 ### 4.1 Clone and install
 
 ```bash
-cd ~/src/edumeet
+cd ~/src/edumeet-workspace
 for r in common client room-server media-node management-server; do
   git clone git@github.com:edumeet/edumeet-$r.git
   (cd edumeet-$r && yarn install --immutable)
@@ -91,13 +108,9 @@ done
 ```bash
 docker run -d --name edumeet-dev-db -p 127.0.0.1:5432:5432 \
   -e POSTGRES_PASSWORD=edumeet -e POSTGRES_DB=edumeet postgres:18-alpine
-cd edumeet-management-server && yarn migrate
 ```
-
-The first migration creates the super-admin **`edumeet-admin@localhost`** with the published password `supersecret`, which the management server refuses. Set your own (at least 12 characters). The room server logs in with it as well:
-```bash
-cd edumeet-management-server && yarn compile && yarn set-password edumeet-admin@localhost
-```
+Wait for PostgreSQL to be ready. Configure the signing key in the next section
+before running migrations; the management server rejects the published example key.
 
 ### 4.3 Config files
 
@@ -111,7 +124,7 @@ var config = {
 	managementUrl: 'http://localhost:3030',
 };
 ```
-The client connects to `wss://<page hostname>:<developmentPort>` in development and `productionPort` in production builds. It only uses `serverHostname` when that's set. All options are in `public/config/config.example.js` and the client README.
+The client connects to `wss://<page hostname>:<developmentPort>` in development and `productionPort` in production builds. It only uses `serverHostname` when that's set. All options are in `public/config/config.example.js` and the [client configuration reference](https://github.com/edumeet/edumeet-client/blob/main/docs/configuration.md).
 
 **`edumeet-room-server/config/config.json`**: copy `config/config.example.json` and change:
 ```jsonc
@@ -154,11 +167,27 @@ The client connects to `wss://<page hostname>:<developmentPort>` in development 
 docker exec edumeet-dev-db createdb -U postgres edumeet_test
 ```
 
+Before running tests, verify that `config/test.json` and any configuration
+overrides point to the separate test database. Bootstrap preserves an existing
+`config/test.json`; it does not check whether that file is safe.
+
+With `config/local.json` in place, run the migrations and set the super-admin's
+password (at least 12 characters). The first migration's published password is
+refused at sign-in. The room server uses the new password too.
+```bash
+cd ~/src/edumeet-workspace/edumeet-management-server
+yarn compile
+yarn migrate
+yarn set-password edumeet-admin@localhost
+```
+
 ---
 
 ## 5. Run the stack
 
-Start in this order, each in its own terminal, all with Node 24:
+Start in this order, each in its own terminal opened at the workspace root,
+all with Node 24. If using nvm, run `nvm use 24` in each terminal first;
+bootstrap's Node selection does not change your parent shell.
 
 ```bash
 # 1. management server (auto-restarts on change)
@@ -167,24 +196,26 @@ cd edumeet-management-server && TRUST_PROXY=false yarn dev
 # 2. media node
 cd edumeet-media-node && LOG_LEVEL=info yarn start --ip 127.0.0.1 --secret devsecret --numberOfWorkers 2
 
-# 3. room server (logs in to the management server as the super-admin;
-#    with bootstrap.sh: set -a && . ../.dev-secrets/room-server.env && set +a)
-cd edumeet-room-server && NODE_TLS_REJECT_UNAUTHORIZED=0 \
-  MANAGEMENT_USERNAME=edumeet-admin@localhost MANAGEMENT_PASSWORD='<your password>' \
-  LOG_LEVEL=info yarn start
+# 3. room server, using the credentials generated by bootstrap.sh
+set -a && . .dev-secrets/room-server.env && set +a &&
+  cd edumeet-room-server && NODE_TLS_REJECT_UNAUTHORIZED=0 LOG_LEVEL=info yarn start
 
 # 4. client (hot reload)
 cd edumeet-client && yarn start
 ```
 
+For manual setup, instead of sourcing `.dev-secrets/room-server.env`, export
+`MANAGEMENT_USERNAME` and the password you set for that account in the room
+server's terminal. Avoid putting the password in shell history.
+
 The commands use these options:
 
 | Option | Meaning |
 |---|---|
-| `--ip` | address the media node listens on **and announces to browsers** in ICE candidates. `127.0.0.1` only works for browsers on the same machine (see section 7) |
+| `--ip` | address the media node listens on and, unless `--announcedIp` is set, announces to browsers. `127.0.0.1` only works on the same machine. See [testing from other devices](docs/development-testing.md#testing-from-other-devices-on-your-network). |
 | `--secret` | must match `mediaNodes[].secret` in the room-server config |
 | `--numberOfWorkers` | mediasoup worker processes; the default is one per CPU core, which is more than you need in dev |
-| `NODE_TLS_REJECT_UNAUTHORIZED=0` | the media node uses a self-signed demo certificate; dev only |
+| `NODE_TLS_REJECT_UNAUTHORIZED=0` | disables TLS certificate verification for this Node process; use only in an isolated development environment |
 | `LOG_LEVEL` | log level for room-server and media-node (`trace`, `debug`, `info`, `warn`, `error`). The old `DEBUG=edumeet:*` has **no effect** anymore |
 
 `yarn start` in room-server and media-node compiles TypeScript first (`tsc --build`), so **restart them after code changes**. The client (Vite) and management server (nodemon) reload by themselves.
@@ -198,7 +229,6 @@ The commands use these options:
 - [ ] Two participants see and hear each other.
 - [ ] Two video elements play in each window (`chrome://webrtc-internals` shows inbound and outbound RTP).
 - [ ] https://localhost:4443/mgmt-admin lets you log in as `edumeet-admin@localhost` with your password.
-- [ ] The management server answers: `curl -s localhost:3030/authentication -H 'Content-Type: application/json' -d '{"strategy":"local","email":"edumeet-admin@localhost","password":"<your password>"}'` returns an `accessToken`.
 
 ---
 
@@ -227,101 +257,21 @@ docker exec -it edumeet-dev-db psql -U postgres -d edumeet     # shell
 cd edumeet-management-server && yarn migrate:make <name>        # new migration
 ```
 
----
+## More development guides
 
-## 7. Testing from other devices on your network
-
-The media node announces the `--ip` address to browsers. With `127.0.0.1`, only browsers on your own machine can send media.
-
-1. Start the media node with your LAN address: `--ip 192.168.x.y`.
-2. Open `https://192.168.x.y:4443/test` on the other device, then accept the certificate on `https://192.168.x.y:8443` there as well.
-3. Rooms and media work; login doesn't, because `managementUrl` points to `localhost`. For login testing use the docker stack (section 8).
-
-Phones need a secure context for camera access. Accepting the self-signed certificates works in most desktop browsers. On phones it's awkward to accept the second one (port 8443) too, so for phone testing a deployment with a real certificate is easier (section 8).
-
----
-
-## 8. Production-like testing: edumeet-docker, login (OIDC) and real networks
-
-For login through an identity provider, TURN, NAT and many participants, run [edumeet-docker](https://github.com/edumeet/edumeet-docker) on a test machine. The minimal stack in this repo (`./run-first.sh` + `docker compose up -d`, see [README.md](README.md#installation)) is enough for media and network tests without login, and most of the host, certificate and router notes below apply to it as well. Point it at your branches with `BRANCH_*` in `.env`, or build images from local code. These are the problems we hit doing that, roughly in setup order.
-
-### Host and DNS
-- **You need two host names, not IPs.** nginx routes port 443 by TLS SNI: `MAIN_DOMAIN` goes to the web app, `MEDIA_DOMAIN` to TURN over TLS. Browsers send no SNI for IP addresses. On a LAN without DNS, use a wildcard-DNS service such as `edumeet.192-168-1-50.sslip.io` / `turn.192-168-1-50.sslip.io`. Some routers' DNS-rebind protection blocks such answers; test with `getent hosts`.
-- **Ports 80 and 443 must be free on the host.** Check with `ss -tlnp` before starting, because home-automation software or a local web server often already uses them.
-- **Disk:** the images take about 4.3 GB. If `/var/lib/docker` is on a small partition, move Docker's `data-root` before pulling.
-- **Pull, don't build, unless you're testing your own branches.** Use `docker compose pull` and `docker compose up -d --no-build`. Building every component needs considerably more space and time.
-
-### Configuration (`utils/run-me-first.sh` is interactive and needs `jq` and `ack`)
-- `MGMT_PUB` in `.env` is substituted into the room server's `config.json` with `envsubst`, so it must keep **literal `\n`** sequences. Single quotes in `.env` (`MGMT_PUB='-----BEGIN…\n…'`) do that.
-- `MEDIA_SECRET` must be identical for the media node and the `mediaNodes` entry in `configs/server/config.json.template`.
-- The coturn relay range is 50000–60000 by default. Narrow it if you have to forward it through a NAT router: `command: --min-port=50000 --max-port=50249` for the `turn` service in `docker-compose.override.yml`. Options there are added after the defaults; leave out `-n` and `--static-auth-secret`.
-- When the host is behind NAT, set `LISTEN_IP` to the LAN address (or `0.0.0.0`), `EXTERNAL_IP` to the public one and `LOCAL_IP` to the host's LAN address. The media node announces `EXTERNAL_IP`; coturn maps it to `LOCAL_IP` and allows only these two of the private addresses as relay peers. `LOCAL_IP` must never be `0.0.0.0`.
-- `.env` holds the deployment's secrets: keep it readable by its owner only (`chmod 600 .env`), and run `docker compose` as that user.
-
-### Login through Keycloak (or any OIDC provider)
-1. In Keycloak, create a realm and a **confidential** client. `configs/kc/dev.json` is an importable example: mount it at `/opt/keycloak/data/import/` and start Keycloak with `start --import-realm`. **That example's client secret and test-user password are public in the repo**, so change both before exposing the host. Also turn on brute-force protection and turn off "direct access grants".
-2. In the management server (admin UI or REST), create a **tenant**, a **tenant FQDN** (the host name users open) and a **tenant OAuth** entry. The OAuth entry needs `key`, `secret`, `authorize_url`, `access_url`, `profile_url` and `end_session_endpoint`, plus:
-   - The three URLs must use `https` and must not point to a private or local address. For an identity provider on an internal network, list its host name in `oauthPrivateHosts` in the management server's config.
-   - **`redirect_uri`**: `https://<MAIN_DOMAIN>/mgmt/oauth/tenant/callback`, which must also be a valid redirect URI of the client at the identity provider. The admin UI fills it in; when it's empty, the management server builds the same address from `MGMT_URL`, which edumeet-docker sets to `https://<MAIN_DOMAIN>/mgmt`.
-3. Changes to a tenant OAuth entry apply at once; the management server doesn't need a restart.
-4. Sign-in also checks that the page's origin is a registered tenant FQDN (`src/auth/allowedOrigin.ts`). A host name that's missing from the tenant's FQDNs fails with "Sign in was started from a site that does not belong to this tenant".
-
-### nginx (`configs/proxy/nginx.conf.template`)
-- **Restricting admin pages** (`/mgmt-admin`, `/kc/admin`, `/kc/realms/master`) with `allow`/`deny`: put the locations in the **HTTPS server** (`listen 4443 ssl proxy_protocol`), not the port-80 redirect server. Inside those locations use `proxy_pass https://keycloak:8443;` **without a path**. Copying `proxy_pass https://keycloak:8443/kc;` from the `/kc` location makes nginx swap the matched prefix, so `/kc/admin/` becomes `/kc/` and the page redirects to itself until the browser gives up.
-- The real client IP arrives through the PROXY protocol (`real_ip_header proxy_protocol`), so `allow` rules see outside visitors' real addresses. LAN clients that use the public name through the router's NAT loopback show up with **the router's public IP**, so add that to the allow list.
-- Blocking `/mgmt-admin` is only cosmetic: the admin UI is part of the normal client bundle, and the `/mgmt` API has to stay public. Real protection is a strong super-admin password plus the management server's login throttle (`TRUST_PROXY=true` behind nginx).
-
-### Certificates
-- Without public DNS, create a small local CA and give the server certificate SANs for both names. Import the CA into your browser once; TURN over TLS also needs a certificate the browser trusts.
-- For Let's Encrypt, forward TCP 80 and 443, test with `certbot … --dry-run` first (staging, no rate limits), and set `USE_CERTBOT=true` so the certbot container renews every 12 hours.
-
-### Router port forwards (host behind NAT)
-
-| Port | Protocol | Purpose |
-|---|---|---|
-| 80, 443 | TCP | web, signaling, TURN over TLS (by SNI), ACME |
-| 40000–40249 | **UDP and TCP** | media node |
-| 3478 | **UDP and TCP** | TURN |
-| 50000–50249 (narrowed) | UDP | TURN relay |
-
-The minimal stack in this repository offers TURN only over TLS on **443/tcp** (shared with the web ports by SNI), so it needs no 3478 forward. The TURN relay ports stay host-internal: coturn relays only to the media node on the same host.
-
-Routers create a separate rule per protocol: a UDP forward doesn't cover TCP. Keep 3000 (media-node control) closed; only the room server talks to it.
+- <a name="7-testing-from-other-devices-on-your-network"></a>
+  [Test from other devices](docs/development-testing.md#testing-from-other-devices-on-your-network)
+- <a name="8-production-like-testing-edumeet-docker-login-oidc-and-real-networks"></a>
+  <a name="host-and-dns"></a><a name="configuration-utilsrun-me-firstsh-is-interactive-and-needs-jq-and-ack"></a>
+  <a name="login-through-keycloak-or-any-oidc-provider"></a><a name="nginx-configsproxynginxconftemplate"></a>
+  <a name="certificates"></a><a name="router-port-forwards-host-behind-nat"></a>
+  [Test with the full Docker deployment](https://github.com/edumeet/edumeet-docker#readme)
+  for OIDC, TURN and NAT; see its networking and authentication guides.
+- For the separate minimal deployment, see its
+  [firewall and TURN guidance](docs/minimal-deployment.md#networking).
+- <a name="9-automated-browser-tests-with-fake-media"></a>
+  [Automate browser tests](docs/development-testing.md#automated-browser-tests-with-fake-media)
+- <a name="10-troubleshooting"></a><a name="11-known-upstream-issues-found-during-setup"></a>
+  [Troubleshooting](docs/development-testing.md#troubleshooting)
 
 ---
-
-## 9. Automated browser tests with fake media
-
-Headless Chrome can join rooms with a synthetic camera and microphone, which is useful for smoke tests, load tests and checking network paths:
-
-```js
-const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: [
-  '--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--ignore-certificate-errors' ] });
-```
-
-Notes for writing such tests against the current client:
-- The name field on the join dialog is the last visible `<input>` (`input:not([aria-hidden="true"]):not([type="hidden"])`). The first inputs are device selectors.
-- The join button's text is `JOIN`, and it stays disabled while the media preview is loading. Wait about 2–3 s.
-- To read media stats, wrap `RTCPeerConnection` in `page.evaluateOnNewDocument` and collect `getStats()`: `inbound-rtp` and `outbound-rtp` bytes, `packetsLost`, and the nominated `candidate-pair`.
-- To force TURN, create the connection with `iceTransportPolicy: 'relay'`. To test one TURN transport, filter `iceServers[].urls` (`^turns:`, `transport=tcp`, …).
-- With TURN, the client-to-TURN transport is in the local candidate's `relayProtocol` (`udp`, `tcp`, `tls`), not in `protocol`. When coturn and the media node share a host, the selected pair can show the relay port as a `prflx` candidate; that's still TURN.
-- Headless Chrome's fake camera showed about 2.4% `packetsLost` on every path, including TCP and TLS. Don't read that as a network problem.
-
----
-
-## 10. Troubleshooting
-
-| Problem | Cause / fix |
-|---|---|
-| Join hangs, no error | The room-server certificate hasn't been accepted. Open https://localhost:8443 once |
-| `EADDRINUSE` on 3000, 3030, 4443 or 8443 | An old process is still running: `fuser -k 3000/tcp 3030/tcp 4443/tcp 8443/tcp` |
-| Management server: unsupported engine, or syntax errors | Wrong Node version; use 24 |
-| `yarn` is 1.x | `corepack enable` (once for each Node version) |
-| No logs despite `DEBUG=edumeet:*` | Use `LOG_LEVEL=debug` |
-| Other devices connect but get no media | The media node was started with `--ip 127.0.0.1` (section 7) |
-| Management tests changed your dev data | Add `config/test.json` (section 4.3) |
-| OIDC login stops at the provider, which reports an invalid redirect URI | Register `https://<MAIN_DOMAIN>/mgmt/oauth/tenant/callback` at the provider, and check that the tenant's `redirect_uri`, or `MGMT_URL` when it's empty, is the management server's public address (section 8) |
-| `/kc/admin` says "This page isn't working" (redirect loop) | nginx `proxy_pass` with a path inside a sub-location (section 8) |
-
-## 11. Known upstream issues found during setup
-- edumeet-docker: `run-me-first.sh` is interactive only and needs `jq` and `ack`; Keycloak 26 warns that `KEYCLOAK_ADMIN*` is deprecated (`KC_BOOTSTRAP_ADMIN_*`).
