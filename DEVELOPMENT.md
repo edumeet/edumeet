@@ -284,6 +284,8 @@ For login through an identity provider, TURN, NAT and many participants, run [ed
 | 3478 | **UDP and TCP** | TURN |
 | 50000–50249 (narrowed) | UDP | TURN relay |
 
+The minimal stack in this repository offers TURN only over TLS on **443/tcp** (shared with the web ports by SNI), so it needs no 3478 forward. The TURN relay ports stay host-internal: coturn relays only to the media node on the same host.
+
 Routers create a separate rule per protocol: a UDP forward doesn't cover TCP. Keep 3000 (media-node control) closed; only the room server talks to it.
 
 ---
