@@ -1,8 +1,12 @@
 # eduMEET webinar - load & scaling test results
 
-> Validation artifact for NLnet project **2024-10-244 "Federated webinars for eduMEET"**, milestone
-> *3a - Federated webinar scenarios tested*. See [WEBINAR.md](WEBINAR.md) for the architecture this
-> validates.
+> Report for NLnet project **2024-10-244 "Federated webinars for eduMEET"**, milestone
+> *3a - Federated webinar scenarios tested*. See [WEBINAR.md](WEBINAR.md) for the architecture.
+
+This document reports a historical test. Raw measurements and a reproducible
+test procedure are not included here, so the results could not be independently
+verified from this repository. Do not treat them as a capacity guarantee for a
+different deployment; measure your own workload and environment.
 
 ## 1. Test setup
 
@@ -38,7 +42,7 @@ audio preset `conference`):
 
 ### 3.1 Upstream ingest (10-person panel → media nodes)
 
-| Metric | Measured |
+| Metric | Reported |
 | --- | --- |
 | Total upstream into the system | **8.274 Mbps** |
 | Presenter screen-share bitrate (sustained) | **1.571 Mbps** |
@@ -49,7 +53,7 @@ Total upstream is fixed by the panel size and does not grow with the audience.
 
 ### 3.2 Downstream egress (nodes → ~502 view-only audience)
 
-| Metric | Measured |
+| Metric | Reported |
 | --- | --- |
 | Per-viewer downstream (presenter + 9 panel videos + audio) | **3.21 Mbps** |
 | Total system egress | **1.57 Gbps** |
@@ -63,7 +67,7 @@ Total upstream is fixed by the panel size and does not grow with the audience.
 
 ### 3.3 Inter-node bridging (pipe transports across the 6 nodes)
 
-| Metric | Measured |
+| Metric | Reported |
 | --- | --- |
 | Inbound pipe traffic per node | **7.4 Mbps** |
 | Total mesh pipe traffic across all nodes | **41 Mbps** |
@@ -72,7 +76,7 @@ Inter-node bridging is bounded by panel size, not audience size.
 
 ### 3.4 Client experience
 
-| Metric | Measured |
+| Metric | Reported |
 | --- | --- |
 | Clients successfully joined | **512 / 512** |
 | Median join time | **2.7 s** |
@@ -82,16 +86,15 @@ Inter-node bridging is bounded by panel size, not audience size.
 
 ## 4. Conclusion
 
-The 6-node / 512-client geographically-distributed run exercised the full webinar media path end-to-end:
+The reported 6-node / 512-client geographically-distributed run exercised the full webinar media path end-to-end:
 all **512 clients joined successfully** (median join time **2.7 s**, median end-to-end latency **328 ms**),
 distributed by geo/load routing, with presenter and panel media bridged between nodes via pipe transports
 and consumed locally on each node. The dominant load - audience egress - was divided across the node pool,
 peaking at **294 Mbps per node**, while total upstream ingest stayed at **8.274 Mbps** and total inter-node
 mesh traffic at **41 Mbps** - both bounded by the small panel and independent of audience size. Per-node
 resource use stayed low - **8.71%** CPU (normalized to 8 cores) and **1.7 GB** memory, versus **54%** CPU
-and **3.8 GB** to serve the same event from a single node. This confirms the horizontal-scaling design:
-audience size is absorbed by adding media nodes, with per-node load staying low - leaving substantial
-headroom to scale well beyond 512 concurrent participants.
+and **3.8 GB** to serve the same event from a single node. These reported figures describe this
+particular workload, not a verified capacity limit or guarantee for larger events.
 
 ---
 
@@ -112,7 +115,7 @@ analytical values from the profiles, not measurements.
 **Upstream ingest** - `presenter (4150+40) + 9×(650+40)` ≈ **10.4 Mbps** worst case (only the panel uploads).
 
 **Downstream per viewer** - presenter screen (1 layer) + 9 panel thumbnails (low layer 150 kbps) + panel
-audio: `1500 + 9×150 + 10×40` ≈ **3.25 Mbps** (worst case, mid layers ≈ 8.4 Mbps).
+audio: `1500 + 9×150 + 10×40` ≈ **3.25 Mbps** (mid layers ≈ 8.4 Mbps).
 
 **Aggregate egress** - `~502 × 3.25 Mbps` ≈ **1.6 Gbps**, across 6 nodes ≈ **270 Mbps/node** (worst case
 ≈ 700 Mbps/node).

@@ -1,0 +1,29 @@
+name: Documentation checks
+
+on:
+  push:
+    branches: [main]
+    paths: ['**/*.md', '.github/workflows/docs.yml']
+  pull_request:
+    branches: [main]
+    paths: ['**/*.md', '.github/workflows/docs.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  whitespace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check changed Markdown whitespace
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "Cannot check documentation changes without a previous commit." >&2
+            exit 1
+          fi
+          git diff --check "$BASE_SHA" "$GITHUB_SHA" -- '*.md'

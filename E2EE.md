@@ -7,19 +7,18 @@ reading before enabling it for anyone who depends on the guarantee.
 
 ## What it protects, and from whom
 
-Without end-to-end encryption a media node terminates SRTP. It decrypts every stream, forwards it,
-and re-encrypts it per recipient, so the node handles decoded audio and video. In a federated
+Without end-to-end encryption a media node terminates SRTP. It decrypts the transport, forwards the
+encoded media, and re-encrypts it per recipient, so the node can access the media content. In a federated
 deployment those nodes may run on infrastructure operated by other organisations, in other
 countries. That node is the party this feature exists to protect against.
 
 With end-to-end encryption on, the media node sees only the leading codec bytes it needs in order to
 make forwarding decisions. Everything else is ciphertext it has no key for.
 
-The room server is a different matter. It is trusted for membership, and that is unavoidable in a
-browser client: the room server also serves the application, so a hostile room server would not need
-to attack the key agreement when it could simply serve a modified client. The design keeps the room
-server from ever holding a key, but it cannot stop a room server from lying about who is in the
-room. The limitations spell out what that means.
+The room server is a different matter. It is trusted for membership: the design keeps it from
+holding a key, but cannot stop it from lying about who is in the room. Separately, anyone who
+controls the client application or how it is served could distribute a modified client. The
+limitations spell out what these trust boundaries mean.
 
 Peer to peer media is not covered by any of this, and does not need to be. It goes directly between
 the two browsers rather than through a media node, so the party being guarded against is not in the
@@ -27,13 +26,15 @@ path.
 
 ## Turning it on
 
-It is off unless enabled. The effective value for a room is resolved as: the per-room setting, then
-the tenant default, then the room server configuration, then off. Only an unset value falls through,
-so an explicit "off" at any level stops the chain rather than deferring to the next one.
+It is off unless enabled. Unless the tenant has locked its default, a managed room's effective value
+is resolved as: the per-room setting, then the tenant default, then the room-server configuration,
+then off. Only an unset value falls through, so an explicit "off" stops the chain. For an unmanaged
+room, there is no per-room setting, so the tenant default takes precedence over the room-server
+configuration.
 
 Both the tenant default and the per-room setting are edited from the management views. A super
-administrator can also lock a tenant's default, in which case neither the tenant's admins nor its
-rooms can change it.
+administrator can lock a tenant's default; when locked, that value takes precedence over the
+per-room setting, and neither tenant admins nor rooms can change it.
 
 A browser that cannot support the WebRTC Encoded Transform API is refused entry to a room that
 requires encryption, at the lobby rather than after admission. A bot, which skips the lobby, stops
@@ -93,22 +94,16 @@ gets it too.
 ### Why a group
 
 Keys have to change whenever the membership does: a newcomer must not read what was said before it
-arrived, and a leaver must not read what is said after. Handing each sender's key to each receiver
-would cost one message from every sender to every receiver at every such change, the square of the
-room size in a room where many participants send, and that does not shrink with lastN: the SFU
-forwards a dozen videos to each receiver, but every sender would have to key every receiver whether
-anyone is watching them or not.
+arrived, and a leaver must not read what is said after. If every sender had to send its own key to
+every other member, a room of N people would need up to N × (N − 1) key deliveries at each such
+change.
 
 MLS avoids that. A room holds a single group secret in a ratchet tree. A membership change is one
 commit, broadcast once, of logarithmic size, and every member derives the new epoch's secret from
 it. Per-sender frame keys are derived locally from that secret, so nothing per sender is ever sent.
-Per membership change, in messages:
-
-| Room                                | Messages                    |
-| ----------------------------------- | --------------------------- |
-| Meeting, 20 people, all sending     | 20 deliveries of one commit |
-| Seminar, 50 people, all sending     | 50                          |
-| Conference, 200 people, all sending | 200                         |
+The room server relays the one commit to the other current members, a number of deliveries that
+grows linearly with room size. For example, in a 200-person room, that is one commit sent to at most
+199 other members, rather than up to 39,800 per-sender key deliveries.
 
 Every commit replaces the group secret, so a newcomer cannot read what came before it and a leaver
 cannot read what comes after. What a group does not change is keyframes: an epoch change still needs
@@ -270,23 +265,23 @@ reasonable means of linking those ids to people, which in turn depends on who ca
 server and its logs.
 
 **Region limits are per tenant.** The room server can restrict a tenant's rooms to media nodes in
-chosen regions (see Media Node Region Binding in the room server README). The restriction applies to
-every participant of the room alike, whatever their own location, and a room keeps using the nodes
-it already has when further participants join.
+chosen regions (see [Media Node Region Binding](https://github.com/edumeet/edumeet-room-server/blob/main/docs/configuration.md#media-node-region-binding)).
+The restriction applies to every participant of the room alike, whatever their own location, and a
+room keeps using the nodes it already has when further participants join.
 
 **Identities stay on the room and management servers.** Apart from client monitoring, described
 above, names, accounts, chat and files never reach a media node, so where those two servers run is
 what decides where identifying data is processed. The room server's debug logs contain IP addresses
 and display names.
 
-**Encryption is per room.** In a room without it, media nodes handle decoded audio and video. An
+**Encryption is per room.** In a room without it, media nodes can access encoded audio and video. An
 assessment that relies on encryption applies to encrypted rooms only, so for a tenant that depends
 on it a super administrator should lock its default.
 
-**Some browser features involve third parties.** Transcription uses the browser's own speech
-recognition, which sends the speaker's audio to the browser vendor's service and is outside the
-encryption. It is off unless enabled in the client configuration. Local recording stays in the
-browser.
+**Some browser features involve third parties.** Speech recognition uses the browser- or
+operating-system-provided API. Depending on the platform, audio may be processed by an external
+service; the provider and data location vary. This processing is outside the media encryption. It
+is off unless enabled in the client configuration. Local recording stays in the browser.
 
 **The guarantees are bounded.** The room server is trusted for membership, identity is trusted on
 first use, and neither the library nor this implementation has been audited. A privacy notice that
@@ -317,8 +312,10 @@ away, so the key changes a fraction of a second after someone leaves, or a few s
 the expected committer is slow and another steps in. Anything sent in that window is readable by
 them if they can obtain the ciphertext.
 
-**Old frames can be replayed within the retention window.** Recipients accept any key they still
-hold, so a media node could resend frames captured under one of them.
+**Old frames can be replayed while their key is retained.** A receiver keeps up to 16 recent epoch
+keys per sender and authenticates a frame without tracking whether its nonce was already seen. A
+media node could therefore resend a captured frame while that key is still held. When a member
+leaves, its keys are dropped.
 
 **A media node can misattribute streams.** Decryption looks the key up by the frame's sender
 position, not by which participant a consumer belongs to, so a node could route one person's stream
@@ -332,9 +329,10 @@ has to precede any stronger claim than keeping federated media nodes out.
 **Local recording and transcription see plaintext.** Both run in the browser on decoded media and
 are unaffected by encryption. A transcript is sent to the other participants over a data channel,
 encrypted under the sender's key for the epoch as its frames are, so the media node forwards it
-without being able to read it. The text itself comes from the browser's speech recognition, which
-sends the speaker's audio to the browser vendor's service; encryption does not reach that step,
-which is worth considering in a room chosen for its privacy.
+without being able to read it. The text itself comes from browser- or operating-system-provided
+speech recognition. Depending on the platform, the audio may be processed by an external service;
+encryption does not protect it at that step, which is worth considering in a room chosen for its
+privacy.
 
 **Client monitoring is not covered.** The client sends connection statistics to the media node over
 a data channel when the operator configures sampling, and the node reads them, in an encrypted room

@@ -15,14 +15,14 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
 ### edumeet-management-server
-- A meeting token opens its meetings-only room from an hour before the meeting (or each occurrence of a series) until an hour after it ends. The hour starts when the room empties, so a meeting that runs over keeps its token, and whoever enters during that hour starts it again. A migration adds the column `lastActiveAt` to `meetings`
+- A meeting token opens its meetings-only room from an hour before the meeting (or each occurrence of a series) until an hour after it ends. The hour starts when the room empties, so a meeting that runs over keeps its token, and whoever enters during that hour starts it again. A migration adds the column `lastActiveAt` to `meetings`.
 
 ### edumeet-room-server
-- In a meetings-only room, a valid meeting token is refused too early or too late, with the times of the meeting. A room bound to a meeting reports to the management server while it is in use and when it empties. Switching the setting off and on again no longer releases the room from its meeting; the room keeps it until it empties
+- In a meetings-only room, a valid meeting token is refused too early or too late, with the times of the meeting. A room bound to a meeting reports to the management server while it is in use and when it empties. Switching the setting off and on again no longer releases the room from its meeting; the room keeps it until it empties.
 
 ### edumeet-client
-- The join dialog tells a participant with a valid meeting token when the meeting starts, or that it is over, instead of asking for the token again. For automation, the text is the control `meeting-closed`, and a headless page leaves with `meetingTokenEarly` or `meetingTokenOver`
-- Automation can change the language of the page with the `edumeet:set-locale` event, as the language menu does; a language the page does not have is ignored (AUTOMATION.md)
+- The join dialog tells a participant with a valid meeting token when the meeting starts, or that it is over, instead of asking for the token again. For automation, the text is the control `meeting-closed`, and a headless page leaves with `meetingTokenEarly` or `meetingTokenOver`.
+- Automation can change the language of the page with the `edumeet:set-locale` event, as the language menu does; a language the page does not have is ignored ([automation reference](https://github.com/edumeet/edumeet-client/blob/main/docs/browser-automation.md)).
 
 ## [4.2-20261118-stable] - 2026-11-18
 This is the current stable release.
@@ -30,7 +30,11 @@ This is the current stable release.
 - **Security release**: it fixes a high-severity advisory in the room-server and mitigates Java4Shell in the bundled Keycloak. Every installation should upgrade. The room-server and client images are new; the management server and media node are those of 4.2-20261113-stable
 - Security (high): Session recovery replay can be requested again and again, stalling the room server ([GHSA-3q2c-6p9p-wmm6](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-3q2c-6p9p-wmm6))
 - edumeet-docker: Keycloak runs with `-XX:-UseBASE64Intrinsics` against Java4Shell (CVE-2026-114938), a heap overflow in the Base64 code of the Red Hat OpenJDK in every Keycloak image up to 26.8.2, on CPUs with AVX-512 VBMI. A `JAVA_OPTS_APPEND` set in `.env` is kept. The flag goes again once a Keycloak image ships a fixed JDK (edumeet/edumeet-docker#91)
-- edumeet-docker: Keycloak keeps its database in the `keycloak-data` volume, so its realms and users survive when the container is recreated. **Before the first `docker compose up -d` of this release, copy the database over** as described in edumeet-docker's README ("Upgrading from 4.2-20261113-stable or older"), otherwise Keycloak starts empty (edumeet/edumeet-docker#91)
+- edumeet-docker: Keycloak keeps its database in the `keycloak-data` volume, so its
+  realms and users survive when the container is recreated. **Before the first
+  `docker compose up -d` of this release, copy the database over** using the
+  [Keycloak data migration steps in the operations guide](https://github.com/edumeet/edumeet-docker/blob/main/docs/operations.md);
+  otherwise, Keycloak starts empty (edumeet/edumeet-docker#91)
 - edumeet-docker: the client container has a restart policy, so it comes back after a reboot of the host. Before, the proxy kept failing until it was started by hand (edumeet/edumeet-docker#90)
 
 ### edumeet-room-server
