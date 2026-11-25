@@ -265,8 +265,9 @@ cd edumeet-management-server && yarn migrate:make <name>        # new migration
   <a name="host-and-dns"></a><a name="configuration-utilsrun-me-firstsh-is-interactive-and-needs-jq-and-ack"></a>
   <a name="login-through-keycloak-or-any-oidc-provider"></a><a name="nginx-configsproxynginxconftemplate"></a>
   <a name="certificates"></a><a name="router-port-forwards-host-behind-nat"></a>
-  [Test with the full Docker deployment](https://github.com/edumeet/edumeet-docker#readme)
-  for OIDC, TURN and NAT; see its networking and authentication guides.
+  [Test with the full Docker deployment](docs/production-like-testing.md)
+  for OIDC, TURN and NAT, with [edumeet-docker](https://github.com/edumeet/edumeet-docker#readme)
+  and its networking and authentication guides.
 - For the separate minimal deployment, see its
   [firewall and TURN guidance](docs/minimal-deployment.md#networking).
 - <a name="9-automated-browser-tests-with-fake-media"></a>

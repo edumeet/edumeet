@@ -41,11 +41,17 @@ Compose command installed for the minimal deployment.
    touch data/suspicious/suspicious-ips.log
    ```
 
-   The room-server process needs write access to the folder and file. Check its
-   user and group with `docker compose exec edumeet-room-server id` on a
-   running deployment, then set host ownership or permissions accordingly.
-   Do not assume a particular UID: it can differ between images or custom
-   builds. fail2ban (see below) also needs the file to exist before its jail
+   The room-server process needs write access to the folder and file. In the
+   published image it runs as the user `edumeet` with the uid 1001:
+
+   ```bash
+   sudo chown -R 1001:1001 data/suspicious
+   ```
+
+   A custom image can use another uid: `docker compose exec edumeet-room-server id`
+   shows it on a running deployment. If the folder does not exist when the
+   container starts, Docker makes it for root, and the room-server cannot write
+   the file. fail2ban (see below) also needs the file to exist before its jail
    starts.
 
 3. Mount the folder. In `docker-compose.yml`, add to the volumes of `edumeet-room-server`:
