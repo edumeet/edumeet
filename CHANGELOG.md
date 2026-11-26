@@ -10,16 +10,25 @@ We are using a rolling release versioning:
 ```
 <version>-<date of release>-<tag>
 
-4.2-20261118-stable
+4.2-20261126-stable
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+
+## [4.2-20261126-stable] - 2026-11-26
+This is the current stable release.
 ### general
+- **Security release**: it fixes a high-severity advisory in the management server and one in edumeet-docker. Every installation should upgrade. The management server, room-server and client images are new; the media node is that of 4.2-20261118-stable. The management server adds a database migration, so back up the database first: after it, an older management server image no longer starts on that database
+- Security (high): The limit on failed password logins to the management server could be passed by sending the attempts at the same time or from many addresses ([GHSA-978c-pxr4-gpcp](https://github.com/edumeet/edumeet-management-server/security/advisories/GHSA-978c-pxr4-gpcp))
+- Security (high), edumeet-docker: the shipped `.env` switched TLS certificate verification off in the management server, room-server and media node (`NODE_TLS_REJECT_UNAUTHORIZED=0`), so whoever could intercept the connection to a tenant's identity provider could sign in as any user of that tenant. `docker-compose.yml` now sets `NODE_TLS_REJECT_UNAUTHORIZED=1` for these services, also when an older `.env` still has the line. A server with a certificate from a private CA needs that CA in `certs/extra-ca/` and `NODE_EXTRA_CA_CERTS` in `.env`; see [certificate verification](https://github.com/edumeet/edumeet-docker/blob/main/docs/certificates.md#certificate-verification) ([GHSA-p8h7-cmgv-2rvx](https://github.com/edumeet/edumeet-docker/security/advisories/GHSA-p8h7-cmgv-2rvx), edumeet/edumeet-docker#94)
+- edumeet-docker: the proxy and the client image use nginx 1.31.9 (was 1.31.6), which fixes CVE-2026-123007, CVE-2026-123634, CVE-2026-123633, CVE-2026-121810 and CVE-2026-113425 in nginx. An existing `.env` keeps its own `NGINX_IMAGE`; set it to `nginx:1.31.9-alpine` there
 - `docker-compose.yml` pins the edumeet images to the stable release instead of using `latest`, so a checkout of a release tag runs the images of that release
 - The release workflow moves the `latest` tag of the edumeet images on Docker Hub to each new stable release. Before, `latest` was last moved in April 2026
 - `run-first.sh` and edumeet-docker's `utils/gen_cert.sh` and `utils/gen_dev_cert.sh` download Certbot's recommended TLS parameters from their new place in the Certbot repository. Since Certbot moved them, the scripts saved the text `404: Not Found` as `certbot/conf/options-ssl-nginx.conf` and `ssl-dhparams.pem`, and the proxy did not start. A failed download now stops the script, and a file left by a failed run is replaced on the next run.
+- edumeet-docker: `utils/gen_cert.sh` starts all services before the proxy and waits until the proxy answers. Before, a first run failed with `host not found in upstream`, because nginx only starts when the services it forwards to are running (edumeet/edumeet-docker#97)
 
 ### edumeet-management-server
+- Failed password logins are counted when the attempt starts, so of a burst sent at once only 10 are checked and the rest get HTTP 429. An IPv6 /64 counts as one address. Accounts with the super-admin or edumeet-server role also take only 10 failed logins in 15 minutes from all addresses together. Room servers are left out of that account limit: private addresses always, and the addresses in the new `ROOM_SERVER_ADDRESSES` (IP addresses or CIDR ranges, comma separated) for room servers that reach the management server from public addresses
 - A meeting token opens its meetings-only room from an hour before the meeting (or each occurrence of a series) until an hour after it ends. The hour starts when the room empties, so a meeting that runs over keeps its token, and whoever enters during that hour starts it again. A migration adds the column `lastActiveAt` to `meetings`.
 
 ### edumeet-room-server
@@ -38,7 +47,6 @@ The stable tag  is teseted by the development team and used by default for [edum
 - The app bar has its own logo option, `theme.appBarLogo`. On the default dark app bar, a deployment without its own logo now shows the light eduMEET logo (`images/logo.edumeet.light.svg`); join and lobby keep the dark logo. A deployment with its own logo or app bar colour sees no change ([configuration](https://github.com/edumeet/edumeet-client/blob/main/docs/configuration.md)).
 
 ## [4.2-20261118-stable] - 2026-11-18
-This is the current stable release.
 ### general
 - **Security release**: it fixes a high-severity advisory in the room-server and mitigates Java4Shell in the bundled Keycloak. Every installation should upgrade. The room-server and client images are new; the management server and media node are those of 4.2-20261113-stable
 - Security (high): Session recovery replay can be requested again and again, stalling the room server ([GHSA-3q2c-6p9p-wmm6](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-3q2c-6p9p-wmm6))
