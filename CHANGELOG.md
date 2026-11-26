@@ -15,6 +15,8 @@ We are using a rolling release versioning:
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
 ### general
+- `docker-compose.yml` pins the edumeet images to the stable release instead of using `latest`, so a checkout of a release tag runs the images of that release
+- The release workflow moves the `latest` tag of the edumeet images on Docker Hub to each new stable release. Before, `latest` was last moved in April 2026
 - `run-first.sh` and edumeet-docker's `utils/gen_cert.sh` and `utils/gen_dev_cert.sh` download Certbot's recommended TLS parameters from their new place in the Certbot repository. Since Certbot moved them, the scripts saved the text `404: Not Found` as `certbot/conf/options-ssl-nginx.conf` and `ssl-dhparams.pem`, and the proxy did not start. A failed download now stops the script, and a file left by a failed run is replaced on the next run.
 
 ### edumeet-management-server
