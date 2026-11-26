@@ -213,7 +213,7 @@ The commands use these options:
 | Option | Meaning |
 |---|---|
 | `--ip` | address the media node listens on and, unless `--announcedIp` is set, announces to browsers. `127.0.0.1` only works on the same machine. See [testing from other devices](docs/development-testing.md#testing-from-other-devices-on-your-network). |
-| `--secret` | must match `mediaNodes[].secret` in the room-server config |
+| `--secret` | must match `mediaNodes[].secret` in the room-server config. The media node does not start without a secret, and the room server does not start with an empty one. Outside development, set `MEDIA_SECRET` in the environment instead: other accounts on the host can read a command line |
 | `--numberOfWorkers` | mediasoup worker processes; the default is one per CPU core, which is more than you need in dev |
 | `NODE_TLS_REJECT_UNAUTHORIZED=0` | disables TLS certificate verification for this Node process; use only in an isolated development environment |
 | `LOG_LEVEL` | log level for room-server and media-node (`trace`, `debug`, `info`, `warn`, `error`). The old `DEBUG=edumeet:*` has **no effect** anymore |
