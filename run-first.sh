@@ -98,14 +98,26 @@ if [ -d "$data_path" ]; then
   fi
 fi
 
-# Downloading recommended TLS parameters
-if [ ! -e "$data_path/conf/options-ssl-nginx.conf" ] || [ ! -e "$data_path/conf/ssl-dhparams.pem" ]; then
-  echo "### Downloading recommended TLS parameters ..."
+# Recommended TLS parameters from Certbot. Each file is checked for text it must
+# contain, so an error page saved by a failed download is replaced, and a good
+# file is never overwritten.
+certbot_src="https://raw.githubusercontent.com/certbot/certbot/main/certbot/src/certbot"
+get_tls_file() { # <file name> <text it must contain> <URL>
+  local file="$data_path/conf/$1"
+  grep -q -- "$2" "$file" 2>/dev/null && return 0
+  echo "### Downloading $1 ..."
   mkdir -p "$data_path/conf"
-  curl -s https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf > "$data_path/conf/options-ssl-nginx.conf"
-  curl -s https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem > "$data_path/conf/ssl-dhparams.pem"
-  echo
-fi
+  if curl -fsSL "$3" -o "$file.tmp" && grep -q -- "$2" "$file.tmp"; then
+    mv "$file.tmp" "$file"
+  else
+    rm -f "$file.tmp"
+    echo "Error: could not download $1 from $3" >&2
+    exit 1
+  fi
+}
+get_tls_file options-ssl-nginx.conf "ssl_protocols" "$certbot_src/_internal/plugins/nginx/tls_configs/options-ssl-nginx.conf"
+get_tls_file ssl-dhparams.pem "BEGIN DH PARAMETERS" "$certbot_src/ssl-dhparams.pem"
+echo
 
 echo "### Creating dummy certificate for $domains ..."
 path="/etc/letsencrypt/live/$domains"

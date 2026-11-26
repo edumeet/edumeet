@@ -12,7 +12,17 @@ if [[ "$1" == run && "$*" == *"certonly --webroot"* ]]; then
   printf '%s\n' "$@" > certbot-args
 fi
 EOF
-printf '#!/bin/bash\nexit 0\n' > "$work_dir/bin/curl"
+# Stands in for the download of Certbot's TLS parameters: writes both marker
+# texts that run-first.sh checks for into the file given with -o.
+cat > "$work_dir/bin/curl" <<'CURL'
+#!/bin/bash
+while [[ $# -gt 0 ]]; do
+  if [[ "$1" == -o ]]; then
+    printf 'ssl_protocols TLSv1.2 TLSv1.3;\n# BEGIN DH PARAMETERS\n' > "$2"
+  fi
+  shift
+done
+CURL
 chmod +x "$work_dir/bin/docker-compose" "$work_dir/bin/curl"
 
 check_email() (
