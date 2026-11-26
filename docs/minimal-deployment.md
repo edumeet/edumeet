@@ -84,6 +84,29 @@ The setup also creates a separate certificate for the media node, pinned by the
 room server. After changing `LISTEN_IP`, run `./media-node-cert.sh` and then
 `docker-compose up -d` to apply the updated environment to affected services.
 
+### HTTPS only (HSTS)
+
+The proxy sends `Strict-Transport-Security: max-age=31536000` with every HTTPS
+answer (`proxy/nginx.conf.template`). A browser that has visited the site uses
+HTTPS for this host name from then on, for a year after its last visit. Without
+the header, an attacker on the visitor's network can answer a plain HTTP request
+for the site with a page of their own, before the redirect to HTTPS.
+
+For such a browser:
+
+- Nothing on this host name opens over plain HTTP any more, on any port. If
+  another service is reached as `http://<the same name>:<port>`, give it HTTPS
+  or another host name first, or switch the header off.
+- A certificate error cannot be passed. If the certificate expires, the browser
+  shows an error without the button to continue, so check that the renewal works.
+
+Subdomains and other host names are not affected. To switch the header off
+before any browser has seen it, comment the `add_header` line out and restart
+the proxy. After that, set it to `max-age=0` and leave it like that for as long
+as visitors may come back; removing the line does not make browsers forget the
+policy. An installation with its own copy of the template gets the header only
+when it takes the line over.
+
 ## Configuration and backup
 
 - Client settings are in `client/config.js`; the room server generates its
@@ -97,6 +120,9 @@ room server. After changing `LISTEN_IP`, run `./media-node-cert.sh` and then
 
 - **Website or certificate challenge unavailable:** check DNS, the proxy logs,
   and TCP ports 80 and 443.
+- **The browser shows a certificate error without a way to continue, or changes
+  `http://` to `https://` for another service on the same host name:** the proxy
+  sends an HSTS header, see [HTTPS only (HSTS)](#https-only-hsts).
 - **Page loads but there is no media:** check the announced public IP, the
   media port range, NAT forwarding and the media-node logs.
 - **TURN relay fails:** check the TURN domain, TLS certificate, 443/TCP and
