@@ -14,6 +14,10 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+### general
+- `docker-compose.yml` pins the edumeet images to the stable release instead of using `latest`, so a checkout of a release tag runs the images of that release
+- The release workflow moves the `latest` tag of the edumeet images on Docker Hub to each new stable release. Before, `latest` was last moved in April 2026
+
 ### edumeet-management-server
 - A meeting token opens its meetings-only room from an hour before the meeting (or each occurrence of a series) until an hour after it ends. The hour starts when the room empties, so a meeting that runs over keeps its token, and whoever enters during that hour starts it again. A migration adds the column `lastActiveAt` to `meetings`.
 

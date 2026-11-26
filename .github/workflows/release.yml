@@ -5,8 +5,17 @@
 # with the version and creates the GitHub Release from the section, so the
 # repository page shows the current rolling release as "Latest".
 #
+# For the newest release it also moves the "latest" tag of the edumeet images
+# on Docker Hub to that version, so `docker pull edumeet/<image>` gets the
+# current release. The images must be pushed with the version tag before the
+# changelog section is merged, and docker-compose.yml must pin that version;
+# the job stops before creating the release when either is missing. Moving
+# "latest" needs the DOCKERHUB_USERNAME and DOCKERHUB_TOKEN repository secrets.
+#
 # It can also be started by hand (Actions > Release > Run workflow) for one
-# version, e.g. to recreate notes. A release that already exists is skipped.
+# version, e.g. to recreate notes. A release that already exists is skipped,
+# but "latest" is still moved when it is the newest one, so a run can be
+# repeated to fix the tag.
 name: Release
 
 on:
@@ -33,12 +42,14 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      IMAGES: edumeet-client edumeet-room-server edumeet-media-node edumeet-management-server
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create the release
+      - name: Pick the version
+        id: version
         env:
-          GH_TOKEN: ${{ github.token }}
           INPUT_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
@@ -55,19 +66,84 @@ jobs:
             *) echo "Only *-stable versions are released: $version"; exit 1 ;;
           esac
 
-          if gh release view "$version" >/dev/null 2>&1; then
-            echo "Release $version already exists, nothing to do"
+          latest=false
+          [ "$version" = "$newest" ] && latest=true
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+
+      - name: Check docker-compose.yml and the images
+        if: steps.version.outputs.latest == 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          wrong="$(grep -E '^[[:space:]]*image:[[:space:]]*edumeet/' docker-compose.yml \
+            | grep -vE ":${VERSION}[[:space:]]*\$" || true)"
+          if [ -n "$wrong" ]; then
+            echo "docker-compose.yml must pin the edumeet images to $VERSION:"
+            echo "$wrong"
+            exit 1
+          fi
+          for image in $IMAGES; do
+            if ! docker buildx imagetools inspect "edumeet/$image:$VERSION" >/dev/null; then
+              echo "edumeet/$image:$VERSION is not on Docker Hub; push it first"
+              exit 1
+            fi
+          done
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          LATEST: ${{ steps.version.outputs.latest }}
+        run: |
+          set -euo pipefail
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists, nothing to do"
             exit 0
           fi
 
-          bash "$script" "$version" > "$RUNNER_TEMP/notes.md"
+          bash .github/scripts/release-notes.sh "$VERSION" > "$RUNNER_TEMP/notes.md"
 
-          latest=false
-          [ "$version" = "$newest" ] && latest=true
-
-          gh release create "$version" \
+          gh release create "$VERSION" \
             --target "$GITHUB_SHA" \
-            --title "$version" \
+            --title "$VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md" \
-            --latest="$latest"
-          echo "Published $version (latest: $latest)"
+            --latest="$LATEST"
+          echo "Published $VERSION (latest: $LATEST)"
+
+      - name: Log in to Docker Hub
+        if: steps.version.outputs.latest == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        if: steps.version.outputs.latest == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Move the latest tag on Docker Hub
+        if: steps.version.outputs.latest == 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          digest() {
+            docker buildx imagetools inspect "$1" --format '{{json .Manifest}}' | jq -r .digest
+          }
+          # Copies the manifest on the registry: nothing is rebuilt. With
+          # --prefer-index=false a single-platform image is copied as it is
+          # instead of being wrapped in a new index, so "latest" has the same
+          # digest as the version tag.
+          for image in $IMAGES; do
+            docker buildx imagetools create --prefer-index=false \
+              --tag "edumeet/$image:latest" "edumeet/$image:$VERSION"
+            want="$(digest "edumeet/$image:$VERSION")"
+            got="$(digest "edumeet/$image:latest")"
+            if [ "$want" != "$got" ]; then
+              echo "edumeet/$image:latest is $got, expected $want"
+              exit 1
+            fi
+            echo "edumeet/$image:latest -> $VERSION ($got)"
+          done
