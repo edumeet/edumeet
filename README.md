@@ -31,7 +31,7 @@ branch; a deployed release may differ.
 
 `docker-compose.yml` pins the edumeet images to the current stable release, and the `latest` tag on Docker Hub points at the same release.
 
-To publish a release: push the images with the version tag, then merge the pull request that adds the `## [<version>-stable]` section to `CHANGELOG.md` and sets that version in `docker-compose.yml`. The [release workflow](.github/workflows/release.yml) then creates the GitHub Release and moves `latest` to the new version.
+To publish a release: push the images with the version tag, then merge the pull request that adds the `## [<version>-stable]` section to `CHANGELOG.md` and sets that version in `docker-compose.yml`. The [release workflow](.github/workflows/release.yml) then creates the GitHub Release. It also moves `latest` to the new version when the repository has the `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secrets. Without them it leaves `latest` alone and reports whether the tag already points at the release; move it by hand, with the commands of the workflow's last step.
 
 ## Main features
 
