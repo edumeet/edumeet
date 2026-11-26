@@ -7,7 +7,7 @@ One VS Code window for the whole stack: start everything with **Ctrl+Shift+B**, 
 The workspace is a plain parent folder holding the repos side by side, plus a few shared files copied from [dev-workspace/](dev-workspace/) in this repo:
 
 ```
-~/src/edumeet/                 ← open this folder in VS Code
+~/src/edumeet-workspace/       ← open this folder in VS Code
 ├── .nvmrc                     Node version (24) for tasks and debugging
 ├── bootstrap.sh               one-time setup
 ├── .vscode/
@@ -26,15 +26,13 @@ The workspace is a plain parent folder holding the repos side by side, plus a fe
 └── edumeet-common/
 ```
 
-```bash
-mkdir -p ~/src/edumeet && cd ~/src/edumeet
-git clone https://github.com/edumeet/edumeet.git
-cp -a edumeet/dev-workspace/. .
-./bootstrap.sh                 # Node 24, clone, install, local configs, Postgres, migrations
-code .
-```
+Follow [quick start](DEVELOPMENT.md#3-quick-start-recommended) to create a
+new workspace and run bootstrap. From that workspace, run `code .` or open the
+folder in VS Code. Read the database and existing-file cautions there first.
 
-To update the workspace files later (for example new tasks), pull `edumeet` and copy `dev-workspace/` again. The local config files inside the component repos are never overwritten.
+To update workspace files later, compare the new template with your existing
+files and copy only what you want to replace. Copying the whole template again
+can overwrite local task, debug and other workspace customizations.
 
 Notes:
 - **Open the parent folder, not one repo.** The tasks and debug configs refer to all components. VS Code's Source Control view (Ctrl+Shift+G) finds the five git repos inside on its own.
@@ -48,7 +46,7 @@ VS Code runs tasks in a shell that often doesn't load nvm, especially when VS Co
 
 | Action | How |
 |---|---|
-| **Start the whole stack** | **Ctrl+Shift+B** (task `edumeet: start all`): Postgres → migrations → management-server, media-node, room-server, client, in one split terminal |
+| **Start the whole stack** | **Ctrl+Shift+B** (task `edumeet: start all`): starts the four components in parallel; the management task first starts Postgres and runs migrations |
 | Stop all components | Ctrl+Shift+P → *Tasks: Terminate Task* → *All Running Tasks* |
 | Restart one component | Ctrl+Shift+P → *Tasks: Restart Running Task* → pick it |
 | Stop or wipe Postgres | tasks `db: down` / `db: reset (DELETES ALL DATA)` |
@@ -72,12 +70,12 @@ First time in the browser: open **https://localhost:8443** and accept the certif
 |---|---|
 | `edumeet: start all` | default build task (Ctrl+Shift+B) |
 | `management-server`, `media-node`, `room-server`, `client` | run one component |
-| `media-node (LAN IP)` | media node that devices on your network can reach; asks for your LAN IP |
+| `media-node (LAN IP)` | media node on your LAN address; also update the room-server configuration as described in [testing from other devices](docs/development-testing.md#testing-from-other-devices-on-your-network) |
 | `management-server: migrate` | apply migrations (runs automatically before `management-server`) |
 | `db: up`, `db: down`, `db: reset (DELETES ALL DATA)`, `db: psql` | PostgreSQL |
 | `install all`, `pull all`, `lint all` | across all repos |
 | `common: build`, `room-server: build`, `media-node: build` | compile |
-| `room-server: unit tests`, `media-node: unit tests`, `client: tests`, `management-server: tests` | tests; the management tests use the `edumeet_test` database |
+| `room-server: unit tests`, `media-node: unit tests`, `client: tests`, `management-server: tests` | tests; verify the management test configuration points to a separate database before running |
 
 ### How the tasks work
 - The four components are **background tasks** with problem matchers. VS Code knows when each is ready from its log line (`Feathers app listening`, `httpsServer.listen()`, `Config live reload`, `ready in`). TypeScript errors from `tsc` show up in the Problems panel (Ctrl+Shift+M).
@@ -143,7 +141,7 @@ Optional key bindings for tasks: Ctrl+Shift+P → *Preferences: Open Keyboard Sh
 | Task fails: `nvm: command not found` / wrong Node | Check that `~/.nvm/nvm.sh` exists (set `NVM_DIR` if nvm lives elsewhere) and that the Node version in `.nvmrc` is installed (`nvm install`) |
 | Debug config: "Can't find Node.js binary" or a version error | `runtimeVersion: "24"` needs Node 24 installed through nvm |
 | `edumeet: start all` stays "running", nothing happens | Each component signals "ready" through its log line. Look at the terminal of the component that is still starting |
-| `EADDRINUSE` when starting a debug config | Stop the matching task, or run `fuser -k 3000/tcp 3030/tcp 4443/tcp 8443/tcp` |
+| `EADDRINUSE` when starting a debug config | Find the listener with `ss -ltnp`, then stop the matching task or specific process. |
 | Breakpoints in room-server or media-node stay grey | Started from a task rather than the debug config: use *Attach to running Node process*, or stop the task and launch the debug config, which builds with source maps |
 | Client loads, join does nothing | Accept https://localhost:8443 in the browser you're using (not needed in the `client (Chrome)` debug profile) |
-| Something is stuck | Terminate all tasks → `db: down` → `fuser -k …` (above) → Ctrl+Shift+B |
+| Something is stuck | Terminate the relevant tasks, stop the development database if needed, check the listeners as above, then restart with Ctrl+Shift+B. |

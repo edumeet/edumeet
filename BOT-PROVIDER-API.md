@@ -227,7 +227,8 @@ listed job in these conditions:
 - The job has a job type that the row does not offer any more.
 - The job has a job type that the session already runs. This includes the job type of a different
   job in the same list.
-- The job is more than the job limit of the room.
+- Taking it back would exceed the hard recovery cap of 100 jobs per room. A lower configured
+  room limit does not stop jobs that were already running before the restart.
 - The job is for a room or a breakout room that closed in the meantime.
 
 A special case: the `room.url` of a bot contains `botType` when its row offered exactly one job

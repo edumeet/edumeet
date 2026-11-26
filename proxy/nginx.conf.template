@@ -1,5 +1,7 @@
+worker_processes auto;
+
 events {
-	worker_connections 1024;
+	worker_connections 4096;
 }
 
 http {
@@ -72,12 +74,6 @@ stream {
 		proxy_pass $name;
 		proxy_buffer_size 10m;
 		proxy_protocol on;
-	}
-
-	server {
-		listen 443 udp;
-		proxy_pass ${LISTEN_IP}:3478;
-		proxy_buffer_size 10m;
 	}
 
 	server {

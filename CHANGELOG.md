@@ -18,13 +18,34 @@ The stable tag  is teseted by the development team and used by default for [edum
 - `docker-compose.yml` pins the edumeet images to the stable release instead of using `latest`, so a checkout of a release tag runs the images of that release
 - The release workflow moves the `latest` tag of the edumeet images on Docker Hub to each new stable release. Before, `latest` was last moved in April 2026
 
+### edumeet-management-server
+- A meeting token opens its meetings-only room from an hour before the meeting (or each occurrence of a series) until an hour after it ends. The hour starts when the room empties, so a meeting that runs over keeps its token, and whoever enters during that hour starts it again. A migration adds the column `lastActiveAt` to `meetings`.
+
+### edumeet-room-server
+- In a meetings-only room, a valid meeting token is refused too early or too late, with the times of the meeting. A room bound to a meeting reports to the management server while it is in use and when it empties. Switching the setting off and on again no longer releases the room from its meeting; the room keeps it until it empties.
+
+### edumeet-client
+- The join dialog tells a participant with a valid meeting token when the meeting starts, or that it is over, instead of asking for the token again. For automation, the text is the control `meeting-closed`, and a headless page leaves with `meetingTokenEarly` or `meetingTokenOver`.
+- Automation can change the language of the page with the `edumeet:set-locale` event, as the language menu does; a language the page does not have is ignored ([automation reference](https://github.com/edumeet/edumeet-client/blob/main/docs/browser-automation.md)).
+- Changing the screen sharing frame rate while sharing no longer shows the share as stopped, and no longer shows an error when the shared screen has audio; the share continues with the new frame rate.
+- Switching the camera or the microphone keeps it on, off or muted as it was. If the switch fails, the device in use keeps working and stays selected in the device menu. The device menus wait while the device is starting or switching. A microphone or camera that a moderator stops during a switch is no longer started again. A local recording keeps your microphone after you switch to another one, and records it only while you are not muted.
+- Choosing a microphone in the microphone button menu while the microphone is off only selects it: the microphone is not turned on and not opened. The camera button menu no longer keeps a second copy of the chosen camera open, so the camera light goes off when the camera is turned off. On the join and lobby screens, choosing a camera or microphone while it is off only selects it; before, the preview turned on while the room then started with it off.
+- Turning the microphone on, also after a reconnect or a change of the audio settings, uses the selected microphone, not the first one in the list. If the selected microphone cannot be opened, the browser's default one is used. A switched or stopped microphone is released, so the browser no longer shows it as in use.
+- Screen readers announce the right label for the camera and microphone selectors; before, both selectors could get the same label.
+- After a long disconnect, a muted microphone comes back muted; before, it stayed stopped and unmuting it sent nothing. A muted microphone that is started again (reconnect, change of the audio settings) now starts muted instead of unmuted for a moment. A microphone or camera that cannot start again after a reconnect shows as off. With blur or a background image, a reconnect no longer leaves the camera open. A local recording that spans a reconnect keeps the audio of the other participants.
+- The threshold slider in the advanced audio settings now works and is called "Voice detection threshold" (it had the same label as the noise suppression switch): your own volume indicator and the "muted but speaking" alert ignore sound below it, as a hint under the slider says. It also works with the keyboard. The default stays -60 dB; a `noiseThreshold` outside -100 to 0 falls back to it.
+
 ## [4.2-20261118-stable] - 2026-11-18
 This is the current stable release.
 ### general
 - **Security release**: it fixes a high-severity advisory in the room-server and mitigates Java4Shell in the bundled Keycloak. Every installation should upgrade. The room-server and client images are new; the management server and media node are those of 4.2-20261113-stable
 - Security (high): Session recovery replay can be requested again and again, stalling the room server ([GHSA-3q2c-6p9p-wmm6](https://github.com/edumeet/edumeet-room-server/security/advisories/GHSA-3q2c-6p9p-wmm6))
 - edumeet-docker: Keycloak runs with `-XX:-UseBASE64Intrinsics` against Java4Shell (CVE-2026-114938), a heap overflow in the Base64 code of the Red Hat OpenJDK in every Keycloak image up to 26.8.2, on CPUs with AVX-512 VBMI. A `JAVA_OPTS_APPEND` set in `.env` is kept. The flag goes again once a Keycloak image ships a fixed JDK (edumeet/edumeet-docker#91)
-- edumeet-docker: Keycloak keeps its database in the `keycloak-data` volume, so its realms and users survive when the container is recreated. **Before the first `docker compose up -d` of this release, copy the database over** as described in edumeet-docker's README ("Upgrading from 4.2-20261113-stable or older"), otherwise Keycloak starts empty (edumeet/edumeet-docker#91)
+- edumeet-docker: Keycloak keeps its database in the `keycloak-data` volume, so its
+  realms and users survive when the container is recreated. **Before the first
+  `docker compose up -d` of this release, copy the database over** using the
+  [Keycloak data migration steps in the operations guide](https://github.com/edumeet/edumeet-docker/blob/main/docs/operations.md);
+  otherwise, Keycloak starts empty (edumeet/edumeet-docker#91)
 - edumeet-docker: the client container has a restart policy, so it comes back after a reboot of the host. Before, the proxy kept failing until it was started by hand (edumeet/edumeet-docker#90)
 
 ### edumeet-room-server

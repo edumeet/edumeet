@@ -1,6 +1,9 @@
 # Suspicious clients
 
-The room-server can write the addresses of clients that behave unusually to a file: clients that open and close connections again and again, that the room-server refuses because of its limits, or that do not read what they are sent. The room-server does not block anyone. You decide what to do with the file, for example a temporary firewall ban.
+The room-server can write client addresses to a file when clients repeatedly open short
+connections, hit a server-side limit (including when a session recovery is refused), or stop
+reading data sent to them. It does not block clients. You decide what to do with the file, for
+example a temporary firewall ban.
 
 The function is off. It starts when you set a file in the room-server configuration.
 
@@ -13,10 +16,15 @@ The room-server must see the real address of each client. Make sure that:
 - a reverse proxy that connects to the room-server from a public address is listed in `trustedProxies` in the room-server configuration. Private networks and loopback are trusted by default
 
 The proxy of this compose setup and of edumeet-docker meets these points. You do not have to change anything.
+If you change the networking, prevent untrusted clients on private networks or
+the host from bypassing the proxy: the default trusted proxy ranges include
+private networks and loopback.
 
 ## Turn it on
 
-Do these steps in the folder of this compose setup.
+Do these steps in the folder of this compose setup. The commands below use
+Compose v2 (`docker compose`); use `docker-compose` instead if that is the
+Compose command installed for the minimal deployment.
 
 1. Add to `room-server/config.json.template`:
 
@@ -26,15 +34,25 @@ Do these steps in the folder of this compose setup.
    }
    ```
 
-2. Make the folder and an empty file. In its container, the room-server runs as the user `edumeet` with the uid 1001, so this user must own them:
+2. Make the folder and an empty file:
 
    ```bash
    mkdir -p data/suspicious
    touch data/suspicious/suspicious-ips.log
+   ```
+
+   The room-server process needs write access to the folder and file. In the
+   published image it runs as the user `edumeet` with the uid 1001:
+
+   ```bash
    sudo chown -R 1001:1001 data/suspicious
    ```
 
-   If the folder does not exist when the container starts, Docker makes it for root, and the room-server cannot write the file. fail2ban (see below) does not start when the file of a jail does not exist, so make the empty file now. `docker compose exec edumeet-room-server id -u` shows the uid of the room-server.
+   A custom image can use another uid: `docker compose exec edumeet-room-server id`
+   shows it on a running deployment. If the folder does not exist when the
+   container starts, Docker makes it for root, and the room-server cannot write
+   the file. fail2ban (see below) also needs the file to exist before its jail
+   starts.
 
 3. Mount the folder. In `docker-compose.yml`, add to the volumes of `edumeet-room-server`:
 
@@ -47,7 +65,7 @@ Do these steps in the folder of this compose setup.
 5. Make sure that the room-server can write to the folder:
 
    ```bash
-   docker compose exec edumeet-room-server sh -c 'touch /usr/src/app/suspicious/.test && rm /usr/src/app/suspicious/.test && echo WRITABLE'
+   docker compose exec edumeet-room-server sh -c 'test -w /usr/src/app/suspicious && test -w /usr/src/app/suspicious/suspicious-ips.log && echo WRITABLE'
    ```
 
    The command shows `WRITABLE`. The file stays empty until the room-server writes the first address. If the room-server cannot write it, its log shows `cannot write the suspicious clients file`.
@@ -59,8 +77,8 @@ You can change these settings:
 | `file` | | The file that the lines are appended to. Without it, the function is off. |
 | `windowSeconds` | `300` | The length of the time window in which events are counted. |
 | `shortConnectionSeconds` | `10` | A connection that received the state of a room and lasted less than this counts as short. |
-| `maxShortConnections` | `200` | Short connections of one address in one window before it is written. |
-| `maxLimitHits` | `10` | Refused requests, refused session recoveries, and connections closed because the client did not read, of one address in one window before it is written. |
+| `maxShortConnections` | `200` | Write a line when one address has more than this many short connections in a window. |
+| `maxLimitHits` | `10` | Write a line when one address triggers a server-side limit more than this many times in a window. Refused session recoveries count as limit hits. |
 
 ## The file
 
@@ -86,7 +104,7 @@ The file only grows. Rotate it on the host with logrotate. Make the file `/etc/l
 }
 ```
 
-With `copytruncate`, the file stays in its place, and fail2ban (see below) continues to read it. `sudo logrotate -d /etc/logrotate.d/edumeet-suspicious` shows what logrotate will do, and changes nothing.
+With `copytruncate`, the file stays in its place, and fail2ban (see below) continues to read it. Lines written between copying and truncation can be lost. `sudo logrotate -d /etc/logrotate.d/edumeet-suspicious` shows what logrotate will do, and changes nothing.
 
 ## Act on the file
 
@@ -132,7 +150,11 @@ This example bans a written address for 15 minutes. The commands are for Debian 
    ignoreip  = 127.0.0.1/8 ::1
    ```
 
-   Docker sends the traffic to the published ports of containers through the `FORWARD` chain, not through `INPUT`. Thus the default ban of fail2ban, in `INPUT`, does not stop it. For your own rules, Docker has the `DOCKER-USER` chain. This jail blocks all traffic from the address to your containers. The host itself, for example SSH, stays available.
+   With Docker's iptables firewall backend, traffic to published container ports
+   passes through `FORWARD` and `DOCKER-USER`, rather than the host's `INPUT`
+   chain. This example affects forwarded traffic to containers, not host-network
+   services or SSH. Check your firewall backend and test the rule in your own
+   environment; it is not a general recipe for Docker's nftables backend.
 
    The reverse proxy runs on the host:
 
