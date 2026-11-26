@@ -35,6 +35,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Screen readers announce the right label for the camera and microphone selectors; before, both selectors could get the same label.
 - After a long disconnect, a muted microphone comes back muted; before, it stayed stopped and unmuting it sent nothing. A muted microphone that is started again (reconnect, change of the audio settings) now starts muted instead of unmuted for a moment. A microphone or camera that cannot start again after a reconnect shows as off. With blur or a background image, a reconnect no longer leaves the camera open. A local recording that spans a reconnect keeps the audio of the other participants.
 - The threshold slider in the advanced audio settings now works and is called "Voice detection threshold" (it had the same label as the noise suppression switch): your own volume indicator and the "muted but speaking" alert ignore sound below it, as a hint under the slider says. It also works with the keyboard. The default stays -60 dB; a `noiseThreshold` outside -100 to 0 falls back to it.
+- The app bar has its own logo option, `theme.appBarLogo`. On the default dark app bar, a deployment without its own logo now shows the light eduMEET logo (`images/logo.edumeet.light.svg`); join and lobby keep the dark logo. A deployment with its own logo or app bar colour sees no change ([configuration](https://github.com/edumeet/edumeet-client/blob/main/docs/configuration.md)).
 
 ## [4.2-20261118-stable] - 2026-11-18
 This is the current stable release.
