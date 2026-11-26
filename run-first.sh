@@ -119,6 +119,22 @@ get_tls_file options-ssl-nginx.conf "ssl_protocols" "$certbot_src/_internal/plug
 get_tls_file ssl-dhparams.pem "BEGIN DH PARAMETERS" "$certbot_src/ssl-dhparams.pem"
 echo
 
+# Removes the certificate of $domains with everything Certbot keeps for it. Run through
+# a shell: Compose runs only the first of several commands joined with && in --entrypoint.
+remove_certificate() {
+  docker-compose run --rm --entrypoint sh certbot -c "\
+    rm -Rf '/etc/letsencrypt/live/$domains' \
+           '/etc/letsencrypt/archive/$domains' \
+           '/etc/letsencrypt/renewal/$domains.conf'"
+}
+
+# An existing certificate goes first. Otherwise the dummy certificate below is written
+# over its key, and Certbot later saves the new certificate under another name
+# ($domains-0001), where the proxy does not look for it.
+echo "### Removing an existing certificate for $domains ..."
+remove_certificate
+echo
+
 echo "### Creating dummy certificate for $domains ..."
 path="/etc/letsencrypt/live/$domains"
 mkdir -p "$data_path/conf/live/$domains"
@@ -135,10 +151,7 @@ docker-compose up --force-recreate -d proxy
 echo
 
 echo "### Deleting dummy certificate for $domains ..."
-docker-compose run --rm --entrypoint "\
-  rm -Rf /etc/letsencrypt/live/$domains && \
-  rm -Rf /etc/letsencrypt/archive/$domains && \
-  rm -Rf /etc/letsencrypt/renewal/$domains.conf" certbot
+remove_certificate
 echo
 
 
