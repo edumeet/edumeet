@@ -14,6 +14,8 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+### general
+- `run-first.sh` and edumeet-docker's `utils/gen_cert.sh` replace an existing certificate correctly. Before, only part of the old certificate was removed, so Certbot saved the new one under another name (`<domain>-0001`), the proxy did not find it and kept the one-day placeholder certificate (edumeet/edumeet-docker#99)
 
 ## [4.2-20261126-stable] - 2026-11-26
 This is the current stable release.
