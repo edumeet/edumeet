@@ -14,6 +14,8 @@ We are using a rolling release versioning:
 ```
 The stable tag  is teseted by the development team and used by default for [edumeet-docker](https://github.com/edumeet/edumeet-docker/) repository installs.
 ## [Upcoming release]
+### edumeet-client
+- Screen shares of different shapes, such as a single window or an ultrawide screen, are no longer cut off at the top and the bottom. It happened to a participant whose own screen share, extra video or drawing board was shown next to the shares of others: the rows were planned in another order than the tiles are shown in, so the browser wrapped them into more rows than fit
 
 ## [4.2-20261127-stable] - 2026-11-27
 This is the current stable release.
