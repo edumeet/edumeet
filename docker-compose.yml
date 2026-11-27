@@ -82,7 +82,7 @@ services:
     # Options in a command: of this service (for example in docker-compose.override.yml) are
     # added after these. Leave out -n and --static-auth-secret: the secret comes from the file.
   edumeet-client:
-    image: edumeet/edumeet-client:4.2-20261126-stable
+    image: edumeet/edumeet-client:4.2-20261127-stable
     restart: unless-stopped
     volumes:
      - ./client:/app/config
@@ -90,7 +90,7 @@ services:
     ports:
      - "127.0.0.1:8080:80"
   edumeet-room-server:
-    image: edumeet/edumeet-room-server:4.2-20261126-stable
+    image: edumeet/edumeet-room-server:4.2-20261127-stable
     restart: unless-stopped
     volumes:
      # Only the template: the config.json built from it holds MEDIA_SECRET and stays in the container.
@@ -107,7 +107,7 @@ services:
     ports:
      - "127.0.0.1:8443:8443"
   edumeet-media-node:
-    image: edumeet/edumeet-media-node:4.2-20261126-stable
+    image: edumeet/edumeet-media-node:4.2-20261127-stable
     restart: unless-stopped
     environment:
      - MEDIA_SECRET=${MEDIA_SECRET}
