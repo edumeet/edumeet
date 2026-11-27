@@ -41,6 +41,7 @@ branch; a deployed release may differ.
 | **Chat messages**  | Text conversation with other participants |
 | **Local Recording**  | Record window/tab/screen content in browser supported formats with room audio and save them (**disabled by default**) |
 | **Authentication**  | Optional authentication through the full deployment's management server and an OIDC provider |
+| **SIP room systems** | Cisco, Poly and other SIP room systems join meetings with video, sound and their presentation, through the separate [edumeet-sip-gateway](https://github.com/edumeet/edumeet-sip-gateway#readme) deployment |
 
 ## Installation
 
@@ -62,6 +63,7 @@ instead.
 - [Minimal Docker deployment](docs/minimal-deployment.md) — install and operate without management or login
 - [Full Docker deployment](https://github.com/edumeet/edumeet-docker#readme) — management and optional login
 - [Suspicious clients](SUSPICIOUS-CLIENTS.md) — monitor unusual connections and optionally configure bans
+- [SIP room systems](https://github.com/edumeet/edumeet-sip-gateway#readme): gateways that let SIP room systems join meetings, with a central SIP server and gateway hosts
 
 ### Meetings and features
 

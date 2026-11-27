@@ -28,6 +28,8 @@ The stable tag  is teseted by the development team and used by default for [edum
 - Rooms open again for a tenant that has defaults but no default role. Before, nobody could enter any room of such a tenant, ad-hoc or managed: the participant was dropped while entering and the room server logged `addPeer() failed`. Tenants without defaults, or with a default role in them, were not affected (edumeet/edumeet-room-server#158)
 ### edumeet-management-server
 - `yarn set-password <email>` works when a tenant has an account with the same address: it changes the account that belongs to no tenant, such as the super-admin. Before, it refused, so one such account in a tenant stopped an operator from setting the super-admin's password. `yarn set-password <email> <tenantId>` changes the account of a tenant (edumeet/edumeet-management-server#60)
+### edumeet-sip-gateway
+- New repository [edumeet-sip-gateway](https://github.com/edumeet/edumeet-sip-gateway): SIP room systems (Cisco, Poly and others) join eduMEET meetings with video, sound and their presentation, through gateways based on RENATER's [SIPMediaGW](https://github.com/Renater/SIPMediaGW). It deploys a central SIP server and gateway hosts; the gateway code with the eduMEET connector is the fork [edumeet-sipmediagw](https://github.com/edumeet/edumeet-sipmediagw)
 
 ## [4.2-20261126-stable] - 2026-11-26
 This is the current stable release.

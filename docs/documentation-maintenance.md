@@ -19,6 +19,7 @@ starting point, linking to those guides rather than copying them.
 | `edumeet-management-server` | Management-service configuration and APIs, signing keys, migrations, database setup and tests. |
 | `edumeet-media-node` | Media-node configuration, networking, certificates, APIs and node-specific features and operations. |
 | `edumeet-room-server` | Room-server configuration and integrations, signaling and service-specific behavior, APIs and tests. |
+| `edumeet-sip-gateway` | The SIP room connector: deployment of its central host and gateway hosts, TURN for the room systems, adding institutions, images and updates. The gateway code is in the fork `edumeet-sipmediagw`. |
 
 For a feature spanning repositories, keep the user-facing workflow in the
 project guide and put implementation-specific configuration and API details
