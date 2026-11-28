@@ -16,6 +16,7 @@ The stable tag  is teseted by the development team and used by default for [edum
 ## [Upcoming release]
 ### edumeet-client
 - Screen shares of different shapes, such as a single window or an ultrawide screen, are no longer cut off at the top and the bottom. It happened to a participant whose own screen share, extra video or drawing board was shown next to the shares of others: the rows were planned in another order than the tiles are shown in, so the browser wrapped them into more rows than fit
+- Language lists show each language in its own name and script, such as Deutsch, Polski or 简体中文, sorted by that name, with the name in the language of the page beside it. A user who cannot read the current language can find their own. This applies to the language selector and to the invitation language of a meeting and of a tenant
 
 ## [4.2-20261127-stable] - 2026-11-27
 This is the current stable release.
